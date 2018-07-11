@@ -1,0 +1,16 @@
+{
+  "name": "dashboard",
+  "version": "0.0.1",
+  "dependencies": {
+    "angular-nvd3": "1.0.8",
+    "angular":"",
+    "angular-resource":"",
+    "nvd3":"1.8.4",
+    "d3": "^3.4.4",
+    "jquery": "~2.1.0",
+    "underscore":"",
+    "bootstrap":"",
+    "moment":""
+  },
+  "private": true
+}

@@ -1,0 +1,181 @@
+{% load static %}
+<head>
+    <script src="{% static 'angular/angular.js' %}"></script>
+    <script src="{% static 'angular-nvd3/dist/angular-nvd3.js' %}"></script>
+    <script src="{% static 'angular-resource/angular-resource.js' %}"></script>
+    <script src="{% static 'd3/d3.js' %}"></script>
+    <script src="{% static 'nvd3/build/nv.d3.min.js' %}"></script>
+    <link media="all" href="{% static 'nvd3/build/nv.d3.css' %}" type="text/css" rel="stylesheet" />
+    <script src="{% static 'underscore/underscore-min.js' %}"></script>
+    <script src="{% static 'moment/min/moment.min.js' %}"></script>
+    <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.min.js"></script>
+
+    <style type="text/css">
+        body {
+            font: 11px sans-serif;
+            margin: 10px;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        .bar:hover {
+            fill: #bcbcbc ;
+        }
+
+        .x.axis path {
+            display: none;
+        }
+
+        .d3-tip {
+            line-height: 1;
+            font-weight: bold;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #efefef;
+            border-radius: 2px;
+        }
+
+        /* Creates a small triangle extender for the tooltip */
+        .d3-tip:after {
+            box-sizing: border-box;
+            display: inline;
+            font-size: 10px;
+            width: 100%;
+            line-height: 1;
+            color: rgba(0, 0, 0, 0.8);
+            content: "\25BC";
+            position: absolute;
+            text-align: center;
+        }
+
+        /* Style northward tooltips differently */
+        .d3-tip.n:after {
+            margin: -1px 0 0 0;
+            top: 100%;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+<div id="vis"><h2>File interactions based on Grades</h2></div>
+<script type="text/javascript">
+
+    var margin = {top: 45, right: 100, bottom: 20, left: 20},
+        width = 450 - margin.left - margin.right,
+        height = 100 - margin.top - margin.bottom;
+
+    var formatPercent = d3.format(",.2r");
+
+    var color = d3.scale.linear()
+        .range(["#ca0020","#f4a582","#f7f7f7","#92c5de","#0571b0"])
+        .domain([0,0.2,0.4,0.6,0.8]);
+
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], .1);
+
+    // Scales. Note the inverted domain fo y-scale: bigger is up!
+    var y = d3.scale.linear()
+        .range([height, 0]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .tickFormat(formatPercent);
+
+    var tip = d3.tip()
+        .attr('class', 'd3-tip')
+        .offset([-10, 0])
+        .html(function(d) {
+            return "<strong>" + d.grade + "\t" + d.files + "</strong><br/><span style='color:#fff'>" + d.interactions + "</span>";
+        })
+
+    // csv loaded asynchronously
+    d3.tsv("/static/json/top_file_access_week_grade2.tsv", type, function(data) {
+
+        // Data is nested by country
+        var grade = d3.nest()
+            .key(function(d) { return d.grade; })
+            .entries(data);
+
+        // Parse dates and numbers. We assume values are sorted by date.
+        // Also compute the maximum price per symbol, needed for the y-domain.
+        // symbols.forEach(function(s) {
+        //   s.values.forEach(function(d) { d.date = parse(d.date); d.price = +d.price; });
+        //   s.maxPrice = d3.max(s.values, function(d) { return d.price; });
+        // });
+
+        // Compute the minimum and maximum year and percent across symbols.
+        x.domain(data.map(function(d) { return d.files; }));
+        y.domain([0, d3.max(grade, function(s) { return s.values[0].interactions; })]);
+
+        // Add an SVG element for each country, with the desired dimensions and margin.
+        var svg = d3.select("#vis").selectAll("svg")
+            .data(grade)
+            .enter()
+            .append("svg:svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom+100)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis)
+              .selectAll("text")
+              .attr("transform", "rotate(-10)");
+
+        svg.append("g")
+        // Hide y axis
+        // .attr("class", "y axis")
+        // .call(yAxis)
+            .append("text")
+            .attr("x", width -100)
+            .attr("y", height+40)
+            .attr("dy", ".71em")
+            .attr("text-anchor", "start")
+            .attr("font-size", "1.1em")
+            .text(function(d) { return d.key});
+
+        // Accessing nested data: https://groups.google.com/forum/#!topic/d3-js/kummm9mS4EA
+        // data(function(d) {return d.values;})
+        // this will dereference the values for nested data for each group
+        svg.selectAll(".bar")
+            .data(function(d) {return d.values;})
+            .enter()
+            .append("rect")
+            .attr("class", "bar")
+            .attr("x", function(d) { return x(d.files); })
+            .attr("width", x.rangeBand())
+            .attr("y", function(d) { return y(d.interactions); })
+            .attr("height", function(d) { return height - y(d.interactions); })
+            .attr("fill", function(d) {return color(d.interactions)})
+            .on('mouseover', tip.show)
+            .on('mouseout', tip.hide)
+
+
+        svg.call(tip);
+
+    });
+
+    function type(d) {
+        d.interactions = +d.interactions;
+        return d;
+    }
+
+</script>
+</body>

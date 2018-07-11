@@ -1,0 +1,2 @@
+# exclude dashboard/__pycache__ folder
+dashboard/__pycache__/*
