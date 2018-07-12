@@ -32,7 +32,7 @@ SECRET_KEY = 'p7zq=2&ms4%&b%5&5^g(ks0%u#^ku%x5z4xc+#(jao+t1h7*n^'
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost","dashboard.tl.it.umich.edu"]
 
 
 # Application definition
