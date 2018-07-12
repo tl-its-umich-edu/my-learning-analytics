@@ -1,11 +1,11 @@
 # FROM directive instructing base image to build upon
 FROM python:3.5
 #FROM python:2-onbuild
-RUN apt-get install curl
+RUN yum install curl
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
-# RUN apt-get update
-RUN apt-get install -y nodejs
-RUN apt-get clean -y
+# RUN yum update
+RUN yum install -y nodejs
+RUN yum clean -y
 
 RUN npm install -g bower
 
