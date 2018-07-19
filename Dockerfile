@@ -33,7 +33,6 @@ COPY manage.py /manage.py
 #CMD echo yes | python manage.py bower install
 RUN echo yes | python manage.py collectstatic
 
-CMD ["rm /docker-entrypoint-initdb.d/*"]
 COPY mysql/init.sql /docker-entrypoint-initdb.d
 
 #CMD ["/start.sh"]
