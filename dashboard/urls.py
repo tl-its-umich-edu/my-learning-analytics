@@ -29,6 +29,9 @@ urlpatterns = [
     url(r'^grades/', views.grades, name='grades'),
     url(r'^small_multiples_files_bar_chart/', views.small_multiples_files_bar_chart, name='small_multiples_files_bar_chart'),
 
+    # get file access patterns
+    url(r'^file_access/', views.file_access, name='file_access'),
+
     url(r'^$', serve, {
         'path': '/home.html',
         'document_root': '.',

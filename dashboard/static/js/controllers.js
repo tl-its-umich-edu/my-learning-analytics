@@ -2,7 +2,7 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
     $scope.data = [];
     $scope.weekFilterEnabled = true;
     $scope.gradeFilterEnabled = true;
-        Fetch.getData('/static/json/top_file_access_week_grade.json').then(function(result) {
+        Fetch.getData('/file_access').then(function(result) {
         $scope.raw = result.data;
         $scope.weeks = _.uniq(
             _.map(
@@ -35,7 +35,7 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
                 top: 20,
                 right: 20,
                 bottom: 50,
-                left: 55
+                left: 80
             },
             x: function (d) {
                 return d.label;
@@ -45,12 +45,12 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
             },
             showValues: false,
             duration: 500,
-            xAxis: {
-                axisLabel: 'Files',
-                rotateLabels:-45
-            },
             yAxis: {
                 axisLabel: 'Interaction Count',
+                rotateLabels:-45
+            },
+            xAxis: {
+                axisLabel: 'Files',
                 axisLabelDistance: -10,
                 tickFormat: function (d) {
                     return d;

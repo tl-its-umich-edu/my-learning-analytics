@@ -4,7 +4,7 @@ FROM python:3.5
 RUN apt-get install curl
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 # RUN apt-get update
-RUN apt-get install -y nodejs
+RUN apt-get install -y nodejs libmysqlclient-dev python-dev
 RUN apt-get clean -y
 
 RUN npm install -g bower
@@ -13,6 +13,8 @@ RUN pip install gunicorn whitenoise
 RUN pip install django-bower
 RUN pip install django-nvd3
 RUN pip install django-registration
+RUN pip install djangosaml2
+RUN pip install mysql-connector mysqlclient
 
 # COPY startup script into known file location in container
 COPY start.sh /start.sh
@@ -31,8 +33,8 @@ COPY manage.py /manage.py
 #CMD echo yes | python manage.py bower install
 RUN echo yes | python manage.py collectstatic
 
-#COPY . /dashboard/
+CMD ["rm /docker-entrypoint-initdb.d/*"]
+COPY mysql/init.sql /docker-entrypoint-initdb.d
 
-RUN ls /dashboard/
-CMD ["/start.sh"]
+#CMD ["/start.sh"]
 # done!
