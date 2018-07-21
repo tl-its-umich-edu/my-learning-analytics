@@ -9,12 +9,12 @@ RUN apt-get clean -y
 
 RUN npm install -g bower
 
-RUN pip install gunicorn whitenoise
-RUN pip install django-bower
-RUN pip install django-nvd3
-RUN pip install django-registration
+RUN pip install gunicorn whitenoise django-bower django-nvd3 django-registration django-crontab
+
 RUN pip install djangosaml2
-RUN pip install mysql-connector mysqlclient
+RUN pip install mysql-connector mysqlclient sqlalchemy
+
+RUN pip install canvasapi pandas
 
 # COPY startup script into known file location in container
 COPY start.sh /start.sh
@@ -30,7 +30,9 @@ RUN npm install -g bower
 RUN bower install --allow-root
 
 COPY manage.py /manage.py
-#CMD echo yes | python manage.py bower install
+
+COPY data/csv/* /data/csv/
+
 RUN echo yes | python manage.py collectstatic
 
 COPY mysql/init.sql /docker-entrypoint-initdb.d

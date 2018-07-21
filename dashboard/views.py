@@ -10,7 +10,15 @@ import json
 import collections
 import logging
 import datetime
+import csv
 
+import pandas as pd
+from pandas.io import sql
+import MySQLdb
+
+import pandas as pd
+from sqlalchemy import create_engine
+from pandas.io import sql
 
 logger = logging.getLogger(__name__)
 
@@ -60,3 +68,20 @@ def grades(request):
 
 def small_multiples_files_bar_chart(request):
     return render_to_response("small_multiples_files_bar_chart.html")
+
+def load_file(request):
+    con = MySQLdb.connect (host = 'student-dashboard-django_mysql_1',
+                            port = 3306,
+                            user = 'root',  # mysql root
+                            passwd ='root',  # mysql root password
+                            db = 'student_dashboard', autocommit="true")
+
+    df = pd.read_csv('../data/csv/file.csv', header=0)
+
+    engine = create_engine("mysql+pymysql://{user}:{pw}@{host}:{port}/{db}"
+                       .format(user="root",
+                                pw="root",
+                                db="pandas",
+                                host="student-dashboard-django_mysql_1",
+                                port="3306"))
+    df.to_sql(con=engine, name='FILE', if_exists='replace')

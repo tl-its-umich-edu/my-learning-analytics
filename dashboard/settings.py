@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'dashboard',
     'djangobower',
     'django_nvd3',
+    'django_crontab',
 ]
 
 MIDDLEWARE_CLASSES = [

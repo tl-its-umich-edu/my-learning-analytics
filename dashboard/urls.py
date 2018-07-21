@@ -32,6 +32,9 @@ urlpatterns = [
     # get file access patterns
     url(r'^file_access/', views.file_access, name='file_access'),
 
+    # load file information
+    url(r'^load_file/', views.load_file, name='load_file'),
+
     url(r'^$', serve, {
         'path': '/home.html',
         'document_root': '.',
