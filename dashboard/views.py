@@ -26,17 +26,17 @@ import pymysql
 logger = logging.getLogger(__name__)
 
 
-logger.info("host" + os.environ["MYSQL_HOST"]);
-logger.info("port" + os.environ["MYSQL_PORT"]);
-logger.info("user" + os.environ["MYSQL_USER"]);
-logger.info("password" + os.environ["MYSQL_PASSWORD"]);
-logger.info("database" + os.environ["MYSQL_DATABASE"]);
+logger.info("host" + os.environ.get("MYSQL_HOST"));
+logger.info("port" + os.environ.get("MYSQL_PORT"));
+logger.info("user" + os.environ.get("MYSQL_USER"));
+logger.info("password" + os.environ.get("MYSQL_PASSWORD"));
+logger.info("database" + os.environ.get("MYSQL_DATABASE"));
 
-conn = MySQLdb.connect (host = os.environ["MYSQL_HOST"],
-                        port = int(os.environ["MYSQL_PORT"]),
-                        user = os.environ["MYSQL_USER"],
-                        password =os.environ["MYSQL_PASSWORD"],
-                        db = os.environ["MYSQL_DATABASE"])
+conn = MySQLdb.connect (db = os.environ.get('MYSQL_DATABASE', 'student_dashboard'),  # your mysql database name
+                        user = os.environ.get('MYSQL_USER', 'student_dashboard_user'), # your mysql user for the database
+                        passwd = os.environ.get('MYSQL_PASSWORD', 'student_dashboard_password'), # password for user
+                        host = os.environ.get('MYSQL_HOST', '127.0.0.1'),
+                        port = int(os.environ.get('MYSQL_PORT', '3306')))
 
 def home(request):
     """
