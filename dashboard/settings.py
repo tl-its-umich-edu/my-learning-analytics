@@ -195,6 +195,23 @@ BOWER_INSTALLED_APPS = (
     'underscore',
 )
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
+}
+
+
 # IMPORT LOCAL SETTINGS
 # =====================
 try:
@@ -279,3 +296,4 @@ SAML_ATTRIBUTE_MAPPING = {
     'givenName': ('first_name', ),
     'sn': ('last_name', ),
 }
+
