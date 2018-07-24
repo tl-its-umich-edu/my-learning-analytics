@@ -40,5 +40,5 @@ RUN echo yes | python manage.py collectstatic
 
 COPY mysql/init.sql /docker-entrypoint-initdb.d
 
-#CMD ["/start.sh"]
+CMD ["/start.sh"]
 # done!
