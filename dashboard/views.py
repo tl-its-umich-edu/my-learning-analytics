@@ -25,6 +25,13 @@ import pymysql
 
 logger = logging.getLogger(__name__)
 
+
+logger.info("host" + os.environ["MYSQL_HOST"]);
+logger.info("port" + os.environ["MYSQL_PORT"]);
+logger.info("user" + os.environ["MYSQL_USER"]);
+logger.info("password" + os.environ["MYSQL_PASSWORD"]);
+logger.info("database" + os.environ["MYSQL_DATABASE"]);
+
 conn = MySQLdb.connect (host = os.environ["MYSQL_HOST"],
                         port = int(os.environ["MYSQL_PORT"]),
                         user = os.environ["MYSQL_USER"],
