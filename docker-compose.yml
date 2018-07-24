@@ -5,12 +5,9 @@ services:
   mysql:
     image: mysql:5.7.22
     restart: always
+    env_file:
+      - .env
     entrypoint: ['docker-entrypoint.sh', '--default-authentication-plugin=mysql_native_password']
-    environment:
-      - MYSQL_DATABASE=student_dashboard
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_USER=student_dashboard_user
-      - MYSQL_PASSWORD=student_dashboard_password
     ports:
           - "3306"
     volumes:
@@ -24,3 +21,5 @@ services:
       - "5000:5000"
     depends_on:
       - mysql
+    env_file:
+      - .env

@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.css' %}">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 
+    <link rel="stylesheet" href="/static/css/d3.slider.css" />
+
     <style>
         text {
             font: 11px sans-serif;
@@ -59,12 +61,18 @@
 <!--</div>-->
 {{outputString}}
 <div>
+    Choose Week:
+    <div id="week_slider"></div>
+
+    <p/>
+    <p/>
     <div class="dropdown pull-left" >
     <p ng-show="weekFilterEnabled"><br><select ng-change="updateFilesFilter()" ng-model="weeks_filter" ng-options="w as w for w in weeks"></select>
         <!--<input type="radio" name="sort" value="x" ng-model="sortBy" id="sortByX" ng-change="updateFilesFilter()"> <label for="sortByX">Sort by x</label>-->
         <!--<input type="radio" name="sort" value="y" ng-model="sortBy" id="sortByY" ng-change="updateFilesFilter()"> <label for="sortByY">Sort by y</label>-->
-    </p></div>
-        <div class="dropdown pull-left" ><p ng-show="gradeFilterEnabled"><br><select  ng-change="updateFilesFilter()" ng-model="grade_filter" ng-options="g as g for g in grade"></select></p></div>
+    </p>
+    </div>
+    <div class="dropdown pull-left" ><p ng-show="gradeFilterEnabled"><br><select  ng-change="updateFilesFilter()" ng-model="grade_filter" ng-options="g as g for g in grade"></select></p></div>
     </div>
     <div>
         <nvd3 options="options" data="data"></nvd3>
@@ -78,5 +86,11 @@
 <script src="/static/js/app.js"></script>
 <script src="/static/js/controllers.js"></script>
 <script src="/static/js/factories.js"></script>
-</body>
+<script src="/static/js/d3.slider.js"></script>
+<!--<script src="http://d3js.org/d3.v3.min.js"></script>-->
+<script>
 
+    d3.select('#week_slider').call(d3.slider().axis(true).min(0).max(22).step(1));
+
+</script>
+</body>

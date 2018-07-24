@@ -4,7 +4,8 @@ FROM python:3.5
 RUN apt-get install curl
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 # RUN apt-get update
-RUN apt-get install -y nodejs libmysqlclient-dev python-dev
+RUN apt-get install -y nodejs  python-dev
+#libmysqlclient-dev
 RUN apt-get clean -y
 
 RUN npm install -g bower
@@ -15,6 +16,8 @@ RUN pip install djangosaml2
 RUN pip install mysql-connector mysqlclient sqlalchemy
 
 RUN pip install canvasapi pandas
+
+RUN pip install PyMySQL
 
 # COPY startup script into known file location in container
 COPY start.sh /start.sh
@@ -31,7 +34,7 @@ RUN bower install --allow-root
 
 COPY manage.py /manage.py
 
-COPY data/csv/* /data/csv/
+COPY data/* /data/
 
 RUN echo yes | python manage.py collectstatic
 

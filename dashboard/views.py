@@ -1,6 +1,8 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 
+import os
+
 import random
 import datetime
 import time
@@ -19,8 +21,15 @@ import MySQLdb
 import pandas as pd
 from sqlalchemy import create_engine
 from pandas.io import sql
+import pymysql
 
 logger = logging.getLogger(__name__)
+
+conn = MySQLdb.connect (host = os.environ["MYSQL_HOST"],
+                        port = int(os.environ["MYSQL_PORT"]),
+                        user = os.environ["MYSQL_USER"],
+                        password =os.environ["MYSQL_PASSWORD"],
+                        db = os.environ["MYSQL_DATABASE"])
 
 def home(request):
     """
@@ -32,17 +41,13 @@ def files(request):
     return render_to_response("files.html")
 
 def file_access(request):
-    conn = MySQLdb.connect (host = 'student-dashboard-django_mysql_1',
-                            port = 3306,
-                            user = 'root',  # mysql root
-                            passwd ='root',  # mysql root password
-                            db = 'student_dashboard')
     # you must create a Cursor object. It will let
     #  you execute all the queries you need
     cur = conn.cursor()
 
     # Use all the SQL you like
-    cur.execute('SELECT FILE_ID, count(*) as COUNT FROM FILE_ACCESS group by FILE_ID')
+    cur.execute(
+        "SELECT FILE_ID, NAME, COUNT FROM FILE, (SELECT FILE_ID, COUNT(*) AS COUNT FROM FILE_ACCESS GROUP BY FILE_ID) AS FILE_COUNT WHERE FILE.ID = FILE_COUNT.FILE_ID order by count desc limit 5")
     data = cur.fetchall()
 
     #Converting data into json
@@ -51,8 +56,8 @@ def file_access(request):
         d = collections.OrderedDict()
         d['week'] = 1
         d['grade'] = 'A'
-        d['files'] = row[0]
-        d['interactions'] = row[1]
+        d['files'] = row[1]
+        d['interactions'] = row[2]
         #d['FILE_ID']    = row[0] #name
         #d['USER_ID']    = row[1] #lname
         #d['ACCESS_TIME']= time.strftime("%b %d %Y %H:%M:%S", time.gmtime(row[2])) #email
@@ -69,19 +74,20 @@ def grades(request):
 def small_multiples_files_bar_chart(request):
     return render_to_response("small_multiples_files_bar_chart.html")
 
-def load_file(request):
-    con = MySQLdb.connect (host = 'student-dashboard-django_mysql_1',
-                            port = 3306,
-                            user = 'root',  # mysql root
-                            passwd ='root',  # mysql root password
-                            db = 'student_dashboard', autocommit="true")
+def load_data(request):
+    ## create the database connection engine
+    engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
+                           .format(host = os.environ["MYSQL_HOST"],
+                                   port = int(os.environ["MYSQL_PORT"]),
+                                   user = os.environ["MYSQL_USER"],
+                                   password =os.environ["MYSQL_PASSWORD"],
+                                   db = os.environ["MYSQL_DATABASE"]))
+    df_file = pd.read_csv('../data/file.csv', header=0)
+    df_file.to_sql(con=engine, name='FILE', if_exists='replace')
 
-    df = pd.read_csv('../data/csv/file.csv', header=0)
+    ## file access data
+    df_file_access = pd.read_json('../data/file_access.json')
+    df_file_access.rename(columns={'OBJECT_ID': 'FILE_ID', 'MEMBER_ID': 'USER_ID', 'EVENT_TIME':'ACCESS_TIME', 'GROUP_ID':'COURSE_ID'}, inplace=True)
+    df_file_access.to_sql(con=engine, name='FILE_ACCESS', if_exists='replace')
 
-    engine = create_engine("mysql+pymysql://{user}:{pw}@{host}:{port}/{db}"
-                       .format(user="root",
-                                pw="root",
-                                db="pandas",
-                                host="student-dashboard-django_mysql_1",
-                                port="3306"))
-    df.to_sql(con=engine, name='FILE', if_exists='replace')
+    return HttpResponse("finished")

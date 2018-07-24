@@ -30,10 +30,10 @@ urlpatterns = [
     url(r'^small_multiples_files_bar_chart/', views.small_multiples_files_bar_chart, name='small_multiples_files_bar_chart'),
 
     # get file access patterns
-    url(r'^file_access/', views.file_access, name='file_access'),
+    url(r'^file_access', views.file_access, name='file_access'),
 
     # load file information
-    url(r'^load_file/', views.load_file, name='load_file'),
+    url(r'^load_data', views.load_data, name='load_data'),
 
     url(r'^$', serve, {
         'path': '/home.html',
