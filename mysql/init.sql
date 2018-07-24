@@ -1,6 +1,4 @@
-drop database student_dashboard;
-
-create database student_dashboard default character set utf8;
+create database IF NOT EXISTS student_dashboard default character set utf8;
 grant all on student_dashboard.* to student_dashboard_user@'localhost' identified by 'student_dashboard_password';
 grant all on student_dashboard.* to student_dashboard_user@'127.0.0.1' identified by 'student_dashboard_password';
 flush privileges;
@@ -22,6 +20,21 @@ CREATE TABLE IF NOT EXISTS FILE_ACCESS (
   COURSE_ID    CHAR(255)      NOT NULL,
   PRIMARY KEY  (FILE_ID, USER_ID, ACCESS_TIME)
 );
+
+CREATE TABLE IF NOT EXISTS FILE (
+  ID      CHAR(255)      NOT NULL,
+  NAME      CHAR(255)    NOT NULL DEFAULT '',
+  COURSE_ID    CHAR(255)      NOT NULL,
+  PRIMARY KEY  (ID)
+);
+
+CREATE TABLE IF NOT EXISTS USER (
+  ID      CHAR(255)      NOT NULL,
+  NAME      CHAR(255)    NOT NULL DEFAULT '',
+  CURRENT_GRADE    CHAR(255),
+  PRIMARY KEY  (ID)
+);
+
 
 -- insert terms
 INSERT INTO ACADEMIC_TERMS (NAME, START_DATE, END_DATE) VALUES ('SUMMER 2018', '2018-06-27 04:00:00',  '2018-08-17 23:59:59' );
