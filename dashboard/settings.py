@@ -103,12 +103,12 @@ WSGI_APPLICATION = 'dashboard.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': getenv('MYSQL_ENGINE', 'django.db.backends.mysql'),
-        'NAME': getenv('MYSQL_DATABASE', 'student_dashboard'),  # your mysql database name
-        'USER': getenv('MYSQL_USER', 'student_dashboard_user'), # your mysql user for the database
-        'PASSWORD': getenv('MYSQL_PASSWORD', 'student_dashboard_password'), # password for user
-        'HOST': getenv('MYSQL_HOST', '127.0.0.1'),
-        'PORT': int(getenv('MYSQL_PORT', '3306')),
+        'ENGINE': os.environ.get('MYSQL_ENGINE', 'django.db.backends.mysql'),
+        'NAME': os.environ.get('MYSQL_DATABASE', 'student_dashboard'),  # your mysql database name
+        'USER': os.environ.get('MYSQL_USER', 'student_dashboard_user'), # your mysql user for the database
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'student_dashboard_password'), # password for user
+        'HOST': os.environ.get('MYSQL_HOST', '127.0.0.1'),
+        'PORT': int(os.environ.get('MYSQL_PORT', '3306')),
     }
 }
 
