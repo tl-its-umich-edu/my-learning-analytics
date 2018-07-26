@@ -64,7 +64,7 @@ def file_access(request):
 
     # Use all the SQL you like
     cur.execute(
-        "SELECT FILE_ID, NAME, COUNT FROM FILE, (SELECT FILE_ID, COUNT(*) AS COUNT FROM FILE_ACCESS GROUP BY FILE_ID) AS FILE_COUNT WHERE FILE.ID = FILE_COUNT.FILE_ID order by count desc limit 5")
+        "SELECT FILE_ID, NAME, COUNT FROM FILE, (SELECT FILE_ID, COUNT(*) AS COUNT FROM FILE_ACCESS GROUP BY FILE_ID) AS FILE_COUNT WHERE FILE.ID = FILE_COUNT.FILE_ID order by count desc")
     data = cur.fetchall()
 
     #Converting data into json
