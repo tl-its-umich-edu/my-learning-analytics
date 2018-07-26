@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 
 
 from . import views
+from . import cron
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -34,6 +35,11 @@ urlpatterns = [
 
     # load file information
     url(r'^load_data', views.load_data, name='load_data'),
+
+    # load data from UDW
+    url(r'^update_with_udw_file', cron.update_with_udw_file, name='update_with_udw_file'),
+    url(r'^update_with_udw_access', cron.update_with_udw_access, name='update_with_udw_access'),
+    url(r'^update_with_udw_user', cron.update_with_udw_user, name='update_with_udw_user'),
 
     url(r'^$', serve, {
         'path': '/home.html',
