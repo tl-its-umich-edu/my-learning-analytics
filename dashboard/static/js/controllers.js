@@ -29,8 +29,9 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
     });
     $scope.options = {
         chart: {
-            type: 'discreteBarChart',
-            height: 450,
+            type: 'multiBarHorizontalChart', //'discreteBarChart',
+            height: 1800,
+            overflow: scroll,
             margin: {
                 top: 20,
                 right: 20,
@@ -38,18 +39,18 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
                 left: 80
             },
             x: function (d) {
-                return d.label;
+                return d.value;
             },
             y: function (d) {
-                return d.value;
+                return d.label;
             },
             showValues: false,
             duration: 500,
-            yAxis: {
+            xAxis: {
                 axisLabel: 'Interaction Count',
                 rotateLabels:-45
             },
-            xAxis: {
+            yAxis: {
                 axisLabel: 'Files',
                 axisLabelDistance: -10,
                 tickFormat: function (d) {
@@ -63,7 +64,7 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
         },
         subtitle: {
             enable: true,
-            html: '<code>x: Files, y: Interaction Count</code>'
+            html: '<code>y: Files, x: Interaction Count</code>'
         }
     };
     $scope.updateFilesFilter = function () {
@@ -78,9 +79,9 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
         $scope.weekFilterEnabled = true;
         $scope.gradeFilterEnabled = true;
         $scope.lastUsed = 'fileInteract';
-        $scope.options.chart.yAxis.axisLabel = 'Interaction count';
-        $scope.options.chart.xAxis.axisLabel = 'Files';
-        $scope.options.chart.xAxis.rotateLabels = -45;
+        $scope.options.chart.xAxis.axisLabel = 'Interaction count';
+        $scope.options.chart.yAxis.axisLabel = 'Files';
+        //$scope.options.chart.yAxis.rotateLabels = -45;
         $scope.useInteractiveGuideline = true;
         $scope.options.title = {
             enable: true,
@@ -88,9 +89,9 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
         };
         $scope.options.subtitle = {
             enable: true,
-            html: '<code>x: files, y: interaction count</code>'
+            html: '<code>y: files, x: interaction count</code>'
         };
-        $scope.options.chart.yAxis.tickFormat = function (d) {
+        $scope.options.chart.xAxis.tickFormat = function (d) {
             return d;
         };
         $scope.data = transFormFileInteract($scope.raw, $scope.weeks_filter,$scope.grade_filter);
@@ -123,7 +124,7 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
     var transFormFileInteract = function (data,weekFilter,gradeFilter){
         data = filterData(data, weekFilter,gradeFilter);
         returnData = [{
-            key: "Cumulative Return",
+            key: "File Accessed:",
             values: []
         }];
 
@@ -137,8 +138,8 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
                 });
 
                 returnData[0].values.push({
-                    label: item.files,
-                    value: fileCount
+                    value: item.files,
+                    label: fileCount
                 });
             });
 
@@ -151,8 +152,8 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
                     fileCount= fileCount+file.interactions;
                 });
                 returnData[0].values.push({
-                    label: item.files,
-                    value: fileCount
+                    value: item.files,
+                    label: fileCount
                 });
             });
         }

@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 
     <link rel="stylesheet" href="/static/css/d3.slider.css" />
+    <link rel="stylesheet" href="/static/css/sd.css" />
 
     <style>
         text {
@@ -28,7 +29,11 @@
 
         html,
         body,
-        #chart1,
+        #chart1 {
+            width: 960px;
+            height: 470px;
+            overflow-y: scroll;
+        }
         svg {
             margin: 0px;
             padding: 0px;
@@ -73,16 +78,16 @@
     </p>
     </div>
     <div class="dropdown pull-left" ><p ng-show="gradeFilterEnabled"><br><select  ng-change="updateFilesFilter()" ng-model="grade_filter" ng-options="g as g for g in grade"></select></p></div>
-    </div>
-    <div>
+    <div id="x">
         <nvd3 options="options" data="data"></nvd3>
     </div>
+
 </div>
 
 
-<!-- <div id="chart1">
+<div id="chart1">
     <svg></svg>
-  </div> -->
+  </div>
 <script src="/static/js/app.js"></script>
 <script src="/static/js/controllers.js"></script>
 <script src="/static/js/factories.js"></script>
