@@ -107,11 +107,17 @@ DATABASES = {
         'NAME': os.environ.get('MYSQL_DATABASE', 'student_dashboard'),  # your mysql database name
         'USER': os.environ.get('MYSQL_USER', 'student_dashboard_user'), # your mysql user for the database
         'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'student_dashboard_password'), # password for user
-        'HOST': os.environ.get('MYSQL_HOST', '127.0.0.1'),
-        'PORT': int(os.environ.get('MYSQL_PORT', '3306')),
+        'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
+        'PORT': os.environ.get('MYSQL_PORT', '3306'),
+    },
+    'UDW': {
+        'UDW_ENDPOINT': os.environ.get('UDW_ENDPOINT', ''),
+        'UDW_USER': os.environ.get('UDW_USER', ''),
+        'UDW_PASSWORD': os.environ.get('UDW_PASSWORD', ''),
+        'UDW_PORT': os.environ.get('UDW_PORT', ''),
+        'UDW_DATABASE': os.environ.get('UDW_DATABASE', ''),
     }
 }
-
 
 
 # Password validation

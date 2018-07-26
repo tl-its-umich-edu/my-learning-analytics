@@ -22,21 +22,31 @@ import pandas as pd
 from sqlalchemy import create_engine
 from pandas.io import sql
 import pymysql
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
+db_name = settings.DATABASES['default']['NAME']
+db_user = settings.DATABASES['default']['USER']
+db_password = settings.DATABASES['default']['PASSWORD']
+db_host = settings.DATABASES['default']['HOST']
+db_port = 3306
+    #int(settings.DATABASES['default']['PORT'])
+db_engine = settings.DATABASES['default']['ENGINE']
 
-logger.info("host" + os.environ.get("MYSQL_HOST"));
-logger.info("port" + os.environ.get("MYSQL_PORT"));
-logger.info("user" + os.environ.get("MYSQL_USER"));
-logger.info("password" + os.environ.get("MYSQL_PASSWORD"));
-logger.info("database" + os.environ.get("MYSQL_DATABASE"));
+logger.info("host" + db_host);
+##logger.info("port" + db_port);
+logger.info("user" + db_user);
+logger.info("password" + db_password);
+logger.info("database" + db_name);
 
-conn = MySQLdb.connect (db = os.environ.get('MYSQL_DATABASE', 'student_dashboard'),  # your mysql database name
-                        user = os.environ.get('MYSQL_USER', 'student_dashboard_user'), # your mysql user for the database
-                        passwd = os.environ.get('MYSQL_PASSWORD', 'student_dashboard_password'), # password for user
-                        host = os.environ.get('MYSQL_HOST', '127.0.0.1'),
-                        port = int(os.environ.get('MYSQL_PORT', '3306')))
+
+
+conn = MySQLdb.connect (db = db_name,  # your mysql database name
+                        user = db_user, # your mysql user for the database
+                        passwd = db_password, # password for user
+                        host = db_host,
+                        port = db_port)
 
 def home(request):
     """
@@ -84,17 +94,19 @@ def small_multiples_files_bar_chart(request):
 def load_data(request):
     ## create the database connection engine
     engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
-                           .format(host = os.environ["MYSQL_HOST"],
-                                   port = int(os.environ["MYSQL_PORT"]),
-                                   user = os.environ["MYSQL_USER"],
-                                   password =os.environ["MYSQL_PASSWORD"],
-                                   db = os.environ["MYSQL_DATABASE"]))
+                           .format(db = db_name,  # your mysql database name
+                                   user = db_user, # your mysql user for the database
+                                   password = db_password, # password for user
+                                   host = db_host,
+                                   port = db_port))
     df_file = pd.read_csv('../data/file.csv', header=0)
-    df_file.to_sql(con=engine, name='FILE', if_exists='replace')
+    #df_file.to_sql(con=engine, name='FILE', if_exists='append')
 
     ## file access data
     df_file_access = pd.read_json('../data/file_access.json')
     df_file_access.rename(columns={'OBJECT_ID': 'FILE_ID', 'MEMBER_ID': 'USER_ID', 'EVENT_TIME':'ACCESS_TIME', 'GROUP_ID':'COURSE_ID'}, inplace=True)
-    df_file_access.to_sql(con=engine, name='FILE_ACCESS', if_exists='replace')
+    df_file_access.to_sql(con=engine, name='FILE_ACCESS', if_exists='append', index=False)
+
+
 
     return HttpResponse("finished")

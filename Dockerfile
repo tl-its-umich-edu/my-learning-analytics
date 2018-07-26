@@ -13,7 +13,7 @@ RUN npm install -g bower
 RUN pip install gunicorn whitenoise django-bower django-nvd3 django-registration django-crontab
 
 RUN pip install djangosaml2
-RUN pip install mysql-connector mysqlclient sqlalchemy
+RUN pip install mysql-connector mysqlclient sqlalchemy psycopg2-binary
 
 RUN pip install canvasapi pandas
 
