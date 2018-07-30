@@ -118,7 +118,8 @@ def update_with_udw_user(request):
           "p.unique_name AS SIS_NAME, " \
           "u.global_canvas_id AS ID, " \
           "c.current_score AS CURRENT_GRADE, " \
-          "c.final_score AS FINAL_GRADE " \
+          "c.final_score AS FINAL_GRADE, " \
+          "'"+ UDW_COURSE_ID + "' as COURSE_ID " \
           "from user_dim u, " \
           "pseudonym_dim p, " \
           "course_score_fact c, " \

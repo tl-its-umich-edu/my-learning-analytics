@@ -29,14 +29,13 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
     });
     $scope.options = {
         chart: {
-            type: 'multiBarHorizontalChart', //'discreteBarChart',
-            height: 1800,
+            type: 'multiBarHorizontalChart', //'discreteBarChart'
             overflow: scroll,
             margin: {
                 top: 20,
                 right: 20,
                 bottom: 50,
-                left: 80
+                left: 250
             },
             x: function (d) {
                 return d.value;
@@ -44,27 +43,26 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
             y: function (d) {
                 return d.label;
             },
-            showValues: false,
+            showValues: true,
             duration: 500,
             xAxis: {
-                axisLabel: 'Interaction Count',
+                //axisLabel: 'Interaction Count',
                 rotateLabels:-45
             },
             yAxis: {
-                axisLabel: 'Files',
+                //axisLabel: 'Files',
                 axisLabelDistance: -10,
                 tickFormat: function (d) {
                     return d;
                 }
-            }
+            },
+            showControls: false,
+            stacked: false
+
         },
         title: {
             enable: true,
             text: 'Top five files accessed by week and Grade'
-        },
-        subtitle: {
-            enable: true,
-            html: '<code>y: Files, x: Interaction Count</code>'
         }
     };
     $scope.updateFilesFilter = function () {
@@ -79,8 +77,8 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
         $scope.weekFilterEnabled = true;
         $scope.gradeFilterEnabled = true;
         $scope.lastUsed = 'fileInteract';
-        $scope.options.chart.xAxis.axisLabel = 'Interaction count';
-        $scope.options.chart.yAxis.axisLabel = 'Files';
+        $scope.options.chart.yAxis.axisLabel = 'Interaction count';
+        //$scope.options.chart.xAxis.axisLabel = 'Files';
         //$scope.options.chart.yAxis.rotateLabels = -45;
         $scope.useInteractiveGuideline = true;
         $scope.options.title = {
@@ -89,7 +87,7 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
         };
         $scope.options.subtitle = {
             enable: true,
-            html: '<code>y: files, x: interaction count</code>'
+            html: '<code>Y: File Name, X: Interaction Count</code>'
         };
         $scope.options.chart.xAxis.tickFormat = function (d) {
             return d;
@@ -124,7 +122,7 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
     var transFormFileInteract = function (data,weekFilter,gradeFilter){
         data = filterData(data, weekFilter,gradeFilter);
         returnData = [{
-            key: "File Accessed:",
+            key: "File Accessed: in week:" + weekFilter + " by users of Grade level: " + gradeFilter,
             values: []
         }];
 
@@ -158,9 +156,7 @@ visApp.controller('c1', ['$scope', '$log', 'Fetch', function ($scope, $log, Fetc
             });
         }
 
-        if ($scope.sortBy === 'y') {
-            returnData[0].values = _.sortBy(returnData[0].values, 'value').reverse();
-        }
+        returnData[0].values = _.sortBy(returnData[0].values, 'label').reverse();
         return returnData;
 
     };

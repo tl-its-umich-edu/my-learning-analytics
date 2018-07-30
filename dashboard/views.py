@@ -34,12 +34,15 @@ db_port = 3306
     #int(settings.DATABASES['default']['PORT'])
 db_engine = settings.DATABASES['default']['ENGINE']
 
-logger.info("host" + db_host);
-##logger.info("port" + db_port);
-logger.info("user" + db_user);
-logger.info("password" + db_password);
-logger.info("database" + db_name);
+#TODO: replace this with CoSign user
+current_user="norrabp"
 
+logger.info("host" + db_host)
+##logger.info("port" + db_port)
+logger.info("user" + db_user)
+logger.info("password" + db_password)
+logger.info("database" + db_name)
+logger.info("current user " + current_user)
 
 
 conn = MySQLdb.connect (db = db_name,  # your mysql database name
@@ -57,32 +60,50 @@ def home(request):
 def files(request):
     return render_to_response("files.html")
 
+def gpa_map(grade):
+    grade_float = float(grade)
+    if grade_float < 60:
+        return 'F'
+    elif grade_float < 70:
+        return 'D'
+    elif grade_float < 80:
+        return 'C'
+    elif grade_float < 90:
+        return 'B'
+    else:
+        return 'A'
+
 def file_access(request):
     # you must create a Cursor object. It will let
     #  you execute all the queries you need
     cur = conn.cursor()
 
     # Use all the SQL you like
-    cur.execute(
-        "SELECT FILE_ID, NAME, COUNT FROM FILE, (SELECT FILE_ID, COUNT(*) AS COUNT FROM FILE_ACCESS GROUP BY FILE_ID) AS FILE_COUNT WHERE FILE.ID = FILE_COUNT.FILE_ID order by count desc")
-    data = cur.fetchall()
+    sqlString = "SELECT f.ID as FILE_ID, f.NAME as files, u.CURRENT_GRADE as current_grade, CEIL(HOUR(TIMEDIFF(a.ACCESS_TIME, t.START_DATE))/(24*7)) as week " \
+                "FROM FILE f, FILE_ACCESS a, USER u, COURSE c, ACADEMIC_TERMS t " \
+                "WHERE a.FILE_ID =f.ID " \
+                "and a.USER_ID = u.ID " \
+                "and a.COURSE_ID = c.ID " \
+                "and c.TERM_ID = t.TERM_ID"
+    df = pd.read_sql(sqlString, conn);
+    logger.info(df)
 
-    #Converting data into json
-    file_access_list = []
-    for row in data :
-        d = collections.OrderedDict()
-        d['week'] = 1
-        d['grade'] = 'A'
-        d['files'] = row[1]
-        d['interactions'] = row[2]
-        #d['FILE_ID']    = row[0] #name
-        #d['USER_ID']    = row[1] #lname
-        #d['ACCESS_TIME']= time.strftime("%b %d %Y %H:%M:%S", time.gmtime(row[2])) #email
-        #d['COURSE_ID']= row[3] #email
+    df['grade'] = df['current_grade'].map(gpa_map)
 
-        file_access_list.append(d)
+    df = df.groupby(['FILE_ID','files', 'week', 'grade']).size().reset_index(name='interactions')
+    logger.info(df)
 
-    return HttpResponse(json.dumps(file_access_list))
+    # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
+    selfSqlString = "select a.FILE_ID as FILE_ID, count(*) as SELF_ACCESS_COUNT, max(a.ACCESS_TIME) as SELF_ACCESS_LAST_TIME " \
+                    "from FILE_ACCESS a, USER u " \
+                    "where a.USER_ID = u.id " \
+                    "and u.SIS_NAME='" + current_user + "' " \
+                    "group by a.FILE_ID;"
+    selfDf= pd.read_sql(selfSqlString, conn);
+    df = df.join(selfDf.set_index('FILE_ID'), on='FILE_ID')
+    logger.info(df)
+
+    return HttpResponse(df.to_json(orient='records'))
     ##return HttpResponse(outputString)
 
 def grades(request):
