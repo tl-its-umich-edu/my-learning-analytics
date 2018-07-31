@@ -12,4 +12,7 @@ student dashboard based on django framework
 ## Query the MySQL database within the container:
 `docker exec -t -i student-dashboard-django_mysql_1 /bin/bash`
 
-`mysql -uroot -proot`
+## Clean outdated docker images
+The docker images will take up more disk spaces as time goes on, you can delete those outdated docker images by using the following command:
+
+`docker rmi $(docker images -q -f "dangling=true")`
