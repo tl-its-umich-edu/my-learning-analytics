@@ -74,24 +74,26 @@ def gpa_map(grade):
         return 'A'
 
 def file_access(request):
-    # you must create a Cursor object. It will let
-    #  you execute all the queries you need
-    cur = conn.cursor()
 
     # Use all the SQL you like
-    sqlString = "SELECT f.ID as FILE_ID, f.NAME as files, u.CURRENT_GRADE as current_grade, CEIL(HOUR(TIMEDIFF(a.ACCESS_TIME, t.START_DATE))/(24*7)) as week " \
+    sqlString = "SELECT a.FILE_ID as FILE_ID, f.NAME as files, u.CURRENT_GRADE as current_grade, CEIL(HOUR(TIMEDIFF(a.ACCESS_TIME, t.START_DATE))/(24*7)) as week " \
                 "FROM FILE f, FILE_ACCESS a, USER u, COURSE c, ACADEMIC_TERMS t " \
                 "WHERE a.FILE_ID =f.ID " \
                 "and a.USER_ID = u.ID " \
                 "and a.COURSE_ID = c.ID " \
                 "and c.TERM_ID = t.TERM_ID"
-    df = pd.read_sql(sqlString, conn);
-    logger.info(df)
+    df = pd.read_sql(sqlString, conn)
+    logger.debug(df.dtypes)
+    logger.debug(df.describe())
 
+    # map point grade to letter grade
     df['grade'] = df['current_grade'].map(gpa_map)
+    logger.debug(df.dtypes)
 
-    df = df.groupby(['FILE_ID','files', 'week', 'grade']).size().reset_index(name='interactions')
-    logger.info(df)
+    df['interactions'] = df.groupby(['FILE_ID','files', 'week', 'grade'])['FILE_ID'].transform('count')
+    df.drop_duplicates()
+    logger.debug(df.dtypes)
+    logger.debug(df.describe())
 
     # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
     selfSqlString = "select a.FILE_ID as FILE_ID, count(*) as SELF_ACCESS_COUNT, max(a.ACCESS_TIME) as SELF_ACCESS_LAST_TIME " \
@@ -99,12 +101,14 @@ def file_access(request):
                     "where a.USER_ID = u.id " \
                     "and u.SIS_NAME='" + current_user + "' " \
                     "group by a.FILE_ID;"
-    selfDf= pd.read_sql(selfSqlString, conn);
+    logger.debug(selfSqlString)
+    selfDf= pd.read_sql(selfSqlString, conn)
+    logger.debug(selfDf.dtypes)
+    logger.debug(selfDf.describe())
     df = df.join(selfDf.set_index('FILE_ID'), on='FILE_ID')
-    logger.info(df)
+    logger.debug(df.describe())
 
     return HttpResponse(df.to_json(orient='records'))
-    ##return HttpResponse(outputString)
 
 def grades(request):
     return render_to_response("grades.html")

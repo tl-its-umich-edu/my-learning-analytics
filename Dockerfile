@@ -17,6 +17,8 @@ RUN pip install mysql-connector mysqlclient sqlalchemy psycopg2-binary
 
 RUN pip install canvasapi pandas
 
+RUN pip install google-cloud-bigquery
+
 RUN pip install PyMySQL
 
 # COPY startup script into known file location in container
