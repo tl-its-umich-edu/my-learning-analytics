@@ -37,6 +37,10 @@ from sqlalchemy import create_engine
 from canvasapi import Canvas
 import OpenSSL.SSL
 
+# Imports the Google Cloud client library
+from google.cloud import bigquery
+
+
 logger = logging.getLogger(__name__)
 
 # ## Connect to Student Dashboard's MySQL database
@@ -72,15 +76,17 @@ UDW_DATABASE=settings.DATABASES['UDW']['UDW_DATABASE']
 print(UDW_PORT)
 
 CANVAS_COURSE_ID =os.environ.get('CANVAS_COURSE_IDS', '')
-UDW_COURSE_ID = "17700000000" + CANVAS_COURSE_ID
+UDW_ID_PREFIX = "17700000000"
+UDW_FILE_ID_PREFIX = "1770000000"
+UDW_COURSE_ID = UDW_ID_PREFIX + CANVAS_COURSE_ID
 CANVAS_SECTION_ID =os.environ.get('CANVAS_SECTION_IDS', '')
-UDW_SECTION_ID = "17700000000" + CANVAS_SECTION_ID
+UDW_SECTION_ID = UDW_ID_PREFIX + CANVAS_SECTION_ID
 
 # update FILE records from UDW
 def update_with_udw_file(request):
 
     #select file record from UDW
-    file_sql = "select canvas_id as ID, display_name as NAME, course_id as COURSE_ID from file_dim " \
+    file_sql = "select concat(" + UDW_FILE_ID_PREFIX + ", canvas_id) as ID, display_name as NAME, course_id as COURSE_ID from file_dim " \
                "where file_state ='available' " \
                "and course_id='"+ UDW_COURSE_ID + "'" \
                " order by canvas_id"
@@ -90,22 +96,62 @@ def update_with_udw_file(request):
 
     return HttpResponse("loaded file info")
 
-# update FILE_ACCESS records from UDW
+# update FILE_ACCESS records from BigQuery
 def update_with_udw_access(request):
 
-    #select file record from UDW
-    file_access_sql = "select rr.COURSE_ID, rr.FILE_ID, rr.ACCESS_TIME, u.global_canvas_id as USER_ID " \
-                      "from (select r.course_id as COURSE_ID, " \
-                      "split_part(r.url, '/', 5) as FILE_ID, " \
-                      "r.timestamp as ACCESS_TIME, r.user_id AS user_id " \
-                      "from requests r " \
-                      "where r.course_id='" + UDW_COURSE_ID + "' " \
-                      "and r.url like '/courses/" + CANVAS_COURSE_ID + "/files/%') as rr, " \
-                      "user_dim u " \
-                      "where rr.user_id = u.id"
+    # Instantiates a client
+    bigquery_client = bigquery.Client()
 
-    # update FILE_ACCESS records
-    util_function(file_access_sql, 'FILE_ACCESS')
+    datasets = list(bigquery_client.list_datasets())
+    project = bigquery_client.project
+
+    # list all datasets
+    if datasets:
+        logger.debug('Datasets in project {}:'.format(project))
+        for dataset in datasets:  # API request(s)
+            logger.debug('\t{}'.format(dataset.dataset_id))
+
+            # choose the right dataset
+            if ("learning_datasets" == dataset.dataset_id):
+                # list all tables
+                dataset_ref = bigquery_client.dataset(dataset.dataset_id)
+                tables = list(bigquery_client.list_tables(dataset_ref))  # API request(s)
+                for table in tables:
+                    if ("enriched_events" == table.table_id):
+                        logger.debug('\t{}'.format("found table"))
+
+                        # query to retrieve all file access events for one course
+                        query = 'select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, "$.object.id"), 35) AS STRING) AS FILE_ID, ' \
+                                'SUBSTR(JSON_EXTRACT_SCALAR(event, "$.membership.member.id"), 29) AS USER_ID, ' \
+                                'EVENT_TIME as ACCESS_TIME, ' \
+                                'SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) AS COURSE_ID ' \
+                                'FROM learning_datasets.enriched_events ' \
+                                'where JSON_EXTRACT_SCALAR(event, "$.edApp.id") = \'http://umich.instructure.com/\' ' \
+                                'and event_type = \'NavigationEvent\' ' \
+                                'and JSON_EXTRACT_SCALAR(event, "$.object.name") = \'attachment\' ' \
+                                'and JSON_EXTRACT_SCALAR(event, "$.action") = \'NavigatedTo\' ' \
+                                'and JSON_EXTRACT_SCALAR(event, "$.membership.member.id") is not null ' \
+                                'and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) = \'' + UDW_COURSE_ID + '\' '
+                        logger.debug(query)
+
+                        # Location must match that of the dataset(s) referenced in the query.
+                        df = bigquery_client.query(query, location='US').to_dataframe()  # API request - starts the query
+                        logger.debug(df.describe())
+
+                        # drop duplicates
+                        df.drop_duplicates(keep=False, inplace=True)
+
+                        # adjust the time value to drop time zone info
+                        # so instead of 2018-07-02 15:28:32 UTC, we only want 2018-07-02 15:28:32
+
+                        df['ACCESS_TIME'] = df['ACCESS_TIME'].dt.date
+                        # write to MySQL
+                        df.to_sql(con=engine, name='FILE_ACCESS', if_exists='append', index=False)
+
+    else:
+        logger.debug('{} project does not contain any datasets.'.format(project))
+
+
 
     return HttpResponse("loaded file access info")
 
