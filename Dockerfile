@@ -8,18 +8,9 @@ RUN apt-get install -y nodejs  python-dev
 #libmysqlclient-dev
 RUN apt-get clean -y
 
-RUN npm install -g bower
-
-RUN pip install gunicorn whitenoise django-bower django-nvd3 django-registration django-crontab
-
-RUN pip install djangosaml2
-RUN pip install mysql-connector mysqlclient sqlalchemy psycopg2-binary
-
-RUN pip install canvasapi pandas
-
-RUN pip install google-cloud-bigquery
-
-RUN pip install PyMySQL
+RUN pip install --upgrade pip
+COPY requirements.txt /requirements.txt
+RUN pip install -r /requirements.txt
 
 # COPY startup script into known file location in container
 COPY start.sh /start.sh
@@ -29,9 +20,7 @@ EXPOSE 5000
 WORKDIR /dashboard/
 COPY . /dashboard/
 
-# CMD specifcies the command to execute to start the server running.
 RUN npm install -g bower
-
 RUN bower install --allow-root
 
 COPY manage.py /manage.py
