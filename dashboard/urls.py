@@ -17,6 +17,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.views.static import serve
 from django.conf import settings
+from django.conf.urls import include
 from django.conf.urls.static import static
 
 
@@ -50,3 +51,16 @@ urlpatterns = [
         'document_root': '.',
     }),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+if 'djangosaml2' in settings.INSTALLED_APPS:
+    urlpatterns += (
+        url(r'^accounts/', include('djangosaml2.urls')),
+    )
+elif 'registration' in settings.INSTALLED_APPS:
+    urlpatterns += (
+        url(r'^accounts/', include('registration.backends.default.urls')),
+    )
+
+# Override auth_logout from djangosaml2 and registration for consistant
+# behavior
+# urlpatterns.append(url(r'^accounts/logout', views.logout, name='auth_logout'))

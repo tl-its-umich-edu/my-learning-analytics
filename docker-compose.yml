@@ -25,7 +25,7 @@ services:
       - ./mysql:/docker-entrypoint-initdb.d/:ro
   web:
     build: .
-    command: bash -c "./start.sh"; python manage.py crontab add
+    command: bash -c "./start.sh"
     volumes:
       - .:/code
     ports:
