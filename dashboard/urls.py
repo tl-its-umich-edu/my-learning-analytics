@@ -40,6 +40,10 @@ urlpatterns = [
     url(r'^update_with_udw_file', cron.update_with_udw_file, name='update_with_udw_file'),
     url(r'^update_with_udw_access', cron.update_with_udw_access, name='update_with_udw_access'),
     url(r'^update_with_udw_user', cron.update_with_udw_user, name='update_with_udw_user'),
+    url(r'^update_assignment', cron.update_assignment, name='update_assignment'),
+    url(r'^update_groups', cron.update_groups, name='update_groups'),
+    url(r'^submission', cron.submission, name='submission'),
+    url(r'^weight_consideration', cron.weight_consideration, name='weight_consideration'),
 
     url(r'^$', serve, {
         'path': '/home.html',

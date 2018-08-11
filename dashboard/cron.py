@@ -184,8 +184,84 @@ def update_with_udw_user(request):
 
     return HttpResponse("loaded user info")
 
+
+def update_groups(request):
+    '''
+    Loading the assignment groups inforamtion along with weight/points associated ith arn assignment
+    :param request:
+    :return:
+    '''
+    logger.info("update_assignment_groups(): ")
+    assignment_groups_sql = "with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id " \
+                            "from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='" + UDW_COURSE_ID + "'" \
+                            "and ad.visibility = 'everyone' and ad.workflow_state='published')"\
+                            ",assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf " \
+                            "on agd.id = agf.assignment_group_id  where agd.course_id='" + UDW_COURSE_ID + "' and workflow_state='available')"\
+                            ",assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join " \
+                            "(select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id )"\
+                            ",assignment_grp_points as (select ag.*, am.group_points AS GROUP_POINTS from assignment_grp ag join assign_more am on ag.assignment_group_id = am.assignment_group_id)"\
+                            "select assignment_group_id AS ID, course_id AS COURSE_ID, group_weight AS WEIGHT, name AS NAME, group_points AS GROUP_POINTS from assignment_grp_points"
+    util_function(assignment_groups_sql, 'ASSIGNMENT_GROUPS')
+    return HttpResponse("loaded assignment group info")
+
+
+def update_assignment(request):
+    '''
+    Load the assignment info w.r.t to a course such as due_date, points etc
+    :param request:
+    :return:
+    '''
+    logger.info("update_assignment(): ")
+    assignment_sql="with assignment_info as " \
+                   "(select ad.due_at AS DUE_DATE,ad.due_at at time zone 'utc' at time zone 'America/New_York' as LOCAL_DATE," \
+                   "ad.title AS NAME,af.course_id AS COURSE_ID,af.assignment_id AS ID," \
+                   "af.points_possible AS POINTS_POSSIBLE,af.assignment_group_id AS ASSIGNMENT_GROUP_ID" \
+                   " from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='" + UDW_COURSE_ID + "'" \
+                   "and ad.visibility = 'everyone' and ad.workflow_state='published')" \
+                   "select * from assignment_info"
+    util_function(assignment_sql,'ASSIGNMENT')
+    return HttpResponse("loaded assignment info")
+
+
+def submission(request):
+    '''
+    student submission information for assignments
+    :param request:
+    :return:
+    '''
+    logger.info("update_submission(): ")
+    submission_url = "with sub_fact as (select submission_id, assignment_id,user_id, global_canvas_id, published_score " \
+                     "from submission_fact sf join user_dim u on sf.user_id = u.id where course_id = '" + UDW_COURSE_ID + "')," \
+                     "enrollment as (select  distinct(user_id) from enrollment_dim where course_id = '" + UDW_COURSE_ID + "' and workflow_state='active' " \
+                     "and type = 'StudentEnrollment'),"\
+                     "submission_time as (select id, graded_at, graded_at at time zone 'utc' at time zone 'America/New_York' as local_graded_time from submission_dim),"\
+                     "sub_with_enroll as (select sf.* from sub_fact sf join enrollment e on e.user_id = sf.user_id),"\
+                     "submission as (select se.submission_id,se.assignment_id,se.global_canvas_id,se.published_score, st.graded_at, st.local_graded_time " \
+                     "from sub_with_enroll se inner join submission_time st on se.submission_id = st.id)" \
+                     "select submission_id AS ID, assignment_id AS ASSIGNMENT_ID, global_canvas_id AS USER_ID, " \
+                     "published_score AS SCORE, graded_at AS GRADED_DATE, local_graded_time as LOCAL_GRADED_DATE from submission"
+    util_function(submission_url,'SUBMISSION')
+    return HttpResponse("loaded assignment submission info")
+
+
+def weight_consideration(request):
+    '''
+    load the assignment weight consider information with in a course. Some assignments don't have weight consideration
+    the result of it return boolean indicating weight is considered in table calculation or not
+    :param request:
+    :return:
+    '''
+    logger.info("weight_consideration()")
+    is_weight_considered_url ="with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact " \
+                              "where course_id = '" + UDW_COURSE_ID + "' group by course_id having sum(group_weight)>1)"\
+                              "(select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)"
+
+    util_function(is_weight_considered_url,'ASSIGNMENT_WEIGHT_CONSIDERATION', 'weight')
+    return HttpResponse("loaded weight_consideration info")
+
+
 # the util function
-def util_function(sql_string, mysql_table):
+def util_function(sql_string, mysql_table, table_identifier=None):
 
     # get UDW connection
     udw_conn = psycopg2.connect(
@@ -196,6 +272,11 @@ def util_function(sql_string, mysql_table):
         dbname=UDW_DATABASE)
 
     df = pd.read_sql(sql_string, udw_conn)
+    # Sql returns boolean value so grouping course info along with it so that this could be stored in the DB table.
+    if table_identifier == 'weight':
+        df['COURSE_ID']=UDW_COURSE_ID
+        df.columns=['CONSIDER_WEIGHT','COURSE_ID']
+    logger.info('sql data: ',df.head())
     # close UDW connection
     udw_conn.close()
 
