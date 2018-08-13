@@ -30,6 +30,15 @@ CANVAS_USER=
 # Paths to special login credentials (uses SAML)
 GOOGLE_APPLICATION_CREDENTIALS=/secrets/bq_cred.json
 SAML2_FILES_BASE=/secrets/
+
+# Base for Django to your accounts path
+DJANGO_SAML2_URL_BASE=http://localhost:5001/accounts/
+
+# ACS Redirect
+DJANGO_ACS_DEFAULT_REDIRECT=http://localhost:5001/
+
+# Login Redirect
+LOGIN_REDIRECT_URL=http://localhost:5001/
 ```
 
 The bq_cred.json is service account for Big Query, it neesd to be supplied and put into the secrets directory and setup in the environment.
