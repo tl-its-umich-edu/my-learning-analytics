@@ -86,7 +86,6 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
         },
@@ -118,26 +117,6 @@ DATABASES = {
         'UDW_DATABASE': os.environ.get('UDW_DATABASE', ''),
     }
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -238,29 +217,30 @@ except ImportError:
 
 SAML2_URL_PATH = '/accounts/'
 # modify to use port request comes
-SAML2_URL_BASE = getenv('DJANGO_SAML2_URL_BASE', 'http://localhost:18000/accounts/')
+SAML2_URL_BASE = getenv('DJANGO_SAML2_URL_BASE', 'http://localhost:5001/accounts/')
 
 INSTALLED_APPS += ('djangosaml2',)
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
     'djangosaml2.backends.Saml2Backend',
 )
 LOGIN_URL = '%slogin/' % SAML2_URL_PATH
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 BASEDIR = path.dirname(path.abspath(__file__))
+SAML2_FILES_BASE = os.environ.get('SAML2_FILES_BASE', '/saml/')
+
 SAML_CONFIG = {
     'xmlsec_binary': '/usr/bin/xmlsec1',
     'entityid': '%smetadata/' % SAML2_URL_BASE,
 
     # directory with attribute mapping
     # 'attribute_map_dir': path.join(BASEDIR, 'attribute-maps'),
-    'name': 'Ocellus',
+    'name': 'Student Dashboard',
     # this block states what services we provide
     'service': {
         # we are just a lonely SP
         'sp': {
-            'name': 'Ocellus',
+            'name': 'Student Dashboard',
             'name_id_format': ('urn:oasis:names:tc:SAML:2.0:'
                                'nameid-format:transient'),
             'authn_requests_signed': 'true',
@@ -290,18 +270,18 @@ SAML_CONFIG = {
 
     # where the remote metadata is stored
     'metadata': {
-        'local': [path.join(BASEDIR, 'saml/remote-metadata.xml')],
+        'local': [path.join(SAML2_FILES_BASE, 'saml/remote-metadata.xml')],
     },
 
     # set to 1 to output debugging information
     'debug': 1,
 
     # certificate
-    'key_file': path.join(BASEDIR, 'saml/ocellus-saml.key'),  'cert_file': path.join(BASEDIR, 'saml/ocellus-saml.pem'),
+    'key_file': path.join(SAML2_FILES_BASE, '/student-dashboard-saml.key'),  'cert_file': path.join(os.environ.get(SAML2_FILES_BASE, '/saml/'), '/student-dashboard-saml.pem'),
 }
 
-ACS_DEFAULT_REDIRECT_URL = getenv('DJANGO_ACS_DEFAULT_REDIRECT', 'http://localhost:18000/')
-LOGIN_REDIRECT_URL = getenv('DJANGO_LOGIN_REDIRECT_URL', 'http://localhost:18000/')
+ACS_DEFAULT_REDIRECT_URL = getenv('DJANGO_ACS_DEFAULT_REDIRECT', 'http://localhost:5001/')
+LOGIN_REDIRECT_URL = getenv('DJANGO_LOGIN_REDIRECT_URL', 'http://localhost:5001/')
 
 SAML_CREATE_UNKNOWN_USER = True
 

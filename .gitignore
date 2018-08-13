@@ -1,3 +1,5 @@
 # exclude dashboard/__pycache__ folder
 dashboard/__pycache__/*
 .env
+saml
+bq_cred.json
