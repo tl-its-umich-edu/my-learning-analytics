@@ -270,14 +270,14 @@ SAML_CONFIG = {
 
     # where the remote metadata is stored
     'metadata': {
-        'local': [path.join(SAML2_FILES_BASE, 'saml/remote-metadata.xml')],
+        'local': [path.join(SAML2_FILES_BASE, 'remote-metadata.xml')],
     },
 
     # set to 1 to output debugging information
-    'debug': 1,
+    'debug': DEBUG,
 
     # certificate
-    'key_file': path.join(SAML2_FILES_BASE, '/student-dashboard-saml.key'),  'cert_file': path.join(os.environ.get(SAML2_FILES_BASE, '/saml/'), '/student-dashboard-saml.pem'),
+    'key_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.key'),  'cert_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.pem'),
 }
 
 ACS_DEFAULT_REDIRECT_URL = getenv('DJANGO_ACS_DEFAULT_REDIRECT', 'http://localhost:5001/')
