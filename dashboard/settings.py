@@ -227,6 +227,8 @@ LOGIN_URL = '%slogin/' % SAML2_URL_PATH
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 BASEDIR = path.dirname(path.abspath(__file__))
+SAML2_FILES_BASE = os.environ.get('SAML2_FILES_BASE', '/saml/')
+
 SAML_CONFIG = {
     'xmlsec_binary': '/usr/bin/xmlsec1',
     'entityid': '%smetadata/' % SAML2_URL_BASE,
@@ -268,14 +270,14 @@ SAML_CONFIG = {
 
     # where the remote metadata is stored
     'metadata': {
-        'local': [path.join(BASEDIR, 'saml/remote-metadata.xml')],
+        'local': [path.join(SAML2_FILES_BASE, 'saml/remote-metadata.xml')],
     },
 
     # set to 1 to output debugging information
     'debug': 1,
 
     # certificate
-    'key_file': path.join(BASEDIR, 'saml/student-dashboard-saml.key'),  'cert_file': path.join(BASEDIR, 'saml/student-dashboard-saml.pem'),
+    'key_file': path.join(SAML2_FILES_BASE, '/student-dashboard-saml.key'),  'cert_file': path.join(os.environ.get(SAML2_FILES_BASE, '/saml/'), '/student-dashboard-saml.pem'),
 }
 
 ACS_DEFAULT_REDIRECT_URL = getenv('DJANGO_ACS_DEFAULT_REDIRECT', 'http://localhost:5001/')

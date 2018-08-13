@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if [ -f /secrets/bq_cred.json ]
-then
-  ln -sf /secrets/bq_cred.json /dashboard/dashboard/static/json/bq_cred.json
-fi
-
 echo $DJANGO_SETTINGS_MODULE
 
 if [ -z "${GUNICORN_WORKERS}" ]; then

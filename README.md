@@ -1,5 +1,45 @@
 # student-dashboard-django
 student dashboard based on django framework
+## Environment configuration
+There is some environment configuration and addtional files needed for this app to run. You can put this in a file called .env for testing. 
+
+(Sample .env)
+```
+DJANGO_LOG_LEVEL=DEBUG
+
+# MySQL Configuration
+MYSQL_DATABASE=student_dashboard
+MYSQL_USER=student_dashboard_user
+MYSQL_PASSWORD=student_dashboard_pw
+MYSQL_HOST=student-dashboard-django_mysql_1
+MYSQL_PORT=3306
+MYSQL_ROOT_PASSWORD=student_dashboard_root_pw
+
+# UDW configuration
+UDW_ENDPOINT=
+UDW_USER=
+UDW_PASSWORD=
+UDW_PORT=
+UDW_DATABASE=
+
+# Canvas Configuration
+CANVAS_COURSE_IDS=
+CANVAS_SECTION_IDS=
+CANVAS_USER=
+
+# Paths to special login credentials (uses SAML)
+GOOGLE_APPLICATION_CREDENTIALS=/secrets/bq_cred.json
+SAML2_FILES_BASE=/secrets/
+```
+
+The bq_cred.json is service account for Big Query, it neesd to be supplied and put into the secrets directory and setup in the environment.
+
+The dashboard/saml directory needs to contain 4 files for SAML configuration. These are currently hard-coded in settings.py though the path comes from the environment SAML2_FILES_BASE.
+
+	remote-metadata.xml 
+	student-dashboard-saml.key
+	student-dashboard-saml.pem
+
 
 ## Docker commands for deploying the app
 1. Tear down running application and db instances:
