@@ -3,3 +3,4 @@ dashboard/__pycache__/*
 .env
 saml
 bq_cred.json
+.idea/
