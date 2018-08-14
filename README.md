@@ -24,7 +24,6 @@ UDW_DATABASE=
 
 # Canvas Configuration
 CANVAS_COURSE_IDS=
-CANVAS_SECTION_IDS=
 CANVAS_USER=
 
 # Paths to special login credentials (uses SAML)
