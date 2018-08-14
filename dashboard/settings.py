@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'dashboard',
-    'djangobower',
     'django_nvd3',
     'django_crontab',
 ]
@@ -145,39 +144,15 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 # Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
 
-# Additional locations of static files
-STATICFILES_DIRS = (
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    # os.path.join(PROJECT_ROOT, "static"),
-    os.path.join(BASE_DIR, 'bower_components'),
-)
+NPM_ROOT_PATH = BASE_DIR
 
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'npm.finders.NpmFinder',
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
-    'djangobower.finders.BowerFinder',
-)
-
-
-# Django-bower
-# ------------
-
-# Specifie path to components root (you need to use absolute path)
-BOWER_COMPONENTS_ROOT = os.path.join(PROJECT_ROOT, 'components')
-
-#BOWER_PATH = '/usr/local/bin/bower'
-BOWER_PATH = '/usr/bin/bower'
-
-BOWER_INSTALLED_APPS = (
-    'd3#3.5.5',
-    'nvd3#1.7.1',
-    'jquery#1.9',
-    'underscore',
 )
 
 LOGGING = {

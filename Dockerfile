@@ -26,8 +26,10 @@ EXPOSE 5000
 WORKDIR /dashboard/
 COPY . /dashboard/
 
-RUN npm install -g bower
-RUN bower install --allow-root
+RUN npm install
+
+# This is needed to clean up the examples files as these cause collectstatic to fail (and take up extra space)
+RUN find /usr/lib/node_modules /dashboard/node_modules -type d -name "examples" | xargs rm -rf
 
 COPY manage.py /manage.py
 
