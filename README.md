@@ -11,7 +11,7 @@ DJANGO_LOG_LEVEL=DEBUG
 MYSQL_DATABASE=student_dashboard
 MYSQL_USER=student_dashboard_user
 MYSQL_PASSWORD=student_dashboard_pw
-MYSQL_HOST=student-dashboard-django_mysql_1
+MYSQL_HOST=student_dashboard_mysql
 MYSQL_PORT=3306
 MYSQL_ROOT_PASSWORD=student_dashboard_root_pw
 
@@ -29,7 +29,7 @@ CANVAS_USER=
 
 # Paths to special login credentials (uses SAML)
 GOOGLE_APPLICATION_CREDENTIALS=/secrets/bq_cred.json
-SAML2_FILES_BASE=/secrets/
+SAML2_FILES_BASE=/secrets/saml/
 
 # Base for Django to your accounts path
 DJANGO_SAML2_URL_BASE=http://localhost:5001/accounts/
@@ -56,6 +56,10 @@ The dashboard/saml directory needs to contain 4 files for SAML configuration. Th
 2. Build the application:
 `docker-compose build`
 3. Run the application in a detached mode: `docker-compose up -d`
+4. Place all of your secrets in a directory and copy it into the docker with
+`docker cp ~/secrets student_dashboard:/secrets`
+
+
 4. Initialize the MySQL database with mysql/init.sql: `http://localhost:5001/load_data`
 
 ## Load user, file, file access data into database
@@ -69,7 +73,7 @@ Use the following URL patterns to load data into databases:
 7. weight_consideration: load information about weights (as boolean) considered in grading of an assignment.
 
 ## Query the MySQL database within the container:
-`docker exec -t -i student-dashboard-django_mysql_1 /bin/bash`
+`docker exec -t -i student_dashboard_mysql /bin/bash`
 1. login as `mysql -u <user> -p`
 2. `use student_dashboard`
 
