@@ -23,6 +23,7 @@ services:
       - "3306"
     volumes:
       - ./mysql:/docker-entrypoint-initdb.d/:ro
+    container_name: student_dashboard_mysql
   web:
     build: .
     command: bash -c "./start.sh"
@@ -34,3 +35,4 @@ services:
       - mysql
     env_file:
       - .env
+    container_name: student_dashboard
