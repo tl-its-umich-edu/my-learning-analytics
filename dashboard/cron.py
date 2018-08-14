@@ -79,8 +79,6 @@ CANVAS_COURSE_ID =os.environ.get('CANVAS_COURSE_IDS', '')
 UDW_ID_PREFIX = "17700000000"
 UDW_FILE_ID_PREFIX = "1770000000"
 UDW_COURSE_ID = UDW_ID_PREFIX + CANVAS_COURSE_ID
-CANVAS_SECTION_ID =os.environ.get('CANVAS_SECTION_IDS', '')
-UDW_SECTION_ID = UDW_ID_PREFIX + CANVAS_SECTION_ID
 
 # update FILE records from UDW
 def update_with_udw_file(request):
@@ -170,7 +168,7 @@ def update_with_udw_user(request):
           "pseudonym_dim p, " \
           "course_score_fact c, " \
           "(select e.user_id as user_id, e.id as enrollment_id from enrollment_dim e " \
-          "where e.course_section_id = '" + UDW_SECTION_ID + "' " \
+          "where e.course_id = '" + UDW_COURSE_ID + "' " \
           "and e.type='StudentEnrollment' " \
           "and e.workflow_state='active' ) as e " \
           "where p.user_id=u.id " \
@@ -178,6 +176,8 @@ def update_with_udw_user(request):
           "and c.enrollment_id =  e.enrollment_id " \
           "and c.current_score is not null " \
           "and c.final_score is not null"
+
+    logger.debug(user_sql)
 
     # upate USER records
     util_function(user_sql, 'USER')
