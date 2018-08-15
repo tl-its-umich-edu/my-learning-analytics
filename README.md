@@ -5,7 +5,10 @@ There is some environment configuration and addtional files needed for this app 
 
 (Sample .env)
 ```
+# Any logs that django outputs
 DJANGO_LOG_LEVEL=DEBUG
+# Any other logs
+ROOT_LOG_LEVEL=INFO
 
 # MySQL Configuration
 MYSQL_DATABASE=student_dashboard
