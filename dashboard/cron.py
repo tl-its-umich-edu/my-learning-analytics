@@ -89,10 +89,7 @@ def update_with_udw_file(request):
                "and course_id='"+ UDW_COURSE_ID + "'" \
                " order by canvas_id"
 
-    # update FILE_ACCESS records
-    util_function(file_sql, 'FILE')
-
-    return HttpResponse("loaded file info")
+    return HttpResponse("loaded file info: " + util_function(file_sql, 'FILE'))
 
 # update FILE_ACCESS records from BigQuery
 def update_with_udw_access(request):
@@ -151,7 +148,7 @@ def update_with_udw_access(request):
 
 
 
-    return HttpResponse("loaded file access info")
+    return HttpResponse("loaded file access info: inserted " + str(df.shape[0]) + " rows.")
 
 # update USER records from UDW
 def update_with_udw_user(request):
@@ -177,12 +174,9 @@ def update_with_udw_user(request):
           "and c.current_score is not null " \
           "and c.final_score is not null"
 
-    logger.debug(user_sql)
+    logger.info(user_sql)
 
-    # upate USER records
-    util_function(user_sql, 'USER')
-
-    return HttpResponse("loaded user info")
+    return HttpResponse("loaded user info: " + util_function(user_sql, 'USER'))
 
 
 def update_groups(request):
@@ -201,8 +195,8 @@ def update_groups(request):
                             "(select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id )"\
                             ",assignment_grp_points as (select ag.*, am.group_points AS GROUP_POINTS from assignment_grp ag join assign_more am on ag.assignment_group_id = am.assignment_group_id)"\
                             "select assignment_group_id AS ID, course_id AS COURSE_ID, group_weight AS WEIGHT, name AS NAME, group_points AS GROUP_POINTS from assignment_grp_points"
-    util_function(assignment_groups_sql, 'ASSIGNMENT_GROUPS')
-    return HttpResponse("loaded assignment group info")
+
+    return HttpResponse("loaded assignment group info: " + util_function(assignment_groups_sql, 'ASSIGNMENT_GROUPS'))
 
 
 def update_assignment(request):
@@ -219,8 +213,8 @@ def update_assignment(request):
                    " from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='" + UDW_COURSE_ID + "'" \
                    "and ad.visibility = 'everyone' and ad.workflow_state='published')" \
                    "select * from assignment_info"
-    util_function(assignment_sql,'ASSIGNMENT')
-    return HttpResponse("loaded assignment info")
+
+    return HttpResponse("loaded assignment info: " + util_function(assignment_sql,'ASSIGNMENT'))
 
 
 def submission(request):
@@ -240,8 +234,8 @@ def submission(request):
                      "from sub_with_enroll se inner join submission_time st on se.submission_id = st.id)" \
                      "select submission_id AS ID, assignment_id AS ASSIGNMENT_ID, global_canvas_id AS USER_ID, " \
                      "published_score AS SCORE, graded_at AS GRADED_DATE, local_graded_time as LOCAL_GRADED_DATE from submission"
-    util_function(submission_url,'SUBMISSION')
-    return HttpResponse("loaded assignment submission info")
+
+    return HttpResponse("loaded assignment submission info: " + util_function(submission_url,'SUBMISSION'))
 
 
 def weight_consideration(request):
@@ -256,8 +250,7 @@ def weight_consideration(request):
                               "where course_id = '" + UDW_COURSE_ID + "' group by course_id having sum(group_weight)>1)"\
                               "(select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)"
 
-    util_function(is_weight_considered_url,'ASSIGNMENT_WEIGHT_CONSIDERATION', 'weight')
-    return HttpResponse("loaded weight_consideration info")
+    return HttpResponse("loaded weight_consideration info: " + util_function(is_weight_considered_url,'ASSIGNMENT_WEIGHT_CONSIDERATION', 'weight'))
 
 
 # the util function
@@ -272,16 +265,22 @@ def util_function(sql_string, mysql_table, table_identifier=None):
         dbname=UDW_DATABASE)
 
     df = pd.read_sql(sql_string, udw_conn)
+    logger.info("df shape " + str(df.shape[0]) + " " + str(df.shape[1]))
+
     # Sql returns boolean value so grouping course info along with it so that this could be stored in the DB table.
     if table_identifier == 'weight':
         df['COURSE_ID']=UDW_COURSE_ID
         df.columns=['CONSIDER_WEIGHT','COURSE_ID']
-    logger.info('sql data: ',df.head())
     # close UDW connection
     udw_conn.close()
 
     # drop duplicates
-    df.drop_duplicates(keep=False, inplace=True)
+    df.drop_duplicates(keep='first', inplace=True)
+
+    logger.info(" table: " + mysql_table + " insert size: " + str(df.shape[0]))
 
     # write to MySQL
     df.to_sql(con=engine, name=mysql_table, if_exists='append', index=False)
+
+    # returns the row size of dataframe
+    return "inserted " + str(df.shape[0]) + " rows."
