@@ -1,0 +1,192 @@
+[
+  {
+    "score": 42,
+    "count": 2,
+    "grade": "E",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 48,
+    "count": 1,
+    "grade": "E",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 60,
+    "count": 1,
+    "grade": "D",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 62,
+    "count": 1,
+    "grade": "D",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 66,
+    "count": 1,
+    "grade": "C",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 70,
+    "count": 1,
+    "grade": "C",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 72,
+    "count": 3,
+    "grade": "C",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 76,
+    "count": 7,
+    "grade": "C",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 78,
+    "count": 2,
+    "grade": "C",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 80,
+    "count": 7,
+    "grade": "B",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 82,
+    "count": 7,
+    "grade": "B",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 84,
+    "count": 2,
+    "grade": "B",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 86,
+    "count": 5,
+    "grade": "B",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 88,
+    "count": 3,
+    "grade": "B",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 90,
+    "count": 1,
+    "grade": "A",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 92,
+    "count": 2,
+    "grade": "A",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 94,
+    "count": 4,
+    "grade": "A",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 96,
+    "count": 3,
+    "grade": "A",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  },
+  {
+    "score": 98,
+    "count": 1,
+    "grade": "A",
+    "my_score": "86",
+    "my_score_actual": "85.8",
+    "tot_students": 54,
+    "grade_stdev": 12.15,
+    "grade_avg": 81.06
+  }
+]

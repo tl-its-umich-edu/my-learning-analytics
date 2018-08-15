@@ -33,6 +33,7 @@ urlpatterns = [
 
     # get file access patterns
     url(r'^file_access', views.file_access, name='file_access'),
+    url(r'^grade_distribution', views.grade_distribution, name='grade_distribution'),
 
     # load file information
     url(r'^load_data', views.load_data, name='load_data'),
