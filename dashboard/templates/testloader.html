@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+	.success {color: green}
+	.failure {color: red} 
+    </style>
+    <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+    <script>
+
+function UrlExists(url, cb){
+	jQuery.ajax({
+		async:	  false,
+		url:      url,
+		dataType: 'text',
+		type:     'GET',
+		complete:  function(xhr){
+			if(typeof cb === 'function')
+				cb.apply(this, [xhr.status]);
+		}
+	});
+}
+
+function runallloaders() {
+	jQuery("#loaderresults").empty();
+	var urls = ["/update_with_udw_user","/update_with_udw_file","/update_with_udw_access","/update_assignment","/update_groups","/submission","/weight_consideration"];
+	urls.forEach(function(url) {
+		UrlExists(url, function(status){
+			if(status === 200){
+				jQuery("#loaderresults").append("<p class='success'>Successful load of " + url + "</p>")
+			}
+			else {
+				jQuery("#loaderresults").append("<p class='failure'>Failed load of <a href='" + url + "' target='_blank'>"+url+"</a>. Status code:" + status + ". Click to see more details.</p>")
+			}
+		});
+	});
+	jQuery("#loaderresults").append("<a href='/'>Return to home</a>")
+}
+</script>
+    <meta charset="UTF-8">
+    <title>Test loaders</title>
+</head>
+<body>
+    <button onclick="this.disabled=true;runallloaders()">Run all Loaders (Only run once, should be all green)</button><br>
+    <div id="loaderresults"></div>
+</body>
+</html>

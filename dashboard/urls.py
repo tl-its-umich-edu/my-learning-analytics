@@ -16,6 +16,8 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from django.views.static import serve
+from django.views.generic.base import TemplateView
+
 from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.static import static
@@ -45,7 +47,9 @@ urlpatterns = [
     url(r'^update_groups', cron.update_groups, name='update_groups'),
     url(r'^submission', cron.submission, name='submission'),
     url(r'^weight_consideration', cron.weight_consideration, name='weight_consideration'),
-
+    url(r'^testloader', TemplateView.as_view(
+        template_name='testloader.html'), name="testloader",
+    ),
     url(r'^$', serve, {
         'path': '/home.html',
         'document_root': '.',
