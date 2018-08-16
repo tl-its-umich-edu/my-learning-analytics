@@ -66,6 +66,9 @@ The dashboard/saml directory needs to contain 4 files for SAML configuration. Th
 
 ## Load user, file, file access data into database
 Use the following URL patterns to load data into databases:
+
+** For testing now just use /testloader, this has all the URL's ready to load **
+
 1. update_with_udw_user: load user enrollment information from Unizin Data Warehouse
 2. update_with_udw_file: load file info from Unizin Data Warehouse
 3. update_with_udw_access: load file access information from Canvas Live Event records hosted on Unizin Data Platform
@@ -73,6 +76,7 @@ Use the following URL patterns to load data into databases:
 5. update_groups: groups that assignment belongs has weight/point information associated with assignment group
 6. submission: assignment submission information of students in the course
 7. weight_consideration: load information about weights (as boolean) considered in grading of an assignment.
+
 
 ## Query the MySQL database within the container:
 `docker exec -t -i student_dashboard_mysql /bin/bash`
