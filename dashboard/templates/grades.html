@@ -1,25 +1,29 @@
-<head>
-    <meta charset="UTF-8">
-    <title>files</title>
-    <style>
-        html {
-            font-family: sans-serif;
-            color: #333;
-        }
+{% load static %}
+<!DOCTYPE html>
+<meta charset="utf-8">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.css' %}">
+<link rel="stylesheet" href="/static/css/grades.css">
 
-        body {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
 
-        div, article {
-            padding: 10px;
-            margin: 5px;
-            border: 1px solid #dedede;
-        }
-    </style>
-</head>
 <body>
-<div><p>Grades Distribution page </p></div>
+<script src="{% static 'd3/d3.js' %}"></script>
+<script src="{% static 'underscore/underscore-min.js' %}"></script>
+<script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static 'moment/min/moment.min.js' %}"></script>
+<script src="/static/js/grade_distribution.js"></script>
+<script src="/static/js/d3.tip.v0.6.3.js"></script>
+<script src="/static/js/d3.legend.js"></script>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="navbar-header mastHead">
+            <h1 class="navbar-brand collapse-nav"><span>Student Dashboard</span></h1>
+        </div></div></nav>
+<div class="grade-info">
+</div>
+<div id="chart"></div>
+<div class ="error"></div>
 </body>
+
+</html>
