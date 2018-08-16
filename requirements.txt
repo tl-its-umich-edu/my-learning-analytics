@@ -12,5 +12,5 @@ psycopg2-binary
 canvasapi
 pandas
 PyMySQL
-django-bower
+django-npm
 google-cloud-bigquery

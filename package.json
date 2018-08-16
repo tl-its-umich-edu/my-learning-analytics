@@ -1,0 +1,16 @@
+{
+  "name": "dashboard",
+  "version": "0.0.1",
+  "dependencies": {
+    "angular-nvd3": "1.0.8",
+    "angular":"1.7.3",
+    "angular-resource":"1.7.3",
+    "nvd3":"1.8.6",
+    "d3": "~3.5",
+    "jquery": "~2.1.0",
+    "underscore":"",
+    "bootstrap":"~4.1.3",
+	"popper.js":"^1.14.3",
+    "moment":""
+  }
+}
