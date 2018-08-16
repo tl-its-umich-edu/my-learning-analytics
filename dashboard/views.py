@@ -37,9 +37,16 @@ db_engine = settings.DATABASES['default']['ENGINE']
 #TODO: replace this with CoSign user
 current_user="norrabp"
 
+# Todo the framework needs to remember the course
 CANVAS_COURSE_ID =os.environ.get('CANVAS_COURSE_IDS', '')
 UDW_ID_PREFIX = "17700000000"
 UDW_COURSE_ID = UDW_ID_PREFIX + CANVAS_COURSE_ID
+logger.info("host" + db_host)
+##logger.info("port" + db_port)
+logger.info("user" + db_user)
+logger.info("password" + db_password)
+logger.info("database" + db_name)
+logger.info("current user " + current_user)
 
 
 conn = MySQLdb.connect (db = db_name,  # your mysql database name
@@ -94,6 +101,7 @@ def file_access(request):
     df.drop_duplicates(inplace=True)
     logger.debug(df.dtypes)
     logger.debug(df.describe())
+
 
     # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
     selfSqlString = "select a.FILE_ID as FILE_ID, count(*) as SELF_ACCESS_COUNT, max(a.ACCESS_TIME) as SELF_ACCESS_LAST_TIME " \
@@ -155,6 +163,50 @@ def file_access_within_week(request):
     output_df = pd.concat([output_df, df])
 
     return HttpResponse(output_df.to_json(orient='records'))
+
+def grade_distribution(request):
+
+    # Later this could be coming from a table specific to the course
+    bins = [0, 50, 65, 78, 89, 100]
+    labels = ['E', 'D', 'C', 'B', 'A']
+
+    grade_score_sql = "Select CURRENT_GRADE, FINAL_GRADE FROM USER where COURSE_ID='" + UDW_COURSE_ID + "'"
+    df = sql_data_as_dataframe(grade_score_sql)
+    number_of_students = df.shape[0]
+    average_grade = df['CURRENT_GRADE'].astype(float).mean().round(2)
+    standard_deviation = df['CURRENT_GRADE'].astype(float).std().round(2)
+    # Round half to even
+    df['rounded_score'] = df['CURRENT_GRADE'].astype(float).map(lambda x: int(x / 2) * 2)
+    df_grade = df.groupby(['rounded_score'])[["rounded_score"]].count()
+    df_grade.columns = [['count']]
+    df_grade.reset_index(inplace=True)
+    df_grade.columns = ['score', 'count']
+    df_grade['grade'] = pd.cut(df_grade['score'].astype(float), bins=bins, labels=labels)
+    user_score, rounded_score=get_current_user_score()
+    df_grade['my_score'] = user_score
+    df_grade['my_score_actual'] = rounded_score
+    df_grade['tot_students'] = number_of_students
+    df_grade['grade_stdev'] = standard_deviation
+    df_grade['grade_avg'] = average_grade
+    return HttpResponse(df_grade.to_json(orient='records'))
+
+
+def get_current_user_score():
+    user_score_sql= "select * from USER where SIS_NAME = '" + current_user + "'" \
+                     " and COURSE_ID='" + UDW_COURSE_ID + "'"
+    df = sql_data_as_dataframe(user_score_sql)
+    df['rounded_score'] = df['CURRENT_GRADE'].astype(float).map(lambda x: int(x / 2) * 2)
+    df.to_json('user.json',orient='records')
+    # iloc is used to return single value(as there is single record) otherwise return a Series
+    user_score = df['CURRENT_GRADE'].iloc[0]
+    rounded_score = df['rounded_score'].iloc[0]
+    return user_score,rounded_score
+
+
+
+def sql_data_as_dataframe(sql):
+    df = pd.read_sql(sql, conn)
+    return df
 
 def grades(request):
     return render_to_response("grades.html")

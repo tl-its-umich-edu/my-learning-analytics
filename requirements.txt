@@ -13,5 +13,5 @@ canvasapi
 pandas
 numpy
 PyMySQL
-django-bower
+django-npm
 google-cloud-bigquery
