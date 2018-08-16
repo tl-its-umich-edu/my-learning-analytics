@@ -32,14 +32,16 @@ urlpatterns = [
     url(r'^small_multiples_files_bar_chart/', views.small_multiples_files_bar_chart, name='small_multiples_files_bar_chart'),
 
     # get file access patterns
-    url(r'^file_access', views.file_access, name='file_access'),
+    url(r'^file_access/', views.file_access, name='file_access'),
+    url(r'^file_access_within_week/', views.file_access_within_week, name='file_access_within_week'),
+    url(r'^view_file_access_within_week', views.view_file_access_within_week, name='view_file_access_within_week'),
 
     # load file information
     url(r'^load_data', views.load_data, name='load_data'),
 
     # load data from UDW
     url(r'^update_with_udw_file', cron.update_with_udw_file, name='update_with_udw_file'),
-    url(r'^update_with_udw_access', cron.update_with_udw_access, name='update_with_udw_access'),
+    url(r'^update_with_bq_access', cron.update_with_bq_access, name='update_with_bq_access'),
     url(r'^update_with_udw_user', cron.update_with_udw_user, name='update_with_udw_user'),
     url(r'^update_assignment', cron.update_assignment, name='update_assignment'),
     url(r'^update_groups', cron.update_groups, name='update_groups'),

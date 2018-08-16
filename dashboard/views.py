@@ -2,16 +2,16 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse
 
 import os
+import numpy as np
 
 import random
-import datetime
+from datetime import datetime, timedelta
 import time
 import nvd3
 import MySQLdb
 import json
 import collections
 import logging
-import datetime
 import csv
 
 import pandas as pd
@@ -37,12 +37,9 @@ db_engine = settings.DATABASES['default']['ENGINE']
 #TODO: replace this with CoSign user
 current_user="norrabp"
 
-logger.info("host" + db_host)
-##logger.info("port" + db_port)
-logger.info("user" + db_user)
-logger.info("password" + db_password)
-logger.info("database" + db_name)
-logger.info("current user " + current_user)
+CANVAS_COURSE_ID =os.environ.get('CANVAS_COURSE_IDS', '')
+UDW_ID_PREFIX = "17700000000"
+UDW_COURSE_ID = UDW_ID_PREFIX + CANVAS_COURSE_ID
 
 
 conn = MySQLdb.connect (db = db_name,  # your mysql database name
@@ -59,6 +56,9 @@ def home(request):
 
 def files(request):
     return render_to_response("files.html")
+
+def view_file_access_within_week(request):
+    return render_to_response("file_access_within_week.html")
 
 def gpa_map(grade):
     grade_float = float(grade)
@@ -80,7 +80,7 @@ def file_access(request):
                 "FROM FILE f, FILE_ACCESS a, USER u, COURSE c, ACADEMIC_TERMS t " \
                 "WHERE a.FILE_ID =f.ID " \
                 "and a.USER_ID = u.ID " \
-                "and a.COURSE_ID = c.ID " \
+                "and f.COURSE_ID = c.ID " \
                 "and c.TERM_ID = t.TERM_ID"
     df = pd.read_sql(sqlString, conn)
     logger.debug(df.dtypes)
@@ -91,7 +91,7 @@ def file_access(request):
     logger.debug(df.dtypes)
 
     df['interactions'] = df.groupby(['FILE_ID','files', 'week', 'grade'])['FILE_ID'].transform('count')
-    df.drop_duplicates()
+    df.drop_duplicates(inplace=True)
     logger.debug(df.dtypes)
     logger.debug(df.describe())
 
@@ -109,6 +109,52 @@ def file_access(request):
     logger.debug(df.describe())
 
     return HttpResponse(df.to_json(orient='records'))
+
+# show percentage of users who read the file within prior n weeks
+def file_access_within_week(request):
+
+    week_num = int(request.GET.get('week_num','0'))
+
+    # get total number of student within the course_id
+    total_number_student_sql = "select count(*) from USER where COURSE_ID = '" + UDW_COURSE_ID + "'"
+    total_number_student_df = pd.read_sql(total_number_student_sql, conn)
+    total_number_student = total_number_student_df.iloc[0,0]
+    logger.info("total student=" + str(total_number_student))
+
+    # output dataframe
+    # file_name: String with max length of 255
+    # file_id: String with max length of 255
+    # grade: String with max length of 1
+    # week: 32-bit integer
+    # percent: 32-bit float
+    output_df = pd.DataFrame(columns=['week','file_name','file_id','grade','percent'])
+
+    # get time range based on week number passed in via request
+
+    today = datetime.now().date()
+    start = today - timedelta(days=(week_num * 7 + today.weekday()))
+    end = today + timedelta(days=(7-today.weekday()))
+
+    sqlString = "SELECT a.FILE_ID as file_id, f.NAME as file_name, u.CURRENT_GRADE as current_grade, a.user_ID as user_id " \
+                "FROM FILE f, FILE_ACCESS a, USER u, COURSE c, ACADEMIC_TERMS t  " \
+                "WHERE a.FILE_ID =f.ID and a.USER_ID = u.ID  " \
+                "and f.COURSE_ID = c.ID and c.TERM_ID = t.TERM_ID " \
+                "and a.ACCESS_TIME > '"+ start.strftime('%Y%m%d') + "000000" + "' " \
+                "and a.ACCESS_TIME < '" + end.strftime('%Y%m%d') + "000000" + "' "
+    logger.info(sqlString)
+    df = pd.read_sql(sqlString, conn)
+
+    # map point grade to letter grade
+    df['grade'] = df['current_grade'].map(gpa_map)
+    df['percent'] = np.ceil(df.groupby(['file_id','file_name', 'grade'])['file_id'].transform('count')*100/total_number_student)
+    df.drop(columns=['current_grade', 'user_id'], inplace=True)
+    df.drop_duplicates(inplace=True)
+    df['week'] = week_num
+
+    # concatenate dataframe
+    output_df = pd.concat([output_df, df])
+
+    return HttpResponse(output_df.to_json(orient='records'))
 
 def grades(request):
     return render_to_response("grades.html")
