@@ -61,12 +61,6 @@ def home(request):
     """
     return render_to_response('home.html')
 
-def files(request):
-    return render_to_response("files.html")
-
-def view_file_access_within_week(request):
-    return render_to_response("file_access_within_week.html")
-
 def gpa_map(grade):
     grade_float = float(grade)
     if grade_float < 60:
@@ -207,12 +201,6 @@ def get_current_user_score():
 def sql_data_as_dataframe(sql):
     df = pd.read_sql(sql, conn)
     return df
-
-def grades(request):
-    return render_to_response("grades.html")
-
-def small_multiples_files_bar_chart(request):
-    return render_to_response("small_multiples_files_bar_chart.html")
 
 def load_data(request):
     ## create the database connection engine

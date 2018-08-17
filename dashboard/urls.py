@@ -29,14 +29,21 @@ from . import cron
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.home, name='home'),
-    url(r'^files/', views.files, name='files'),
-    url(r'^grades/', views.grades, name='grades'),
-    url(r'^small_multiples_files_bar_chart/', views.small_multiples_files_bar_chart, name='small_multiples_files_bar_chart'),
-
+    url(r'^files/', TemplateView.as_view(
+        template_name='files.html'), name="files",
+    ),
+    url(r'^grades/', TemplateView.as_view(
+        template_name='grades.html'), name="grades",
+    ),
+    url(r'^small_multiples_files_bar_chart/', TemplateView.as_view(
+        template_name='small_multiples_files_bar_chart.html'), name="small_multiples_files_bar_chart",
+    ),
     # get file access patterns
     url(r'^file_access/', views.file_access, name='file_access'),
     url(r'^file_access_within_week/', views.file_access_within_week, name='file_access_within_week'),
-    url(r'^view_file_access_within_week', views.view_file_access_within_week, name='view_file_access_within_week'),
+    url(r'^view_file_access_within_week', TemplateView.as_view(
+      template_name='file_access_within_week.html'), name="view_file_access_within_week",
+      ),
     url(r'^grade_distribution', views.grade_distribution, name='grade_distribution'),
 
     # load file information

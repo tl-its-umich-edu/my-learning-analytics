@@ -119,16 +119,16 @@ def update_with_bq_access(request):
                                 'and JSON_EXTRACT_SCALAR(event, "$.action") = \'NavigatedTo\' ' \
                                 'and JSON_EXTRACT_SCALAR(event, "$.membership.member.id") is not null ' \
                                 'and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) = \'' + UDW_COURSE_ID + '\' '
-                        logger.info(query)
+                        logger.debug(query)
 
                         # Location must match that of the dataset(s) referenced in the query.
                         df = bigquery_client.query(query, location='US').to_dataframe()  # API request - starts the query
 
-                        logger.info("df row number=" + str(df.shape[0]))
+                        logger.debug("df row number=" + str(df.shape[0]))
                         # drop duplicates
                         df.drop_duplicates(["FILE_ID", "USER_ID", "ACCESS_TIME"], keep='first', inplace=True)
 
-                        logger.info("after drop duplicates, df row number=" + str(df.shape[0]))
+                        logger.debug("after drop duplicates, df row number=" + str(df.shape[0]))
 
                         # write to MySQL
                         df.to_sql(con=engine, name='FILE_ACCESS', if_exists='append', index=False)
@@ -164,7 +164,7 @@ def update_with_udw_user(request):
           "and c.current_score is not null " \
           "and c.final_score is not null"
 
-    logger.info(user_sql)
+    logger.debug(user_sql)
 
     return HttpResponse("loaded user info: " + util_function(user_sql, 'USER'))
 
@@ -175,7 +175,7 @@ def update_groups(request):
     :param request:
     :return:
     '''
-    logger.info("update_assignment_groups(): ")
+    logger.debug("update_assignment_groups(): ")
     assignment_groups_sql = "with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id " \
                             "from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='" + UDW_COURSE_ID + "'" \
                             "and ad.visibility = 'everyone' and ad.workflow_state='published')"\
@@ -255,7 +255,7 @@ def util_function(sql_string, mysql_table, table_identifier=None):
         dbname=UDW_DATABASE)
 
     df = pd.read_sql(sql_string, udw_conn)
-    logger.info("df shape " + str(df.shape[0]) + " " + str(df.shape[1]))
+    logger.debug("df shape " + str(df.shape[0]) + " " + str(df.shape[1]))
 
     # Sql returns boolean value so grouping course info along with it so that this could be stored in the DB table.
     if table_identifier == 'weight':
@@ -267,7 +267,7 @@ def util_function(sql_string, mysql_table, table_identifier=None):
     # drop duplicates
     df.drop_duplicates(keep='first', inplace=True)
 
-    logger.info(" table: " + mysql_table + " insert size: " + str(df.shape[0]))
+    logger.debug(" table: " + mysql_table + " insert size: " + str(df.shape[0]))
 
     # write to MySQL
     df.to_sql(con=engine, name=mysql_table, if_exists='append', index=False)
