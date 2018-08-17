@@ -52,12 +52,6 @@ db_password = settings.DATABASES['default']['PASSWORD']
 db_host = settings.DATABASES['default']['HOST']
 db_port = settings.DATABASES['default']['PORT']
 
-logger.info("host" + db_host);
-##logger.info("port" + db_port);
-logger.info("user" + db_user);
-logger.info("password" + db_password);
-logger.info("database" + db_name);
-
 engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
                        .format(db = db_name,  # your mysql database name
                                user = db_user, # your mysql user for the database
@@ -73,7 +67,6 @@ UDW_USER=settings.DATABASES['UDW']['UDW_USER']
 UDW_PASSWORD=settings.DATABASES['UDW']['UDW_PASSWORD']
 UDW_PORT=settings.DATABASES['UDW']['UDW_PORT']
 UDW_DATABASE=settings.DATABASES['UDW']['UDW_DATABASE']
-print(UDW_PORT)
 
 CANVAS_COURSE_ID =os.environ.get('CANVAS_COURSE_IDS', '')
 UDW_ID_PREFIX = "17700000000"
@@ -92,7 +85,7 @@ def update_with_udw_file(request):
     return HttpResponse("loaded file info: " + util_function(file_sql, 'FILE'))
 
 # update FILE_ACCESS records from BigQuery
-def update_with_udw_access(request):
+def update_with_bq_access(request):
 
     # Instantiates a client
     bigquery_client = bigquery.Client()
@@ -118,35 +111,35 @@ def update_with_udw_access(request):
                         # query to retrieve all file access events for one course
                         query = 'select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, "$.object.id"), 35) AS STRING) AS FILE_ID, ' \
                                 'SUBSTR(JSON_EXTRACT_SCALAR(event, "$.membership.member.id"), 29) AS USER_ID, ' \
-                                'EVENT_TIME as ACCESS_TIME, ' \
-                                'SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) AS COURSE_ID ' \
+                                'datetime(EVENT_TIME) as ACCESS_TIME ' \
                                 'FROM learning_datasets.enriched_events ' \
                                 'where JSON_EXTRACT_SCALAR(event, "$.edApp.id") = \'http://umich.instructure.com/\' ' \
                                 'and event_type = \'NavigationEvent\' ' \
                                 'and JSON_EXTRACT_SCALAR(event, "$.object.name") = \'attachment\' ' \
                                 'and JSON_EXTRACT_SCALAR(event, "$.action") = \'NavigatedTo\' ' \
                                 'and JSON_EXTRACT_SCALAR(event, "$.membership.member.id") is not null ' \
-                                'and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) = \'' + UDW_COURSE_ID + '\' '
+                                'and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) = @course_id '
                         logger.debug(query)
+                        query_params =[
+                            bigquery.ScalarQueryParameter('course_id', 'STRING', UDW_COURSE_ID),
+                        ]
+                        job_config = bigquery.QueryJobConfig()
+                        job_config.query_parameters = query_params
 
                         # Location must match that of the dataset(s) referenced in the query.
-                        df = bigquery_client.query(query, location='US').to_dataframe()  # API request - starts the query
-                        logger.debug(df.describe())
+                        df = bigquery_client.query(query, location='US', job_config=job_config).to_dataframe()  # API request - starts the query
 
+                        logger.debug("df row number=" + str(df.shape[0]))
                         # drop duplicates
-                        df.drop_duplicates(keep=False, inplace=True)
+                        df.drop_duplicates(["FILE_ID", "USER_ID", "ACCESS_TIME"], keep='first', inplace=True)
 
-                        # adjust the time value to drop time zone info
-                        # so instead of 2018-07-02 15:28:32 UTC, we only want 2018-07-02 15:28:32
+                        logger.debug("after drop duplicates, df row number=" + str(df.shape[0]))
 
-                        df['ACCESS_TIME'] = df['ACCESS_TIME'].dt.date
                         # write to MySQL
                         df.to_sql(con=engine, name='FILE_ACCESS', if_exists='append', index=False)
 
     else:
         logger.debug('{} project does not contain any datasets.'.format(project))
-
-
 
     return HttpResponse("loaded file access info: inserted " + str(df.shape[0]) + " rows.")
 
@@ -174,7 +167,7 @@ def update_with_udw_user(request):
           "and c.current_score is not null " \
           "and c.final_score is not null"
 
-    logger.info(user_sql)
+    logger.debug(user_sql)
 
     return HttpResponse("loaded user info: " + util_function(user_sql, 'USER'))
 
@@ -185,7 +178,7 @@ def update_groups(request):
     :param request:
     :return:
     '''
-    logger.info("update_assignment_groups(): ")
+    logger.debug("update_assignment_groups(): ")
     assignment_groups_sql = "with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id " \
                             "from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='" + UDW_COURSE_ID + "'" \
                             "and ad.visibility = 'everyone' and ad.workflow_state='published')"\
@@ -265,7 +258,7 @@ def util_function(sql_string, mysql_table, table_identifier=None):
         dbname=UDW_DATABASE)
 
     df = pd.read_sql(sql_string, udw_conn)
-    logger.info("df shape " + str(df.shape[0]) + " " + str(df.shape[1]))
+    logger.debug("df shape " + str(df.shape[0]) + " " + str(df.shape[1]))
 
     # Sql returns boolean value so grouping course info along with it so that this could be stored in the DB table.
     if table_identifier == 'weight':
@@ -277,7 +270,7 @@ def util_function(sql_string, mysql_table, table_identifier=None):
     # drop duplicates
     df.drop_duplicates(keep='first', inplace=True)
 
-    logger.info(" table: " + mysql_table + " insert size: " + str(df.shape[0]))
+    logger.debug(" table: " + mysql_table + " insert size: " + str(df.shape[0]))
 
     # write to MySQL
     df.to_sql(con=engine, name=mysql_table, if_exists='append', index=False)

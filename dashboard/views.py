@@ -2,26 +2,25 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse
 
 import os
+import numpy as np
 
 import random
-import datetime
+from datetime import datetime, timedelta
 import time
 import nvd3
 import MySQLdb
 import json
 import collections
 import logging
-import datetime
 import csv
 
 import pandas as pd
 from pandas.io import sql
-import MySQLdb
+#import MySQLdb
 
 import pandas as pd
-from sqlalchemy import create_engine
-from pandas.io import sql
-import pymysql
+#from sqlalchemy import create_engine
+#import pymysql
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -36,6 +35,7 @@ db_engine = settings.DATABASES['default']['ENGINE']
 
 #TODO: replace this with CoSign user
 current_user="norrabp"
+
 # Todo the framework needs to remember the course
 CANVAS_COURSE_ID =os.environ.get('CANVAS_COURSE_IDS', '')
 UDW_ID_PREFIX = "17700000000"
@@ -60,9 +60,6 @@ def home(request):
     """
     return render_to_response('home.html')
 
-def files(request):
-    return render_to_response("files.html")
-
 def gpa_map(grade):
     grade_float = float(grade)
     if grade_float < 60:
@@ -83,7 +80,7 @@ def file_access(request):
                 "FROM FILE f, FILE_ACCESS a, USER u, COURSE c, ACADEMIC_TERMS t " \
                 "WHERE a.FILE_ID =f.ID " \
                 "and a.USER_ID = u.ID " \
-                "and a.COURSE_ID = c.ID " \
+                "and f.COURSE_ID = c.ID " \
                 "and c.TERM_ID = t.TERM_ID"
     df = pd.read_sql(sqlString, conn)
     logger.debug(df.dtypes)
@@ -94,7 +91,7 @@ def file_access(request):
     logger.debug(df.dtypes)
 
     df['interactions'] = df.groupby(['FILE_ID','files', 'week', 'grade'])['FILE_ID'].transform('count')
-    df.drop_duplicates()
+    df.drop_duplicates(inplace=True)
     logger.debug(df.dtypes)
     logger.debug(df.describe())
 
@@ -103,10 +100,10 @@ def file_access(request):
     selfSqlString = "select a.FILE_ID as FILE_ID, count(*) as SELF_ACCESS_COUNT, max(a.ACCESS_TIME) as SELF_ACCESS_LAST_TIME " \
                     "from FILE_ACCESS a, USER u " \
                     "where a.USER_ID = u.id " \
-                    "and u.SIS_NAME='" + current_user + "' " \
+                    "and u.SIS_NAME=%(current_user)s " \
                     "group by a.FILE_ID;"
     logger.debug(selfSqlString)
-    selfDf= pd.read_sql(selfSqlString, conn)
+    selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user})
     logger.debug(selfDf.dtypes)
     logger.debug(selfDf.describe())
     df = df.join(selfDf.set_index('FILE_ID'), on='FILE_ID')
@@ -114,6 +111,52 @@ def file_access(request):
 
     return HttpResponse(df.to_json(orient='records'))
 
+# show percentage of users who read the file within prior n weeks
+def file_access_within_week(request):
+
+    week_num = int(request.GET.get('week_num','0'))
+
+    # get total number of student within the course_id
+    total_number_student_sql = "select count(*) from USER where COURSE_ID = %(course_id)s"
+    total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": UDW_COURSE_ID})
+    total_number_student = total_number_student_df.iloc[0,0]
+    logger.info("total student=" + str(total_number_student))
+
+    # output dataframe
+    # file_name: String with max length of 255
+    # file_id: String with max length of 255
+    # grade: String with max length of 1
+    # week: 32-bit integer
+    # percent: 32-bit float
+    output_df = pd.DataFrame(columns=['week','file_name','file_id','grade','percent'])
+
+    # get time range based on week number passed in via request
+
+    today = datetime.now().date()
+    start = today - timedelta(days=(week_num * 7 + today.weekday()))
+    end = today + timedelta(days=(7-today.weekday()))
+
+    sqlString = "SELECT a.FILE_ID as file_id, f.NAME as file_name, u.CURRENT_GRADE as current_grade, a.user_ID as user_id " \
+                "FROM FILE f, FILE_ACCESS a, USER u, COURSE c, ACADEMIC_TERMS t  " \
+                "WHERE a.FILE_ID =f.ID and a.USER_ID = u.ID  " \
+                "and f.COURSE_ID = c.ID and c.TERM_ID = t.TERM_ID " \
+                "and a.ACCESS_TIME > %(start_time)s " \
+                "and a.ACCESS_TIME < %(end_time)s "
+    startTimeString = start.strftime('%Y%m%d') + "000000"
+    endTimeString = end.strftime('%Y%m%d') + "000000"
+    df = pd.read_sql(sqlString, conn, params={"start_time": startTimeString,"end_time": endTimeString})
+
+    # map point grade to letter grade
+    df['grade'] = df['current_grade'].map(gpa_map)
+    df['percent'] = np.ceil(df.groupby(['file_id','file_name', 'grade'])['file_id'].transform('count')*100/total_number_student)
+    df.drop(columns=['current_grade', 'user_id'], inplace=True)
+    df.drop_duplicates(inplace=True)
+    df['week'] = week_num
+
+    # concatenate dataframe
+    output_df = pd.concat([output_df, df])
+
+    return HttpResponse(output_df.to_json(orient='records'))
 
 def grade_distribution(request):
 
@@ -121,8 +164,8 @@ def grade_distribution(request):
     bins = [0, 50, 65, 78, 89, 100]
     labels = ['E', 'D', 'C', 'B', 'A']
 
-    grade_score_sql = "Select CURRENT_GRADE, FINAL_GRADE FROM USER where COURSE_ID='" + UDW_COURSE_ID + "'"
-    df = sql_data_as_dataframe(grade_score_sql)
+    grade_score_sql = "Select CURRENT_GRADE, FINAL_GRADE FROM USER where COURSE_ID=%(course_id)s"
+    df = pd.read_sql(grade_score_sql, conn, params={'course_id': UDW_COURSE_ID})
     number_of_students = df.shape[0]
     average_grade = df['CURRENT_GRADE'].astype(float).mean().round(2)
     standard_deviation = df['CURRENT_GRADE'].astype(float).std().round(2)
@@ -143,28 +186,14 @@ def grade_distribution(request):
 
 
 def get_current_user_score():
-    user_score_sql= "select * from USER where SIS_NAME = '" + current_user + "'" \
-                     " and COURSE_ID='" + UDW_COURSE_ID + "'"
-    df = sql_data_as_dataframe(user_score_sql)
+    user_score_sql= "select * from USER where SIS_NAME = %(current_user)s and COURSE_ID=%(course_id)s"
+    df = pd.read_sql(user_score_sql, conn, params={"current_user": current_user,'course_id': UDW_COURSE_ID})
     df['rounded_score'] = df['CURRENT_GRADE'].astype(float).map(lambda x: int(x / 2) * 2)
     df.to_json('user.json',orient='records')
     # iloc is used to return single value(as there is single record) otherwise return a Series
     user_score = df['CURRENT_GRADE'].iloc[0]
     rounded_score = df['rounded_score'].iloc[0]
     return user_score,rounded_score
-
-
-
-def sql_data_as_dataframe(sql):
-    df = pd.read_sql(sql, conn)
-    return df
-
-
-def grades(request):
-    return render_to_response("grades.html")
-
-def small_multiples_files_bar_chart(request):
-    return render_to_response("small_multiples_files_bar_chart.html")
 
 def load_data(request):
     ## create the database connection engine

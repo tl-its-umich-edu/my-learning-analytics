@@ -11,6 +11,7 @@ sqlalchemy
 psycopg2-binary
 canvasapi
 pandas
+numpy
 PyMySQL
 django-npm
 google-cloud-bigquery

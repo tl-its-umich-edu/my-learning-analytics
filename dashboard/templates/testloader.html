@@ -24,7 +24,7 @@ function UrlExists(url, cb){
 
 function runallloaders() {
 	jQuery("#loaderresults").empty();
-	var urls = ["/update_with_udw_user","/update_with_udw_file","/update_with_udw_access","/update_assignment","/update_groups","/submission","/weight_consideration"];
+	var urls = ["/update_with_udw_user","/update_with_udw_file","/update_with_bq_access","/update_assignment","/update_groups","/submission","/weight_consideration"];
 	urls.forEach(function(url) {
 		UrlExists(url, function(status){
 			if(status === 200){
