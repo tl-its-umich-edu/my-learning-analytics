@@ -118,11 +118,16 @@ def update_with_bq_access(request):
                                 'and JSON_EXTRACT_SCALAR(event, "$.object.name") = \'attachment\' ' \
                                 'and JSON_EXTRACT_SCALAR(event, "$.action") = \'NavigatedTo\' ' \
                                 'and JSON_EXTRACT_SCALAR(event, "$.membership.member.id") is not null ' \
-                                'and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) = \'' + UDW_COURSE_ID + '\' '
+                                'and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) = @course_id '
                         logger.debug(query)
+                        query_params =[
+                            bigquery.ScalarQueryParameter('course_id', 'STRING', UDW_COURSE_ID),
+                        ]
+                        job_config = bigquery.QueryJobConfig()
+                        job_config.query_parameters = query_params
 
                         # Location must match that of the dataset(s) referenced in the query.
-                        df = bigquery_client.query(query, location='US').to_dataframe()  # API request - starts the query
+                        df = bigquery_client.query(query, location='US', job_config=job_config).to_dataframe()  # API request - starts the query
 
                         logger.debug("df row number=" + str(df.shape[0]))
                         # drop duplicates
@@ -135,8 +140,6 @@ def update_with_bq_access(request):
 
     else:
         logger.debug('{} project does not contain any datasets.'.format(project))
-
-
 
     return HttpResponse("loaded file access info: inserted " + str(df.shape[0]) + " rows.")
 

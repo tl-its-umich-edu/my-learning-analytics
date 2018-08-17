@@ -16,12 +16,11 @@ import csv
 
 import pandas as pd
 from pandas.io import sql
-import MySQLdb
+#import MySQLdb
 
 import pandas as pd
-from sqlalchemy import create_engine
-from pandas.io import sql
-import pymysql
+#from sqlalchemy import create_engine
+#import pymysql
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -101,10 +100,10 @@ def file_access(request):
     selfSqlString = "select a.FILE_ID as FILE_ID, count(*) as SELF_ACCESS_COUNT, max(a.ACCESS_TIME) as SELF_ACCESS_LAST_TIME " \
                     "from FILE_ACCESS a, USER u " \
                     "where a.USER_ID = u.id " \
-                    "and u.SIS_NAME='" + current_user + "' " \
+                    "and u.SIS_NAME=%(current_user)s " \
                     "group by a.FILE_ID;"
     logger.debug(selfSqlString)
-    selfDf= pd.read_sql(selfSqlString, conn)
+    selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user})
     logger.debug(selfDf.dtypes)
     logger.debug(selfDf.describe())
     df = df.join(selfDf.set_index('FILE_ID'), on='FILE_ID')
@@ -118,8 +117,8 @@ def file_access_within_week(request):
     week_num = int(request.GET.get('week_num','0'))
 
     # get total number of student within the course_id
-    total_number_student_sql = "select count(*) from USER where COURSE_ID = '" + UDW_COURSE_ID + "'"
-    total_number_student_df = pd.read_sql(total_number_student_sql, conn)
+    total_number_student_sql = "select count(*) from USER where COURSE_ID = %(course_id)s"
+    total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": UDW_COURSE_ID})
     total_number_student = total_number_student_df.iloc[0,0]
     logger.info("total student=" + str(total_number_student))
 
@@ -141,10 +140,11 @@ def file_access_within_week(request):
                 "FROM FILE f, FILE_ACCESS a, USER u, COURSE c, ACADEMIC_TERMS t  " \
                 "WHERE a.FILE_ID =f.ID and a.USER_ID = u.ID  " \
                 "and f.COURSE_ID = c.ID and c.TERM_ID = t.TERM_ID " \
-                "and a.ACCESS_TIME > '"+ start.strftime('%Y%m%d') + "000000" + "' " \
-                "and a.ACCESS_TIME < '" + end.strftime('%Y%m%d') + "000000" + "' "
-    logger.info(sqlString)
-    df = pd.read_sql(sqlString, conn)
+                "and a.ACCESS_TIME > %(start_time)s " \
+                "and a.ACCESS_TIME < %(end_time)s "
+    startTimeString = start.strftime('%Y%m%d') + "000000"
+    endTimeString = end.strftime('%Y%m%d') + "000000"
+    df = pd.read_sql(sqlString, conn, params={"start_time": startTimeString,"end_time": endTimeString})
 
     # map point grade to letter grade
     df['grade'] = df['current_grade'].map(gpa_map)
@@ -164,8 +164,8 @@ def grade_distribution(request):
     bins = [0, 50, 65, 78, 89, 100]
     labels = ['E', 'D', 'C', 'B', 'A']
 
-    grade_score_sql = "Select CURRENT_GRADE, FINAL_GRADE FROM USER where COURSE_ID='" + UDW_COURSE_ID + "'"
-    df = sql_data_as_dataframe(grade_score_sql)
+    grade_score_sql = "Select CURRENT_GRADE, FINAL_GRADE FROM USER where COURSE_ID=%(course_id)s"
+    df = pd.read_sql(grade_score_sql, conn, params={'course_id': UDW_COURSE_ID})
     number_of_students = df.shape[0]
     average_grade = df['CURRENT_GRADE'].astype(float).mean().round(2)
     standard_deviation = df['CURRENT_GRADE'].astype(float).std().round(2)
@@ -186,21 +186,14 @@ def grade_distribution(request):
 
 
 def get_current_user_score():
-    user_score_sql= "select * from USER where SIS_NAME = '" + current_user + "'" \
-                     " and COURSE_ID='" + UDW_COURSE_ID + "'"
-    df = sql_data_as_dataframe(user_score_sql)
+    user_score_sql= "select * from USER where SIS_NAME = %(current_user)s and COURSE_ID=%(course_id)s"
+    df = pd.read_sql(user_score_sql, conn, params={"current_user": current_user,'course_id': UDW_COURSE_ID})
     df['rounded_score'] = df['CURRENT_GRADE'].astype(float).map(lambda x: int(x / 2) * 2)
     df.to_json('user.json',orient='records')
     # iloc is used to return single value(as there is single record) otherwise return a Series
     user_score = df['CURRENT_GRADE'].iloc[0]
     rounded_score = df['rounded_score'].iloc[0]
     return user_score,rounded_score
-
-
-
-def sql_data_as_dataframe(sql):
-    df = pd.read_sql(sql, conn)
-    return df
 
 def load_data(request):
     ## create the database connection engine
