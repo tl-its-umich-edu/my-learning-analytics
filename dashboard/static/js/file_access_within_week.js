@@ -1,17 +1,12 @@
-var highlightData = function(file_name) {
-    $('.bar').css('opacity', '1')
-    $('.bar').not("." + file_name).css('opacity', '.2')
-}
-
-$('select').on('change', function() {
-    makeGraph(this.value);
-})
+var highlightData = function(fileName) {
+    $('.bar').css("opacity", "1");
+    $('.bar').not("." + fileName).css("opacity", ".2")
+};
 
 var makeGraph = function(url) {
     d3.selectAll("#chart > *").remove();
     $.getJSON(url ||  "/file_access_within_week/", function(initResult) {
-        data = initResult;
-        console.log(data);
+        var data = initResult;
         var margin = {
                 top: 40,
                 right: 20,
@@ -24,7 +19,7 @@ var makeGraph = function(url) {
         var color = d3.scale.category10();
         var colorColumn = "grade";
         // legend
-        var active_link = "0"; //to control legend selections and hover
+        var activeLink = "0"; //to control legend selections and hover
         var legendClicked; //to control legend selections
         var legendClassArray = []; //store legend classes to select bars in plotSingle()
 
@@ -37,12 +32,12 @@ var makeGraph = function(url) {
             .orient("bottom");
         var yAxis = d3.svg.axis()
             .scale(y)
-            .orient("left")
+            .orient("left");
         var tip = d3.tip()
-            .attr('class', 'd3-tip')
+            .attr("class", "d3-tip")
             .offset([-10, 0])
             .html(function(d) {
-                return '<div><strong>Percent:</strong> <span style="color:red">' + d.percent + '</span></div><p>' + d.file_name + '</p><p>Grade: '+ d.grade + '</p><p>';
+                return "<div><strong>Percent:</strong> <span style=\"color:red\">" + d.percent + "</span></div><p>" + d.file_name + "</p><p>Grade: "+ d.grade + "</p><p>";
             })
         var svg = d3.select("#chart").append("svg")
             .attr("width", width + margin.left + margin.right)
@@ -54,19 +49,19 @@ var makeGraph = function(url) {
         svg.call(tip);
 
         //d3.json("data.json", function(error, data) {
-        var files = _.uniq(_.pluck(data, 'file_name'));
+        var files = _.uniq(_.pluck(data, "file_name"));
         var fileCount = [];
         _.each(files, function(file) {
             fileCount.push({
-                'file': file,
-                'count': 0
+                "file": file,
+                "count": 0
             });
         })
         _.each(data, function(item) {
             var corr = _.findWhere(fileCount, {
                 file: item.file_name
             });
-            corr.count = corr.count + 1
+            corr.count = corr.count + 1;
         });
         _.each(data, function(item) {
             var corr = _.findWhere(fileCount, {
@@ -115,7 +110,7 @@ var makeGraph = function(url) {
             .sort(function(a, b) { return x0(a.letter) - x0(b.letter); })
             .enter().append("rect")
             .attr("class", function(d) {
-                return 'bar ' + d.file_name.replace(/ /gi, '_') + ' Percent:' + d.count  + " for Grade:" + d.grade;
+                return "bar " + d.file_name.replace(/ /gi, "_") + " Percent:" + d.count  + " for Grade:" + d.grade;
             })
             .attr("x", function(d) {
                 return x(d.file_name);
@@ -131,7 +126,7 @@ var makeGraph = function(url) {
             .on('mouseover', tip.show)
             .on('mouseout', tip.hide)
             .on('click', function(d) {
-                highlightData(d.file_name.replace(/ /gi, '_'));
+                highlightData(d.file_name.replace(/ /gi, "_"));
             })
             .sort(function(a, b) { return x0(a.percent) - x0(b.percent); });
 
@@ -175,37 +170,37 @@ var makeGraph = function(url) {
             })
             .on("mouseover",function(){
 
-                if (active_link === "0") d3.select(this).style("cursor", "pointer");
+                if (activeLink === "0") d3.select(this).style("cursor", "pointer");
                 else {
-                    if (active_link.split("class").pop() === this.id.split("id").pop()) {
+                    if (activeLink.split("class").pop() === this.id.split("id").pop()) {
                         d3.select(this).style("cursor", "pointer");
                     } else d3.select(this).style("cursor", "auto");
                 }
             })
             .on("click",function(d){
 
-                if (active_link === "0") { //nothing selected, turn on this selection
+                if (activeLink === "0") { //nothing selected, turn on this selection
                     d3.select(this)
                         .style("stroke", "black")
                         .style("stroke-width", 2);
 
-                    active_link = this.id.split("id").pop();
+                    activeLink = this.id.split("id").pop();
                     plotSingle(this);
 
                     //gray out the others
                     for (i = 0; i < legendClassArray.length; i++) {
-                        if (legendClassArray[i] != active_link) {
+                        if (legendClassArray[i] != activeLink) {
                             d3.select("#id" + legendClassArray[i])
                                 .style("opacity", 0.5);
                         }
                     }
 
                 } else { //deactivate
-                    if (active_link === this.id.split("id").pop()) {//active square selected; turn it OFF
+                    if (activeLink === this.id.split("id").pop()) {//active square selected; turn it OFF
                         d3.select(this)
                             .style("stroke", "none");
 
-                        active_link = "0"; //reset
+                        activeLink = "0"; //reset
 
                         //restore remaining boxes to normal opacity
                         for (i = 0; i < legendClassArray.length; i++) {
@@ -218,7 +213,7 @@ var makeGraph = function(url) {
 
                     }
 
-                } //end active_link check
+                } //end activeLink check
 
 
             });
@@ -298,4 +293,7 @@ var makeGraph = function(url) {
 
     });
 };
+$('select').on("change", function() {
+    makeGraph(this.value);
+});
 makeGraph();
