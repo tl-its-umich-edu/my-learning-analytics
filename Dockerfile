@@ -1,16 +1,16 @@
 # FROM directive instructing base image to build upon
-FROM python:3.5
+FROM amancevice/pandas:0.23.0-python3-alpine
 
-RUN pip install --upgrade pip
-COPY requirements.txt /requirements.txt
-RUN pip install -r /requirements.txt
-#FROM python:2-onbuild
-RUN apt-get install curl
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
-# RUN apt-get update
-RUN apt-get install -y nodejs python-dev xmlsec1 wget
-#libmysqlclient-dev
-RUN apt-get clean -y
+COPY requirements.txt /
+
+RUN apk --no-cache add --virtual build-dependencies postgresql-dev python3-dev build-base gcc libc-dev libffi-dev mariadb-dev  
+RUN python3 -m pip install -r /requirements.txt 
+RUN rm -rf .cache/pip 
+RUN apk --no-cache add --virtual runtime-dependencies bash git wget nodejs-npm mariadb-client-libs postgresql-client xmlsec-dev 
+RUN apk del build-dependencies
+
+COPY . /dashboard/
+WORKDIR /dashboard/
 
 #https://github.com/jwilder/dockerize
 ENV DOCKERIZE_VERSION v0.6.1
@@ -23,8 +23,6 @@ COPY start.sh /start.sh
 
 # EXPOSE port 8000 to allow communication to/from server
 EXPOSE 5000
-WORKDIR /dashboard/
-COPY . /dashboard/
 
 RUN npm install
 
@@ -35,7 +33,7 @@ COPY manage.py /manage.py
 
 COPY data/* /data/
 
-RUN echo yes | python manage.py collectstatic
+RUN echo yes | python3 manage.py collectstatic
 
 COPY mysql/init.sql /docker-entrypoint-initdb.d
 

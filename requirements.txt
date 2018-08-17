@@ -7,10 +7,10 @@ django-nvd3
 django-registration
 django-crontab
 mysqlclient
+psycopg2
 sqlalchemy
-psycopg2-binary
 canvasapi
-pandas
 PyMySQL
 django-npm
 google-cloud-bigquery
+pandas
