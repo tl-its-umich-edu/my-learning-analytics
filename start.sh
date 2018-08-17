@@ -11,7 +11,7 @@ if [ -z "${GUNICORN_PORT}" ]; then
 fi
 
 echo "Waiting for DB"
-dockerize -wait tcp://student_dashboard_mysql:3306 -timeout 30s
+dockerize -wait tcp://${MYSQL_HOST}:${MYSQL_PORT} -timeout 15s
 
 echo Running python startups
 python manage.py crontab add; python manage.py migrate
