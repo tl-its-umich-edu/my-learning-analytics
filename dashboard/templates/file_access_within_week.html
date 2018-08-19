@@ -1,118 +1,131 @@
+{% load static %}
 <!DOCTYPE html>
-<meta charset="utf-8">
-<style>
-  body {
-    font: 10px sans-serif;
-  }
+<html lang="en">
+<head>
+    <title>Files Accessed</title>
+    <meta charset="utf-8">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-124181744-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-  .axis path,
-  .axis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
-  }
+        gtag('config', 'UA-124181744-1');
+    </script>
+    <style>
+          body {
+            font: 10px sans-serif;
+          }
 
-  .filter {
-    color: #fff
-  }
+          .axis path,
+          .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+          }
 
-  .Skippednull {
-    stroke: orange;
-    fill: orange;
-  }
+          .filter {
+            color: #fff
+          }
 
-  .Completedtrue {
-    stroke: green;
-    fill: green;
-  }
+          .Skippednull {
+            stroke: orange;
+            fill: orange;
+          }
 
-  .Completedfalse {
-    stroke: red;
-    fill: red;
-  }
+          .Completedtrue {
+            stroke: green;
+            fill: green;
+          }
 
-
-  .bar.Skippednull:hover {
-    fill: darkorange;
-  }
-
-  .bar.Completedtrue:hover {
-    fill: darkgreen;
-  }
-
-  .bar.count1 {
-    /*stroke-dasharray:5,5*/
-  }
-
-  .bar:not(.count1):hover {
-    cursor: pointer;
-    /*fill: #000;*/
-  }
-
-  .bar.count1:hover {
-    cursor: not-allowed;
-  }
-
-  .Completedfalse:hover {
-    fill: #c00;
-  }
-
-  .x.axis path {
-    display: none;
-  }
-
-  .d3-tip {
-    line-height: 1;
-    font-weight: bold;
-    padding: 12px;
-    background: rgba(0, 0, 0, 0.8);
-    color: #fff;
-    border-radius: 2px;
-  }
-  /* Creates a small triangle extender for the tooltip */
-
-  .d3-tip:after {
-    box-sizing: border-box;
-    display: inline;
-    font-size: 10px;
-    width: 100%;
-    line-height: 1;
-    color: rgba(0, 0, 0, 0.8);
-    content: "\25BC";
-    position: absolute;
-    text-align: center;
-  }
-  /* Style northward tooltips differently */
-
-  .d3-tip.n:after {
-    margin: -1px 0 0 0;
-    top: 100%;
-    left: 0;
-  }
-
-  .textlabel {}
-</style>
-
-<body>
+          .Completedfalse {
+            stroke: red;
+            fill: red;
+          }
 
 
-  <script src="http://d3js.org/d3.v3.min.js"></script>
-  <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+          .bar.Skippednull:hover {
+            fill: darkorange;
+          }
 
-  <label for="student_filter">View File Access Patterns in last </label>
-  <select id="student_filter">
-    <option value="/file_access_within_week?week_num=0" selected>Week 0</option>
-    <option value="/file_access_within_week?week_num=1" >Week 1</option>
-    <option value="/file_access_within_week?week_num=2" >Week 2</option>
-    <option value="/file_access_within_week?week_num=3" >Week 3</option>
-    <option value="/file_access_within_week?week_num=4" >Week 4</option>
-    <option value="/file_access_within_week?week_num=5" >Week 5</option>
-  </select>
-  <div id="chart"></div>
-<script src="/static/js/file_access_within_week.js"></script>
-</body>
+          .bar.Completedtrue:hover {
+            fill: darkgreen;
+          }
 
+          .bar.count1 {
+            /*stroke-dasharray:5,5*/
+          }
+
+          .bar:not(.count1):hover {
+            cursor: pointer;
+            /*fill: #000;*/
+          }
+
+          .bar.count1:hover {
+            cursor: not-allowed;
+          }
+
+          .Completedfalse:hover {
+            fill: #c00;
+          }
+
+          .x.axis path {
+            display: none;
+          }
+
+          .d3-tip {
+            line-height: 1;
+            font-weight: bold;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 2px;
+          }
+          /* Creates a small triangle extender for the tooltip */
+
+          .d3-tip:after {
+            box-sizing: border-box;
+            display: inline;
+            font-size: 10px;
+            width: 100%;
+            line-height: 1;
+            color: rgba(0, 0, 0, 0.8);
+            content: "\25BC";
+            position: absolute;
+            text-align: center;
+          }
+          /* Style northward tooltips differently */
+
+          .d3-tip.n:after {
+            margin: -1px 0 0 0;
+            top: 100%;
+            left: 0;
+          }
+
+          .textlabel {}
+        </style>
+
+    </head>
+    <body>
+
+
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+
+        <label for="student_filter">View File Access Patterns in last </label>
+        <select id="student_filter">
+        <option value="/file_access_within_week?week_num=0" selected>Week 0</option>
+        <option value="/file_access_within_week?week_num=1" >Week 1</option>
+        <option value="/file_access_within_week?week_num=2" >Week 2</option>
+        <option value="/file_access_within_week?week_num=3" >Week 3</option>
+        <option value="/file_access_within_week?week_num=4" >Week 4</option>
+        <option value="/file_access_within_week?week_num=5" >Week 5</option>
+        </select>
+        <div id="chart"></div>
+        <script src="/static/js/file_access_within_week.js"></script>
+    </body>
 </html>
