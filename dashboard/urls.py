@@ -85,7 +85,6 @@ if apps.is_installed('djangosaml2'):
     urlpatterns += (
         url(r'^accounts/', include('djangosaml2.urls')),
         url(r'^samltest/', login_required(echo_attributes)),
-        
     )
 elif apps.is_installed('registration'):
     urlpatterns += (
