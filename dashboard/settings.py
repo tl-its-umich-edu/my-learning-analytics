@@ -191,8 +191,8 @@ except ImportError:
 
 #Shib
 
-if getenv_bool('STUDENT_DASHBOARD_SAML', 'false'):
-    
+# Give an opportunity to disable SAML
+if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
     import saml2
 
     SAML2_URL_PATH = '/accounts/'

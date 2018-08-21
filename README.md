@@ -33,8 +33,8 @@ CANVAS_USER=
 GOOGLE_APPLICATION_CREDENTIALS=/secrets/bq_cred.json
 
 # SAML Configuration
-# Need to set this to true to turn it on at all
-STUDENT_DASHBOARD_SAML=true
+# Need to set this to false to turn it off for dev, but default is true
+STUDENT_DASHBOARD_SAML=false
 
 # Where your secrets are stored
 SAML2_FILES_BASE=/secrets/saml/

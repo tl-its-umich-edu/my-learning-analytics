@@ -16,10 +16,17 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from .common.util import *
+from django.apps import apps
 
-if getenv_bool('STUDENT_DASHBOARD_SAML', 'false'):
+# If djangosaml2 is installed, then import the login decorator
+# It's possible some other auth decorator could also be used
+
+# Otherwise for now provide a login_required that does nothing if this
+# decorator is not available
+
+if apps.is_installed('djangosaml2'):
     from django.contrib.auth.decorators import login_required
+    from djangosaml2.views import echo_attributes
 else:
     def login_required(func):
         return func
@@ -30,9 +37,6 @@ from django.views.generic.base import TemplateView
 from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.static import static
-
-from djangosaml2.views import echo_attributes
-
 
 from . import views
 from . import cron
@@ -77,13 +81,13 @@ urlpatterns = [
     }),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-if 'djangosaml2' in settings.INSTALLED_APPS:
+if apps.is_installed('djangosaml2'):
     urlpatterns += (
         url(r'^accounts/', include('djangosaml2.urls')),
         url(r'^samltest/', echo_attributes),
         
     )
-elif 'registration' in settings.INSTALLED_APPS:
+elif apps.is_installed('registration'):
     urlpatterns += (
         url(r'^accounts/', include('registration.backends.default.urls')),
     )
