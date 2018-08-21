@@ -13,8 +13,9 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 from os import getenv
 from os import path
-import saml2
 import sys
+
+from .common.util import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -166,7 +167,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
         '': {
             'level': 'WARNING',
@@ -175,7 +176,7 @@ LOGGING = {
 
     },
     'root': {
-        'level': os.getenv('ROOT_LOG_LEVEL', 'INFO'),
+        'level': getenv('ROOT_LOG_LEVEL', 'INFO'),
         'handlers': ['console']
     },
 }
@@ -190,80 +191,84 @@ except ImportError:
 
 #Shib
 
-SAML2_URL_PATH = '/accounts/'
-# modify to use port request comes
-SAML2_URL_BASE = getenv('DJANGO_SAML2_URL_BASE', 'http://localhost:5001/accounts/')
+if getenv_bool('STUDENT_DASHBOARD_SAML', 'false'):
+    
+    import saml2
 
-INSTALLED_APPS += ('djangosaml2',)
-AUTHENTICATION_BACKENDS = (
-    'djangosaml2.backends.Saml2Backend',
-)
-LOGIN_URL = '%slogin/' % SAML2_URL_PATH
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+    SAML2_URL_PATH = '/accounts/'
+    # modify to use port request comes
+    SAML2_URL_BASE = getenv('DJANGO_SAML2_URL_BASE', 'http://localhost:5001/accounts/')
 
-BASEDIR = path.dirname(path.abspath(__file__))
-SAML2_FILES_BASE = os.environ.get('SAML2_FILES_BASE', '/saml/')
+    INSTALLED_APPS += ('djangosaml2',)
+    AUTHENTICATION_BACKENDS = (
+        'djangosaml2.backends.Saml2Backend',
+    )
+    LOGIN_URL = '%slogin/' % SAML2_URL_PATH
+    SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-SAML_CONFIG = {
-    'xmlsec_binary': '/usr/bin/xmlsec1',
-    'entityid': '%smetadata/' % SAML2_URL_BASE,
+    BASEDIR = path.dirname(path.abspath(__file__))
+    SAML2_FILES_BASE = os.environ.get('SAML2_FILES_BASE', '/saml/')
 
-    # directory with attribute mapping
-    # 'attribute_map_dir': path.join(BASEDIR, 'attribute-maps'),
-    'name': 'Student Dashboard',
-    # this block states what services we provide
-    'service': {
-        # we are just a lonely SP
-        'sp': {
-            'name': 'Student Dashboard',
-            'name_id_format': ('urn:oasis:names:tc:SAML:2.0:'
-                               'nameid-format:transient'),
-            'authn_requests_signed': 'true',
-            'allow_unsolicited': True,
-            'endpoints': {
-                # url and binding to the assetion consumer service view
-                # do not change the binding or service name
-                'assertion_consumer_service': [
-                    ('%sacs/' % SAML2_URL_BASE, saml2.BINDING_HTTP_POST),
-                ],
-                # url and binding to the single logout service view+
+    SAML_CONFIG = {
+        'xmlsec_binary': '/usr/bin/xmlsec1',
+        'entityid': '%smetadata/' % SAML2_URL_BASE,
 
-                # do not change the binding or service name
-                'single_logout_service': [
-                    ('%sls/' % SAML2_URL_BASE, saml2.BINDING_HTTP_REDIRECT),
-                    ('%sls/post' % SAML2_URL_BASE, saml2.BINDING_HTTP_POST),
-                ],
+        # directory with attribute mapping
+        # 'attribute_map_dir': path.join(BASEDIR, 'attribute-maps'),
+        'name': 'Student Dashboard',
+        # this block states what services we provide
+        'service': {
+            # we are just a lonely SP
+            'sp': {
+                'name': 'Student Dashboard',
+                'name_id_format': ('urn:oasis:names:tc:SAML:2.0:'
+                                   'nameid-format:transient'),
+                'authn_requests_signed': 'true',
+                'allow_unsolicited': True,
+                'endpoints': {
+                    # url and binding to the assetion consumer service view
+                    # do not change the binding or service name
+                    'assertion_consumer_service': [
+                        ('%sacs/' % SAML2_URL_BASE, saml2.BINDING_HTTP_POST),
+                    ],
+                    # url and binding to the single logout service view+
+
+                    # do not change the binding or service name
+                    'single_logout_service': [
+                        ('%sls/' % SAML2_URL_BASE, saml2.BINDING_HTTP_REDIRECT),
+                        ('%sls/post' % SAML2_URL_BASE, saml2.BINDING_HTTP_POST),
+                    ],
+                },
+
+                # attributes that this project need to identify a user
+                'required_attributes': ['uid'],
+
+                # attributes that may be useful to have but not required
+                'optional_attributes': ['eduPersonAffiliation'],
             },
-
-            # attributes that this project need to identify a user
-            'required_attributes': ['uid'],
-
-            # attributes that may be useful to have but not required
-            'optional_attributes': ['eduPersonAffiliation'],
         },
-    },
 
-    # where the remote metadata is stored
-    'metadata': {
-        'local': [path.join(SAML2_FILES_BASE, 'remote-metadata.xml')],
-    },
+        # where the remote metadata is stored
+        'metadata': {
+            'local': [path.join(SAML2_FILES_BASE, 'remote-metadata.xml')],
+        },
 
-    # set to 1 to output debugging information
-    'debug': DEBUG,
+        # set to 1 to output debugging information
+        'debug': DEBUG,
 
-    # certificate
-    'key_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.key'),  'cert_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.pem'),
-}
+        # certificate
+        'key_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.key'),  'cert_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.pem'),
+    }
 
-ACS_DEFAULT_REDIRECT_URL = getenv('DJANGO_ACS_DEFAULT_REDIRECT', 'http://localhost:5001/')
-LOGIN_REDIRECT_URL = getenv('DJANGO_LOGIN_REDIRECT_URL', 'http://localhost:5001/')
+    ACS_DEFAULT_REDIRECT_URL = getenv('DJANGO_ACS_DEFAULT_REDIRECT', 'http://localhost:5001/')
+    LOGIN_REDIRECT_URL = getenv('DJANGO_LOGIN_REDIRECT_URL', 'http://localhost:5001/')
 
-SAML_CREATE_UNKNOWN_USER = True
+    SAML_CREATE_UNKNOWN_USER = True
 
-SAML_ATTRIBUTE_MAPPING = {
-    'uid': ('username', ),
-    'mail': ('email', ),
-    'givenName': ('first_name', ),
-    'sn': ('last_name', ),
-}
+    SAML_ATTRIBUTE_MAPPING = {
+        'uid': ('username', ),
+        'mail': ('email', ),
+        'givenName': ('first_name', ),
+        'sn': ('last_name', ),
+    }
 

@@ -31,6 +31,12 @@ CANVAS_USER=
 
 # Paths to special login credentials (uses SAML)
 GOOGLE_APPLICATION_CREDENTIALS=/secrets/bq_cred.json
+
+# SAML Configuration
+# Need to set this to true to turn it on at all
+STUDENT_DASHBOARD_SAML=true
+
+# Where your secrets are stored
 SAML2_FILES_BASE=/secrets/saml/
 
 # Base for Django to your accounts path
