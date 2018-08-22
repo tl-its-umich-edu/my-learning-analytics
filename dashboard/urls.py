@@ -15,6 +15,22 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+
+from django.apps import apps
+
+# If djangosaml2 is installed, then import the login decorator
+# It's possible some other auth decorator could also be used
+
+# Otherwise for now provide a login_required that does nothing if this
+# decorator is not available
+
+if apps.is_installed('djangosaml2'):
+    from django.contrib.auth.decorators import login_required
+    from djangosaml2.views import echo_attributes
+else:
+    def login_required(func):
+        return func
+
 from django.views.static import serve
 from django.views.generic.base import TemplateView
 
@@ -22,43 +38,42 @@ from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.static import static
 
-
 from . import views
 from . import cron
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.home, name='home'),
-    url(r'^files/', TemplateView.as_view(
-        template_name='files.html'), name="files",
+    url(r'^files/', login_required(TemplateView.as_view(
+        template_name='files.html')), name="files",
     ),
-    url(r'^grades/', TemplateView.as_view(
-        template_name='grades.html'), name="grades",
+    url(r'^grades/', login_required(TemplateView.as_view(
+        template_name='grades.html')), name="grades",
     ),
-    url(r'^small_multiples_files_bar_chart/', TemplateView.as_view(
-        template_name='small_multiples_files_bar_chart.html'), name="small_multiples_files_bar_chart",
+    url(r'^small_multiples_files_bar_chart/', login_required(TemplateView.as_view(
+        template_name='small_multiples_files_bar_chart.html')), name="small_multiples_files_bar_chart",
     ),
     # get file access patterns
-    url(r'^file_access/', views.file_access, name='file_access'),
-    url(r'^file_access_within_week/', views.file_access_within_week, name='file_access_within_week'),
-    url(r'^view_file_access_within_week', TemplateView.as_view(
-      template_name='file_access_within_week.html'), name="view_file_access_within_week",
+    url(r'^file_access/', login_required(views.file_access), name='file_access'),
+    url(r'^file_access_within_week/', login_required(views.file_access_within_week), name='file_access_within_week'),
+    url(r'^view_file_access_within_week', login_required(TemplateView.as_view(
+      template_name='file_access_within_week.html')), name="view_file_access_within_week",
       ),
-    url(r'^grade_distribution', views.grade_distribution, name='grade_distribution'),
+    url(r'^grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
 
     # load file information
-    url(r'^load_data', views.load_data, name='load_data'),
+    url(r'^load_data', login_required(views.load_data), name='load_data'),
 
     # load data from UDW
-    url(r'^update_with_udw_file', cron.update_with_udw_file, name='update_with_udw_file'),
-    url(r'^update_with_bq_access', cron.update_with_bq_access, name='update_with_bq_access'),
-    url(r'^update_with_udw_user', cron.update_with_udw_user, name='update_with_udw_user'),
-    url(r'^update_assignment', cron.update_assignment, name='update_assignment'),
-    url(r'^update_groups', cron.update_groups, name='update_groups'),
-    url(r'^submission', cron.submission, name='submission'),
-    url(r'^weight_consideration', cron.weight_consideration, name='weight_consideration'),
-    url(r'^testloader', TemplateView.as_view(
-        template_name='testloader.html'), name="testloader",
+    url(r'^update_with_udw_file', login_required(cron.update_with_udw_file), name='update_with_udw_file'),
+    url(r'^update_with_bq_access', login_required(cron.update_with_bq_access), name='update_with_bq_access'),
+    url(r'^update_with_udw_user', login_required(cron.update_with_udw_user), name='update_with_udw_user'),
+    url(r'^update_assignment', login_required(cron.update_assignment), name='update_assignment'),
+    url(r'^update_groups', login_required(cron.update_groups), name='update_groups'),
+    url(r'^submission', login_required(cron.submission), name='submission'),
+    url(r'^weight_consideration', login_required(cron.weight_consideration), name='weight_consideration'),
+    url(r'^testloader', login_required(TemplateView.as_view(
+        template_name='testloader.html')), name="testloader",
     ),
     url(r'^$', serve, {
         'path': '/home.html',
@@ -66,11 +81,12 @@ urlpatterns = [
     }),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-if 'djangosaml2' in settings.INSTALLED_APPS:
+if apps.is_installed('djangosaml2'):
     urlpatterns += (
         url(r'^accounts/', include('djangosaml2.urls')),
+        url(r'^samltest/', login_required(echo_attributes)),
     )
-elif 'registration' in settings.INSTALLED_APPS:
+elif apps.is_installed('registration'):
     urlpatterns += (
         url(r'^accounts/', include('registration.backends.default.urls')),
     )
