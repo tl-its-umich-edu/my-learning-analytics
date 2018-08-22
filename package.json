@@ -7,6 +7,7 @@
     "angular-resource":"1.7.3",
     "nvd3":"1.8.6",
     "d3": "~3.5",
+    "d3-tip":"~0.9.1",
     "jquery": "~3.3.1",
     "underscore":"",
     "bootstrap":"~4.1.3",
