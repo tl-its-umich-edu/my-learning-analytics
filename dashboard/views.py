@@ -114,7 +114,9 @@ def file_access(request):
 # show percentage of users who read the file within prior n weeks
 def file_access_within_week(request):
 
+    # read from request param
     week_num = int(request.GET.get('week_num','0'))
+    grade = request.GET.get('grade','all')
 
     # get total number of student within the course_id
     total_number_student_sql = "select count(*) from USER where COURSE_ID = %(course_id)s"
@@ -128,7 +130,7 @@ def file_access_within_week(request):
     # grade: String with max length of 1
     # week: 32-bit integer
     # percent: 32-bit float
-    output_df = pd.DataFrame(columns=['week','file_name','file_id','grade','percent'])
+    output_df = pd.DataFrame(columns=['file_name','A','B','C','D','F'])
 
     # get time range based on week number passed in via request
 
@@ -144,17 +146,57 @@ def file_access_within_week(request):
                 "and a.ACCESS_TIME < %(end_time)s "
     startTimeString = start.strftime('%Y%m%d') + "000000"
     endTimeString = end.strftime('%Y%m%d') + "000000"
+    logger.info(sqlString);
+    logger.info("start time=" + startTimeString + " end_time=" + endTimeString);
     df = pd.read_sql(sqlString, conn, params={"start_time": startTimeString,"end_time": endTimeString})
+
+    # group by file_id, and file_name
+    df.set_index(['file_id', 'file_name'])
+    # drop file records when the file has been accessed multiple times by one user
+    df.drop_duplicates(inplace=True)
 
     # map point grade to letter grade
     df['grade'] = df['current_grade'].map(gpa_map)
-    df['percent'] = np.ceil(df.groupby(['file_id','file_name', 'grade'])['file_id'].transform('count')*100/total_number_student)
-    df.drop(columns=['current_grade', 'user_id'], inplace=True)
+    # calculate the percentage
+    df['percent'] = round(df.groupby(['file_id','file_name', 'grade'])['file_id'].transform('count')/total_number_student, 2)
+    df=df.drop(['current_grade', 'user_id'], axis=1)
+    # now only keep the file access stats by grade level
     df.drop_duplicates(inplace=True)
-    df['week'] = week_num
 
-    # concatenate dataframe
-    output_df = pd.concat([output_df, df])
+    # reformat for output
+    file_name=df["file_name"].unique()
+    # zero filled dataframe with file name as row name, and grade as column name
+    output_df=pd.DataFrame(0.0, index=file_name, columns=['A','B','C','D','F'])
+    output_df=output_df.rename_axis('file_name')
+    for index, row in df.iterrows():
+        # set value
+        output_df.at[row['file_name'], row['grade']] = row['percent']
+    output_df.reset_index(inplace=True)
+
+    # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
+    selfSqlString = "select f.NAME as file_name, count(*) as self_access_count, max(a.ACCESS_TIME) as self_access_last_time " \
+                    "from FILE_ACCESS a, USER u, FILE f " \
+                    "where a.USER_ID = u.id " \
+                    "and a.FILE_ID = f.ID " \
+                    "and u.SIS_NAME=%(current_user)s " \
+                    "group by f.NAME;"
+    #select f.NAME as file_name, count(*) as self_access_count, max(a.ACCESS_TIME) as self_access_last_time from FILE_ACCESS a, USER u, FILE f where a.USER_ID = u.id and u.SIS_NAME='norrabp' and a.FILE_ID = f.ID group by f.NAME
+    logger.info(selfSqlString)
+    logger.info("current_user=" + current_user)
+
+    selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user})
+    output_df = output_df.join(selfDf.set_index('file_name'), on='file_name', how='left')
+    output_df["total_count"] = output_df.apply(lambda row: row.A + row.B+row.C+row.D+row.F, axis=1)
+
+    if (grade != "all"):
+        # drop all other grades
+        grades = ['A', 'B', 'C', 'D', 'F']
+        for i_grade in grades:
+            if (i_grade!=grade):
+                output_df["total_count"] = output_df["total_count"] - output_df[i_grade]
+                output_df=output_df.drop([i_grade], axis=1)
+
+    output_df.fillna(0, inplace=True) #replace null value with 0
 
     return HttpResponse(output_df.to_json(orient='records'))
 
@@ -162,7 +204,7 @@ def grade_distribution(request):
 
     # Later this could be coming from a table specific to the course
     bins = [0, 50, 65, 78, 89, 100]
-    labels = ['E', 'D', 'C', 'B', 'A']
+    labels = ['F', 'D', 'C', 'B', 'A']
 
     grade_score_sql = "Select CURRENT_GRADE, FINAL_GRADE FROM USER where COURSE_ID=%(course_id)s"
     df = pd.read_sql(grade_score_sql, conn, params={'course_id': UDW_COURSE_ID})

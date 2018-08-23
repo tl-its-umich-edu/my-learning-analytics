@@ -41,9 +41,12 @@ urlpatterns = [
     # get file access patterns
     url(r'^file_access/', views.file_access, name='file_access'),
     url(r'^file_access_within_week/', views.file_access_within_week, name='file_access_within_week'),
-    url(r'^view_file_access_within_week', TemplateView.as_view(
-      template_name='file_access_within_week.html'), name="view_file_access_within_week",
+    url(r'^view_file_access_within_week/', TemplateView.as_view(
+      template_name='view_file_access_within_week.html'), name="view_view_file_access_within_week",
       ),
+    url(r'^view_file_access_within_week_horizontal/', TemplateView.as_view(
+        template_name='view_file_access_within_week_horizontal.html'), name="view_file_access_within_week_horizontal",
+    ),
     url(r'^grade_distribution', views.grade_distribution, name='grade_distribution'),
 
     # load file information
