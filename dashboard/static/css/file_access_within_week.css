@@ -1,0 +1,128 @@
+body {
+    font: 10px sans-serif;
+}
+
+
+.toolTip {
+    position: absolute;
+    display: none;
+    min-width: 80px;
+    height: auto;
+    background: none repeat scroll 0 0 #ffffff;
+    border: 1px solid #6F257F;
+    padding: 14px;
+    text-align: center;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.filter {
+    color: #fff
+}
+
+.Skippednull {
+    stroke: orange;
+    fill: orange;
+}
+
+.Completedtrue {
+    stroke: green;
+    fill: green;
+}
+
+.Completedfalse {
+    stroke: red;
+    fill: red;
+}
+
+
+.bar.Skippednull:hover {
+    fill: darkorange;
+}
+
+.bar.Completedtrue:hover {
+    fill: darkgreen;
+}
+
+.bar.count1 {
+    /*stroke-dasharray:5,5*/
+}
+
+.bar:not(.count1):hover {
+    cursor: pointer;
+    /*fill: #000;*/
+}
+
+.bar.count1:hover {
+    cursor: not-allowed;
+}
+
+.Completedfalse:hover {
+    fill: #c00;
+}
+
+.x.axis path {
+    display: none;
+}
+
+.d3-tip {
+    line-height: 1;
+    font-weight: bold;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 2px;
+}
+/* Creates a small triangle extender for the tooltip */
+
+.d3-tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 10px;
+    width: 100%;
+    line-height: 1;
+    color: rgba(0, 0, 0, 0.8);
+    content: "\25BC";
+    position: absolute;
+    text-align: center;
+}
+/* Style northward tooltips differently */
+
+.d3-tip.n:after {
+    margin: -1px 0 0 0;
+    top: 100%;
+    left: 0;
+}
+
+.textlabel {}
+
+#slider {
+    border: 1px solid #ccc;
+}
+#slider svg line.track {
+    stroke-opacity: 0.4;
+    stroke: #000;
+    stroke-width: 10px;
+}
+#slider svg line.track-inset {
+    stroke: steelblue;
+    stroke-width: 8px;
+}
+#slider svg line.track-overlay {
+    stroke: #ccc;
+    stroke-width: 40px;
+    stroke-opacity: 0;
+    cursor: crosshair;
+}
+#slider svg .handle {
+    fill: red;
+    stroke: #000;
+}
+#slider svg line.track-overlay, #slider svg line.track, #slider svg line.track-inset {
+    stroke-linecap: round;
+}

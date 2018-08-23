@@ -57,7 +57,7 @@ urlpatterns = [
     url(r'^file_access/', login_required(views.file_access), name='file_access'),
     url(r'^file_access_within_week/', login_required(views.file_access_within_week), name='file_access_within_week'),
     url(r'^view_file_access_within_week', login_required(TemplateView.as_view(
-      template_name='file_access_within_week.html')), name="view_file_access_within_week",
+      template_name='view_file_access_within_week.html')), name="view_file_access_within_week",
       ),
     url(r'^grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
 

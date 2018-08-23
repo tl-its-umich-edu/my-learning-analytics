@@ -1,0 +1,42 @@
+{% load static %}
+<meta charset="utf-8">
+<style>
+
+    .label {
+      fill: black;
+      font: 10px sans-serif;
+    }
+    #chart {
+        width: 100%;
+        height: 100%;
+        overflow-y: scroll;
+    }
+
+</style>
+<body>
+    <!-- week slider -->
+    <div id="slider_label">View File Access Patterns in last 1 week: </div>
+    <div id="slider"></div>
+    <input type="hidden" name="slider_num" id="slider_num" />
+    <div/>
+    Please choose Grade level:
+    <select class="grade" name="grade" id="grade">
+        <option value="all" selected>All Grade</option>
+        <option value="A" >A</option>
+        <option value="B" >B</option>
+        <option value="C" >C</option>
+        <option value="D" >D</option>
+        <option value="F" >F</option>
+    </select>
+
+    <div id="chart"></div>
+
+    <script src="http://d3js.org/d3.v4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.7.1/d3-tip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="/static/js/file_access_within_week.js"></script>
+    <link rel="stylesheet" href="/static/css/file_access_within_week.css" />
+</body>

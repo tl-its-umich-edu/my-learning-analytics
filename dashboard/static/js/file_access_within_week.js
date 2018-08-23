@@ -1,299 +1,226 @@
-var highlightData = function(fileName) {
-    $('.bar').css("opacity", "1");
-    $('.bar').not("." + fileName).css("opacity", ".2")
-};
+
+var tooltip = d3.select("body").append("div").attr("class", "toolTip");
+
 
 var makeGraph = function(url) {
-    d3.selectAll("#chart > *").remove();
-    $.getJSON(url ||  "/file_access_within_week/", function(initResult) {
-        var data = initResult;
-        var margin = {
-                top: 40,
-                right: 20,
-                bottom: 30,
-                left: 40
-            },
-            width = 960 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
-
-        var color = d3.scale.category10();
-        var colorColumn = "grade";
-        // legend
-        var activeLink = "0"; //to control legend selections and hover
-        var legendClicked; //to control legend selections
-        var legendClassArray = []; //store legend classes to select bars in plotSingle()
-
-        var x = d3.scale.ordinal()
-            .rangeRoundBands([0, width], .1);
-        var y = d3.scale.linear()
-            .range([height, 0]);
-        var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom");
-        var yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left");
-        var tip = d3.tip()
-            .attr("class", "d3-tip")
-            .offset([-10, 0])
-            .html(function(d) {
-                return "<div><strong>Percent:</strong> <span style=\"color:red\">" + d.percent + "</span></div><p>" + d.file_name + "</p><p>Grade: "+ d.grade + "</p><p>";
-            })
-        var svg = d3.select("#chart").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .attr("style", 'padding-bottom:400px')
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        svg.call(tip);
-
-        //d3.json("data.json", function(error, data) {
-        var files = _.uniq(_.pluck(data, "file_name"));
-        var fileCount = [];
-        _.each(files, function(file) {
-            fileCount.push({
-                "file": file,
-                "count": 0
-            });
-        })
-        _.each(data, function(item) {
-            var corr = _.findWhere(fileCount, {
-                file: item.file_name
-            });
-            corr.count = corr.count + 1;
-        });
-        _.each(data, function(item) {
-            var corr = _.findWhere(fileCount, {
-                file: item.file_name
-            });
-            item.count = corr.count;
-        });
+    var margin = {
+        top: 20,
+        right: 20,
+        bottom: 30,
+        left: 250
+    };
+    var width = 960 - margin.left - margin.right;
+    var height = 800 - margin.top - margin.bottom;
 
 
-        x.domain(data.map(function(d) {
-            return d.file_name;
-        }));
-        y.domain([0, d3.max(data, function(d) {
-            return d.percent;
+    d3.selectAll("div#chart > *").remove();
+
+    var svg = d3.select("div#chart").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .attr("overflow-y", "auto")
+        .attr('preserveAspectRatio', 'xMinYMin')
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var x = d3.scaleLinear()
+        .range([0, width]);
+
+    var y = d3.scaleBand()
+        .range([height, 0]);
+
+    var xAxis = d3.axisBottom(x)
+        .ticks(10, "%");
+
+    var yAxis = d3.axisLeft(y);
+
+    $.getJSON(url || "/file_access_within_week?week_num=1", function ( initResult) {
+        data = initResult;
+
+        data.sort(function(a, b) { return a.total_count - b.total_count; });
+
+        x.domain([0, d3.max(data, function (d) {
+            return d.total_count;
         })]);
-        color.domain(data.map(function (d){ return d[colorColumn]; }));
+
+        y.domain(data.map(function (d) {
+            return d.file_name;
+        }))
+            .paddingInner(0.1)
+            .paddingOuter(0.5);
 
         svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis)
-            .selectAll("text")
-            .attr("transform", "rotate(-45)")
-            .style("text-anchor", "end")
-            .style("width", "500px")
-            .style("text-anchor", "end")
-            .attr("dx", ".71em")
-            .style("text-anchor", "end");
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis)
             .append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 2)
-            .attr("dy", ".71em")
+            .attr("class", "label")
+            .attr("transform", "translate(" + width + ",0)")
+            .attr("y", -5)
             .style("text-anchor", "end")
             .text("Percentage");
 
-        // Copy-on-write since tweens are evaluated after a delay.
-        var x0 = x.domain(data.sort(function(a, b) { return b.percent - a.percent; })
-            .map(function(d) { return d.file_name; }))
-            .copy();
-
-        var bar = svg.selectAll(".bar")
-            .data(data)
-            .sort(function(a, b) { return x0(a.letter) - x0(b.letter); })
-            .enter().append("rect")
-            .attr("class", function(d) {
-                return "bar " + d.file_name.replace(/ /gi, "_") + " Percent:" + d.count  + " for Grade:" + d.grade;
-            })
-            .attr("x", function(d) {
-                return x(d.file_name);
-            })
-            .attr("width", x.rangeBand())
-            .attr("y", function(d) {
-                return y(d.percent);
-            })
-            .attr("height", function(d) {
-                return height - y(d.percent);
-            })
-            .attr("fill", function (d){ return color(d[colorColumn]); })
-            .on('mouseover', tip.show)
-            .on('mouseout', tip.hide)
-            .on('click', function(d) {
-                highlightData(d.file_name.replace(/ /gi, "_"));
-            })
-            .sort(function(a, b) { return x0(a.percent) - x0(b.percent); });
-
         svg.append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-            .selectAll(".textlabel")
+            .attr("class", "y axis")
+            .call(yAxis);
+
+        svg.selectAll(".bar")
             .data(data)
-            .enter()
-            .append("text")
-            .attr("class", "textlabel")
-            .attr("x", function(d) {
-                 return x(d.file_name);
+            .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", 0)
+            .attr("height", y.bandwidth())
+            .attr("y", function (d) {
+                return y(d.file_name);
             })
-            .attr("y", function(d) {
-                return y(d.percent);
+            .attr("width", function (d) {
+                return x(d.total_count);
             })
-            .text(function(d) {
-                return d.count;
+            .attr("fill", function(d) {
+                if (d.self_access_count > 0 ) {
+                    return "steelblue";
+                } else {
+                    return "orange";
+                }
+            })
+            .on("mouseover", function() { tooltip.style("display", null); })
+            .on("mouseout", function() { tooltip.style("display", "none"); })
+            .on("mousemove", function(d) {
+                if (d.self_access_count > 0) {
+                    self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time);
+                } else {
+                    self_string = "You haven't viewed this file. ";
+                }
+                tooltip
+                    .style("left", d3.event.pageX - 50 + "px")
+                    .style("top", d3.event.pageY - 70 + "px")
+                    .style("display", "inline-block")
+                    .html("<b>" + d.total_count*100 + "% </b>of students have accessed <b>" + d.file_name + "</b>. " + self_string);
             });
-
-        var legend = svg.selectAll(".legend")
-            .data(color.domain().slice().reverse())
-            .enter().append("g")
-            //.attr("class", "legend")
-            .attr("class", function (d) {
-                legendClassArray.push(d.replace(/\s/g, '')); //remove spaces
-                return "legend";
-            })
-            .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-        //reverse order to match order in which bars are stacked
-        legendClassArray = legendClassArray.reverse();
-
-        legend.append("rect")
-            .attr("x", width - 18)
-            .attr("width", 18)
-            .attr("height", 18)
-            .style("fill", color)
-            .attr("id", function (d, i) {
-                return "id" + d.replace(/\s/g, '');
-            })
-            .on("mouseover",function(){
-
-                if (activeLink === "0") d3.select(this).style("cursor", "pointer");
-                else {
-                    if (activeLink.split("class").pop() === this.id.split("id").pop()) {
-                        d3.select(this).style("cursor", "pointer");
-                    } else d3.select(this).style("cursor", "auto");
-                }
-            })
-            .on("click",function(d){
-
-                if (activeLink === "0") { //nothing selected, turn on this selection
-                    d3.select(this)
-                        .style("stroke", "black")
-                        .style("stroke-width", 2);
-
-                    activeLink = this.id.split("id").pop();
-                    plotSingle(this);
-
-                    //gray out the others
-                    for (i = 0; i < legendClassArray.length; i++) {
-                        if (legendClassArray[i] != activeLink) {
-                            d3.select("#id" + legendClassArray[i])
-                                .style("opacity", 0.5);
-                        }
-                    }
-
-                } else { //deactivate
-                    if (activeLink === this.id.split("id").pop()) {//active square selected; turn it OFF
-                        d3.select(this)
-                            .style("stroke", "none");
-
-                        activeLink = "0"; //reset
-
-                        //restore remaining boxes to normal opacity
-                        for (i = 0; i < legendClassArray.length; i++) {
-                            d3.select("#id" + legendClassArray[i])
-                                .style("opacity", 1);
-                        }
-
-                        //restore plot to original
-                        restorePlot(d);
-
-                    }
-
-                } //end activeLink check
-
-
-            });
-
-        legend.append("text")
-            .attr("x", width - 24)
-            .attr("y", 9)
-            .attr("dy", ".35em")
-            .style("text-anchor", "end")
-            .text(function(d) { return d; });
-
-        function restorePlot(d) {
-
-            state.selectAll("rect").forEach(function (d, i) {
-                //restore shifted bars to original posn
-                d3.select(d[idx])
-                    .transition()
-                    .duration(1000)
-                    .attr("y", y_orig[i]);
-            })
-
-            //restore opacity of erased bars
-            for (i = 0; i < legendClassArray.length; i++) {
-                if (legendClassArray[i] != class_keep) {
-                    d3.selectAll(".class" + legendClassArray[i])
-                        .transition()
-                        .duration(1000)
-                        .delay(750)
-                        .style("opacity", 1);
-                }
-            }
-
-        }
-
-        function plotSingle(d) {
-
-            class_keep = d.id.split("id").pop();
-            idx = legendClassArray.indexOf(class_keep);
-
-            //erase all but selected bars by setting opacity to 0
-            for (i = 0; i < legendClassArray.length; i++) {
-                if (legendClassArray[i] != class_keep) {
-                    d3.selectAll(".class" + legendClassArray[i])
-                        .transition()
-                        .duration(1000)
-                        .style("opacity", 0);
-                }
-            }
-
-            //lower the bars to start on x-axis
-            y_orig = [];
-            bar.selectAll("rect").forEach(function (d, i) {
-
-                //get height and y posn of base bar and selected bar
-                h_keep = d3.select(d[idx]).attr("height");
-                y_keep = d3.select(d[idx]).attr("y");
-                //store y_base in array to restore plot
-                y_orig.push(y_keep);
-
-                h_base = d3.select(d[0]).attr("height");
-                y_base = d3.select(d[0]).attr("y");
-
-                h_shift = h_keep - h_base;
-                y_new = y_base - h_shift;
-
-                //reposition selected bars
-                d3.select(d[idx])
-                    .transition()
-                    .ease("bounce")
-                    .duration(1000)
-                    .delay(750)
-                    .attr("y", y_new);
-
-            })
-
-        }
 
     });
+
+    function type(d) {
+        d.total_count = +d.total_count;
+        return d;
+    }
 };
-$('select').on("change", function() {
-    makeGraph(this.value);
+
+$('#grade').change(function() {
+
+    var grade = $('#grade').val();
+    var slider_num=$('#slider_num').val();
+    makeGraph('/file_access_within_week?week_num=' + slider_num + "&grade=" + grade);
+
 });
+
+var makeSlider = function() {
+
+    var margin = {left: 30, right: 30},
+        width = 860,
+        height = 50,
+        range = [1, 20],
+        step = 1; // change the step and if null, it'll switch back to a normal slider
+
+    // append svg
+    var svg = d3.select('div#slider').append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+    var slider = svg.append('g')
+        .classed('slider', true)
+        .attr('transform', 'translate(' + margin.left +', '+ (height/2) + ')');
+
+    // using clamp here to avoid slider exceeding the range limits
+    var xScale = d3.scaleLinear()
+        .domain(range)
+        .range([0, width - margin.left - margin.right])
+        .clamp(true);
+
+    // array useful for step sliders
+    var rangeValues = d3.range(range[0], range[1], step || 1).concat(range[1]);
+    var xAxis = d3.axisBottom(xScale).tickValues(rangeValues).tickFormat(function (d) {
+        return d;
+    });
+
+    xScale.clamp(true);
+
+    // drag handle
+    var handle = slider.append('circle').classed('handle', true)
+        .attr('r', 8);
+
+    function dragged(value) {
+        var x = xScale.invert(value), index = null, midPoint, cx, xVal;
+        if(step) {
+            // if step has a value, compute the midpoint based on range values and reposition the slider based on the mouse position
+            for (var i = 0; i < rangeValues.length - 1; i++) {
+                if (x >= rangeValues[i] && x <= rangeValues[i + 1]) {
+                    index = i;
+                    break;
+                }
+            }
+            midPoint = (rangeValues[index] + rangeValues[index + 1]) / 2;
+            if (x < midPoint) {
+                cx = xScale(rangeValues[index]);
+                xVal = rangeValues[index];
+            } else {
+                cx = xScale(rangeValues[index + 1]);
+                xVal = rangeValues[index + 1];
+            }
+        } else {
+            // if step is null or 0, return the drag value as is
+            cx = xScale(x);
+            xVal = x.toFixed(3);
+        }
+        // use xVal as drag value
+        handle.attr('cx', cx);
+        d3.selectAll("div#slider_label").nodes().map(function(d) { d.innerHTML = "View File Access Patterns in last " + xVal +" weeks:"; });
+
+        // set the hidden value
+        $('#slider_num').val(xVal);
+
+        var grade = $('#grade').val();
+        makeGraph('/file_access_within_week?week_num=' + xVal + "&grade=" + grade);
+    }
+
+    // drag behavior initialization
+    var drag = d3.drag()
+        .on('start.interrupt', function () {
+            slider.interrupt();
+        }).on('end', function () {
+            dragged(d3.event.x);
+        });
+
+    // this is the main bar with a stroke (applied through CSS)
+    var track = slider.append('line').attr('class', 'track')
+        .attr('x1', xScale.range()[0])
+        .attr('x2', xScale.range()[1]);
+
+    // this is a bar (steelblue) that's inside the main "track" to make it look like a rect with a border
+    var trackInset = d3.select(slider.node().appendChild(track.node().cloneNode())).attr('class', 'track-inset');
+
+    var ticks = slider.append('g').attr('class', 'ticks').attr('transform', 'translate(0, 4)')
+        .call(xAxis);
+
+    // this is the bar on top of above tracks with stroke = transparent and on which the drag behaviour is actually called
+    // try removing above 2 tracks and play around with the CSS for this track overlay, you'll see the difference
+    var trackOverlay = d3.select(slider.node().appendChild(track.node().cloneNode())).attr('class', 'track-overlay')
+        .call(drag);
+
+    // initial transition
+    slider.transition().duration(750)
+        .tween("drag", function () {
+            var i = d3.interpolate(0, 1);
+
+            // init the slider_num
+            $('#slider_num').val(1);
+
+            return function (t) {
+                // dragged(xScale(i(t)));
+            };
+        });
+};
+
+makeSlider();
+
 makeGraph();
