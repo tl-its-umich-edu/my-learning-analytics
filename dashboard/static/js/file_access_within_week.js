@@ -89,7 +89,7 @@ var makeGraph = function(url) {
                 if (d.self_access_count > 0) {
                     self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time);
                 } else {
-                    self_string = "You haven't viewed this file. "
+                    self_string = "You haven't viewed this file. ";
                 }
                 tooltip
                     .style("left", d3.event.pageX - 50 + "px")
@@ -115,6 +115,35 @@ $('#grade').change(function() {
 });
 
 var makeSlider = function() {
+
+    var margin = {left: 30, right: 30},
+        width = 860,
+        height = 50,
+        range = [1, 20],
+        step = 1; // change the step and if null, it'll switch back to a normal slider
+
+    // append svg
+    var svg = d3.select('div#slider').append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+    var slider = svg.append('g')
+        .classed('slider', true)
+        .attr('transform', 'translate(' + margin.left +', '+ (height/2) + ')');
+
+    // using clamp here to avoid slider exceeding the range limits
+    var xScale = d3.scaleLinear()
+        .domain(range)
+        .range([0, width - margin.left - margin.right])
+        .clamp(true);
+
+    // array useful for step sliders
+    var rangeValues = d3.range(range[0], range[1], step || 1).concat(range[1]);
+    var xAxis = d3.axisBottom(xScale).tickValues(rangeValues).tickFormat(function (d) {
+        return d;
+    });
+
+    xScale.clamp(true);
 
     function dragged(value) {
         var x = xScale.invert(value), index = null, midPoint, cx, xVal;
@@ -147,38 +176,9 @@ var makeSlider = function() {
         $('#slider_num').val(xVal);
 
         var grade = $('#grade').val();
-        console.log("choose grade " + grade + " slider_num=" + slider_num);
         makeGraph('/file_access_within_week?week_num=' + xVal + "&grade=" + grade);
     }
 
-    var margin = {left: 30, right: 30},
-        width = 860,
-        height = 50,
-        range = [1, 20],
-        step = 1; // change the step and if null, it'll switch back to a normal slider
-
-    // append svg
-    var svg = d3.select('div#slider').append('svg')
-        .attr('width', width)
-        .attr('height', height);
-
-    var slider = svg.append('g')
-        .classed('slider', true)
-        .attr('transform', 'translate(' + margin.left +', '+ (height/2) + ')');
-
-    // using clamp here to avoid slider exceeding the range limits
-    var xScale = d3.scaleLinear()
-        .domain(range)
-        .range([0, width - margin.left - margin.right])
-        .clamp(true);
-
-    // array useful for step sliders
-    var rangeValues = d3.range(range[0], range[1], step || 1).concat(range[1]);
-    var xAxis = d3.axisBottom(xScale).tickValues(rangeValues).tickFormat(function (d) {
-        return d;
-    });
-
-    xScale.clamp(true);
     // drag behavior initialization
     var drag = d3.drag()
         .on('start.interrupt', function () {
@@ -217,7 +217,7 @@ var makeSlider = function() {
 
             return function (t) {
                 // dragged(xScale(i(t)));
-            }
+            };
         });
 };
 
