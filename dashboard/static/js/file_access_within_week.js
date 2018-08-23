@@ -145,6 +145,10 @@ var makeSlider = function() {
 
     xScale.clamp(true);
 
+    // drag handle
+    var handle = slider.append('circle').classed('handle', true)
+        .attr('r', 8);
+
     function dragged(value) {
         var x = xScale.invert(value), index = null, midPoint, cx, xVal;
         if(step) {
@@ -197,10 +201,6 @@ var makeSlider = function() {
 
     var ticks = slider.append('g').attr('class', 'ticks').attr('transform', 'translate(0, 4)')
         .call(xAxis);
-
-    // drag handle
-    var handle = slider.append('circle').classed('handle', true)
-        .attr('r', 8);
 
     // this is the bar on top of above tracks with stroke = transparent and on which the drag behaviour is actually called
     // try removing above 2 tracks and play around with the CSS for this track overlay, you'll see the difference
