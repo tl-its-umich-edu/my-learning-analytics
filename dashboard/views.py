@@ -168,7 +168,7 @@ def file_access_within_week(request):
     # zero filled dataframe with file name as row name, and grade as column name
     output_df=pd.DataFrame(0.0, index=file_name, columns=['A','B','C','D','F'])
     output_df=output_df.rename_axis('file_name')
-    for index, row in df.iterrows():
+    for row in df.iterrows():
         # set value
         output_df.at[row['file_name'], row['grade']] = row['percent']
     output_df.reset_index(inplace=True)
