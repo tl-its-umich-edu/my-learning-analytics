@@ -7,8 +7,11 @@ RUN pip install -r /requirements.txt
 #FROM python:2-onbuild
 RUN apt-get install curl
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
-# RUN apt-get update
-RUN apt-get install -y nodejs python-dev xmlsec1 wget
+
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+
+RUN apt-get update && apt-get install -y yarn python-dev xmlsec1 wget
 #libmysqlclient-dev
 RUN apt-get clean -y
 
@@ -26,7 +29,7 @@ EXPOSE 5000
 WORKDIR /dashboard/
 COPY . /dashboard/
 
-RUN npm install
+RUN yarn install
 
 # This is needed to clean up the examples files as these cause collectstatic to fail (and take up extra space)
 RUN find /usr/lib/node_modules /dashboard/node_modules -type d -name "examples" | xargs rm -rf
