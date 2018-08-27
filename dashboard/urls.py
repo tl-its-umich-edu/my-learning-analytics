@@ -50,9 +50,6 @@ urlpatterns = [
     url(r'^grades/', login_required(TemplateView.as_view(
         template_name='grades.html')), name="grades",
     ),
-    url(r'^small_multiples_files_bar_chart/', login_required(TemplateView.as_view(
-        template_name='small_multiples_files_bar_chart.html')), name="small_multiples_files_bar_chart",
-    ),
     # get file access patterns
     url(r'^file_access/', login_required(views.file_access), name='file_access'),
     url(r'^file_access_within_week/', login_required(views.file_access_within_week), name='file_access_within_week'),
