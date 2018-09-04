@@ -1,1 +1,1 @@
-var visApp = angular.module('visApp', ['nvd3']);
+var visApp = angular.module('visApp', []);

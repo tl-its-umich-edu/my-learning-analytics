@@ -201,6 +201,7 @@ def file_access_within_week(request):
     return HttpResponse(output_df.to_json(orient='records'))
 
 def grade_distribution(request):
+    logger.info(grade_distribution.__name__)
 
     # Later this could be coming from a table specific to the course
     bins = [0, 50, 65, 78, 89, 100]
@@ -227,7 +228,71 @@ def grade_distribution(request):
     return HttpResponse(df_grade.to_json(orient='records'))
 
 
+def assignment_view(request):
+    logger.info(assignment_view.__name__)
+
+    percent_selection = float(request.GET.get('percent','0.0'))
+    logger.info("selection from assignment view",percent_selection)
+    sql = "select assignment_id,local_graded_date as graded_date,score,name,local_date as due_date,points_possible,group_points,weight from (" \
+          "(select assignment_id,local_graded_date,score from"\
+          "(select id from USER where sis_name = %(current_user)s ) as u join"\
+          "(select user_id,assignment_id,local_graded_date,score from SUBMISSION) as sub on sub.user_id=u.id) as rock join"\
+          "(select assign_id,name,local_date,points_possible,group_points,weight from"\
+          "(select id as assign_id,assignment_group_id, local_date,name,points_possible from ASSIGNMENT where course_id = %(course_id)s) as a join"\
+          "(select id,group_points, weight from ASSIGNMENT_GROUPS) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
+    df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': UDW_COURSE_ID},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%m/%d/%Y'})
+    df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
+    df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
+    df[['points_possible', 'group_points','weight']] = df[['points_possible', 'group_points','weight']].astype(float)
+    df['towards_final_grade'] = round((df['points_possible']/df['group_points'])*df['weight'],2)
+
+    df['calender_week']=df['due_date'].dt.week
+    min = df['calender_week'].min()
+    max =  df['calender_week'].max()
+    week_list = [x for x in range(min,max+1)]
+    df['week']=df['calender_week'].apply(lambda x: week_list.index(x)+1)
+    df.sort_values(by='due_date', inplace = True)
+    df['graded']=df['graded_date'].notnull()
+    df['due_date_mod'] =df['due_date'].astype(str).apply(lambda x:x.split()[0])
+    df.drop(columns=['assignment_id','due_date','graded_date'], inplace=True)
+    df2 = df[df['towards_final_grade']>=percent_selection]
+    df2.reset_index(inplace=True)
+    df2.drop(columns=['index'],inplace=True)
+
+    grouped = df2.groupby(['week','due_date_mod'])
+    assignment_list=[]
+    for name, group in grouped:
+        temp_dict={}
+        group.drop(['week', 'due_date_mod'], axis=1,inplace = True)
+        temp_dict['week']=name[0]
+        temp_dict['due_date']=name[1]
+        temp_dict['assign']=json.loads(group.to_json(orient='records'))
+        assignment_list.append(temp_dict)
+
+    week_list=[]
+    for item in assignment_list:
+        week_list.append(item['week'])
+    weeks = set(week_list)
+    full = []
+    for week in weeks:
+        data = {}
+        data["week"]=np.uint64(week).item()
+        dd_items = data["due_date_items"]=[]
+        for item in assignment_list:
+            assignment_due_date_grp={}
+            if item['week']==week:
+                assignment_due_date_grp['due_date']=item['due_date']
+                assignment_due_date_grp['assignment_items']=item['assign']
+                dd_items.append(assignment_due_date_grp)
+        full.append(data)
+    return HttpResponse(json.dumps(full), content_type='application/json')
+
+
+
+
+
 def get_current_user_score():
+    logger.info(get_current_user_score.__name__)
     user_score_sql= "select * from USER where SIS_NAME = %(current_user)s and COURSE_ID=%(course_id)s"
     df = pd.read_sql(user_score_sql, conn, params={"current_user": current_user,'course_id': UDW_COURSE_ID})
     df['rounded_score'] = df['CURRENT_GRADE'].astype(float).map(lambda x: int(x / 2) * 2)
