@@ -23,7 +23,7 @@ var makeGraph = function(url) {
         .attr("class", "tooltip");
 
     $.getJSON(url || "/file_access_within_week?week_num_start=1&week_num_end=0", function (initResult) {
-        if (initResult.length == 0 )
+        if (initResult.length === 0 )
         {
             // return no data
             return "no data";
@@ -151,8 +151,7 @@ var makeGraph = function(url) {
         brush = d3.svg.brush()
             .y(mini_yScale)
             .extent([mini_yScale(data[0].file_name), mini_yScale(data[brushExtent].file_name)])
-            .on("brush", brushmove)
-        //.on("brushend", brushend);
+            .on("brush", brushmove);
         //Set up the visual part of the brush
         gBrush = d3.select(".brushGroup").append("g")
             .attr("class", "brush")
@@ -177,7 +176,7 @@ var makeGraph = function(url) {
         /////////////////// Create a rainbow gradient - for fun ///////////////////
         ///////////////////////////////////////////////////////////////////////////
 
-        defs = svg.append("defs")
+        defs = svg.append("defs");
         //Add the clip path for the main bar chart
         defs.append("clipPath")
             .attr("id", "clip")
@@ -224,65 +223,6 @@ var makeGraph = function(url) {
         //Start the brush
         gBrush.call(brush.event);
     }); //init()
-
-    //Function runs on a brush move - to update the big bar chart
-    function update() {
-
-        /////////////////////////////////////////////////////////////
-        ////////// Update the bars of the main bar chart ////////////
-        /////////////////////////////////////////////////////////////
-
-        //DATA JOIN
-        var bar = d3.select(".mainGroup").selectAll(".bar")
-            .data(data, function(d) { return d.file_name; });
-        //UPDATE
-        bar
-            .attr("y", function(d) { return main_yScale(d.file_name); })
-            .attr("height", main_yScale.rangeBand())
-            .attr("x", 0)
-            .transition().duration(50)
-            .attr("width", function(d) { return main_xScale(d.total_count); });
-
-        //ENTER
-        bar.enter().append("rect")
-            .attr("class", "bar")
-            .attr("fill", function(d) {
-                if (d.self_access_count > 0 ) {
-                    return "steelblue";
-                } else {
-                    return "orange";
-                }
-            })
-            .attr("y", function(d) {
-                return main_yScale(d.file_name); })
-            .attr("height", main_yScale.rangeBand())
-            .attr("x", 0)
-            .transition().duration(50)
-            .attr("width", function(d) {
-                return main_xScale(d.total_count); });
-        bar.on("mousemove", function () {
-            chartTooltip.style("display", null);
-            })
-            .on("mouseout", function () {
-                chartTooltip.style("display", "none");
-            })
-            .on("mouseover", function (d) {
-                if (d.self_access_count > 0) {
-                    self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time);
-                } else {
-                    self_string = "You haven't viewed this file. ";
-                }
-                chartTooltip
-                    .style("left", d3.event.pageX - 50 + "px")
-                    .style("top", d3.event.pageY - 70 + "px")
-                    .style("display", "inline-block")
-                    .html("<b>" + d.total_count * 100 + "% </b>of students have accessed <b>" + d.file_name + "</b>. " + self_string);
-            });
-        //EXIT
-        bar.exit()
-            .remove();
-
-    }//update
 
     /////////////////////////////////////////////////////////////
     ////////////////////// Brush functions //////////////////////
@@ -398,6 +338,65 @@ var makeGraph = function(url) {
 
     }//scroll
 
+    //Function runs on a brush move - to update the big bar chart
+    function update() {
+
+        /////////////////////////////////////////////////////////////
+        ////////// Update the bars of the main bar chart ////////////
+        /////////////////////////////////////////////////////////////
+
+        //DATA JOIN
+        var bar = d3.select(".mainGroup").selectAll(".bar")
+            .data(data, function(d) { return d.file_name; });
+        //UPDATE
+        bar
+            .attr("y", function(d) { return main_yScale(d.file_name); })
+            .attr("height", main_yScale.rangeBand())
+            .attr("x", 0)
+            .transition().duration(50)
+            .attr("width", function(d) { return main_xScale(d.total_count); });
+
+        //ENTER
+        bar.enter().append("rect")
+            .attr("class", "bar")
+            .attr("fill", function(d) {
+                if (d.self_access_count > 0 ) {
+                    return "steelblue";
+                } else {
+                    return "orange";
+                }
+            })
+            .attr("y", function(d) {
+                return main_yScale(d.file_name); })
+            .attr("height", main_yScale.rangeBand())
+            .attr("x", 0)
+            .transition().duration(50)
+            .attr("width", function(d) {
+                return main_xScale(d.total_count); });
+        bar.on("mousemove", function () {
+            chartTooltip.style("display", null);
+            })
+            .on("mouseout", function () {
+                chartTooltip.style("display", "none");
+            })
+            .on("mouseover", function (d) {
+                if (d.self_access_count > 0) {
+                    self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time);
+                } else {
+                    self_string = "You haven't viewed this file. ";
+                }
+                chartTooltip
+                    .style("left", d3.event.pageX - 50 + "px")
+                    .style("top", d3.event.pageY - 70 + "px")
+                    .style("display", "inline-block")
+                    .html("<b>" + d.total_count * 100 + "% </b>of students have accessed <b>" + d.file_name + "</b>. " + self_string);
+            });
+        //EXIT
+        bar.exit()
+            .remove();
+
+    }//update
+
 };
 
 var mySlider = new rSlider({
@@ -420,14 +419,14 @@ var mySlider = new rSlider({
 });
 
 $('#grade').change(function() {
-
-    makeGrapBasedOnGradeAndSlide($('#grade').val(), mySlider.getValue())
+    // make new graph based on the grade selection
+    makeGrapBasedOnGradeAndSlide($('#grade').val(), mySlider.getValue());
 
 });
 
 function makeGrapBasedOnGradeAndSlide(grade, silderValues)
 {
     makeGraph('/file_access_within_week?week_num_start=' + silderValues[0] + "&week_num_end=" + silderValues[2] + "&grade=" + grade);
-};
+}
 
 makeGraph();
