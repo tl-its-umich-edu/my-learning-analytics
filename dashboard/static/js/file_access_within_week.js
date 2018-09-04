@@ -22,6 +22,120 @@ var makeGraph = function(url) {
     var chartTooltip = d3.select("body").append("div")
         .attr("class", "tooltip");
 
+    /////////////////////////////////////////////////////////////
+    ////////////////////// Brush functions //////////////////////
+    /////////////////////////////////////////////////////////////
+
+    //First function that runs on a brush move
+    function brushmove() {
+        var extent = brush.extent();
+
+        //Which bars are still "selected"
+        var selected = mini_yScale.domain()
+            .filter(function(d) {
+                return (extent[0] - mini_yScale.rangeBand() + 1e-2 <= mini_yScale(d)) && (mini_yScale(d) <= extent[1] - 1e-2); });
+        //Update the colors of the mini chart - Make everything outside the brush grey
+        d3.select(".miniGroup").selectAll(".bar")
+            .style("fill", function(d, i) {
+                if (selected.indexOf(d.file_name) > -1) {
+                    if (d.self_access_count > 0 ) {
+                        return "steelblue";
+                    } else {
+                        return "orange";
+                    }
+                } else {
+                    return "#e0e0e0";
+                }
+            });
+
+        //Update the label size
+        d3.selectAll(".y.axis text")
+            .style("font-size", textScale(selected.length));
+
+        /////////////////////////////////////////////////////////////
+        ///////////////////// Update the axes ///////////////////////
+        /////////////////////////////////////////////////////////////
+
+        //Reset the part that is visible on the big chart
+        var originalRange = main_yZoom.range();
+        main_yZoom.domain( extent );
+
+        //Update the domain of the x & y scale of the big bar chart
+        main_yScale.domain(data.map(function(d) { return d.file_name; }));
+        main_yScale.rangeBands( [ main_yZoom(originalRange[0]), main_yZoom(originalRange[1]) ], 0.4, 0);
+
+        //Update the y axis of the big chart
+        d3.select(".mainGroup")
+            .select(".y.axis")
+            .call(main_yAxis);
+
+        //Find the new max of the bars to update the x scale
+        var newMaxXScale = d3.max(data, function(d) { return selected.indexOf(d.file_name) > -1 ? d.total_count : 0; });
+        main_xScale.domain([0, newMaxXScale]);
+
+        //Update the x axis of the big chart
+        d3.select(".mainGroupWrapper")
+            .select(".x.axis")
+            .transition().duration(50)
+            .call(main_xAxis);
+
+        //Update the big bar chart
+        update();
+
+    }//brushmove
+
+    /////////////////////////////////////////////////////////////
+    ////////////////////// Click functions //////////////////////
+    /////////////////////////////////////////////////////////////
+
+    //Based on http://bl.ocks.org/mbostock/6498000
+    //What to do when the user clicks on another location along the brushable bar chart
+    function brushcenter() {
+        var target = d3.event.target,
+            extent = brush.extent(),
+            size = extent[1] - extent[0],
+            range = mini_yScale.range(),
+            y0 = d3.min(range) + size / 2,
+            y1 = d3.max(range) + mini_yScale.rangeBand() - size / 2,
+            center = Math.max( y0, Math.min( y1, d3.mouse(target)[1] ) );
+
+        d3.event.stopPropagation();
+
+        gBrush
+            .call(brush.extent([center - size / 2, center + size / 2]))
+            .call(brush.event);
+
+    }//brushcenter
+
+    /////////////////////////////////////////////////////////////
+    ///////////////////// Scroll functions //////////////////////
+    /////////////////////////////////////////////////////////////
+
+    function scroll() {
+
+        //Mouse scroll on the mini chart
+        var extent = brush.extent(),
+            size = extent[1] - extent[0],
+            range = mini_yScale.range(),
+            y0 = d3.min(range),
+            y1 = d3.max(range) + mini_yScale.rangeBand(),
+            dy = d3.event.deltaY,
+            topSection;
+
+        if ( extent[0] - dy < y0 ) { topSection = y0; }
+        else if ( extent[1] - dy > y1 ) { topSection = y1 - size; }
+        else { topSection = extent[0] - dy; }
+
+        //Make sure the page doesn't scroll as well
+        d3.event.stopPropagation();
+        d3.event.preventDefault();
+
+        gBrush
+            .call(brush.extent([ topSection, topSection + size ]))
+            .call(brush.event);
+
+    }//scroll
+
     $.getJSON(url || "/file_access_within_week?week_num_start=1&week_num_end=0", function (initResult) {
         if (initResult.length === 0 )
         {
@@ -224,120 +338,6 @@ var makeGraph = function(url) {
         gBrush.call(brush.event);
     }); //init()
 
-    /////////////////////////////////////////////////////////////
-    ////////////////////// Brush functions //////////////////////
-    /////////////////////////////////////////////////////////////
-
-    //First function that runs on a brush move
-    function brushmove() {
-        var extent = brush.extent();
-
-        //Which bars are still "selected"
-        var selected = mini_yScale.domain()
-            .filter(function(d) {
-                return (extent[0] - mini_yScale.rangeBand() + 1e-2 <= mini_yScale(d)) && (mini_yScale(d) <= extent[1] - 1e-2); });
-        //Update the colors of the mini chart - Make everything outside the brush grey
-        d3.select(".miniGroup").selectAll(".bar")
-            .style("fill", function(d, i) {
-                if (selected.indexOf(d.file_name) > -1) {
-                    if (d.self_access_count > 0 ) {
-                        return "steelblue";
-                    } else {
-                        return "orange";
-                    }
-                } else {
-                    return "#e0e0e0";
-                }
-            });
-
-        //Update the label size
-        d3.selectAll(".y.axis text")
-            .style("font-size", textScale(selected.length));
-
-        /////////////////////////////////////////////////////////////
-        ///////////////////// Update the axes ///////////////////////
-        /////////////////////////////////////////////////////////////
-
-        //Reset the part that is visible on the big chart
-        var originalRange = main_yZoom.range();
-        main_yZoom.domain( extent );
-
-        //Update the domain of the x & y scale of the big bar chart
-        main_yScale.domain(data.map(function(d) { return d.file_name; }));
-        main_yScale.rangeBands( [ main_yZoom(originalRange[0]), main_yZoom(originalRange[1]) ], 0.4, 0);
-
-        //Update the y axis of the big chart
-        d3.select(".mainGroup")
-            .select(".y.axis")
-            .call(main_yAxis);
-
-        //Find the new max of the bars to update the x scale
-        var newMaxXScale = d3.max(data, function(d) { return selected.indexOf(d.file_name) > -1 ? d.total_count : 0; });
-        main_xScale.domain([0, newMaxXScale]);
-
-        //Update the x axis of the big chart
-        d3.select(".mainGroupWrapper")
-            .select(".x.axis")
-            .transition().duration(50)
-            .call(main_xAxis);
-
-        //Update the big bar chart
-        update();
-
-    }//brushmove
-
-    /////////////////////////////////////////////////////////////
-    ////////////////////// Click functions //////////////////////
-    /////////////////////////////////////////////////////////////
-
-    //Based on http://bl.ocks.org/mbostock/6498000
-    //What to do when the user clicks on another location along the brushable bar chart
-    function brushcenter() {
-        var target = d3.event.target,
-            extent = brush.extent(),
-            size = extent[1] - extent[0],
-            range = mini_yScale.range(),
-            y0 = d3.min(range) + size / 2,
-            y1 = d3.max(range) + mini_yScale.rangeBand() - size / 2,
-            center = Math.max( y0, Math.min( y1, d3.mouse(target)[1] ) );
-
-        d3.event.stopPropagation();
-
-        gBrush
-            .call(brush.extent([center - size / 2, center + size / 2]))
-            .call(brush.event);
-
-    }//brushcenter
-
-    /////////////////////////////////////////////////////////////
-    ///////////////////// Scroll functions //////////////////////
-    /////////////////////////////////////////////////////////////
-
-    function scroll() {
-
-        //Mouse scroll on the mini chart
-        var extent = brush.extent(),
-            size = extent[1] - extent[0],
-            range = mini_yScale.range(),
-            y0 = d3.min(range),
-            y1 = d3.max(range) + mini_yScale.rangeBand(),
-            dy = d3.event.deltaY,
-            topSection;
-
-        if ( extent[0] - dy < y0 ) { topSection = y0; }
-        else if ( extent[1] - dy > y1 ) { topSection = y1 - size; }
-        else { topSection = extent[0] - dy; }
-
-        //Make sure the page doesn't scroll as well
-        d3.event.stopPropagation();
-        d3.event.preventDefault();
-
-        gBrush
-            .call(brush.extent([ topSection, topSection + size ]))
-            .call(brush.event);
-
-    }//scroll
-
     //Function runs on a brush move - to update the big bar chart
     function update() {
 
@@ -399,6 +399,11 @@ var makeGraph = function(url) {
 
 };
 
+function makeGrapBasedOnGradeAndSlide(grade, silderValues)
+{
+    makeGraph('/file_access_within_week?week_num_start=' + silderValues[0] + "&week_num_end=" + silderValues[2] + "&grade=" + grade);
+}
+
 var mySlider = new rSlider({
     target: '#slider',
     values: [8, 7, 6, 5, 4, 3, 2, 1, 0],
@@ -423,10 +428,5 @@ $('#grade').change(function() {
     makeGrapBasedOnGradeAndSlide($('#grade').val(), mySlider.getValue());
 
 });
-
-function makeGrapBasedOnGradeAndSlide(grade, silderValues)
-{
-    makeGraph('/file_access_within_week?week_num_start=' + silderValues[0] + "&week_num_end=" + silderValues[2] + "&grade=" + grade);
-}
 
 makeGraph();
