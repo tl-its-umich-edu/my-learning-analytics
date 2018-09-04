@@ -1,5 +1,48 @@
 body {
-    font: 10px sans-serif;
+    font-size: 10px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    text-align: center;
+}
+
+#explanation {
+    font-size: 12px;
+    max-width: 620px;
+    margin: 0 auto;
+    padding-top: 10px;
+    color: #ababab;
+    font-weight: 300;
+}
+
+.y.axis line {
+    fill: none;
+}
+
+.x.axis line {
+    fill: none;
+    stroke: #e0e0e0;
+    shape-rendering: crispEdges;
+}
+
+.axis path {
+    display: none;
+}
+
+.brush .extent {
+    fill-opacity: .125;
+    shape-rendering: crispEdges;
+}
+
+.resize {
+    display: inline !important; /* show when empty */
+    fill: #7A7A7A;
+    fill-opacity: 1;
+    stroke: #7A7A7A;
+    stroke-width: 2px;
+}
+
+.bar {
+    /*shape-rendering: crispEdges;*/
 }
 
 
