@@ -115,7 +115,8 @@ def file_access(request):
 def file_access_within_week(request):
 
     # read from request param
-    week_num = int(request.GET.get('week_num','0'))
+    week_num_start = int(request.GET.get('week_num_start','1'))
+    week_num_end = int(request.GET.get('week_num_end','0'))
     grade = request.GET.get('grade','all')
 
     # get total number of student within the course_id
@@ -135,8 +136,8 @@ def file_access_within_week(request):
     # get time range based on week number passed in via request
 
     today = datetime.now().date()
-    start = today - timedelta(days=(week_num * 7 + today.weekday()))
-    end = today + timedelta(days=(7-today.weekday()))
+    start = today - timedelta(days=(week_num_start * 7 + today.weekday()))
+    end = today - timedelta(days=(week_num_end * 7 + today.weekday()))
 
     sqlString = "SELECT a.FILE_ID as file_id, f.NAME as file_name, u.CURRENT_GRADE as current_grade, a.user_ID as user_id " \
                 "FROM FILE f, FILE_ACCESS a, USER u, COURSE c, ACADEMIC_TERMS t  " \
@@ -149,6 +150,10 @@ def file_access_within_week(request):
     logger.info(sqlString);
     logger.info("start time=" + startTimeString + " end_time=" + endTimeString);
     df = pd.read_sql(sqlString, conn, params={"start_time": startTimeString,"end_time": endTimeString})
+
+    # return if there is no data during this interval
+    if (df.empty):
+        return HttpResponse("no data");
 
     # group by file_id, and file_name
     df.set_index(['file_id', 'file_name'])
@@ -195,6 +200,16 @@ def file_access_within_week(request):
             if (i_grade!=grade):
                 output_df["total_count"] = output_df["total_count"] - output_df[i_grade]
                 output_df=output_df.drop([i_grade], axis=1)
+
+    # round all numbers to one decimal point
+    output_df = output_df.round(1)
+
+    # only keep rows where total_count > 0
+    output_df = output_df[output_df.total_count > 0]
+
+
+    # time 100 to show the percentage
+    output_df["total_count"] = output_df["total_count"] * 100
 
     output_df.fillna(0, inplace=True) #replace null value with 0
 
