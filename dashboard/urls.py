@@ -13,10 +13,9 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+from django.apps import apps
 from django.conf.urls import url
 from django.contrib import admin
-
-from django.apps import apps
 
 # If djangosaml2 is installed, then import the login decorator
 # It's possible some other auth decorator could also be used
@@ -52,11 +51,14 @@ urlpatterns = [
     ),
     # get file access patterns
     url(r'^file_access/', login_required(views.file_access), name='file_access'),
+
     url(r'^file_access_within_week/', login_required(views.file_access_within_week), name='file_access_within_week'),
-    url(r'^view_file_access_within_week', login_required(TemplateView.as_view(
-      template_name='view_file_access_within_week.html')), name="view_file_access_within_week",
+    url(r'^view_file_access_within_week', login_required(TemplateView.as_view(template_name='view_file_access_within_week.html')), name="view_file_access_within_week",
       ),
     url(r'^grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
+
+    url(r'^assignment_view/', login_required(views.assignment_view), name='assignment_view'),
+    url(r'^assignments', login_required(TemplateView.as_view(template_name='assignments.html')), name="assignments"),
 
     # load file information
     url(r'^load_data', login_required(views.load_data), name='load_data'),
