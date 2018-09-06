@@ -5,7 +5,7 @@ RUN pip install --upgrade pip
 COPY requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 #FROM python:2-onbuild
-RUN apt-get install curl=7.52.1-5+deb9u6 --no-install-recommends
+RUN apt-get update && apt-get install curl=7.52.1-5+deb9u6 --no-install-recommends
 
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 
