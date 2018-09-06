@@ -207,6 +207,10 @@ def file_access_within_week(request):
     # only keep rows where total_count > 0
     output_df = output_df[output_df.total_count > 0]
 
+
+    # time 100 to show the percentage
+    output_df["total_count"] = output_df["total_count"] * 100
+
     output_df.fillna(0, inplace=True) #replace null value with 0
 
     return HttpResponse(output_df.to_json(orient='records'))

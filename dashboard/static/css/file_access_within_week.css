@@ -41,11 +41,6 @@ body {
     stroke-width: 2px;
 }
 
-.bar {
-    /*shape-rendering: crispEdges;*/
-}
-
-
 .toolTip {
     position: absolute;
     display: none;

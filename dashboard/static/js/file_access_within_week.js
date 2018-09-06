@@ -16,6 +16,8 @@ var makeGraph = function(url) {
         mini_width,
         textScale;
 
+    var padding = 100; // space around the chart, not including labels
+
     d3.selectAll("div#chart > *").remove();
 
     // Define the div for the tooltip
@@ -77,7 +79,7 @@ var makeGraph = function(url) {
                     .style("left", d3.event.pageX - 50 + "px")
                     .style("top", d3.event.pageY - 70 + "px")
                     .style("display", "inline-block")
-                    .html("<b>" + d.total_count * 100 + "% </b>of students have accessed <b>" + d.file_name + "</b>. " + self_string);
+                    .html("<b>" + d.total_count + "% </b>of students have accessed <b>" + d.file_name + "</b>. " + self_string);
             });
         //EXIT
         bar.exit()
@@ -292,6 +294,11 @@ var makeGraph = function(url) {
         mainGroup.append("g")
             .attr("class", "y axis")
             .attr("transform", "translate(-5,0)");
+
+        mainGroup.append("text")
+            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+            .attr("transform", "translate("+ (main_width/2) +","+(main_height+padding)+")")  // centre below axis
+            .text("Percentage of Students");
 
         /////////////////////////////////////////////////////////////
         /////////////////////// Update scales ///////////////////////
