@@ -5,19 +5,20 @@ RUN pip install --upgrade pip
 COPY requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 #FROM python:2-onbuild
-RUN apt-get install curl
+RUN apt-get install curl=7.52.1-5+deb9u6 --no-install-recommends
+
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 
-RUN apt-get update && apt-get install -y yarn python-dev xmlsec1 wget
+RUN apt-get update && apt-get install -y yarn=1.9.4-1 python3-dev=3.5.3-1 xmlsec1=1.2.23-0.1
 #libmysqlclient-dev
 RUN apt-get clean -y
 
 #https://github.com/jwilder/dockerize
 ENV DOCKERIZE_VERSION v0.6.1
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+RUN curl -sLO https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
@@ -32,7 +33,7 @@ COPY . /dashboard/
 RUN yarn install
 
 # This is needed to clean up the examples files as these cause collectstatic to fail (and take up extra space)
-RUN find /usr/lib/node_modules /dashboard/node_modules -type d -name "examples" | xargs rm -rf
+RUN find /usr/lib/node_modules /dashboard/node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
 
 COPY manage.py /manage.py
 
