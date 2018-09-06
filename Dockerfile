@@ -18,9 +18,9 @@ RUN apt-get clean -y
 
 #https://github.com/jwilder/dockerize
 ENV DOCKERIZE_VERSION v0.6.1
-RUN curl -sLO https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+RUN curl -sLO "https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz" \
+    && tar -C /usr/local/bin -xzvf "dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz" \
+    && rm "dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz"
 
 # COPY startup script into known file location in container
 COPY start.sh /start.sh
