@@ -39,7 +39,7 @@ COPY manage.py /manage.py
 
 COPY data/* /data/
 
-RUN echo yes | python manage.py collectstatic
+RUN echo yes | DJANGO_SECRET_KEY="collectstatic" python manage.py collectstatic
 
 COPY mysql/init.sql /docker-entrypoint-initdb.d
 

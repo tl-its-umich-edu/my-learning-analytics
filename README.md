@@ -3,59 +3,11 @@ student dashboard based on django framework
 ## Environment configuration
 There is some environment configuration and addtional files needed for this app to run. You can put this in a file called .env for testing. 
 
-(Sample .env)
-```
-# Required to set this with some value
-# Run the code here to generate https://raw.githubusercontent.com/openwisp/ansible-openwisp2/master/files/generate_django_secret_key.py 
+Configuration:
 
-DJANGO_SECRET_KEY=g7[0ahRU(KpEJ(Q^OP^bQ=DFLRtej_yp7AOQifAD63c[t#Kn3]
+Copy the file `.env.sample` to `.env` and fill in with the values for local testing.
 
-# Any logs that django outputs, turn these off for production
-DJANGO_LOG_LEVEL=DEBUG
-DJANGO_DEBUG=true
-DJANGO_TEMPLATE_DEBUG=true
-
-# Any other logs
-ROOT_LOG_LEVEL=INFO
-
-# MySQL Configuration
-MYSQL_DATABASE=student_dashboard
-MYSQL_USER=student_dashboard_user
-MYSQL_PASSWORD=student_dashboard_pw
-MYSQL_HOST=student_dashboard_mysql
-MYSQL_PORT=3306
-MYSQL_ROOT_PASSWORD=student_dashboard_root_pw
-
-# UDW configuration
-UDW_ENDPOINT=
-UDW_USER=
-UDW_PASSWORD=
-UDW_PORT=
-UDW_DATABASE=
-
-# Canvas Configuration
-CANVAS_COURSE_IDS=
-CANVAS_USER=
-
-# Paths to special login credentials (uses SAML)
-GOOGLE_APPLICATION_CREDENTIALS=/secrets/bq_cred.json
-
-# SAML Configuration
-# Need to set this to false to turn it off for dev, but default is true
-STUDENT_DASHBOARD_SAML=false
-
-# Where your secrets are stored
-SAML2_FILES_BASE=/secrets/saml/
-
-# Base for Django to your accounts path
-DJANGO_SAML2_URL_BASE=http://localhost:5001/accounts/
-
-# ACS Redirect
-DJANGO_ACS_DEFAULT_REDIRECT=http://localhost:5001/
-
-# Login Redirect
-LOGIN_REDIRECT_URL=http://localhost:5001/
-```
+On OpenShift fill these in the appropriate places.
 
 The bq_cred.json is service account for Big Query, it neesd to be supplied and put into the secrets directory and setup in the environment.
 

@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import csv
+
 from os import getenv
 from os import path
 import sys
@@ -31,14 +33,13 @@ PROJECT_ROOT = os.path.abspath(
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','GENERATE_NEW_KEY')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG',True)
 TEMPLATE_DEBUG = os.environ.get('DJANGO_TEMPLATE_DEBUG',DEBUG)
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost","dashboard.tl.it.umich.edu","dev.dashboard.tl.it.umich.edu"]
-
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS","127.0.0.1,localhost").split(',')
 
 # Application definition
 
