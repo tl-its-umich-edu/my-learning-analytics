@@ -31,13 +31,13 @@ PROJECT_ROOT = os.path.abspath(
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'p7zq=2&ms4%&b%5&5^g(ks0%u#^ku%x5z4xc+#(jao+t1h7*n^'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','GENERATE_NEW_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+DEBUG = os.environ.get('DJANGO_DEBUG',True)
+TEMPLATE_DEBUG = os.environ.get('DJANGO_TEMPLATE_DEBUG',DEBUG)
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost","dashboard.tl.it.umich.edu"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost","dashboard.tl.it.umich.edu","dev.dashboard.tl.it.umich.edu"]
 
 
 # Application definition

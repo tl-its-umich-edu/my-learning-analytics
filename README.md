@@ -5,8 +5,16 @@ There is some environment configuration and addtional files needed for this app 
 
 (Sample .env)
 ```
-# Any logs that django outputs
+# Required to set this with some value
+# Run the code here to generate https://raw.githubusercontent.com/openwisp/ansible-openwisp2/master/files/generate_django_secret_key.py 
+
+DJANGO_SECRET_KEY=g7[0ahRU(KpEJ(Q^OP^bQ=DFLRtej_yp7AOQifAD63c[t#Kn3]
+
+# Any logs that django outputs, turn these off for production
 DJANGO_LOG_LEVEL=DEBUG
+DJANGO_DEBUG=true
+DJANGO_TEMPLATE_DEBUG=true
+
 # Any other logs
 ROOT_LOG_LEVEL=INFO
 
