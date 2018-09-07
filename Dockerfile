@@ -39,6 +39,7 @@ COPY manage.py /manage.py
 
 COPY data/* /data/
 
+# This DJANGO_SECRET_KEY is set here just so collectstatic runs with an empty key. It can be set to anything
 RUN echo yes | DJANGO_SECRET_KEY="collectstatic" python manage.py collectstatic
 
 COPY mysql/init.sql /docker-entrypoint-initdb.d
