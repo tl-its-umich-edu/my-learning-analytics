@@ -39,13 +39,17 @@ current_user="norrabp"
 # Todo the framework needs to remember the course
 CANVAS_COURSE_ID =os.environ.get('CANVAS_COURSE_IDS', '')
 UDW_ID_PREFIX = "17700000000"
+
+# TODO: need to put this into env.sample file
+# strings for construct file download url
+CANVAS_FILE_PREFIX = os.environ.get('CANVAS_FILE_PREFIX', 'https://umich.instructure.com/files/')
+CANVAS_FILE_POSTFIX=os.environ.get('CANVAS_FILE_POSTFIX', '/download?download_frd=1')
+CANVAS_FILE_ID_NAME_SEPARATOR = "|"
+
 UDW_COURSE_ID = UDW_ID_PREFIX + CANVAS_COURSE_ID
-logger.info("host" + db_host)
-##logger.info("port" + db_port)
-logger.info("user" + db_user)
-logger.info("password" + db_password)
-logger.info("database" + db_name)
-logger.info("current user " + current_user)
+
+# string for no grade
+NO_GRADE_STRING = "NO_GRADE"
 
 
 conn = MySQLdb.connect (db = db_name,  # your mysql database name
@@ -61,6 +65,10 @@ def home(request):
     return render_to_response('home.html')
 
 def gpa_map(grade):
+    if grade is None:
+        return NO_GRADE_STRING;
+
+    # convert to float
     grade_float = float(grade)
     if grade_float < 60:
         return 'F'
@@ -114,6 +122,13 @@ def file_access(request):
 # show percentage of users who read the file within prior n weeks
 def file_access_within_week(request):
 
+    # environment settings:
+    pd.set_option('display.max_column',None)
+    pd.set_option('display.max_rows',None)
+    pd.set_option('display.max_seq_items',None)
+    pd.set_option('display.max_colwidth', 500)
+    pd.set_option('expand_frame_repr', True)
+
     # read from request param
     week_num_start = int(request.GET.get('week_num_start','1'))
     week_num_end = int(request.GET.get('week_num_end','0'))
@@ -125,19 +140,11 @@ def file_access_within_week(request):
     total_number_student = total_number_student_df.iloc[0,0]
     logger.info("total student=" + str(total_number_student))
 
-    # output dataframe
-    # file_name: String with max length of 255
-    # file_id: String with max length of 255
-    # grade: String with max length of 1
-    # week: 32-bit integer
-    # percent: 32-bit float
-    output_df = pd.DataFrame(columns=['file_name','A','B','C','D','F'])
-
     # get time range based on week number passed in via request
 
     today = datetime.now().date()
-    start = today - timedelta(days=(week_num_start * 7 + today.weekday()))
-    end = today - timedelta(days=(week_num_end * 7 + today.weekday()))
+    start = today - timedelta(days=((week_num_start - 1) * 7 + today.weekday()))
+    end = today - timedelta(days=((week_num_end-1) * 7 + today.weekday()))
 
     sqlString = "SELECT a.FILE_ID as file_id, f.NAME as file_name, u.CURRENT_GRADE as current_grade, a.user_ID as user_id " \
                 "FROM FILE f, FILE_ACCESS a, USER u, COURSE c, ACADEMIC_TERMS t  " \
@@ -153,65 +160,76 @@ def file_access_within_week(request):
 
     # return if there is no data during this interval
     if (df.empty):
-        return HttpResponse("no data");
+        return HttpResponse("no data")
 
     # group by file_id, and file_name
-    df.set_index(['file_id', 'file_name'])
+    # reformat for output
+    df['file_id_name'] = df['file_id'].str.cat(df['file_name'], sep=';')
+
+    df=df.drop(['file_id', 'file_name'], axis=1)
+    df.set_index(['file_id_name'])
     # drop file records when the file has been accessed multiple times by one user
     df.drop_duplicates(inplace=True)
 
     # map point grade to letter grade
     df['grade'] = df['current_grade'].map(gpa_map)
     # calculate the percentage
-    df['percent'] = round(df.groupby(['file_id','file_name', 'grade'])['file_id'].transform('count')/total_number_student, 2)
+    df['percent'] = round(df.groupby(['file_id_name', 'grade'])['file_id_name'].transform('count')/total_number_student, 2)
     df=df.drop(['current_grade', 'user_id'], axis=1)
     # now only keep the file access stats by grade level
     df.drop_duplicates(inplace=True)
 
-    # reformat for output
-    file_name=df["file_name"].unique()
+    file_id_name=df["file_id_name"].unique()
+
+    #df.reset_index(inplace=True)
+
     # zero filled dataframe with file name as row name, and grade as column name
-    output_df=pd.DataFrame(0.0, index=file_name, columns=['A','B','C','D','F'])
-    output_df=output_df.rename_axis('file_name')
+    output_df=pd.DataFrame(0.0, index=file_id_name, columns=['A','B','C','D','F', NO_GRADE_STRING])
+    output_df=output_df.rename_axis('file_id_name')
+
+    logger.debug(output_df)
+
     for index, row in df.iterrows():
         # set value
-        output_df.at[row['file_name'], row['grade']] = row['percent']
+        output_df.at[row['file_id_name'], row['grade']] = row['percent']
     output_df.reset_index(inplace=True)
 
     # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
-    selfSqlString = "select f.NAME as file_name, count(*) as self_access_count, max(a.ACCESS_TIME) as self_access_last_time " \
+    selfSqlString = "select f.ID + ';' + f.NAME as file_id_name, count(*) as self_access_count, max(a.ACCESS_TIME) as self_access_last_time " \
                     "from FILE_ACCESS a, USER u, FILE f " \
                     "where a.USER_ID = u.id " \
                     "and a.FILE_ID = f.ID " \
                     "and u.SIS_NAME=%(current_user)s " \
-                    "group by f.NAME;"
-    #select f.NAME as file_name, count(*) as self_access_count, max(a.ACCESS_TIME) as self_access_last_time from FILE_ACCESS a, USER u, FILE f where a.USER_ID = u.id and u.SIS_NAME='norrabp' and a.FILE_ID = f.ID group by f.NAME
+                    "group by f.ID + ';' + f.NAME;"
     logger.info(selfSqlString)
     logger.info("current_user=" + current_user)
 
     selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user})
-    output_df = output_df.join(selfDf.set_index('file_name'), on='file_name', how='left')
-    output_df["total_count"] = output_df.apply(lambda row: row.A + row.B+row.C+row.D+row.F, axis=1)
+    output_df = output_df.join(selfDf.set_index('file_id_name'), on='file_id_name', how='left')
+    output_df["total_count"] = output_df.apply(lambda row: row.A + row.B+row.C+row.D+row.F+row.NO_GRADE, axis=1)
 
     if (grade != "all"):
         # drop all other grades
-        grades = ['A', 'B', 'C', 'D', 'F']
+        grades = ['A', 'B', 'C', 'D', 'F', NO_GRADE_STRING]
         for i_grade in grades:
             if (i_grade!=grade):
                 output_df["total_count"] = output_df["total_count"] - output_df[i_grade]
                 output_df=output_df.drop([i_grade], axis=1)
 
-    # round all numbers to one decimal point
-    output_df = output_df.round(1)
-
     # only keep rows where total_count > 0
     output_df = output_df[output_df.total_count > 0]
 
-
     # time 100 to show the percentage
     output_df["total_count"] = output_df["total_count"] * 100
+    # round all numbers to one decimal point
+    output_df = output_df.round(1)
 
     output_df.fillna(0, inplace=True) #replace null value with 0
+
+    output_df['file_id_part'], output_df['file_name_part'] = output_df['file_id_name'].str.split(';', 1).str
+    output_df['file_name'] = output_df.apply(lambda row: CANVAS_FILE_PREFIX + row.file_id_part + CANVAS_FILE_POSTFIX + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
+    output_df.drop(columns=['file_id_part', 'file_name_part', 'file_id_name'], inplace=True)
+    logger.debug(output_df.to_json(orient='records'))
 
     return HttpResponse(output_df.to_json(orient='records'))
 

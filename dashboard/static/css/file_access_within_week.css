@@ -18,6 +18,11 @@ body {
     fill: none;
 }
 
+.y.axis text {
+    font: 16px sans-serif;
+    color: blue;
+}
+
 .x.axis line {
     fill: none;
     stroke: #e0e0e0;
@@ -106,6 +111,13 @@ body {
 
 .x.axis path {
     display: none;
+}
+.axis .label {
+    font-size: 40pt;
+}
+
+div.y-axis-label {
+    font: 10px sans-serif;
 }
 
 .d3-tip {
