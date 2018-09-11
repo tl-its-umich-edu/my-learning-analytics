@@ -1,0 +1,19 @@
+# This is built with the script ./builddockerbase.sh
+
+FROM alpine:3.7
+
+COPY requirements.txt /
+
+RUN apk add --no-cache python3-dev && \
+    apk add --no-cache --virtual .build-deps g++ postgresql-dev python3-dev build-base gcc libc-dev libffi-dev mariadb-dev && \
+    ln -s /usr/include/locale.h /usr/include/xlocale.h && \
+    pip3 install -r /requirements.txt && \
+    apk del .build-deps && \
+    rm -rf .cache/pip && \
+    apk add --no-cache --virtual runtime-dependencies bash git curl mariadb-client-libs postgresql-client xmlsec-dev yarn 
+
+#https://github.com/jwilder/dockerize
+ENV DOCKERIZE_VERSION v0.6.1
+RUN curl -sLO "https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz" \
+    && tar -C /usr/local/bin -xzvf "dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz" \
+    && rm "dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz"

@@ -1,26 +1,7 @@
 # FROM directive instructing base image to build upon
-FROM python:3.5
+FROM tlitsumichedu/student-dashboard-django-base:1.0
 
-RUN pip install --upgrade pip
-COPY requirements.txt /requirements.txt
-RUN pip install -r /requirements.txt
-#FROM python:2-onbuild
-RUN apt-get update && apt-get install -y curl --no-install-recommends
-
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
-
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-
-RUN apt-get update && apt-get install -y yarn python3-dev xmlsec1
-#libmysqlclient-dev
-RUN apt-get clean -y
-
-#https://github.com/jwilder/dockerize
-ENV DOCKERIZE_VERSION v0.6.1
-RUN curl -sLO "https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz" \
-    && tar -C /usr/local/bin -xzvf "dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz" \
-    && rm "dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz"
+# If you change any python dependencies you should create a new image in Dockerfile.build
 
 # COPY startup script into known file location in container
 COPY start.sh /start.sh
@@ -40,7 +21,7 @@ COPY manage.py /manage.py
 COPY data/* /data/
 
 # This DJANGO_SECRET_KEY is set here just so collectstatic runs with an empty key. It can be set to anything
-RUN echo yes | DJANGO_SECRET_KEY="collectstatic" python manage.py collectstatic
+RUN echo yes | DJANGO_SECRET_KEY="collectstatic" python3 manage.py collectstatic
 
 COPY mysql/init.sql /docker-entrypoint-initdb.d
 
