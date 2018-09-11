@@ -461,8 +461,10 @@ var mySlider = new rSlider({
         // argument values represents current values
         var grade = $('#grade').val();
         var endWeek = "now:";
-        if (values[2] != 0)
+        if (values[2] != 0) {
+            // show week number
             endWeek = values[2] + " weeks:";
+        }
         $("#slider_label").html("in last " + values[0] + " to " + endWeek);
         makeGrapBasedOnGradeAndSlide(grade, values);
     }
