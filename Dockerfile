@@ -1,10 +1,14 @@
 # FROM directive instructing base image to build upon
-FROM tlitsumichedu/student-dashboard-django-base:1.0
+FROM tlitsumichedu/student-dashboard-django-base:1.1
 
 # If you change any python dependencies you should create a new image in Dockerfile.build
 
 # COPY startup script into known file location in container
 COPY start.sh /start.sh
+
+# This is needed for some local python dependencies
+COPY requirements.txt /
+RUN pip3 install -r /requirements.txt && rm -rf .cache/pip
 
 # EXPOSE port 8000 to allow communication to/from server
 EXPOSE 5000
