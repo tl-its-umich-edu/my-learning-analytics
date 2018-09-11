@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.css' %}">
     {% block css %} {% endblock %}
 </head>
-<body class="container-fluid" ng-app="visApp">
+<body class="container-fluid">
     <header>Student Dashboard :: 
         {% if user.is_authenticated %}Welcome, {{ user.get_username }}. You can <a href="/accounts/logout">logout here</a>.
         {% else %}Welcome! Please <a href="/accounts/login">login</a>
