@@ -163,10 +163,7 @@ def update_with_udw_user(request):
           "and e.workflow_state='active' ) as e " \
           "where p.user_id=u.id " \
           "and u.id = e.user_id " \
-          "and c.enrollment_id =  e.enrollment_id " \
-          "and c.current_score is not null " \
-          "and c.final_score is not null"
-
+          "and c.enrollment_id =  e.enrollment_id"
     logger.debug(user_sql)
 
     return HttpResponse("loaded user info: " + util_function(user_sql, 'USER'))

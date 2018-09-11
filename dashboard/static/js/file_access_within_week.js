@@ -63,13 +63,15 @@ var makeGraph = function(url) {
             .transition().duration(50)
             .attr("width", function(d) {
                 return main_xScale(d.total_count); });
-        bar.on("mousemove", function () {
+        bar.on("mouseover", function () {
             chartTooltip.style("display", null);
-        })
+            })
             .on("mouseout", function () {
                 chartTooltip.style("display", "none");
             })
-            .on("mouseover", function (d) {
+            .on("mousemove", function (d) {
+                // split file link and file name
+                var parts = d.file_name.split("|");
                 if (d.self_access_count > 0) {
                     self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time);
                 } else {
@@ -79,7 +81,7 @@ var makeGraph = function(url) {
                     .style("left", d3.event.pageX - 50 + "px")
                     .style("top", d3.event.pageY - 70 + "px")
                     .style("display", "inline-block")
-                    .html("<b>" + d.total_count + "% </b>of students have accessed <b>" + d.file_name + "</b>. " + self_string);
+                    .html("<b>" + d.total_count + "% </b>of students have accessed <b>" + parts[1] + "</b>. " + self_string);
             });
         //EXIT
         bar.exit()
@@ -98,14 +100,17 @@ var makeGraph = function(url) {
         //Update the colors of the mini chart - Make everything outside the brush grey
         d3.select(".miniGroup").selectAll(".bar")
             .style("fill", function(d, i) {
-                if (selected.indexOf(d.file_name) > -1) {
-                    if (d.self_access_count > 0 ) {
-                        return "steelblue";
-                    } else {
-                        return "orange";
-                    }
+                if (d.self_access_count > 0 ) {
+                    return "steelblue";
                 } else {
-                    return "#e0e0e0";
+                    return "orange";
+                }
+            })
+            .style("opacity", function(d, i) {
+                if (selected.indexOf(d.file_name) > -1) {
+                    return "1";
+                } else {
+                    return "0.5";
                 }
             });
 
@@ -215,11 +220,11 @@ var makeGraph = function(url) {
         var zoomer = d3.behavior.zoom()
             .on("zoom", null);
 
-        var main_margin = {top: 10, right: 10, bottom: 30, left: 300},
+        var main_margin = {top: 10, right: 10, bottom: 50, left: 300},
             main_width = 1000 - main_margin.left - main_margin.right,
             main_height = 400 - main_margin.top - main_margin.bottom;
 
-        var mini_margin = {top: 10, right: 10, bottom: 30, left: 10},
+        var mini_margin = {top: 10, right: 10, bottom: 50, left: 10},
             mini_height = 400 - mini_margin.top - mini_margin.bottom;
         mini_width = 100 - mini_margin.left - mini_margin.right;
 
@@ -278,10 +283,17 @@ var makeGraph = function(url) {
             .outerTickSize(0);
 
         //Add group for the x axis
-        d3.select(".mainGroupWrapper")
+        var xAxisG = d3.select(".mainGroupWrapper")
             .append("g")
             .attr("class", "x axis")
-            .attr("transform", "translate(" + 0 + "," + (main_height + 5) + ")");
+            .attr("transform", "translate(" + 0 + "," + (main_height + 20) + ")");
+
+        var xAxisLabel = xAxisG.append("text")
+            .style("text-anchor", "middle")
+            .attr("x", main_width / 2)
+            .attr("y", main_height+padding)
+            .attr("class", "label")
+            .text("Percentage");
 
         //Create y axis object
         main_yAxis = d3.svg.axis()
@@ -292,13 +304,22 @@ var makeGraph = function(url) {
 
         //Add group for the y axis
         mainGroup.append("g")
-            .attr("class", "y axis")
-            .attr("transform", "translate(-5,0)");
+                .attr("class", "y axis")
+                .attr("transform", "translate(-5,0)");
+
+        var half_width = main_width/2;
+        var bottom_x_axis = (main_height+padding);
 
         mainGroup.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            .attr("transform", "translate("+ (main_width/2) +","+(main_height+padding)+")")  // centre below axis
+            .attr("transform", "translate("+ half_width +","  + bottom_x_axis +")")  // centre below axis
             .text("Percentage of Students");
+
+        // now add titles to the axes
+        mainGroup.append("text")
+            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+            .attr("transform", "translate("+ (- padding/2) +","+ 0 +")")  // text is drawn off the screen top left, move down and out and rotate
+            .text("File Name");
 
         /////////////////////////////////////////////////////////////
         /////////////////////// Update scales ///////////////////////
@@ -311,7 +332,32 @@ var makeGraph = function(url) {
         mini_yScale.domain(data.map(function(d) { return d.file_name; }));
 
         //Create the visual part of the y axis
-        d3.select(".mainGroup").select(".y.axis").call(main_yAxis);
+        d3.select(".mainGroup")
+            .select(".y.axis")
+            .call(main_yAxis)
+            .selectAll("g")
+            .append("svg:foreignObject");
+
+        d3.selectAll(".y .tick text").each(function(d) {
+            var parts = d.split("|");
+            const a = d3.select(this.parentNode).append("a")
+                .attr("xlink:href", parts[0]);//change this for your function
+            a.node().appendChild(this);
+            d = parts[1];
+        });
+
+        // update tick link
+        d3.selectAll(".y .tick text").each(function(d) {
+            var parts = d.split("|");
+            const a = d3.select(this.parentNode).append("a")
+                .attr("xlink:href", parts[0]);//change this for your function
+            a.node().appendChild(this);
+        });
+        // update the tick text
+        main_yAxis.tickFormat(function(d) {
+            var parts = d.split("|");
+            return parts[1];
+        });
 
         /////////////////////////////////////////////////////////////
         ///////////////////// Label axis scales /////////////////////
@@ -327,6 +373,7 @@ var makeGraph = function(url) {
         /////////////////////////////////////////////////////////////
         //What should the first extent of the brush become - a bit arbitrary this
         var brushExtent = Math.max( 1, Math.min( 20, Math.round(data.length*0.2) ) );
+        //var brushExtent = Math.min(5, data.length-1);
 
         brush = d3.svg.brush()
             .y(mini_yScale)
@@ -352,18 +399,6 @@ var makeGraph = function(url) {
         gBrush.select(".background")
             .on("mousedown.brush", brushcenter)
             .on("touchstart.brush", brushcenter);
-        ///////////////////////////////////////////////////////////////////////////
-        /////////////////// Create a rainbow gradient - for fun ///////////////////
-        ///////////////////////////////////////////////////////////////////////////
-
-        defs = svg.append("defs");
-        //Add the clip path for the main bar chart
-        defs.append("clipPath")
-            .attr("id", "clip")
-            .append("rect")
-            .attr("x", -main_margin.left)
-            .attr("width", main_width + main_margin.left)
-            .attr("height", main_height);
 
         /////////////////////////////////////////////////////////////
         /////////////// Set-up the mini bar chart ///////////////////
@@ -418,14 +453,19 @@ var mySlider = new rSlider({
     set:    [1], // an array of preselected values
     width:    null,
     scale:    true,
-    labels:   false,
+    labels:   true,
     tooltip:  true,
     step:     1, // step size
     disabled: false, // is disabled?
     onChange:  function (values) {
         // argument values represents current values
         var grade = $('#grade').val();
-        $("#slider_label").html("View File Access Patterns in last " + values[0] + " to " + values[2] + " weeks:");
+        var endWeek = "now:";
+        if (values[2] != 0) {
+            // show week number
+            endWeek = values[2] + " weeks:";
+        }
+        $("#slider_label").html("in last " + values[0] + " to " + endWeek);
         makeGrapBasedOnGradeAndSlide(grade, values);
     }
 });
