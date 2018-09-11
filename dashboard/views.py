@@ -40,10 +40,9 @@ current_user="norrabp"
 CANVAS_COURSE_ID =os.environ.get('CANVAS_COURSE_IDS', '')
 UDW_ID_PREFIX = "17700000000"
 
-# TODO: need to put this into env.sample file
 # strings for construct file download url
-CANVAS_FILE_PREFIX = os.environ.get('CANVAS_FILE_PREFIX', 'https://umich.instructure.com/files/')
-CANVAS_FILE_POSTFIX=os.environ.get('CANVAS_FILE_POSTFIX', '/download?download_frd=1')
+CANVAS_FILE_PREFIX = os.environ.get('CANVAS_FILE_PREFIX', '')
+CANVAS_FILE_POSTFIX=os.environ.get('CANVAS_FILE_POSTFIX', '')
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
 UDW_COURSE_ID = UDW_ID_PREFIX + CANVAS_COURSE_ID
