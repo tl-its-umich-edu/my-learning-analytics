@@ -5,14 +5,14 @@ RUN pip install --upgrade pip
 COPY requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 #FROM python:2-onbuild
-RUN apt-get install curl=7.52.1-5+deb9u6 --no-install-recommends
+RUN apt-get update && apt-get install -y curl --no-install-recommends
 
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 
-RUN apt-get update && apt-get install -y yarn=1.9.4-1 python3-dev=3.5.3-1 xmlsec1=1.2.23-0.1
+RUN apt-get update && apt-get install -y yarn python3-dev xmlsec1
 #libmysqlclient-dev
 RUN apt-get clean -y
 
@@ -39,7 +39,8 @@ COPY manage.py /manage.py
 
 COPY data/* /data/
 
-RUN echo yes | python manage.py collectstatic
+# This DJANGO_SECRET_KEY is set here just so collectstatic runs with an empty key. It can be set to anything
+RUN echo yes | DJANGO_SECRET_KEY="collectstatic" python manage.py collectstatic
 
 COPY mysql/init.sql /docker-entrypoint-initdb.d
 

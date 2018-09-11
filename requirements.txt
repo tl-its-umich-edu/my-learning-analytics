@@ -18,9 +18,9 @@ pyOpenSSL>=18.0,<18.0.99
 canvasapi>=0.10,<0.10.99
 protobuf>=3.6,<3.6.99
 
-# Hold these versions back until https://github.com/IdentityPython/pysaml2/issues/546 is resolved
-djangosaml2==0.17.1
-pysaml2==4.5.0
+# These caused problems in the past so test when updating
+djangosaml2==0.17.2
+pysaml2==4.6.2
 
 SQLAlchemy>=1.2.7,<1.2.99
 psycopg2_binary>=2.7.5,<2.7.99
