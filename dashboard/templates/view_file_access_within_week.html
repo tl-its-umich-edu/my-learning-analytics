@@ -1,5 +1,8 @@
+{% extends 'base.html' %}
 {% load static %}
-<meta charset="utf-8">
+{% block css %}
+<link rel="stylesheet" href="/static/css/rSlider.min.css">
+<link rel="stylesheet" href="/static/css/file_access_within_week.css" />
 <style>
 
     .label {
@@ -13,7 +16,8 @@
     }
 
 </style>
-<body>
+{% endblock %}
+{% block content %}
     <!-- week slider -->
     <br/>
     <br/>
@@ -38,16 +42,10 @@
     </select> <span id="slider_label">in last 1 week: </span>
 
     <div id="chart"></div>
-
+{% endblock %}
+{% block js %}
     <script src="{% static 'd3/d3.js' %}"></script>
     <script src="{% static 'd3-tip/dist/index.js' %}"></script>
-    <script src="{% static 'underscore/underscore-min.js' %}"></script>
-    <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
-    <script src="{% static 'moment/min/moment.min.js' %}"></script>
-
-    <link rel="stylesheet" href="/static/css/rSlider.min.css">
-    <script src="/static/js/rSlider.min.js"></script>
-
-    <script src="/static/js/file_access_within_week.js"></script>
-    <link rel="stylesheet" href="/static/css/file_access_within_week.css" />
-</body>
+    <script src="{% static 'js/rSlider.min.js' %}"></script>
+    <script src="{% static 'js/file_access_within_week.js'%}"></script>
+{% endblock %}
