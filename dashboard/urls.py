@@ -43,9 +43,6 @@ from . import cron
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.home, name='home'),
-    url(r'^files/', login_required(TemplateView.as_view(
-        template_name='files.html')), name="files",
-    ),
     url(r'^grades/', login_required(TemplateView.as_view(
         template_name='grades.html')), name="grades",
     ),
