@@ -84,6 +84,8 @@ if apps.is_installed('djangosaml2'):
     urlpatterns += (
         url(r'^accounts/', include('djangosaml2.urls')),
         url(r'^samltest/', login_required(echo_attributes)),
+        # Override auth_logout from djangosaml2 and registration for consistency
+        url(r'^accounts/logout', views.logout, name='auth_logout')
     )
 elif apps.is_installed('registration'):
     urlpatterns += (
