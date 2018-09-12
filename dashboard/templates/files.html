@@ -1,23 +1,19 @@
+{% extends 'base.html' %}
 {% load static %}
 <head>
-    <title>Files Accessed</title>
-    <meta charset="utf-8">
-
-    <script src="{% static 'angular/angular.js' %}"></script>
+    {% block title %}Files Accessed{% endblock %}
+    {% block js %}
     <script src="{% static 'angular-nvd3/dist/angular-nvd3.js' %}"></script>
     <script src="{% static 'angular-resource/angular-resource.js' %}"></script>
     <script src="{% static 'd3/d3.js' %}"></script>
     <script src="{% static 'nvd3/build/nv.d3.js' %}"></script>
+    <script src="{% static 'js/d3.slider.js' %}"></script>
+    {% endblock %}
+    {% block css %}
     <link media="all" href="{% static 'nvd3/build/nv.d3.css' %}" type="text/css" rel="stylesheet" />
-    <script src="{% static 'underscore/underscore-min.js' %}"></script>
-    <script src="{% static 'moment/min/moment.min.js' %}"></script>
-    <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.css' %}">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-
     <link rel="stylesheet" href="/static/css/d3.slider.css" />
     <link rel="stylesheet" href="/static/css/sd.css" />
-
     <style>
         text {
             font: 11px sans-serif;
@@ -49,8 +45,8 @@
         }
     </style>
 </head>
-
-<body class="container-fluid" ng-app="visApp"  ng-controller="c1">
+{% endblock %}
+{% block content %}
     <br>
     <!--<div class="btn-group btn-group-sm">-->
 <!--<button class="btn-default btn" id="user_counts" ng-click="userCounts()">Users and counts</button>-->
@@ -88,14 +84,8 @@
 <div id="chart1">
     <svg></svg>
   </div>
-<script src="/static/js/app.js"></script>
-<script src="/static/js/controllers.js"></script>
-<script src="/static/js/factories.js"></script>
-<script src="/static/js/d3.slider.js"></script>
-<!--<script src="http://d3js.org/d3.v3.min.js"></script>-->
 <script>
-
     d3.select('#week_slider').call(d3.slider().axis(true).min(0).max(22).step(1));
 
 </script>
-</body>
+{% endblock %}

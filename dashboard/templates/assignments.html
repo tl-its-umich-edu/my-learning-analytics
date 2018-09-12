@@ -1,18 +1,11 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Assignments Preparation view</title>
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.css' %}">
+{% block title %}Assignments Preparation view{% endblock %}
+{% block css %}
     <link rel="stylesheet" href="/static/css/assign.css">
-</head>
+{% endblock %}
 
-<body>
+{% block content %}
 <div class="container-fluid">
     <div class="navbar-header mastHead">
         <h1 class="navbar-brand collapse-nav"><span>Student Dashboard</span></h1>
@@ -101,16 +94,9 @@
 
 </div>
 <div class ="error"></div>
-<script src="{% static 'moment/min/moment.min.js' %}"></script>
-<script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
-<script src="{% static 'angular/angular.js' %}"></script>
-<script src="{% static 'underscore/underscore-min.js' %}"></script>
-<script src="{% static static 'd3-v4/build/d3.min.js' %}"></script>
-<!--<script src="https://d3js.org/d3.v4.js"></script>-->
-<script src="/static/js/app.js"></script>
-<script src="/static/js/controllers.js"></script>
-<script src="/static/js/factories.js"></script>
-<script src="/static/js/assign-progress.js"></script>
-</body>
+{% endblock %}
 
-</html>
+{% block js %}
+<script src="{% static 'd3-v4/build/d3.min.js' %}"></script>
+<script src="/static/js/assign-progress.js"></script>
+{% endblock %}
