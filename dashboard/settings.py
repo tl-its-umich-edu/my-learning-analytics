@@ -85,6 +85,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.messages.context_processors.messages',
@@ -272,4 +273,7 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
         'givenName': ('first_name', ),
         'sn': ('last_name', ),
     }
+
+    SAML_LOGOUT_REQUEST_PREFERRED_BINDING = saml2.BINDING_HTTP_POST
+    
 
