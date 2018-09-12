@@ -1,7 +1,16 @@
 var makeGraph = function () {
-    d3.selectAll("#progress > *").remove();
+    d3.selectAll("#chart > *").remove();
     $.getJSON("/assignment_progress", function (initResult) {
         data = initResult;
+        if(_.isEmpty(data)){
+            var gradeInfo = d3.select("#chart").append("div")
+                .attr("class", "alert alert-info")
+                .attr("role","alert")
+                .style("font-size", "20px")
+                .style("font-weight", "bold")
+                .html('No data for the view')
+            return
+        }
 
         var tooltip = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
 
@@ -15,7 +24,7 @@ var makeGraph = function () {
             left: 10
         };
 
-        var svg = d3.select("#chart")
+        var svg = d3.select("#chart").append("svg")
             .attr('width', '100%')
             .attr('height', '100%')
             .attr('viewBox', '0 0 ' + width + ' ' + height)

@@ -269,6 +269,8 @@ def assignment_progress(request):
           "(select id as assign_id,assignment_group_id, local_date,name,points_possible from ASSIGNMENT where course_id = %(course_id)s) as a join" \
           "(select id,name as assign_grp_name,group_points, weight from ASSIGNMENT_GROUPS) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
     df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': UDW_COURSE_ID},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%m/%d/%Y'})
+    if df.empty:
+        return HttpResponse(json.dumps({}), content_type='application/json')
     df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
     df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
     df[['points_possible', 'group_points','weight','score']] = df[['points_possible', 'group_points','weight','score']].astype(float)
@@ -302,6 +304,9 @@ def assignment_view(request):
           "(select id as assign_id,assignment_group_id, local_date,name,points_possible from ASSIGNMENT where course_id = %(course_id)s) as a join"\
           "(select id,group_points, weight from ASSIGNMENT_GROUPS) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
     df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': UDW_COURSE_ID},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%m/%d/%Y'})
+    if df.empty:
+        return HttpResponse(json.dumps([]), content_type='application/json')
+
     df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
     df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
     df[['points_possible', 'group_points','weight']] = df[['points_possible', 'group_points','weight']].astype(float)
