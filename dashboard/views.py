@@ -259,10 +259,39 @@ def grade_distribution(request):
     df_grade['grade_avg'] = average_grade
     return HttpResponse(df_grade.to_json(orient='records'))
 
+def assignment_progress(request):
+    logger.info(assignment_view.__name__)
+    sql = "select assignment_id,local_graded_date as graded_date,score,name,assign_grp_name,local_date as due_date,points_possible,group_points,weight from (" \
+          "(select assignment_id,local_graded_date,score from" \
+          "(select id from USER where sis_name = %(current_user)s ) as u join" \
+          "(select user_id,assignment_id,local_graded_date,score from SUBMISSION) as sub on sub.user_id=u.id) as rock join" \
+          "(select assign_id,name,assign_grp_name,local_date,points_possible,group_points,weight from" \
+          "(select id as assign_id,assignment_group_id, local_date,name,points_possible from ASSIGNMENT where course_id = %(course_id)s) as a join" \
+          "(select id,name as assign_grp_name,group_points, weight from ASSIGNMENT_GROUPS) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
+    df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': UDW_COURSE_ID},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%m/%d/%Y'})
+    df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
+    df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
+    df[['points_possible', 'group_points','weight','score']] = df[['points_possible', 'group_points','weight','score']].astype(float)
+    df['towards_final_grade'] = round((df['points_possible']/df['group_points'])*df['weight'],2)
+    df.sort_values(by='due_date', inplace = True)
+    df['graded']=df['graded_date'].notnull()
+    df['due_date_mod'] =df['due_date'].astype(str).apply(lambda x:x.split()[0])
+    df.drop(columns=['assignment_id','due_date','graded_date'], inplace=True)
+    df = df[df['weight']>0.0]
+    def user_percent(row):
+        if row['graded']==True:
+            s =round((row['score']/row['points_possible'])*row['towards_final_grade'],2)
+            return s
+        else: return row['towards_final_grade']
+
+    df['percent_gotten']=df.apply(user_percent,axis=1)
+    df.reset_index(inplace=True)
+    df.drop(columns=['index'],inplace=True)
+    return HttpResponse(df.to_json(orient='records'))
+
 
 def assignment_view(request):
     logger.info(assignment_view.__name__)
-
     percent_selection = float(request.GET.get('percent','0.0'))
     logger.info("selection from assignment view",percent_selection)
     sql = "select assignment_id,local_graded_date as graded_date,score,name,local_date as due_date,points_possible,group_points,weight from (" \

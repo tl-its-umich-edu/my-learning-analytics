@@ -12,13 +12,19 @@
     <link rel="stylesheet" href="/static/css/assign.css">
 </head>
 
-<body ng-app="visApp">
+<body>
 <div class="container-fluid">
     <div class="navbar-header mastHead">
         <h1 class="navbar-brand collapse-nav"><span>Student Dashboard</span></h1>
     </div>
 </div>
-<div class="container" ng-controller="mainController">
+
+<div class="container-fluid">
+    <h5 style="padding-left: 8px">Progress Bar</h5>
+    <svg id="chart"></svg>
+</div>
+
+<div class="container" ng-controller="mainController" ng-app="visApp">
     <div class="row">
         <div class="column">
             <span>Show assignments weight more than</span>
@@ -94,13 +100,17 @@
 </div>
 
 </div>
+<div class ="error"></div>
 <script src="{% static 'moment/min/moment.min.js' %}"></script>
 <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
 <script src="{% static 'angular/angular.js' %}"></script>
 <script src="{% static 'underscore/underscore-min.js' %}"></script>
+<script src="{% static static 'd3-v4/build/d3.min.js' %}"></script>
+<!--<script src="https://d3js.org/d3.v4.js"></script>-->
 <script src="/static/js/app.js"></script>
 <script src="/static/js/controllers.js"></script>
 <script src="/static/js/factories.js"></script>
+<script src="/static/js/assign-progress.js"></script>
 </body>
 
 </html>
