@@ -14,7 +14,7 @@ echo "Waiting for DB"
 dockerize -wait tcp://${MYSQL_HOST}:${MYSQL_PORT} -timeout 15s
 
 echo Running python startups
-python manage.py crontab add; python manage.py migrate
+python3 manage.py crontab add; python3 manage.py migrate
 
 # Start Gunicorn processes
 echo Starting Gunicorn.
