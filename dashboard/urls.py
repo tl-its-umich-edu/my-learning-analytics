@@ -41,6 +41,7 @@ from . import views
 from . import cron
 
 urlpatterns = [
+    url(r'^status', include('watchman.urls')),
     url(r'^$', views.home, name='home'),
 
     url(r'^admin', admin.site.urls),
