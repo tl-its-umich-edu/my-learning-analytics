@@ -83,12 +83,12 @@ def gpa_map(grade):
 def file_access(request):
 
     # Use all the SQL you like
-    sqlString = "SELECT a.FILE_ID as FILE_ID, f.NAME as files, u.CURRENT_GRADE as current_grade, CEIL(HOUR(TIMEDIFF(a.ACCESS_TIME, t.START_DATE))/(24*7)) as week " \
-                "FROM FILE f, FILE_ACCESS a, USER u, COURSE c, ACADEMIC_TERMS t " \
-                "WHERE a.FILE_ID =f.ID " \
-                "and a.USER_ID = u.ID " \
-                "and f.COURSE_ID = c.ID " \
-                "and c.TERM_ID = t.TERM_ID"
+    sqlString = "SELECT a.file_id as FILE_ID, f.name as files, u.current_grade as current_grade, CEIL(HOUR(TIMEDIFF(a.access_time, t.start_date))/(24*7)) as week " \
+                "FROM file f, file_access a, user u, course c, academic_terms t " \
+                "WHERE a.file_id =f.id " \
+                "and a.user_id = u.id " \
+                "and f.course_id = c.id " \
+                "and c.term_id = t.term_id"
     df = pd.read_sql(sqlString, conn)
     logger.debug(df.dtypes)
     logger.debug(df.describe())
@@ -104,11 +104,11 @@ def file_access(request):
 
 
     # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
-    selfSqlString = "select a.FILE_ID as FILE_ID, count(*) as SELF_ACCESS_COUNT, max(a.ACCESS_TIME) as SELF_ACCESS_LAST_TIME " \
-                    "from FILE_ACCESS a, USER u " \
-                    "where a.USER_ID = u.id " \
-                    "and u.SIS_NAME=%(current_user)s " \
-                    "group by a.FILE_ID;"
+    selfSqlString = "select a.file_id as FILE_ID, count(*) as SELF_ACCESS_COUNT, max(a.access_time) as SELF_ACCESS_LAST_TIME " \
+                    "from file_access a, user u " \
+                    "where a.user_id = u.id " \
+                    "and u.sis_name=%(current_user)s " \
+                    "group by a.file_id;"
     logger.debug(selfSqlString)
     selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user})
     logger.debug(selfDf.dtypes)
@@ -134,7 +134,7 @@ def file_access_within_week(request):
     grade = request.GET.get('grade','all')
 
     # get total number of student within the course_id
-    total_number_student_sql = "select count(*) from USER where COURSE_ID = %(course_id)s"
+    total_number_student_sql = "select count(*) from user where course_id = %(course_id)s"
     total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": UDW_COURSE_ID})
     total_number_student = total_number_student_df.iloc[0,0]
     logger.info("total student=" + str(total_number_student))
@@ -145,12 +145,12 @@ def file_access_within_week(request):
     start = today - timedelta(days=((week_num_start - 1) * 7 + today.weekday()))
     end = today - timedelta(days=((week_num_end-1) * 7 + today.weekday()))
 
-    sqlString = "SELECT a.FILE_ID as file_id, f.NAME as file_name, u.CURRENT_GRADE as current_grade, a.user_ID as user_id " \
-                "FROM FILE f, FILE_ACCESS a, USER u, COURSE c, ACADEMIC_TERMS t  " \
-                "WHERE a.FILE_ID =f.ID and a.USER_ID = u.ID  " \
-                "and f.COURSE_ID = c.ID and c.TERM_ID = t.TERM_ID " \
-                "and a.ACCESS_TIME > %(start_time)s " \
-                "and a.ACCESS_TIME < %(end_time)s "
+    sqlString = "SELECT a.file_id as file_id, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id " \
+                "FROM file f, file_access a, user u, course c, academic_terms t  " \
+                "WHERE a.file_id =f.ID and a.user_id = u.ID  " \
+                "and f.course_id = c.id and c.term_id = t.term_id " \
+                "and a.access_time > %(start_time)s " \
+                "and a.access_time < %(end_time)s "
     startTimeString = start.strftime('%Y%m%d') + "000000"
     endTimeString = end.strftime('%Y%m%d') + "000000"
     logger.info(sqlString);
@@ -194,12 +194,12 @@ def file_access_within_week(request):
     output_df.reset_index(inplace=True)
 
     # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
-    selfSqlString = "select f.ID + ';' + f.NAME as file_id_name, count(*) as self_access_count, max(a.ACCESS_TIME) as self_access_last_time " \
-                    "from FILE_ACCESS a, USER u, FILE f " \
-                    "where a.USER_ID = u.id " \
-                    "and a.FILE_ID = f.ID " \
-                    "and u.SIS_NAME=%(current_user)s " \
-                    "group by f.ID + ';' + f.NAME;"
+    selfSqlString = "select f.id + ';' + f.name as file_id_name, count(*) as self_access_count, max(a.access_time) as self_access_last_time " \
+                    "from file_access a, user u, file f " \
+                    "where a.user_id = u.id " \
+                    "and a.file_id = f.id " \
+                    "and u.sis_name=%(current_user)s " \
+                    "group by f.id + ';' + f.name;"
     logger.info(selfSqlString)
     logger.info("current_user=" + current_user)
 
@@ -239,15 +239,15 @@ def grade_distribution(request):
     bins = [0, 50, 65, 78, 89, 100]
     labels = ['F', 'D', 'C', 'B', 'A']
 
-    grade_score_sql = "Select CURRENT_GRADE, FINAL_GRADE FROM USER where COURSE_ID=%(course_id)s"
+    grade_score_sql = "Select current_grade, final_grade FROM user where course_id=%(course_id)s"
     df = pd.read_sql(grade_score_sql, conn, params={'course_id': UDW_COURSE_ID})
     number_of_students = df.shape[0]
-    df = df[df['CURRENT_GRADE'].notnull()]
+    df = df[df['current_grade'].notnull()]
     if not df.empty:
-        average_grade = df['CURRENT_GRADE'].astype(float).mean().round(2)
-        standard_deviation = df['CURRENT_GRADE'].astype(float).std().round(2)
+        average_grade = df['current_grade'].astype(float).mean().round(2)
+        standard_deviation = df['current_grade'].astype(float).std().round(2)
         # Round half to even
-        df['rounded_score'] = df['CURRENT_GRADE'].astype(float).map(lambda x: int(x / 2) * 2)
+        df['rounded_score'] = df['current_grade'].astype(float).map(lambda x: int(x / 2) * 2)
         df_grade = df.groupby(['rounded_score'])[["rounded_score"]].count()
         df_grade.columns = [['count']]
         df_grade.reset_index(inplace=True)
@@ -266,12 +266,12 @@ def assignment_progress(request):
     logger.info(assignment_view.__name__)
     sql = "select assignment_id,local_graded_date as graded_date,score,name,assign_grp_name,local_date as due_date,points_possible,group_points,weight from (" \
           "(select assignment_id,local_graded_date,score from" \
-          "(select id from USER where sis_name = %(current_user)s ) as u join" \
-          "(select user_id,assignment_id,local_graded_date,score from SUBMISSION) as sub on sub.user_id=u.id) as rock join" \
+          "(select id from user where sis_name = %(current_user)s ) as u join" \
+          "(select user_id,assignment_id,local_graded_date,score from submission) as sub on sub.user_id=u.id) as rock join" \
           "(select assign_id,name,assign_grp_name,local_date,points_possible,group_points,weight from" \
-          "(select id as assign_id,assignment_group_id, local_date,name,points_possible from ASSIGNMENT where course_id = %(course_id)s) as a join" \
-          "(select id,name as assign_grp_name,group_points, weight from ASSIGNMENT_GROUPS) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
-    df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': UDW_COURSE_ID},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%m/%d/%Y'})
+          "(select id as assign_id,assignment_group_id, local_date,name,points_possible from assignment where course_id = %(course_id)s) as a join" \
+          "(select id,name as assign_grp_name,group_points, weight from assignment_groups) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
+    df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': UDW_COURSE_ID},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%Y-%m-%d'})
     if df.empty:
         return HttpResponse(json.dumps({}), content_type='application/json')
     df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
@@ -301,12 +301,12 @@ def assignment_view(request):
     logger.info("selection from assignment view",percent_selection)
     sql = "select assignment_id,local_graded_date as graded_date,score,name,local_date as due_date,points_possible,group_points,weight from (" \
           "(select assignment_id,local_graded_date,score from"\
-          "(select id from USER where sis_name = %(current_user)s ) as u join"\
-          "(select user_id,assignment_id,local_graded_date,score from SUBMISSION) as sub on sub.user_id=u.id) as rock join"\
+          "(select id from user where sis_name = %(current_user)s ) as u join"\
+          "(select user_id,assignment_id,local_graded_date,score from submission) as sub on sub.user_id=u.id) as rock join"\
           "(select assign_id,name,local_date,points_possible,group_points,weight from"\
-          "(select id as assign_id,assignment_group_id, local_date,name,points_possible from ASSIGNMENT where course_id = %(course_id)s) as a join"\
-          "(select id,group_points, weight from ASSIGNMENT_GROUPS) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
-    df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': UDW_COURSE_ID},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%m/%d/%Y'})
+          "(select id as assign_id,assignment_group_id, local_date,name,points_possible from assignment where course_id = %(course_id)s) as a join"\
+          "(select id,group_points, weight from assignment_groups) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
+    df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': UDW_COURSE_ID},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%Y-%m-%d'})
     if df.empty:
         return HttpResponse(json.dumps([]), content_type='application/json')
 
@@ -362,12 +362,12 @@ def assignment_view(request):
 
 def get_current_user_score():
     logger.info(get_current_user_score.__name__)
-    user_score_sql= "select * from USER where SIS_NAME = %(current_user)s and COURSE_ID=%(course_id)s"
+    user_score_sql= "select * from user where sis_name = %(current_user)s and course_id=%(course_id)s"
     df = pd.read_sql(user_score_sql, conn, params={"current_user": current_user,'course_id': UDW_COURSE_ID})
-    df['rounded_score'] = df['CURRENT_GRADE'].astype(float).map(lambda x: int(x / 2) * 2)
+    df['rounded_score'] = df['current_grade'].astype(float).map(lambda x: int(x / 2) * 2)
     df.to_json('user.json',orient='records')
     # iloc is used to return single value(as there is single record) otherwise return a Series
-    user_score = df['CURRENT_GRADE'].iloc[0]
+    user_score = df['current_grade'].iloc[0]
     rounded_score = df['rounded_score'].iloc[0]
     return user_score,rounded_score
 
