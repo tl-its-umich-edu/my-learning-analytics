@@ -91,7 +91,3 @@ elif apps.is_installed('registration'):
     urlpatterns += (
         url(r'^accounts/', include('registration.backends.default.urls')),
     )
-
-# Override auth_logout from djangosaml2 and registration for consistant
-# behavior
-# urlpatterns.append(url(r'^accounts/logout', views.logout, name='auth_logout'))
