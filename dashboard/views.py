@@ -242,22 +242,25 @@ def grade_distribution(request):
     grade_score_sql = "Select CURRENT_GRADE, FINAL_GRADE FROM USER where COURSE_ID=%(course_id)s"
     df = pd.read_sql(grade_score_sql, conn, params={'course_id': UDW_COURSE_ID})
     number_of_students = df.shape[0]
-    average_grade = df['CURRENT_GRADE'].astype(float).mean().round(2)
-    standard_deviation = df['CURRENT_GRADE'].astype(float).std().round(2)
-    # Round half to even
-    df['rounded_score'] = df['CURRENT_GRADE'].astype(float).map(lambda x: int(x / 2) * 2)
-    df_grade = df.groupby(['rounded_score'])[["rounded_score"]].count()
-    df_grade.columns = [['count']]
-    df_grade.reset_index(inplace=True)
-    df_grade.columns = ['score', 'count']
-    df_grade['grade'] = pd.cut(df_grade['score'].astype(float), bins=bins, labels=labels)
-    user_score, rounded_score=get_current_user_score()
-    df_grade['my_score'] = user_score
-    df_grade['my_score_actual'] = rounded_score
-    df_grade['tot_students'] = number_of_students
-    df_grade['grade_stdev'] = standard_deviation
-    df_grade['grade_avg'] = average_grade
-    return HttpResponse(df_grade.to_json(orient='records'))
+    df = df[df['CURRENT_GRADE'].notnull()]
+    if not df.empty:
+        average_grade = df['CURRENT_GRADE'].astype(float).mean().round(2)
+        standard_deviation = df['CURRENT_GRADE'].astype(float).std().round(2)
+        # Round half to even
+        df['rounded_score'] = df['CURRENT_GRADE'].astype(float).map(lambda x: int(x / 2) * 2)
+        df_grade = df.groupby(['rounded_score'])[["rounded_score"]].count()
+        df_grade.columns = [['count']]
+        df_grade.reset_index(inplace=True)
+        df_grade.columns = ['score', 'count']
+        df_grade['grade'] = pd.cut(df_grade['score'].astype(float), bins=bins, labels=labels)
+        user_score, rounded_score=get_current_user_score()
+        df_grade['my_score'] = rounded_score
+        df_grade['my_score_actual'] = user_score
+        df_grade['tot_students'] = number_of_students
+        df_grade['grade_stdev'] = standard_deviation
+        df_grade['grade_avg'] = average_grade
+        return HttpResponse(df_grade.to_json(orient='records'))
+    else: return HttpResponse(json.dumps({}), content_type='application/json')
 
 def assignment_progress(request):
     logger.info(assignment_view.__name__)

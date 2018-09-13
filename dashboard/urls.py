@@ -46,9 +46,9 @@ urlpatterns = [
     url(r'^files/', login_required(TemplateView.as_view(
         template_name='files.html')), name="files",
     ),
-    url(r'^grades/', login_required(TemplateView.as_view(
-        template_name='grades.html')), name="grades",
-    ),
+    url(r'^grade_distribution/', login_required(views.grade_distribution), name='grade_distribution'),
+    url(r'^grades', login_required(TemplateView.as_view(template_name='grades.html')), name="grades"),
+
     # get file access patterns
     url(r'^file_access/', login_required(views.file_access), name='file_access'),
 
