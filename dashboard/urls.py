@@ -58,6 +58,7 @@ urlpatterns = [
     url(r'^grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
 
     url(r'^assignment_view/', login_required(views.assignment_view), name='assignment_view'),
+    url(r'^assignment_progress/', login_required(views.assignment_progress), name='assignment_progress'),
     url(r'^assignments', login_required(TemplateView.as_view(template_name='assignments.html')), name="assignments"),
 
     # load file information
