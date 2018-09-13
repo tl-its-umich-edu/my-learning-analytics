@@ -11,7 +11,13 @@
         <h1 class="navbar-brand collapse-nav"><span>Student Dashboard</span></h1>
     </div>
 </div>
-<div class="container" ng-controller="mainController">
+
+<div class="container-fluid">
+    <h5 style="padding-left: 8px">Progress Bar</h5>
+    <div id="chart"></div>
+</div>
+
+<div class="container" ng-controller="mainController" ng-app="visApp">
     <div class="row">
         <div class="column">
             <span>Show assignments weight more than</span>
@@ -90,8 +96,9 @@
 {% endblock %}
 
 {% block js %}
-<script src="{% static 'underscore/underscore-min.js' %}"></script>
-<script src="/static/js/app.js"></script>
-<script src="/static/js/controllers.js"></script>
-<script src="/static/js/factories.js"></script>
+<script src="{% static 'd3-v4/build/d3.min.js' %}"></script>
+<script src="/static/js/assign-progress.js"></script>
+<script src="{% static 'js/app.js' %}"></script>
+<script src="{% static 'js/controllers.js' %}"></script>
+<script src="{% static 'js/factories.js' %}"></script>
 {% endblock %}

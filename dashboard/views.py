@@ -1,4 +1,4 @@
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.http import HttpResponse
 
 import os
@@ -61,7 +61,7 @@ def home(request):
     """
     home page
     """
-    return render_to_response('home.html')
+    return render(request, 'home.html')
 
 def gpa_map(grade):
     if grade is None:
@@ -242,27 +242,61 @@ def grade_distribution(request):
     grade_score_sql = "Select CURRENT_GRADE, FINAL_GRADE FROM USER where COURSE_ID=%(course_id)s"
     df = pd.read_sql(grade_score_sql, conn, params={'course_id': UDW_COURSE_ID})
     number_of_students = df.shape[0]
-    average_grade = df['CURRENT_GRADE'].astype(float).mean().round(2)
-    standard_deviation = df['CURRENT_GRADE'].astype(float).std().round(2)
-    # Round half to even
-    df['rounded_score'] = df['CURRENT_GRADE'].astype(float).map(lambda x: int(x / 2) * 2)
-    df_grade = df.groupby(['rounded_score'])[["rounded_score"]].count()
-    df_grade.columns = [['count']]
-    df_grade.reset_index(inplace=True)
-    df_grade.columns = ['score', 'count']
-    df_grade['grade'] = pd.cut(df_grade['score'].astype(float), bins=bins, labels=labels)
-    user_score, rounded_score=get_current_user_score()
-    df_grade['my_score'] = user_score
-    df_grade['my_score_actual'] = rounded_score
-    df_grade['tot_students'] = number_of_students
-    df_grade['grade_stdev'] = standard_deviation
-    df_grade['grade_avg'] = average_grade
-    return HttpResponse(df_grade.to_json(orient='records'))
+    df = df[df['CURRENT_GRADE'].notnull()]
+    if not df.empty:
+        average_grade = df['CURRENT_GRADE'].astype(float).mean().round(2)
+        standard_deviation = df['CURRENT_GRADE'].astype(float).std().round(2)
+        # Round half to even
+        df['rounded_score'] = df['CURRENT_GRADE'].astype(float).map(lambda x: int(x / 2) * 2)
+        df_grade = df.groupby(['rounded_score'])[["rounded_score"]].count()
+        df_grade.columns = [['count']]
+        df_grade.reset_index(inplace=True)
+        df_grade.columns = ['score', 'count']
+        df_grade['grade'] = pd.cut(df_grade['score'].astype(float), bins=bins, labels=labels)
+        user_score, rounded_score=get_current_user_score()
+        df_grade['my_score'] = rounded_score
+        df_grade['my_score_actual'] = user_score
+        df_grade['tot_students'] = number_of_students
+        df_grade['grade_stdev'] = standard_deviation
+        df_grade['grade_avg'] = average_grade
+        return HttpResponse(df_grade.to_json(orient='records'))
+    else: return HttpResponse(json.dumps({}), content_type='application/json')
+
+def assignment_progress(request):
+    logger.info(assignment_view.__name__)
+    sql = "select assignment_id,local_graded_date as graded_date,score,name,assign_grp_name,local_date as due_date,points_possible,group_points,weight from (" \
+          "(select assignment_id,local_graded_date,score from" \
+          "(select id from USER where sis_name = %(current_user)s ) as u join" \
+          "(select user_id,assignment_id,local_graded_date,score from SUBMISSION) as sub on sub.user_id=u.id) as rock join" \
+          "(select assign_id,name,assign_grp_name,local_date,points_possible,group_points,weight from" \
+          "(select id as assign_id,assignment_group_id, local_date,name,points_possible from ASSIGNMENT where course_id = %(course_id)s) as a join" \
+          "(select id,name as assign_grp_name,group_points, weight from ASSIGNMENT_GROUPS) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
+    df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': UDW_COURSE_ID},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%m/%d/%Y'})
+    if df.empty:
+        return HttpResponse(json.dumps({}), content_type='application/json')
+    df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
+    df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
+    df[['points_possible', 'group_points','weight','score']] = df[['points_possible', 'group_points','weight','score']].astype(float)
+    df['towards_final_grade'] = round((df['points_possible']/df['group_points'])*df['weight'],2)
+    df.sort_values(by='due_date', inplace = True)
+    df['graded']=df['graded_date'].notnull()
+    df['due_date_mod'] =df['due_date'].astype(str).apply(lambda x:x.split()[0])
+    df.drop(columns=['assignment_id','due_date','graded_date'], inplace=True)
+    df = df[df['weight']>0.0]
+    def user_percent(row):
+        if row['graded']==True:
+            s =round((row['score']/row['points_possible'])*row['towards_final_grade'],2)
+            return s
+        else: return row['towards_final_grade']
+
+    df['percent_gotten']=df.apply(user_percent,axis=1)
+    df.reset_index(inplace=True)
+    df.drop(columns=['index'],inplace=True)
+    return HttpResponse(df.to_json(orient='records'))
 
 
 def assignment_view(request):
     logger.info(assignment_view.__name__)
-
     percent_selection = float(request.GET.get('percent','0.0'))
     logger.info("selection from assignment view",percent_selection)
     sql = "select assignment_id,local_graded_date as graded_date,score,name,local_date as due_date,points_possible,group_points,weight from (" \
@@ -273,6 +307,9 @@ def assignment_view(request):
           "(select id as assign_id,assignment_group_id, local_date,name,points_possible from ASSIGNMENT where course_id = %(course_id)s) as a join"\
           "(select id,group_points, weight from ASSIGNMENT_GROUPS) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
     df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': UDW_COURSE_ID},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%m/%d/%Y'})
+    if df.empty:
+        return HttpResponse(json.dumps([]), content_type='application/json')
+
     df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
     df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
     df[['points_possible', 'group_points','weight']] = df[['points_possible', 'group_points','weight']].astype(float)

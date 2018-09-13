@@ -149,3 +149,44 @@ div.table-style {
     flex: 50%;
     padding: 10px;
 }
+
+#chart text {
+    /*fill: #000;*/
+    font: 15px sans-serif;
+    /*padding-left: 30px;*/
+    /*text-anchor:start;*/
+}
+#chart {
+    /*border:1px solid #000;*/
+    background-color: #ffffff;
+}
+.progress-graded{
+    fill: #a0d4ee;
+    border: 1px solid transparent;
+}
+.progress-nongraded{
+    fill: #e1e1e1;
+    border: 1px solid transparent;
+}
+
+.progress-hover-graded{
+    fill: #a0d4ee;
+    outline: 1px solid black;
+}
+
+.progress-hover-notgraded{
+    fill: #e1e1e1;
+    outline: 1px solid black;
+}
+
+div.tooltip {
+    position: absolute;
+    min-width: 80px;
+    height: auto;
+    background: none repeat scroll 0 0 #ffffff;
+    border: 1px solid #6F257F;
+    padding: 14px;
+    text-align: left;
+    pointer-events: none;
+    /*!*pointer-events:none !imporatant;*!*/
+}

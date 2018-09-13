@@ -43,9 +43,11 @@ from . import cron
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.home, name='home'),
+    url(r'^grade_distribution/', login_required(views.grade_distribution), name='grade_distribution'),
     url(r'^grades/', login_required(TemplateView.as_view(
         template_name='grades.html')), name="grades",
     ),
+
     # get file access patterns
     url(r'^file_access/', login_required(views.file_access), name='file_access'),
 
@@ -55,6 +57,7 @@ urlpatterns = [
     url(r'^grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
 
     url(r'^assignment_view/', login_required(views.assignment_view), name='assignment_view'),
+    url(r'^assignment_progress/', login_required(views.assignment_progress), name='assignment_progress'),
     url(r'^assignments', login_required(TemplateView.as_view(template_name='assignments.html')), name="assignments"),
 
     # load file information

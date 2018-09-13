@@ -2,6 +2,15 @@ var makeGraph = function () {
     d3.selectAll("#chart > *").remove();
     $.getJSON("/grade_distribution", function (initResult) {
         data = initResult;
+        if(_.isEmpty(data)){
+            var gradeInfo = d3.select(".error").append("div")
+                .attr("class", "alert alert-info")
+                .attr("role","alert")
+                .style("font-size", "20px")
+                .style("font-weight", "bold")
+                .html('No data for the view')
+            return
+        }
         //defining the viz dimension
         var margin = {
                 top: 30,
@@ -159,7 +168,7 @@ var makeGraph = function () {
             .call(d3.legend)
 
         //defining the vertical line to show MyGrade over-lay
-        var myScore = data.map(d => d.my_score_actual)
+        var myScore = data.map(d => d.my_score)
         var line = d3.svg.line()
             .x((d, i) => {
                 return x(myScore[0]) + 13
@@ -167,6 +176,21 @@ var makeGraph = function () {
             .y((d, i) => {
                 return y2(i)
             })
+
+        singleDataPoint = data[0]
+        totalStudents = singleDataPoint.tot_students
+        gradeAverage = singleDataPoint.grade_avg
+        standardGradeDeviation = singleDataPoint.grade_stdev
+        score = "MyScore: "+singleDataPoint.my_score_actual+"%"
+
+        var tooltip = d3.select("body")
+            .append("div")
+            .style("position", "absolute")
+            .style("z-index", "10")
+            .style("visibility", "hidden")
+            .style("font-color", "black")
+            .style("font-weight", "bold")
+            .text("a simple tooltip");
 
 
         //Todo 1.make the "MyGrade" text appear on top of the line
@@ -176,6 +200,10 @@ var makeGraph = function () {
             .attr("class", "line")
             .attr("id", "mygradepath")
             .attr("d", line)
+            .on("mouseover", function(d){tooltip.text(score); return tooltip.style("visibility", "visible");})
+            .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+            .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+
 
         svg.append("text")
             .append("textPath")
@@ -193,11 +221,6 @@ var makeGraph = function () {
             .style("font-size", "20px")
             .style("font-weight", "bold")
             .text("Grade Distribution");
-
-        singleDataPoint = data[0]
-        totalStudents = singleDataPoint.tot_students
-        gradeAverage = singleDataPoint.grade_avg
-        standardGradeDeviation = singleDataPoint.grade_stdev
 
         var gradeInfo = d3.select(".grade-info").append("div")
             .attr("class", "grade-details")
