@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.contrib import auth
 
 import os
 import numpy as np
@@ -370,3 +371,8 @@ def get_current_user_score():
     user_score = df['CURRENT_GRADE'].iloc[0]
     rounded_score = df['rounded_score'].iloc[0]
     return user_score,rounded_score
+
+def logout(request):
+    logger.info('User %s logging out.' % request.user.username)
+    auth.logout(request)
+    return redirect(settings.LOGOUT_REDIRECT_URL)

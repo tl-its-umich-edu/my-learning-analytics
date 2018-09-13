@@ -264,6 +264,8 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
 
     ACS_DEFAULT_REDIRECT_URL = getenv('DJANGO_ACS_DEFAULT_REDIRECT', 'http://localhost:5001/')
     LOGIN_REDIRECT_URL = getenv('DJANGO_LOGIN_REDIRECT_URL', 'http://localhost:5001/')
+    
+    LOGOUT_REDIRECT_URL = getenv('DJANGO_LOGOUT_REDIRECT_URL','/')
 
     SAML_CREATE_UNKNOWN_USER = True
 
@@ -274,6 +276,6 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
         'sn': ('last_name', ),
     }
 
-    SAML_LOGOUT_REQUEST_PREFERRED_BINDING = saml2.BINDING_HTTP_POST
+
     
 
