@@ -11,7 +11,7 @@
     {% block css %} {% endblock %}
 </head>
 <body class="container-fluid">
-    <header>Student Dashboard :: 
+    <header><a href="/">Student Dashboard</a> :: 
         {% if user.is_authenticated %}Welcome, {{ user.get_username }}. You can <a href="/accounts/logout">logout here</a>.
         {% else %}Welcome! Please <a href="/accounts/login">login</a>
         {% endif %}
