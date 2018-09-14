@@ -3,6 +3,7 @@ from __future__ import print_function #python 3 support
 
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
+from django.db import connections as conns
 
 import os
 
@@ -62,12 +63,6 @@ engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
 # ## Connect to Unizin Data Warehouse
 #
 # ### Get enrolled users and files within site
-UDW_ENDPOINT=settings.DATABASES['UDW']['UDW_ENDPOINT']
-UDW_USER=settings.DATABASES['UDW']['UDW_USER']
-UDW_PASSWORD=settings.DATABASES['UDW']['UDW_PASSWORD']
-UDW_PORT=settings.DATABASES['UDW']['UDW_PORT']
-UDW_DATABASE=settings.DATABASES['UDW']['UDW_DATABASE']
-
 CANVAS_COURSE_ID =os.environ.get('CANVAS_COURSE_IDS', '')
 UDW_ID_PREFIX = "17700000000"
 UDW_FILE_ID_PREFIX = "1770000000"
@@ -246,23 +241,13 @@ def weight_consideration(request):
 # the util function
 def util_function(sql_string, mysql_table, table_identifier=None):
 
-    # get UDW connection
-    udw_conn = psycopg2.connect(
-        host=UDW_ENDPOINT,
-        user=UDW_USER,
-        port=5439,#int(UDW_PORT),
-        password=UDW_PASSWORD,
-        dbname=UDW_DATABASE)
-
-    df = pd.read_sql(sql_string, udw_conn)
+    df = pd.read_sql(sql_string, conns['UDW'])
     logger.debug("df shape " + str(df.shape[0]) + " " + str(df.shape[1]))
 
     # Sql returns boolean value so grouping course info along with it so that this could be stored in the DB table.
     if table_identifier == 'weight':
         df['course_id']=UDW_COURSE_ID
         df.columns=['consider_weight','course_id']
-    # close UDW connection
-    udw_conn.close()
 
     # drop duplicates
     df.drop_duplicates(keep='first', inplace=True)
