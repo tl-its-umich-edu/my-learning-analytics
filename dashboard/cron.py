@@ -10,7 +10,6 @@ import os
 import random
 import datetime
 import time
-import nvd3
 import MySQLdb
 import json
 import collections

@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'dashboard',
-    'django_nvd3',
     'django_crontab',
     'watchman'
 ]
