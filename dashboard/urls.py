@@ -43,18 +43,14 @@ from . import cron
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.home, name='home'),
-    url(r'^files/', login_required(TemplateView.as_view(
-        template_name='files.html')), name="files",
-    ),
     url(r'^grade_distribution/', login_required(views.grade_distribution), name='grade_distribution'),
     url(r'^grades', login_required(TemplateView.as_view(template_name='grades.html')), name="grades"),
-
-    # get file access patterns
-    url(r'^file_access/', login_required(views.file_access), name='file_access'),
 
     url(r'^file_access_within_week/', login_required(views.file_access_within_week), name='file_access_within_week'),
     url(r'^view_file_access_within_week', login_required(TemplateView.as_view(template_name='view_file_access_within_week.html')), name="view_file_access_within_week",
       ),
+    url(r'^get_current_week_number/', login_required(views.get_current_week_number), name='get_current_week_number'),
+
     url(r'^grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
 
     url(r'^assignment_view/', login_required(views.assignment_view), name='assignment_view'),

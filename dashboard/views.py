@@ -6,6 +6,7 @@ import numpy as np
 
 import random
 from datetime import datetime, timedelta
+import math
 import time
 import nvd3
 import MySQLdb
@@ -34,7 +35,7 @@ db_port = 3306
 db_engine = settings.DATABASES['default']['ENGINE']
 
 #TODO: replace this with CoSign user
-current_user="norrabp"
+current_user="eltonlin"
 
 # Todo the framework needs to remember the course
 CANVAS_COURSE_ID =os.environ.get('CANVAS_COURSE_IDS', '')
@@ -66,7 +67,6 @@ def home(request):
 def gpa_map(grade):
     if grade is None:
         return NO_GRADE_STRING;
-
     # convert to float
     grade_float = float(grade)
     if grade_float < 60:
@@ -77,46 +77,31 @@ def gpa_map(grade):
         return 'C'
     elif grade_float < 90:
         return 'B'
-    else:
+    elif grade_float > 90:
         return 'A'
+    else:
+        return NO_GRADE_STRING
 
-def file_access(request):
+def get_current_week_number(request):
+    # get term start date
+    # TODO: term id hardcoded now
+    termSqlString = "SELECT START_DATE FROM ACADEMIC_TERMS where TERM_ID = 2"
+    termDf = pd.read_sql(termSqlString, conn)
+    # 2018-09-04 04:00:00
+    termStartDate =termDf.iloc[0]['START_DATE']
+    today = datetime.now().date()
 
-    # Use all the SQL you like
-    sqlString = "SELECT a.FILE_ID as FILE_ID, f.NAME as files, u.CURRENT_GRADE as current_grade, CEIL(HOUR(TIMEDIFF(a.ACCESS_TIME, t.START_DATE))/(24*7)) as week " \
-                "FROM FILE f, FILE_ACCESS a, USER u, COURSE c, ACADEMIC_TERMS t " \
-                "WHERE a.FILE_ID =f.ID " \
-                "and a.USER_ID = u.ID " \
-                "and f.COURSE_ID = c.ID " \
-                "and c.TERM_ID = t.TERM_ID"
-    df = pd.read_sql(sqlString, conn)
-    logger.debug(df.dtypes)
-    logger.debug(df.describe())
+    logger.info(termStartDate.date())
+    logger.info(today)
 
-    # map point grade to letter grade
-    df['grade'] = df['current_grade'].map(gpa_map)
-    logger.debug(df.dtypes)
+    ## calculate the week number
+    currentWeekNumber = math.ceil((today - termStartDate.date()).days/7) + 1
 
-    df['interactions'] = df.groupby(['FILE_ID','files', 'week', 'grade'])['FILE_ID'].transform('count')
-    df.drop_duplicates(inplace=True)
-    logger.debug(df.dtypes)
-    logger.debug(df.describe())
+    # construct json
+    data = {}
+    data['currentWeekNumber'] = currentWeekNumber
+    return HttpResponse(json.dumps(data))
 
-
-    # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
-    selfSqlString = "select a.FILE_ID as FILE_ID, count(*) as SELF_ACCESS_COUNT, max(a.ACCESS_TIME) as SELF_ACCESS_LAST_TIME " \
-                    "from FILE_ACCESS a, USER u " \
-                    "where a.USER_ID = u.id " \
-                    "and u.SIS_NAME=%(current_user)s " \
-                    "group by a.FILE_ID;"
-    logger.debug(selfSqlString)
-    selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user})
-    logger.debug(selfDf.dtypes)
-    logger.debug(selfDf.describe())
-    df = df.join(selfDf.set_index('FILE_ID'), on='FILE_ID')
-    logger.debug(df.describe())
-
-    return HttpResponse(df.to_json(orient='records'))
 
 # show percentage of users who read the file within prior n weeks
 def file_access_within_week(request):
@@ -137,13 +122,19 @@ def file_access_within_week(request):
     total_number_student_sql = "select count(*) from USER where COURSE_ID = %(course_id)s"
     total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": UDW_COURSE_ID})
     total_number_student = total_number_student_df.iloc[0,0]
-    logger.info("total student=" + str(total_number_student))
+    logger.debug("total student=" + str(total_number_student))
+
+    ## TODO: term id hardcoded now
+    termSqlString = "SELECT START_DATE FROM ACADEMIC_TERMS where TERM_ID = 2"
+    termDf = pd.read_sql(termSqlString, conn)
+    term_start_date =termDf.iloc[0]['START_DATE']
+    start = term_start_date + timedelta(days=((week_num_start - 1) * 7 + term_start_date.weekday()))
+    end = term_start_date + timedelta(days=((week_num_end-1) * 7 + term_start_date.weekday()))
+
 
     # get time range based on week number passed in via request
 
     today = datetime.now().date()
-    start = today - timedelta(days=((week_num_start - 1) * 7 + today.weekday()))
-    end = today - timedelta(days=((week_num_end-1) * 7 + today.weekday()))
 
     sqlString = "SELECT a.FILE_ID as file_id, f.NAME as file_name, u.CURRENT_GRADE as current_grade, a.user_ID as user_id " \
                 "FROM FILE f, FILE_ACCESS a, USER u, COURSE c, ACADEMIC_TERMS t  " \
@@ -153,8 +144,8 @@ def file_access_within_week(request):
                 "and a.ACCESS_TIME < %(end_time)s "
     startTimeString = start.strftime('%Y%m%d') + "000000"
     endTimeString = end.strftime('%Y%m%d') + "000000"
-    logger.info(sqlString);
-    logger.info("start time=" + startTimeString + " end_time=" + endTimeString);
+    logger.debug(sqlString);
+    logger.debug("start time=" + startTimeString + " end_time=" + endTimeString);
     df = pd.read_sql(sqlString, conn, params={"start_time": startTimeString,"end_time": endTimeString})
 
     # return if there is no data during this interval
@@ -172,8 +163,10 @@ def file_access_within_week(request):
 
     # map point grade to letter grade
     df['grade'] = df['current_grade'].map(gpa_map)
+
     # calculate the percentage
     df['percent'] = round(df.groupby(['file_id_name', 'grade'])['file_id_name'].transform('count')/total_number_student, 2)
+
     df=df.drop(['current_grade', 'user_id'], axis=1)
     # now only keep the file access stats by grade level
     df.drop_duplicates(inplace=True)
@@ -183,10 +176,8 @@ def file_access_within_week(request):
     #df.reset_index(inplace=True)
 
     # zero filled dataframe with file name as row name, and grade as column name
-    output_df=pd.DataFrame(0.0, index=file_id_name, columns=['A','B','C','D','F', NO_GRADE_STRING])
+    output_df=pd.DataFrame(0.0, index=file_id_name, columns=['A','B','C','D','F', 'NO_GRADE'])
     output_df=output_df.rename_axis('file_id_name')
-
-    logger.debug(output_df)
 
     for index, row in df.iterrows():
         # set value
@@ -194,16 +185,17 @@ def file_access_within_week(request):
     output_df.reset_index(inplace=True)
 
     # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
-    selfSqlString = "select f.ID + ';' + f.NAME as file_id_name, count(*) as self_access_count, max(a.ACCESS_TIME) as self_access_last_time " \
+    selfSqlString = "select CONCAT(f.ID, ';', f.NAME) as file_id_name, count(*) as self_access_count, max(a.ACCESS_TIME) as self_access_last_time " \
                     "from FILE_ACCESS a, USER u, FILE f " \
                     "where a.USER_ID = u.id " \
                     "and a.FILE_ID = f.ID " \
                     "and u.SIS_NAME=%(current_user)s " \
-                    "group by f.ID + ';' + f.NAME;"
-    logger.info(selfSqlString)
-    logger.info("current_user=" + current_user)
+                    "group by CONCAT(f.ID, ';', f.NAME)";
+    logger.debug(selfSqlString)
+    logger.debug("current_user=" + current_user)
 
     selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user})
+
     output_df = output_df.join(selfDf.set_index('file_id_name'), on='file_id_name', how='left')
     output_df["total_count"] = output_df.apply(lambda row: row.A + row.B+row.C+row.D+row.F+row.NO_GRADE, axis=1)
 
@@ -221,7 +213,7 @@ def file_access_within_week(request):
     # time 100 to show the percentage
     output_df["total_count"] = output_df["total_count"] * 100
     # round all numbers to one decimal point
-    output_df = output_df.round(1)
+    output_df = output_df.round(2)
 
     output_df.fillna(0, inplace=True) #replace null value with 0
 

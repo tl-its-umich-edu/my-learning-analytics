@@ -20,10 +20,20 @@ var makeGraph = function(url) {
 
     d3.selectAll("div#chart > *").remove();
 
-    // Define the div for the tooltip
-    var chartTooltip = d3.select("body").append("div")
-        .attr("class", "tooltip");
-
+    var tip = d3.tip()
+        .attr('class', 'd3-tip')
+        .offset([-10, 0])
+        .html(function(d) {
+            // split file link and file name
+            var parts = d.file_name.split("|");
+            if (d.self_access_count > 0) {
+                self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time);
+            } else {
+                self_string = "You haven't viewed this file. ";
+            }
+            var returnHtml = d.total_count + "% of students have accessed" + parts[1] + ". " + self_string;
+            return returnHtml;
+        })
     /////////////////////////////////////////////////////////////
     ////////////////////// Brush functions //////////////////////
     /////////////////////////////////////////////////////////////
@@ -56,33 +66,16 @@ var makeGraph = function(url) {
                     return "orange";
                 }
             })
-            .attr("y", function(d) {
-                return main_yScale(d.file_name); })
+            .attr("y", function(d) { return main_yScale(d.file_name); })
             .attr("height", main_yScale.rangeBand())
             .attr("x", 0)
             .transition().duration(50)
             .attr("width", function(d) {
                 return main_xScale(d.total_count); });
-        bar.on("mouseover", function () {
-            chartTooltip.style("display", null);
-            })
-            .on("mouseout", function () {
-                chartTooltip.style("display", "none");
-            })
-            .on("mousemove", function (d) {
-                // split file link and file name
-                var parts = d.file_name.split("|");
-                if (d.self_access_count > 0) {
-                    self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time);
-                } else {
-                    self_string = "You haven't viewed this file. ";
-                }
-                chartTooltip
-                    .style("left", d3.event.pageX - 50 + "px")
-                    .style("top", d3.event.pageY - 70 + "px")
-                    .style("display", "inline-block")
-                    .html("<b>" + d.total_count + "% </b>of students have accessed <b>" + parts[1] + "</b>. " + self_string);
-            });
+
+        bar.on("mouseover", tip.show)
+            .on("mouseout", tip.hide);
+
         //EXIT
         bar.exit()
             .remove();
@@ -220,11 +213,11 @@ var makeGraph = function(url) {
         var zoomer = d3.behavior.zoom()
             .on("zoom", null);
 
-        var main_margin = {top: 10, right: 10, bottom: 50, left: 300},
+        var main_margin = {top: 50, right: 10, bottom: 50, left: 300},
             main_width = 1000 - main_margin.left - main_margin.right,
             main_height = 400 - main_margin.top - main_margin.bottom;
 
-        var mini_margin = {top: 10, right: 10, bottom: 50, left: 10},
+        var mini_margin = {top: 50, right: 10, bottom: 50, left: 10},
             mini_height = 400 - mini_margin.top - mini_margin.bottom;
         mini_width = 100 - mini_margin.left - mini_margin.right;
 
@@ -242,6 +235,8 @@ var makeGraph = function(url) {
             .on("touchstart.zoom", null)
             .on("touchmove.zoom", null)
             .on("touchend.zoom", null);
+
+        svg.call(tip);
 
         var mainGroup = svg.append("g")
             .attr("class","mainGroupWrapper")
@@ -286,14 +281,7 @@ var makeGraph = function(url) {
         var xAxisG = d3.select(".mainGroupWrapper")
             .append("g")
             .attr("class", "x axis")
-            .attr("transform", "translate(" + 0 + "," + (main_height + 20) + ")");
-
-        var xAxisLabel = xAxisG.append("text")
-            .style("text-anchor", "middle")
-            .attr("x", main_width / 2)
-            .attr("y", main_height+padding)
-            .attr("class", "label")
-            .text("Percentage");
+            .attr("transform", "translate(0,-20)");
 
         //Create y axis object
         main_yAxis = d3.svg.axis()
@@ -312,14 +300,17 @@ var makeGraph = function(url) {
 
         mainGroup.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            .attr("transform", "translate("+ half_width +","  + bottom_x_axis +")")  // centre below axis
-            .text("Percentage of Students");
+            //.attr("transform", "translate("+ half_width +","  + bottom_x_axis +")")  // centre below axis
+            .attr("transform", "translate(200,-30)")  // center below axis
+            .text("Percentage of Students")
+            .style("font-size", "14px");
 
         // now add titles to the axes
         mainGroup.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
             .attr("transform", "translate("+ (- padding/2) +","+ 0 +")")  // text is drawn off the screen top left, move down and out and rotate
-            .text("File Name");
+            .text("File Name")
+            .style("font-size", "14px");
 
         /////////////////////////////////////////////////////////////
         /////////////////////// Update scales ///////////////////////
@@ -341,18 +332,12 @@ var makeGraph = function(url) {
         d3.selectAll(".y .tick text").each(function(d) {
             var parts = d.split("|");
             const a = d3.select(this.parentNode).append("a")
-                .attr("xlink:href", parts[0]);//change this for your function
+                .attr("xlink:href", parts[0])//change this for your function
+                .style("fill", "steelblue");
             a.node().appendChild(this);
             d = parts[1];
         });
 
-        // update tick link
-        d3.selectAll(".y .tick text").each(function(d) {
-            var parts = d.split("|");
-            const a = d3.select(this.parentNode).append("a")
-                .attr("xlink:href", parts[0]);//change this for your function
-            a.node().appendChild(this);
-        });
         // update the tick text
         main_yAxis.tickFormat(function(d) {
             var parts = d.split("|");
@@ -437,43 +422,129 @@ var makeGraph = function(url) {
             .remove();
         //Start the brush
         gBrush.call(brush.event);
+
+        //////////////////////////////////
+        // add legend
+        var w = 550 - main_margin.left - main_margin.right,
+            h = 350 - main_margin.top - main_margin.bottom,
+            legend_box_length = 10,
+            legend_box_text_interval = 15,
+            legend_interval = 100,
+            legend_y = -50;
+        var colors =	[ ["Files I haven't viewed", "orange"],
+            ["Files I've viewed", "steelblue"] ];
+        var legend = svg.append("g")
+            .attr("class", "legend")
+            .attr("height", 100)
+            .attr("width", 100)
+            .attr('transform', 'translate(-100,50)');
+
+        var legendRect = legend.selectAll('rect').data(colors);
+
+        legendRect.enter()
+            .append("rect")
+            .attr("y", legend_y)
+            .attr("width", legend_box_length)
+            .attr("height", legend_box_length);
+
+        legendRect
+            .attr("y", legend_y)
+            .attr("x", function(d, i) {
+                return w - i * legend_interval;
+            })
+            .style("fill", function(d) {
+                return d[1];
+            });
+        var legendText = legend.selectAll('text').data(colors);
+        legendText.enter()
+            .append("text")
+            .attr("y", legend_y+legend_box_length);
+        legendText
+            .attr("y", legend_y + legend_box_length)
+            .attr("x", function(d, i) {
+                return w + legend_box_text_interval - i * legend_interval;
+            })
+            .text(function(d) {
+                return d[0];
+            });
     });
 
 };
 
 function makeGrapBasedOnGradeAndSlide(grade, silderValues)
 {
-    makeGraph('/file_access_within_week?week_num_start=' + silderValues[0] + "&week_num_end=" + silderValues[2] + "&grade=" + grade);
+    // parse to get start and end week number
+    var startWeek = cleanWeekInputNum(silderValues[0]);
+    var endWeek = cleanWeekInputNum(silderValues[1]);
+    makeGraph('/file_access_within_week?week_num_start=' + startWeek + "&week_num_end=" + endWeek + "&grade=" + grade);
 }
 
-var mySlider = new rSlider({
-    target: '#slider',
-    values: [8, 7, 6, 5, 4, 3, 2, 1, 0],
-    range: true, // range slider
-    set:    [1], // an array of preselected values
-    width:    null,
-    scale:    true,
-    labels:   true,
-    tooltip:  true,
-    step:     1, // step size
-    disabled: false, // is disabled?
-    onChange:  function (values) {
-        // argument values represents current values
-        var grade = $('#grade').val();
-        var endWeek = "now:";
-        if (values[2] != 0) {
-            // show week number
-            endWeek = values[2] + " weeks:";
+function cleanWeekInputNum(weekNumString)
+{
+    // get rid of "Now - Week " or "Week " substring
+    // return only the week integer number
+    var value = weekNumString.replace(CURRENT_WEEK_PREFIX, "");
+    value = value.replace(WEEK_PREFIX, "");
+    return value;
+}
+
+
+var CURRENT_WEEK_PREFIX = "Now - Week ";
+var WEEK_PREFIX = "Week ";
+
+var mySlider;
+var makeSlider;
+makeSlider = function () {
+    var TOTAL_WEEKS = 16;
+
+    // default to be the first week
+    var currentWeeKNumber = 1;
+
+    $.getJSON("/get_current_week_number", function (initResult) {
+        if (initResult.length === 0) {
+            // return no data
+            return "no data";
         }
-        $("#slider_label").html("in last " + values[0] + " to " + endWeek);
-        makeGrapBasedOnGradeAndSlide(grade, values);
-    }
-});
+        currentWeeKNumber = initResult.currentWeekNumber;
+
+        var i;
+        var weekArray = [];
+        var currentWeek ="Week 2";
+        for (i = 1; i < TOTAL_WEEKS; i++) {
+            if (i === currentWeeKNumber) {
+                currentWeek = CURRENT_WEEK_PREFIX + i;
+                weekArray.push(currentWeek);
+            }
+            else {
+                weekArray.push(WEEK_PREFIX + i);
+            }
+        }
+
+        mySlider = new rSlider({
+            target: '#slider',
+            values: weekArray,
+            range: true, // range slider
+            set: ['Week 1', currentWeek], // an array of preselected values
+            scale: true,
+            tooltip: false,
+            onChange: function (values) {
+                var valuesParts = values.split(",");
+                // argument values represents current values
+                var grade = $('#grade').val();
+                $("#slider_label").html(" students from <b>" + valuesParts[0] + "</b> to <b>" + valuesParts[1] + "</b>");
+                makeGrapBasedOnGradeAndSlide(grade, valuesParts);
+            }
+        });
+    });
+};
 
 $('#grade').change(function() {
     // make new graph based on the grade selection
-    makeGrapBasedOnGradeAndSlide($('#grade').val(), mySlider.getValue());
+    var sliderValues = mySlider.getValue().split(",");
+    makeGrapBasedOnGradeAndSlide($('#grade').val(), sliderValues);
 
 });
+
+makeSlider();
 
 makeGraph();
