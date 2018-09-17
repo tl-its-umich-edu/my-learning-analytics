@@ -372,26 +372,6 @@ def get_current_user_score():
     rounded_score = df['rounded_score'].iloc[0]
     return user_score,rounded_score
 
-def load_data(request):
-    ## create the database connection engine
-    engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
-                           .format(db = db_name,  # your mysql database name
-                                   user = db_user, # your mysql user for the database
-                                   password = db_password, # password for user
-                                   host = db_host,
-                                   port = db_port))
-    df_file = pd.read_csv('../data/file.csv', header=0)
-    #df_file.to_sql(con=engine, name='FILE', if_exists='append')
-
-    ## file access data
-    df_file_access = pd.read_json('../data/file_access.json')
-    df_file_access.rename(columns={'OBJECT_ID': 'FILE_ID', 'MEMBER_ID': 'USER_ID', 'EVENT_TIME':'ACCESS_TIME', 'GROUP_ID':'COURSE_ID'}, inplace=True)
-    df_file_access.to_sql(con=engine, name='FILE_ACCESS', if_exists='append', index=False)
-
-
-
-    return HttpResponse("finished")
-
 def logout(request):
     logger.info('User %s logging out.' % request.user.username)
     auth.logout(request)

@@ -41,26 +41,26 @@ from . import views
 from . import cron
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
     url(r'^$', views.home, name='home'),
-    url(r'^grade_distribution/', login_required(views.grade_distribution), name='grade_distribution'),
+
+    url(r'^admin', admin.site.urls),
+
+    # These URL's are for views
+    url(r'^files', login_required(TemplateView.as_view(template_name='files.html')), name="files"),
     url(r'^grades', login_required(TemplateView.as_view(template_name='grades.html')), name="grades"),
-
-    # get file access patterns
-    url(r'^file_access/', login_required(views.file_access), name='file_access'),
-
-    url(r'^file_access_within_week/', login_required(views.file_access_within_week), name='file_access_within_week'),
-    url(r'^view_file_access_within_week', login_required(TemplateView.as_view(template_name='view_file_access_within_week.html')), name="view_file_access_within_week",
-      ),
-    url(r'^grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
-
-    url(r'^assignment_view/', login_required(views.assignment_view), name='assignment_view'),
-    url(r'^assignment_progress/', login_required(views.assignment_progress), name='assignment_progress'),
     url(r'^assignments', login_required(TemplateView.as_view(template_name='assignments.html')), name="assignments"),
 
-    # load file information
-    url(r'^load_data', login_required(views.load_data), name='load_data'),
+    # Thse URL's are data patterns
+    # get file access patterns
+    url(r'^grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
+    url(r'^file_access', login_required(views.file_access), name='file_access'),
+    url(r'^file_access_within_week', login_required(views.file_access_within_week), name='file_access_within_week'),
+    url(r'^view_file_access_within_week', login_required(TemplateView.as_view(template_name='view_file_access_within_week.html')), name="view_file_access_within_week"),
+    url(r'^assignment_view', login_required(views.assignment_view), name='assignment_view'),
+    url(r'^assignment_progress', login_required(views.assignment_progress), name='assignment_progress'),
 
+    # These methods are all for loading test data
+    # TODO: Move these to cron job
     # load data from UDW
     url(r'^update_with_udw_file', login_required(cron.update_with_udw_file), name='update_with_udw_file'),
     url(r'^update_with_bq_access', login_required(cron.update_with_bq_access), name='update_with_bq_access'),
@@ -69,23 +69,18 @@ urlpatterns = [
     url(r'^update_groups', login_required(cron.update_groups), name='update_groups'),
     url(r'^submission', login_required(cron.submission), name='submission'),
     url(r'^weight_consideration', login_required(cron.weight_consideration), name='weight_consideration'),
-    url(r'^testloader', login_required(TemplateView.as_view(
-        template_name='testloader.html')), name="testloader",
-    ),
-    url(r'^$', serve, {
-        'path': '/home.html',
-        'document_root': '.',
-    }),
+    url(r'^testloader', login_required(TemplateView.as_view(template_name='testloader.html')), name="testloader"),
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if apps.is_installed('djangosaml2'):
     urlpatterns += (
-        url(r'^accounts/', include('djangosaml2.urls')),
-        url(r'^samltest/', login_required(echo_attributes)),
+        url(r'^accounts', include('djangosaml2.urls')),
+        url(r'^samltest', login_required(echo_attributes)),
         # Override auth_logout from djangosaml2 and registration for consistency
         url(r'^accounts/logout', views.logout, name='auth_logout')
     )
 elif apps.is_installed('registration'):
     urlpatterns += (
-        url(r'^accounts/', include('registration.backends.default.urls')),
+        url(r'^accounts', include('registration.backends.default.urls')),
     )
