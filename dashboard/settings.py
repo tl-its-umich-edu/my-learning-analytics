@@ -115,7 +115,7 @@ DATABASES = {
         'USER': config('MYSQL_USER', default='student_dashboard_user'), # your mysql user for the database
         'PASSWORD': config('MYSQL_PASSWORD', default='student_dashboard_password'), # password for user
         'HOST': config('MYSQL_HOST', default='localhost'),
-        'PORT': config('MYSQL_PORT', default='3306', cast=int),
+        'PORT': config('MYSQL_PORT', default=3306, cast=int),
     },
     'UDW': {
         'ENGINE': config('UDW_ENGINE', default='django.db.backends.postgresql'),
@@ -123,7 +123,7 @@ DATABASES = {
         'USER': config('UDW_USER', default=''),
         'PASSWORD': config('UDW_PASSWORD', default=''),
         'HOST': config('UDW_HOST', default=config('UDW_ENDPOINT', default='')),
-        'PORT': config('UDW_PORT', default='', cast=int),
+        'PORT': config('UDW_PORT', default=5432, cast=int),
     }
 }
 
