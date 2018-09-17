@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import auth
+from django.db import connection as conn
 
 import os
 import numpy as np
@@ -26,14 +27,6 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
-db_name = settings.DATABASES['default']['NAME']
-db_user = settings.DATABASES['default']['USER']
-db_password = settings.DATABASES['default']['PASSWORD']
-db_host = settings.DATABASES['default']['HOST']
-db_port = 3306
-    #int(settings.DATABASES['default']['PORT'])
-db_engine = settings.DATABASES['default']['ENGINE']
-
 #TODO: replace this with CoSign user
 current_user="norrabp"
 
@@ -50,13 +43,6 @@ UDW_COURSE_ID = UDW_ID_PREFIX + CANVAS_COURSE_ID
 
 # string for no grade
 NO_GRADE_STRING = "NO_GRADE"
-
-
-conn = MySQLdb.connect (db = db_name,  # your mysql database name
-                        user = db_user, # your mysql user for the database
-                        passwd = db_password, # password for user
-                        host = db_host,
-                        port = db_port)
 
 def home(request):
     """

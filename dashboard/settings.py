@@ -42,6 +42,10 @@ TEMPLATE_DEBUG = config('DJANGO_TEMPLATE_DEBUG', default=DEBUG, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS",default="127.0.0.1,localhost", cast=Csv())
 
+WATCHMAN_TOKEN = getenv('DJANGO_WATCHMAN_TOKEN', None)
+
+WATCHMAN_TOKEN_NAME = getenv('DJANGO_WATCHMAN_TOKEN_NAME', 'token')
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -55,6 +59,7 @@ INSTALLED_APPS = [
     'dashboard',
     'django_nvd3',
     'django_crontab',
+    'watchman'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -113,11 +118,12 @@ DATABASES = {
         'PORT': config('MYSQL_PORT', default='3306', cast=int),
     },
     'UDW': {
-        'UDW_ENDPOINT': config('UDW_ENDPOINT', default=''),
-        'UDW_USER': config('UDW_USER', default=''),
-        'UDW_PASSWORD': config('UDW_PASSWORD', default=''),
-        'UDW_PORT': config('UDW_PORT', default='', cast=int),
-        'UDW_DATABASE': config('UDW_DATABASE', default=''),
+        'ENGINE': config('UDW_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': config('UDW_DATABASE', default=''),
+        'USER': config('UDW_USER', default=''),
+        'PASSWORD': config('UDW_PASSWORD', default=''),
+        'HOST': config('UDW_HOST', default=config('UDW_ENDPOINT', default='')),
+        'PORT': config('UDW_PORT', default='', cast=int),
     }
 }
 
