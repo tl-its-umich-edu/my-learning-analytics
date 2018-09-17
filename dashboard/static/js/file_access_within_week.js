@@ -31,8 +31,7 @@ var makeGraph = function(url) {
             } else {
                 self_string = "You haven't viewed this file. ";
             }
-            var returnHtml = d.total_count + "% of students have accessed" + parts[1] + ". " + self_string;
-            return returnHtml;
+            return self_string;
         })
     /////////////////////////////////////////////////////////////
     ////////////////////// Brush functions //////////////////////
@@ -72,6 +71,12 @@ var makeGraph = function(url) {
             .transition().duration(50)
             .attr("width", function(d) {
                 return main_xScale(d.total_count); });
+        bar.append("text")
+            .attr("x", function(d) { return main_xScale(d.total_count) - 3; })
+            .attr("y", function(d) { return main_yScale(d.file_name); })
+            .attr("dy", ".35em")
+            .text(function(d) { return d.total_count; })
+            .style("font-size", "10px");
 
         bar.on("mouseover", tip.show)
             .on("mouseout", tip.hide);
@@ -428,8 +433,8 @@ var makeGraph = function(url) {
         var w = 550 - main_margin.left - main_margin.right,
             h = 350 - main_margin.top - main_margin.bottom,
             legend_box_length = 10,
-            legend_box_text_interval = 15,
-            legend_interval = 100,
+            legend_box_text_interval = 10,
+            legend_interval = 120,
             legend_y = -50;
         var colors =	[ ["Files I haven't viewed", "orange"],
             ["Files I've viewed", "steelblue"] ];
@@ -460,6 +465,8 @@ var makeGraph = function(url) {
             .append("text")
             .attr("y", legend_y+legend_box_length);
         legendText
+            .attr("font-family", "sans-serif")
+            .attr("font-size", "14px")
             .attr("y", legend_y + legend_box_length)
             .attr("x", function(d, i) {
                 return w + legend_box_text_interval - i * legend_interval;

@@ -3,6 +3,7 @@ from __future__ import print_function #python 3 support
 
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
+from django.db import connections as conns
 
 import os
 
@@ -62,12 +63,6 @@ engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
 # ## Connect to Unizin Data Warehouse
 #
 # ### Get enrolled users and files within site
-UDW_ENDPOINT=settings.DATABASES['UDW']['UDW_ENDPOINT']
-UDW_USER=settings.DATABASES['UDW']['UDW_USER']
-UDW_PASSWORD=settings.DATABASES['UDW']['UDW_PASSWORD']
-UDW_PORT=settings.DATABASES['UDW']['UDW_PORT']
-UDW_DATABASE=settings.DATABASES['UDW']['UDW_DATABASE']
-
 CANVAS_COURSE_ID =os.environ.get('CANVAS_COURSE_IDS', '')
 UDW_ID_PREFIX = "17700000000"
 UDW_FILE_ID_PREFIX = "1770000000"
@@ -77,12 +72,12 @@ UDW_COURSE_ID = UDW_ID_PREFIX + CANVAS_COURSE_ID
 def update_with_udw_file(request):
 
     #select file record from UDW
-    file_sql = "select concat(" + UDW_FILE_ID_PREFIX + ", canvas_id) as ID, display_name as NAME, course_id as COURSE_ID from file_dim " \
+    file_sql = "select concat(" + UDW_FILE_ID_PREFIX + ", canvas_id) as id, display_name as name, course_id as course_id from file_dim " \
                "where file_state ='available' " \
                "and course_id='"+ UDW_COURSE_ID + "'" \
                " order by canvas_id"
 
-    return HttpResponse("loaded file info: " + util_function(file_sql, 'FILE'))
+    return HttpResponse("loaded file info: " + util_function(file_sql, 'file'))
 
 # update FILE_ACCESS records from BigQuery
 def update_with_bq_access(request):
@@ -109,9 +104,9 @@ def update_with_bq_access(request):
                         logger.debug('\t{}'.format("found table"))
 
                         # query to retrieve all file access events for one course
-                        query = 'select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, "$.object.id"), 35) AS STRING) AS FILE_ID, ' \
-                                'SUBSTR(JSON_EXTRACT_SCALAR(event, "$.membership.member.id"), 29) AS USER_ID, ' \
-                                'datetime(EVENT_TIME) as ACCESS_TIME ' \
+                        query = 'select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, "$.object.id"), 35) AS STRING) AS file_id, ' \
+                                'SUBSTR(JSON_EXTRACT_SCALAR(event, "$.membership.member.id"), 29) AS user_id, ' \
+                                'datetime(EVENT_TIME) as access_time ' \
                                 'FROM learning_datasets.enriched_events ' \
                                 'where JSON_EXTRACT_SCALAR(event, "$.edApp.id") = \'http://umich.instructure.com/\' ' \
                                 'and event_type = \'NavigationEvent\' ' \
@@ -131,12 +126,12 @@ def update_with_bq_access(request):
 
                         logger.debug("df row number=" + str(df.shape[0]))
                         # drop duplicates
-                        df.drop_duplicates(["FILE_ID", "USER_ID", "ACCESS_TIME"], keep='first', inplace=True)
+                        df.drop_duplicates(["file_id", "user_id", "access_time"], keep='first', inplace=True)
 
                         logger.debug("after drop duplicates, df row number=" + str(df.shape[0]))
 
                         # write to MySQL
-                        df.to_sql(con=engine, name='FILE_ACCESS', if_exists='append', index=False)
+                        df.to_sql(con=engine, name='file_access', if_exists='append', index=False)
 
     else:
         logger.debug('{} project does not contain any datasets.'.format(project))
@@ -147,13 +142,13 @@ def update_with_bq_access(request):
 def update_with_udw_user(request):
 
     # select all student registered for the course
-    user_sql = "select u.name AS NAME, " \
-          "p.sis_user_id AS SIS_ID, " \
-          "p.unique_name AS SIS_NAME, " \
-          "u.global_canvas_id AS ID, " \
-          "c.current_score AS CURRENT_GRADE, " \
-          "c.final_score AS FINAL_GRADE, " \
-          "'"+ UDW_COURSE_ID + "' as COURSE_ID " \
+    user_sql = "select u.name AS name, " \
+          "p.sis_user_id AS sis_id, " \
+          "p.unique_name AS sis_name, " \
+          "u.global_canvas_id AS id, " \
+          "c.current_score AS current_grade, " \
+          "c.final_score AS final_grade, " \
+          "'"+ UDW_COURSE_ID + "' as course_id " \
           "from user_dim u, " \
           "pseudonym_dim p, " \
           "course_score_fact c, " \
@@ -166,7 +161,7 @@ def update_with_udw_user(request):
           "and c.enrollment_id =  e.enrollment_id"
     logger.debug(user_sql)
 
-    return HttpResponse("loaded user info: " + util_function(user_sql, 'USER'))
+    return HttpResponse("loaded user info: " + util_function(user_sql, 'user'))
 
 
 def update_groups(request):
@@ -183,10 +178,10 @@ def update_groups(request):
                             "on agd.id = agf.assignment_group_id  where agd.course_id='" + UDW_COURSE_ID + "' and workflow_state='available')"\
                             ",assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join " \
                             "(select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id )"\
-                            ",assignment_grp_points as (select ag.*, am.group_points AS GROUP_POINTS from assignment_grp ag join assign_more am on ag.assignment_group_id = am.assignment_group_id)"\
-                            "select assignment_group_id AS ID, course_id AS COURSE_ID, group_weight AS WEIGHT, name AS NAME, group_points AS GROUP_POINTS from assignment_grp_points"
+                            ",assignment_grp_points as (select ag.*, am.group_points AS group_points from assignment_grp ag join assign_more am on ag.assignment_group_id = am.assignment_group_id)"\
+                            "select assignment_group_id AS id, course_id AS course_id, group_weight AS weight, name AS name, group_points AS group_points from assignment_grp_points"
 
-    return HttpResponse("loaded assignment group info: " + util_function(assignment_groups_sql, 'ASSIGNMENT_GROUPS'))
+    return HttpResponse("loaded assignment group info: " + util_function(assignment_groups_sql, 'assignment_groups'))
 
 
 def update_assignment(request):
@@ -197,14 +192,14 @@ def update_assignment(request):
     '''
     logger.info("update_assignment(): ")
     assignment_sql="with assignment_info as " \
-                   "(select ad.due_at AS DUE_DATE,ad.due_at at time zone 'utc' at time zone 'America/New_York' as LOCAL_DATE," \
-                   "ad.title AS NAME,af.course_id AS COURSE_ID,af.assignment_id AS ID," \
-                   "af.points_possible AS POINTS_POSSIBLE,af.assignment_group_id AS ASSIGNMENT_GROUP_ID" \
+                   "(select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone 'America/New_York' as local_date," \
+                   "ad.title AS name,af.course_id AS course_id,af.assignment_id AS id," \
+                   "af.points_possible AS points_possible,af.assignment_group_id AS assignment_group_id" \
                    " from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='" + UDW_COURSE_ID + "'" \
                    "and ad.visibility = 'everyone' and ad.workflow_state='published')" \
                    "select * from assignment_info"
 
-    return HttpResponse("loaded assignment info: " + util_function(assignment_sql,'ASSIGNMENT'))
+    return HttpResponse("loaded assignment info: " + util_function(assignment_sql,'assignment'))
 
 
 def submission(request):
@@ -222,10 +217,10 @@ def submission(request):
                      "sub_with_enroll as (select sf.* from sub_fact sf join enrollment e on e.user_id = sf.user_id),"\
                      "submission as (select se.submission_id,se.assignment_id,se.global_canvas_id,se.published_score, st.graded_at, st.local_graded_time " \
                      "from sub_with_enroll se inner join submission_time st on se.submission_id = st.id)" \
-                     "select submission_id AS ID, assignment_id AS ASSIGNMENT_ID, global_canvas_id AS USER_ID, " \
-                     "published_score AS SCORE, graded_at AS GRADED_DATE, local_graded_time as LOCAL_GRADED_DATE from submission"
+                     "select submission_id AS ID, assignment_id AS assignment_id, global_canvas_id AS user_id, " \
+                     "published_score AS score, graded_at AS graded_date, local_graded_time as local_graded_date from submission"
 
-    return HttpResponse("loaded assignment submission info: " + util_function(submission_url,'SUBMISSION'))
+    return HttpResponse("loaded assignment submission info: " + util_function(submission_url,'submission'))
 
 
 def weight_consideration(request):
@@ -240,29 +235,19 @@ def weight_consideration(request):
                               "where course_id = '" + UDW_COURSE_ID + "' group by course_id having sum(group_weight)>1)"\
                               "(select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)"
 
-    return HttpResponse("loaded weight_consideration info: " + util_function(is_weight_considered_url,'ASSIGNMENT_WEIGHT_CONSIDERATION', 'weight'))
+    return HttpResponse("loaded weight_consideration info: " + util_function(is_weight_considered_url,'assignment_weight_consideration', 'weight'))
 
 
 # the util function
 def util_function(sql_string, mysql_table, table_identifier=None):
 
-    # get UDW connection
-    udw_conn = psycopg2.connect(
-        host=UDW_ENDPOINT,
-        user=UDW_USER,
-        port=5439,#int(UDW_PORT),
-        password=UDW_PASSWORD,
-        dbname=UDW_DATABASE)
-
-    df = pd.read_sql(sql_string, udw_conn)
+    df = pd.read_sql(sql_string, conns['UDW'])
     logger.debug("df shape " + str(df.shape[0]) + " " + str(df.shape[1]))
 
     # Sql returns boolean value so grouping course info along with it so that this could be stored in the DB table.
     if table_identifier == 'weight':
-        df['COURSE_ID']=UDW_COURSE_ID
-        df.columns=['CONSIDER_WEIGHT','COURSE_ID']
-    # close UDW connection
-    udw_conn.close()
+        df['course_id']=UDW_COURSE_ID
+        df.columns=['consider_weight','course_id']
 
     # drop duplicates
     df.drop_duplicates(keep='first', inplace=True)
