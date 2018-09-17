@@ -206,7 +206,7 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
 
     SAML2_URL_PATH = '/accounts/'
     # modify to use port request comes
-    SAML2_URL_BASE = getenv('DJANGO_SAML2_URL_BASE', 'http://localhost:5001/accounts/')
+    SAML2_URL_BASE = getenv('DJANGO_SAML2_URL_BASE', '/accounts/')
 
     INSTALLED_APPS += ('djangosaml2',)
     AUTHENTICATION_BACKENDS = (
@@ -269,8 +269,8 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
         'key_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.key'),  'cert_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.pem'),
     }
 
-    ACS_DEFAULT_REDIRECT_URL = getenv('DJANGO_ACS_DEFAULT_REDIRECT', 'http://localhost:5001/')
-    LOGIN_REDIRECT_URL = getenv('DJANGO_LOGIN_REDIRECT_URL', 'http://localhost:5001/')
+    ACS_DEFAULT_REDIRECT_URL = getenv('DJANGO_ACS_DEFAULT_REDIRECT', '/')
+    LOGIN_REDIRECT_URL = getenv('DJANGO_LOGIN_REDIRECT_URL', '/')
     
     LOGOUT_REDIRECT_URL = getenv('DJANGO_LOGOUT_REDIRECT_URL','/')
 
@@ -282,7 +282,7 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
         'givenName': ('first_name', ),
         'sn': ('last_name', ),
     }
-
-
+else: 
+    AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
+    LOGIN_REDIRECT_URL = '/'
     
-

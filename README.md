@@ -53,3 +53,25 @@ Use the following URL patterns to load data into databases:
 The docker images will take up more disk spaces as time goes on, you can delete those outdated docker images by using the following command:
 
 `docker rmi $(docker images -q -f "dangling=true")`
+
+This will remove everythin! (images, containers, volumes)
+`docker system prune -a`
+
+
+## Testing tips!
+
+1. Create a super user to test login. Run this command and follow the prompts.
+
+`docker exec -it student_dashboard python manage.py createsuperuser
+
+2. Connect to the docker and edit some files!
+
+`docker exec -it student_dashboard /bin/bash`
+then install a text editor like vim
+`apt-get -y install vim`
+
+Then you can edit your files! (Probably in /dashboard/dashboard)
+
+3. Restart the gunicorn to read the configuration. This is useful to avoid a redeploy.
+
+`docker exec student_dashboard pkill -HUP gunicorn`

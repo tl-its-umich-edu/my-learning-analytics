@@ -27,6 +27,8 @@ if apps.is_installed('djangosaml2'):
     from django.contrib.auth.decorators import login_required
     from djangosaml2.views import echo_attributes
 else:
+    # On dev don't require login, but still import a view for testing
+    from django.contrib.auth import views as auth_views
     def login_required(func):
         return func
 
@@ -43,8 +45,6 @@ from . import cron
 urlpatterns = [
     url(r'^status', include('watchman.urls')),
     url(r'^$', views.home, name='home'),
-
-    url(r'^admin', admin.site.urls),
 
     # These URL's are for views
     url(r'^files', login_required(TemplateView.as_view(template_name='files.html')), name="files"),
@@ -81,7 +81,16 @@ if apps.is_installed('djangosaml2'):
         # Override auth_logout from djangosaml2 and registration for consistency
         url(r'^accounts/logout', views.logout, name='auth_logout')
     )
-elif apps.is_installed('registration'):
+else:
+    # Login patterns for testing, SAML should be installed in prod
+    urlpatterns += (
+        url(r'^accounts/login', auth_views.LoginView.as_view(), name='login'),
+        url(r'^accounts/logout', auth_views.LoginView.as_view(), name='logout'),
+        url(r'^admin', admin.site.urls),
+     )
+
+ 
+if apps.is_installed('registration'):
     urlpatterns += (
         url(r'^accounts', include('registration.backends.default.urls')),
     )
