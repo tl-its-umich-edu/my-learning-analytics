@@ -46,6 +46,8 @@ urlpatterns = [
     url(r'^status', include('watchman.urls')),
     url(r'^$', views.home, name='home'),
 
+    url(r'^admin', admin.site.urls),
+
     # These URL's are for views
     url(r'^files', login_required(TemplateView.as_view(template_name='files.html')), name="files"),
     url(r'^grades', login_required(TemplateView.as_view(template_name='grades.html')), name="grades"),
@@ -71,6 +73,7 @@ urlpatterns = [
     url(r'^submission', login_required(cron.submission), name='submission'),
     url(r'^weight_consideration', login_required(cron.weight_consideration), name='weight_consideration'),
     url(r'^testloader', login_required(TemplateView.as_view(template_name='testloader.html')), name="testloader"),
+    url(r'^su', include('django_su.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
@@ -86,7 +89,6 @@ else:
     urlpatterns += (
         url(r'^accounts/login', auth_views.LoginView.as_view(), name='login'),
         url(r'^accounts/logout', auth_views.LoginView.as_view(), name='logout'),
-        url(r'^admin', admin.site.urls),
      )
 
  

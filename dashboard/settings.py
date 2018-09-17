@@ -49,6 +49,7 @@ WATCHMAN_TOKEN_NAME = getenv('DJANGO_WATCHMAN_TOKEN_NAME', 'token')
 # Application definition
 
 INSTALLED_APPS = [
+    'django_su',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -60,6 +61,7 @@ INSTALLED_APPS = [
     'django_nvd3',
     'django_crontab',
     'watchman'
+
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -95,6 +97,7 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.messages.context_processors.messages',
+                'django_su.context_processors.is_su',
             ],
         },
     },
@@ -198,6 +201,8 @@ try:
 except ImportError:
     pass
 
+AUTHENTICATION_BACKENDS = ('django_su.backends.SuBackend',)
+
 #Shib
 
 # Give an opportunity to disable SAML
@@ -209,7 +214,7 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
     SAML2_URL_BASE = getenv('DJANGO_SAML2_URL_BASE', '/accounts/')
 
     INSTALLED_APPS += ('djangosaml2',)
-    AUTHENTICATION_BACKENDS = (
+    AUTHENTICATION_BACKENDS += (
         'djangosaml2.backends.Saml2Backend',
     )
     LOGIN_URL = '%slogin/' % SAML2_URL_PATH
@@ -283,6 +288,6 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
         'sn': ('last_name', ),
     }
 else: 
-    AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
+    AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
     LOGIN_REDIRECT_URL = '/'
     

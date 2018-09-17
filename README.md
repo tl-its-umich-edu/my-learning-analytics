@@ -60,9 +60,15 @@ This will remove everythin! (images, containers, volumes)
 
 ## Testing tips!
 
-1. Create a super user to test login. Run this command and follow the prompts.
+1. Create a super user to test login. Run this command below. The password will be printed unless you specify it with --password. You can run this multiple times to change a password but you need to delete/modify super users via the /admin.
 
-`docker exec -it student_dashboard python manage.py createsuperuser
+`docker exec -it student_dashboard python manage.py createuser --superuser --username=root --email=root@example.edu`
+
+You can create regular users to test with without the superuser flag
+
+`docker exec -it student_dashboard python manage.py createuser --username=student --email=student@example.edu`
+
+Then this super user can login on the /admin URL
 
 2. Connect to the docker and edit some files!
 
