@@ -9,7 +9,6 @@ import numpy as np
 import random
 from datetime import datetime, timedelta
 import time
-import nvd3
 import MySQLdb
 import json
 import collections
