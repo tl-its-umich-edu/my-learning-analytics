@@ -19,28 +19,25 @@
 {% endblock %}
 {% block content %}
     <!-- week slider -->
-    <br/>
-    <br/>
-    <h2>What Students Are Reading?</h2>
+    <h4 class="text-center">What Students Are Reading</h4>
 
 
     <input type="text" id="slider" class="slider">
 
-
     <input type="hidden" name="slider_num" id="slider_num" />
     <div/>
-
-    Top files access by
+    <br/>
+    <h6 class="text-center">Files accessed by
     <select class="grade" name="grade" id="grade">
-        <option value="all" selected>All Grade</option>
+        <option value="all" selected>All Grades</option>
         <option value="A" >A</option>
         <option value="B" >B</option>
         <option value="C" >C</option>
         <option value="D" >D</option>
         <option value="F" >F</option>
         <option value="NO_GRADE" >NO GRADE</option>
-    </select> <span id="slider_label">in last 1 week: </span>
-
+    </select> <span id="slider_label"> students from week 1 to: </span></h6>
+    <br/>
     <div id="chart"></div>
 {% endblock %}
 {% block js %}

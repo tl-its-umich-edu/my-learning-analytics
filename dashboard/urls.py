@@ -46,6 +46,8 @@ urlpatterns = [
 
     url(r'^admin', admin.site.urls),
 
+    url(r'^get_current_week_number/', login_required(views.get_current_week_number), name='get_current_week_number'),
+
     # These URL's are for views
     url(r'^files', login_required(TemplateView.as_view(template_name='files.html')), name="files"),
     url(r'^grades', login_required(TemplateView.as_view(template_name='grades.html')), name="grades"),
@@ -54,7 +56,6 @@ urlpatterns = [
     # Thse URL's are data patterns
     # get file access patterns
     url(r'^grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
-    url(r'^file_access', login_required(views.file_access), name='file_access'),
     url(r'^file_access_within_week', login_required(views.file_access_within_week), name='file_access_within_week'),
     url(r'^view_file_access_within_week', login_required(TemplateView.as_view(template_name='view_file_access_within_week.html')), name="view_file_access_within_week"),
     url(r'^assignment_view', login_required(views.assignment_view), name='assignment_view'),
@@ -63,6 +64,7 @@ urlpatterns = [
     # These methods are all for loading test data
     # TODO: Move these to cron job
     # load data from UDW
+    url(r'^update_with_udw_course', login_required(cron.update_with_udw_course), name='update_with_udw_course'),
     url(r'^update_with_udw_file', login_required(cron.update_with_udw_file), name='update_with_udw_file'),
     url(r'^update_with_bq_access', login_required(cron.update_with_bq_access), name='update_with_bq_access'),
     url(r'^update_with_udw_user', login_required(cron.update_with_udw_user), name='update_with_udw_user'),

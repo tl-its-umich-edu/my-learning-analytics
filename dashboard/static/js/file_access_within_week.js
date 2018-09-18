@@ -1,3 +1,18 @@
+/////////////////////////////////////////////////////////////
+///////////////// Set-up SVG and wrappers ///////////////////
+/////////////////////////////////////////////////////////////
+
+//Added only for the mouse wheel
+var zoomer = d3.behavior.zoom()
+    .on("zoom", null);
+
+var main_margin = {top: 50, right: 10, bottom: 50, left: 300},
+    main_width = 1000 - main_margin.left - main_margin.right,
+    main_height = 400 - main_margin.top - main_margin.bottom;
+
+var mini_margin = {top: 50, right: 10, bottom: 50, left: 10},
+    mini_width = 100 - mini_margin.left - mini_margin.right,
+    mini_height = 400 - mini_margin.top - mini_margin.bottom;
 
 var makeGraph = function(url) {
 
@@ -13,17 +28,28 @@ var makeGraph = function(url) {
         main_yZoom,
         main_xAxis,
         main_yAxis,
-        mini_width,
         textScale;
 
     var padding = 100; // space around the chart, not including labels
 
     d3.selectAll("div#chart > *").remove();
 
-    // Define the div for the tooltip
-    var chartTooltip = d3.select("body").append("div")
-        .attr("class", "tooltip");
+    var tip = d3.tip()
+        .attr('class', 'd3-tip')
+        .offset([-10, 0])
+        .html(function(d) {
+            // split file link and file name
+            var parts = d.file_name.split("|");
+            if (d.self_access_count == 0) {
+                self_string = "You haven't viewed this file. ";
+            } else if (d.self_access_count == 1) {
+                self_string = "You have read the file once on " + new Date(d.self_access_last_time);
+            } else {
+                self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time);
 
+            }
+            return self_string;
+        })
     /////////////////////////////////////////////////////////////
     ////////////////////// Brush functions //////////////////////
     /////////////////////////////////////////////////////////////
@@ -56,33 +82,30 @@ var makeGraph = function(url) {
                     return "orange";
                 }
             })
-            .attr("y", function(d) {
-                return main_yScale(d.file_name); })
+            .attr("y", function(d) { return main_yScale(d.file_name); })
             .attr("height", main_yScale.rangeBand())
             .attr("x", 0)
             .transition().duration(50)
             .attr("width", function(d) {
                 return main_xScale(d.total_count); });
-        bar.on("mouseover", function () {
-            chartTooltip.style("display", null);
-            })
-            .on("mouseout", function () {
-                chartTooltip.style("display", "none");
-            })
-            .on("mousemove", function (d) {
-                // split file link and file name
-                var parts = d.file_name.split("|");
-                if (d.self_access_count > 0) {
-                    self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time);
-                } else {
-                    self_string = "You haven't viewed this file. ";
-                }
-                chartTooltip
-                    .style("left", d3.event.pageX - 50 + "px")
-                    .style("top", d3.event.pageY - 70 + "px")
-                    .style("display", "inline-block")
-                    .html("<b>" + d.total_count + "% </b>of students have accessed <b>" + parts[1] + "</b>. " + self_string);
-            });
+
+        // append text to bars
+        svg.selectAll(".label").remove();
+        var texts = svg.selectAll(".label")
+            .data(data)
+            .enter()
+            .append("text");
+        texts.attr("class", "label")
+            .attr("x", function(d) { return main_xScale(d.total_count)+3 + main_margin.left; })
+            .attr("y", function(d) { return main_yScale(d.file_name) + main_yScale.rangeBand()/2 + main_margin.top;})
+            .attr("dx", -3)
+            .attr("dy", ".35em")
+            .attr("text-anchor", "end")
+            .text(function(d) { return d.total_count; });
+
+        bar.on("mouseover", tip.show)
+            .on("mouseout", tip.hide);
+
         //EXIT
         bar.exit()
             .remove();
@@ -124,6 +147,7 @@ var makeGraph = function(url) {
 
         //Reset the part that is visible on the big chart
         var originalRange = main_yZoom.range();
+
         main_yZoom.domain( extent );
 
         //Update the domain of the x & y scale of the big bar chart
@@ -212,22 +236,6 @@ var makeGraph = function(url) {
 
         data.sort(function(a, b) { return b.total_count - a.total_count; });
 
-        /////////////////////////////////////////////////////////////
-        ///////////////// Set-up SVG and wrappers ///////////////////
-        /////////////////////////////////////////////////////////////
-
-        //Added only for the mouse wheel
-        var zoomer = d3.behavior.zoom()
-            .on("zoom", null);
-
-        var main_margin = {top: 10, right: 10, bottom: 50, left: 300},
-            main_width = 1000 - main_margin.left - main_margin.right,
-            main_height = 400 - main_margin.top - main_margin.bottom;
-
-        var mini_margin = {top: 10, right: 10, bottom: 50, left: 10},
-            mini_height = 400 - mini_margin.top - mini_margin.bottom;
-        mini_width = 100 - mini_margin.left - mini_margin.right;
-
         svg = d3.select("div#chart").append("svg")
             .attr("class", "svgWrapper")
             .attr("width", main_width + main_margin.left + main_margin.right + mini_width + mini_margin.left + mini_margin.right)
@@ -242,6 +250,8 @@ var makeGraph = function(url) {
             .on("touchstart.zoom", null)
             .on("touchmove.zoom", null)
             .on("touchend.zoom", null);
+
+        svg.call(tip);
 
         var mainGroup = svg.append("g")
             .attr("class","mainGroupWrapper")
@@ -286,14 +296,7 @@ var makeGraph = function(url) {
         var xAxisG = d3.select(".mainGroupWrapper")
             .append("g")
             .attr("class", "x axis")
-            .attr("transform", "translate(" + 0 + "," + (main_height + 20) + ")");
-
-        var xAxisLabel = xAxisG.append("text")
-            .style("text-anchor", "middle")
-            .attr("x", main_width / 2)
-            .attr("y", main_height+padding)
-            .attr("class", "label")
-            .text("Percentage");
+            .attr("transform", "translate(" + 0 + "," + main_height + ")");
 
         //Create y axis object
         main_yAxis = d3.svg.axis()
@@ -312,14 +315,17 @@ var makeGraph = function(url) {
 
         mainGroup.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            .attr("transform", "translate("+ half_width +","  + bottom_x_axis +")")  // centre below axis
-            .text("Percentage of Students");
+            //.attr("transform", "translate("+ half_width +","  + bottom_x_axis +")")  // centre below axis
+            .attr("transform", "translate(300," + (main_height+35)+ ")")  // center below axis
+            .text("Percentage of Students")
+            .style("font-size", "14px");
 
         // now add titles to the axes
-        mainGroup.append("text")
+        /*mainGroup.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
             .attr("transform", "translate("+ (- padding/2) +","+ 0 +")")  // text is drawn off the screen top left, move down and out and rotate
-            .text("File Name");
+            .text("File Name")
+            .style("font-size", "14px");*/
 
         /////////////////////////////////////////////////////////////
         /////////////////////// Update scales ///////////////////////
@@ -341,18 +347,12 @@ var makeGraph = function(url) {
         d3.selectAll(".y .tick text").each(function(d) {
             var parts = d.split("|");
             const a = d3.select(this.parentNode).append("a")
-                .attr("xlink:href", parts[0]);//change this for your function
+                .attr("xlink:href", parts[0])//change this for your function
+                .style("fill", "steelblue");
             a.node().appendChild(this);
             d = parts[1];
         });
 
-        // update tick link
-        d3.selectAll(".y .tick text").each(function(d) {
-            var parts = d.split("|");
-            const a = d3.select(this.parentNode).append("a")
-                .attr("xlink:href", parts[0]);//change this for your function
-            a.node().appendChild(this);
-        });
         // update the tick text
         main_yAxis.tickFormat(function(d) {
             var parts = d.split("|");
@@ -373,11 +373,15 @@ var makeGraph = function(url) {
         /////////////////////////////////////////////////////////////
         //What should the first extent of the brush become - a bit arbitrary this
         var brushExtent = Math.max( 1, Math.min( 20, Math.round(data.length*0.2) ) );
-        //var brushExtent = Math.min(5, data.length-1);
+        if (data.length <=5) {
+            // for small number of data, choose the whole range
+            brushExtent = data.length -1;
+        }
+
 
         brush = d3.svg.brush()
             .y(mini_yScale)
-            .extent([mini_yScale(data[0].file_name), mini_yScale(data[brushExtent].file_name)])
+            .extent([mini_yScale(data[0].file_name), mini_yScale(data[brushExtent].file_name) + mini_yScale.rangeBand()])
             .on("brush", brushmove);
         //Set up the visual part of the brush
         gBrush = d3.select(".brushGroup").append("g")
@@ -437,43 +441,126 @@ var makeGraph = function(url) {
             .remove();
         //Start the brush
         gBrush.call(brush.event);
+
+        //////////////////////////////////
+        // add legend
+        var w = 550 - main_margin.left - main_margin.right,
+            h = 350 - main_margin.top - main_margin.bottom,
+            legend_box_length = 10,
+            legend_box_text_interval = 15,
+            legend_interval = 20,
+            legend_y = -50;
+        var colors =	[ ["Files I haven't viewed", "orange"],
+            ["Files I've viewed", "steelblue"] ];
+        var legend = svg.append("g")
+            .attr("class", "legend")
+            /*.attr("height", 100)
+            .attr("width", 100)*/
+            .attr('transform', 'translate(-100,50)');
+
+        var legendRect = legend.selectAll('rect').data(colors);
+
+        legendRect.enter()
+            .append("rect")
+            .attr("y", legend_y)
+            .attr("width", legend_box_length)
+            .attr("height", legend_box_length);
+
+        legendRect
+            .attr("y", function(d, i) { return legend_y + i * legend_interval;})
+            .attr("x", w)
+            .style("fill", function(d) {
+                return d[1];
+            });
+
+        var legendText = legend.selectAll('text').data(colors);
+        legendText.enter()
+            .append("text")
+        legendText
+            .attr("font-family", "sans-serif")
+            .attr("font-size", "14px")
+            .attr("y", function(d, i) { return legend_y + i * legend_interval + legend_box_length;})
+            .attr("x", w + legend_box_text_interval)
+            .text(function(d) {
+                return d[0];
+            });
     });
 
 };
 
-function makeGrapBasedOnGradeAndSlide(grade, silderValues)
+var CURRENT_WEEK_PREFIX = "Now - Week ";
+var WEEK_PREFIX = "Week ";
+
+function cleanWeekInputNum(weekNumString)
 {
-    makeGraph('/file_access_within_week?week_num_start=' + silderValues[0] + "&week_num_end=" + silderValues[2] + "&grade=" + grade);
+    // get rid of "Now - Week " or "Week " substring
+    // return only the week integer number
+    var value = weekNumString.replace(CURRENT_WEEK_PREFIX, "");
+    value = value.replace(WEEK_PREFIX, "");
+    return value;
 }
 
-var mySlider = new rSlider({
-    target: '#slider',
-    values: [8, 7, 6, 5, 4, 3, 2, 1, 0],
-    range: true, // range slider
-    set:    [1], // an array of preselected values
-    width:    null,
-    scale:    true,
-    labels:   true,
-    tooltip:  true,
-    step:     1, // step size
-    disabled: false, // is disabled?
-    onChange:  function (values) {
-        // argument values represents current values
-        var grade = $('#grade').val();
-        var endWeek = "now:";
-        if (values[2] != 0) {
-            // show week number
-            endWeek = values[2] + " weeks:";
+function makeGrapBasedOnGradeAndSlide(grade, silderValues)
+{
+    // parse to get start and end week number
+    var startWeek = cleanWeekInputNum(silderValues[0]);
+    var endWeek = cleanWeekInputNum(silderValues[1]);
+    makeGraph('/file_access_within_week?week_num_start=' + startWeek + "&week_num_end=" + endWeek + "&grade=" + grade);
+}
+
+var mySlider;
+var makeSlider;
+makeSlider = function () {
+    var TOTAL_WEEKS = 16;
+
+    // default to be the first week
+    var currentWeeKNumber = 1;
+
+    $.getJSON("/get_current_week_number", function (initResult) {
+        if (initResult.length === 0) {
+            // return no data
+            return "no data";
         }
-        $("#slider_label").html("in last " + values[0] + " to " + endWeek);
-        makeGrapBasedOnGradeAndSlide(grade, values);
-    }
-});
+        currentWeeKNumber = initResult.currentWeekNumber;
+
+        var i;
+        var weekArray = [];
+        var currentWeek ="Week 2";
+        for (i = 1; i < TOTAL_WEEKS; i++) {
+            if (i === currentWeeKNumber) {
+                currentWeek = CURRENT_WEEK_PREFIX + i;
+                weekArray.push(currentWeek);
+            }
+            else {
+                weekArray.push(WEEK_PREFIX + i);
+            }
+        }
+
+        mySlider = new rSlider({
+            target: '#slider',
+            values: weekArray,
+            range: true, // range slider
+            set: ['Week 1', currentWeek], // an array of preselected values
+            scale: true,
+            tooltip: false,
+            onChange: function (values) {
+                var valuesParts = values.split(",");
+                // argument values represents current values
+                var grade = $('#grade').val();
+                $("#slider_label").html(" students from <b>" + valuesParts[0] + "</b> to <b>" + valuesParts[1] + "</b>");
+                makeGrapBasedOnGradeAndSlide(grade, valuesParts);
+            }
+        });
+    });
+};
 
 $('#grade').change(function() {
     // make new graph based on the grade selection
-    makeGrapBasedOnGradeAndSlide($('#grade').val(), mySlider.getValue());
+    var sliderValues = mySlider.getValue().split(",");
+    makeGrapBasedOnGradeAndSlide($('#grade').val(), sliderValues);
 
 });
+
+makeSlider();
 
 makeGraph();
