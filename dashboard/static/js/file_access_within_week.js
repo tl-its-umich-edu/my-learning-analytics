@@ -40,9 +40,9 @@ var makeGraph = function(url) {
         .html(function(d) {
             // split file link and file name
             var parts = d.file_name.split("|");
-            if (d.self_access_count = 0) {
+            if (d.self_access_count == 0) {
                 self_string = "You haven't viewed this file. ";
-            } else if (d.self_access_count = 1) {
+            } else if (d.self_access_count == 1) {
                 self_string = "You have read the file once on " + new Date(d.self_access_last_time);
             } else {
                 self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time);
@@ -488,13 +488,8 @@ var makeGraph = function(url) {
 
 };
 
-function makeGrapBasedOnGradeAndSlide(grade, silderValues)
-{
-    // parse to get start and end week number
-    var startWeek = cleanWeekInputNum(silderValues[0]);
-    var endWeek = cleanWeekInputNum(silderValues[1]);
-    makeGraph('/file_access_within_week?week_num_start=' + startWeek + "&week_num_end=" + endWeek + "&grade=" + grade);
-}
+var CURRENT_WEEK_PREFIX = "Now - Week ";
+var WEEK_PREFIX = "Week ";
 
 function cleanWeekInputNum(weekNumString)
 {
@@ -505,9 +500,13 @@ function cleanWeekInputNum(weekNumString)
     return value;
 }
 
-
-var CURRENT_WEEK_PREFIX = "Now - Week ";
-var WEEK_PREFIX = "Week ";
+function makeGrapBasedOnGradeAndSlide(grade, silderValues)
+{
+    // parse to get start and end week number
+    var startWeek = cleanWeekInputNum(silderValues[0]);
+    var endWeek = cleanWeekInputNum(silderValues[1]);
+    makeGraph('/file_access_within_week?week_num_start=' + startWeek + "&week_num_end=" + endWeek + "&grade=" + grade);
+}
 
 var mySlider;
 var makeSlider;
