@@ -50,6 +50,31 @@ Use the following URL patterns to load data into databases:
 2. `use student_dashboard`
 
 ## Clean outdated docker images
-The docker images will take up more disk spaces as time goes on, you can delete those outdated docker images by using the following command:
+The docker artifacts will take up more disk spaces as time goes on, you can clean up docker containers, networks images and optionally volumes using the command below.
 
-`docker rmi $(docker images -q -f "dangling=true")`
+Remove the --volumes to leave volumes without at least one container associated. This will not remove anything running.
+
+This will remove everything! (images, containers, volumes)
+`docker system prune -a --volumes`
+
+## Testing tips!
+
+1. Create a super user to test login. Run this command below. The password will be printed unless you specify it with --password. You can run this multiple times to change a password but you need to delete/modify super users via the Admin login (appears when logged in as admin). You can also add new users in there.
+
+`docker exec -it student_dashboard python manage.py createuser --superuser --username=root --email=root@example.edu`
+
+You can create regular users to test with without the superuser flag via the command line without using the --superuser.
+
+`docker exec -it student_dashboard python manage.py createuser --username=student --email=student@example.edu`
+
+2. Connect to the docker and edit some files!
+
+`docker exec -it student_dashboard /bin/bash`
+then install a text editor like vim
+`apt-get -y install vim`
+
+Then you can edit your files! (Probably in /dashboard/dashboard)
+
+3. Restart the gunicorn to read the configuration. This is useful to avoid a redeploy.
+
+`docker exec student_dashboard pkill -HUP gunicorn`

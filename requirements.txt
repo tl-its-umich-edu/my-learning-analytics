@@ -8,6 +8,7 @@ django-registration>=3.0,<3.0.99
 django-crontab>=0.7.1,<0.7.99
 django-yarn>=0.0.1,<0.0.99
 django-watchman>=0.15.0,<0.15.99
+django-su>=0.8.0,<0.8.99
 
 # These should be okay to update minors
 numpy>=1.14,<1.14.99

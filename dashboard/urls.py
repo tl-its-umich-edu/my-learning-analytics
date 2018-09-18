@@ -27,6 +27,8 @@ if apps.is_installed('djangosaml2'):
     from django.contrib.auth.decorators import login_required
     from djangosaml2.views import echo_attributes
 else:
+    # On dev don't require login, but still import a view for testing
+    from django.contrib.auth import views as auth_views
     def login_required(func):
         return func
 
@@ -73,6 +75,7 @@ urlpatterns = [
     url(r'^submission', login_required(cron.submission), name='submission'),
     url(r'^weight_consideration', login_required(cron.weight_consideration), name='weight_consideration'),
     url(r'^testloader', login_required(TemplateView.as_view(template_name='testloader.html')), name="testloader"),
+    url(r'^su', include('django_su.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
@@ -83,7 +86,15 @@ if apps.is_installed('djangosaml2'):
         # Override auth_logout from djangosaml2 and registration for consistency
         url(r'^accounts/logout', views.logout, name='auth_logout')
     )
-elif apps.is_installed('registration'):
+else:
+    # Login patterns for testing, SAML should be installed in prod
+    urlpatterns += (
+        url(r'^accounts/login', auth_views.LoginView.as_view(), name='login'),
+        url(r'^accounts/logout', auth_views.LoginView.as_view(), name='logout'),
+     )
+
+ 
+if apps.is_installed('registration'):
     urlpatterns += (
         url(r'^accounts', include('registration.backends.default.urls')),
     )

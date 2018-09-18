@@ -49,6 +49,7 @@ WATCHMAN_TOKEN_NAME = getenv('DJANGO_WATCHMAN_TOKEN_NAME', 'token')
 # Application definition
 
 INSTALLED_APPS = [
+    'django_su',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,6 +60,7 @@ INSTALLED_APPS = [
     'dashboard',
     'django_crontab',
     'watchman'
+
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -94,6 +96,7 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.messages.context_processors.messages',
+                'django_su.context_processors.is_su',
             ],
         },
     },
@@ -197,6 +200,8 @@ try:
 except ImportError:
     pass
 
+AUTHENTICATION_BACKENDS = ('django_su.backends.SuBackend',)
+
 #Shib
 
 # Give an opportunity to disable SAML
@@ -205,10 +210,10 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
 
     SAML2_URL_PATH = '/accounts/'
     # modify to use port request comes
-    SAML2_URL_BASE = getenv('DJANGO_SAML2_URL_BASE', 'http://localhost:5001/accounts/')
+    SAML2_URL_BASE = getenv('DJANGO_SAML2_URL_BASE', '/accounts/')
 
     INSTALLED_APPS += ('djangosaml2',)
-    AUTHENTICATION_BACKENDS = (
+    AUTHENTICATION_BACKENDS += (
         'djangosaml2.backends.Saml2Backend',
     )
     LOGIN_URL = '%slogin/' % SAML2_URL_PATH
@@ -268,8 +273,8 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
         'key_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.key'),  'cert_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.pem'),
     }
 
-    ACS_DEFAULT_REDIRECT_URL = getenv('DJANGO_ACS_DEFAULT_REDIRECT', 'http://localhost:5001/')
-    LOGIN_REDIRECT_URL = getenv('DJANGO_LOGIN_REDIRECT_URL', 'http://localhost:5001/')
+    ACS_DEFAULT_REDIRECT_URL = getenv('DJANGO_ACS_DEFAULT_REDIRECT', '/')
+    LOGIN_REDIRECT_URL = getenv('DJANGO_LOGIN_REDIRECT_URL', '/')
     
     LOGOUT_REDIRECT_URL = getenv('DJANGO_LOGOUT_REDIRECT_URL','/')
 
@@ -281,7 +286,7 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
         'givenName': ('first_name', ),
         'sn': ('last_name', ),
     }
-
-
+else: 
+    AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
+    LOGIN_REDIRECT_URL = '/'
     
-
