@@ -81,7 +81,8 @@ urlpatterns = [
 
 if apps.is_installed('djangosaml2'):
     urlpatterns += (
-        url(r'^accounts', include('djangosaml2.urls')),
+        # This URL *does* need a trailing slash because of the include
+        url(r'^accounts/', include('djangosaml2.urls')),
         url(r'^samltest', login_required(echo_attributes)),
         # Override auth_logout from djangosaml2 and registration for consistency
         url(r'^accounts/logout', views.logout, name='auth_logout')
@@ -96,5 +97,6 @@ else:
  
 if apps.is_installed('registration'):
     urlpatterns += (
-        url(r'^accounts', include('registration.backends.default.urls')),
+        # This URL *does* need a trailing slash because of the include
+        url(r'^accounts/', include('registration.backends.default.urls')),
     )
