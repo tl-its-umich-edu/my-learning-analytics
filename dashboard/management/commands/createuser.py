@@ -2,6 +2,8 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 import random, string
 
+RANDOM_PASSWORD_DEFAULT_LENGTH = 8
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--username', dest='username', type=str, required=True)
@@ -12,7 +14,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         username = options.get('username')
         password = options.get('password')
-        password = ''.join(random.sample(string.ascii_letters, 8)) if password is None else password
+        if password is None:
+            password = ''.join(random.sample(string.ascii_letters, RANDOM_PASSWORD_DEFAULT_LENGTH))
+            self.stderr.write ("Password not specified on command line generated password {}".format(password))
+
         email = options.get('email')
         superuser = options.get('superuser')
 
@@ -22,10 +27,9 @@ class Command(BaseCommand):
             user_obj.save()
         except User.DoesNotExist:
             if superuser:
-                print ("Creating superuser")
+                self.stdout.write ("Creating superuser {}".format(username))
                 User.objects.create_superuser(username=username, email=email, password=password)
             else:
-                print ("Creating regular user")
+                self.stdout.write ("Creating regular user {}".format(username))
                 User.objects.create_user(username=username, email=email, password=password)
 
-        print ("No password specified on command line, setting password for user {} to {}".format(username, password))
