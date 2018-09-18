@@ -10,7 +10,6 @@ import random
 from datetime import datetime, timedelta
 import math
 import time
-import nvd3
 import MySQLdb
 import json
 import collections
