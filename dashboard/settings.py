@@ -38,7 +38,6 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
-TEMPLATE_DEBUG = config('DJANGO_TEMPLATE_DEBUG', default=DEBUG, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS",default="127.0.0.1,localhost", cast=Csv())
 
@@ -77,20 +76,13 @@ MIDDLEWARE_CLASSES = [
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    'django.template.loaders.eggs.Loader',
-)
-TEMPLATE_DIRS = (os.path.join(APPLICATION_DIR, 'templates'), )
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(APPLICATION_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
+            'debug': config('DJANGO_TEMPLATE_DEBUG', default=DEBUG, cast=bool),
             'context_processors': [
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.debug',
