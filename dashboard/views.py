@@ -29,7 +29,7 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 #TODO: replace this with CoSign user
-current_user="eltonlin"
+current_user=os.environ.get("CANVAS_USER", "")
 
 # Todo the framework needs to remember the course
 CANVAS_COURSE_ID =os.environ.get('CANVAS_COURSE_IDS', '')
@@ -133,6 +133,7 @@ def file_access_within_week(request):
     logger.debug(sqlString);
     logger.debug("start time=" + startTimeString + " end_time=" + endTimeString);
     df = pd.read_sql(sqlString, conn, params={"start_time": startTimeString,"end_time": endTimeString})
+    logger.debug(df);
 
     # return if there is no data during this interval
     if (df.empty):
@@ -190,8 +191,9 @@ def file_access_within_week(request):
         # drop all other grades
         grades = ['A', 'B', 'C', 'D', 'F', NO_GRADE_STRING]
         for i_grade in grades:
-            if (i_grade!=grade):
-                output_df["total_count"] = output_df["total_count"] - output_df[i_grade]
+            if (i_grade==grade):
+                output_df["total_count"] = output_df[i_grade]
+            else:
                 output_df=output_df.drop([i_grade], axis=1)
 
     # only keep rows where total_count > 0

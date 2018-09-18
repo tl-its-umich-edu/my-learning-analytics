@@ -1,3 +1,18 @@
+/////////////////////////////////////////////////////////////
+///////////////// Set-up SVG and wrappers ///////////////////
+/////////////////////////////////////////////////////////////
+
+//Added only for the mouse wheel
+var zoomer = d3.behavior.zoom()
+    .on("zoom", null);
+
+var main_margin = {top: 50, right: 10, bottom: 50, left: 300},
+    main_width = 1000 - main_margin.left - main_margin.right,
+    main_height = 400 - main_margin.top - main_margin.bottom;
+
+var mini_margin = {top: 50, right: 10, bottom: 50, left: 10},
+    mini_width = 100 - mini_margin.left - mini_margin.right,
+    mini_height = 400 - mini_margin.top - mini_margin.bottom;
 
 var makeGraph = function(url) {
 
@@ -13,7 +28,6 @@ var makeGraph = function(url) {
         main_yZoom,
         main_xAxis,
         main_yAxis,
-        mini_width,
         textScale;
 
     var padding = 100; // space around the chart, not including labels
@@ -26,10 +40,13 @@ var makeGraph = function(url) {
         .html(function(d) {
             // split file link and file name
             var parts = d.file_name.split("|");
-            if (d.self_access_count > 0) {
-                self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time);
-            } else {
+            if (d.self_access_count = 0) {
                 self_string = "You haven't viewed this file. ";
+            } else if (d.self_access_count = 1) {
+                self_string = "You have read the file once on " + new Date(d.self_access_last_time);
+            } else {
+                self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time);
+
             }
             return self_string;
         })
@@ -71,12 +88,20 @@ var makeGraph = function(url) {
             .transition().duration(50)
             .attr("width", function(d) {
                 return main_xScale(d.total_count); });
-        bar.append("text")
-            .attr("x", function(d) { return main_xScale(d.total_count) - 3; })
-            .attr("y", function(d) { return main_yScale(d.file_name); })
+
+        // append text to bars
+        svg.selectAll(".label").remove();
+        var texts = svg.selectAll(".label")
+            .data(data)
+            .enter()
+            .append("text");
+        texts.attr("class", "label")
+            .attr("x", function(d) { return main_xScale(d.total_count)+3 + main_margin.left; })
+            .attr("y", function(d) { return main_yScale(d.file_name) + main_yScale.rangeBand()/2 + main_margin.top;})
+            .attr("dx", -3)
             .attr("dy", ".35em")
-            .text(function(d) { return d.total_count; })
-            .style("font-size", "10px");
+            .attr("text-anchor", "end")
+            .text(function(d) { return d.total_count; });
 
         bar.on("mouseover", tip.show)
             .on("mouseout", tip.hide);
@@ -122,6 +147,7 @@ var makeGraph = function(url) {
 
         //Reset the part that is visible on the big chart
         var originalRange = main_yZoom.range();
+
         main_yZoom.domain( extent );
 
         //Update the domain of the x & y scale of the big bar chart
@@ -210,22 +236,6 @@ var makeGraph = function(url) {
 
         data.sort(function(a, b) { return b.total_count - a.total_count; });
 
-        /////////////////////////////////////////////////////////////
-        ///////////////// Set-up SVG and wrappers ///////////////////
-        /////////////////////////////////////////////////////////////
-
-        //Added only for the mouse wheel
-        var zoomer = d3.behavior.zoom()
-            .on("zoom", null);
-
-        var main_margin = {top: 50, right: 10, bottom: 50, left: 300},
-            main_width = 1000 - main_margin.left - main_margin.right,
-            main_height = 400 - main_margin.top - main_margin.bottom;
-
-        var mini_margin = {top: 50, right: 10, bottom: 50, left: 10},
-            mini_height = 400 - mini_margin.top - mini_margin.bottom;
-        mini_width = 100 - mini_margin.left - mini_margin.right;
-
         svg = d3.select("div#chart").append("svg")
             .attr("class", "svgWrapper")
             .attr("width", main_width + main_margin.left + main_margin.right + mini_width + mini_margin.left + mini_margin.right)
@@ -286,7 +296,7 @@ var makeGraph = function(url) {
         var xAxisG = d3.select(".mainGroupWrapper")
             .append("g")
             .attr("class", "x axis")
-            .attr("transform", "translate(0,-20)");
+            .attr("transform", "translate(" + 0 + "," + main_height + ")");
 
         //Create y axis object
         main_yAxis = d3.svg.axis()
@@ -306,16 +316,16 @@ var makeGraph = function(url) {
         mainGroup.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
             //.attr("transform", "translate("+ half_width +","  + bottom_x_axis +")")  // centre below axis
-            .attr("transform", "translate(200,-30)")  // center below axis
+            .attr("transform", "translate(300," + (main_height+35)+ ")")  // center below axis
             .text("Percentage of Students")
             .style("font-size", "14px");
 
         // now add titles to the axes
-        mainGroup.append("text")
+        /*mainGroup.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
             .attr("transform", "translate("+ (- padding/2) +","+ 0 +")")  // text is drawn off the screen top left, move down and out and rotate
             .text("File Name")
-            .style("font-size", "14px");
+            .style("font-size", "14px");*/
 
         /////////////////////////////////////////////////////////////
         /////////////////////// Update scales ///////////////////////
@@ -363,11 +373,15 @@ var makeGraph = function(url) {
         /////////////////////////////////////////////////////////////
         //What should the first extent of the brush become - a bit arbitrary this
         var brushExtent = Math.max( 1, Math.min( 20, Math.round(data.length*0.2) ) );
-        //var brushExtent = Math.min(5, data.length-1);
+        if (data.length <=5) {
+            // for small number of data, choose the whole range
+            brushExtent = data.length -1;
+        }
+
 
         brush = d3.svg.brush()
             .y(mini_yScale)
-            .extent([mini_yScale(data[0].file_name), mini_yScale(data[brushExtent].file_name)])
+            .extent([mini_yScale(data[0].file_name), mini_yScale(data[brushExtent].file_name) + mini_yScale.rangeBand()])
             .on("brush", brushmove);
         //Set up the visual part of the brush
         gBrush = d3.select(".brushGroup").append("g")
@@ -433,15 +447,15 @@ var makeGraph = function(url) {
         var w = 550 - main_margin.left - main_margin.right,
             h = 350 - main_margin.top - main_margin.bottom,
             legend_box_length = 10,
-            legend_box_text_interval = 10,
-            legend_interval = 120,
+            legend_box_text_interval = 15,
+            legend_interval = 20,
             legend_y = -50;
         var colors =	[ ["Files I haven't viewed", "orange"],
             ["Files I've viewed", "steelblue"] ];
         var legend = svg.append("g")
             .attr("class", "legend")
-            .attr("height", 100)
-            .attr("width", 100)
+            /*.attr("height", 100)
+            .attr("width", 100)*/
             .attr('transform', 'translate(-100,50)');
 
         var legendRect = legend.selectAll('rect').data(colors);
@@ -453,24 +467,20 @@ var makeGraph = function(url) {
             .attr("height", legend_box_length);
 
         legendRect
-            .attr("y", legend_y)
-            .attr("x", function(d, i) {
-                return w - i * legend_interval;
-            })
+            .attr("y", function(d, i) { return legend_y + i * legend_interval;})
+            .attr("x", w)
             .style("fill", function(d) {
                 return d[1];
             });
+
         var legendText = legend.selectAll('text').data(colors);
         legendText.enter()
             .append("text")
-            .attr("y", legend_y+legend_box_length);
         legendText
             .attr("font-family", "sans-serif")
             .attr("font-size", "14px")
-            .attr("y", legend_y + legend_box_length)
-            .attr("x", function(d, i) {
-                return w + legend_box_text_interval - i * legend_interval;
-            })
+            .attr("y", function(d, i) { return legend_y + i * legend_interval + legend_box_length;})
+            .attr("x", w + legend_box_text_interval)
             .text(function(d) {
                 return d[0];
             });

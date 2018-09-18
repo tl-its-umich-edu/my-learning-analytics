@@ -64,6 +64,7 @@ urlpatterns = [
     # These methods are all for loading test data
     # TODO: Move these to cron job
     # load data from UDW
+    url(r'^update_with_udw_course', login_required(cron.update_with_udw_course), name='update_with_udw_course'),
     url(r'^update_with_udw_file', login_required(cron.update_with_udw_file), name='update_with_udw_file'),
     url(r'^update_with_bq_access', login_required(cron.update_with_bq_access), name='update_with_bq_access'),
     url(r'^update_with_udw_user', login_required(cron.update_with_udw_user), name='update_with_udw_user'),

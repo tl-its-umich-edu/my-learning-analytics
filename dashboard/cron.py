@@ -69,6 +69,14 @@ UDW_FILE_ID_PREFIX = "1770000000"
 UDW_COURSE_ID = UDW_ID_PREFIX + CANVAS_COURSE_ID
 
 # update FILE records from UDW
+def update_with_udw_course(request):
+
+    #select file record from UDW
+    course_sql = "select id, name, \'2\' as term_id from course_dim where id='" + UDW_COURSE_ID + "'"
+
+    return HttpResponse("loaded file info: " + util_function(course_sql, 'course'))
+
+# update FILE records from UDW
 def update_with_udw_file(request):
 
     #select file record from UDW

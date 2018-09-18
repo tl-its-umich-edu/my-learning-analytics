@@ -12,12 +12,12 @@
 }
 
 .y.axis text {
-    font: 16px sans-serif;
+    font: 14px sans-serif;
     color: blue;
 }
 
 .y.tick text {
-    font: 16px sans-serif;
+    font: 14px sans-serif;
     color: blue;
 }
 
@@ -103,6 +103,11 @@
     cursor: not-allowed;
 }
 
+.label {
+    font-size: 13px;
+    color: black;
+}
+
 .Completedfalse:hover {
     fill: #c00;
 }
@@ -118,7 +123,7 @@ div.y-axis-label {
 .d3-tip {
     line-height: 1;
     font-size: 12px;
-    background: white;
+    background: paleturquoise;
     color: black;
     border-radius: 2px;
 }
