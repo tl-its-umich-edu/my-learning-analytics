@@ -19,7 +19,7 @@
 {% endblock %}
 {% block content %}
     <!-- week slider -->
-    <h4 align="center">What Students Are Reading</h4>
+    <h4 class="text-center">What Students Are Reading</h4>
 
 
     <input type="text" id="slider" class="slider">
@@ -27,7 +27,7 @@
     <input type="hidden" name="slider_num" id="slider_num" />
     <div/>
     <br/>
-    <h6 align="center">Files accessed by
+    <h6 class="text-center">Files accessed by
     <select class="grade" name="grade" id="grade">
         <option value="all" selected>All Grades</option>
         <option value="A" >A</option>
@@ -45,5 +45,4 @@
     <script src="{% static 'd3-tip/dist/index.js' %}"></script>
     <script src="{% static 'js/rSlider.min.js' %}"></script>
     <script src="{% static 'js/file_access_within_week.js'%}"></script>
-    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 {% endblock %}

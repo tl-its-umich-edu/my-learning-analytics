@@ -17,6 +17,8 @@ import collections
 import logging
 import csv
 
+from decouple import config, Csv
+
 import pandas as pd
 from pandas.io import sql
 #import MySQLdb
@@ -29,21 +31,24 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 #TODO: replace this with CoSign user
-current_user=os.environ.get("CANVAS_USER", "")
+current_user=config("CANVAS_USER", default="")
 
 # Todo the framework needs to remember the course
-CANVAS_COURSE_ID =os.environ.get('CANVAS_COURSE_IDS', '')
+CANVAS_COURSE_ID =config("CANVAS_COURSE_IDS", default="")
 UDW_ID_PREFIX = "17700000000"
 
 # strings for construct file download url
-CANVAS_FILE_PREFIX = os.environ.get('CANVAS_FILE_PREFIX', '')
-CANVAS_FILE_POSTFIX=os.environ.get('CANVAS_FILE_POSTFIX', '')
+CANVAS_FILE_PREFIX = config("CANVAS_FILE_PREFIX", default="")
+CANVAS_FILE_POSTFIX = config("CANVAS_FILE_POSTFIX", default="")
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
 UDW_COURSE_ID = UDW_ID_PREFIX + CANVAS_COURSE_ID
 
 # string for no grade
 NO_GRADE_STRING = "NO_GRADE"
+
+# how many decimal digits to keep
+DECIMAL_ROUND_DIGIT = 1
 
 def home(request):
     """
@@ -202,7 +207,7 @@ def file_access_within_week(request):
     # time 100 to show the percentage
     output_df["total_count"] = output_df["total_count"] * 100
     # round all numbers to one decimal point
-    output_df = output_df.round(2)
+    output_df = output_df.round(DECIMAL_ROUND_DIGIT)
 
     output_df.fillna(0, inplace=True) #replace null value with 0
 

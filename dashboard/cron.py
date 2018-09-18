@@ -38,6 +38,8 @@ from sqlalchemy import create_engine
 from canvasapi import Canvas
 import OpenSSL.SSL
 
+from decouple import config, Csv
+
 # Imports the Google Cloud client library
 from google.cloud import bigquery
 
@@ -63,16 +65,19 @@ engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
 # ## Connect to Unizin Data Warehouse
 #
 # ### Get enrolled users and files within site
-CANVAS_COURSE_ID =os.environ.get('CANVAS_COURSE_IDS', '')
+CANVAS_COURSE_ID =config('CANVAS_COURSE_IDS', default="")
 UDW_ID_PREFIX = "17700000000"
 UDW_FILE_ID_PREFIX = "1770000000"
 UDW_COURSE_ID = UDW_ID_PREFIX + CANVAS_COURSE_ID
+
+# set the current term id from config
+CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
 
 # update FILE records from UDW
 def update_with_udw_course(request):
 
     #select file record from UDW
-    course_sql = "select id, name, \'2\' as term_id from course_dim where id='" + UDW_COURSE_ID + "'"
+    course_sql = "select id, name, " + CURRENT_CANVAS_TERM_ID + " as term_id from course_dim where id='" + UDW_COURSE_ID + "'"
 
     return HttpResponse("loaded file info: " + util_function(course_sql, 'course'))
 
