@@ -90,19 +90,12 @@ def get_current_week_number(request):
     data['currentWeekNumber'] = currentWeekNumber
     return HttpResponse(json.dumps(data))
 
-def get_current_user_from_request(request):
-    if request.user.is_authenticated:
-        # get current user username
-        return request.user.get_username()
-    else:
-        # not user not login
-        return ""
-
 # show percentage of users who read the file within prior n weeks
 def file_access_within_week(request):
 
-    current_user=get_current_user_from_request(request)
-    logger.info("current_user=" + current_user)
+    current_user=request.user.get_username()
+
+    logger.debug("current_user=" + current_user)
 
     # environment settings:
     pd.set_option('display.max_column',None)
@@ -228,7 +221,7 @@ def file_access_within_week(request):
 def grade_distribution(request):
     logger.info(grade_distribution.__name__)
 
-    current_user = get_current_user_from_request(request)
+    current_user = request.user.get_username()
 
     # Later this could be coming from a table specific to the course
     bins = [0, 50, 65, 78, 89, 100]
@@ -260,7 +253,7 @@ def grade_distribution(request):
 def assignment_progress(request):
     logger.info(assignment_view.__name__)
 
-    current_user = get_current_user_from_request(request)
+    current_user = request.user.get_username()
 
     sql = "select assignment_id,local_graded_date as graded_date,score,name,assign_grp_name,local_date as due_date,points_possible,group_points,weight,drop_lowest,drop_highest  from (" \
           "(select assignment_id,local_graded_date,score from" \
@@ -305,7 +298,7 @@ def assignment_progress(request):
 def assignment_view(request):
     logger.info(assignment_view.__name__)
 
-    current_user = get_current_user_from_request(request)
+    current_user = request.user.get_username()
 
     percent_selection = float(request.GET.get('percent','0.0'))
     logger.info('selection from assignment view %s '.format(percent_selection))
