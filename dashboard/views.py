@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import auth
 from django.db import connection as conn
+from django.contrib.auth.models import User
 
 import os
 import numpy as np
@@ -28,9 +29,6 @@ import pandas as pd
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
-
-#TODO: replace this with CoSign user
-current_user=config("CANVAS_USER", default="")
 
 # Todo the framework needs to remember the course
 CANVAS_COURSE_ID =config("CANVAS_COURSE_IDS", default="")
@@ -93,8 +91,19 @@ def get_current_week_number(request):
     data['currentWeekNumber'] = currentWeekNumber
     return HttpResponse(json.dumps(data))
 
+def get_current_user_from_request(request):
+    if request.user.is_authenticated:
+        # get current user username
+        return request.user.get_username()
+    else:
+        # not user not login
+        return ""
+
 # show percentage of users who read the file within prior n weeks
 def file_access_within_week(request):
+
+    current_user=get_current_user_from_request(request)
+    logger.info("current_user=" + current_user)
 
     # environment settings:
     pd.set_option('display.max_column',None)
@@ -220,6 +229,8 @@ def file_access_within_week(request):
 def grade_distribution(request):
     logger.info(grade_distribution.__name__)
 
+    current_user = get_current_user_from_request(request)
+
     # Later this could be coming from a table specific to the course
     bins = [0, 50, 65, 78, 89, 100]
     labels = ['F', 'D', 'C', 'B', 'A']
@@ -238,7 +249,7 @@ def grade_distribution(request):
         df_grade.reset_index(inplace=True)
         df_grade.columns = ['score', 'count']
         df_grade['grade'] = pd.cut(df_grade['score'].astype(float), bins=bins, labels=labels)
-        user_score, rounded_score=get_current_user_score()
+        user_score, rounded_score=get_current_user_score(current_user)
         df_grade['my_score'] = rounded_score
         df_grade['my_score_actual'] = user_score
         df_grade['tot_students'] = number_of_students
@@ -249,6 +260,9 @@ def grade_distribution(request):
 
 def assignment_progress(request):
     logger.info(assignment_view.__name__)
+
+    current_user = get_current_user_from_request(request)
+
     sql = "select assignment_id,local_graded_date as graded_date,score,name,assign_grp_name,local_date as due_date,points_possible,group_points,weight from (" \
           "(select assignment_id,local_graded_date,score from" \
           "(select id from user where sis_name = %(current_user)s ) as u join" \
@@ -282,6 +296,9 @@ def assignment_progress(request):
 
 def assignment_view(request):
     logger.info(assignment_view.__name__)
+
+    current_user = get_current_user_from_request(request)
+
     percent_selection = float(request.GET.get('percent','0.0'))
     logger.info("selection from assignment view",percent_selection)
     sql = "select assignment_id,local_graded_date as graded_date,score,name,local_date as due_date,points_possible,group_points,weight from (" \
@@ -345,8 +362,9 @@ def assignment_view(request):
 
 
 
-def get_current_user_score():
+def get_current_user_score(current_user):
     logger.info(get_current_user_score.__name__)
+
     user_score_sql= "select * from user where sis_name = %(current_user)s and course_id=%(course_id)s"
     df = pd.read_sql(user_score_sql, conn, params={"current_user": current_user,'course_id': UDW_COURSE_ID})
     df['rounded_score'] = df['current_grade'].astype(float).map(lambda x: int(x / 2) * 2)
