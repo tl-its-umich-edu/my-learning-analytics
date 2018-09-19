@@ -7,9 +7,9 @@
                 svg = d3.select(g.property("nearestViewportElement")),
                 legendPadding = g.attr("data-style-padding") || 5,
                 legendTitle = g.attr("data-legend-title")
-            lb = g.selectAll(".legend-box").data([true]),
+                lb = g.selectAll(".legend-box").data([true]),
                 li = g.selectAll(".legend-items").data([true]),
-                lb.enter().append("g").classed("legend-box",true)
+            lb.enter().append("g").classed("legend-box",true)
             li.enter().append("g").classed("legend-items",true)
 
             svg.selectAll("[data-legend]").each(function() {

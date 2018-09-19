@@ -3,51 +3,11 @@ student dashboard based on django framework
 ## Environment configuration
 There is some environment configuration and addtional files needed for this app to run. You can put this in a file called .env for testing. 
 
-(Sample .env)
-```
-# Any logs that django outputs
-DJANGO_LOG_LEVEL=DEBUG
-# Any other logs
-ROOT_LOG_LEVEL=INFO
+Configuration:
 
-# MySQL Configuration
-MYSQL_DATABASE=student_dashboard
-MYSQL_USER=student_dashboard_user
-MYSQL_PASSWORD=student_dashboard_pw
-MYSQL_HOST=student_dashboard_mysql
-MYSQL_PORT=3306
-MYSQL_ROOT_PASSWORD=student_dashboard_root_pw
+Copy the file `.env.sample` to `.env` and fill in with the values for local testing.
 
-# UDW configuration
-UDW_ENDPOINT=
-UDW_USER=
-UDW_PASSWORD=
-UDW_PORT=
-UDW_DATABASE=
-
-# Canvas Configuration
-CANVAS_COURSE_IDS=
-CANVAS_USER=
-
-# Paths to special login credentials (uses SAML)
-GOOGLE_APPLICATION_CREDENTIALS=/secrets/bq_cred.json
-
-# SAML Configuration
-# Need to set this to false to turn it off for dev, but default is true
-STUDENT_DASHBOARD_SAML=false
-
-# Where your secrets are stored
-SAML2_FILES_BASE=/secrets/saml/
-
-# Base for Django to your accounts path
-DJANGO_SAML2_URL_BASE=http://localhost:5001/accounts/
-
-# ACS Redirect
-DJANGO_ACS_DEFAULT_REDIRECT=http://localhost:5001/
-
-# Login Redirect
-LOGIN_REDIRECT_URL=http://localhost:5001/
-```
+On OpenShift fill these in the appropriate places.
 
 The bq_cred.json is service account for Big Query, it neesd to be supplied and put into the secrets directory and setup in the environment.
 
@@ -90,6 +50,31 @@ Use the following URL patterns to load data into databases:
 2. `use student_dashboard`
 
 ## Clean outdated docker images
-The docker images will take up more disk spaces as time goes on, you can delete those outdated docker images by using the following command:
+The docker artifacts will take up more disk spaces as time goes on, you can clean up docker containers, networks images and optionally volumes using the command below.
 
-`docker rmi $(docker images -q -f "dangling=true")`
+Remove the --volumes to leave volumes without at least one container associated. This will not remove anything running.
+
+This will remove everything! (images, containers, volumes)
+`docker system prune -a --volumes`
+
+## Testing tips!
+
+1. Create a super user to test login. Run this command below. The password will be printed unless you specify it with --password. You can run this multiple times to change a password but you need to delete/modify super users via the Admin login (appears when logged in as admin). You can also add new users in there.
+
+`docker exec -it student_dashboard python manage.py createuser --superuser --username=root --email=root@example.edu`
+
+You can create regular users to test with without the superuser flag via the command line without using the --superuser.
+
+`docker exec -it student_dashboard python manage.py createuser --username=student --email=student@example.edu`
+
+2. Connect to the docker and edit some files!
+
+`docker exec -it student_dashboard /bin/bash`
+then install a text editor like vim
+`apt-get -y install vim`
+
+Then you can edit your files! (Probably in /dashboard/dashboard)
+
+3. Restart the gunicorn to read the configuration. This is useful to avoid a redeploy.
+
+`docker exec student_dashboard pkill -HUP gunicorn`
