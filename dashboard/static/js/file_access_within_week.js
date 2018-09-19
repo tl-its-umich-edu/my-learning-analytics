@@ -522,6 +522,8 @@ makeSlider = function () {
             return "no data";
         }
         currentWeeKNumber = initResult.currentWeekNumber;
+        // start week defaults to be two weeks ago
+        var twoWeeksBeforeCurrentWeek = WEEK_PREFIX + Math.max(0, currentWeeKNumber-2)
 
         var i;
         var weekArray = [];
@@ -540,7 +542,7 @@ makeSlider = function () {
             target: '#slider',
             values: weekArray,
             range: true, // range slider
-            set: ['Week 1', currentWeek], // an array of preselected values
+            set: [twoWeeksBeforeCurrentWeek, currentWeek], // an array of preselected values
             scale: true,
             tooltip: false,
             onChange: function (values) {
