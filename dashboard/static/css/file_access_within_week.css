@@ -1,7 +1,48 @@
-body {
-    font: 10px sans-serif;
+#explanation {
+    font-size: 12px;
+    max-width: 620px;
+    margin: 0 auto;
+    padding-top: 10px;
+    color: #ababab;
+    font-weight: 300;
 }
 
+.y.axis line {
+    fill: none;
+}
+
+.y.axis text {
+    font: 14px sans-serif;
+    color: blue;
+}
+
+.y.tick text {
+    font: 14px sans-serif;
+    color: blue;
+}
+
+.x.axis line {
+    fill: none;
+    stroke: #e0e0e0;
+    shape-rendering: crispEdges;
+}
+
+.y.axis path {
+    display: none;
+}
+
+.brush .extent {
+    fill-opacity: .125;
+    shape-rendering: crispEdges;
+}
+
+.resize {
+    display: inline !important; /* show when empty */
+    fill: #7A7A7A;
+    fill-opacity: 1;
+    stroke: #7A7A7A;
+    stroke-width: 2px;
+}
 
 .toolTip {
     position: absolute;
@@ -62,20 +103,28 @@ body {
     cursor: not-allowed;
 }
 
+.label {
+    font-size: 13px;
+    color: black;
+}
+
 .Completedfalse:hover {
     fill: #c00;
 }
 
-.x.axis path {
-    display: none;
+.axis .label {
+    font-size: 40pt;
+}
+
+div.y-axis-label {
+    font: 10px sans-serif;
 }
 
 .d3-tip {
     line-height: 1;
-    font-weight: bold;
-    padding: 12px;
-    background: rgba(0, 0, 0, 0.8);
-    color: #fff;
+    font-size: 12px;
+    background: paleturquoise;
+    color: black;
     border-radius: 2px;
 }
 /* Creates a small triangle extender for the tooltip */
@@ -83,10 +132,10 @@ body {
 .d3-tip:after {
     box-sizing: border-box;
     display: inline;
-    font-size: 10px;
+    font-size: 8px;
     width: 100%;
     line-height: 1;
-    color: rgba(0, 0, 0, 0.8);
+    color: white;
     content: "\25BC";
     position: absolute;
     text-align: center;
@@ -126,3 +175,8 @@ body {
 #slider svg line.track-overlay, #slider svg line.track, #slider svg line.track-inset {
     stroke-linecap: round;
 }
+
+.legend rect {
+    fill:white;
+    stroke:black;
+    opacity:0.8;}

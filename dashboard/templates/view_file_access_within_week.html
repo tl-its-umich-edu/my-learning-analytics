@@ -1,5 +1,8 @@
+{% extends 'base.html' %}
 {% load static %}
-<meta charset="utf-8">
+{% block css %}
+<link rel="stylesheet" href="/static/css/rSlider.min.css">
+<link rel="stylesheet" href="/static/css/file_access_within_week.css" />
 <style>
 
     .label {
@@ -13,31 +16,33 @@
     }
 
 </style>
-<body>
+{% endblock %}
+{% block content %}
     <!-- week slider -->
-    <div id="slider_label">View File Access Patterns in last 1 week: </div>
-    <div id="slider"></div>
+    <h4 class="text-center">What Students Are Reading</h4>
+
+
+    <input type="text" id="slider" class="slider">
+
     <input type="hidden" name="slider_num" id="slider_num" />
     <div/>
-    Please choose Grade level:
+    <br/>
+    <h6 class="text-center">Files accessed by
     <select class="grade" name="grade" id="grade">
-        <option value="all" selected>All Grade</option>
+        <option value="all" selected>All Grades</option>
         <option value="A" >A</option>
         <option value="B" >B</option>
         <option value="C" >C</option>
         <option value="D" >D</option>
         <option value="F" >F</option>
-    </select>
-
+        <option value="NO_GRADE" >NO GRADE</option>
+    </select> <span id="slider_label"> students from week 1 to: </span></h6>
+    <br/>
     <div id="chart"></div>
-
-    <script src="{% static 'd3-v4/build/d3.min.js' %}"></script>
-    <script src="{% static 'd3-scale-chromatic/dist/d3-scale-chromatic.min.js' %}"></script>
+{% endblock %}
+{% block js %}
+    <script src="{% static 'd3/d3.js' %}"></script>
     <script src="{% static 'd3-tip/dist/index.js' %}"></script>
-    <script src="{% static 'underscore/underscore-min.js' %}"></script>
-    <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
-    <script src="{% static 'moment/min/moment.min.js' %}"></script>
-
-    <script src="/static/js/file_access_within_week.js"></script>
-    <link rel="stylesheet" href="/static/css/file_access_within_week.css" />
-</body>
+    <script src="{% static 'js/rSlider.min.js' %}"></script>
+    <script src="{% static 'js/file_access_within_week.js'%}"></script>
+{% endblock %}

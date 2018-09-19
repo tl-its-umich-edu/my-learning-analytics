@@ -1,4 +1,4 @@
-visApp.factory('Fetch', function ($http) {
+visApp.factory('Get', function ($http) {
   return {
     getData: function (url) {
       return $http.get(url, {cache: false}).then(

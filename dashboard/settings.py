@@ -11,11 +11,14 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import csv
+
 from os import getenv
 from os import path
 import sys
 
 from .common.util import *
+from decouple import config, Csv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,18 +34,21 @@ PROJECT_ROOT = os.path.abspath(
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'p7zq=2&ms4%&b%5&5^g(ks0%u#^ku%x5z4xc+#(jao+t1h7*n^'
+SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost","dashboard.tl.it.umich.edu"]
+ALLOWED_HOSTS = config("ALLOWED_HOSTS",default="127.0.0.1,localhost", cast=Csv())
 
+WATCHMAN_TOKEN = getenv('DJANGO_WATCHMAN_TOKEN', None)
+
+WATCHMAN_TOKEN_NAME = getenv('DJANGO_WATCHMAN_TOKEN_NAME', 'token')
 
 # Application definition
 
 INSTALLED_APPS = [
+    'django_su',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,8 +57,9 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'dashboard',
-    'django_nvd3',
     'django_crontab',
+    'watchman'
+
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -69,24 +76,19 @@ MIDDLEWARE_CLASSES = [
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    'django.template.loaders.eggs.Loader',
-)
-TEMPLATE_DIRS = (os.path.join(APPLICATION_DIR, 'templates'), )
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(APPLICATION_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
+            'debug': config('DJANGO_TEMPLATE_DEBUG', default=DEBUG, cast=bool),
             'context_processors': [
+                'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.messages.context_processors.messages',
+                'django_su.context_processors.is_su',
             ],
         },
     },
@@ -102,19 +104,20 @@ WSGI_APPLICATION = 'dashboard.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.environ.get('MYSQL_ENGINE', 'django.db.backends.mysql'),
-        'NAME': os.environ.get('MYSQL_DATABASE', 'student_dashboard'),  # your mysql database name
-        'USER': os.environ.get('MYSQL_USER', 'student_dashboard_user'), # your mysql user for the database
-        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'student_dashboard_password'), # password for user
-        'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
-        'PORT': os.environ.get('MYSQL_PORT', '3306'),
+        'ENGINE': config('MYSQL_ENGINE', default='django.db.backends.mysql'),
+        'NAME': config('MYSQL_DATABASE', default='student_dashboard'),  # your mysql database name
+        'USER': config('MYSQL_USER', default='student_dashboard_user'), # your mysql user for the database
+        'PASSWORD': config('MYSQL_PASSWORD', default='student_dashboard_password'), # password for user
+        'HOST': config('MYSQL_HOST', default='localhost'),
+        'PORT': config('MYSQL_PORT', default=3306, cast=int),
     },
     'UDW': {
-        'UDW_ENDPOINT': os.environ.get('UDW_ENDPOINT', ''),
-        'UDW_USER': os.environ.get('UDW_USER', ''),
-        'UDW_PASSWORD': os.environ.get('UDW_PASSWORD', ''),
-        'UDW_PORT': os.environ.get('UDW_PORT', ''),
-        'UDW_DATABASE': os.environ.get('UDW_DATABASE', ''),
+        'ENGINE': config('UDW_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': config('UDW_DATABASE', default=''),
+        'USER': config('UDW_USER', default=''),
+        'PASSWORD': config('UDW_PASSWORD', default=''),
+        'HOST': config('UDW_HOST', default=config('UDW_ENDPOINT', default='')),
+        'PORT': config('UDW_PORT', default=5432, cast=int),
     }
 }
 
@@ -189,6 +192,8 @@ try:
 except ImportError:
     pass
 
+AUTHENTICATION_BACKENDS = ('django_su.backends.SuBackend',)
+
 #Shib
 
 # Give an opportunity to disable SAML
@@ -197,17 +202,17 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
 
     SAML2_URL_PATH = '/accounts/'
     # modify to use port request comes
-    SAML2_URL_BASE = getenv('DJANGO_SAML2_URL_BASE', 'http://localhost:5001/accounts/')
+    SAML2_URL_BASE = getenv('DJANGO_SAML2_URL_BASE', '/accounts/')
 
     INSTALLED_APPS += ('djangosaml2',)
-    AUTHENTICATION_BACKENDS = (
+    AUTHENTICATION_BACKENDS += (
         'djangosaml2.backends.Saml2Backend',
     )
     LOGIN_URL = '%slogin/' % SAML2_URL_PATH
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
     BASEDIR = path.dirname(path.abspath(__file__))
-    SAML2_FILES_BASE = os.environ.get('SAML2_FILES_BASE', '/saml/')
+    SAML2_FILES_BASE = config('SAML2_FILES_BASE', default='/saml/')
 
     SAML_CONFIG = {
         'xmlsec_binary': '/usr/bin/xmlsec1',
@@ -260,8 +265,10 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
         'key_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.key'),  'cert_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.pem'),
     }
 
-    ACS_DEFAULT_REDIRECT_URL = getenv('DJANGO_ACS_DEFAULT_REDIRECT', 'http://localhost:5001/')
-    LOGIN_REDIRECT_URL = getenv('DJANGO_LOGIN_REDIRECT_URL', 'http://localhost:5001/')
+    ACS_DEFAULT_REDIRECT_URL = getenv('DJANGO_ACS_DEFAULT_REDIRECT', '/')
+    LOGIN_REDIRECT_URL = getenv('DJANGO_LOGIN_REDIRECT_URL', '/')
+    
+    LOGOUT_REDIRECT_URL = getenv('DJANGO_LOGOUT_REDIRECT_URL','/')
 
     SAML_CREATE_UNKNOWN_USER = True
 
@@ -271,4 +278,7 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
         'givenName': ('first_name', ),
         'sn': ('last_name', ),
     }
-
+else: 
+    AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
+    LOGIN_REDIRECT_URL = '/'
+    

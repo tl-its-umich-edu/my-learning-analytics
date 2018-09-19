@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Assignments Preparation view{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="/static/css/assign.css">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="navbar-header mastHead">
+        <h1 class="navbar-brand collapse-nav"><span>Student Dashboard</span></h1>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <h5 style="padding-left: 8px">Progress Bar</h5>
+    <div id="chart"></div>
+</div>
+
+<div class="container" ng-controller="mainController" ng-app="visApp">
+    <div class="row">
+        <div class="column">
+            <span>Show assignments weight more than</span>
+            <p ng-show="percentFilterEnabled">
+                <select class="percent-selection" ng-change="updatePercentFilter()" ng-model="percent_filter"
+                        ng-options="p as p for p in percent"></select>
+            </p>
+        </div>
+        <div class="column">
+            <span>Assignment Status: </span><br>
+            <div class="graded"></div>
+            <span style="display: inline-block;">Graded</span><br>
+            <div class="extra-credit"></div>
+            <span style="display: inline-block;">Extra-Credit</span><br>
+            <div class="ungraded"></div>
+            <span style="display: inline-block;">Not Graded</span><br>
+            <div class="current-week"></div>
+            <span style="display: inline-block;">Current Week</span>
+        </div>
+    </div>
+    <h4>Assignments Due By Date</h4>
+    <table class="table table_container assign-header">
+        <thead>
+        <th style="text-align:left">Week</th>
+        <th style="text-align:left; padding-left: 1px">Due Date</th>
+        <th style="text-align:center">Assignment Title</th>
+        <th style="text-align:left">Percent of final grade</th>
+        </thead>
+    </table>
+    {% verbatim %}
+    <div class="table-style">
+        <table class="table table-borderless table_container assign-week">
+            <tr ng-if="data.length!=0" ng-repeat="week in data">
+                <!--<td>Week {{week.week}} <br>({{week.tot}} assigmments)</td>-->
+                <td class = "{{week.week}}">Week {{week.week}}</td>
+                <td class="table_container table_container1">
+                    <table class="table assign-duedate">
+                        <tr ng-repeat="due_dates in week.due_date_items">
+                            <td class="time">{{due_dates.due_date}}</td>
+                            <td class="table_container table_container2">
+                                <table class="table assignments-info">
+                                    <tr ng-repeat="assignments in due_dates.assignment_items">
+                                        <div class="container-bar">
+                                            <td class="bar_text">{{assignments.name}}</td>
+                                        </div>
+                                        <td class="bar_cell">
+                                            <!--<div class="container-bar">-->
+                                            <div ng-if="assignments.weight==0.0" data-descr = {{assignments.towards_final_grade}}%
+                                                 class="bar zero-weight" style="width:{{assignments.towards_final_grade}}%"
+                                                 data-toggle="tooltip" tooltip-info="MyScore: {{assignments.score}} Possible_Score: {{assignments.points_possible}}"></div>
+                                            <div ng-if="assignments.weight!=0.0 && assignments.graded" data-descr = {{assignments.towards_final_grade}}%
+                                                 class="bar blue-bar" style="width:{{assignments.towards_final_grade}}%"
+                                                 data-toggle="tooltip" tooltip-info="MyScore: {{assignments.score}} Possible_Score: {{assignments.points_possible}}"></div>
+                                            <div ng-if="assignments.weight!=0.0 && !assignments.graded" data-descr = {{assignments.towards_final_grade}}%
+                                                 class="bar grey-bar" style="width:{{assignments.towards_final_grade}}%"
+                                                 data-toggle="tooltip" tooltip-info="MyScore:{{assignments.score}} Possible_Score: {{assignments.points_possible}}"></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+
+            </tr>
+            <td ng-show="data.length == 0">
+                There's no data for selection
+            </td>
+
+        </table>
+    </div>
+    {% endverbatim %}
+</div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'd3-v4/build/d3.min.js' %}"></script>
+<script src="/static/js/assign-progress.js"></script>
+<script src="{% static 'js/app.js' %}"></script>
+<script src="{% static 'js/controllers.js' %}"></script>
+<script src="{% static 'js/factories.js' %}"></script>
+{% endblock %}
