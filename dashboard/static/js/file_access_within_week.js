@@ -523,7 +523,7 @@ makeSlider = function () {
         }
         currentWeeKNumber = initResult.currentWeekNumber;
         // start week defaults to be two weeks ago
-        var twoWeeksBeforeCurrentWeek = WEEK_PREFIX + Math.max(0, currentWeeKNumber-2)
+        var twoWeeksBeforeCurrentWeek = WEEK_PREFIX + Math.max(1, currentWeeKNumber-2)
 
         var i;
         var weekArray = [];
