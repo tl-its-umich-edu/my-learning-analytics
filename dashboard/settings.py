@@ -13,11 +13,9 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 import csv
 
-from os import getenv
 from os import path
 import sys
 
-from .common.util import *
 from decouple import config, Csv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -41,9 +39,9 @@ DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS",default="127.0.0.1,localhost", cast=Csv())
 
-WATCHMAN_TOKEN = getenv('DJANGO_WATCHMAN_TOKEN', None)
+WATCHMAN_TOKEN = config('DJANGO_WATCHMAN_TOKEN', default=None)
 
-WATCHMAN_TOKEN_NAME = getenv('DJANGO_WATCHMAN_TOKEN_NAME', 'token')
+WATCHMAN_TOKEN_NAME = config('DJANGO_WATCHMAN_TOKEN_NAME', default='token')
 
 # Application definition
 
@@ -170,7 +168,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
         },
         '': {
             'level': 'WARNING',
@@ -179,7 +177,7 @@ LOGGING = {
 
     },
     'root': {
-        'level': getenv('ROOT_LOG_LEVEL', 'INFO'),
+        'level': config('ROOT_LOG_LEVEL', default='INFO'),
         'handlers': ['console']
     },
 }
@@ -197,12 +195,12 @@ AUTHENTICATION_BACKENDS = ('django_su.backends.SuBackend',)
 #Shib
 
 # Give an opportunity to disable SAML
-if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
+if config('STUDENT_DASHBOARD_SAML', default='True', cast=bool):
     import saml2
 
     SAML2_URL_PATH = '/accounts/'
     # modify to use port request comes
-    SAML2_URL_BASE = getenv('DJANGO_SAML2_URL_BASE', '/accounts/')
+    SAML2_URL_BASE = config('DJANGO_SAML2_URL_BASE', default='/accounts/')
 
     INSTALLED_APPS += ('djangosaml2',)
     AUTHENTICATION_BACKENDS += (
@@ -213,6 +211,8 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
 
     BASEDIR = path.dirname(path.abspath(__file__))
     SAML2_FILES_BASE = config('SAML2_FILES_BASE', default='/saml/')
+    SAML2_REMOTE_METADATA = config('SAML2_REMOTE_METADATA', default='')
+    SAML2_REMOTE_PEM_FILE = config('SAML2_REMOTE_PEM_FILE', default='')
 
     SAML_CONFIG = {
         'xmlsec_binary': '/usr/bin/xmlsec1',
@@ -254,9 +254,12 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
         },
 
         # where the remote metadata is stored
-        'metadata': {
-            'local': [path.join(SAML2_FILES_BASE, 'remote-metadata.xml')],
-        },
+        'metadata': [{
+            "class": "saml2.mdstore.MetaDataExtern",
+            "metadata": [
+                (SAML2_REMOTE_METADATA, SAML2_REMOTE_PEM_FILE)]
+            }
+        ],
 
         # set to 1 to output debugging information
         'debug': DEBUG,
@@ -265,10 +268,10 @@ if getenv_bool('STUDENT_DASHBOARD_SAML', 'true'):
         'key_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.key'),  'cert_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.pem'),
     }
 
-    ACS_DEFAULT_REDIRECT_URL = getenv('DJANGO_ACS_DEFAULT_REDIRECT', '/')
-    LOGIN_REDIRECT_URL = getenv('DJANGO_LOGIN_REDIRECT_URL', '/')
+    ACS_DEFAULT_REDIRECT_URL = config('DJANGO_ACS_DEFAULT_REDIRECT', default='/')
+    LOGIN_REDIRECT_URL = config('DJANGO_LOGIN_REDIRECT_URL', default='/')
     
-    LOGOUT_REDIRECT_URL = getenv('DJANGO_LOGOUT_REDIRECT_URL','/')
+    LOGOUT_REDIRECT_URL = config('DJANGO_LOGOUT_REDIRECT_URL',default='/')
 
     SAML_CREATE_UNKNOWN_USER = True
 
