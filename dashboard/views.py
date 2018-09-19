@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import auth
 from django.db import connection as conn
-from django.contrib.auth.models import User
 
 import os
 import numpy as np
