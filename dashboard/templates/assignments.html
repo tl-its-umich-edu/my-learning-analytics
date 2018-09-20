@@ -13,7 +13,7 @@
 </div>
 
 <div class="container-fluid">
-    <h5 style="padding-left: 8px">Progress Bar</h5>
+    <h5 style="padding-left: 8px">Progress toward Final Grade</h5>
     <div id="chart"></div>
 </div>
 
@@ -30,12 +30,8 @@
             <span>Assignment Status: </span><br>
             <div class="graded"></div>
             <span style="display: inline-block;">Graded</span><br>
-            <div class="extra-credit"></div>
-            <span style="display: inline-block;">Extra-Credit</span><br>
             <div class="ungraded"></div>
-            <span style="display: inline-block;">Not Graded</span><br>
-            <div class="current-week"></div>
-            <span style="display: inline-block;">Current Week</span>
+            <span style="display: inline-block;">Not Yet Graded</span><br>
         </div>
     </div>
     <h4>Assignments Due By Date</h4>
@@ -49,10 +45,10 @@
     </table>
     {% verbatim %}
     <div class="table-style">
-        <table class="table table-borderless table_container assign-week">
-            <tr ng-if="data.length!=0" ng-repeat="week in data">
-                <!--<td>Week {{week.week}} <br>({{week.tot}} assigmments)</td>-->
-                <td class = "{{week.week}}">Week {{week.week}}</td>
+        <table class="table table_container assign-week">
+            <tr ng-if="data.length!=0" ng-repeat="week in data" id="{{week.id}}">
+                <td ng-if="!week.due_date_items[0].assignment_items[0].current_week" >Week {{week.week}}</td>
+                <td ng-if="week.due_date_items[0].assignment_items[0].current_week" class="current-week-indicator">Week {{week.week}}</td>
                 <td class="table_container table_container1">
                     <table class="table assign-duedate">
                         <tr ng-repeat="due_dates in week.due_date_items">
@@ -64,16 +60,18 @@
                                             <td class="bar_text">{{assignments.name}}</td>
                                         </div>
                                         <td class="bar_cell">
-                                            <!--<div class="container-bar">-->
-                                            <div ng-if="assignments.weight==0.0" data-descr = {{assignments.towards_final_grade}}%
-                                                 class="bar zero-weight" style="width:{{assignments.towards_final_grade}}%"
-                                                 data-toggle="tooltip" tooltip-info="MyScore: {{assignments.score}} Possible_Score: {{assignments.points_possible}}"></div>
-                                            <div ng-if="assignments.weight!=0.0 && assignments.graded" data-descr = {{assignments.towards_final_grade}}%
+                                            <div ng-if="assignments.graded" data-descr = {{assignments.towards_final_grade}}%
                                                  class="bar blue-bar" style="width:{{assignments.towards_final_grade}}%"
-                                                 data-toggle="tooltip" tooltip-info="MyScore: {{assignments.score}} Possible_Score: {{assignments.points_possible}}"></div>
-                                            <div ng-if="assignments.weight!=0.0 && !assignments.graded" data-descr = {{assignments.towards_final_grade}}%
+                                                 data-toggle="tooltip" tooltip-info="Score:{{assignments.score==null?'NA':assignments.score}}/{{assignments.points_possible}}
+                                                         {{assignments.drop_lowest!=0?'.The lowest ' +assignments.drop_lowest+' scores will dropped from this assignment group':''}}
+                                                         {{assignments.drop_highest!=0?'.The highest '+assignments.drop_highest+' scores will dropped from this assignment group':''}}">
+                                            </div>
+                                            <div ng-if="!assignments.graded" data-descr = {{assignments.towards_final_grade}}%
                                                  class="bar grey-bar" style="width:{{assignments.towards_final_grade}}%"
-                                                 data-toggle="tooltip" tooltip-info="MyScore:{{assignments.score}} Possible_Score: {{assignments.points_possible}}"></div>
+                                                 data-toggle="tooltip" tooltip-info="Score:{{assignments.score==null?'NA':assignments.score}}/{{assignments.points_possible}}
+                                                         {{assignments.drop_lowest!=0?'.The lowest ' +assignments.drop_lowest+' scores will dropped from this assignment group':''}}
+                                                         {{assignments.drop_highest!=0?'.The highest '+assignments.drop_highest+' scores will dropped from this assignment group':''}}">
+                                            </div>
                                         </td>
                                     </tr>
                                 </table>
@@ -83,6 +81,7 @@
                 </td>
 
             </tr>
+
             <td ng-show="data.length == 0">
                 There's no data for selection
             </td>

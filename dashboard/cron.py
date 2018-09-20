@@ -183,15 +183,13 @@ def update_groups(request):
     :return:
     '''
     logger.debug("update_assignment_groups(): ")
-    assignment_groups_sql = "with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id " \
-                            "from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='" + UDW_COURSE_ID + "'" \
-                            "and ad.visibility = 'everyone' and ad.workflow_state='published')"\
-                            ",assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf " \
-                            "on agd.id = agf.assignment_group_id  where agd.course_id='" + UDW_COURSE_ID + "' and workflow_state='available')"\
-                            ",assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join " \
-                            "(select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id )"\
-                            ",assignment_grp_points as (select ag.*, am.group_points AS group_points from assignment_grp ag join assign_more am on ag.assignment_group_id = am.assignment_group_id)"\
-                            "select assignment_group_id AS id, course_id AS course_id, group_weight AS weight, name AS name, group_points AS group_points from assignment_grp_points"
+    assignment_groups_sql = "with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='" + UDW_COURSE_ID + "'and ad.visibility = 'everyone' and ad.workflow_state='published'),"\
+                            "assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf on agd.id = agf.assignment_group_id  where agd.course_id='" + UDW_COURSE_ID + "' and workflow_state='available'),"\
+                            "assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join (select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id ),"\
+                            "assign_rules as (select DISTINCT ad.assignment_group_id,agr.drop_lowest,agr.drop_highest from assignment_details ad join assignment_group_rule_dim agr on ad.assignment_group_id=agr.assignment_group_id),"\
+                            "assignment_grp_points as (select ag.*, am.group_points AS group_points from assignment_grp ag join assign_more am on ag.assignment_group_id = am.assignment_group_id),"\
+                            "assign_final as (select assignment_group_id AS id, course_id AS course_id, group_weight AS weight, name AS name, group_points AS group_points from assignment_grp_points)"\
+                            "select g.*, ar.drop_lowest,ar.drop_highest from assign_rules ar join assign_final g on ar.assignment_group_id=g.id"\
 
     return HttpResponse("loaded assignment group info: " + util_function(assignment_groups_sql, 'assignment_groups'))
 

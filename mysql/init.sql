@@ -51,6 +51,8 @@ CREATE TABLE IF NOT EXISTS assignment_groups(
    weight     CHAR(255),
    group_points     CHAR(255),
    course_id  CHAR(255)    NOT NULL,
+   drop_lowest CHAR(255),
+   drop_highest CHAR(255),
    PRIMARY KEY  (id)
 );
 
@@ -86,6 +88,7 @@ INSERT INTO academic_terms (NAME, start_date, end_date) VALUES ('SUMMER 2018', '
 INSERT INTO academic_terms (NAME, start_date, end_date) VALUES ('FALL 2018', '2018-09-04 04:00:00',  '2018-12-24 23:59:59' );
 -- inert course
 INSERT INTO course (id, name, term_id) VALUES ('17700000000230745', 'STATS 250 SU 2018', 1);
-INSERT INTO course (id, NAME, term_id) VALUES ('17700000000252307', 'SI 110 001 FA 2018', 2);
+INSERT INTO course (id, name, term_id) VALUES ('17700000000252307', 'SI 110 001 FA 2018', 2);
+INSERT INTO course (id, name, term_id) VALUES ('17700000000245664', 'SI 664 002 FA 2018', 3);
 
 COMMIT;

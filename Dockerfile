@@ -12,7 +12,7 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
 
 # apt-utils needs to be installed separately
 RUN apt-get update && \ 
-    apt-get install -y --no-install-recommends nodejs yarn python3-dev xmlsec1 cron && \
+    apt-get install -y --no-install-recommends nodejs yarn python3-dev xmlsec1 cron vim && \
     apt-get clean -y
 
 #https://github.com/jwilder/dockerize

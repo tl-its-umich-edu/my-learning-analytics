@@ -85,8 +85,7 @@ var makeGraph = function () {
                              "Due at: <b>" + (d.due_date_mod) +"</b><br>"+
                              "Your grade is: <b>"+((!d.score)?"Not available":(d.score))+ "</b><br>"+
                              "Total Points Possible: <b>"+(d.points_possible)+"</b><br>"+
-                             "Percentage worth in final grade: <b>"+(d.towards_final_grade)+"%</b><br>"+
-                             "All assignments in <b>"+d.assign_grp_name+"</b> group worth <b>"+d.weight+"%</b> to final grade")
+                             "Percentage worth in final grade: <b>"+(d.towards_final_grade)+"%</b><br>")
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY +20) + "px");
             })
