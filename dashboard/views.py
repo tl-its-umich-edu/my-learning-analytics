@@ -275,7 +275,7 @@ def assignment_progress(request):
     df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
     df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
     df[['points_possible', 'group_points','weight','score']] = df[['points_possible', 'group_points','weight','score']].astype(float)
-    consider_weight=False
+    consider_weight=is_weight_considered()
     total_points=df['points_possible'].sum()
     def percent_calculation(consider_weight,total_points,row):
         if consider_weight:
@@ -322,7 +322,7 @@ def assignment_view(request):
     df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
     df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
     df[['points_possible', 'group_points','weight']] = df[['points_possible', 'group_points','weight']].astype(float)
-    consider_weight=False
+    consider_weight=is_weight_considered()
     total_points=df['points_possible'].sum()
     df['towards_final_grade']=df.apply(lambda x: percent_calculation(consider_weight, total_points,x), axis=1)
     df['calender_week']=df['due_date'].dt.week
@@ -393,6 +393,13 @@ def find_current_week(row):
     if row == week:
         return True
     else: return False
+
+
+def is_weight_considered():
+    url = "select consider_weight from assignment_weight_consideration where course_id=%(course_id)s"
+    df = pd.read_sql(url, conn, params={"course_id": UDW_COURSE_ID})
+    value = df['consider_weight'].iloc[0]
+    return value
 
 
 def get_term_dates_for_course():
