@@ -31,7 +31,7 @@ var makeGraph = function () {
             .append('g');
 
         width = width - margin.left - margin.right,
-            height = height - margin.top - margin.bottom;
+        height = height - margin.top - margin.bottom;
 
         svg.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
@@ -49,6 +49,8 @@ var makeGraph = function () {
             .attr('class', 'axis')
             .attr('transform', 'translate(' + 0 + ',' + height + ')')
             .call(d3.axisBottom(xScale)
+                .tickFormat(function(d) {
+                return d+"%"})
                 .ticks(20, 's'))
 
 
