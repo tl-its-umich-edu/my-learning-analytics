@@ -84,10 +84,12 @@ var makeGraph = function () {
                     .duration(200)
                     .style("opacity", 1);
                 tooltip.html("Assignment: <b>"+(d.name) + "</b><br>" +
-                             "Due at: <b>" + (d.due_date_mod) +"</b><br>"+
-                             "Your grade is: <b>"+((!d.score)?"Not available":(d.score))+ "</b><br>"+
-                             "Total Points Possible: <b>"+(d.points_possible)+"</b><br>"+
-                             "Percentage worth in final grade: <b>"+(d.towards_final_grade)+"%</b><br>")
+                    "Due at: <b>" + (d.due_date_mod) +"</b><br>"+
+                    "Your grade is: <b>"+((!d.score)?"Not available":(d.score))+ "</b><br>"+
+                    "Total Points Possible: <b>"+(d.points_possible)+"</b><br>"+
+                    "Percentage worth in final grade: <b>"+(d.towards_final_grade)+"%</b><br>"+
+                    ((d.drop_lowest!=0)?"The lowest <b>"+d.drop_lowest+"</b> scores will dropped from this assignment group":'')+
+                    ((d.drop_highest!=0)?"The highest <b>"+d.drop_highest+"</b> scores will dropped from this assignment group":''))
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY +20) + "px");
             })

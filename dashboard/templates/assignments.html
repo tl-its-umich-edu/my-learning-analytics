@@ -20,7 +20,7 @@
 <div class="container" ng-controller="mainController" ng-app="visApp">
     <div class="row">
         <div class="column">
-            <span>Show assignments weight more than</span>
+            <span>Show assignments that weigh at least</span>
             <p ng-show="percentFilterEnabled">
                 <select class="percent-selection" ng-change="updatePercentFilter()" ng-model="percent_filter"
                         ng-options="p as p for p in percent"></select>
