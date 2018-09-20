@@ -490,6 +490,8 @@ var makeGraph = function(url) {
 
 var CURRENT_WEEK_PREFIX = "Now - Week ";
 var WEEK_PREFIX = "Week ";
+// default to show two weeks in advance
+var WEEK_IN_ADVANCE = 2;
 
 function cleanWeekInputNum(weekNumString)
 {
@@ -523,7 +525,7 @@ makeSlider = function () {
         }
         currentWeeKNumber = initResult.currentWeekNumber;
         // start week defaults to be two weeks ago
-        var twoWeeksBeforeCurrentWeek = WEEK_PREFIX + Math.max(1, currentWeeKNumber-2)
+        var twoWeeksBeforeCurrentWeek = WEEK_PREFIX + Math.max(1, currentWeeKNumber - WEEK_IN_ADVANCE)
 
         var i;
         var weekArray = [];
