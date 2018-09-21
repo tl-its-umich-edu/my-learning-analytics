@@ -31,7 +31,7 @@ var makeGraph = function () {
             .append('g');
 
         width = width - margin.left - margin.right,
-            height = height - margin.top - margin.bottom;
+        height = height - margin.top - margin.bottom;
 
         svg.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
@@ -49,6 +49,8 @@ var makeGraph = function () {
             .attr('class', 'axis')
             .attr('transform', 'translate(' + 0 + ',' + height + ')')
             .call(d3.axisBottom(xScale)
+                .tickFormat(function(d) {
+                return d+"%"})
                 .ticks(20, 's'))
 
 
@@ -82,11 +84,12 @@ var makeGraph = function () {
                     .duration(200)
                     .style("opacity", 1);
                 tooltip.html("Assignment: <b>"+(d.name) + "</b><br>" +
-                             "Due at: <b>" + (d.due_date_mod) +"</b><br>"+
-                             "Your grade is: <b>"+((!d.score)?"Not available":(d.score))+ "</b><br>"+
-                             "Total Points Possible: <b>"+(d.points_possible)+"</b><br>"+
-                             "Percentage worth in final grade: <b>"+(d.towards_final_grade)+"%</b><br>"+
-                             "All assignments in <b>"+d.assign_grp_name+"</b> group worth <b>"+d.weight+"%</b> to final grade")
+                    "Due at: <b>" + (d.due_date_mod) +"</b><br>"+
+                    "Your grade is: <b>"+((!d.score)?"Not available":(d.score))+ "</b><br>"+
+                    "Total Points Possible: <b>"+(d.points_possible)+"</b><br>"+
+                    "Percentage worth in final grade: <b>"+(d.towards_final_grade)+"%</b><br>"+
+                    ((d.drop_lowest!=0)?"The lowest <b>"+d.drop_lowest+"</b> scores will dropped from this assignment group":'')+
+                    ((d.drop_highest!=0)?"The highest <b>"+d.drop_highest+"</b> scores will dropped from this assignment group":''))
                     .style("left", (d3.event.pageX) + "px")
                     .style("top", (d3.event.pageY +20) + "px");
             })
