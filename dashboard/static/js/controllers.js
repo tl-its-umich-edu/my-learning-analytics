@@ -15,12 +15,13 @@ visApp.controller('mainController', ['$scope', 'Get','$location', '$anchorScroll
         Get.getData(dataFile).then(function(data) {
             $scope.data = data.data
             scrollId=1
-            $scope.data.forEach(function (e) {
+            $scope.data.find(function (e) {
                 current_week_indicator=e.due_date_items[0].assignment_items[0].current_week
                 if(current_week_indicator){
-                    scrollId=e.id;
+                    return scrollId=e.id;
                 }
-            });
+
+            })
             $location.hash(scrollId);
             $anchorScroll();
         });
