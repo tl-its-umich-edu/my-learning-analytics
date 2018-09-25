@@ -133,7 +133,7 @@ var makeGraph = function () {
                 xCoordinate=xScale(dprev_perc)
                 if(gradeIndicator.length==2) {
                     if (d.graded) {
-                        currentWeekXValue = xScale(perc_so_far);;
+                        currentWeekXValue = xScale(perc_so_far);
                     }
                     if (data.length == i + 1) {
                         maxPossibleWeekXValue = xScale(perc_so_far);
@@ -152,13 +152,14 @@ var makeGraph = function () {
             .attr("dy", "2.4em")
             .attr("dx",".6em")
             .text(function(d,i) {
-                if (parseFloat(d.percent_gotten)<2.0){
+                if (parseFloat(d.percent_gotten) < 2.0) {
                     return "";
                 }
-                if(d.name.length > 5)
-                    return d.name.substring(0,5)+'...';
-                else
+                if (d.name.length > 5) {
+                    return d.name.substring(0, 5) + '...';
+                } else {
                     return d.name;
+                }
             });
             if(currentWeekXValue.length!=0) {
                 var currentLine = svg.append("g")
