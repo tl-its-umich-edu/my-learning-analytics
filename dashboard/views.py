@@ -272,6 +272,7 @@ def assignment_progress(request):
     df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': UDW_COURSE_ID},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%Y-%m-%d'})
     if df.empty:
         return HttpResponse(json.dumps({}), content_type='application/json')
+    df.drop_duplicates(keep='first', inplace=True)
     df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
     df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
     df[['points_possible', 'group_points','weight','score']] = df[['points_possible', 'group_points','weight','score']].astype(float)
@@ -318,7 +319,7 @@ def assignment_view(request):
     df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': UDW_COURSE_ID},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%Y-%m-%d'})
     if df.empty:
         return HttpResponse(json.dumps([]), content_type='application/json')
-
+    df.drop_duplicates(keep='first', inplace=True)
     df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
     df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
     df[['points_possible', 'group_points','weight']] = df[['points_possible', 'group_points','weight']].astype(float)
