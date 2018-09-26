@@ -40,7 +40,6 @@ from django.conf.urls import include
 from django.conf.urls.static import static
 
 from . import views
-from . import cron
 
 urlpatterns = [
     url(r'^status', include('watchman.urls')),
@@ -66,14 +65,14 @@ urlpatterns = [
     # These methods are all for loading test data
     # TODO: Move these to cron job
     # load data from UDW
-    url(r'^update_with_udw_course', login_required(cron.update_with_udw_course), name='update_with_udw_course'),
-    url(r'^update_with_udw_file', login_required(cron.update_with_udw_file), name='update_with_udw_file'),
-    url(r'^update_with_bq_access', login_required(cron.update_with_bq_access), name='update_with_bq_access'),
-    url(r'^update_with_udw_user', login_required(cron.update_with_udw_user), name='update_with_udw_user'),
-    url(r'^update_assignment', login_required(cron.update_assignment), name='update_assignment'),
-    url(r'^update_groups', login_required(cron.update_groups), name='update_groups'),
-    url(r'^submission', login_required(cron.submission), name='submission'),
-    url(r'^weight_consideration', login_required(cron.weight_consideration), name='weight_consideration'),
+    #url(r'^update_with_udw_course', login_required(cron.update_with_udw_course), name='update_with_udw_course'),
+    #url(r'^update_with_udw_file', login_required(cron.update_with_udw_file), name='update_with_udw_file'),
+    #url(r'^update_with_bq_access', login_required(cron.update_with_bq_access), name='update_with_bq_access'),
+    #url(r'^update_with_udw_user', login_required(cron.update_with_udw_user), name='update_with_udw_user'),
+    #url(r'^update_assignment', login_required(cron.update_assignment), name='update_assignment'),
+    #url(r'^update_groups', login_required(cron.update_groups), name='update_groups'),
+    #url(r'^submission', login_required(cron.submission), name='submission'),
+    #url(r'^weight_consideration', login_required(cron.weight_consideration), name='weight_consideration'),
     url(r'^testloader', login_required(TemplateView.as_view(template_name='testloader.html')), name="testloader"),
     url(r'^su', include('django_su.urls')),
 

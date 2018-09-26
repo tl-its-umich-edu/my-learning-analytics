@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'dashboard',
-    'django_crontab',
+    'django_cron',
     'watchman'
 
 ]
@@ -70,6 +70,12 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+]
+
+CRON_CLASSES = [
+    "dashboard.cron.CourseCronJob",
+    "dashboard.cron.FileAccessCronJob",
+    "dashboard.cron.AssignmentCronJob",
 ]
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

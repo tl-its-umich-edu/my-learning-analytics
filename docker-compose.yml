@@ -26,7 +26,7 @@ services:
     container_name: student_dashboard_mysql
   web:
     build: .
-    command: bash -c "./start.sh"
+    command: bash -c "../start.sh"
     volumes:
       - .:/code
     ports:

@@ -10,11 +10,15 @@ if [ -z "${GUNICORN_PORT}" ]; then
     GUNICORN_PORT=5000
 fi
 
+if [ -z "${GUNICORN_TIMEOUT}" ]; then
+    GUNICORN_TIMEOUT=120
+fi
+
 echo "Waiting for DB"
 dockerize -wait tcp://${MYSQL_HOST}:${MYSQL_PORT} -timeout 15s
 
 echo Running python startups
-python manage.py crontab add; python manage.py migrate
+python manage.py migrate django_cron; python manage.py migrate
 
 # Start Gunicorn processes
 echo Starting Gunicorn.
