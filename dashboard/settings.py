@@ -291,5 +291,5 @@ else:
     AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
     LOGIN_REDIRECT_URL = '/'
     
-
+# Add any settings you need to be available to templates in this array
 SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG']
