@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.contrib import auth
 from django.db import connection as conn
@@ -316,9 +316,9 @@ def assignment_view(request, course_id=0):
     df['towards_final_grade']=df.apply(lambda x: percent_calculation(consider_weight, total_points,x), axis=1)
     df['calender_week']=df['due_date'].dt.week
     df['calender_week']=df['calender_week'].fillna(0).astype(int)
-    min=find_min_week(course_id)
-    max = df['calender_week'].max()
-    week_list = [x for x in range(min,max+1)]
+    min_week=find_min_week(course_id)
+    max_week=df['calender_week'].max()
+    week_list = [x for x in range(min_week,max_week+1)]
     df['week']=df['calender_week'].apply(lambda x: 0 if x == 0 else week_list.index(x)+1)
     df.sort_values(by='due_date', inplace = True)
     df['current_week']=df['calender_week'].apply(lambda x: find_current_week(x))
