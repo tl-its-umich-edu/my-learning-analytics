@@ -1,6 +1,6 @@
 var makeGraph = function () {
     d3.selectAll("#chart > *").remove();
-    $.getJSON("/grade_distribution", function (initResult) {
+    $.getJSON("/"+dashboard.course_id+"/grade_distribution", function (initResult) {
         data = initResult;
         if(_.isEmpty(data)){
             var gradeInfo = d3.select(".error").append("div")

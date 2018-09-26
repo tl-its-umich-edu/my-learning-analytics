@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-    <a href="/grades/">grade data</a> <br/>
-    <a href="/view_file_access_within_week/">File Access by Week</a> <br/>
-    <a href="/assignments/">assignments Planning view</a> <br/>
+    <a href="{{ settings.DEFAULT_COURSE_ID }}/grades/">grade data</a> <br/>
+    <a href="{{ settings.DEFAULT_COURSE_ID }}/view_file_access_within_week/">File Access by Week</a> <br/>
+    <a href="{{ settings.DEFAULT_COURSE_ID }}/assignments/">assignments Planning view</a> <br/>
 {% endblock %}

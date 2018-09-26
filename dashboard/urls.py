@@ -48,7 +48,6 @@ urlpatterns = [
 
     url('admin', admin.site.urls),
 
-    url(r'^get_current_week_number/', login_required(views.get_current_week_number), name='get_current_week_number'),
 
     # These URL's are for views, the accept an empty id
     url(r'(?P<course_id>[0-9]+|)/?grades', login_required(TemplateView.as_view(template_name='grades.html')), name="grades"),
@@ -62,6 +61,7 @@ urlpatterns = [
     url(r'^(?P<course_id>[0-9]+)/file_access_within_week', login_required(views.file_access_within_week), name='file_access_within_week'),
     url(r'^(?P<course_id>[0-9]+)/assignment_view', login_required(views.assignment_view), name='assignment_view'),
     url(r'^(?P<course_id>[0-9]+)/assignment_progress', login_required(views.assignment_progress), name='assignment_progress'),
+    url(r'^(?P<course_id>[0-9]+)/get_current_week_number', login_required(views.get_current_week_number), name='get_current_week_number'),
 
     # These methods are all for loading test data
     # TODO: Move these to cron job
