@@ -29,6 +29,9 @@ PROJECT_ROOT = os.path.abspath(
 
 LOGOUT_URL = '/accounts/logout'
 
+# Google Analytics ID
+GA_ID = config('GA_ID', default='')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
@@ -299,4 +302,5 @@ UDW_ID_PREFIX = config("UDW_ID_PREFIX", default=17700000000, cast=int)
 DEFAULT_COURSE_ID = config("CANVAS_COURSE_IDS", default=0, cast=int)
 
 # Add any settings you need to be available to templates in this array
-SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'UDW_ID_PREFIX','DEFAULT_COURSE_ID']
+SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX','DEFAULT_COURSE_ID']
+
