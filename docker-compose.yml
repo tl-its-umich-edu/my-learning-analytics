@@ -6,18 +6,18 @@ services:
     image: mysql:5.7.22
     restart: always
     environment:
-      - MYSQL_HOST=${MYSQL_HOST}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_HOST=student_dashboard_mysql
+      - MYSQL_DATABASE=student_dashboard
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=student_dashboard_user
+      - MYSQL_PASSWORD=student_dashboard_password
+      - MYSQL_PORT=3306
 
-      - UDW_ENDPOINT=${UDW_ENDPOINT}
-      - UDW_USER=${UDW_USER}
-      - UDW_PASSWORD=${UDW_PASSWORD}
-      - UDW_PORT=${UDW_PORT}
-      - UDW_DATABASE=${UDW_DATABASE}
+      - UDW_ENDPOINT=udw.prod.unizin.org
+      - UDW_USER=du82xkwzgq86
+      - UDW_PASSWORD=gMixsHCwu8y4wRM29F4aPlIfD
+      - UDW_PORT=5439
+      - UDW_DATABASE=dbx14by8tn
     entrypoint: ['docker-entrypoint.sh', '--default-authentication-plugin=mysql_native_password']
     ports:
       - "3306"
@@ -36,3 +36,14 @@ services:
     env_file:
       - .env
     container_name: student_dashboard
+  cron:
+    build:
+      context: .
+      dockerfile: Dockerfile.cron
+    volumes:
+      - .:/code
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+    container_name: student_dashboard_cron

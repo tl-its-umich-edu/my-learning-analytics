@@ -51,24 +51,51 @@ logger = logging.getLogger(__name__)
 UDW_ID_PREFIX = "17700000000"
 UDW_FILE_ID_PREFIX = "1770000000"
 
-# ## Connect to Student Dashboard's MySQL database
-#
-# ### Get enrolled users and files within site
-db_name = settings.DATABASES['default']['NAME']
-db_user = settings.DATABASES['default']['USER']
-db_password = settings.DATABASES['default']['PASSWORD']
-db_host = settings.DATABASES['default']['HOST']
-db_port = settings.DATABASES['default']['PORT']
+db_name = ""
+db_user = ""
+db_password = ""
+db_host = ""
+db_port = ""
 
-engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
-                       .format(db = db_name,  # your mysql database name
-                               user = db_user, # your mysql user for the database
-                               password = db_password, # password for user
-                               host = db_host,
-                               port = db_port))
+
+engine = null
+# set the current term id from config
+CURRENT_CANVAS_TERM_ID =""
+
+UDWCourseIds = ""
+
+def setup():
+    # ## Connect to Student Dashboard's MySQL database
+    #
+    # ### Get enrolled users and files within site
+    db_name = settings.DATABASES['default']['NAME']
+    db_user = settings.DATABASES['default']['USER']
+    db_password = settings.DATABASES['default']['PASSWORD']
+    db_host = settings.DATABASES['default']['HOST']
+    db_port = settings.DATABASES['default']['PORT']
+
+    logger.info("db-name:" + db_name);
+    logger.info("db-user:" + db_user);
+
+    engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
+                           .format(db = db_name,  # your mysql database name
+                                   user = db_user, # your mysql user for the database
+                                   password = db_password, # password for user
+                                   host = db_host,
+                                   port = db_port))
+    # set the current term id from config
+    CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
+
+    UDWCourseIds = getUDWCourseIds()
+
+RUN_EVERY_DAY = 2
+#24*60
+#  everyday
 
 # get UDW course id array from configuration file
 def getUDWCourseIds():
+    setup()
+
     # ### Get enrolled users and files within site
     canvasCourseIdString =config('CANVAS_COURSE_IDS', default="")
     if canvasCourseIdString:
@@ -76,14 +103,9 @@ def getUDWCourseIds():
         canvasCourseIdArray = [UDW_ID_PREFIX + canvasCourseId for canvasCourseId in canvasCourseIdArray]
     return canvasCourseIdArray
 
-UDWCourseIds = getUDWCourseIds()
-
-# set the current term id from config
-CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
-
-
 # the util function
 def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None):
+    setup()
 
     df = pd.read_sql(sql_string, conns['UDW'])
     logger.debug("df shape " + str(df.shape[0]) + " " + str(df.shape[1]))
@@ -105,7 +127,7 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
     return "inserted " + str(df.shape[0]) + " rows for course " + UDW_course_id + "; "
 
 class CourseCronJob(CronJobBase):
-    RUN_EVERY_DAY = 5 # everyday
+    setup()
 
     schedule = Schedule(run_every_mins=RUN_EVERY_DAY)
     code = 'dashboard.CourseCronJob'    # a unique code
@@ -168,7 +190,8 @@ class CourseCronJob(CronJobBase):
         self.update_with_udw_user()
 
 class FileAccessCronJob(CronJobBase):
-    RUN_EVERY_DAY = 24*60 # everyday
+
+    setup()
 
     schedule = Schedule(run_every_mins=RUN_EVERY_DAY)
     code = 'dashboard.FileAccessCronJob'    # a unique code
@@ -261,7 +284,8 @@ class FileAccessCronJob(CronJobBase):
         self.update_with_bq_access()
 
 class AssignmentCronJob(CronJobBase):
-    RUN_EVERY_DAY = 24*60 # everyday
+
+    setup()
 
     schedule = Schedule(run_every_mins=RUN_EVERY_DAY)
     code = 'dashboard.AssignmentCronJob'    # a unique code

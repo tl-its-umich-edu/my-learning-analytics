@@ -30,7 +30,7 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 # Todo the framework needs to remember the course
-CANVAS_COURSE_ID =config("CANVAS_COURSE_IDS", default="")
+CANVAS_COURSE_ID = "252307"
 UDW_ID_PREFIX = "17700000000"
 
 # strings for construct file download url
@@ -83,7 +83,7 @@ def get_current_week_number(request):
     logger.info(today)
 
     ## calculate the week number
-    currentWeekNumber = math.ceil((today - termStartDate.date()).days/7) + 1
+    currentWeekNumber = math.ceil((today - termStartDate.date()).days/7)
 
     # construct json
     data = {}
