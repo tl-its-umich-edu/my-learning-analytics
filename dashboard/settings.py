@@ -29,6 +29,9 @@ PROJECT_ROOT = os.path.abspath(
 
 LOGOUT_URL = '/accounts/logout'
 
+# Google Analytics ID
+GA_ID = config('GA_ID', default='')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
@@ -292,4 +295,4 @@ else:
     LOGIN_REDIRECT_URL = '/'
     
 # Add any settings you need to be available to templates in this array
-SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG']
+SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG','GA_ID',]
