@@ -18,18 +18,24 @@ td.table_container1 table tr td:nth-child(n) {
 /*}*/
 
 td.table_container2 table tr td:nth-child(n) {
-    width:50%;
+    /*width:50%;*/
     padding: 0;
 }
 
 .table {
     margin: 0 !important;
 }
+.table td {
+    padding: 0;
+}
 
-.table .assignments-info td:nth-child(1){
+
+
+.assignments-info td:nth-child(1){
     border-collapse: collapse;
     border-right:1px solid gray;
 }
+
 
 /*.table .assignments-info td{*/
 /*border: none;*/
@@ -45,21 +51,44 @@ div.table-style {
 }
 
 .bar_cell {
-    width: 60%;
+    width: 70%;
+    font-size: 75%;
     padding: 7px 0 !important;
     vertical-align: middle;
     color: #fff;
 }
 
 .bar_text {
-    text-align: right;
+    text-align: center;
 }
-
+[assign-title]:hover:after {
+    opacity: 1;
+    /*transition: all 0.1s ease 0.5s;*/
+    visibility: visible;
+    cursor:pointer;
+}
+[assign-title]:after {
+    content: attr(assign-title);
+    background-color: whitesmoke;
+    color: #111;
+    font-size: 75%;
+    position: absolute;
+    padding: 1px 5px 2px 5px;
+    bottom: .9em;
+    right:1em;
+    middle: 100%;
+    white-space: nowrap;
+    opacity: 0;
+    border: 1px solid #111111;
+    z-index: 99999;
+    visibility: hidden;
+}
+[assign-title] {
+    position: relative;
+}
 .container-bar{
     width:200px;
 }
-
-
 .bar{
     height:20px;
     width:0%;
@@ -87,12 +116,14 @@ div.table-style {
 .bar::after{
     content:attr(data-descr);
     color: black;
-    margin-left: 10px;
+    margin-left: 20px;
+    font-size: 14px;
+    text-align: center;
 }
 .bar:hover::after {
     content: attr(tooltip-info);
     position: absolute;
-    left: 0;
+    left: 10px;
     top: 2px;
     min-width: 200px;
     border: 1px #aaaaaa solid;
@@ -152,6 +183,7 @@ div.table-style {
     flex: 50%;
     padding: 10px;
 }
+/*progress bar stuff*/
 
 #chart text {
     /*fill: #000;*/
@@ -195,7 +227,7 @@ div.tooltip {
     background: none repeat scroll 0 0 #ffffff;
     border: 1px solid #6F257F;
     padding: 14px;
-    text-align: left;
+    /*text-align: left;*/
     pointer-events: none;
     /*!*pointer-events:none !imporatant;*!*/
 }

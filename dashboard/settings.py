@@ -27,6 +27,10 @@ PROJECT_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), ".."),
 )
 
+LOGOUT_URL = '/accounts/logout'
+
+# Google Analytics ID
+GA_ID = config('GA_ID', default='')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
@@ -87,6 +91,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.messages.context_processors.messages',
                 'django_su.context_processors.is_su',
+                'django_settings_export.settings_export',
             ],
         },
     },
@@ -201,12 +206,16 @@ if config('STUDENT_DASHBOARD_SAML', default='True', cast=bool):
     SAML2_URL_PATH = '/accounts/'
     # modify to use port request comes
     SAML2_URL_BASE = config('DJANGO_SAML2_URL_BASE', default='/accounts/')
+    SAML2_DEFAULT_IDP = config('DJANGO_SAML2_DEFAULT_IDP', default='')
+    # Append the query parameter for idp to the default if it's set, otherwise do nothing
+    if SAML2_DEFAULT_IDP:
+        SAML2_DEFAULT_IDP = '?idp=%s' % SAML2_DEFAULT_IDP
 
     INSTALLED_APPS += ('djangosaml2',)
     AUTHENTICATION_BACKENDS += (
         'djangosaml2.backends.Saml2Backend',
     )
-    LOGIN_URL = '%slogin/' % SAML2_URL_PATH
+    LOGIN_URL = '%slogin/%s' % (SAML2_URL_PATH, SAML2_DEFAULT_IDP)
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
     BASEDIR = path.dirname(path.abspath(__file__))
@@ -285,3 +294,5 @@ else:
     AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
     LOGIN_REDIRECT_URL = '/'
     
+# Add any settings you need to be available to templates in this array
+SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG','GA_ID',]

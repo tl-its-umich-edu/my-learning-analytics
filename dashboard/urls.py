@@ -16,21 +16,7 @@ Including another URLconf
 from django.apps import apps
 from django.conf.urls import url
 from django.contrib import admin
-
-# If djangosaml2 is installed, then import the login decorator
-# It's possible some other auth decorator could also be used
-
-# Otherwise for now provide a login_required that does nothing if this
-# decorator is not available
-
-if apps.is_installed('djangosaml2'):
-    from django.contrib.auth.decorators import login_required
-    from djangosaml2.views import echo_attributes
-else:
-    # On dev don't require login, but still import a view for testing
-    from django.contrib.auth import views as auth_views
-    def login_required(func):
-        return func
+from django.contrib.auth.decorators import login_required
 
 from django.views.static import serve
 from django.views.generic.base import TemplateView
@@ -80,6 +66,7 @@ urlpatterns = [
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if apps.is_installed('djangosaml2'):
+    from djangosaml2.views import echo_attributes
     urlpatterns += (
         # This URL *does* need a trailing slash because of the include
         url(r'^accounts/', include('djangosaml2.urls')),
@@ -88,6 +75,7 @@ if apps.is_installed('djangosaml2'):
         url(r'^accounts/logout', views.logout, name='auth_logout')
     )
 else:
+    from django.contrib.auth import views as auth_views
     # Login patterns for testing, SAML should be installed in prod
     urlpatterns += (
         url(r'^accounts/login', auth_views.LoginView.as_view(), name='login'),
