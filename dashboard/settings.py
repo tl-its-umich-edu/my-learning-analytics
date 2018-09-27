@@ -294,5 +294,13 @@ else:
     AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
     LOGIN_REDIRECT_URL = '/'
     
+# This is fixed from UDW
+UDW_ID_PREFIX = config("UDW_ID_PREFIX", default=17700000000, cast=int)
+
+# TODO: Select a default course for user from database, just here so things don't all break
+# This will probably need to move to views.py
+DEFAULT_COURSE_ID = config("CANVAS_COURSE_IDS", default=0, cast=int)
+
 # Add any settings you need to be available to templates in this array
-SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG','GA_ID',]
+SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX','DEFAULT_COURSE_ID']
+

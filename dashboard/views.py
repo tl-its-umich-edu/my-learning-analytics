@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.contrib import auth
 from django.db import connection as conn
@@ -29,28 +29,16 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
-# Todo the framework needs to remember the course
-CANVAS_COURSE_ID =config("CANVAS_COURSE_IDS", default="")
-UDW_ID_PREFIX = "17700000000"
-
 # strings for construct file download url
 CANVAS_FILE_PREFIX = config("CANVAS_FILE_PREFIX", default="")
 CANVAS_FILE_POSTFIX = config("CANVAS_FILE_POSTFIX", default="")
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
-
-UDW_COURSE_ID = UDW_ID_PREFIX + CANVAS_COURSE_ID
 
 # string for no grade
 NO_GRADE_STRING = "NO_GRADE"
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
-
-def home(request):
-    """
-    home page
-    """
-    return render(request, 'home.html')
 
 def gpa_map(grade):
     if grade is None:
@@ -70,7 +58,7 @@ def gpa_map(grade):
     else:
         return NO_GRADE_STRING
 
-def get_current_week_number(request):
+def get_current_week_number(request, course_id):
     # get term start date
     # TODO: term id hardcoded now
     termSqlString = "SELECT start_date FROM academic_terms where term_id = 2"
@@ -91,7 +79,7 @@ def get_current_week_number(request):
     return HttpResponse(json.dumps(data))
 
 # show percentage of users who read the file within prior n weeks
-def file_access_within_week(request):
+def file_access_within_week(request, course_id=0):
 
     current_user=request.user.get_username()
 
@@ -111,7 +99,7 @@ def file_access_within_week(request):
 
     # get total number of student within the course_id
     total_number_student_sql = "select count(*) from user where course_id = %(course_id)s"
-    total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": UDW_COURSE_ID})
+    total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": course_id})
     total_number_student = total_number_student_df.iloc[0,0]
     logger.debug("total student=" + str(total_number_student))
 
@@ -218,7 +206,7 @@ def file_access_within_week(request):
 
     return HttpResponse(output_df.to_json(orient='records'))
 
-def grade_distribution(request):
+def grade_distribution(request, course_id=0):
     logger.info(grade_distribution.__name__)
 
     current_user = request.user.get_username()
@@ -228,7 +216,7 @@ def grade_distribution(request):
     labels = ['F', 'D', 'C', 'B', 'A']
 
     grade_score_sql = "Select current_grade, final_grade FROM user where course_id=%(course_id)s"
-    df = pd.read_sql(grade_score_sql, conn, params={'course_id': UDW_COURSE_ID})
+    df = pd.read_sql(grade_score_sql, conn, params={'course_id': course_id})
     number_of_students = df.shape[0]
     df = df[df['current_grade'].notnull()]
     if not df.empty:
@@ -241,7 +229,7 @@ def grade_distribution(request):
         df_grade.reset_index(inplace=True)
         df_grade.columns = ['score', 'count']
         df_grade['grade'] = pd.cut(df_grade['score'].astype(float), bins=bins, labels=labels)
-        user_score, rounded_score=get_current_user_score(current_user)
+        user_score, rounded_score=get_current_user_score(current_user, course_id)
         df_grade['my_score'] = rounded_score
         df_grade['my_score_actual'] = user_score
         df_grade['tot_students'] = number_of_students
@@ -250,7 +238,7 @@ def grade_distribution(request):
         return HttpResponse(df_grade.to_json(orient='records'))
     else: return HttpResponse(json.dumps({}), content_type='application/json')
 
-def assignment_progress(request):
+def assignment_progress(request, course_id=0):
     logger.info(assignment_view.__name__)
 
     current_user = request.user.get_username()
@@ -262,14 +250,14 @@ def assignment_progress(request):
           "(select assign_id,name,assign_grp_name,local_date,points_possible,group_points,weight,drop_lowest,drop_highest  from" \
           "(select id as assign_id,assignment_group_id, local_date,name,points_possible from assignment where course_id = %(course_id)s) as a join" \
           "(select id,name as assign_grp_name,group_points, weight,drop_lowest,drop_highest  from assignment_groups) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
-    df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': UDW_COURSE_ID},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%Y-%m-%d'})
+    df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': course_id},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%Y-%m-%d'})
     if df.empty:
         return HttpResponse(json.dumps({}), content_type='application/json')
     df.drop_duplicates(keep='first', inplace=True)
     df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
     df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
     df[['points_possible', 'group_points','weight','score']] = df[['points_possible', 'group_points','weight','score']].astype(float)
-    consider_weight=is_weight_considered()
+    consider_weight=is_weight_considered(course_id)
     total_points=df['points_possible'].sum()
     def percent_calculation(consider_weight,total_points,row):
         if consider_weight:
@@ -295,7 +283,7 @@ def assignment_progress(request):
     return HttpResponse(df.to_json(orient='records'))
 
 
-def assignment_view(request):
+def assignment_view(request, course_id=0):
     logger.info(assignment_view.__name__)
 
     current_user = request.user.get_username()
@@ -309,21 +297,21 @@ def assignment_view(request):
           "(select assign_id,name,local_date,points_possible,group_points,weight,drop_lowest,drop_highest from"\
           "(select id as assign_id,assignment_group_id, local_date,name,points_possible from assignment where course_id = %(course_id)s) as a join"\
           "(select id, group_points, weight,drop_lowest,drop_highest from assignment_groups) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
-    df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': UDW_COURSE_ID},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%Y-%m-%d'})
+    df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': course_id},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%Y-%m-%d'})
     if df.empty:
         return HttpResponse(json.dumps([]), content_type='application/json')
     df.drop_duplicates(keep='first', inplace=True)
     df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
     df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
     df[['points_possible', 'group_points','weight']] = df[['points_possible', 'group_points','weight']].astype(float)
-    consider_weight=is_weight_considered()
+    consider_weight=is_weight_considered(course_id)
     total_points=df['points_possible'].sum()
     df['towards_final_grade']=df.apply(lambda x: percent_calculation(consider_weight, total_points,x), axis=1)
     df['calender_week']=df['due_date'].dt.week
     df['calender_week']=df['calender_week'].fillna(0).astype(int)
-    min=find_min_week()
-    max = df['calender_week'].max()
-    week_list = [x for x in range(min,max+1)]
+    min_week=find_min_week(course_id)
+    max_week=df['calender_week'].max()
+    week_list = [x for x in range(min_week,max_week+1)]
     df['week']=df['calender_week'].apply(lambda x: 0 if x == 0 else week_list.index(x)+1)
     df.sort_values(by='due_date', inplace = True)
     df['current_week']=df['calender_week'].apply(lambda x: find_current_week(x))
@@ -375,8 +363,8 @@ def percent_calculation(consider_weight,total_points,row):
         return round((row['points_possible']/total_points)*100,2)
 
 
-def find_min_week():
-    date = get_term_dates_for_course()
+def find_min_week(course_id):
+    date = get_term_dates_for_course(course_id)
     year,week,dow=date.isocalendar()
     return week;
 
@@ -389,25 +377,25 @@ def find_current_week(row):
     else: return False
 
 
-def is_weight_considered():
+def is_weight_considered(course_id):
     url = "select consider_weight from assignment_weight_consideration where course_id=%(course_id)s"
-    df = pd.read_sql(url, conn, params={"course_id": UDW_COURSE_ID})
+    df = pd.read_sql(url, conn, params={"course_id": course_id})
     value = df['consider_weight'].iloc[0]
     return value
 
 
-def get_term_dates_for_course():
+def get_term_dates_for_course(course_id):
     logger.info(get_term_dates_for_course.__name__)
     sql = "select a.start_date from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.term_id;"
-    df = pd.read_sql(sql, conn, params={"course_id": UDW_COURSE_ID}, parse_dates={'start_date': '%Y-%m-%d'})
+    df = pd.read_sql(sql, conn, params={"course_id": course_id}, parse_dates={'start_date': '%Y-%m-%d'})
     return df['start_date'].iloc[0]
 
 
-def get_current_user_score(current_user):
+def get_current_user_score(current_user, course_id):
     logger.info(get_current_user_score.__name__)
 
     user_score_sql= "select * from user where sis_name = %(current_user)s and course_id=%(course_id)s"
-    df = pd.read_sql(user_score_sql, conn, params={"current_user": current_user,'course_id': UDW_COURSE_ID})
+    df = pd.read_sql(user_score_sql, conn, params={"current_user": current_user,'course_id': course_id})
     df['rounded_score'] = df['current_grade'].astype(float).map(lambda x: int(x / 2) * 2)
     df.to_json('user.json',orient='records')
     # iloc is used to return single value(as there is single record) otherwise return a Series

@@ -16,7 +16,7 @@
     {% include "su/is_su.html" %}
     <header class="row">
         <div class="col-md-6 text-left">
-            <a href="/">Student Dashboard</a>
+            <a href="/">Student Dashboard</a>{% if course_id %} : {{ course_id }} {% endif %}
         </div>
         <div class="col-md-6 text-right">
             {% if user.is_authenticated %} 
@@ -44,6 +44,14 @@
     gtag('js', new Date());
 
     gtag('config', '{{ settings.GA_ID }}');
+</script>
+<script>
+<!-- Setup a top level js object to hold global values -->
+var dashboard = {
+    {% if course_id %}"course_id": '{{settings.UDW_ID_PREFIX}}'+'{{ course_id }}',
+{% else %}"course_id": 0,
+{% endif %}
+};
 </script>
 {% endif %}
 <script src="{% static 'moment/min/moment.min.js' %}"></script>
