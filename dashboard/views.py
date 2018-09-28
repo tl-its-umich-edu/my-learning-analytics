@@ -58,7 +58,7 @@ def gpa_map(grade):
     else:
         return NO_GRADE_STRING
 
-def get_current_week_number(request, course_id):
+def get_current_week_number(request):
     # get term start date
     # TODO: term id hardcoded now
     termSqlString = "SELECT start_date FROM academic_terms where term_id = 2"

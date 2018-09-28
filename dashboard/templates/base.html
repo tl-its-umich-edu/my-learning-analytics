@@ -45,15 +45,15 @@
 
     gtag('config', '{{ settings.GA_ID }}');
 </script>
+{% endif %}
 <script>
 <!-- Setup a top level js object to hold global values -->
 var dashboard = {
-    {% if course_id %}"course_id": '{{settings.UDW_ID_PREFIX}}'+'{{ course_id }}',
+{% if course_id %}"course_id": '{{settings.UDW_ID_PREFIX}}'+'{{ course_id }}',
 {% else %}"course_id": 0,
 {% endif %}
 };
 </script>
-{% endif %}
 <script src="{% static 'moment/min/moment.min.js' %}"></script>
 <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
 <script src="{% static 'angular/angular.js' %}"></script>

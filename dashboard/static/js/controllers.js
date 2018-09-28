@@ -11,7 +11,7 @@ visApp.controller('mainController', ['$scope', 'Get','$location', '$anchorScroll
     };
 
     function dataCall(){
-        var dataFile = '/'+dashboard.course_id+'/assignment_view?percent='+$scope.percent_filter;
+        var dataFile = '/api/v1/courses/'+dashboard.course_id+'/assignment_view?percent='+$scope.percent_filter;
         Get.getData(dataFile).then(function(data) {
             $scope.data = data.data
             scrollId=1
