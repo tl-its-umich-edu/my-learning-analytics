@@ -297,6 +297,7 @@ def assignment_progress(request):
         else: return row['towards_final_grade']
 
     df['percent_gotten']=df.apply(user_percent,axis=1)
+    df.sort_values(by=['graded','due_date_mod'], ascending=[False,True],inplace = True)
     df.reset_index(inplace=True)
     df.drop(columns=['index'],inplace=True)
     return HttpResponse(df.to_json(orient='records'))
