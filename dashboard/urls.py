@@ -34,20 +34,19 @@ urlpatterns = [
 
     url('admin', admin.site.urls),
 
-
     # These URL's are for views, the accept an empty id
-    url(r'(?P<course_id>[0-9]+|)/?grades', login_required(TemplateView.as_view(template_name='grades.html')), name="grades"),
-    url(r'(?P<course_id>[0-9]+|)/?assignments', login_required(TemplateView.as_view(template_name='assignments.html')), name="assignments"),
+    url(r'^courses/(?P<course_id>[0-9]+|)/?grades', login_required(TemplateView.as_view(template_name='grades.html')), name="grades"),
+    url(r'^courses/(?P<course_id>[0-9]+|)/?assignments', login_required(TemplateView.as_view(template_name='assignments.html')), name="assignments"),
 
-    url(r'(?P<course_id>[0-9]+|)/?view_file_access_within_week', login_required(TemplateView.as_view(template_name='view_file_access_within_week.html')), name="view_file_access_within_week"),
+    url(r'^courses/(?P<course_id>[0-9]+|)/?view_file_access_within_week', login_required(TemplateView.as_view(template_name='view_file_access_within_week.html')), name="view_file_access_within_week"),
 
     # Thse URL's are data patterns
     # get file access patterns
-    url(r'^(?P<course_id>[0-9]+)/grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
-    url(r'^(?P<course_id>[0-9]+)/file_access_within_week', login_required(views.file_access_within_week), name='file_access_within_week'),
-    url(r'^(?P<course_id>[0-9]+)/assignment_view', login_required(views.assignment_view), name='assignment_view'),
-    url(r'^(?P<course_id>[0-9]+)/assignment_progress', login_required(views.assignment_progress), name='assignment_progress'),
-    url(r'^(?P<course_id>[0-9]+)/get_current_week_number', login_required(views.get_current_week_number), name='get_current_week_number'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/file_access_within_week', login_required(views.file_access_within_week), name='file_access_within_week'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignment_view', login_required(views.assignment_view), name='assignment_view'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignment_progress', login_required(views.assignment_progress), name='assignment_progress'),
+    url(r'^api/v1/get_current_week_number', login_required(views.get_current_week_number), name='get_current_week_number'),
 
     # These methods are all for loading test data
     # TODO: Move these to cron job
