@@ -2,6 +2,10 @@
 ///////////////// Set-up SVG and wrappers ///////////////////
 /////////////////////////////////////////////////////////////
 
+// colors used for different file states
+var COLOR_ACCESSED_FILE ="steelblue",
+    COLOR_NOT_ACCESSED_FILE = "gray";
+
 //Added only for the mouse wheel
 var zoomer = d3.behavior.zoom()
     .on("zoom", null);
@@ -75,9 +79,9 @@ var makeGraph = function(url) {
             .attr("class", "bar")
             .attr("fill", function(d) {
                 if (d.self_access_count > 0 ) {
-                    return "steelblue";
+                    return COLOR_ACCESSED_FILE;
                 } else {
-                    return "orange";
+                    return COLOR_NOT_ACCESSED_FILE;
                 }
             })
             .attr("y", function(d) { return main_yScale(d.file_name); })
@@ -142,9 +146,9 @@ var makeGraph = function(url) {
         d3.select(".miniGroup").selectAll(".bar")
             .style("fill", function(d, i) {
                 if (d.self_access_count > 0 ) {
-                    return "steelblue";
+                    return COLOR_ACCESSED_FILE;
                 } else {
-                    return "orange";
+                    return COLOR_NOT_ACCESSED_FILE;
                 }
             })
             .style("opacity", function(d, i) {
@@ -421,9 +425,9 @@ var makeGraph = function(url) {
             .attr("height", mini_yScale.rangeBand())
             .attr("fill", function(d) {
                 if (d.self_access_count > 0 ) {
-                    return "steelblue";
+                    return COLOR_ACCESSED_FILE;
                 } else {
-                    return "orange";
+                    return COLOR_NOT_ACCESSED_FILE;
                 }
             });
 
@@ -442,8 +446,8 @@ var makeGraph = function(url) {
             legend_box_text_interval = 15,
             legend_interval = 20,
             legend_y = -50;
-        var legendLabels = [ ["Files I haven't viewed", "orange"],
-            ["Files I've viewed", "steelblue"] ];
+        var legendLabels = [ ["Files I haven't viewed", COLOR_NOT_ACCESSED_FILE],
+            ["Files I've viewed", COLOR_ACCESSED_FILE] ];
         var legend = svg.append("g")
             .attr("class", "legend")
             //.attr("height", 100)
