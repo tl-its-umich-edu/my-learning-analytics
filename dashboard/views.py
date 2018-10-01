@@ -33,11 +33,9 @@ logger = logging.getLogger(__name__)
 CANVAS_FILE_PREFIX = config("CANVAS_FILE_PREFIX", default="")
 CANVAS_FILE_POSTFIX = config("CANVAS_FILE_POSTFIX", default="")
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
-# This is fixed from UDW
-UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000")
 
 # string for no grade
-GRADE_A=">=90"
+GRADE_A="90-100"
 GRADE_B="80-89"
 GRADE_C="70-79"
 GRADE_LOW="low_grade"
@@ -181,7 +179,7 @@ def file_access_within_week(request, course_id=0):
     selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user})
 
     output_df = output_df.join(selfDf.set_index('file_id_name'), on='file_id_name', how='left')
-    output_df["total_count"] = output_df.apply(lambda row: row[">=90"]+row["80-89"]+row["70-79"] + row["low_grade"]+row.NO_GRADE, axis=1)
+    output_df["total_count"] = output_df.apply(lambda row: row["90-100"]+row["80-89"]+row["70-79"] + row["low_grade"]+row.NO_GRADE, axis=1)
 
     if (grade != "all"):
         # drop all other grades
