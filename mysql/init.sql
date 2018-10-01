@@ -90,5 +90,6 @@ INSERT INTO academic_terms (NAME, start_date, end_date) VALUES ('FALL 2018', '20
 INSERT INTO course (id, name, term_id) VALUES ('17700000000230745', 'STATS 250 SU 2018', 1);
 INSERT INTO course (id, name, term_id) VALUES ('17700000000252307', 'SI 110 001 FA 2018', 2);
 INSERT INTO course (id, name, term_id) VALUES ('17700000000245664', 'SI 664 002 FA 2018', 2);
+INSERT INTO course (id, name, term_id) VALUES ('17700000000283292', 'HMP 654 001 FA 2018', 2);
 
 COMMIT;

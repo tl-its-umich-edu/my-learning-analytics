@@ -16,13 +16,13 @@
     {% include "su/is_su.html" %}
     <header class="row">
         <div class="col-md-6 text-left">
-            <a href="/">Student Dashboard</a>
+            <a href="/">Student Dashboard</a>{% if course_id %} : {{ course_id }} {% endif %}
         </div>
         <div class="col-md-6 text-right">
             {% if user.is_authenticated %} 
-                <a href="/accounts/logout">Logout</a> ({{ user.get_username }})  
+                <a href="{{ settings.LOGOUT_URL }}">Logout</a> ({{ user.get_username }})  
             {% else %} 
-                <a href="/accounts/login">Login</a>
+                <a href="{{ settings.LOGIN_URL }}">Login</a>
             {% endif %}  
             {% if user.is_superuser %} 
                 | <a href="/admin">Admin</a> 
@@ -35,13 +35,24 @@
     <footer><hr>Copyright 2018 University of Michigan ITS Teaching and Learning</footer>
 </body>
 <!-- Common Javascript -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-124181744-1"></script>
+{% if settings.GA_ID %}
+<!-- Google analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ settings.GA_ID }}"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
 
-    gtag('config', 'UA-124181744-1');
+    gtag('config', '{{ settings.GA_ID }}');
+</script>
+{% endif %}
+<script>
+<!-- Setup a top level js object to hold global values -->
+var dashboard = {
+{% if course_id %}"course_id": '{{settings.UDW_ID_PREFIX}}'+'{{ course_id }}',
+{% else %}"course_id": 0,
+{% endif %}
+};
 </script>
 <script src="{% static 'moment/min/moment.min.js' %}"></script>
 <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
