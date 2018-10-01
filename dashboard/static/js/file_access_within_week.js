@@ -30,8 +30,6 @@ var makeGraph = function(url) {
         main_yAxis,
         textScale;
 
-    var padding = 100; // space around the chart, not including labels
-
     d3.selectAll("div#chart > *").remove();
 
     var tip = d3.tip()
@@ -90,6 +88,7 @@ var makeGraph = function(url) {
                 return main_xScale(d.total_count); });
 
         // append text to bars
+        // only when the bar is fully displayed
         svg.selectAll(".label").remove();
         var texts = svg.selectAll(".label")
             .data(data)
@@ -98,10 +97,12 @@ var makeGraph = function(url) {
         texts.attr("class", "label")
             .attr("x", function(d) { return main_xScale(d.total_count)+3 + main_margin.left; })
             .attr("y", function(d) { return main_yScale(d.file_name) + main_yScale.rangeBand()/2 + main_margin.top;})
-            .attr("dx", -3)
+            .attr("dx", -10)
             .attr("dy", ".35em")
             .attr("text-anchor", "end")
-            .text(function(d) { return d.total_count; });
+            .text(function(d) {
+                return (((main_yScale(d.file_name) + main_yScale.rangeBand()/2) < main_height) && ((main_yScale(d.file_name) + main_yScale.rangeBand()/2) > 0))? d.total_count:"";
+            });
 
         bar.on("mouseover", tip.show)
             .on("mouseout", tip.hide);
@@ -115,6 +116,23 @@ var makeGraph = function(url) {
     //First function that runs on a brush move
     function brushmove() {
         var extent = brush.extent();
+
+        /////////////////////////////////////////////////////////////
+        ///////////////////// Update the axes ///////////////////////
+        /////////////////////////////////////////////////////////////
+
+        //Reset the part that is visible on the big chart
+        var originalRange = main_yZoom.range();
+        main_yZoom.domain( extent );
+
+        //Update the domain of the x & y scale of the big bar chart
+        main_yScale.domain(data.map(function(d) { return d.file_name; }));
+        main_yScale.rangeBands( [ main_yZoom(originalRange[0]), main_yZoom(originalRange[1]) ], 0.4, 0);
+
+        //Update the y axis of the big chart
+        d3.select(".mainGroup")
+            .select(".y.axis")
+            .call(main_yAxis);
 
         //Which bars are still "selected"
         var selected = mini_yScale.domain()
@@ -140,25 +158,7 @@ var makeGraph = function(url) {
         //Update the label size
         d3.selectAll(".y.axis text")
             .style("font-size", textScale(selected.length));
-
-        /////////////////////////////////////////////////////////////
-        ///////////////////// Update the axes ///////////////////////
-        /////////////////////////////////////////////////////////////
-
-        //Reset the part that is visible on the big chart
-        var originalRange = main_yZoom.range();
-
-        main_yZoom.domain( extent );
-
-        //Update the domain of the x & y scale of the big bar chart
-        main_yScale.domain(data.map(function(d) { return d.file_name; }));
-        main_yScale.rangeBands( [ main_yZoom(originalRange[0]), main_yZoom(originalRange[1]) ], 0.4, 0);
-
-        //Update the y axis of the big chart
-        d3.select(".mainGroup")
-            .select(".y.axis")
-            .call(main_yAxis);
-
+    /*
         //Find the new max of the bars to update the x scale
         var newMaxXScale = d3.max(data, function(d) { return selected.indexOf(d.file_name) > -1 ? d.total_count : 0; });
         main_xScale.domain([0, newMaxXScale]);
@@ -168,7 +168,7 @@ var makeGraph = function(url) {
             .select(".x.axis")
             .transition().duration(50)
             .call(main_xAxis);
-
+    */
         //Update the big bar chart
         update();
 
@@ -242,10 +242,6 @@ var makeGraph = function(url) {
             .attr("height", main_height + main_margin.top + main_margin.bottom)
             .call(zoomer)
             .on("wheel.zoom", scroll)
-            //.on("mousewheel.zoom", scroll)
-            //.on("DOMMouseScroll.zoom", scroll)
-            //.on("MozMousePixelScroll.zoom", scroll)
-            //Is this needed?
             .on("mousedown.zoom", null)
             .on("touchstart.zoom", null)
             .on("touchmove.zoom", null)
@@ -288,15 +284,20 @@ var makeGraph = function(url) {
         main_xAxis = d3.svg.axis()
             .scale(main_xScale)
             .orient("bottom")
-            .ticks(4)
-            //.tickSize(0)
-            .outerTickSize(0);
+            .ticks(6)
+            //.tickSize(4)
+            .outerTickSize(8);
 
         //Add group for the x axis
-        var xAxisG = d3.select(".mainGroupWrapper")
+        xlabel=d3.select(".mainGroupWrapper")
             .append("g")
             .attr("class", "x axis")
-            .attr("transform", "translate(" + 0 + "," + main_height + ")");
+            .attr("transform", "translate(" + 0 + "," + (main_height + 5) + ")");
+        xlabel.append("text")
+            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+            .attr("transform", "translate(" + main_width/2 + ", " + 40 + ")")  // center below axis
+            .text("Percentage of All Students in the Course")
+            .style("font-size", "14px");
 
         //Create y axis object
         main_yAxis = d3.svg.axis()
@@ -310,22 +311,6 @@ var makeGraph = function(url) {
                 .attr("class", "y axis")
                 .attr("transform", "translate(-5,0)");
 
-        var half_width = main_width/2;
-        var bottom_x_axis = (main_height+padding);
-
-        mainGroup.append("text")
-            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            //.attr("transform", "translate("+ half_width +","  + bottom_x_axis +")")  // centre below axis
-            .attr("transform", "translate(300," + (main_height+35)+ ")")  // center below axis
-            .text("Percentage of Students")
-            .style("font-size", "14px");
-
-        // now add titles to the axes
-        /*mainGroup.append("text")
-            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-            .attr("transform", "translate("+ (- padding/2) +","+ 0 +")")  // text is drawn off the screen top left, move down and out and rotate
-            .text("File Name")
-            .style("font-size", "14px");*/
 
         /////////////////////////////////////////////////////////////
         /////////////////////// Update scales ///////////////////////
@@ -338,15 +323,12 @@ var makeGraph = function(url) {
         mini_yScale.domain(data.map(function(d) { return d.file_name; }));
 
         //Create the visual part of the y axis
-        d3.select(".mainGroup")
-            .select(".y.axis")
-            .call(main_yAxis)
-            .selectAll("g")
-            .append("svg:foreignObject");
+        d3.select(".mainGroup").select(".y.axis").call(main_yAxis);
 
         d3.selectAll(".y .tick text").each(function(d) {
             var parts = d.split("|");
             const a = d3.select(this.parentNode).append("a")
+                .attr("xlink:target","_blank")
                 .attr("xlink:href", parts[0])//change this for your function
                 .style("fill", "steelblue");
             a.node().appendChild(this);
@@ -358,6 +340,9 @@ var makeGraph = function(url) {
             var parts = d.split("|");
             return parts[1];
         });
+
+
+        d3.select(".mainGroupWrapper").select(".x.axis").call(main_xAxis);
 
         /////////////////////////////////////////////////////////////
         ///////////////////// Label axis scales /////////////////////
@@ -373,16 +358,16 @@ var makeGraph = function(url) {
         /////////////////////////////////////////////////////////////
         //What should the first extent of the brush become - a bit arbitrary this
         var brushExtent = Math.max( 1, Math.min( 20, Math.round(data.length*0.2) ) );
-        if (data.length <=5) {
+        /*if (data.length <=5) {
             // for small number of data, choose the whole range
             brushExtent = data.length -1;
-        }
-
+        }*/
 
         brush = d3.svg.brush()
             .y(mini_yScale)
-            .extent([mini_yScale(data[0].file_name), mini_yScale(data[brushExtent].file_name) + mini_yScale.rangeBand()])
+            .extent([mini_yScale(data[0].file_name), mini_yScale(data[brushExtent].file_name)])// + mini_yScale.rangeBand()])
             .on("brush", brushmove);
+
         //Set up the visual part of the brush
         gBrush = d3.select(".brushGroup").append("g")
             .attr("class", "brush")
@@ -394,7 +379,6 @@ var makeGraph = function(url) {
             .append("path")
             .attr("d", d3.svg.symbol().type("triangle-up").size(20))
             .attr("transform", function(d,i) {
-
                 return i?"translate(" + (mini_width/2) + "," + 4 + ") rotate(180)" : "translate(" + (mini_width/2) + "," + -4 + ") rotate(0)";
             });
         gBrush.selectAll("rect")
@@ -403,6 +387,16 @@ var makeGraph = function(url) {
         gBrush.select(".background")
             .on("mousedown.brush", brushcenter)
             .on("touchstart.brush", brushcenter);
+
+        defs = svg.append("defs")
+
+        //Add the clip path for the main bar chart
+        defs.append("clipPath")
+            .attr("id", "clip")
+            .append("rect")
+            .attr("x", -main_margin.left)
+            .attr("width", main_width + main_margin.left)
+            .attr("height", main_height);
 
         /////////////////////////////////////////////////////////////
         /////////////// Set-up the mini bar chart ///////////////////
@@ -433,12 +427,10 @@ var makeGraph = function(url) {
                 }
             });
 
-
-
-
         //EXIT
         mini_bar.exit()
             .remove();
+
         //Start the brush
         gBrush.call(brush.event);
 
@@ -450,15 +442,15 @@ var makeGraph = function(url) {
             legend_box_text_interval = 15,
             legend_interval = 20,
             legend_y = -50;
-        var colors =	[ ["Files I haven't viewed", "orange"],
+        var legendLabels = [ ["Files I haven't viewed", "orange"],
             ["Files I've viewed", "steelblue"] ];
         var legend = svg.append("g")
             .attr("class", "legend")
-            /*.attr("height", 100)
-            .attr("width", 100)*/
+            //.attr("height", 100)
+            //.attr("width", 100)
             .attr('transform', 'translate(-100,50)');
 
-        var legendRect = legend.selectAll('rect').data(colors);
+        var legendRect = legend.selectAll('rect').data(legendLabels);
 
         legendRect.enter()
             .append("rect")
@@ -473,7 +465,7 @@ var makeGraph = function(url) {
                 return d[1];
             });
 
-        var legendText = legend.selectAll('text').data(colors);
+        var legendText = legend.selectAll('text').data(legendLabels);
         legendText.enter()
             .append("text")
         legendText
@@ -551,7 +543,7 @@ makeSlider = function () {
                 var valuesParts = values.split(",");
                 // argument values represents current values
                 var grade = $('#grade').val();
-                $("#slider_label").html(" students from <b>" + valuesParts[0] + "</b> to <b>" + valuesParts[1] + "</b>");
+                $("#slider_label").html(" from <b>" + valuesParts[0] + "</b> to <b>" + valuesParts[1] + "</b>");
                 makeGrapBasedOnGradeAndSlide(grade, valuesParts);
             }
         });

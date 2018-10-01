@@ -33,8 +33,14 @@ logger = logging.getLogger(__name__)
 CANVAS_FILE_PREFIX = config("CANVAS_FILE_PREFIX", default="")
 CANVAS_FILE_POSTFIX = config("CANVAS_FILE_POSTFIX", default="")
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
+# This is fixed from UDW
+UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000")
 
 # string for no grade
+GRADE_A=">=90"
+GRADE_B="80-89"
+GRADE_C="70-79"
+GRADE_LOW="low_grade"
 NO_GRADE_STRING = "NO_GRADE"
 
 # how many decimal digits to keep
@@ -45,18 +51,14 @@ def gpa_map(grade):
         return NO_GRADE_STRING;
     # convert to float
     grade_float = float(grade)
-    if grade_float < 60:
-        return 'F'
-    elif grade_float < 70:
-        return 'D'
-    elif grade_float < 80:
-        return 'C'
-    elif grade_float < 90:
-        return 'B'
-    elif grade_float > 90:
-        return 'A'
+    if grade_float >= 90:
+        return GRADE_A
+    elif grade_float >=80:
+        return GRADE_B
+    elif grade_float >=70:
+        return GRADE_C
     else:
-        return NO_GRADE_STRING
+        return GRADE_LOW
 
 def get_current_week_number(request):
     # get term start date
@@ -71,7 +73,7 @@ def get_current_week_number(request):
     logger.info(today)
 
     ## calculate the week number
-    currentWeekNumber = math.ceil((today - termStartDate.date()).days/7) + 1
+    currentWeekNumber = math.ceil((today - termStartDate.date()).days/7)
 
     # construct json
     data = {}
@@ -101,14 +103,15 @@ def file_access_within_week(request, course_id=0):
     total_number_student_sql = "select count(*) from user where course_id = %(course_id)s"
     total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": course_id})
     total_number_student = total_number_student_df.iloc[0,0]
-    logger.debug("total student=" + str(total_number_student))
+    logger.debug("course_id_string" + course_id + " total student=" + str(total_number_student))
 
     ## TODO: term id hardcoded now
     termSqlString = "SELECT start_date FROM academic_terms where term_id = 2"
     termDf = pd.read_sql(termSqlString, conn)
     term_start_date =termDf.iloc[0]['start_date']
-    start = term_start_date + timedelta(days=((week_num_start - 1) * 7 + term_start_date.weekday()))
-    end = term_start_date + timedelta(days=((week_num_end-1) * 7 + term_start_date.weekday()))
+    start = term_start_date + timedelta(days=(week_num_start * 7))
+    end = term_start_date + timedelta(days=(week_num_end * 7))
+    logger.debug("term_start=" + str(term_start_date) + " start=" + str(start) + " end=" + str(end))
 
 
     # get time range based on week number passed in via request
@@ -156,7 +159,7 @@ def file_access_within_week(request, course_id=0):
     #df.reset_index(inplace=True)
 
     # zero filled dataframe with file name as row name, and grade as column name
-    output_df=pd.DataFrame(0.0, index=file_id_name, columns=['A','B','C','D','F', 'NO_GRADE'])
+    output_df=pd.DataFrame(0.0, index=file_id_name, columns=[GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING])
     output_df=output_df.rename_axis('file_id_name')
 
     for index, row in df.iterrows():
@@ -178,11 +181,11 @@ def file_access_within_week(request, course_id=0):
     selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user})
 
     output_df = output_df.join(selfDf.set_index('file_id_name'), on='file_id_name', how='left')
-    output_df["total_count"] = output_df.apply(lambda row: row.A + row.B+row.C+row.D+row.F+row.NO_GRADE, axis=1)
+    output_df["total_count"] = output_df.apply(lambda row: row[">=90"]+row["80-89"]+row["70-79"] + row["low_grade"]+row.NO_GRADE, axis=1)
 
     if (grade != "all"):
         # drop all other grades
-        grades = ['A', 'B', 'C', 'D', 'F', NO_GRADE_STRING]
+        grades = [GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING]
         for i_grade in grades:
             if (i_grade==grade):
                 output_df["total_count"] = output_df[i_grade]
