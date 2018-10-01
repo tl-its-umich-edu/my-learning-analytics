@@ -33,7 +33,6 @@ logger = logging.getLogger(__name__)
 CANVAS_FILE_PREFIX = config("CANVAS_FILE_PREFIX", default="")
 CANVAS_FILE_POSTFIX = config("CANVAS_FILE_POSTFIX", default="")
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
-# This is fixed from UDW
 
 # string for no grade
 GRADE_A="90-100"
@@ -212,33 +211,19 @@ def grade_distribution(request, course_id=0):
     logger.info(grade_distribution.__name__)
 
     current_user = request.user.get_username()
-
-    # Later this could be coming from a table specific to the course
-    bins = [0, 50, 65, 78, 89, 100]
-    labels = ['F', 'D', 'C', 'B', 'A']
-
-    grade_score_sql = "Select current_grade, final_grade FROM user where course_id=%(course_id)s"
-    df = pd.read_sql(grade_score_sql, conn, params={'course_id': course_id})
+    grade_score_sql = "select current_grade,(select current_grade from user where sis_name=" \
+                      "%(current_user)s and course_id=%(course_id)s) as current_user_grade from user where course_id=%(course_id)s;"
+    df = pd.read_sql(grade_score_sql, conn, params={"current_user": current_user,'course_id': course_id})
+    if df.empty:
+        return HttpResponse(json.dumps({}), content_type='application/json')
     number_of_students = df.shape[0]
     df = df[df['current_grade'].notnull()]
-    if not df.empty:
-        average_grade = df['current_grade'].astype(float).mean().round(2)
-        standard_deviation = df['current_grade'].astype(float).std().round(2)
-        # Round half to even
-        df['rounded_score'] = df['current_grade'].astype(float).map(lambda x: int(x / 2) * 2)
-        df_grade = df.groupby(['rounded_score'])[["rounded_score"]].count()
-        df_grade.columns = [['count']]
-        df_grade.reset_index(inplace=True)
-        df_grade.columns = ['score', 'count']
-        df_grade['grade'] = pd.cut(df_grade['score'].astype(float), bins=bins, labels=labels)
-        user_score, rounded_score=get_current_user_score(current_user, course_id)
-        df_grade['my_score'] = rounded_score
-        df_grade['my_score_actual'] = user_score
-        df_grade['tot_students'] = number_of_students
-        df_grade['grade_stdev'] = standard_deviation
-        df_grade['grade_avg'] = average_grade
-        return HttpResponse(df_grade.to_json(orient='records'))
-    else: return HttpResponse(json.dumps({}), content_type='application/json')
+    average_grade = df['current_grade'].astype(float).mean().round(2)
+    standard_deviation = df['current_grade'].astype(float).std().round(2)
+    df['tot_students'] = number_of_students
+    df['grade_stdev'] = standard_deviation
+    df['grade_avg'] = average_grade
+    return HttpResponse(df.to_json(orient='records'))
 
 def assignment_progress(request, course_id=0):
     logger.info(assignment_view.__name__)
@@ -392,19 +377,6 @@ def get_term_dates_for_course(course_id):
     sql = "select a.start_date from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.term_id;"
     df = pd.read_sql(sql, conn, params={"course_id": course_id}, parse_dates={'start_date': '%Y-%m-%d'})
     return df['start_date'].iloc[0]
-
-
-def get_current_user_score(current_user, course_id):
-    logger.info(get_current_user_score.__name__)
-
-    user_score_sql= "select * from user where sis_name = %(current_user)s and course_id=%(course_id)s"
-    df = pd.read_sql(user_score_sql, conn, params={"current_user": current_user,'course_id': course_id})
-    df['rounded_score'] = df['current_grade'].astype(float).map(lambda x: int(x / 2) * 2)
-    df.to_json('user.json',orient='records')
-    # iloc is used to return single value(as there is single record) otherwise return a Series
-    user_score = df['current_grade'].iloc[0]
-    rounded_score = df['rounded_score'].iloc[0]
-    return user_score,rounded_score
 
 def logout(request):
     logger.info('User %s logging out.' % request.user.username)
