@@ -226,7 +226,7 @@ var makeGraph = function(url) {
 
     }//scroll
 
-    $.getJSON(url || "/file_access_within_week?week_num_start=1&week_num_end=0", function (initResult) {
+    $.getJSON(url || "/api/v1/courses/"+dashboard.course_id+"/file_access_within_week?week_num_start=1&week_num_end=0", function (initResult) {
         if (initResult.length === 0 )
         {
             // return no data
@@ -507,7 +507,7 @@ function makeGrapBasedOnGradeAndSlide(grade, silderValues)
     // parse to get start and end week number
     var startWeek = cleanWeekInputNum(silderValues[0]);
     var endWeek = cleanWeekInputNum(silderValues[1]);
-    makeGraph('/file_access_within_week?week_num_start=' + startWeek + "&week_num_end=" + endWeek + "&grade=" + grade);
+    makeGraph('/api/v1/courses/'+dashboard.course_id+'/file_access_within_week?week_num_start=' + startWeek + "&week_num_end=" + endWeek + "&grade=" + grade);
 }
 
 var mySlider;
@@ -518,7 +518,7 @@ makeSlider = function () {
     // default to be the first week
     var currentWeeKNumber = 1;
 
-    $.getJSON("/get_current_week_number", function (initResult) {
+    $.getJSON("/api/v1/get_current_week_number", function (initResult) {
         if (initResult.length === 0) {
             // return no data
             return "no data";
