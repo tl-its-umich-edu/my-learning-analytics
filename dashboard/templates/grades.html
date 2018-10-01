@@ -6,23 +6,16 @@
     {% endblock %}
 
 {% block content %}
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <div class="navbar-header mastHead">
-            <h1 class="navbar-brand collapse-nav"><span>Student Dashboard</span></h1>
-        </div></div></nav>
-<div class = "grades">
+<br>
+<h4 style="text-align: center">Grade Distribution</h4>
 <div class="grade-info"></div>
-<div id="chart"></div>
+<div id="chart">
 <div class ="error"></div>
 </div>
 {% endblock %}
 
 {% block js %}
-<script src="{% static 'd3/d3.js' %}"></script>
-<script src="{% static 'd3-tip/dist/index.js' %}"></script>
-
-<script src="/static/js/d3.legend.js"></script>
+<script src="{% static 'd3-v4/build/d3.min.js' %}"></script>
 <script src="/static/js/grade_distribution.js"></script>
 {% endblock %}
 
