@@ -214,7 +214,7 @@ def grade_distribution(request, course_id=0):
     grade_score_sql = "select current_grade,(select current_grade from user where sis_name=" \
                       "%(current_user)s and course_id=%(course_id)s) as current_user_grade from user where course_id=%(course_id)s;"
     df = pd.read_sql(grade_score_sql, conn, params={"current_user": current_user,'course_id': course_id})
-    if df.empty:
+    if df.empty or df['current_grade'].isnull().all():
         return HttpResponse(json.dumps({}), content_type='application/json')
     number_of_students = df.shape[0]
     df = df[df['current_grade'].notnull()]
