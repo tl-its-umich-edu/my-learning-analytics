@@ -16,7 +16,7 @@
     {% include "su/is_su.html" %}
     <header class="row">
         <div class="col-md-6 text-left">
-            <a href="/">Student Dashboard</a>{% if course_id %} : {{ course_id }} {% endif %}
+            <a href="/">Student Dashboard</a>{% if course_id %} : {{ course_name }} {% endif %}
         </div>
         <div class="col-md-6 text-right">
             {% if user.is_authenticated %} 
