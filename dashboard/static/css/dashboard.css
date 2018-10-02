@@ -31,9 +31,10 @@
     overflow: hidden;
     background: #fff;
     width: 269px;
-    display: inline-block;
     vertical-align: top;
     margin: 0 36px 36px 0;
+	cursor: pointer !important; 
+	display: inline-block;
 }
 
 .UnDashboardCard:hover {
