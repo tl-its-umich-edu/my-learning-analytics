@@ -8,7 +8,7 @@ if __name__ == "__main__":
 
     # Regex for which modules to ignore warnings from
     IGNORE_MODULES = 'djangosaml2'
-    warnings.filterwarnings("ignore", module=IGNORE_MODULES)
+    warnings.filterwarnings("ignore", module=IGNORE_MODULES, category=DeprecationWarning)
 
     from django.core.management import execute_from_command_line
 
