@@ -87,3 +87,11 @@ if apps.is_installed('registration'):
         # This URL *does* need a trailing slash because of the include
         url(r'^accounts/', include('registration.backends.default.urls')),
     )
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += (
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+        # For django versions after 2.0:
+        #path('__debug__/', include(debug_toolbar.urls)),
+    ) 
