@@ -10,4 +10,59 @@
     background-image: linear-gradient(135deg, rgba(0, 0, 0, .04) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, .04) 50%, rgba(0, 0, 0, .04) 75%, transparent 75%, transparent);
     text-align: center;
     z-index: 5000;
+}
 
+.col-md-6 {
+	color:#fff;
+	background-color: #008ee2;
+	margin-bottom:40px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.col-md-6 a {
+	color:#fff;
+}
+
+.UnDashboardCard {
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+    width: 269px;
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 36px 36px 0;
+}
+
+.UnDashboardCard:hover {
+	box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+}
+
+.UnDashboardCard_Header {
+    box-sizing: border-box;
+    height: 146px;
+    border: 1px solid rgba(0,0,0,0.1);
+	background-color: #f6f6f6;
+}
+
+.UnDashboardCard_Title {
+	padding: 10px;
+	background-color: #008ee2;
+	color: #fff;
+}
+
+.UnDashboardCard_Description {
+	height: 40px;
+	padding: 10px;
+	margin-bottom: 5px;
+	font-size: .6em;
+	color:#000;
+}
+
+.UnDashboardCard_Header img {
+	display: block;
+	margin:0 auto;
+	margin-top:10px;
+}
