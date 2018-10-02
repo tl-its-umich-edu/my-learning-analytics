@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
     <div class="d-flex justify-content-center flex-wrap">
-		<div class="UnDashboardCard" onclick="window.location='/courses/{{ settings.DEFAULT_COURSE_ID }}/grades/';">
+		<div class="UnDashboardCard" tabindex="0" role="button" onKeyPress="window.location='/courses/{{ settings.DEFAULT_COURSE_ID }}/grades/'" onclick="window.location='/courses/{{ settings.DEFAULT_COURSE_ID }}/grades/';">
 			<div id="Undashboard_GradeTool" class="UnDashboardCard_Header"> 
 		    <img src="../static/images/grade_distribution_Icon.png" width="247" height="126" alt="Chart with grade distributions"/> </div>
 			<div class="UnDashboardCard_Title">
@@ -13,7 +13,7 @@
 			</div>
 		</div>
 
-		<div class="UnDashboardCard" onclick="window.location='/courses/{{ settings.DEFAULT_COURSE_ID }}/view_file_access_within_week/';">
+		<div class="UnDashboardCard" tabindex="1" role="button"  onKeyPress="window.location='/courses/{{ settings.DEFAULT_COURSE_ID }}/view_file_access_within_week/'" onclick="window.location='/courses/{{ settings.DEFAULT_COURSE_ID }}/view_file_access_within_week/';">
 			<div id="Undashboard_FileTool" class="UnDashboardCard_Header">
 				<img src="../static/images/File_access_trends_icon.png" width="247" height="126" alt="Chart with files accessed by peers"/>
 		</div>
@@ -25,7 +25,7 @@
 			</div>
 		</div>
 
-		<div class="UnDashboardCard" onclick="window.location='/courses/{{ settings.DEFAULT_COURSE_ID }}/assignments/';">
+		<div class="UnDashboardCard" tabindex="2" role="button"  onKeyPress="window.location='/courses/{{ settings.DEFAULT_COURSE_ID }}/assignments/'" onclick="window.location='/courses/{{ settings.DEFAULT_COURSE_ID }}/assignments/';">
 			<div id="Undashboard_AssignmentTool" class="UnDashboardCard_Header">
     	    <img src="../static/images/assignments_planning_icon.png" width="247" height="126" alt="Chart with assignment relative weights"/> </div>
 			<div class="UnDashboardCard_Title">
