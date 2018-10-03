@@ -12,6 +12,8 @@
     z-index: 5000;
 }
 
+/* Home.html style */
+
 .col-md-6 {
 	color:#fff;
 	background-color: #008ee2;
@@ -31,9 +33,10 @@
     overflow: hidden;
     background: #fff;
     width: 269px;
-    display: inline-block;
     vertical-align: top;
     margin: 0 36px 36px 0;
+	cursor: pointer !important; 
+	display: inline-block;
 }
 
 .UnDashboardCard:hover {
@@ -65,4 +68,11 @@
 	display: block;
 	margin:0 auto;
 	margin-top:10px;
+}
+
+/* Footer Style */
+
+footer {
+	font-size: .7em;
+	color:#999999;
 }
