@@ -306,6 +306,7 @@ def assignment_view(request, course_id=0):
     df['graded']=df['graded_date'].notnull()
     df['due_date_mod'] =df['due_date'].astype(str).apply(lambda x:x.split()[0])
     df['due_dates']= pd.to_datetime(df['due_date_mod']).dt.strftime('%m/%d')
+    df['due_dates'].replace('NaT','N/A',inplace=True)
     df.drop(columns=['assignment_id','due_date','graded_date'], inplace=True)
     df2 = df[df['towards_final_grade']>=percent_selection]
     df2.reset_index(inplace=True)
