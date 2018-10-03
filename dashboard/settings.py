@@ -60,7 +60,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'dashboard',
     'django_crontab',
-    'watchman'
+    'watchman',
+    'macros',
 
 ]
 
