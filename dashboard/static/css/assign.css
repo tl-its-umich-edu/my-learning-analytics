@@ -91,9 +91,7 @@ div.table-style {
 }
 .bar{
     height:20px;
-    width:var(--bar-width);
     font-size: 40%;
-    /*padding: 3px;*/
     vertical-align:middle;
     position: relative;
     cursor:pointer;
@@ -116,7 +114,7 @@ div.table-style {
 .bar::after{
     content:attr(data-descr);
     color: black;
-    margin-left: calc(100% - var(--bar-width) + 6px);
+    margin-left: 100%;
     font-size: 13px;
     text-align: center;
     display: inline;
