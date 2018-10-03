@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}What Students Are Reading {% endblock %}
 {% load static %}
 {% block css %}
 <link rel="stylesheet" href="/static/css/rSlider.min.css">
@@ -19,9 +20,6 @@
 {% endblock %}
 {% block content %}
     <!-- week slider -->
-    <h4 class="text-center">What Students Are Reading</h4>
-
-
     <input type="text" id="slider" class="slider">
 
     <input type="hidden" name="slider_num" id="slider_num" />
