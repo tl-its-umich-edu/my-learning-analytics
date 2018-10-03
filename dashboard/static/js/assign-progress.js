@@ -18,7 +18,7 @@ var makeGraph = function () {
             height = 100;
 
         var margin = {
-            top: 10,
+            top: 20,
             right: 30,
             bottom: 30,
             left: 30
@@ -49,6 +49,7 @@ var makeGraph = function () {
         var x_axis = svg.append('g')
             .attr('class', 'axis')
             .attr('transform', 'translate(' + 0 + ',' + height + ')')
+            .attr('stroke-width','2')
             .call(d3.axisBottom(xScale)
                 .tickFormat(function(d) {
                     return d+"%"
@@ -162,6 +163,11 @@ var makeGraph = function () {
                 }
             });
             if(currentWeekXValue.length!=0) {
+                if(currentWeekXValue<6){
+                  dxValue = "2em";
+                }else {
+                    dxValue=".7em";
+                }
                 var currentLine = svg.append("g")
                 currentLine.append('line')
                     .attr('x1', currentWeekXValue)
@@ -173,9 +179,9 @@ var makeGraph = function () {
                 currentLine.append('text')
                     .attr('text-anchor', 'middle')
                     .attr("x", currentWeekXValue - 30)
-                    .attr("dx", '.1em')
-                    .attr("y", ".1em")
-                    .attr("dy", ".9em")
+                    .attr("dx", dxValue)
+                    // .attr("y", ".1em")
+                    // .attr("dy", ".9em")
                     .attr('stroke', 'orange')
                     .attr("background-color", 'whitesmoke')
                     .text('Current')
@@ -192,9 +198,9 @@ var makeGraph = function () {
             maxLine.append('text')
                 .attr('text-anchor', 'middle')
                 .attr("x", maxPossibleWeekXValue - 50)
-                .attr("dx", '.1em')
-                .attr("y", ".1em")
-                .attr("dy", ".9em")
+                .attr("dx", '.8em')
+                // .attr("y", ".1em")
+                // .attr("dy", ".9em")
                 .attr('stroke', 'green')
                 .text('Max Possible')
         }
