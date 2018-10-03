@@ -12,6 +12,8 @@
     z-index: 5000;
 }
 
+/* Home.html style */
+
 .col-md-6 {
 	color:#fff;
 	background-color: #008ee2;
@@ -67,6 +69,8 @@
 	margin:0 auto;
 	margin-top:10px;
 }
+
+/* Footer Style */
 
 footer {
 	font-size: .7em;
