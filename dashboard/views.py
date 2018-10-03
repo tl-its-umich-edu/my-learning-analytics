@@ -243,14 +243,10 @@ def assignment_progress(request, course_id=0):
     df.drop_duplicates(keep='first', inplace=True)
     df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
     df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
+    df[['points_possible','group_points']]=df[['points_possible','group_points']].fillna(0)
     df[['points_possible', 'group_points','weight','score']] = df[['points_possible', 'group_points','weight','score']].astype(float)
     consider_weight=is_weight_considered(course_id)
     total_points=df['points_possible'].sum()
-    def percent_calculation(consider_weight,total_points,row):
-        if consider_weight:
-            return round((row['points_possible']/row['group_points'])*row['weight'],2)
-        else:
-            return round((row['points_possible']/total_points)*100,2)
     df['towards_final_grade']=df.apply(lambda x: percent_calculation(consider_weight, total_points,x), axis=1)
     df.sort_values(by='due_date', inplace = True)
     df['graded']=df['graded_date'].notnull()
@@ -291,6 +287,7 @@ def assignment_view(request, course_id=0):
     df.drop_duplicates(keep='first', inplace=True)
     df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
     df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
+    df[['points_possible','group_points']]=df[['points_possible','group_points']].fillna(0)
     df[['points_possible', 'group_points','weight']] = df[['points_possible', 'group_points','weight']].astype(float)
     consider_weight=is_weight_considered(course_id)
     total_points=df['points_possible'].sum()
@@ -346,7 +343,7 @@ def assignment_view(request, course_id=0):
 
 
 def percent_calculation(consider_weight,total_points,row):
-    if consider_weight:
+    if consider_weight and row['group_points']!=0:
         return round((row['points_possible']/row['group_points'])*row['weight'],2)
     else:
         return round((row['points_possible']/total_points)*100,2)

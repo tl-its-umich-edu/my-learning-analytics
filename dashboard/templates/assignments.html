@@ -57,21 +57,22 @@
                                         <td class="bar_cell">
                                             <div ng-if="assignments.graded && assignments.points_possible != 0"
                                                  data-descr={{assignments.towards_final_grade}}%
-                                                 class="bar blue-bar" style="--bar-width:{{assignments.towards_final_grade}}%;"
+
+                                                 class="bar blue-bar" style="width:{{assignments.towards_final_grade}}%;"
                                                  tooltip-info="Score: {{assignments.score==null?'NA':assignments.score}}/{{assignments.points_possible}}
                                                          {{assignments.drop_lowest!=0?'.The lowest ' +assignments.drop_lowest+' scores will be dropped from this assignment group':''}}
                                                          {{assignments.drop_highest!=0?'.The highest '+assignments.drop_highest+' scores will be dropped from this assignment group':''}}">
                                             </div>
                                             <div ng-if="!assignments.graded && assignments.points_possible != 0"
                                                  data-descr={{assignments.towards_final_grade}}%
-                                                 class="bar grey-bar" style="--bar-width:{{assignments.towards_final_grade}}%;"
+                                                 class="bar grey-bar" style="width:{{assignments.towards_final_grade}}%;"
                                                  tooltip-info="Score: {{assignments.score==null?'NA':assignments.score}}/{{assignments.points_possible}}
                                                          {{assignments.drop_lowest!=0?'.The lowest ' +assignments.drop_lowest+' scores will be dropped from this assignment group':''}}
                                                          {{assignments.drop_highest!=0?'.The highest '+assignments.drop_highest+' scores will be dropped from this assignment group':''}}">
                                             </div>
                                             <div ng-if="assignments.points_possible == 0"
                                                  data-descr={{assignments.towards_final_grade}}%
-                                                 class="bar zero-weight" style="--bar-width:{{assignments.towards_final_grade}}%;"
+                                                 class="bar zero-weight" style="width:{{assignments.towards_final_grade}}%;"
                                                  tooltip-info="No Points">
                                             </div>
                                         </td>
