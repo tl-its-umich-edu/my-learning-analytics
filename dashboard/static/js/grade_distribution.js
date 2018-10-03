@@ -158,20 +158,16 @@ var makeGraph = function () {
                 .text("a simple tooltip");
         }
 
-        if(myscore==null){
-            var gradeInfo = d3.select(".grade-info").append("div")
-                .attr("class", "grade-details")
-                .html('<span>Number of students: <b>' + totalStudents + '</b></span><br>' +
-                    '<span>Average grade: <b>' + gradeAverage + '</b></span><br>' +
-                    '<span>Standard deviation of grades: <b>' + standardGradeDeviation + '</b></span><br>'+
-                     '<span>**You don\'t seems to have your grade yet</span><br>')
-        }else{
-            var gradeInfo = d3.select(".grade-info").append("div")
-                .attr("class", "grade-details")
-                .html('<span>Number of students: <b>' + totalStudents + '</b></span><br>' +
-                    '<span>Average grade: <b>' + gradeAverage + '</b></span><br>' +
-                    '<span>Standard deviation of grades: <b>' + standardGradeDeviation + '</b></span><br>')
+        var gradeDetailsHtml = 
+            '<span>Number of students: <b>' + totalStudents + '</b></span><br>' +
+            '<span>Average grade: <b>' + gradeAverage + '</b></span><br>' +
+            '<span>Standard deviation of grades: <b>' + standardGradeDeviation + '</b></span><br>';
+        if(myscore==null) {
+            gradeDetailsHtml += '<span><b>There are no grades yet for you in this course</b></span><br>';
         }
+        var gradeInfo = d3.select(".grade-info").append("div")
+            .attr("class", "grade-details")
+            .html(gradeDetailsHtml);
 
     }).fail(function(jqXHR, textStatus, errorThrown) {
         var gradeInfo = d3.select(".error").append("div")

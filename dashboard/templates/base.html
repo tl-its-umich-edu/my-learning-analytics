@@ -16,7 +16,7 @@
     {% include "su/is_su.html" %}
     <header class="row">
         <div class="col-md-6 text-left">
-            <a href="/">Student Dashboard</a>{% if course_id %} : {{ course_id }} {% endif %}
+            <a href="/">Student Dashboard</a>{% if course_id %} : {{ course_name }} {% endif %}
         </div>
         <div class="col-md-6 text-right">
             {% if user.is_authenticated %} 
@@ -32,7 +32,7 @@
     </header>
     {% block content %}
     {% endblock %}
-    <footer><hr>Copyright 2018 University of Michigan ITS Teaching and Learning</footer>
+    <footer><hr>Copyright © 2018 The Regents of the University of Michigan</footer>
 </body>
 <!-- Common Javascript -->
 {% if settings.GA_ID %}

@@ -85,7 +85,7 @@ PRIMARY KEY (course_id)
 
 -- insert terms
 INSERT INTO academic_terms (NAME, start_date, end_date) VALUES ('SUMMER 2018', '2018-06-27 04:00:00',  '2018-08-17 23:59:59' );
-INSERT INTO academic_terms (NAME, start_date, end_date) VALUES ('FALL 2018', '2018-09-04 04:00:00',  '2018-12-24 23:59:59' );
+INSERT INTO academic_terms (NAME, start_date, end_date) VALUES ('FALL 2018', '2018-09-03 04:00:00',  '2018-12-24 23:59:59' );
 -- inert course
 INSERT INTO course (id, name, term_id) VALUES ('17700000000230745', 'STATS 250 SU 2018', 1);
 INSERT INTO course (id, name, term_id) VALUES ('17700000000252307', 'SI 110 001 FA 2018', 2);

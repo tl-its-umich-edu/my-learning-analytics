@@ -66,30 +66,6 @@
     color: #fff
 }
 
-.Skippednull {
-    stroke: orange;
-    fill: orange;
-}
-
-.Completedtrue {
-    stroke: green;
-    fill: green;
-}
-
-.Completedfalse {
-    stroke: red;
-    fill: red;
-}
-
-
-.bar.Skippednull:hover {
-    fill: darkorange;
-}
-
-.bar.Completedtrue:hover {
-    fill: darkgreen;
-}
-
 .bar.count1 {
     /*stroke-dasharray:5,5*/
 }
