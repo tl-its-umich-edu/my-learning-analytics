@@ -27,7 +27,8 @@
             {% use_macro title %}
         </div>
         <div class="col-md-4 text-right">
-            {% if user.is_authenticated %} 
+            {% if user.is_authenticated %}
+                <span id="help"></span>
                 <a href="{{ settings.LOGOUT_URL }}">Logout</a> ({{ user.get_username }})  
             {% else %} 
                 <a href="{{ settings.LOGIN_URL }}">Login</a>
@@ -50,7 +51,6 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', '{{ settings.GA_ID }}');
 </script>
 {% endif %}
@@ -66,6 +66,22 @@ var dashboard = {
 <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
 <script src="{% static 'angular/angular.js' %}"></script>
 <script src="{% static 'underscore/underscore-min.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        url = window.location.href;
+        var help_link='https://sites.google.com/umich.edu/student-dashboard-help/home';
+        if(url.includes('grades')){
+            help_link='https://sites.google.com/umich.edu/student-dashboard-help/home/grade-distribution';
+        }
+        if(url.includes('assignments')){
+            help_link='https://sites.google.com/umich.edu/student-dashboard-help/home/assignment-planning-tool';
+        }
+        if(url.includes('file')){
+            help_link='https://sites.google.com/umich.edu/student-dashboard-help/home/what-students-are-reading';
+        }
+        $('<a href='+help_link+' style="padding-right:10px">Help</a>').insertAfter($('#help'));
+    });
+</script>
 {% block js %}
 {% endblock %}
 </html>
