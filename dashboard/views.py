@@ -251,6 +251,8 @@ def assignment_progress(request, course_id=0):
     df.sort_values(by='due_date', inplace = True)
     df['graded']=df['graded_date'].notnull()
     df['due_date_mod'] =df['due_date'].astype(str).apply(lambda x:x.split()[0])
+    df['due_dates']= pd.to_datetime(df['due_date_mod']).dt.strftime('%m/%d')
+    df['due_dates'].replace('NaT','N/A',inplace=True)
     df.drop(columns=['assignment_id','due_date','graded_date'], inplace=True)
     df = df[df['towards_final_grade']>0.0]
 
