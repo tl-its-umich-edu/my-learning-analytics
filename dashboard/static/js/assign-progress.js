@@ -87,25 +87,19 @@ var makeGraph = function () {
                     .duration(200)
                     .style("opacity", 1);
                 var coordinates = d3.mouse(this);
+                var tooltipVal="Assignment: <b>" + (d.name) + "</b><br>" +
+                    "Due at: <b>" + (d.due_dates) + "</b><br>" +
+                    "Your grade is: <b>" + ((!d.score) ? "Not available" : (d.score)) + "</b><br>" +
+                    "Total Points Possible: <b>" + (d.points_possible) + "</b><br>" +
+                    "Percentage worth in final grade: <b>" + (d.towards_final_grade) + "%</b><br>" +
+                    ((d.drop_lowest != 0) ? "The lowest <b>" + d.drop_lowest + "</b> scores will dropped from this assignment group" : '') +
+                    ((d.drop_highest != 0) ? "The highest <b>" + d.drop_highest + "</b> scores will dropped from this assignment group" : '');
                 if ((width - coordinates[0]) < 50) {
-                    tooltip.html("Assignment: <b>" + (d.name) + "</b><br>" +
-                        "Due at: <b>" + (d.due_date_mod) + "</b><br>" +
-                        "Your grade is: <b>" + ((!d.score) ? "Not available" : (d.score)) + "</b><br>" +
-                        "Total Points Possible: <b>" + (d.points_possible) + "</b><br>" +
-                        "Percentage worth in final grade: <b>" + (d.towards_final_grade) + "%</b><br>" +
-                        ((d.drop_lowest != 0) ? "The lowest <b>" + d.drop_lowest + "</b> scores will dropped from this assignment group" : '') +
-                        ((d.drop_highest != 0) ? "The highest <b>" + d.drop_highest + "</b> scores will dropped from this assignment group" : ''))
+                    tooltip.html(tooltipVal)
                         .style("left", (d3.event.pageX)-(d3.event.pageY*2) + "px")
                         .style("top", (d3.event.pageY)-150 + "px");
-
                 } else {
-                    tooltip.html("Assignment: <b>" + (d.name) + "</b><br>" +
-                        "Due at: <b>" + (d.due_date_mod) + "</b><br>" +
-                        "Your grade is: <b>" + ((!d.score) ? "Not available" : (d.score)) + "</b><br>" +
-                        "Total Points Possible: <b>" + (d.points_possible) + "</b><br>" +
-                        "Percentage worth in final grade: <b>" + (d.towards_final_grade) + "%</b><br>" +
-                        ((d.drop_lowest != 0) ? "The lowest <b>" + d.drop_lowest + "</b> scores will dropped from this assignment group" : '') +
-                        ((d.drop_highest != 0) ? "The highest <b>" + d.drop_highest + "</b> scores will dropped from this assignment group" : ''))
+                    tooltip.html(tooltipVal)
                         .style("left", (d3.event.pageX)+ "px")
                         .style("top", (d3.event.pageY) + "px");
                 }
