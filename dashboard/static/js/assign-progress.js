@@ -1,6 +1,6 @@
 var makeGraph = function () {
     d3.selectAll("#chart > *").remove();
-    $.getJSON("/assignment_progress", function (initResult) {
+    $.getJSON("/api/v1/courses/"+dashboard.course_id+"/assignment_progress", function (initResult) {
         data = initResult;
         if(_.isEmpty(data)){
             var gradeInfo = d3.select("#chart").append("div")
@@ -18,7 +18,7 @@ var makeGraph = function () {
             height = 100;
 
         var margin = {
-            top: 10,
+            top: 20,
             right: 30,
             bottom: 30,
             left: 30
@@ -49,6 +49,7 @@ var makeGraph = function () {
         var x_axis = svg.append('g')
             .attr('class', 'axis')
             .attr('transform', 'translate(' + 0 + ',' + height + ')')
+            .attr('stroke-width','2')
             .call(d3.axisBottom(xScale)
                 .tickFormat(function(d) {
                     return d+"%"
@@ -86,25 +87,19 @@ var makeGraph = function () {
                     .duration(200)
                     .style("opacity", 1);
                 var coordinates = d3.mouse(this);
+                var tooltipVal="Assignment: <b>" + (d.name) + "</b><br>" +
+                    "Due at: <b>" + (d.due_dates) + "</b><br>" +
+                    "Your grade is: <b>" + ((!d.score) ? "Not available" : (d.score)) + "</b><br>" +
+                    "Total Points Possible: <b>" + (d.points_possible) + "</b><br>" +
+                    "Percentage worth in final grade: <b>" + (d.towards_final_grade) + "%</b><br>" +
+                    ((d.drop_lowest != 0) ? "The lowest <b>" + d.drop_lowest + "</b> scores will dropped from this assignment group" : '') +
+                    ((d.drop_highest != 0) ? "The highest <b>" + d.drop_highest + "</b> scores will dropped from this assignment group" : '');
                 if ((width - coordinates[0]) < 50) {
-                    tooltip.html("Assignment: <b>" + (d.name) + "</b><br>" +
-                        "Due at: <b>" + (d.due_date_mod) + "</b><br>" +
-                        "Your grade is: <b>" + ((!d.score) ? "Not available" : (d.score)) + "</b><br>" +
-                        "Total Points Possible: <b>" + (d.points_possible) + "</b><br>" +
-                        "Percentage worth in final grade: <b>" + (d.towards_final_grade) + "%</b><br>" +
-                        ((d.drop_lowest != 0) ? "The lowest <b>" + d.drop_lowest + "</b> scores will dropped from this assignment group" : '') +
-                        ((d.drop_highest != 0) ? "The highest <b>" + d.drop_highest + "</b> scores will dropped from this assignment group" : ''))
+                    tooltip.html(tooltipVal)
                         .style("left", (d3.event.pageX)-(d3.event.pageY*2) + "px")
                         .style("top", (d3.event.pageY)-150 + "px");
-
                 } else {
-                    tooltip.html("Assignment: <b>" + (d.name) + "</b><br>" +
-                        "Due at: <b>" + (d.due_date_mod) + "</b><br>" +
-                        "Your grade is: <b>" + ((!d.score) ? "Not available" : (d.score)) + "</b><br>" +
-                        "Total Points Possible: <b>" + (d.points_possible) + "</b><br>" +
-                        "Percentage worth in final grade: <b>" + (d.towards_final_grade) + "%</b><br>" +
-                        ((d.drop_lowest != 0) ? "The lowest <b>" + d.drop_lowest + "</b> scores will dropped from this assignment group" : '') +
-                        ((d.drop_highest != 0) ? "The highest <b>" + d.drop_highest + "</b> scores will dropped from this assignment group" : ''))
+                    tooltip.html(tooltipVal)
                         .style("left", (d3.event.pageX)+ "px")
                         .style("top", (d3.event.pageY) + "px");
                 }
@@ -162,6 +157,11 @@ var makeGraph = function () {
                 }
             });
             if(currentWeekXValue.length!=0) {
+                if(currentWeekXValue<6){
+                  dxValue = "2em";
+                }else {
+                    dxValue=".7em";
+                }
                 var currentLine = svg.append("g")
                 currentLine.append('line')
                     .attr('x1', currentWeekXValue)
@@ -173,9 +173,9 @@ var makeGraph = function () {
                 currentLine.append('text')
                     .attr('text-anchor', 'middle')
                     .attr("x", currentWeekXValue - 30)
-                    .attr("dx", '.1em')
-                    .attr("y", ".1em")
-                    .attr("dy", ".9em")
+                    .attr("dx", dxValue)
+                    // .attr("y", ".1em")
+                    // .attr("dy", ".9em")
                     .attr('stroke', 'orange')
                     .attr("background-color", 'whitesmoke')
                     .text('Current')
@@ -192,9 +192,9 @@ var makeGraph = function () {
             maxLine.append('text')
                 .attr('text-anchor', 'middle')
                 .attr("x", maxPossibleWeekXValue - 50)
-                .attr("dx", '.1em')
-                .attr("y", ".1em")
-                .attr("dy", ".9em")
+                .attr("dx", '.8em')
+                // .attr("y", ".1em")
+                // .attr("dy", ".9em")
                 .attr('stroke', 'green')
                 .text('Max Possible')
         }

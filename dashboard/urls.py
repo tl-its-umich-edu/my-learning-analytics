@@ -16,21 +16,7 @@ Including another URLconf
 from django.apps import apps
 from django.conf.urls import url
 from django.contrib import admin
-
-# If djangosaml2 is installed, then import the login decorator
-# It's possible some other auth decorator could also be used
-
-# Otherwise for now provide a login_required that does nothing if this
-# decorator is not available
-
-if apps.is_installed('djangosaml2'):
-    from django.contrib.auth.decorators import login_required
-    from djangosaml2.views import echo_attributes
-else:
-    # On dev don't require login, but still import a view for testing
-    from django.contrib.auth import views as auth_views
-    def login_required(func):
-        return func
+from django.contrib.auth.decorators import login_required
 
 from django.views.static import serve
 from django.views.generic.base import TemplateView
@@ -42,25 +28,24 @@ from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
-    url(r'^status', include('watchman.urls')),
-    url(r'^$', views.home, name='home'),
+    url(r'^$', TemplateView.as_view(template_name='home.html'), name = 'home'),
+    url('status', include('watchman.urls')),
 
-    url(r'^admin', admin.site.urls),
+    url('admin', admin.site.urls),
 
-    url(r'^get_current_week_number/', login_required(views.get_current_week_number), name='get_current_week_number'),
+    # These URL's are for views, the accept an empty id
+    url(r'^courses/(?P<course_id>[0-9]+|)/?grades', login_required(TemplateView.as_view(template_name='grades.html')), name="grades"),
+    url(r'^courses/(?P<course_id>[0-9]+|)/?assignments', login_required(TemplateView.as_view(template_name='assignments.html')), name="assignments"),
 
-    # These URL's are for views
-    url(r'^files', login_required(TemplateView.as_view(template_name='files.html')), name="files"),
-    url(r'^grades', login_required(TemplateView.as_view(template_name='grades.html')), name="grades"),
-    url(r'^assignments', login_required(TemplateView.as_view(template_name='assignments.html')), name="assignments"),
+    url(r'^courses/(?P<course_id>[0-9]+|)/?view_file_access_within_week', login_required(TemplateView.as_view(template_name='view_file_access_within_week.html')), name="view_file_access_within_week"),
 
     # Thse URL's are data patterns
     # get file access patterns
-    url(r'^grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
-    url(r'^file_access_within_week', login_required(views.file_access_within_week), name='file_access_within_week'),
-    url(r'^view_file_access_within_week', login_required(TemplateView.as_view(template_name='view_file_access_within_week.html')), name="view_file_access_within_week"),
-    url(r'^assignment_view', login_required(views.assignment_view), name='assignment_view'),
-    url(r'^assignment_progress', login_required(views.assignment_progress), name='assignment_progress'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/file_access_within_week', login_required(views.file_access_within_week), name='file_access_within_week'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignment_view', login_required(views.assignment_view), name='assignment_view'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignment_progress', login_required(views.assignment_progress), name='assignment_progress'),
+    url(r'^api/v1/get_current_week_number', login_required(views.get_current_week_number), name='get_current_week_number'),
 
     # These methods are all for loading test data
     # TODO: Move these to cron job
@@ -79,6 +64,7 @@ urlpatterns = [
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if apps.is_installed('djangosaml2'):
+    from djangosaml2.views import echo_attributes
     urlpatterns += (
         # This URL *does* need a trailing slash because of the include
         url(r'^accounts/', include('djangosaml2.urls')),
@@ -87,6 +73,7 @@ if apps.is_installed('djangosaml2'):
         url(r'^accounts/logout', views.logout, name='auth_logout')
     )
 else:
+    from django.contrib.auth import views as auth_views
     # Login patterns for testing, SAML should be installed in prod
     urlpatterns += (
         url(r'^accounts/login', auth_views.LoginView.as_view(), name='login'),

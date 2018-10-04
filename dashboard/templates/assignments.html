@@ -1,39 +1,35 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Assignments Preparation view{% endblock %}
+{% block title %}Assignment Planning Tool{% endblock %}
 {% block css %}
     <link rel="stylesheet" href="/static/css/assign.css">
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-    <div class="navbar-header mastHead">
-        <h1 class="navbar-brand collapse-nav"><span>Student Dashboard</span></h1>
-    </div>
-</div>
-
-<div class="container-fluid">
-    <h5 style="padding-left: 8px">Progress toward Final Grade</h5>
+    <h5 style="padding-left: 10px">Progress toward Final Grade</h5>
     <div id="chart"></div>
 </div>
-
-<div class="container" ng-controller="mainController" ng-app="visApp">
+<br><br>
+<div class="container-fluid">
+<div class="row">
+<div style="padding-left: 40px"  class="col-lg" ng-controller="mainController" ng-app="visApp">
     <div class="row">
         <div class="column">
-            <h4>Assignments Due By Date</h4>
+            <h5>Assignments Due By Date</h5>
+            <span>Show assignments that weigh at least</span>
+            <p ng-show="percentFilterEnabled">
+                <select ng-change="updatePercentFilter()" ng-model="percent_filter" ng-options="obj.value as obj.text for obj in percent"></select>
+            </p>
         </div>
         <div class="column">
             <span>Assignment Status: </span><br>
             <div class="graded"></div>
             <span style="display: inline-block;">Graded</span><br>
             <div class="ungraded"></div>
-            <span style="display: inline-block;">Not Graded</span><br>
+            <span style="display: inline-block;">Not Yet Graded</span><br>
         </div>
     </div>
-    <span>Show assignments that weigh at least</span>
-    <p ng-show="percentFilterEnabled">
-        <select ng-change="updatePercentFilter()" ng-model="percent_filter" ng-options="obj.value as obj.text for obj in percent"></select>
-    </p>
     <table class="table table_container">
         <thead>
         <th style="padding: 0 10px 0 0">Week</th>
@@ -56,22 +52,28 @@
                                 <table class="table assignments-info">
                                     <tr ng-repeat="assignments in due_dates.assignment_items">
                                         <div class="container-bar">
-                                            <td class="bar_text" assign-title={{assignments.name}}>{{assignments.name | limitTo:25}}{{assignments.name.length > 25?'&hellip;':''}}</td>
+                                            <td class="bar_text" assign-title={{assignments.name}}>{{assignments.name | limitTo:20}}{{assignments.name.length > 20?'&hellip;':''}}</td>
                                         </div>
                                         <td class="bar_cell">
-                                            <div ng-if="assignments.graded"
+                                            <div ng-if="assignments.graded && assignments.points_possible != 0"
                                                  data-descr={{assignments.towards_final_grade}}%
-                                                 class="bar blue-bar" style="width:{{assignments.towards_final_grade}}%"
+
+                                                 class="bar blue-bar" style="width:{{assignments.towards_final_grade}}%;"
                                                  tooltip-info="Score: {{assignments.score==null?'NA':assignments.score}}/{{assignments.points_possible}}
                                                          {{assignments.drop_lowest!=0?'.The lowest ' +assignments.drop_lowest+' scores will be dropped from this assignment group':''}}
                                                          {{assignments.drop_highest!=0?'.The highest '+assignments.drop_highest+' scores will be dropped from this assignment group':''}}">
                                             </div>
-                                            <div ng-if="!assignments.graded"
+                                            <div ng-if="!assignments.graded && assignments.points_possible != 0"
                                                  data-descr={{assignments.towards_final_grade}}%
-                                                 class="bar grey-bar" style="width:{{assignments.towards_final_grade}}%"
+                                                 class="bar grey-bar" style="width:{{assignments.towards_final_grade}}%;"
                                                  tooltip-info="Score: {{assignments.score==null?'NA':assignments.score}}/{{assignments.points_possible}}
                                                          {{assignments.drop_lowest!=0?'.The lowest ' +assignments.drop_lowest+' scores will be dropped from this assignment group':''}}
                                                          {{assignments.drop_highest!=0?'.The highest '+assignments.drop_highest+' scores will be dropped from this assignment group':''}}">
+                                            </div>
+                                            <div ng-if="assignments.points_possible == 0"
+                                                 data-descr={{assignments.towards_final_grade}}%
+                                                 class="bar zero-weight" style="width:{{assignments.towards_final_grade}}%;"
+                                                 tooltip-info="No Points">
                                             </div>
                                         </td>
                                     </tr>
@@ -91,7 +93,9 @@
     </div>
     {% endverbatim %}
 </div>
-
+<div class="col-sm">
+</div>
+</div>
 </div>
 {% endblock %}
 

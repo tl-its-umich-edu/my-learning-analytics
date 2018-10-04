@@ -1,233 +1,173 @@
 var makeGraph = function () {
-    d3.selectAll("#chart > *").remove();
-    $.getJSON("/grade_distribution", function (initResult) {
+    $.getJSON("/api/v1/courses/"+dashboard.course_id+"/grade_distribution", function (initResult) {
         data = initResult;
         if(_.isEmpty(data)){
-            var gradeInfo = d3.select(".error").append("div")
+            var gradeInfo = d3.select("#chart").append("div")
                 .attr("class", "alert alert-info")
                 .attr("role","alert")
                 .style("font-size", "20px")
                 .style("font-weight", "bold")
                 .html('No data for the view')
-            return
+            return;
         }
-        //defining the viz dimension
-        var margin = {
-                top: 30,
-                right: 20,
-                bottom: 40,
-                left: 100
-            },
-            // Todo: adapt to response design
-            width = 1700 - margin.left - margin.right,
-            height = 680 - margin.top - margin.bottom;
-        // x/y def
-        var x = d3.scale.ordinal()
-            .rangeRoundBands([0, width], .5);
+        // over all course statistics
+        singleDataPoint = data[0];
+        totalStudents = singleDataPoint.tot_students;
+        gradeAverage = singleDataPoint.grade_avg;
+        standardGradeDeviation = singleDataPoint.grade_stdev;
+        myscore=singleDataPoint.current_user_grade
+        myscoreText= singleDataPoint.current_user_grade+"%"
 
-        var y = d3.scale.linear()
-            .range([height, 0]);
+        // get the current grade
+        bin_grades = [];
+        data.forEach(function (e) {
+            bin_grades.push(e.current_grade)
+        })
 
-        var y2 = d3.scale.linear()
-            .range([height, 0]);
-
-        var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom");
-        var yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left")
-
-        var min = d3.min(data, function (d) {
-            return d.score;
-        });
-        var xaxixValues = []
-        for (var i = min; i <= 100; i = i + 2) {
-            xaxixValues.push(i)
-        }
-        x.domain(xaxixValues);
-
-        y.domain([0, d3.max(data, function (d) {
-            return d.count;
-        })]);
-        y2.domain([0, d3.max(data, function (d) {
-            return d.count;
-        })]);
-
-        //  tooltip for each bar
-        var tip = d3.tip()
-            .attr('class', 'd3-tip')
-            .offset([-10, 0])
-            .html(function (d) {
-                return '<p>Grade: ' + d.grade + '</p><p>Students with this score : ' + d.count + '</p>';
-            })
+        var width = 1000,
+            height = 300;
+        margin = {top: 10, right: 30, bottom: 30, left: 30};
 
         var svg = d3.select("#chart").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr('width', '100%')
+            .attr('height', '100%')
+            .attr('viewBox', '0 0 ' + width + ' ' + height)
+            .attr("preserveAspectRatio", "xMinYMin")
+        width = width - margin.left - margin.right,
+        height = height - margin.top - margin.bottom;
+        g = svg.append("g")
+            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-        svg.call(tip);
+        var x = d3.scaleLinear()
+            .domain([0, 100]).nice()
+            .rangeRound([0, width]);
 
-        svg.append("g")
-            .attr("class", "x axis")
-            .attr("id", "gradeticks")
+        var bins = d3.histogram()
+            .domain(x.domain())
+            .thresholds(x.ticks(40))
+            (bin_grades);
+
+        var y = d3.scaleLinear()
+            .domain([0, d3.max(bins, function (d) {
+                return d.length;
+            })]).nice()
+            .range([height, 0]);
+
+        g.append("g")
             .attr("transform", "translate(0," + height + ")")
-            .call(xAxis)
-            .append("text")
+            .call(d3.axisBottom(x)
+                .tickFormat(function (d) {
+                    return d + "%"
+                })
+                .ticks(20, 's'));
+
+        g.append("text")
             .attr("transform",
                 "translate(" + (width / 2 - margin.left) + " ," +
-                (margin.top + 5) + ")")
+                (height + margin.left - margin.top) + ")")
+            .attr("dy", ".8em")
             .style("text-anchor", "middle")
-            .style("font-size", "15px")
+            .style("font-size", "10px")
             .style("font-weight", "bold")
             .text("(%) Grade");
 
-        svg.append("g")
-            .attr("class", "y axis")
-            .attr("id", "studentCountticks")
-            .call(yAxis)
-            .append("text")
+        g.append("g")
+            .call(d3.axisLeft(y));
+
+        g.append("text")
             .attr("transform", "rotate(-90)")
             .attr("y", 0 - margin.left)
             .attr("x", 0 - (height / 2))
-            .attr("dy", "4em")
+            .attr("dy", ".8em")
             .style("text-anchor", "middle")
-            .style("font-size", "15px")
+            .style("font-size", "10px")
             .style("font-weight", "bold")
             .text("Number of students");
 
-        // defining the bar for Chart
-        svg.selectAll(".bar")
-            .data(data)
-            .enter().append("rect")
-            .attr("class", function (d) {
-                return 'bar ' + d.grade;
-            })
+        var bar = g.selectAll(".bar")
+            .data(bins)
+            .enter().append("g")
+            .attr("class", "bar")
+            .attr("transform", function (d) {
+                return "translate(" + x(d.x0) + "," + y(d.length) + ")";
+            });
 
-            .attr("x", function (d) {
-                return x(d.score);
-            })
-            .attr("width", x.rangeBand())
-            .attr("y", function (d) {
-                return y(d.count);
-            })
+        bar.append("rect")
+            .attr("width", x(bins[0].x1) - x(bins[0].x0) - 1)
             .attr("height", function (d) {
-                return height - y(d.count);
+                return height - y(d.length);
+            });
+
+        bar.append("text")
+            .attr("y", 12)
+            .attr("x", (x(bins[0].x1) - x(bins[0].x0)) / 2)
+            .attr("height", function (d) {
+                return height - y(d.length) - 50;
             })
-
-            .attr("data-legend", function (d) {
-                return d.grade
-            })
-            .attr("data-legend-pos", function (d) {
-                if (d.grade == 'A') {
-                    return 1
-                }
-                if (d.grade == 'B') {
-                    return 2
-                }
-                if (d.grade == 'C') {
-                    return 3
-                }
-                if (d.grade == 'D') {
-                    return 4
-                }
-                if (d.grade == 'E') {
-                    return 5
-                }
-                if (d.grade == 'F') {
-                    return 6
-                }
-            })
-            .on('mouseover', tip.show)
-            .on('mouseout', tip.hide)
-
-        svg.append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-            .selectAll(".textlabel")
-            .data(data)
-            .enter()
-            .append("text")
-            .attr("class", "textlabel")
-            .attr("x", function (d) {
-                return x(d.score);
-            })
-            .attr("y", function (d) {
-                return y(d.count);
-            })
-
-
-        // Defining Legend for the Graph
-        var legend = svg.append("g")
-            .attr("class", "legend")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-            .style("font-size", "12px")
-            .attr("data-legend-title", "Grade")
-            .attr("data-style-padding", 10)
-            .call(d3.legend)
-
-        //defining the vertical line to show MyGrade over-lay
-        var myScore = data.map(d => d.my_score)
-        var line = d3.svg.line()
-            .x((d, i) => {
-                return x(myScore[0]) + 13
-            })
-            .y((d, i) => {
-                return y2(i)
-            })
-
-        singleDataPoint = data[0]
-        totalStudents = singleDataPoint.tot_students
-        gradeAverage = singleDataPoint.grade_avg
-        standardGradeDeviation = singleDataPoint.grade_stdev
-        score = "MyScore: "+singleDataPoint.my_score_actual+"%"
-
-        var tooltip = d3.select("body")
-            .append("div")
-            .style("position", "absolute")
-            .style("z-index", "10")
-            .style("visibility", "hidden")
-            .style("font-color", "black")
-            .style("font-weight", "bold")
-            .text("a simple tooltip");
-
-
-        //Todo 1.make the "MyGrade" text appear on top of the line
-        // Todo 2. Hover over line display student actual grade in the course
-        svg.append("path")
-            .datum(data)
-            .attr("class", "line")
-            .attr("id", "mygradepath")
-            .attr("d", line)
-            .on("mouseover", function(d){tooltip.text(score); return tooltip.style("visibility", "visible");})
-            .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
-            .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
-
-
-        svg.append("text")
-            .append("textPath")
-            .attr("xlink:href", "#mygradepath")
-            .style("font-size", "15px")
-            .style("font-weight", "bold")
-            .text("MyGrade");
-
-
-        // giving a title to the chart
-        svg.append("text")
-            .attr("x", (width / 2))
-            .attr("y", 0 - (margin.top / 2))
             .attr("text-anchor", "middle")
-            .style("font-size", "20px")
-            .style("font-weight", "bold")
-            .text("Grade Distribution");
+            .style("font-size", "10px")
+            .text(function (d) {
+                if (d.length == 0) {
+                    return '';
+                }
+                return d.length
+            });
+        if(myscore!=null) {
+            g.append('line')
+                .attr('x1', x(myscore))
+                .attr('y1', 0)
+                .attr('x2', x(myscore))
+                .attr('y2', height)
+                .attr('stroke', 'darkorange')
+                .attr('stroke-width', '1')
+                .style('cursor', 'pointer')
+                .on("mouseover", function (d) {
+                    tooltip.text(myscoreText);
+                    return tooltip.style("visibility", "visible");
+                })
+                .on("mousemove", function () {
+                    return tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px");
+                })
+                .on("mouseout", function () {
+                    return tooltip.style("visibility", "hidden")
+                });
+            df= x(myscore) - 30;
+            g.append('text')
+                .attr('text-anchor', 'middle')
+                .attr("x", x(myscore) - 30)
+                .attr("dx", '.8em')
+                .attr("y", ".1em")
+                .attr("dy", ".9em")
+                .attr("class", "myGradeline")
+                .text('MyGrade')
 
+        // Line Tooltip showing users current grade
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltips")
+            .style("opacity", 0);
+
+            var tooltip = d3.select("body")
+                .append("div")
+                .style("position", "absolute")
+                .style("z-index", "10")
+                .style("visibility", "hidden")
+                .style("font-color", "black")
+                .style("font-weight", "bold")
+                .style("font-size", "15px")
+                .style("cursor", "pointer")
+                .text("a simple tooltip");
+        }
+
+        var gradeDetailsHtml = 
+            '<span>Number of students: <b>' + totalStudents + '</b></span><br>' +
+            '<span>Average grade: <b>' + gradeAverage + '</b></span><br>' +
+            '<span>Standard deviation of grades: <b>' + standardGradeDeviation + '</b></span><br>';
+        if(myscore==null) {
+            gradeDetailsHtml += '<span><b>There are no grades yet for you in this course</b></span><br>';
+        }
         var gradeInfo = d3.select(".grade-info").append("div")
             .attr("class", "grade-details")
-            .html('<p>Number of students: <b>' + totalStudents + '</b></p>' +
-                '<p>Average grade: <b>' + gradeAverage + '</b></p>' +
-                '<p>Standard deviation of grades: <b>' + standardGradeDeviation + '</b></p>')
-
+            .html(gradeDetailsHtml);
 
     }).fail(function(jqXHR, textStatus, errorThrown) {
         var gradeInfo = d3.select(".error").append("div")
@@ -237,6 +177,6 @@ var makeGraph = function () {
             .style("font-weight", "bold")
             .html('Some error has occurred please try later or refresh the browser')
     });
-};
 
+};
 makeGraph();
