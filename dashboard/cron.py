@@ -4,44 +4,24 @@ from __future__ import print_function #python 3 support
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.db import connections as conns
+from django.conf import settings
 
-import os
-
-import random
-import datetime
-import time
-import MySQLdb
-import json
-import collections
-import logging
-import datetime
-import csv
+import os, random, datetime, time, json, collections, logging
 
 import pandas as pd
 from pandas.io import sql
-import MySQLdb
 
 from sqlalchemy import create_engine
 from sqlalchemy import VARCHAR
-from pandas.io import sql
-import pymysql
-from django.conf import settings
 
-import psycopg2
+import pymysql, psycopg2 
 
-import pandas as pd
-import os
-import requests
-
-from sqlalchemy import create_engine
 from canvasapi import Canvas
-import OpenSSL.SSL
 
 from decouple import config, Csv
 
 # Imports the Google Cloud client library
 from google.cloud import bigquery
-
 
 logger = logging.getLogger(__name__)
 
@@ -78,7 +58,7 @@ def update_with_udw_course(request):
     #select file record from UDW
     course_sql = "select id, name, " + CURRENT_CANVAS_TERM_ID + " as term_id from course_dim where id='" + UDW_COURSE_ID + "'"
 
-    return HttpResponse("loaded file info: " + util_function(course_sql, 'course'))
+    return HttpResponse("loaded file info: " + util_function(course_sql, 'course', primary_key="id"))
 
 # update FILE records from UDW
 def update_with_udw_file(request):
@@ -89,7 +69,7 @@ def update_with_udw_file(request):
                "and course_id='"+ UDW_COURSE_ID + "'" \
                " order by canvas_id"
 
-    return HttpResponse("loaded file info: " + util_function(file_sql, 'file'))
+    return HttpResponse("loaded file info: " + util_function(file_sql, 'file', primary_key="id"))
 
 # update FILE_ACCESS records from BigQuery
 def update_with_bq_access(request):
@@ -143,7 +123,7 @@ def update_with_bq_access(request):
                         logger.debug("after drop duplicates, df row number=" + str(df.shape[0]))
 
                         # write to MySQL
-                        df.to_sql(con=engine, name='file_access', if_exists='append', index=False)
+                        df.to_sql(con=engine, name='file_access', if_exists='replace', index=False, dtype={'file_id': VARCHAR(255), 'user_id' : VARCHAR(255)})
 
     else:
         logger.debug('{} project does not contain any datasets.'.format(project))
@@ -173,7 +153,7 @@ def update_with_udw_user(request):
           "and c.enrollment_id =  e.enrollment_id"
     logger.debug(user_sql)
 
-    return HttpResponse("loaded user info: " + util_function(user_sql, 'user'))
+    return HttpResponse("loaded user info: " + util_function(user_sql, 'user', primary_key="id"))
 
 
 def update_groups(request):
@@ -191,7 +171,7 @@ def update_groups(request):
                             "assign_final as (select assignment_group_id AS id, course_id AS course_id, group_weight AS weight, name AS name, group_points AS group_points from assignment_grp_points)"\
                             "select g.*, ar.drop_lowest,ar.drop_highest from assign_rules ar join assign_final g on ar.assignment_group_id=g.id"\
 
-    return HttpResponse("loaded assignment group info: " + util_function(assignment_groups_sql, 'assignment_groups'))
+    return HttpResponse("loaded assignment group info: " + util_function(assignment_groups_sql, 'assignment_groups', primary_key="id"))
 
 
 def update_assignment(request):
@@ -209,7 +189,7 @@ def update_assignment(request):
                    "and ad.visibility = 'everyone' and ad.workflow_state='published')" \
                    "select * from assignment_info"
 
-    return HttpResponse("loaded assignment info: " + util_function(assignment_sql,'assignment'))
+    return HttpResponse("loaded assignment info: " + util_function(assignment_sql,'assignment', primary_key="id"))
 
 
 def submission(request):
@@ -230,7 +210,7 @@ def submission(request):
                      "select submission_id AS ID, assignment_id AS assignment_id, global_canvas_id AS user_id, " \
                      "published_score AS score, graded_at AS graded_date, local_graded_time as local_graded_date from submission"
 
-    return HttpResponse("loaded assignment submission info: " + util_function(submission_url,'submission'))
+    return HttpResponse("loaded assignment submission info: " + util_function(submission_url,'submission', primary_key='id'))
 
 
 def weight_consideration(request):
@@ -245,11 +225,12 @@ def weight_consideration(request):
                               "where course_id = '" + UDW_COURSE_ID + "' group by course_id having sum(group_weight)>1)"\
                               "(select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)"
 
-    return HttpResponse("loaded weight_consideration info: " + util_function(is_weight_considered_url,'assignment_weight_consideration', 'weight'))
+    return HttpResponse("loaded weight_consideration info: " + util_function(is_weight_considered_url,'assignment_weight_consideration', table_identifier='weight', primary_key='course_id'))
 
 
 # the util function
-def util_function(sql_string, mysql_table, table_identifier=None):
+# Currently this method only supports a single primary_key
+def util_function(sql_string, mysql_table, table_identifier=None, primary_key=False):
 
     df = pd.read_sql(sql_string, conns['UDW'])
     logger.debug("df shape " + str(df.shape[0]) + " " + str(df.shape[1]))
@@ -264,8 +245,26 @@ def util_function(sql_string, mysql_table, table_identifier=None):
 
     logger.debug(" table: " + mysql_table + " insert size: " + str(df.shape[0]))
 
+    to_sql_dtype=None
     # write to MySQL
-    df.to_sql(con=engine, name=mysql_table, if_exists='append', index=False)
+    if primary_key:
+        df.set_index(primary_key)
+        # If the index column is a string, limit the length
+        if df[primary_key].dtype == object: 
+            to_sql_dtype = {primary_key:VARCHAR(255)}
+
+    logger.debug("to_sql_dtype = {}".format(to_sql_dtype))
+    df.to_sql(con=engine, name=mysql_table, if_exists='replace', index=False, dtype=to_sql_dtype)
+
+    if primary_key:
+        add_primary_to_table(mysql_table, primary_key)
 
     # returns the row size of dataframe
     return "inserted " + str(df.shape[0]) + " rows."
+
+# Add a primary key to a table
+# Table: MySQL Table 
+# Column or comma separated list of columns to use as primary key
+def add_primary_to_table(table, column):
+    with engine.connect() as con:
+        con.execute("ALTER TABLE `{0}` ADD PRIMARY KEY ({1});".format(table,column))
