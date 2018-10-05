@@ -2,7 +2,6 @@
 from __future__ import print_function #python 3 support
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponse
 from django.db import connections as conns
 
 import os
@@ -47,68 +46,51 @@ from django_cron import CronJobBase, Schedule
 
 logger = logging.getLogger(__name__)
 
-# ## Connect to Unizin Data Warehouse
 UDW_ID_PREFIX = "17700000000"
-UDW_FILE_ID_PREFIX = "1770000000"
 
-db_name = ""
-db_user = ""
-db_password = ""
-db_host = ""
-db_port = ""
+db_name = settings.DATABASES['default']['NAME']
+db_user = settings.DATABASES['default']['USER']
+db_password = settings.DATABASES['default']['PASSWORD']
+db_host = settings.DATABASES['default']['HOST']
+db_port = settings.DATABASES['default']['PORT']
 
+logger.debug("db-name:" + db_name);
+logger.debug("db-user:" + db_user);
 
-engine = null
 # set the current term id from config
-CURRENT_CANVAS_TERM_ID =""
+CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
 
-UDWCourseIds = ""
+UDWCourseIdsString = config("CANVAS_COURSE_IDS", "")
+UDWCourseIds = UDWCourseIdsString.split(",")
+UDWCourseIds = [UDW_ID_PREFIX + canvasCourseId for canvasCourseId in UDWCourseIds]
+logger.debug(UDWCourseIds)
 
-def setup():
-    # ## Connect to Student Dashboard's MySQL database
-    #
+# minutes between cron jobs
+RUN_SCHEDULE = 24*60
+
+# get UDW course id array from configuration file
+def getUDWCourseIds():
+
     # ### Get enrolled users and files within site
-    db_name = settings.DATABASES['default']['NAME']
-    db_user = settings.DATABASES['default']['USER']
-    db_password = settings.DATABASES['default']['PASSWORD']
-    db_host = settings.DATABASES['default']['HOST']
-    db_port = settings.DATABASES['default']['PORT']
+    canvasCourseIdString =config('CANVAS_COURSE_IDS', default="")
 
-    logger.info("db-name:" + db_name);
-    logger.info("db-user:" + db_user);
+    canvasCourseIdArray = canvasCourseIdString.split(",")
+    canvasCourseIdArray = [UDW_ID_PREFIX + canvasCourseId for canvasCourseId in canvasCourseIdArray]
+    logger.debug(canvasCourseIdArray)
 
+    return canvasCourseIdArray
+
+# the util function
+def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None):
     engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
                            .format(db = db_name,  # your mysql database name
                                    user = db_user, # your mysql user for the database
                                    password = db_password, # password for user
                                    host = db_host,
                                    port = db_port))
-    # set the current term id from config
-    CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
-
-    UDWCourseIds = getUDWCourseIds()
-
-RUN_EVERY_DAY = 2
-#24*60
-#  everyday
-
-# get UDW course id array from configuration file
-def getUDWCourseIds():
-    setup()
-
-    # ### Get enrolled users and files within site
-    canvasCourseIdString =config('CANVAS_COURSE_IDS', default="")
-    if canvasCourseIdString:
-        canvasCourseIdArray = canvasCourseIdString.split(",")
-        canvasCourseIdArray = [UDW_ID_PREFIX + canvasCourseId for canvasCourseId in canvasCourseIdArray]
-    return canvasCourseIdArray
-
-# the util function
-def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None):
-    setup()
 
     df = pd.read_sql(sql_string, conns['UDW'])
-    logger.debug("df shape " + str(df.shape[0]) + " " + str(df.shape[1]))
+    logger.debug(df)
 
     # Sql returns boolean value so grouping course info along with it so that this could be stored in the DB table.
     if table_identifier == 'weight':
@@ -124,13 +106,40 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
     df.to_sql(con=engine, name=mysql_table, if_exists='append', index=False)
 
     # returns the row size of dataframe
-    return "inserted " + str(df.shape[0]) + " rows for course " + UDW_course_id + "; "
+    return  "inserted " + str(df.shape[0]) + " rows in table " + mysql_table + " for course " + UDW_course_id + ";"
 
-class CourseCronJob(CronJobBase):
-    setup()
+def update_cron_status(status):
+    engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
+                           .format(db = db_name,  # your mysql database name
+                                   user = db_user, # your mysql user for the database
+                                   password = db_password, # password for user
+                                   host = db_host,
+                                   port = db_port))
+    connection = engine.connect()
+    connection.execute("insert into cron_status (cron_date, status) values(" + str(datetime.datetime.now()) + "," + status +") ")
+    connection.close()
 
-    schedule = Schedule(run_every_mins=RUN_EVERY_DAY)
-    code = 'dashboard.CourseCronJob'    # a unique code
+# remove all records inside the specified table
+def deleteAllRecordInTable(tableName):
+    # delete all records in the table first
+    engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
+                           .format(db = db_name,  # your mysql database name
+                                   user = db_user, # your mysql user for the database
+                                   password = db_password, # password for user
+                                   host = db_host,
+                                   port = db_port))
+    connection = engine.connect()
+    connection.execute("delete from " + tableName)
+    connection.close()
+
+    return "records removed from " + tableName + ";"
+
+# cron job to populate course and user tables
+class DashboardCronJob(CronJobBase):
+    RUN_EVERY_MINS = RUN_SCHEDULE
+
+    schedule = Schedule(run_every_mins=RUN_SCHEDULE)
+    code = 'dashboard.DashboardCronJob'    # a unique code
 
     UDWCourseIds = getUDWCourseIds()
 
@@ -139,22 +148,38 @@ class CourseCronJob(CronJobBase):
 
     # update FILE records from UDW
     def update_with_udw_course(self):
-        # return string with concatenated SQL insert result
-        returnString = ""
+        # cron status
+        status = ""
+
+        logger.debug("in update with udw course")
+
+        # delete all records in the table first
+        status += deleteAllRecordInTable("course")
 
         # loop through multiple course ids
         for UDW_course_id in UDWCourseIds:
-            #course_sql = "delete from course"
-            #returnString = returnString + util_function(UDW_course_id, course_sql, 'course')
+            logger.debug("UDW_course_id = " + UDW_course_id)
 
             #select file record from UDW
             course_sql = "select id, name, " + CURRENT_CANVAS_TERM_ID + " as term_id from course_dim where id='" + UDW_course_id + "'"
-            returnString = returnString + util_function(UDW_course_id, course_sql, 'course')
 
-        return HttpResponse("loaded file info: " + returnString)
+            logger.debug(course_sql)
+
+            status += util_function(UDW_course_id, course_sql, 'course')
+
+        return status
 
     # update USER records from UDW
     def update_with_udw_user(self):
+
+        # cron status
+        status = ""
+
+        logger.debug("in update with udw user")
+
+        # delete all records in the table first
+        status += deleteAllRecordInTable("user")
+
         # return string with concatenated SQL insert result
         returnString = ""
 
@@ -181,39 +206,18 @@ class CourseCronJob(CronJobBase):
                         "and c.enrollment_id =  e.enrollment_id"
             logger.debug(user_sql)
 
-            returnString = returnString + util_function(UDW_course_id, user_sql, 'user')
+            status += util_function(UDW_course_id, user_sql, 'user')
 
-        return HttpResponse("loaded user info: " + returnString)
-
-    def do(self):
-        self.update_with_udw_course()
-        self.update_with_udw_user()
-
-class FileAccessCronJob(CronJobBase):
-
-    setup()
-
-    schedule = Schedule(run_every_mins=RUN_EVERY_DAY)
-    code = 'dashboard.FileAccessCronJob'    # a unique code
-
-    # update FILE records from UDW
-    def update_with_udw_file(self):
-        # return string with concatenated SQL insert result
-        returnString = ""
-
-        # loop through multiple course ids
-        for UDW_course_id in UDWCourseIds:
-            #select file record from UDW
-            file_sql = "select concat(" + UDW_FILE_ID_PREFIX + ", canvas_id) as id, display_name as name, course_id as course_id from file_dim " \
-                                                               "where file_state ='available' " \
-                                                               "and course_id='"+ UDW_course_id + "'" \
-                                                                                                  " order by canvas_id"
-            returnString = returnString + util_function(UDW_course_id, file_sql, 'file')
-
-        return HttpResponse("loaded file info: " + returnString)
+        return status
 
     # update FILE_ACCESS records from BigQuery
     def update_with_bq_access(self):
+
+        # cron status
+        status = ""
+
+        # delete all records in file_access table
+        status += deleteAllRecordInTable("file_access")
 
         # return string with concatenated SQL insert result
         returnString = ""
@@ -270,27 +274,33 @@ class FileAccessCronJob(CronJobBase):
                                 logger.debug("after drop duplicates, df row number=" + str(df.shape[0]))
 
                                 # write to MySQL
+                                engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
+                                                       .format(db = db_name,  # your mysql database name
+                                                               user = db_user, # your mysql user for the database
+                                                               password = db_password, # password for user
+                                                               host = db_host,
+                                                               port = db_port))
+                                connection = engine.connect()
                                 df.to_sql(con=engine, name='file_access', if_exists='append', index=False)
+                                connection.close()
 
-                                returnString = returnString + str(df.shape[0]) + " rows for course " + UDW_course_id + ";"
+                                returnString += str(df.shape[0]) + " rows for course " + UDW_course_id + ";"
+                                logger.info(returnString)
 
         else:
-            logger.debug('{} project does not contain any datasets.'.format(project))
+            logger.debug('project does not contain any datasets.'.format(project))
 
-        return HttpResponse("loaded file access info: inserted " + returnString)
+            returnString += "project does not contain any datasets.".format(project)
 
-    def do(self):
-        self.update_with_udw_file()
-        self.update_with_bq_access()
-
-class AssignmentCronJob(CronJobBase):
-
-    setup()
-
-    schedule = Schedule(run_every_mins=RUN_EVERY_DAY)
-    code = 'dashboard.AssignmentCronJob'    # a unique code
+        return status
 
     def update_groups(self):
+        # cron status
+        status =""
+
+        # delete all records in assignment_group table
+        status += deleteAllRecordInTable("assignment_groups")
+
         # update groups
 
         '''
@@ -312,9 +322,9 @@ class AssignmentCronJob(CronJobBase):
                                     "assignment_grp_points as (select ag.*, am.group_points AS group_points from assignment_grp ag join assign_more am on ag.assignment_group_id = am.assignment_group_id)," \
                                     "assign_final as (select assignment_group_id AS id, course_id AS course_id, group_weight AS weight, name AS name, group_points AS group_points from assignment_grp_points)" \
                                     "select g.*, ar.drop_lowest,ar.drop_highest from assign_rules ar join assign_final g on ar.assignment_group_id=g.id"
-            returnString = returnString + util_function(UDW_course_id, assignment_groups_sql, 'assignment_groups')
+            status += util_function(UDW_course_id, assignment_groups_sql, 'assignment_groups')
 
-        return HttpResponse("loaded assignment group info: " + returnString)
+        return status
 
     def update_assignment(self):
         '''
@@ -322,7 +332,12 @@ class AssignmentCronJob(CronJobBase):
         :param request:
         :return:
         '''
+        status =""
+
         logger.info("update_assignment(): ")
+
+        # delete all records in assignment table
+        status += deleteAllRecordInTable("assignment")
 
         # return string with concatenated SQL insert result
         returnString = ""
@@ -336,9 +351,9 @@ class AssignmentCronJob(CronJobBase):
                            " from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='" + UDW_course_id + "'" \
                                                                                                                                                       "and ad.visibility = 'everyone' and ad.workflow_state='published')" \
                                                                                                                                                       "select * from assignment_info"
-            returnString = returnString + util_function(UDW_course_id, assignment_sql,'assignment')
+            status += util_function(UDW_course_id, assignment_sql,'assignment')
 
-        return HttpResponse("loaded assignment info: " + returnString)
+        return status
 
 
     def submission(self):
@@ -347,7 +362,13 @@ class AssignmentCronJob(CronJobBase):
         :param request:
         :return:
         '''
+        # cron status
+        status =""
+
         logger.info("update_submission(): ")
+
+        # delete all records in file_access table
+        status += deleteAllRecordInTable("submission")
 
         # return string with concatenated SQL insert result
         returnString = ""
@@ -364,9 +385,9 @@ class AssignmentCronJob(CronJobBase):
                             "from sub_with_enroll se inner join submission_time st on se.submission_id = st.id)" \
                             "select submission_id AS ID, assignment_id AS assignment_id, global_canvas_id AS user_id, " \
                             "published_score AS score, graded_at AS graded_date, local_graded_time as local_graded_date from submission"
-            returnString = returnString + util_function(UDW_course_id, submission_url,'submission')
+            status += util_function(UDW_course_id, submission_url,'submission')
 
-        return HttpResponse("loaded assignment submission info: " + returnString)
+        return status
 
 
     def weight_consideration(self):
@@ -376,7 +397,12 @@ class AssignmentCronJob(CronJobBase):
         :param request:
         :return:
         '''
+        status =""
+
         logger.info("weight_consideration()")
+
+        # delete all records in assignment_weight_consideration table
+        status += deleteAllRecordInTable("assignment_weight_consideration")
 
         # return string with concatenated SQL insert result
         returnString = ""
@@ -386,14 +412,38 @@ class AssignmentCronJob(CronJobBase):
             is_weight_considered_url ="with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact " \
                                         "where course_id = '" + UDW_course_id + "' group by course_id having sum(group_weight)>1)" \
                                         "(select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)"
-            returnString = returnString + util_function(UDW_course_id, is_weight_considered_url,'assignment_weight_consideration', 'weight')
-        return HttpResponse("loaded weight_consideration info: " + returnString)
+            status += util_function(UDW_course_id, is_weight_considered_url,'assignment_weight_consideration', 'weight')
+
+        return status
 
     def do(self):
-        self.update_groups()
+        logger.info("************ dashboard cron tab")
 
-        self.update_assignment()
+        status = ""
 
-        self.submission()
+        status += "Start cron at: " +  str(datetime.datetime.now()) + ";"
 
-        self.weight_consideration()
+        logger.info("************ cron tab course")
+        status += self.update_with_udw_course()
+
+        logger.info("************ user")
+        status += self.update_with_udw_user()
+
+
+        logger.info("************ course")
+        self.update_with_bq_access()
+
+        logger.info("************ assignment")
+        status += self.update_groups()
+        status += self.update_assignment()
+        status += self.submission()
+        status += self.weight_consideration()
+
+        status += "End cron at: " +  str(datetime.datetime.now()) + ";"
+
+        logger.info("************ total status=" + status)
+
+        # update the cron status table
+        update_cron_status(status)
+
+

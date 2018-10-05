@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'dashboard',
-    'django_crontab',
+    'django_cron',
     'watchman',
     'macros',
 
@@ -78,9 +78,7 @@ MIDDLEWARE_CLASSES = [
 ]
 
 CRON_CLASSES = [
-    "dashboard.cron.CourseCronJob",
-    "dashboard.cron.FileAccessCronJob",
-    "dashboard.cron.AssignmentCronJob",
+    "dashboard.cron.DashboardCronJob",
 ]
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -307,7 +305,7 @@ UDW_ID_PREFIX = config("UDW_ID_PREFIX", default=17700000000, cast=int)
 
 # TODO: Select a default course for user from database, just here so things don't all break
 # This will probably need to move to views.py
-DEFAULT_COURSE_ID = config("CANVAS_COURSE_IDS", default=0, cast=int)
+DEFAULT_COURSE_ID = config("CANVAS_COURSE_IDS", default=0)
 
 # Add any settings you need to be available to templates in this array
 SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX','DEFAULT_COURSE_ID']

@@ -20,9 +20,20 @@ dockerize -wait tcp://${MYSQL_HOST}:${MYSQL_PORT} -timeout 15s
 echo Running python startups
 python manage.py migrate
 
-# Start Gunicorn processes
-echo Starting Gunicorn.
+if [ -z "${IS_CRON_POD}" ]; then
+    # Start Gunicorn processes
+    echo Starting Gunicorn.
 
-exec gunicorn dashboard.wsgi:application \
-    --bind 0.0.0.0:${GUNICORN_PORT} \
-    --workers="${GUNICORN_WORKERS}"
+    # application pod
+    exec gunicorn dashboard.wsgi:application \
+        --bind 0.0.0.0:${GUNICORN_PORT} \
+        --workers="${GUNICORN_WORKERS}"
+else
+    # in cron pod
+
+    echo Running cron jobs
+
+    python manage.py migrate django_cron
+
+    python manage.py runcrons
+fi
