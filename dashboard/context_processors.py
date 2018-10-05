@@ -1,14 +1,15 @@
-from django.db import connection as conn
-from django.conf import settings
+from dashboard.common.util import *
 
 def course_name(request):
-    course_id = str(settings.UDW_ID_PREFIX) + str(request.resolver_match.kwargs.get('course_id'))
+    course_id = str(request.resolver_match.kwargs.get('course_id'))
     course_name = "Course Not Found"
     if (course_id): 
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM course WHERE id = %s", [course_id])
-        row = cursor.fetchone()
-        if (row != None):
-            course_name = row[0]
+        course_name = get_course_name_from_id(course_id)
 
     return {'course_name': course_name}
+
+def current_user_course_id(request):
+    course_id = str(request.resolver_match.kwargs.get('course_id'))
+    if not course_id:
+        course_id = get_default_user_course_id(request.user.username)
+    return {'current_user_course_id': course_id}
