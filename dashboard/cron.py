@@ -109,6 +109,8 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
     return  "inserted " + str(df.shape[0]) + " rows in table " + mysql_table + " for course " + UDW_course_id + ";"
 
 def update_cron_status(status):
+    logger.debug("in update_cron_status")
+
     engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
                            .format(db = db_name,  # your mysql database name
                                    user = db_user, # your mysql user for the database
@@ -116,8 +118,12 @@ def update_cron_status(status):
                                    host = db_host,
                                    port = db_port))
     connection = engine.connect()
-    connection.execute("insert into cron_status (cron_date, status) values(" + str(datetime.datetime.now()) + "," + status +") ")
+    sql = "insert into cron_status (cron_date, status) values('" + str(datetime.datetime.now()) + "', '" + status + "')"
+    logger.debug("sql=" + sql)
+    connection.execute(sql)
     connection.close()
+
+    logger.info("updated cron_status")
 
 # remove all records inside the specified table
 def deleteAllRecordInTable(tableName):
@@ -179,9 +185,6 @@ class DashboardCronJob(CronJobBase):
 
         # delete all records in the table first
         status += deleteAllRecordInTable("user")
-
-        # return string with concatenated SQL insert result
-        returnString = ""
 
         # loop through multiple course ids
         for UDW_course_id in UDWCourseIds:
@@ -288,9 +291,7 @@ class DashboardCronJob(CronJobBase):
                                 logger.info(returnString)
 
         else:
-            logger.debug('project does not contain any datasets.'.format(project))
-
-            returnString += "project does not contain any datasets.".format(project)
+            returnString += "BigQuery project does not contain any datasets."
 
         return status
 
@@ -327,6 +328,7 @@ class DashboardCronJob(CronJobBase):
         return status
 
     def update_assignment(self):
+
         '''
         Load the assignment info w.r.t to a course such as due_date, points etc
         :param request:
@@ -404,15 +406,14 @@ class DashboardCronJob(CronJobBase):
         # delete all records in assignment_weight_consideration table
         status += deleteAllRecordInTable("assignment_weight_consideration")
 
-        # return string with concatenated SQL insert result
-        returnString = ""
-
         # loop through multiple course ids
         for UDW_course_id in UDWCourseIds:
             is_weight_considered_url ="with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact " \
                                         "where course_id = '" + UDW_course_id + "' group by course_id having sum(group_weight)>1)" \
                                         "(select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)"
             status += util_function(UDW_course_id, is_weight_considered_url,'assignment_weight_consideration', 'weight')
+
+            logger.debug(status+"\n\n")
 
         return status
 
@@ -441,9 +442,9 @@ class DashboardCronJob(CronJobBase):
 
         status += "End cron at: " +  str(datetime.datetime.now()) + ";"
 
-        logger.info("************ total status=" + status)
-
         # update the cron status table
         update_cron_status(status)
+
+        logger.info("************ total status=" + status + "/n/n")
 
 
