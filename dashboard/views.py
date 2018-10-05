@@ -29,10 +29,6 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
-# Todo the framework needs to remember the course
-CANVAS_COURSE_ID = "252307"
-UDW_ID_PREFIX = "17700000000"
-
 # strings for construct file download url
 CANVAS_FILE_PREFIX = config("CANVAS_FILE_PREFIX", default="")
 CANVAS_FILE_POSTFIX = config("CANVAS_FILE_POSTFIX", default="")
