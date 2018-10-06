@@ -227,10 +227,7 @@ class DashboardCronJob(CronJobBase):
         # update groups
         #Loading the assignment groups inforamtion along with weight/points associated ith arn assignment
         logger.debug("update_assignment_groups(): ")
-
-        # return string with concatenated SQL insert result
-        returnString = ""
-
+        
         # loop through multiple course ids
         for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
             assignment_groups_sql = "with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='" + UDW_course_id + "'and ad.visibility = 'everyone' and ad.workflow_state='published')," \
