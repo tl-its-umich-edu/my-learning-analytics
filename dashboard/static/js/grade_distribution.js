@@ -21,12 +21,12 @@ var makeGraph = function () {
         // get the current grade
         bin_grades = [];
         data.forEach(function (e) {
-            bin_grades.push(e.current_grade)
+            bin_grades.push(e.current_grade_mod)
         })
 
         var width = 1000,
             height = 300;
-        margin = {top: 10, right: 30, bottom: 30, left: 30};
+        margin = {top: 30, right: 30, bottom: 30, left: 30};
 
         var svg = d3.select("#chart").append("svg")
             .attr('width', '100%')
@@ -64,7 +64,7 @@ var makeGraph = function () {
         g.append("text")
             .attr("transform",
                 "translate(" + (width / 2 - margin.left) + " ," +
-                (height + margin.left - margin.top) + ")")
+                (height + 20) + ")")
             .attr("dy", ".8em")
             .style("text-anchor", "middle")
             .style("font-size", "10px")
@@ -99,7 +99,7 @@ var makeGraph = function () {
             });
 
         bar.append("text")
-            .attr("y", 12)
+            .attr("y", 10)
             .attr("x", (x(bins[0].x1) - x(bins[0].x0)) / 2)
             .attr("height", function (d) {
                 return height - y(d.length) - 50;
@@ -115,7 +115,7 @@ var makeGraph = function () {
         if(myscore!=null) {
             g.append('line')
                 .attr('x1', x(myscore))
-                .attr('y1', 0)
+                .attr('y1', 0-margin.top)
                 .attr('x2', x(myscore))
                 .attr('y2', height)
                 .attr('stroke', 'darkorange')
@@ -131,12 +131,11 @@ var makeGraph = function () {
                 .on("mouseout", function () {
                     return tooltip.style("visibility", "hidden")
                 });
-            df= x(myscore) - 30;
             g.append('text')
                 .attr('text-anchor', 'middle')
-                .attr("x", x(myscore) - 30)
-                .attr("dx", '.8em')
-                .attr("y", ".1em")
+                .attr("x", x(myscore) - margin.right)
+                .attr("dx", '1em')
+                .attr("y", 0-margin.top)
                 .attr("dy", ".9em")
                 .attr("class", "myGradeline")
                 .text('MyGrade')
@@ -160,8 +159,7 @@ var makeGraph = function () {
 
         var gradeDetailsHtml = 
             '<span>Number of students: <b>' + totalStudents + '</b></span><br>' +
-            '<span>Average grade: <b>' + gradeAverage + '</b></span><br>' +
-            '<span>Standard deviation of grades: <b>' + standardGradeDeviation + '</b></span><br>';
+            '<span>Average grade: <b>' + gradeAverage + '</b></span><br>';
         if(myscore==null) {
             gradeDetailsHtml += '<span><b>There are no grades yet for you in this course</b></span><br>';
         }
