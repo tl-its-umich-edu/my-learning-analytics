@@ -46,8 +46,6 @@ from django_cron import CronJobBase, Schedule
 
 logger = logging.getLogger(__name__)
 
-UDW_ID_PREFIX = "17700000000"
-
 db_name = settings.DATABASES['default']['NAME']
 db_user = settings.DATABASES['default']['USER']
 db_password = settings.DATABASES['default']['PASSWORD']
@@ -56,29 +54,6 @@ db_port = settings.DATABASES['default']['PORT']
 
 logger.debug("db-name:" + db_name);
 logger.debug("db-user:" + db_user);
-
-# set the current term id from config
-CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
-
-UDWCourseIdsString = config("CANVAS_COURSE_IDS", "")
-UDWCourseIds = UDWCourseIdsString.split(",")
-UDWCourseIds = [UDW_ID_PREFIX + canvasCourseId for canvasCourseId in UDWCourseIds]
-logger.debug(UDWCourseIds)
-
-# minutes between cron jobs
-RUN_SCHEDULE = 24*60
-
-# get UDW course id array from configuration file
-def getUDWCourseIds():
-
-    # ### Get enrolled users and files within site
-    canvasCourseIdString =config('CANVAS_COURSE_IDS', default="")
-
-    canvasCourseIdArray = canvasCourseIdString.split(",")
-    canvasCourseIdArray = [UDW_ID_PREFIX + canvasCourseId for canvasCourseId in canvasCourseIdArray]
-    logger.debug(canvasCourseIdArray)
-
-    return canvasCourseIdArray
 
 # the util function
 def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None):
@@ -142,15 +117,9 @@ def deleteAllRecordInTable(tableName):
 
 # cron job to populate course and user tables
 class DashboardCronJob(CronJobBase):
-    RUN_EVERY_MINS = RUN_SCHEDULE
 
-    schedule = Schedule(run_every_mins=RUN_SCHEDULE)
+    schedule = Schedule(run_every_mins=settings.CRON_RUN_SCHEDULE)
     code = 'dashboard.DashboardCronJob'    # a unique code
-
-    UDWCourseIds = getUDWCourseIds()
-
-    # set the current term id from config
-    CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
 
     # update FILE records from UDW
     def update_with_udw_course(self):
@@ -163,11 +132,11 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("course")
 
         # loop through multiple course ids
-        for UDW_course_id in UDWCourseIds:
+        for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
             logger.debug("UDW_course_id = " + UDW_course_id)
 
             #select file record from UDW
-            course_sql = "select id, name, " + CURRENT_CANVAS_TERM_ID + " as term_id from course_dim where id='" + UDW_course_id + "'"
+            course_sql = "select id, name, " + settings.CURRENT_CANVAS_TERM_ID + " as term_id from course_dim where id='" + UDW_course_id + "'"
 
             logger.debug(course_sql)
 
@@ -187,7 +156,7 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("user")
 
         # loop through multiple course ids
-        for UDW_course_id in UDWCourseIds:
+        for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
 
             # select all student registered for the course
             user_sql = "select u.name AS name, " \
@@ -247,7 +216,7 @@ class DashboardCronJob(CronJobBase):
                             logger.debug('\t{}'.format("found table"))
 
                             # loop through multiple course ids
-                            for UDW_course_id in UDWCourseIds:
+                            for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
 
                                 # query to retrieve all file access events for one course
                                 query = 'select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, "$.object.id"), 35) AS STRING) AS file_id, ' \
@@ -315,7 +284,7 @@ class DashboardCronJob(CronJobBase):
         returnString = ""
 
         # loop through multiple course ids
-        for UDW_course_id in UDWCourseIds:
+        for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
             assignment_groups_sql = "with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='" + UDW_course_id + "'and ad.visibility = 'everyone' and ad.workflow_state='published')," \
                                     "assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf on agd.id = agf.assignment_group_id  where agd.course_id='" + UDW_course_id + "' and workflow_state='available')," \
                                     "assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join (select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id )," \
@@ -345,7 +314,7 @@ class DashboardCronJob(CronJobBase):
         returnString = ""
 
         # loop through multiple course ids
-        for UDW_course_id in UDWCourseIds:
+        for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
             assignment_sql="with assignment_info as " \
                            "(select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone 'America/New_York' as local_date," \
                            "ad.title AS name,af.course_id AS course_id,af.assignment_id AS id," \
@@ -376,7 +345,7 @@ class DashboardCronJob(CronJobBase):
         returnString = ""
 
         # loop through multiple course ids
-        for UDW_course_id in UDWCourseIds:
+        for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
             submission_url = "with sub_fact as (select submission_id, assignment_id,user_id, global_canvas_id, published_score " \
                             "from submission_fact sf join user_dim u on sf.user_id = u.id where course_id = '" + UDW_course_id + "')," \
                             "enrollment as (select  distinct(user_id) from enrollment_dim where course_id = '" + UDW_course_id + "' and workflow_state='active' " \
@@ -407,7 +376,7 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("assignment_weight_consideration")
 
         # loop through multiple course ids
-        for UDW_course_id in UDWCourseIds:
+        for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
             is_weight_considered_url ="with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact " \
                                         "where course_id = '" + UDW_course_id + "' group by course_id having sum(group_weight)>1)" \
                                         "(select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)"
