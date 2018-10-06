@@ -1,42 +1,15 @@
 
 from __future__ import print_function #python 3 support
 
-from django.shortcuts import render_to_response
 from django.db import connections as conns
 
-import os
-
-import random
-import datetime
-import time
-import MySQLdb
-import json
-import collections
 import logging
 import datetime
-import csv
-
-import pandas as pd
-from pandas.io import sql
-import MySQLdb
 
 from sqlalchemy import create_engine
-from sqlalchemy import VARCHAR
-from pandas.io import sql
-import pymysql
 from django.conf import settings
 
-import psycopg2
-
 import pandas as pd
-import os
-import requests
-
-from sqlalchemy import create_engine
-from canvasapi import Canvas
-import OpenSSL.SSL
-
-from decouple import config, Csv
 
 # Imports the Google Cloud client library
 from google.cloud import bigquery
@@ -55,15 +28,15 @@ db_port = settings.DATABASES['default']['PORT']
 logger.debug("db-name:" + db_name);
 logger.debug("db-user:" + db_user);
 
+engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
+                       .format(db = db_name,  # your mysql database name
+                               user = db_user, # your mysql user for the database
+                               password = db_password, # password for user
+                               host = db_host,
+                               port = db_port))
+
 # the util function
 def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None):
-    engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
-                           .format(db = db_name,  # your mysql database name
-                                   user = db_user, # your mysql user for the database
-                                   password = db_password, # password for user
-                                   host = db_host,
-                                   port = db_port))
-
     df = pd.read_sql(sql_string, conns['UDW'])
     logger.debug(df)
 
@@ -83,35 +56,23 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
     # returns the row size of dataframe
     return  "inserted " + str(df.shape[0]) + " rows in table " + mysql_table + " for course " + UDW_course_id + ";"
 
+# execute database query
+def executeDbQuery(query):
+    with engine.connect() as connection:
+        connection.detach()
+        connection.execute(query)
+
 def update_cron_status(status):
     logger.debug("in update_cron_status")
-
-    engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
-                           .format(db = db_name,  # your mysql database name
-                                   user = db_user, # your mysql user for the database
-                                   password = db_password, # password for user
-                                   host = db_host,
-                                   port = db_port))
-    connection = engine.connect()
-    sql = "insert into cron_status (cron_date, status) values('" + str(datetime.datetime.now()) + "', '" + status + "')"
-    logger.debug("sql=" + sql)
-    connection.execute(sql)
-    connection.close()
+    sql = """insert into cron_status (cron_date, status) values('%s', '%s')""" % (str(datetime.datetime.now()), status)
+    executeDbQuery(sql)
 
     logger.info("updated cron_status")
 
 # remove all records inside the specified table
 def deleteAllRecordInTable(tableName):
     # delete all records in the table first
-    engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
-                           .format(db = db_name,  # your mysql database name
-                                   user = db_user, # your mysql user for the database
-                                   password = db_password, # password for user
-                                   host = db_host,
-                                   port = db_port))
-    connection = engine.connect()
-    connection.execute("delete from " + tableName)
-    connection.close()
+    executeDbQuery("""delete from %s""" % (tableName))
 
     return "records removed from " + tableName + ";"
 
@@ -203,14 +164,14 @@ class DashboardCronJob(CronJobBase):
         # list all datasets
         if datasets:
             logger.debug('Datasets in project {}:'.format(project))
-            for dataset in datasets:  # API request(s)
+            for dataset in datasets:
                 logger.debug('\t{}'.format(dataset.dataset_id))
 
                 # choose the right dataset
                 if ("learning_datasets" == dataset.dataset_id):
                     # list all tables
                     dataset_ref = bigquery_client.dataset(dataset.dataset_id)
-                    tables = list(bigquery_client.list_tables(dataset_ref))  # API request(s)
+                    tables = list(bigquery_client.list_tables(dataset_ref))
                     for table in tables:
                         if ("enriched_events" == table.table_id):
                             logger.debug('\t{}'.format("found table"))
@@ -237,7 +198,7 @@ class DashboardCronJob(CronJobBase):
                                 job_config.query_parameters = query_params
 
                                 # Location must match that of the dataset(s) referenced in the query.
-                                df = bigquery_client.query(query, location='US', job_config=job_config).to_dataframe()  # API request - starts the query
+                                df = bigquery_client.query(query, location='US', job_config=job_config).to_dataframe()
 
                                 logger.debug("df row number=" + str(df.shape[0]))
                                 # drop duplicates
@@ -246,15 +207,7 @@ class DashboardCronJob(CronJobBase):
                                 logger.debug("after drop duplicates, df row number=" + str(df.shape[0]))
 
                                 # write to MySQL
-                                engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
-                                                       .format(db = db_name,  # your mysql database name
-                                                               user = db_user, # your mysql user for the database
-                                                               password = db_password, # password for user
-                                                               host = db_host,
-                                                               port = db_port))
-                                connection = engine.connect()
                                 df.to_sql(con=engine, name='file_access', if_exists='append', index=False)
-                                connection.close()
 
                                 returnString += str(df.shape[0]) + " rows for course " + UDW_course_id + ";"
                                 logger.info(returnString)
@@ -272,12 +225,7 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("assignment_groups")
 
         # update groups
-
-        '''
-        Loading the assignment groups inforamtion along with weight/points associated ith arn assignment
-        :param request:
-        :return:
-        '''
+        #Loading the assignment groups inforamtion along with weight/points associated ith arn assignment
         logger.debug("update_assignment_groups(): ")
 
         # return string with concatenated SQL insert result
@@ -297,12 +245,7 @@ class DashboardCronJob(CronJobBase):
         return status
 
     def update_assignment(self):
-
-        '''
-        Load the assignment info w.r.t to a course such as due_date, points etc
-        :param request:
-        :return:
-        '''
+        #Load the assignment info w.r.t to a course such as due_date, points etc
         status =""
 
         logger.info("update_assignment(): ")
@@ -328,11 +271,7 @@ class DashboardCronJob(CronJobBase):
 
 
     def submission(self):
-        '''
-        student submission information for assignments
-        :param request:
-        :return:
-        '''
+        #student submission information for assignments
         # cron status
         status =""
 
@@ -362,12 +301,8 @@ class DashboardCronJob(CronJobBase):
 
 
     def weight_consideration(self):
-        '''
-        load the assignment weight consider information with in a course. Some assignments don't have weight consideration
-        the result of it return boolean indicating weight is considered in table calculation or not
-        :param request:
-        :return:
-        '''
+        #load the assignment weight consider information with in a course. Some assignments don't have weight consideration
+        #the result of it return boolean indicating weight is considered in table calculation or not
         status =""
 
         logger.info("weight_consideration()")
