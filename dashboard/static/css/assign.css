@@ -91,34 +91,33 @@ div.table-style {
 }
 .bar{
     height:20px;
-    width:0%;
     font-size: 40%;
-    padding: 3px;
     vertical-align:middle;
     position: relative;
     cursor:pointer;
 }
 
 .zero-weight {
-    background: pink;
-    padding: 3px;
+    background: grey;
+    padding-left: 2px;
 }
 .blue-bar{
     background: lightskyblue;
-    padding: 6px;
+    padding-left: 6px;
 
 }
 .grey-bar{
     background: grey;
-    padding: 6px;
+    padding-left: 6px;
 }
 
 .bar::after{
     content:attr(data-descr);
     color: black;
-    margin-left: 20px;
-    font-size: 14px;
+    margin-left: 100%;
+    font-size: 13px;
     text-align: center;
+    display: inline;
 }
 .bar:hover::after {
     content: attr(tooltip-info);
@@ -131,7 +130,7 @@ div.table-style {
     background-color: white;
     padding: 12px;
     color: #000000;
-    font-size: 14px;
+    font-size: 13px;
     z-index: 1;
 }
 
@@ -181,13 +180,17 @@ div.table-style {
 
 .column{
     flex: 50%;
-    padding: 10px;
+    /*padding: 10px;*/
+}
+.assign-box {
+    width: 60%;
+    padding-left: 20px;
 }
 /*progress bar stuff*/
 
 #chart text {
     /*fill: #000;*/
-    font: 15px sans-serif;
+    font: 14px sans-serif;
     /*padding-left: 30px;*/
     /*text-anchor:start;*/
 }
@@ -209,6 +212,7 @@ div.table-style {
     outline-style: solid;
     outline-width: 1px;
 }
+
 
 .progress-hover-graded{
     fill: #a0d4ee;

@@ -26,7 +26,6 @@ from django.conf.urls import include
 from django.conf.urls.static import static
 
 from . import views
-from . import cron
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='home.html'), name = 'home'),
@@ -34,33 +33,22 @@ urlpatterns = [
 
     url('admin', admin.site.urls),
 
-
     # These URL's are for views, the accept an empty id
-    url(r'(?P<course_id>[0-9]+|)/?grades', login_required(TemplateView.as_view(template_name='grades.html')), name="grades"),
-    url(r'(?P<course_id>[0-9]+|)/?assignments', login_required(TemplateView.as_view(template_name='assignments.html')), name="assignments"),
+    url(r'^courses/(?P<course_id>[0-9]+|)/?grades', login_required(TemplateView.as_view(template_name='grades.html')), name="grades"),
+    url(r'^courses/(?P<course_id>[0-9]+|)/?assignments', login_required(TemplateView.as_view(template_name='assignments.html')), name="assignments"),
+    url(r'^courses/(?P<course_id>[0-9]+|)/?view_file_access_within_week', login_required(TemplateView.as_view(template_name='view_file_access_within_week.html')), name="view_file_access_within_week"),
 
-    url(r'(?P<course_id>[0-9]+|)/?view_file_access_within_week', login_required(TemplateView.as_view(template_name='view_file_access_within_week.html')), name="view_file_access_within_week"),
+    # This is the courses catch-all
+    url(r'^courses/(?P<course_id>[0-9]+|)', login_required(TemplateView.as_view(template_name='courses.html')), name="courses"),
 
     # Thse URL's are data patterns
     # get file access patterns
-    url(r'^(?P<course_id>[0-9]+)/grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
-    url(r'^(?P<course_id>[0-9]+)/file_access_within_week', login_required(views.file_access_within_week), name='file_access_within_week'),
-    url(r'^(?P<course_id>[0-9]+)/assignment_view', login_required(views.assignment_view), name='assignment_view'),
-    url(r'^(?P<course_id>[0-9]+)/assignment_progress', login_required(views.assignment_progress), name='assignment_progress'),
-    url(r'^(?P<course_id>[0-9]+)/get_current_week_number', login_required(views.get_current_week_number), name='get_current_week_number'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/file_access_within_week', login_required(views.file_access_within_week), name='file_access_within_week'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignment_view', login_required(views.assignment_view), name='assignment_view'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignment_progress', login_required(views.assignment_progress), name='assignment_progress'),
+    url(r'^api/v1/get_current_week_number', login_required(views.get_current_week_number), name='get_current_week_number'),
 
-    # These methods are all for loading test data
-    # TODO: Move these to cron job
-    # load data from UDW
-    url(r'^update_with_udw_course', login_required(cron.update_with_udw_course), name='update_with_udw_course'),
-    url(r'^update_with_udw_file', login_required(cron.update_with_udw_file), name='update_with_udw_file'),
-    url(r'^update_with_bq_access', login_required(cron.update_with_bq_access), name='update_with_bq_access'),
-    url(r'^update_with_udw_user', login_required(cron.update_with_udw_user), name='update_with_udw_user'),
-    url(r'^update_assignment', login_required(cron.update_assignment), name='update_assignment'),
-    url(r'^update_groups', login_required(cron.update_groups), name='update_groups'),
-    url(r'^submission', login_required(cron.submission), name='submission'),
-    url(r'^weight_consideration', login_required(cron.weight_consideration), name='weight_consideration'),
-    url(r'^testloader', login_required(TemplateView.as_view(template_name='testloader.html')), name="testloader"),
     url(r'^su', include('django_su.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
@@ -88,3 +76,11 @@ if apps.is_installed('registration'):
         # This URL *does* need a trailing slash because of the include
         url(r'^accounts/', include('registration.backends.default.urls')),
     )
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += (
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+        # For django versions after 2.0:
+        #path('__debug__/', include(debug_toolbar.urls)),
+    ) 

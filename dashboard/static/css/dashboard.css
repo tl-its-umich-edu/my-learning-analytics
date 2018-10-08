@@ -10,4 +10,85 @@
     background-image: linear-gradient(135deg, rgba(0, 0, 0, .04) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, .04) 50%, rgba(0, 0, 0, .04) 75%, transparent 75%, transparent);
     text-align: center;
     z-index: 5000;
+}
 
+/* Home.html style */
+
+header {
+	color:#fff;
+	background-color: #008ee2;
+	margin-bottom:40px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	font-weight: bold;
+}
+
+header a {
+	color:#fff;
+}
+
+.UnDashboardCard {
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+    width: 269px;
+    vertical-align: top;
+    margin: 0 36px 36px 0;
+	cursor: pointer !important; 
+	display: inline-block;
+}
+
+.UnDashboardCard:hover {
+	box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+}
+
+.UnDashboardCard_Header {
+    box-sizing: border-box;
+    height: 146px;
+    border: 1px solid rgba(0,0,0,0.1);
+	background-color: #f6f6f6;
+}
+
+.UnDashboardCard_Title {
+	padding: 10px;
+	background-color: #008ee2;
+	color: #fff;
+}
+
+.UnDashboardCard_Description {
+	height: 40px;
+	padding: 10px;
+	margin-bottom: 5px;
+	font-size: .6em;
+	color:#000;
+}
+
+.UnDashboardCard_Header img {
+	display: block;
+	margin:0 auto;
+	margin-top:10px;
+}
+
+/* Footer Style */
+
+footer {
+	font-size: .7em;
+	color:#999999;
+}
+
+/* https://stackoverflow.com/a/29341777/3708872 */
+.border-between > [class*='col-']:before {
+   background: #e3e3e3;
+   bottom: 0;
+   content: " ";
+   left: 0;
+   position: absolute;
+   width: 1px;
+   top: 0;
+}
+
+.border-between > [class*='col-']:first-child:before {
+   display: none;
+}
