@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}What Students Are Reading {% endblock %}
+{% block title %}Files Accessed {% endblock %}
 {% load static %}
 {% block css %}
 <link rel="stylesheet" href="/static/css/rSlider.min.css">
@@ -20,18 +20,18 @@
 {% endblock %}
 {% block content %}
     <!-- week slider -->
-    <input type="text" id="slider" class="slider">
+    <div class="slider-container">
+        <input type="text" id="slider" class="slider">
 
-    <input type="hidden" name="slider_num" id="slider_num" />
-    <div/>
+        <input type="hidden" name="slider_num" id="slider_num" />
+    </div>
     <br/>
-    <h6 class="text-center">Files accessed by students with grade
+    <h6 class="text-center">Files accessed by students with
     <select class="grade" name="grade" id="grade">
-        <option value="all" selected>All</option>
+        <option value="all" selected>All Grades</option>
         <option value="90-100" >90-100%</option>
         <option value="80-89" >80-89%</option>
         <option value="70-79" >70-79%</option>
-        <option value="NO_GRADE" >NO GRADE</option>
     </select> <span id="slider_label"> from week 1 to: </span></h6>
     <br/>
     <div id="chart"></div>
