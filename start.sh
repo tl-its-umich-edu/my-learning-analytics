@@ -36,4 +36,6 @@ else
     python manage.py migrate django_cron
 
     python manage.py runcrons
+
+    while true; do sleep 30; done;
 fi

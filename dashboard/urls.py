@@ -36,8 +36,10 @@ urlpatterns = [
     # These URL's are for views, the accept an empty id
     url(r'^courses/(?P<course_id>[0-9]+|)/?grades', login_required(TemplateView.as_view(template_name='grades.html')), name="grades"),
     url(r'^courses/(?P<course_id>[0-9]+|)/?assignments', login_required(TemplateView.as_view(template_name='assignments.html')), name="assignments"),
-
     url(r'^courses/(?P<course_id>[0-9]+|)/?view_file_access_within_week', login_required(TemplateView.as_view(template_name='view_file_access_within_week.html')), name="view_file_access_within_week"),
+
+    # This is the courses catch-all
+    url(r'^courses/(?P<course_id>[0-9]+|)', login_required(TemplateView.as_view(template_name='courses.html')), name="courses"),
 
     # Thse URL's are data patterns
     # get file access patterns
@@ -74,3 +76,11 @@ if apps.is_installed('registration'):
         # This URL *does* need a trailing slash because of the include
         url(r'^accounts/', include('registration.backends.default.urls')),
     )
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += (
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+        # For django versions after 2.0:
+        #path('__debug__/', include(debug_toolbar.urls)),
+    ) 
