@@ -32,10 +32,10 @@
     </div>
     <table class="table table_container">
         <thead>
-        <th style="padding: 0 10px 0 0">Week</th>
-        <th style="padding: 0 40px 0 0">Due Date</th>
-        <th style="padding: 0 110px 0 0">Title</th>
-        <th style="padding: 0 0 0 80px">Percent of final grade</th>
+        <th style="width:15%;padding: 0px">Week</th>
+        <th style="width:13%;padding: 0px">Date</th>
+        <th style="text-align: left; width:37%;padding: 0px;">Title</th>
+        <th style="text-align: left;padding: 0px;">Percent of final grade</th>
         </thead>
     </table>
     {% verbatim %}
@@ -50,9 +50,9 @@
                             <td class="time">{{due_dates.due_date}}</td>
                             <td class="table_container table_container2">
                                 <table class="table assignments-info">
-                                    <tr ng-repeat="assignments in due_dates.assignment_items">
+                                    <tr ng-repeat="assignments in due_dates.assignment_items" class="parent_assign">
                                         <div class="container-bar">
-                                            <td class="bar_text" assign-title={{assignments.name}}>{{assignments.name | limitTo:20}}{{assignments.name.length > 20?'&hellip;':''}}</td>
+                                            <td class="bar_text" title={{assignments.name}}>{{assignments.name}}</td>
                                         </div>
                                         <td class="bar_cell">
                                             <div ng-if="assignments.graded && assignments.points_possible != 0"
