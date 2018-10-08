@@ -1,24 +1,18 @@
 .table_container td.table_container {
-    width:90%;
+    width:85%;
     padding: 0 !important
 }
 
 td.table_container table tr td:nth-child(n) {
-    /*width:30%;*/
     padding: 0;
 }
 
 td.table_container1 table tr td:nth-child(n) {
-    /*width:50%;*/
     padding: 0;
 }
 
-/*.table .table_container1 td:nth-child(1n+1){*/
-/*border-right:1px solid gray;*/
-/*}*/
 
 td.table_container2 table tr td:nth-child(n) {
-    /*width:50%;*/
     padding: 0;
 }
 
@@ -29,18 +23,10 @@ td.table_container2 table tr td:nth-child(n) {
     padding: 0;
 }
 
-
-
 .assignments-info td:nth-child(1){
     border-collapse: collapse;
     border-right:1px solid gray;
 }
-
-
-/*.table .assignments-info td{*/
-/*border: none;*/
-/*}*/
-
 
 div.table-style {
     overflow:scroll;
@@ -50,20 +36,34 @@ div.table-style {
     color:darkorange;
 }
 
+.parent_assign{
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: flex;
+}
+
 .bar_cell {
-    width: 70%;
+    width: 50%;
     font-size: 75%;
     padding: 7px 0 !important;
     vertical-align: middle;
     color: #fff;
+    -webkit-flex: 1;
+    -moz-flex: 1;
+    flex: 1;
 }
 
 .bar_text {
-    text-align: center;
-}
+    width: 50%;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    cursor:pointer;
+    }
 [assign-title]:hover:after {
     opacity: 1;
-    /*transition: all 0.1s ease 0.5s;*/
     visibility: visible;
     cursor:pointer;
 }
@@ -86,9 +86,7 @@ div.table-style {
 [assign-title] {
     position: relative;
 }
-.container-bar{
-    width:200px;
-}
+
 .bar{
     height:20px;
     font-size: 40%;
@@ -118,6 +116,7 @@ div.table-style {
     font-size: 13px;
     text-align: center;
     display: inline;
+    cursor:pointer;
 }
 .bar:hover::after {
     content: attr(tooltip-info);
@@ -189,13 +188,9 @@ div.table-style {
 /*progress bar stuff*/
 
 #chart text {
-    /*fill: #000;*/
     font: 14px sans-serif;
-    /*padding-left: 30px;*/
-    /*text-anchor:start;*/
 }
 #chart {
-    /*border:1px solid #000;*/
     background-color: #ffffff;
 }
 .progress-graded{
@@ -231,7 +226,5 @@ div.tooltip {
     background: none repeat scroll 0 0 #ffffff;
     border: 1px solid #6F257F;
     padding: 14px;
-    /*text-align: left;*/
     pointer-events: none;
-    /*!*pointer-events:none !imporatant;*!*/
 }

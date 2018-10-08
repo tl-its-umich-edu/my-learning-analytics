@@ -158,14 +158,14 @@ var makeGraph = function () {
             });
             if(currentWeekXValue.length!=0) {
                 if(currentWeekXValue<6){
-                  dxValue = "2em";
+                  dxValue = "1.6em";
                 }else {
-                    dxValue=".7em";
+                    dxValue=".4em";
                 }
                 var currentLine = svg.append("g")
                 currentLine.append('line')
                     .attr('x1', currentWeekXValue)
-                    .attr('y1', 0)
+                    .attr('y1', 0-margin.top)
                     .attr('x2', currentWeekXValue)
                     .attr('y2', height)
                     .attr('stroke', 'darkorange')
@@ -174,17 +174,18 @@ var makeGraph = function () {
                     .attr('text-anchor', 'middle')
                     .attr("x", currentWeekXValue - 30)
                     .attr("dx", dxValue)
-                    // .attr("y", ".1em")
+                    .attr("y", -9)
+                    .attr("fill","darkorange")
+                    .attr("font-size","19px")
+                    .attr("font-weight","bold")
                     // .attr("dy", ".9em")
-                    .attr('stroke', 'orange')
-                    .attr("background-color", 'whitesmoke')
                     .text('Current')
             }
         if(maxPossibleWeekXValue.length!=0) {
             var maxLine = svg.append("g")
             maxLine.append('line')
                 .attr('x1', maxPossibleWeekXValue)
-                .attr('y1', 0)
+                .attr('y1', 0-margin.top)
                 .attr('x2', maxPossibleWeekXValue)
                 .attr('y2', height)
                 .attr('stroke', 'green')
@@ -192,10 +193,11 @@ var makeGraph = function () {
             maxLine.append('text')
                 .attr('text-anchor', 'middle')
                 .attr("x", maxPossibleWeekXValue - 50)
-                .attr("dx", '.8em')
-                // .attr("y", ".1em")
+                .attr("dx", '.5em')
+                .attr("y", -9)
                 // .attr("dy", ".9em")
-                .attr('stroke', 'green')
+                .attr('fill', 'green')
+                .attr("font-weight","bold")
                 .text('Max Possible')
         }
 
