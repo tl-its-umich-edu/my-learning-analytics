@@ -59,12 +59,14 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'dashboard',
-    'django_crontab',
+    'django_cron',
     'watchman',
     'macros',
-
+    'debug_toolbar',
 ]
 
+# The order of this is important. It says DebugToolbar should be on top but
+# The tips has it on the bottom
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -75,6 +77,11 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+]
+
+CRON_CLASSES = [
+    "dashboard.cron.DashboardCronJob",
 ]
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -297,12 +304,45 @@ else:
     LOGIN_REDIRECT_URL = '/'
     
 # This is fixed from UDW
-UDW_ID_PREFIX = config("UDW_ID_PREFIX", default=17700000000, cast=int)
+UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000")
 
 # TODO: Select a default course for user from database, just here so things don't all break
-# This will probably need to move to views.py
-DEFAULT_COURSE_ID = config("CANVAS_COURSE_IDS", default=0, cast=int)
+DEFAULT_COURSE_IDS = config("CANVAS_COURSE_IDS", default="0", cast=Csv())
+
+# Use the first course_id as the default for now
+DEFAULT_COURSE_ID = DEFAULT_COURSE_IDS[0]
+
+# Course IDS with the UDW ID appended to them
+DEFAULT_UDW_COURSE_IDS = [UDW_ID_PREFIX + course_id for course_id in DEFAULT_COURSE_IDS]  
+
+# set the current term id from config
+CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
+
+# Minutes between cron runs
+CRON_RUN_SCHEDULE = config('CRON_RUN_SCHEDULE', default=24*60, cast=int)
 
 # Add any settings you need to be available to templates in this array
 SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX','DEFAULT_COURSE_ID']
 
+# Method to show the user, if they're authenticated and superuser
+def show_debug_toolbar(request):
+    return DEBUG and request.user and request.user.is_authenticated and request.user.is_superuser
+
+DEBUG_TOOLBAR_PANELS = [
+    'debug_toolbar.panels.versions.VersionsPanel',
+    'debug_toolbar.panels.timer.TimerPanel',
+    'debug_toolbar.panels.settings.SettingsPanel',
+    'debug_toolbar.panels.headers.HeadersPanel',
+    'debug_toolbar.panels.request.RequestPanel',
+    'debug_toolbar.panels.sql.SQLPanel',
+    'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+    'debug_toolbar.panels.templates.TemplatesPanel',
+    'debug_toolbar.panels.cache.CachePanel',
+    'debug_toolbar.panels.signals.SignalsPanel',
+    'debug_toolbar.panels.logging.LoggingPanel',
+    'debug_toolbar.panels.redirects.RedirectsPanel',
+]
+
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK" : show_debug_toolbar,
+}

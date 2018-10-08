@@ -67,6 +67,8 @@ You can create regular users to test with without the superuser flag via the com
 
 `docker exec -it student_dashboard python manage.py createuser --username=student --email=student@example.edu`
 
+Note: You can also make a user a "super user" by connecting to the database, editing the record in auth_user and setting is_staff=1 and is_superuser=1.
+
 2. Connect to the docker and edit some files!
 
 `docker exec -it student_dashboard /bin/bash`
@@ -78,3 +80,10 @@ Then you can edit your files! (Probably in /dashboard/dashboard)
 3. Restart the gunicorn to read the configuration. This is useful to avoid a redeploy.
 
 `docker exec student_dashboard pkill -HUP gunicorn`
+
+4. The django-debug-toolbar is available for debugging. For this to be displayed.
+  - The environment needs to be DEBUG (set DJANGO_DEBUG=true in your .env)
+  - You have to be authenticated and a "super user" account. See step #1
+  - The method that controls this access is in show_debug_toolbar(request):
+  - Configuration of the panels is in DEBUG_TOOLBAR_PANELS as described on https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-panels
+

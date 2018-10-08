@@ -8,10 +8,9 @@
 }
 
 .myGradeline {
-    fill: none;
-    stroke: #444;
+    font-weight: bold;
     background-color: whitesmoke;
-    font-size: 10px;
+    font-size: 9px;
 }
 .grade-details {
         padding-left: 10px;
