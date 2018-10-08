@@ -84,10 +84,6 @@ CRON_CLASSES = [
     "dashboard.cron.DashboardCronJob",
 ]
 
-CRON_CLASSES = [
-    "dashboard.cron.DashboardCronJob",
-]
-
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 TEMPLATES = [
