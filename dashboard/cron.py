@@ -62,13 +62,6 @@ def executeDbQuery(query):
         connection.detach()
         connection.execute(query)
 
-def update_cron_status(status):
-    logger.debug("in update_cron_status")
-    sql = """insert into cron_status (cron_date, status) values('%s', '%s')""" % (str(datetime.datetime.now()), status)
-    executeDbQuery(sql)
-
-    logger.info("updated cron_status")
-
 # remove all records inside the specified table
 def deleteAllRecordInTable(tableName):
     # delete all records in the table first
@@ -343,9 +336,8 @@ class DashboardCronJob(CronJobBase):
 
         status += "End cron at: " +  str(datetime.datetime.now()) + ";"
 
-        # update the cron status table
-        update_cron_status(status)
-
         logger.info("************ total status=" + status + "/n/n")
+
+        return status
 
 
