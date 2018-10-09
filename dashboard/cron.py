@@ -28,7 +28,7 @@ db_port = settings.DATABASES['default']['PORT']
 logger.debug("db-name:" + db_name);
 logger.debug("db-user:" + db_user);
 
-engine = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
+engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}"
                        .format(db = db_name,  # your mysql database name
                                user = db_user, # your mysql user for the database
                                password = db_password, # password for user

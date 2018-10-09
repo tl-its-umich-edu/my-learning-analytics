@@ -3,28 +3,15 @@ from django.http import HttpResponse
 from django.contrib import auth
 from django.db import connection as conn
 
-import os
-import numpy as np
-
-import random
+import os, random, math, json, logging
 from datetime import datetime, timedelta
-import math
-import time
-import MySQLdb
-import json
-import collections
-import logging
-import csv
 
 from decouple import config, Csv
 
+import numpy as np
 import pandas as pd
 from pandas.io import sql
-#import MySQLdb
 
-import pandas as pd
-#from sqlalchemy import create_engine
-#import pymysql
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
