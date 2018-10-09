@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.contrib import auth
 from django.db import connection as conn
 
-import os, random, math, time, json, collections, logging
+import os, random, math, json, logging
 from datetime import datetime, timedelta
 
 from decouple import config, Csv
