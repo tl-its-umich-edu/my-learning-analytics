@@ -27,9 +27,12 @@ from django.conf.urls.static import static
 
 from . import views
 
+import watchman.views
+
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='home.html'), name = 'home'),
-    url('status', include('watchman.urls')),
+    url(r'^status/', include('watchman.urls')),
+    url(r'^status/bare_status$', watchman.views.bare_status),
 
     url('admin', admin.site.urls),
 
@@ -49,7 +52,7 @@ urlpatterns = [
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignment_progress', login_required(views.assignment_progress), name='assignment_progress'),
     url(r'^api/v1/get_current_week_number', login_required(views.get_current_week_number), name='get_current_week_number'),
 
-    url(r'^su', include('django_su.urls')),
+    url(r'^su/', include('django_su.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
