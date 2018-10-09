@@ -20,7 +20,7 @@ services:
       - UDW_DATABASE=${UDW_DATABASE}
     entrypoint: ['docker-entrypoint.sh', '--default-authentication-plugin=mysql_native_password']
     ports:
-      - "3306"
+      - "5306:3306"
     volumes:
       - ./mysql:/docker-entrypoint-initdb.d/:ro
     container_name: student_dashboard_mysql
