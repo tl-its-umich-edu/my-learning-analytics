@@ -30,19 +30,14 @@ The dashboard/saml directory needs to contain 4 files for SAML configuration. Th
 
 4. Initialize the MySQL database with mysql/init.sql: `http://localhost:5001/load_data`
 
-## Load user, file, file access data into database
-Use the following URL patterns to load data into databases:
+## Load user, file, file access data into database (Local)
+Users and files are loaded now with the cron job. This is run on a separate pod in Openshift when the environment variable `IS_CRON_POD=true`.
 
-** For testing now just use /testloader, this has all the URL's ready to load **
+To run it locally, Make sure your secrets are added and your VPN is active. Then run this command on a running container to execute the cronjob
 
-1. update_with_udw_user: load user enrollment information from Unizin Data Warehouse
-2. update_with_udw_file: load file info from Unizin Data Warehouse
-3. update_with_udw_access: load file access information from Canvas Live Event records hosted on Unizin Data Platform
-4. update_assignment: loading assignment info in a course
-5. update_groups: groups that assignment belongs has weight/point information associated with assignment group
-6. submission: assignment submission information of students in the course
-7. weight_consideration: load information about weights (as boolean) considered in grading of an assignment.
+`docker exec -it student_dashboard /bin/bash -c "python manage.py migrate django_cron && python manage.py runcrons"`
 
+After about 30-60 seconds the crons should all run and you should have data! In the admin interface there is a table where you can check the status of the cron job runs.
 
 ## Query the MySQL database within the container:
 `docker exec -t -i student_dashboard_mysql /bin/bash`
@@ -86,4 +81,3 @@ Then you can edit your files! (Probably in /dashboard/dashboard)
   - You have to be authenticated and a "super user" account. See step #1
   - The method that controls this access is in show_debug_toolbar(request):
   - Configuration of the panels is in DEBUG_TOOLBAR_PANELS as described on https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-panels
-
