@@ -45,9 +45,9 @@ var makeGraph = function(url) {
             if (d.self_access_count == 0) {
                 self_string = "You haven't viewed this file. ";
             } else if (d.self_access_count == 1) {
-                self_string = "You have read the file once on " + new Date(d.self_access_last_time);
+                self_string = "You have read the file once on " + new Date(d.self_access_last_time).toDateString();
             } else {
-                self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time);
+                self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time).toDateString();
 
             }
             return self_string;
