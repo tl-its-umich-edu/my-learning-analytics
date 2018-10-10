@@ -18,3 +18,6 @@ def current_user_course_id(request):
         logger.info("Course ID could not be determined from request, attempting to look up for user {}".format(request.user.username))
         course_id = get_default_user_course_id(request.user.username)
     return {'current_user_course_id': course_id}
+
+def last_updated(request):
+    return {'last_updated' : get_last_cron_run()}

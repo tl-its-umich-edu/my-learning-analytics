@@ -2,6 +2,9 @@
 
 import django
 import logging
+from datetime import datetime
+
+from django_cron.models import CronJobLog
 
 logger = logging.getLogger(__name__)
 
@@ -41,4 +44,10 @@ def get_default_user_course_id(user_id):
             course_id = str(row[0]).replace(str(django.conf.settings.UDW_ID_PREFIX),"")
     return course_id
 
-
+def get_last_cron_run():
+    try:
+        c = CronJobLog.objects.filter(is_success=1).latest('end_time')
+        end_time = c.end_time
+        return end_time
+    except CronJobLog.DoesNotExist:
+        return datetime.min

@@ -102,6 +102,7 @@ TEMPLATES = [
                 'django_settings_export.settings_export',
                 'dashboard.context_processors.course_name',
                 'dashboard.context_processors.current_user_course_id',
+                'dashboard.context_processors.last_updated',
             ],
         },
     },
@@ -139,7 +140,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Detroit'
 
 USE_I18N = True
 
