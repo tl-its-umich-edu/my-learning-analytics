@@ -361,11 +361,7 @@ var makeGraph = function(url) {
         ///////////////////////// Create brush //////////////////////
         /////////////////////////////////////////////////////////////
         //What should the first extent of the brush become - a bit arbitrary this
-        var brushExtent = Math.max( 1, Math.min( 20, Math.round(data.length*0.2) ) );
-        /*if (data.length <=5) {
-            // for small number of data, choose the whole range
-            brushExtent = data.length -1;
-        }*/
+        var brushExtent = Math.min(5, data.length-1)
 
         brush = d3.svg.brush()
             .y(mini_yScale)
