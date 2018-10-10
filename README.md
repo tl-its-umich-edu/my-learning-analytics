@@ -81,3 +81,16 @@ Then you can edit your files! (Probably in /dashboard/dashboard)
   - You have to be authenticated and a "super user" account. See step #1
   - The method that controls this access is in show_debug_toolbar(request):
   - Configuration of the panels is in DEBUG_TOOLBAR_PANELS as described on https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-panels
+
+## Steps for get localhost running
+
+1. build the current code: `docker-compose build`
+2. start app with MySQL instance initialized: `docker-compose up`
+
+For the initial setting of getting database populated, you want to do the following steps:
+
+1. start the app in detached mode: `docker-compose up -d`
+2. create user if necessary: `docker exec -it student_dashboard python manage.py createuser --superuser --username=root --email=root@example.edu --password=root`
+3. run cron job to populate related tables: `docker exec -it student_dashboard /bin/bash -c "python manage.py migrate django_cron && python manage.py runcrons --force`
+
+and off you go!
