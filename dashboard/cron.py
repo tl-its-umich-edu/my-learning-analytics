@@ -28,7 +28,7 @@ db_port = settings.DATABASES['default']['PORT']
 logger.debug("db-name:" + db_name);
 logger.debug("db-user:" + db_user);
 
-engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}"
+engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}?charset=utf8mb4"
                        .format(db = db_name,  # your mysql database name
                                user = db_user, # your mysql user for the database
                                password = db_password, # password for user
@@ -134,6 +134,26 @@ class DashboardCronJob(CronJobBase):
 
             status += util_function(UDW_course_id, user_sql, 'user')
 
+        return status
+
+    # update file records from UDW
+    def update_with_udw_file(self):
+        # cron status
+        status = ""
+
+        logger.debug("in update with udw file")
+
+        # delete all records in the table first
+        status += deleteAllRecordInTable("file")
+
+        #select file record from UDW
+        for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
+            file_sql = "select concat(" + settings.UDW_FILE_ID_PREFIX + ", canvas_id) as ID, display_name as NAME, course_id as COURSE_ID from file_dim " \
+                        "where file_state ='available' " \
+                        "and course_id='"+ UDW_course_id + "'" \
+                        " order by canvas_id"
+
+            status += util_function(UDW_course_id, file_sql, 'file')
         return status
 
     # update FILE_ACCESS records from BigQuery
@@ -318,15 +338,16 @@ class DashboardCronJob(CronJobBase):
 
         status += "Start cron at: " +  str(datetime.datetime.now()) + ";"
 
-        logger.info("************ cron tab course")
+        logger.info("************ course")
         status += self.update_with_udw_course()
 
         logger.info("************ user")
         status += self.update_with_udw_user()
 
 
-        logger.info("************ course")
-        self.update_with_bq_access()
+        logger.info("************ file")
+        status += self.update_with_udw_file()
+        status += self.update_with_bq_access()
 
         logger.info("************ assignment")
         status += self.update_groups()

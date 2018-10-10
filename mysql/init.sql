@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS file_access (
 
 CREATE TABLE IF NOT EXISTS file (
   id      CHAR(255)      NOT NULL,
-  name      CHAR(255)    NOT NULL DEFAULT '',
+  name      TEXT   NOT NULL,
   course_id    CHAR(255)      NOT NULL,
   PRIMARY KEY  (id)
 );
