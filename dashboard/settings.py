@@ -101,6 +101,7 @@ TEMPLATES = [
                 'django_su.context_processors.is_su',
                 'django_settings_export.settings_export',
                 'dashboard.context_processors.course_name',
+                'dashboard.context_processors.current_user_course_id',
             ],
         },
     },
@@ -312,9 +313,6 @@ UDW_FILE_ID_PREFIX = config("UDW_FILE_ID_PREFIX", default="1770000000")
 # TODO: Select a default course for user from database, just here so things don't all break
 DEFAULT_COURSE_IDS = config("CANVAS_COURSE_IDS", default="0", cast=Csv())
 
-# Use the first course_id as the default for now
-DEFAULT_COURSE_ID = DEFAULT_COURSE_IDS[0]
-
 # Course IDS with the UDW ID appended to them
 DEFAULT_UDW_COURSE_IDS = [UDW_ID_PREFIX + course_id for course_id in DEFAULT_COURSE_IDS]  
 
@@ -325,7 +323,7 @@ CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
 CRON_RUN_SCHEDULE = config('CRON_RUN_SCHEDULE', default=24*60, cast=int)
 
 # Add any settings you need to be available to templates in this array
-SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX','DEFAULT_COURSE_ID']
+SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX',]
 
 # Method to show the user, if they're authenticated and superuser
 def show_debug_toolbar(request):
