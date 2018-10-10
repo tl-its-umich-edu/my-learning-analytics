@@ -73,9 +73,9 @@ var dashboard = {
         if (url.includes('grades')) {
             help_link = help_link + '/grade-distribution';
         } else if (url.includes('assignments')) {
-            help_link = help_link + '/assignment-planning-tool';
+            help_link = help_link + '/assignment-planning';
         } else if (url.includes('file')) {
-            help_link = help_link + '/what-students-are-reading';
+            help_link = help_link + '/files-accessed';
         }
         $('<a href=' + help_link + ' style="padding-right:10px" target="_blank">Help</a>').insertAfter($('#help'));
     });
