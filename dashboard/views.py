@@ -212,7 +212,7 @@ def grade_distribution(request, course_id=0):
     return HttpResponse(df.to_json(orient='records'))
 
 def assignment_progress(request, course_id=0):
-    logger.info(assignment_view.__name__)
+    logger.info(assignment_progress.__name__)
 
     current_user = request.user.get_username()
 
