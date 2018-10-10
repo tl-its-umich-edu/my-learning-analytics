@@ -83,6 +83,13 @@ consider_weight BOOLEAN DEFAULT FALSE,
 PRIMARY KEY (course_id)
 );
 
+CREATE TABLE IF NOT EXISTS course_view_option (
+    course_id CHAR(255) PRIMARY KEY,
+    show_file_accessed BOOLEAN DEFAULT TRUE,
+    show_assignment_planning BOOLEAN DEFAULT TRUE,
+    show_grade_distribution BOOLEAN DEFAULT TRUE
+);
+
 -- insert terms
 INSERT INTO academic_terms (NAME, start_date, end_date) VALUES ('SUMMER 2018', '2018-06-27 04:00:00',  '2018-08-17 23:59:59' );
 INSERT INTO academic_terms (NAME, start_date, end_date) VALUES ('FALL 2018', '2018-09-03 04:00:00',  '2018-12-24 23:59:59' );

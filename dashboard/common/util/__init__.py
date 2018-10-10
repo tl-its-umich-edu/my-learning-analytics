@@ -24,6 +24,19 @@ def get_course_name_from_id(course_id):
                 course_name = row[0]
     return course_name
 
+def get_course_view_options (course_id):
+
+    logger.info(get_course_view_options.__name__)
+    course_id = str(django.conf.settings.UDW_ID_PREFIX) + str(course_id)
+    course_view_option = ""
+    if (course_id):
+        with django.db.connection.cursor() as cursor:
+            cursor.execute("SELECT show_file_accessed, show_assignment_planning, show_grade_distribution FROM course_view_option WHERE id = %s", [course_id])
+            row = cursor.fetchone()
+            if (row != None):
+                course_view_option = row[0]
+    return course_view_option
+
 def get_default_user_course_id(user_id):
     """[Get the default course id for the user id from the user table]
     :param user_id: [SIS User ID of the user]
