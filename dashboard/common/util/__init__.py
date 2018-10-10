@@ -1,6 +1,9 @@
 # Some utility functions used by other classes in this project
 
 import django
+import logging
+
+logger = logging.getLogger(__name__)
 
 def get_course_name_from_id(course_id):
     """[Get the long course name from the id]
@@ -10,7 +13,7 @@ def get_course_name_from_id(course_id):
     :return: [Course Name of course or blank not found]
     :rtype: [str]
     """
-
+    logger.info(get_course_name_from_id.__name__)
     course_id = str(django.conf.settings.UDW_ID_PREFIX) + str(course_id)
     course_name = ""
     if (course_id):
@@ -28,6 +31,7 @@ def get_default_user_course_id(user_id):
     :return: [Canvas Course ID]
     :rtype: [str]
     """
+    logger.info(get_default_user_course_id.__name__)
     course_id = ""
     with django.db.connection.cursor() as cursor:
         cursor.execute("SELECT course_id FROM user WHERE sis_name= %s ORDER BY course_id DESC LIMIT 1", [user_id])
