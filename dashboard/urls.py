@@ -29,13 +29,6 @@ from . import views
 
 import watchman.views
 
-
-from django.db import connection as conn
-import pandas as pd
-
-course_view_option_string = "SELECT * FROM course_view_option"
-courseViewOption = pd.read_sql(course_view_option_string, conn)
-
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='home.html'), name = 'home'),
     url(r'^status/', include('watchman.urls')),
@@ -49,7 +42,7 @@ urlpatterns = [
     url(r'^courses/(?P<course_id>[0-9]+|)/?view_file_access_within_week', login_required(TemplateView.as_view(template_name='view_file_access_within_week.html')), name="view_file_access_within_week"),
 
     # This is the courses catch-all
-    url(r'^courses/(?P<course_id>[0-9]+|)', login_required(TemplateView.as_view(template_name='courses.html')), { 'courseViewOptions': courseViewOption}, name="courses"),
+    url(r'^courses/(?P<course_id>[0-9]+|)', login_required(TemplateView.as_view(template_name='courses.html')), name="courses"),
 
     # Thse URL's are data patterns
     # get file access patterns

@@ -108,12 +108,13 @@ def file_access_within_week(request, course_id=0):
                 "WHERE a.file_id =f.ID and a.user_id = u.ID  " \
                 "and f.course_id = c.id and c.term_id = t.term_id " \
                 "and a.access_time > %(start_time)s " \
-                "and a.access_time < %(end_time)s "
+                "and a.access_time < %(end_time)s " \
+                "and f.course_id = %(course_id)s "
     startTimeString = start.strftime('%Y%m%d') + "000000"
     endTimeString = end.strftime('%Y%m%d') + "000000"
     logger.debug(sqlString);
     logger.debug("start time=" + startTimeString + " end_time=" + endTimeString);
-    df = pd.read_sql(sqlString, conn, params={"start_time": startTimeString,"end_time": endTimeString})
+    df = pd.read_sql(sqlString, conn, params={"start_time": startTimeString,"end_time": endTimeString, "course_id": course_id})
     logger.debug(df);
 
     # return if there is no data during this interval

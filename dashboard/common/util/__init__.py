@@ -28,13 +28,17 @@ def get_course_view_options (course_id):
 
     logger.info(get_course_view_options.__name__)
     course_id = str(django.conf.settings.UDW_ID_PREFIX) + str(course_id)
+    logger.debug("course_id=" + str(course_id))
     course_view_option = ""
     if (course_id):
         with django.db.connection.cursor() as cursor:
-            cursor.execute("SELECT show_file_accessed, show_assignment_planning, show_grade_distribution FROM course_view_option WHERE id = %s", [course_id])
+            cursor.execute("SELECT show_files_accessed, show_assignment_planning, show_grade_distribution FROM course_view_option WHERE course_id = %s", [course_id])
             row = cursor.fetchone()
             if (row != None):
-                course_view_option = row[0]
+                course_view_option = {}
+                course_view_option['show_files_accessed'] = row[0]
+                course_view_option['show_assignment_planning'] = row[1]
+                course_view_option['show_grade_distribution'] = row[2]
     return course_view_option
 
 def get_default_user_course_id(user_id):

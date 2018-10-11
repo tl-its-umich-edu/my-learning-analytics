@@ -1,20 +1,25 @@
 {% extends 'base.html' %}
 {% load static %}
-    {% block title %}Grade Distribution{% endblock %}
-    {% block css %}
-    <link rel="stylesheet" href="/static/css/grades.css">
-    {% endblock %}
-
-{% block content %}
-<br>
-<div class="grade-info"></div>
-<div id="chart">
-<div class ="error"></div>
-</div>
+{% block title %}Grade Distribution{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="/static/css/grades.css">
 {% endblock %}
 
-{% block js %}
-<script src="{% static 'd3-v4/build/d3.min.js' %}"></script>
-<script src="/static/js/grade_distribution.js"></script>
+{% block content %}
+    {% if course_view_option.show_grade_distribution %}
+        {% block graph %}
+            <br>
+            <div class="grade-info"></div>
+            <div id="chart">
+            <div class ="error"></div>
+            </div>
+        {% endblock %}
+        {% block js %}
+            <script src="{% static 'd3-v4/build/d3.min.js' %}"></script>
+            <script src="/static/js/grade_distribution.js"></script>
+        {% endblock %}
+    {% else %}
+        Grade Distribution view is hidden for this course.
+    {% endif %}
 {% endblock %}
 

@@ -22,11 +22,11 @@ def current_user_course_id(request):
     return {'current_user_course_id': course_id}
 
 def course_view_option(request):
+
     course_id = str(request.resolver_match.kwargs.get('course_id'))
+    logger.info("course_view_option=" + course_id)
     course_view_option = {}
     if (course_id):
         course_view_option = get_course_view_options(course_id)
 
-    logger.info("course_view_option=" + course_view_option)
-
-    return course_view_option
+    return {"course_view_option": course_view_option}
