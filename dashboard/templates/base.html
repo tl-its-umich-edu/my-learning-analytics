@@ -1,5 +1,7 @@
 {% load static %}
 {% load macros %}
+{% load tz %}
+
 <!DOCTYPE html>
 <!-- Use this as a "macro", no default title set -->
 {% macro title %}
@@ -41,7 +43,13 @@
     </header>
     {% block content %}
     {% endblock %}
-    <footer><hr>Copyright © 2018 The Regents of the University of Michigan</footer>
+    <footer>
+        <hr>
+        <div class="row">
+            <div class="col text-left">Copyright © 2018 The Regents of the University of Michigan</div>
+            <div class="col text-right">Last updated on {{last_updated|date:"m/d/Y P T"}}</div>
+        </div>
+    </footer>
 </body>
 <!-- Common Javascript -->
 {% if settings.GA_ID %}
