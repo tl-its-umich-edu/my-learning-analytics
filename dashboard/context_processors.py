@@ -30,3 +30,6 @@ def course_view_option(request):
         course_view_option = get_course_view_options(course_id)
 
     return {"course_view_option": course_view_option}
+
+def last_updated(request):
+    return {'last_updated' : get_last_cron_run()}
