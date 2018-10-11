@@ -83,13 +83,26 @@ consider_weight BOOLEAN DEFAULT FALSE,
 PRIMARY KEY (course_id)
 );
 
+CREATE TABLE IF NOT EXISTS course_view_option (
+    course_id CHAR(255) PRIMARY KEY,
+    show_files_accessed BOOLEAN DEFAULT TRUE,
+    show_assignment_planning BOOLEAN DEFAULT TRUE,
+    show_grade_distribution BOOLEAN DEFAULT TRUE
+);
+
 -- insert terms
 INSERT INTO academic_terms (NAME, start_date, end_date) VALUES ('SUMMER 2018', '2018-06-27 04:00:00',  '2018-08-17 23:59:59' );
 INSERT INTO academic_terms (NAME, start_date, end_date) VALUES ('FALL 2018', '2018-09-03 04:00:00',  '2018-12-24 23:59:59' );
--- inert course
+-- insert course
 INSERT INTO course (id, name, term_id) VALUES ('17700000000230745', 'STATS 250 SU 2018', 1);
 INSERT INTO course (id, name, term_id) VALUES ('17700000000252307', 'SI 110 001 FA 2018', 2);
 INSERT INTO course (id, name, term_id) VALUES ('17700000000245664', 'SI 664 002 FA 2018', 2);
 INSERT INTO course (id, name, term_id) VALUES ('17700000000283292', 'HMP 654 001 FA 2018', 2);
+-- insert course view options
+INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('17700000000252307', FALSE, FALSE, FALSE);
+INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('17700000000245664', TRUE, TRUE, TRUE);
+INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('17700000000283292', TRUE, TRUE, TRUE);
+
+
 
 COMMIT;

@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block content %}
+{% if course_view_option.show_assignment_planning %}
 <div class="container-fluid">
     <h5 style="padding-left: 10px">Progress toward Final Grade</h5>
     <div id="chart"></div>
@@ -97,6 +98,9 @@
 </div>
 </div>
 </div>
+{% else %}
+    Assignment Planning view is hidden for this course.
+{% endif %}
 {% endblock %}
 
 {% block js %}
