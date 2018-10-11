@@ -102,7 +102,7 @@ TEMPLATES = [
                 'django_settings_export.settings_export',
                 'dashboard.context_processors.course_name',
                 'dashboard.context_processors.current_user_course_id',
-                'dashboard.context_processors.course_view_option'
+                'dashboard.context_processors.course_view_option',
                 'dashboard.context_processors.last_updated',
             ],
         },
