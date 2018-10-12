@@ -30,12 +30,16 @@ if [ -z "${IS_CRON_POD}" ]; then
         --workers="${GUNICORN_WORKERS}"
 else
     # in cron pod
+    echo Running cron job pod
 
-    echo Running cron jobs
+    # Make the log file available
+    touch /var/log/cron.log
 
-    python manage.py migrate django_cron
+    # Get the environment from docker saved
+    # https://ypereirareis.github.io/blog/2016/02/29/docker-crontab-environment-variables/
+    printenv | sed 's/^\([a-zA-Z0-9_]*\)=\(.*\)$/export \1="\2"/g' >> $HOME/.profile
 
-    python manage.py runcrons
+    echo "*/5 * * * * . $HOME/.profile; python /dashboard/manage.py runcrons >> /var/log/cron.log 2>&1" | crontab
 
-    while true; do sleep 30; done;
+    crontab -l && cron -L 15 && tail -f /var/log/cron.log
 fi
