@@ -136,6 +136,28 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
+    # update unizin metadata from UDW
+    def update_unizin_metadata(self):
+
+        # cron status
+        status = ""
+
+        logger.debug("in update unizin metadata")
+
+        # delete all records in the table first
+        status += deleteAllRecordInTable("unizin_metadata")
+
+        # select all student registered for the course
+        metadata_sql = "select key as pkey, value as pvalue from unizin_metadata"
+
+        logger.debug(metadata_sql)
+
+        status += util_function("", metadata_sql, 'unizin_metadata')
+
+        return status
+
+
+
     # update file records from UDW
     def update_with_udw_file(self):
         # cron status
@@ -352,8 +374,12 @@ class DashboardCronJob(CronJobBase):
         logger.info("************ assignment")
         status += self.update_groups()
         status += self.update_assignment()
+
         status += self.submission()
         status += self.weight_consideration()
+        
+        logger.info("************ informational")
+        status += self.update_unizin_metadata()
 
         status += "End cron at: " +  str(datetime.datetime.now()) + ";"
 
