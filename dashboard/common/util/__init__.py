@@ -68,7 +68,7 @@ def get_last_cron_run():
         end_time = c.end_time
         return end_time
     except CronJobLog.DoesNotExist:
-        pass
+        logger.info("CronJobLog did not exist", exc_info = True)
     return datetime.min
 
 def get_canvas_data_date():
@@ -79,6 +79,6 @@ def get_canvas_data_date():
             if (row != None):
                 date = parse(row[0])
                 return date
-    except:
-        pass
+    except Exception:
+        logger.info("Value could not be found from metadata", exc_info = True)
     return datetime.min
