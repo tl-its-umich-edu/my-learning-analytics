@@ -25,8 +25,8 @@ db_password = settings.DATABASES['default']['PASSWORD']
 db_host = settings.DATABASES['default']['HOST']
 db_port = settings.DATABASES['default']['PORT']
 
-logger.debug("db-name:" + db_name);
-logger.debug("db-user:" + db_user);
+logger.debug("db-name:" + db_name)
+logger.debug("db-user:" + db_user)
 
 engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}?charset=utf8mb4"
                        .format(db = db_name,  # your mysql database name
@@ -65,7 +65,7 @@ def executeDbQuery(query):
 # remove all records inside the specified table
 def deleteAllRecordInTable(tableName):
     # delete all records in the table first
-    executeDbQuery("""delete from %s""" % (tableName))
+    executeDbQuery(f"delete from {tableName}")
 
     return "records removed from " + tableName + ";"
 
@@ -90,7 +90,7 @@ class DashboardCronJob(CronJobBase):
             logger.debug("UDW_course_id = " + UDW_course_id)
 
             #select file record from UDW
-            course_sql = "select id, name, " + settings.CURRENT_CANVAS_TERM_ID + " as term_id from course_dim where id='" + UDW_course_id + "'"
+            course_sql = f"select id, name, {settings.CURRENT_CANVAS_TERM_ID} as term_id from course_dim where id='{UDW_course_id}'"
 
             logger.debug(course_sql)
 
@@ -113,23 +113,24 @@ class DashboardCronJob(CronJobBase):
         for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
 
             # select all student registered for the course
-            user_sql = "select u.name AS name, " \
-                        "p.sis_user_id AS sis_id, " \
-                        "p.unique_name AS sis_name, " \
-                        "u.global_canvas_id AS id, " \
-                        "c.current_score AS current_grade, " \
-                        "c.final_score AS final_grade, " \
-                        "'"+ UDW_course_id + "' as course_id " \
-                        "from user_dim u, " \
-                        "pseudonym_dim p, " \
-                        "course_score_fact c, " \
-                        "(select e.user_id as user_id, e.id as enrollment_id from enrollment_dim e " \
-                        "where e.course_id = '" + UDW_course_id + "' " \
-                        "and e.type='StudentEnrollment' " \
-                        "and e.workflow_state='active' ) as e " \
-                        "where p.user_id=u.id " \
-                        "and u.id = e.user_id " \
-                        "and c.enrollment_id =  e.enrollment_id"
+            user_sql = f"""select u.name AS name, 
+                        p.sis_user_id AS sis_id, 
+                        p.unique_name AS sis_name, 
+                        u.global_canvas_id AS id, 
+                        c.current_score AS current_grade, 
+                        c.final_score AS final_grade, 
+                        '{UDW_course_id}' as course_id 
+                        from user_dim u, 
+                        pseudonym_dim p, 
+                        course_score_fact c, 
+                        (select e.user_id as user_id, e.id as enrollment_id from enrollment_dim e 
+                        where e.course_id = '{UDW_course_id}' 
+                        and e.type='StudentEnrollment' 
+                        and e.workflow_state='active' ) as e 
+                        where p.user_id=u.id 
+                        and u.id = e.user_id 
+                        and c.enrollment_id =  e.enrollment_id
+                        """
             logger.debug(user_sql)
 
             status += util_function(UDW_course_id, user_sql, 'user')
@@ -148,10 +149,11 @@ class DashboardCronJob(CronJobBase):
 
         #select file record from UDW
         for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
-            file_sql = "select concat(" + settings.UDW_FILE_ID_PREFIX + ", canvas_id) as ID, display_name as NAME, course_id as COURSE_ID from file_dim " \
-                        "where file_state ='available' " \
-                        "and course_id='"+ UDW_course_id + "'" \
-                        " order by canvas_id"
+            file_sql = f"""select concat({settings.UDW_FILE_ID_PREFIX}, canvas_id) as ID, display_name as NAME, course_id as COURSE_ID from file_dim
+                        where file_state ='available' 
+                        and course_id='{UDW_course_id}'
+                        order by canvas_id
+                        """
 
             status += util_function(UDW_course_id, file_sql, 'file')
         return status
@@ -193,16 +195,17 @@ class DashboardCronJob(CronJobBase):
                             for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
 
                                 # query to retrieve all file access events for one course
-                                query = 'select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, "$.object.id"), 35) AS STRING) AS file_id, ' \
-                                        'SUBSTR(JSON_EXTRACT_SCALAR(event, "$.membership.member.id"), 29) AS user_id, ' \
-                                        'datetime(EVENT_TIME) as access_time ' \
-                                        'FROM learning_datasets.enriched_events ' \
-                                        'where JSON_EXTRACT_SCALAR(event, "$.edApp.id") = \'http://umich.instructure.com/\' ' \
-                                        'and event_type = \'NavigationEvent\' ' \
-                                        'and JSON_EXTRACT_SCALAR(event, "$.object.name") = \'attachment\' ' \
-                                        'and JSON_EXTRACT_SCALAR(event, "$.action") = \'NavigatedTo\' ' \
-                                        'and JSON_EXTRACT_SCALAR(event, "$.membership.member.id") is not null ' \
-                                        'and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) = @course_id '
+                                query = '''select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, "$.object.id"), 35) AS STRING) AS file_id,
+                                        SUBSTR(JSON_EXTRACT_SCALAR(event, "$.membership.member.id"), 29) AS user_id,
+                                        datetime(EVENT_TIME) as access_time
+                                        FROM learning_datasets.enriched_events
+                                        where JSON_EXTRACT_SCALAR(event, "$.edApp.id") = \'http://umich.instructure.com/\'
+                                        and event_type = \'NavigationEvent\'
+                                        and JSON_EXTRACT_SCALAR(event, "$.object.name") = \'attachment\'
+                                        and JSON_EXTRACT_SCALAR(event, "$.action") = \'NavigatedTo\'
+                                        and JSON_EXTRACT_SCALAR(event, "$.membership.member.id") is not null
+                                        and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) = @course_id
+                                        '''
                                 logger.debug(query)
                                 query_params =[
                                     bigquery.ScalarQueryParameter('course_id', 'STRING', UDW_course_id),
@@ -243,13 +246,14 @@ class DashboardCronJob(CronJobBase):
         
         # loop through multiple course ids
         for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
-            assignment_groups_sql = "with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='" + UDW_course_id + "'and ad.visibility = 'everyone' and ad.workflow_state='published')," \
-                                    "assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf on agd.id = agf.assignment_group_id  where agd.course_id='" + UDW_course_id + "' and workflow_state='available')," \
-                                    "assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join (select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id )," \
-                                    "assign_rules as (select DISTINCT ad.assignment_group_id,agr.drop_lowest,agr.drop_highest from assignment_details ad join assignment_group_rule_dim agr on ad.assignment_group_id=agr.assignment_group_id)," \
-                                    "assignment_grp_points as (select ag.*, am.group_points AS group_points from assignment_grp ag join assign_more am on ag.assignment_group_id = am.assignment_group_id)," \
-                                    "assign_final as (select assignment_group_id AS id, course_id AS course_id, group_weight AS weight, name AS name, group_points AS group_points from assignment_grp_points)" \
-                                    "select g.*, ar.drop_lowest,ar.drop_highest from assign_rules ar join assign_final g on ar.assignment_group_id=g.id"
+            assignment_groups_sql = f"""with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{UDW_course_id}' and ad.visibility = 'everyone' and ad.workflow_state='published'),
+                                    assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf on agd.id = agf.assignment_group_id  where agd.course_id='{UDW_course_id}' and workflow_state='available'),
+                                    assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join (select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id ),
+                                    assign_rules as (select DISTINCT ad.assignment_group_id,agr.drop_lowest,agr.drop_highest from assignment_details ad join assignment_group_rule_dim agr on ad.assignment_group_id=agr.assignment_group_id),
+                                    assignment_grp_points as (select ag.*, am.group_points AS group_points from assignment_grp ag join assign_more am on ag.assignment_group_id = am.assignment_group_id),
+                                    assign_final as (select assignment_group_id AS id, course_id AS course_id, group_weight AS weight, name AS name, group_points AS group_points from assignment_grp_points)
+                                    select g.*, ar.drop_lowest,ar.drop_highest from assign_rules ar join assign_final g on ar.assignment_group_id=g.id
+                                    """
             status += util_function(UDW_course_id, assignment_groups_sql, 'assignment_groups')
 
         return status
@@ -263,18 +267,16 @@ class DashboardCronJob(CronJobBase):
         # delete all records in assignment table
         status += deleteAllRecordInTable("assignment")
 
-        # return string with concatenated SQL insert result
-        returnString = ""
-
         # loop through multiple course ids
         for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
-            assignment_sql="with assignment_info as " \
-                           "(select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone 'America/New_York' as local_date," \
-                           "ad.title AS name,af.course_id AS course_id,af.assignment_id AS id," \
-                           "af.points_possible AS points_possible,af.assignment_group_id AS assignment_group_id" \
-                           " from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='" + UDW_course_id + "'" \
-                                                                                                                                                      "and ad.visibility = 'everyone' and ad.workflow_state='published')" \
-                                                                                                                                                      "select * from assignment_info"
+            assignment_sql = f"""with assignment_info as
+                            (select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone 'America/New_York' as local_date,
+                            ad.title AS name,af.course_id AS course_id,af.assignment_id AS id,
+                            af.points_possible AS points_possible,af.assignment_group_id AS assignment_group_id
+                            from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{UDW_course_id}' 
+                            and ad.visibility = 'everyone' and ad.workflow_state='published')
+                            select * from assignment_info
+                            """
             status += util_function(UDW_course_id, assignment_sql,'assignment')
 
         return status
@@ -290,21 +292,19 @@ class DashboardCronJob(CronJobBase):
         # delete all records in file_access table
         status += deleteAllRecordInTable("submission")
 
-        # return string with concatenated SQL insert result
-        returnString = ""
-
         # loop through multiple course ids
         for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
-            submission_url = "with sub_fact as (select submission_id, assignment_id,user_id, global_canvas_id, published_score " \
-                            "from submission_fact sf join user_dim u on sf.user_id = u.id where course_id = '" + UDW_course_id + "')," \
-                            "enrollment as (select  distinct(user_id) from enrollment_dim where course_id = '" + UDW_course_id + "' and workflow_state='active' " \
-                            "and type = 'StudentEnrollment')," \
-                            "submission_time as (select id, graded_at, graded_at at time zone 'utc' at time zone 'America/New_York' as local_graded_time from submission_dim)," \
-                            "sub_with_enroll as (select sf.* from sub_fact sf join enrollment e on e.user_id = sf.user_id)," \
-                            "submission as (select se.submission_id,se.assignment_id,se.global_canvas_id,se.published_score, st.graded_at, st.local_graded_time " \
-                            "from sub_with_enroll se inner join submission_time st on se.submission_id = st.id)" \
-                            "select submission_id AS ID, assignment_id AS assignment_id, global_canvas_id AS user_id, " \
-                            "published_score AS score, graded_at AS graded_date, local_graded_time as local_graded_date from submission"
+            submission_url = f"""with sub_fact as (select submission_id, assignment_id,user_id, global_canvas_id, published_score
+                            from submission_fact sf join user_dim u on sf.user_id = u.id where course_id = '{UDW_course_id}'),
+                            enrollment as (select  distinct(user_id) from enrollment_dim where course_id = '{UDW_course_id}' and workflow_state='active' 
+                            and type = 'StudentEnrollment'),
+                            submission_time as (select id, graded_at, graded_at at time zone 'utc' at time zone 'America/New_York' as local_graded_time from submission_dim),
+                            sub_with_enroll as (select sf.* from sub_fact sf join enrollment e on e.user_id = sf.user_id),
+                            submission as (select se.submission_id,se.assignment_id,se.global_canvas_id,se.published_score, st.graded_at, st.local_graded_time 
+                            from sub_with_enroll se inner join submission_time st on se.submission_id = st.id)
+                            select submission_id AS ID, assignment_id AS assignment_id, global_canvas_id AS user_id, 
+                            published_score AS score, graded_at AS graded_date, local_graded_time as local_graded_date from submission
+                            """
             status += util_function(UDW_course_id, submission_url,'submission')
 
         return status
@@ -322,9 +322,10 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids
         for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
-            is_weight_considered_url ="with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact " \
-                                        "where course_id = '" + UDW_course_id + "' group by course_id having sum(group_weight)>1)" \
-                                        "(select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)"
+            is_weight_considered_url = f"""with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact
+                                        where course_id = '{UDW_course_id}' group by course_id having sum(group_weight)>1)
+                                        (select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)
+                                        """
             status += util_function(UDW_course_id, is_weight_considered_url,'assignment_weight_consideration', 'weight')
 
             logger.debug(status+"\n\n")

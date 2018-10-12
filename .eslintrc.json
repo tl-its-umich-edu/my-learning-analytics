@@ -1,6 +1,7 @@
 {
 	"globals": {
 		"d3": true,
-		"_": true
+		"_": true,
+		"tooltip": true
 	}
 }
