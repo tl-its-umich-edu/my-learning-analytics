@@ -3,14 +3,13 @@ from django.http import HttpResponse
 from django.contrib import auth
 from django.db import connection as conn
 
-import os, random, math, json, logging
+import random, math, json, logging
 from datetime import datetime, timedelta
 
-from decouple import config, Csv
+from decouple import config
 
 import numpy as np
 import pandas as pd
-from pandas.io import sql
 
 from django.conf import settings
 
@@ -100,8 +99,6 @@ def file_access_within_week(request, course_id=0):
 
 
     # get time range based on week number passed in via request
-
-    today = datetime.now().date()
 
     sqlString = "SELECT a.file_id as file_id, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id " \
                 "FROM file f, file_access a, user u, course c, academic_terms t  " \
@@ -262,7 +259,7 @@ def assignment_view(request, course_id=0):
     current_user = request.user.get_username()
 
     percent_selection = float(request.GET.get('percent','0.0'))
-    logger.info('selection from assignment view %s '.format(percent_selection))
+    logger.info('selection from assignment view {}'.format(percent_selection))
     sql = "select assignment_id,local_graded_date as graded_date,score,name,local_date as due_date,points_possible,group_points,weight,drop_lowest,drop_highest from (" \
           "(select assignment_id,local_graded_date,score from"\
           "(select id from user where sis_name = %(current_user)s ) as u join"\
@@ -341,7 +338,7 @@ def percent_calculation(consider_weight,total_points,row):
 def find_min_week(course_id):
     date = get_term_dates_for_course(course_id)
     year,week,dow=date.isocalendar()
-    return week;
+    return week
 
 
 def find_current_week(row):

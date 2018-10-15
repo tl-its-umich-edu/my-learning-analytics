@@ -11,10 +11,8 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
-import csv
 
 from os import path
-import sys
 
 from decouple import config, Csv
 
