@@ -32,4 +32,4 @@ def course_view_option(request):
     return {"course_view_option": course_view_option}
 
 def last_updated(request):
-    return {'last_updated' : get_last_cron_run()}
+    return {'last_updated' : get_canvas_data_date()}

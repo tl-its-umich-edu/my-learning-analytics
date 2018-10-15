@@ -3,6 +3,7 @@
 import django
 import logging
 from datetime import datetime
+from dateutil.parser import parse
 
 from django_cron.models import CronJobLog
 
@@ -67,4 +68,17 @@ def get_last_cron_run():
         end_time = c.end_time
         return end_time
     except CronJobLog.DoesNotExist:
-        return datetime.min
+        logger.info("CronJobLog did not exist", exc_info = True)
+    return datetime.min
+
+def get_canvas_data_date():
+    try:
+        with django.db.connection.cursor() as cursor:
+            cursor.execute("SELECT pvalue from unizin_metadata where pkey = 'canvasdatadate'")
+            row = cursor.fetchone()
+            if (row != None):
+                date = parse(row[0])
+                return date
+    except Exception:
+        logger.info("Value could not be found from metadata", exc_info = True)
+    return datetime.min
