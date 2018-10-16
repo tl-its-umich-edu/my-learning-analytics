@@ -319,8 +319,8 @@ DEFAULT_UDW_COURSE_IDS = [UDW_ID_PREFIX + course_id for course_id in DEFAULT_COU
 # set the current term id from config
 CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
 
-# Minutes between cron runs
-CRON_RUN_SCHEDULE = config('CRON_RUN_SCHEDULE', default=24*60, cast=int)
+# Time to run cron
+RUN_AT_TIMES = config('RUN_AT_TIMES', default="", cast= Csv())
 
 # Add any settings you need to be available to templates in this array
 SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX',]

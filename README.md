@@ -33,9 +33,11 @@ The dashboard/saml directory needs to contain 4 files for SAML configuration. Th
 ## Load user, file, file access data into database (Local)
 Users and files are loaded now with the cron job. This is run on a separate pod in Openshift when the environment variable `IS_CRON_POD=true`.
 
-To run it locally, Make sure your secrets are added and your VPN is active. Then run this command on a running container to execute the cronjob
+You also have to configure when the cron is going to run with the environment variables RUN_AT_TIMES and CRONTAB_SCHEDULE. See the .env.sample for more information.
 
-`docker exec -it student_dashboard /bin/bash -c "python manage.py migrate django_cron && python manage.py runcrons"`
+For local testing, make sure your secrets are added and your VPN is active. Then run this command on a running container to execute the cronjob
+
+`docker exec -it student_dashboard /bin/bash -c "python manage.py migrate django_cron && python manage.py runcrons --force"`
 
 After about 30-60 seconds the crons should all run and you should have data! In the admin interface there is a table where you can check the status of the cron job runs.
 
