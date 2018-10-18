@@ -93,11 +93,7 @@ def file_access_within_week(request, course_id=0):
     logger.debug("current_user=" + current_user)
 
     # environment settings:
-    pd.set_option('display.max_column',None)
-    pd.set_option('display.max_rows',None)
-    pd.set_option('display.max_seq_items',None)
-    pd.set_option('display.max_colwidth', 500)
-    pd.set_option('expand_frame_repr', True)
+    df_default_display_settings()
 
     # read from request param
     week_num_start = int(request.GET.get('week_num_start','1'))
@@ -223,6 +219,7 @@ def file_access_within_week(request, course_id=0):
 
     return HttpResponse(output_df.to_json(orient='records'))
 
+
 def grade_distribution(request, course_id=0):
     logger.info(grade_distribution.__name__)
 
@@ -247,47 +244,33 @@ def grade_distribution(request, course_id=0):
 
     return HttpResponse(df.to_json(orient='records'))
 
+
 def assignment_progress(request, course_id=0):
     logger.info(assignment_progress.__name__)
 
     current_user = request.user.get_username()
+    df_default_display_settings()
 
-    sql = "select assignment_id,local_graded_date as graded_date,score,name,assign_grp_name,local_date as due_date,points_possible,group_points,weight,drop_lowest,drop_highest  from (" \
-          "(select assignment_id,local_graded_date,score from" \
-          "(select id from user where sis_name = %(current_user)s ) as u join" \
-          "(select user_id,assignment_id,local_graded_date,score from submission) as sub on sub.user_id=u.id) as rock join" \
-          "(select assign_id,name,assign_grp_name,local_date,points_possible,group_points,weight,drop_lowest,drop_highest  from" \
-          "(select id as assign_id,assignment_group_id, local_date,name,points_possible from assignment where course_id = %(course_id)s) as a join" \
-          "(select id,name as assign_grp_name,group_points, weight,drop_lowest,drop_highest  from assignment_groups) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
-    df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': course_id},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%Y-%m-%d'})
-    if df.empty:
+    assignments_in_course = get_course_assignments(course_id)
+    if assignments_in_course.empty:
         return HttpResponse(json.dumps({}), content_type='application/json')
+    assignment_submissions = get_user_assignment_submission(current_user, assignments_in_course,course_id)
+
+    df = pd.merge(assignments_in_course, assignment_submissions, on='assignment_id', how='inner')
+    if df.empty:
+        logger.info('There are no assignment data in the course %s for user %s '%(course_id, current_user))
+        return HttpResponse(json.dumps([]), content_type='application/json')
+
+    df.sort_values(by='due_date', inplace=True)
+    df.drop(columns=['assignment_id', 'due_date'], inplace=True)
     df.drop_duplicates(keep='first', inplace=True)
-    df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
-    df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
-    df[['points_possible','group_points']]=df[['points_possible','group_points']].fillna(0)
-    df[['points_possible', 'group_points','weight','score']] = df[['points_possible', 'group_points','weight','score']].astype(float)
-    consider_weight=is_weight_considered(course_id)
-    total_points=df['points_possible'].sum()
-    df['towards_final_grade']=df.apply(lambda x: percent_calculation(consider_weight, total_points,x), axis=1)
-    df.sort_values(by='due_date', inplace = True)
-    df['graded']=df['graded_date'].notnull()
-    df['due_date_mod'] =df['due_date'].astype(str).apply(lambda x:x.split()[0])
-    df['due_dates']= pd.to_datetime(df['due_date_mod']).dt.strftime('%m/%d')
-    df['due_dates'].replace('NaT','N/A',inplace=True)
-    df.drop(columns=['assignment_id','due_date','graded_date'], inplace=True)
     df = df[df['towards_final_grade']>0.0]
-
-    def user_percent(row):
-        if row['graded']==True:
-            s =round((row['score']/row['points_possible'])*row['towards_final_grade'],2)
-            return s
-        else: return row['towards_final_grade']
-
+    df[['score']] = df[['score']].astype(float)
     df['percent_gotten']=df.apply(user_percent,axis=1)
     df.sort_values(by=['graded','due_date_mod'], ascending=[False,True],inplace = True)
     df.reset_index(inplace=True)
     df.drop(columns=['index'],inplace=True)
+    logger.debug('The Dataframe for the assignment progress %s ' %df)
     return HttpResponse(df.to_json(orient='records'))
 
 
@@ -295,6 +278,10 @@ def assignment_view(request, course_id=0):
     logger.info(assignment_view.__name__)
 
     current_user = request.user.get_username()
+    df_default_display_settings()
+
+    percent_selection = float(request.GET.get('percent', '0.0'))
+    logger.info('selection from assignment Planning {}'.format(percent_selection))
 
     percent_selection = float(request.GET.get('percent','0.0'))
 
@@ -315,64 +302,109 @@ def assignment_view(request, course_id=0):
           "(select id as assign_id,assignment_group_id, local_date,name,points_possible from assignment where course_id = %(course_id)s) as a join"\
           "(select id, group_points, weight,drop_lowest,drop_highest from assignment_groups) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
     df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': course_id},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%Y-%m-%d'})
-    if df.empty:
-        return HttpResponse(json.dumps([]), content_type='application/json')
-    df.drop_duplicates(keep='first', inplace=True)
-    df['due_date'] = pd.to_datetime(df['due_date'],unit='ms')
-    df['graded_date'] = pd.to_datetime(df['graded_date'],unit='ms')
-    df[['points_possible','group_points']]=df[['points_possible','group_points']].fillna(0)
-    df[['points_possible', 'group_points','weight']] = df[['points_possible', 'group_points','weight']].astype(float)
-    consider_weight=is_weight_considered(course_id)
-    total_points=df['points_possible'].sum()
-    df['towards_final_grade']=df.apply(lambda x: percent_calculation(consider_weight, total_points,x), axis=1)
-    df['calender_week']=df['due_date'].dt.week
-    df['calender_week']=df['calender_week'].fillna(0).astype(int)
-    min_week=find_min_week(course_id)
-    max_week=df['calender_week'].max()
-    week_list = [x for x in range(min_week,max_week+1)]
-    df['week']=df['calender_week'].apply(lambda x: 0 if x == 0 else week_list.index(x)+1)
-    df.sort_values(by='due_date', inplace = True)
-    df['current_week']=df['calender_week'].apply(lambda x: find_current_week(x))
-    df['graded']=df['graded_date'].notnull()
-    df['due_date_mod'] =df['due_date'].astype(str).apply(lambda x:x.split()[0])
-    df['due_dates']= pd.to_datetime(df['due_date_mod']).dt.strftime('%m/%d')
-    df['due_dates'].replace('NaT','N/A',inplace=True)
-    df.drop(columns=['assignment_id','due_date','graded_date'], inplace=True)
-    df2 = df[df['towards_final_grade']>=percent_selection]
-    df2.reset_index(inplace=True)
-    df2.drop(columns=['index'],inplace=True)
-    grouped = df2.groupby(['week','due_dates'])
 
-    assignment_list=[]
+    if df.empty:
+        logger.info('There are no assignment data in the course %s for user %s '%(course_id, current_user))
+        return HttpResponse(json.dumps([]), content_type='application/json')
+
+    df.sort_values(by='due_date', inplace=True)
+    df.drop(columns=['assignment_id', 'due_date'], inplace=True)
+    df.drop_duplicates(keep='first', inplace=True)
+
+    # Group the data according the assignment prep view
+    df2 = df[df['towards_final_grade'] >= percent_selection]
+    df2.reset_index(inplace=True)
+    df2.drop(columns=['index'], inplace=True)
+    logger.debug('The Dataframe for the assignment planning %s ' %df2)
+    grouped = df2.groupby(['week', 'due_dates'])
+
+    assignment_list = []
     for name, group in grouped:
-    # name is a tuple of (week,due_date) => (1,'06/23/2018')
-    # group is a dataframe based on grouping by week,due_date
-        dic={}
-        group.drop(['week', 'due_dates'], axis=1,inplace = True)
-        dic['week']=name[0]
-        dic['due_date']=name[1]
-        dic['assign']=json.loads(group.to_json(orient='records'))
+        # name is a tuple of (week,due_date) => (1,'06/23/2018')
+        # group is a dataframe based on grouping by week,due_date
+        dic = {}
+        group.drop(['week', 'due_dates'], axis=1, inplace=True)
+        dic['week'] = name[0]
+        dic['due_date'] = name[1]
+        dic['assign'] = json.loads(group.to_json(orient='records'))
         assignment_list.append(dic)
-    week_list=[]
+    week_list = []
     for item in assignment_list:
         week_list.append(item['week'])
     weeks = set(week_list)
     full = []
-    i=1
+    i = 1
     for week in weeks:
         data = {}
-        data["week"]=np.uint64(week).item()
-        data["id"]=i
-        dd_items = data["due_date_items"]=[]
+        data["week"] = np.uint64(week).item()
+        data["id"] = i
+        dd_items = data["due_date_items"] = []
         for item in assignment_list:
-            assignment_due_date_grp={}
-            if item['week']==week:
-                assignment_due_date_grp['due_date']=item['due_date']
-                assignment_due_date_grp['assignment_items']=item['assign']
+            assignment_due_date_grp = {}
+            if item['week'] == week:
+                assignment_due_date_grp['due_date'] = item['due_date']
+                assignment_due_date_grp['assignment_items'] = item['assign']
                 dd_items.append(assignment_due_date_grp)
         full.append(data)
-        i+=1
+        i += 1
     return HttpResponse(json.dumps(full), content_type='application/json')
+
+
+def get_course_assignments(course_id):
+    sql="select assignment_id,name,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from " \
+        "(select id as assignment_id,assignment_group_id, local_date as due_date,name,points_possible from assignment where course_id = %(course_id)s) as a join " \
+        "(select id, group_points, weight,drop_lowest,drop_highest from assignment_groups) as ag on ag.id=a.assignment_group_id"
+
+    assignments_in_course = pd.read_sql(sql,conn,params={'course_id': course_id}, parse_dates={'due_date': '%Y-%m-%d'})
+    # No assignments found in the course
+    if assignments_in_course.empty:
+        logger.info('The course %s don\'t seems to have assignment data' % course_id)
+        return assignments_in_course
+
+    assignments_in_course['due_date'] = pd.to_datetime(assignments_in_course['due_date'],unit='ms')
+    assignments_in_course[['points_possible','group_points']]=assignments_in_course[['points_possible','group_points']].fillna(0)
+    assignments_in_course[['points_possible', 'group_points','weight']] = assignments_in_course[['points_possible', 'group_points','weight']].astype(float)
+    consider_weight=is_weight_considered(course_id)
+    total_points=assignments_in_course['points_possible'].sum()
+    assignments_in_course['towards_final_grade']=assignments_in_course.apply(lambda x: percent_calculation(consider_weight, total_points,x), axis=1)
+    assignments_in_course['calender_week']=assignments_in_course['due_date'].dt.week
+    assignments_in_course['calender_week']=assignments_in_course['calender_week'].fillna(0).astype(int)
+    min_week=find_min_week(course_id)
+    max_week=assignments_in_course['calender_week'].max()
+    week_list = [x for x in range(min_week,max_week+1)]
+    assignments_in_course['week']=assignments_in_course['calender_week'].apply(lambda x: 0 if x == 0 else week_list.index(x)+1)
+    assignments_in_course.sort_values(by='due_date', inplace = True)
+    assignments_in_course['current_week']=assignments_in_course['calender_week'].apply(lambda x: find_current_week(x))
+    assignments_in_course['due_date_mod'] =assignments_in_course['due_date'].astype(str).apply(lambda x:x.split()[0])
+    assignments_in_course['due_dates']= pd.to_datetime(assignments_in_course['due_date_mod']).dt.strftime('%m/%d')
+    assignments_in_course['due_dates'].replace('NaT','N/A',inplace=True)
+    return assignments_in_course
+
+
+def get_user_assignment_submission(current_user,assignments_in_course_df, course_id):
+    sql = "select assignment_id,local_graded_date as graded_date ,score from submission where " \
+          "user_id=(select id from user where sis_name = %(current_user)s and course_id = %(course_id)s ) and course_id = %(course_id)s"
+    assignment_submissions = pd.read_sql(sql, conn, params={'course_id': course_id, "current_user": current_user},
+                                         parse_dates={'graded_date': '%Y-%m-%d'})
+    if assignment_submissions.empty:
+        logger.info('The user %s seems to be a not student in the course.' % current_user)
+        # manually adding the columns for display in UI
+        assignment_submissions = pd.DataFrame()
+        assignment_submissions['assignment_id'] = assignments_in_course_df['assignment_id']
+        assignment_submissions['score'] = None
+        assignment_submissions['graded'] = False
+    else:
+        assignment_submissions['graded'] = assignment_submissions['graded_date'].notnull()
+        assignment_submissions.drop(columns=['graded_date'], inplace=True)
+    return assignment_submissions
+
+
+def user_percent(row):
+    if row['graded'] == True:
+        s = round((row['score'] / row['points_possible']) * row['towards_final_grade'], 2)
+        return s
+    else:
+        return row['towards_final_grade']
 
 
 def percent_calculation(consider_weight,total_points,row):
@@ -408,6 +440,15 @@ def get_term_dates_for_course(course_id):
     sql = "select a.start_date from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.term_id;"
     df = pd.read_sql(sql, conn, params={"course_id": course_id}, parse_dates={'start_date': '%Y-%m-%d'})
     return df['start_date'].iloc[0]
+
+
+def df_default_display_settings():
+    pd.set_option('display.max_column', None)
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_seq_items', None)
+    pd.set_option('display.max_colwidth', 500)
+    pd.set_option('expand_frame_repr', True)
+
 
 def logout(request):
     logger.info('User %s logging out.' % request.user.username)

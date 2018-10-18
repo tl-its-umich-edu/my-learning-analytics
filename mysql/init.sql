@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS user (
   course_id CHAR(255),
   current_grade    CHAR(255),
   final_grade    CHAR(255),
-  PRIMARY KEY  (id)
+  PRIMARY KEY  (id,course_id)
 );
 
 CREATE TABLE IF NOT EXISTS assignment_groups(
@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS assignment(
 CREATE TABLE IF NOT EXISTS submission(
  id  CHAR(255)    NOT NULL,
  assignment_id  CHAR(255)    NOT NULL,
+ course_id CHAR(255) NOT NULL,
  user_id  CHAR(255)    NOT NULL,
  score CHAR(255),
  graded_date TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
@@ -105,7 +106,7 @@ INSERT INTO course (id, name, term_id) VALUES ('17700000000252307', 'SI 110 001 
 INSERT INTO course (id, name, term_id) VALUES ('17700000000245664', 'SI 664 002 FA 2018', 2);
 INSERT INTO course (id, name, term_id) VALUES ('17700000000283292', 'HMP 654 001 FA 2018', 2);
 -- insert course view options
-INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('17700000000252307', FALSE, FALSE, FALSE);
+INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('17700000000252307', TRUE, TRUE, FALSE);
 INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('17700000000245664', TRUE, TRUE, TRUE);
 INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('17700000000283292', TRUE, TRUE, TRUE);
 
