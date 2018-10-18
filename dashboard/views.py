@@ -218,11 +218,12 @@ def assignment_progress(request, course_id=0):
         return HttpResponse(json.dumps({}), content_type='application/json')
     assignment_submissions = get_user_assignment_submission(current_user, assignments_in_course,course_id)
 
-    df = pd.merge(assignments_in_course, assignment_submissions, on='assignment_id', how='inner')
+    df = pd.merge(assignments_in_course, assignment_submissions, on='assignment_id', how='left')
     if df.empty:
         logger.info('There are no assignment data in the course %s for user %s '%(course_id, current_user))
         return HttpResponse(json.dumps([]), content_type='application/json')
 
+    df['graded']= df['graded'].fillna(False)
     df.sort_values(by='due_date', inplace=True)
     df.drop(columns=['assignment_id', 'due_date'], inplace=True)
     df.drop_duplicates(keep='first', inplace=True)
@@ -252,7 +253,7 @@ def assignment_view(request, course_id=0):
 
     assignment_submissions = get_user_assignment_submission(current_user, assignments_in_course,course_id)
 
-    df = pd.merge(assignments_in_course, assignment_submissions, on='assignment_id', how='inner')
+    df = pd.merge(assignments_in_course, assignment_submissions, on='assignment_id', how='left')
     if df.empty:
         logger.info('There are no assignment data in the course %s for user %s '%(course_id, current_user))
         return HttpResponse(json.dumps([]), content_type='application/json')
@@ -332,7 +333,7 @@ def get_course_assignments(course_id):
 
 
 def get_user_assignment_submission(current_user,assignments_in_course_df, course_id):
-    sql = "select assignment_id, score, grade_muted from submission where " \
+    sql = "select assignment_id, score, graded_date from submission where " \
           "user_id=(select id from user where sis_name = %(current_user)s and course_id = %(course_id)s ) and course_id = %(course_id)s"
     assignment_submissions = pd.read_sql(sql, conn, params={'course_id': course_id, "current_user": current_user})
     if assignment_submissions.empty:
@@ -343,8 +344,8 @@ def get_user_assignment_submission(current_user,assignments_in_course_df, course
         assignment_submissions['score'] = None
         assignment_submissions['graded'] = False
     else:
-        assignment_submissions['score']=assignment_submissions.apply(hide_score_on_mute,axis=1)
-        assignment_submissions['graded']=assignment_submissions['score'].apply(lambda x: False if x is None else True)
+        assignment_submissions['graded'] = assignment_submissions['graded_date'].notnull()
+        assignment_submissions.drop(columns=['graded_date'], inplace=True)
     return assignment_submissions
 
 

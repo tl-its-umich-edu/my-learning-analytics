@@ -322,7 +322,7 @@ class DashboardCronJob(CronJobBase):
                              submission_time as (select sd.id, sd.graded_at from submission_dim sd join sub_fact suf on sd.id=suf.submission_id),
                              assign_fact as (select s.*,a.title, a.muted from assignment_dim a join sub_with_enroll s on s.assignment_id=a.id where a.course_id='{UDW_course_id}' and a.workflow_state='published'),
                              assign_sub_time as (select a.*, t.graded_at from assign_fact a join submission_time t on a.submission_id = t.id)
-                             select submission_id AS id, assignment_id AS assignment_id, course_id, global_canvas_id AS user_id, published_score AS score, graded_at AS graded_date, muted AS grade_muted from assign_sub_time
+                             select submission_id AS id, assignment_id AS assignment_id, course_id, global_canvas_id AS user_id, published_score AS score, graded_at AS graded_date from assign_sub_time where muted=false
                              """
             status += util_function(UDW_course_id, submission_url,'submission')
 
