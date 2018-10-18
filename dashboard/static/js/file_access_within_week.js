@@ -45,9 +45,9 @@ var makeGraph = function(url) {
             if (d.self_access_count == 0) {
                 self_string = "You haven't viewed this file. ";
             } else if (d.self_access_count == 1) {
-                self_string = "You have read the file once on " + new Date(d.self_access_last_time).toDateString();
+                self_string = "You have read the file once on " + new Date(d.self_access_last_time).toDateString() + ".";
             } else {
-                self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time).toDateString();
+                self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time).toDateString() + ".";
 
             }
             return self_string;
@@ -230,7 +230,7 @@ var makeGraph = function(url) {
 
     }//scroll
 
-    $.getJSON(url || "/api/v1/courses/"+dashboard.course_id+"/file_access_within_week?week_num_start=1&week_num_end=0", function (initResult) {
+    $.getJSON(url, function (initResult) {
         if (initResult.length === 0 )
         {
             // return no data

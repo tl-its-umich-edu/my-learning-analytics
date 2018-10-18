@@ -13,6 +13,8 @@ import pandas as pd
 
 from django.conf import settings
 
+from pinax.eventlog.models import log
+
 logger = logging.getLogger(__name__)
 
 # strings for construct file download url
@@ -27,12 +29,31 @@ GRADE_C="70-79"
 GRADE_LOW="low_grade"
 NO_GRADE_STRING = "NO_GRADE"
 
+EVENT_VIEW_FILE_ACCESS="VIEW_FILE_ACCESS"
+EVENT_VIEW_ASSIGNMENT_PLANNING="VIEW_ASSIGNMENT_PLANNING"
+EVENT_VIEW_GRADE_DISTRIBUTION="VIEW_GRADE_DISTRIBUTION"
+
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
 
+def eventlog(current_user, event, obj, extra_json):
+    if obj == None:
+        log(
+            user=current_user,
+            action=event,
+            extra=extra_json
+        )
+    else:
+        log(
+            user=current_user,
+            action=event,
+            object=obj,
+            extra=extra_json
+        )
+
 def gpa_map(grade):
     if grade is None:
-        return NO_GRADE_STRING;
+        return NO_GRADE_STRING
     # convert to float
     grade_float = float(grade)
     if grade_float >= 90:
@@ -82,6 +103,16 @@ def file_access_within_week(request, course_id=0):
     week_num_start = int(request.GET.get('week_num_start','1'))
     week_num_end = int(request.GET.get('week_num_end','0'))
     grade = request.GET.get('grade','all')
+
+    # json for eventlog
+    data = {
+        "week_num_start": week_num_start,
+        "week_num_end": week_num_end,
+        "grade": grade,
+        "course_id": course_id
+    }
+    eventlog(request.user, EVENT_VIEW_FILE_ACCESS, None, json.dumps(data))
+
 
     # get total number of student within the course_id
     total_number_student_sql = "select count(*) from user where course_id = %(course_id)s"
@@ -207,6 +238,13 @@ def grade_distribution(request, course_id=0):
     average_grade = df['current_grade'].astype(float).mean().round(2)
     df['tot_students'] = number_of_students
     df['grade_avg'] = average_grade
+
+    # json for eventlog
+    data = {
+        "course_id": course_id
+    }
+    eventlog(request.user, EVENT_VIEW_GRADE_DISTRIBUTION, None, json.dumps(data))
+
     return HttpResponse(df.to_json(orient='records'))
 
 def assignment_progress(request, course_id=0):
@@ -259,6 +297,15 @@ def assignment_view(request, course_id=0):
     current_user = request.user.get_username()
 
     percent_selection = float(request.GET.get('percent','0.0'))
+
+
+    # json for eventlog
+    data = {
+        "course_id": course_id,
+        "percent_selection": percent_selection
+    }
+    eventlog(request.user, EVENT_VIEW_ASSIGNMENT_PLANNING, None, json.dumps(data))
+
     logger.info('selection from assignment view {}'.format(percent_selection))
     sql = "select assignment_id,local_graded_date as graded_date,score,name,local_date as due_date,points_possible,group_points,weight,drop_lowest,drop_highest from (" \
           "(select assignment_id,local_graded_date,score from"\

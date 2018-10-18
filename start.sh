@@ -24,6 +24,9 @@ if [ -z "${IS_CRON_POD}" ]; then
     # Start Gunicorn processes
     echo Starting Gunicorn.
 
+    # prepare for event log
+    python manage.py migrate eventlog
+
     # application pod
     exec gunicorn dashboard.wsgi:application \
         --bind 0.0.0.0:${GUNICORN_PORT} \
