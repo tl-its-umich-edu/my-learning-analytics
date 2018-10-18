@@ -332,10 +332,9 @@ def get_course_assignments(course_id):
 
 
 def get_user_assignment_submission(current_user,assignments_in_course_df, course_id):
-    sql = "select assignment_id,local_graded_date as graded_date ,score from submission where " \
+    sql = "select assignment_id, score, grade_muted from submission where " \
           "user_id=(select id from user where sis_name = %(current_user)s and course_id = %(course_id)s ) and course_id = %(course_id)s"
-    assignment_submissions = pd.read_sql(sql, conn, params={'course_id': course_id, "current_user": current_user},
-                                         parse_dates={'graded_date': '%Y-%m-%d'})
+    assignment_submissions = pd.read_sql(sql, conn, params={'course_id': course_id, "current_user": current_user})
     if assignment_submissions.empty:
         logger.info('The user %s seems to be a not student in the course.' % current_user)
         # manually adding the columns for display in UI
@@ -344,13 +343,19 @@ def get_user_assignment_submission(current_user,assignments_in_course_df, course
         assignment_submissions['score'] = None
         assignment_submissions['graded'] = False
     else:
-        assignment_submissions['graded'] = assignment_submissions['graded_date'].notnull()
-        assignment_submissions.drop(columns=['graded_date'], inplace=True)
+        assignment_submissions['score']=assignment_submissions.apply(hide_score_on_mute,axis=1)
+        assignment_submissions['graded']=assignment_submissions['score'].apply(lambda x: False if x is None else True)
     return assignment_submissions
 
 
+def hide_score_on_mute(row):
+    if row['grade_muted'] and row['score'] is not None:
+        return None
+    else:return row['score']
+
+
 def user_percent(row):
-    if row['graded'] == True:
+    if row['graded']:
         s = round((row['score'] / row['points_possible']) * row['towards_final_grade'], 2)
         return s
     else:
