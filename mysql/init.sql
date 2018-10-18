@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS user (
   course_id CHAR(255),
   current_grade    CHAR(255),
   final_grade    CHAR(255),
-  PRIMARY KEY  (id)
+  PRIMARY KEY  (id,course_id)
 );
 
 CREATE TABLE IF NOT EXISTS assignment_groups(
