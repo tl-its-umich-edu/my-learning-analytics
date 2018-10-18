@@ -72,7 +72,7 @@ def deleteAllRecordInTable(tableName):
 # cron job to populate course and user tables
 class DashboardCronJob(CronJobBase):
 
-    schedule = Schedule(run_every_mins=settings.CRON_RUN_SCHEDULE)
+    schedule = Schedule(run_at_times=settings.RUN_AT_TIMES)
     code = 'dashboard.DashboardCronJob'    # a unique code
 
     # update FILE records from UDW
