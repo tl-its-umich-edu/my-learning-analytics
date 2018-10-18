@@ -273,7 +273,6 @@ def assignment_progress(request, course_id=0):
     logger.debug('The Dataframe for the assignment progress %s ' %df)
     return HttpResponse(df.to_json(orient='records'))
 
-
 def assignment_view(request, course_id=0):
     logger.info(assignment_view.__name__)
 
@@ -281,10 +280,6 @@ def assignment_view(request, course_id=0):
     df_default_display_settings()
 
     percent_selection = float(request.GET.get('percent', '0.0'))
-    logger.info('selection from assignment Planning {}'.format(percent_selection))
-
-    percent_selection = float(request.GET.get('percent','0.0'))
-
 
     # json for eventlog
     data = {
@@ -293,16 +288,16 @@ def assignment_view(request, course_id=0):
     }
     eventlog(request.user, EVENT_VIEW_ASSIGNMENT_PLANNING, None, json.dumps(data))
 
-    logger.info('selection from assignment view {}'.format(percent_selection))
-    sql = "select assignment_id,local_graded_date as graded_date,score,name,local_date as due_date,points_possible,group_points,weight,drop_lowest,drop_highest from (" \
-          "(select assignment_id,local_graded_date,score from"\
-          "(select id from user where sis_name = %(current_user)s ) as u join"\
-          "(select user_id,assignment_id,local_graded_date,score from submission) as sub on sub.user_id=u.id) as rock join"\
-          "(select assign_id,name,local_date,points_possible,group_points,weight,drop_lowest,drop_highest from"\
-          "(select id as assign_id,assignment_group_id, local_date,name,points_possible from assignment where course_id = %(course_id)s) as a join"\
-          "(select id, group_points, weight,drop_lowest,drop_highest from assignment_groups) as ag on ag.id=a.assignment_group_id) as bottom on rock.assignment_id = bottom.assign_id)"
-    df = pd.read_sql(sql,conn,params={"current_user": current_user,'course_id': course_id},parse_dates={'due_date': '%Y-%m-%d','graded_date':'%Y-%m-%d'})
+    logger.info('selection from assignment Planning {}'.format(percent_selection))
 
+    assignments_in_course = get_course_assignments(course_id)
+
+    if assignments_in_course.empty:
+        return HttpResponse(json.dumps([]), content_type='application/json')
+
+    assignment_submissions = get_user_assignment_submission(current_user, assignments_in_course,course_id)
+
+    df = pd.merge(assignments_in_course, assignment_submissions, on='assignment_id', how='inner')
     if df.empty:
         logger.info('There are no assignment data in the course %s for user %s '%(course_id, current_user))
         return HttpResponse(json.dumps([]), content_type='application/json')
@@ -348,7 +343,6 @@ def assignment_view(request, course_id=0):
         full.append(data)
         i += 1
     return HttpResponse(json.dumps(full), content_type='application/json')
-
 
 def get_course_assignments(course_id):
     sql="select assignment_id,name,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from " \
