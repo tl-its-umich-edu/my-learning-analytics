@@ -316,15 +316,16 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids
         for UDW_course_id in settings.DEFAULT_UDW_COURSE_IDS:
-            submission_url = f"""with sub_fact as (select submission_id, assignment_id,user_id, global_canvas_id, published_score
+            submission_url = f"""with sub_fact as (select submission_id, assignment_id,course_id, user_id, global_canvas_id, published_score
                             from submission_fact sf join user_dim u on sf.user_id = u.id where course_id = '{UDW_course_id}'),
                             enrollment as (select  distinct(user_id) from enrollment_dim where course_id = '{UDW_course_id}' and workflow_state='active' 
                             and type = 'StudentEnrollment'),
-                            submission_time as (select id, graded_at, graded_at at time zone 'utc' at time zone 'America/New_York' as local_graded_time from submission_dim),
+                            submission_time as (select sd.id, sd.graded_at, sd.graded_at at time zone 'utc' at time zone 'America/New_York' as local_graded_time 
+                            from submission_dim sd join sub_fact suf on sd.id=suf.submission_id),
                             sub_with_enroll as (select sf.* from sub_fact sf join enrollment e on e.user_id = sf.user_id),
-                            submission as (select se.submission_id,se.assignment_id,se.global_canvas_id,se.published_score, st.graded_at, st.local_graded_time 
+                            submission as (select se.submission_id,se.assignment_id, se.course_id,se.global_canvas_id,se.published_score, st.graded_at, st.local_graded_time 
                             from sub_with_enroll se inner join submission_time st on se.submission_id = st.id)
-                            select submission_id AS ID, assignment_id AS assignment_id, global_canvas_id AS user_id, 
+                            select submission_id AS ID, assignment_id AS assignment_id, course_id, global_canvas_id AS user_id, 
                             published_score AS score, graded_at AS graded_date, local_graded_time as local_graded_date from submission
                             """
             status += util_function(UDW_course_id, submission_url,'submission')
