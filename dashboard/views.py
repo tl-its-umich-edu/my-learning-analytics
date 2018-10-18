@@ -218,11 +218,12 @@ def assignment_progress(request, course_id=0):
         return HttpResponse(json.dumps({}), content_type='application/json')
     assignment_submissions = get_user_assignment_submission(current_user, assignments_in_course,course_id)
 
-    df = pd.merge(assignments_in_course, assignment_submissions, on='assignment_id', how='inner')
+    df = pd.merge(assignments_in_course, assignment_submissions, on='assignment_id', how='left')
     if df.empty:
         logger.info('There are no assignment data in the course %s for user %s '%(course_id, current_user))
         return HttpResponse(json.dumps([]), content_type='application/json')
 
+    df['graded']= df['graded'].fillna(False)
     df.sort_values(by='due_date', inplace=True)
     df.drop(columns=['assignment_id', 'due_date'], inplace=True)
     df.drop_duplicates(keep='first', inplace=True)
@@ -252,7 +253,7 @@ def assignment_view(request, course_id=0):
 
     assignment_submissions = get_user_assignment_submission(current_user, assignments_in_course,course_id)
 
-    df = pd.merge(assignments_in_course, assignment_submissions, on='assignment_id', how='inner')
+    df = pd.merge(assignments_in_course, assignment_submissions, on='assignment_id', how='left')
     if df.empty:
         logger.info('There are no assignment data in the course %s for user %s '%(course_id, current_user))
         return HttpResponse(json.dumps([]), content_type='application/json')
@@ -332,10 +333,9 @@ def get_course_assignments(course_id):
 
 
 def get_user_assignment_submission(current_user,assignments_in_course_df, course_id):
-    sql = "select assignment_id,local_graded_date as graded_date ,score from submission where " \
+    sql = "select assignment_id, score, graded_date from submission where " \
           "user_id=(select id from user where sis_name = %(current_user)s and course_id = %(course_id)s ) and course_id = %(course_id)s"
-    assignment_submissions = pd.read_sql(sql, conn, params={'course_id': course_id, "current_user": current_user},
-                                         parse_dates={'graded_date': '%Y-%m-%d'})
+    assignment_submissions = pd.read_sql(sql, conn, params={'course_id': course_id, "current_user": current_user})
     if assignment_submissions.empty:
         logger.info('The user %s seems to be a not student in the course.' % current_user)
         # manually adding the columns for display in UI
@@ -349,8 +349,14 @@ def get_user_assignment_submission(current_user,assignments_in_course_df, course
     return assignment_submissions
 
 
+def hide_score_on_mute(row):
+    if row['grade_muted'] and row['score'] is not None:
+        return None
+    else:return row['score']
+
+
 def user_percent(row):
-    if row['graded'] == True:
+    if row['graded']:
         s = round((row['score'] / row['points_possible']) * row['towards_final_grade'], 2)
         return s
     else:
