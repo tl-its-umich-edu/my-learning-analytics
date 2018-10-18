@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'watchman',
     'macros',
     'debug_toolbar',
+    'pinax.eventlog',
 ]
 
 # The order of this is important. It says DebugToolbar should be on top but
