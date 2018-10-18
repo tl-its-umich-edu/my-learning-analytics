@@ -1,5 +1,5 @@
 # Custom watchman checks
-import django, logging
+import logging
 from datetime import datetime
 from watchman.decorators import check
 
