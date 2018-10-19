@@ -1,4 +1,7 @@
 # student-dashboard-django
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0fd487531e244c0ebbfbc25e8753c484)](https://app.codacy.com/app/ITS_Teaching_And_Learning/student-dashboard-django?utm_source=github.com&utm_medium=referral&utm_content=tl-its-umich-edu/student-dashboard-django&utm_campaign=Badge_Grade_Settings)
+
 student dashboard based on django framework
 ## Environment configuration
 There is some environment configuration and addtional files needed for this app to run. You can put this in a file called .env for testing. 
