@@ -332,7 +332,7 @@ CRON_RETRY_AFTER_FAILURE_MINS = config('CRON_RETRY_AFTER_FAILURE_MINS', default=
 # Minimum number of failures before an email is sent to ADMINS
 CRON_MIN_NUM_FAILURES = config('CRON_MIN_NUM_FAILURES', default=10, cast=int)
 
-FAILED_RUNS_CRONJOB_EMAIL_PREFIX = config('CRON_FAILED_RUNS_CRONJOB_EMAIL_PREFIX', default=f"[{PROJECT_NAME} : Cron Failure]")
+FAILED_RUNS_CRONJOB_EMAIL_PREFIX = config('CRON_FAILED_RUNS_CRONJOB_EMAIL_PREFIX', default="[{0} :Cron Failure]".format(PROJECT_NAME))
 
 
 # Add any settings you need to be available to templates in this array
