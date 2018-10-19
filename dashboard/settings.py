@@ -12,9 +12,9 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 
-from os import path
-
 from decouple import config, Csv
+
+from debug_toolbar import settings as dt_settings
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -229,7 +229,7 @@ if config('STUDENT_DASHBOARD_SAML', default='True', cast=bool):
     LOGIN_URL = '%slogin/%s' % (SAML2_URL_PATH, SAML2_DEFAULT_IDP)
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-    BASEDIR = path.dirname(path.abspath(__file__))
+    BASEDIR = os.path.dirname(path.abspath(__file__))
     SAML2_FILES_BASE = config('SAML2_FILES_BASE', default='/saml/')
     SAML2_REMOTE_METADATA = config('SAML2_REMOTE_METADATA', default='')
     SAML2_REMOTE_PEM_FILE = config('SAML2_REMOTE_PEM_FILE', default='')
@@ -285,7 +285,7 @@ if config('STUDENT_DASHBOARD_SAML', default='True', cast=bool):
         'debug': DEBUG,
 
         # certificate
-        'key_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.key'),  'cert_file': path.join(SAML2_FILES_BASE, 'student-dashboard-saml.pem'),
+        'key_file': os.path.join(SAML2_FILES_BASE, 'student-dashboard-saml.key'),  'cert_file': os.path.join(SAML2_FILES_BASE, 'student-dashboard-saml.pem'),
     }
 
     ACS_DEFAULT_REDIRECT_URL = config('DJANGO_ACS_DEFAULT_REDIRECT', default='/')
@@ -330,20 +330,7 @@ SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX',]
 def show_debug_toolbar(request):
     return DEBUG and request.user and request.user.is_authenticated and request.user.is_superuser
 
-DEBUG_TOOLBAR_PANELS = [
-    'debug_toolbar.panels.versions.VersionsPanel',
-    'debug_toolbar.panels.timer.TimerPanel',
-    'debug_toolbar.panels.settings.SettingsPanel',
-    'debug_toolbar.panels.headers.HeadersPanel',
-    'debug_toolbar.panels.request.RequestPanel',
-    'debug_toolbar.panels.sql.SQLPanel',
-    'debug_toolbar.panels.staticfiles.StaticFilesPanel',
-    'debug_toolbar.panels.templates.TemplatesPanel',
-    'debug_toolbar.panels.cache.CachePanel',
-    'debug_toolbar.panels.signals.SignalsPanel',
-    'debug_toolbar.panels.logging.LoggingPanel',
-    'debug_toolbar.panels.redirects.RedirectsPanel',
-]
+DEBUG_TOOLBAR_PANELS = dt_settings.PANELS_DEFAULTS
 
 DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TOOLBAR_CALLBACK" : show_debug_toolbar,

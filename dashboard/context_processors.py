@@ -1,4 +1,4 @@
-from dashboard.common.util import *
+from dashboard.common import db_util
 
 import logging
 
@@ -10,7 +10,7 @@ def course_name(request):
     logger.info("course_id=" + course_id)
 
     if (course_id): 
-        course_name = get_course_name_from_id(course_id)
+        course_name = db_util.get_course_name_from_id(course_id)
 
     return {'course_name': course_name}
 
@@ -18,7 +18,7 @@ def current_user_course_id(request):
     course_id = str(request.resolver_match.kwargs.get('course_id'))
     if not course_id:
         logger.info("Course ID could not be determined from request, attempting to look up for user {}".format(request.user.username))
-        course_id = get_default_user_course_id(request.user.username)
+        course_id = db_util.get_default_user_course_id(request.user.username)
     return {'current_user_course_id': course_id}
 
 def course_view_option(request):
@@ -27,9 +27,9 @@ def course_view_option(request):
     logger.info("course_view_option=" + course_id)
     course_view_option = {}
     if (course_id):
-        course_view_option = get_course_view_options(course_id)
+        course_view_option = db_util.get_course_view_options(course_id)
 
     return {"course_view_option": course_view_option}
 
 def last_updated(request):
-    return {'last_updated' : get_canvas_data_date()}
+    return {'last_updated' : db_util.get_canvas_data_date()}
