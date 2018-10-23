@@ -33,7 +33,32 @@ The dashboard/saml directory needs to contain 4 files for SAML configuration. Th
 ## Load user, file, file access data into database (Local)
 Users and files are loaded now with the cron job. This is run on a separate pod in Openshift when the environment variable `IS_CRON_POD=true`.
 
-You also have to configure when the cron is going to run with the environment variables RUN_AT_TIMES and CRONTAB_SCHEDULE. See the .env.sample for more information.
+Crons are configured in this project with django-cron. Django-cron is executed whenever `python manage.py runcrons` is run but it is limited via a few environment variables.
+
+The installation notes recommends that you have a Unix crontab scheduled to run every 5 minutes to run this command. https://django-cron.readthedocs.io/en/latest/installation.html
+
+This is configured with these values
+# (Django Cron) Run only at 2AM
+RUN_AT_TIMES=2:00
+
+# (Unix Cron) - Run every 5 minutes
+CRONTAB_SCHEDULE=*/5 * * * * 
+
+Some additional options are available for cron control
+
+# (Django Cron) How many minutes to retry after a failure
+CRON_RETRY_AFTER_FAILURE_MINS=5
+
+# (Django Cron) How many failures before a email is send out and retries are stopped
+CRON_MIN_NUM_FAILURES=3
+
+Make sure your admins are defined like this, Name, Email Address if you want emails sent
+ADMINS=User1, user1@example.com, User2, user2@example.com%
+
+See the .env.sample for more information.
+
+
+
 
 For local testing, make sure your secrets are added and your VPN is active. Then run this command on a running container to execute the cronjob
 
