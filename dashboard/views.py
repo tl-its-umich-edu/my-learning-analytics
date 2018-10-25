@@ -312,7 +312,7 @@ def assignment_view(request, course_id=0):
     week_list = []
     for item in assignment_list:
         week_list.append(item['week'])
-    weeks = set(week_list)
+    weeks = sorted(set(week_list))
     full = []
     i = 1
     for week in weeks:
