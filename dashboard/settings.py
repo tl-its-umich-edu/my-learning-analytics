@@ -231,7 +231,7 @@ if config('STUDENT_DASHBOARD_SAML', default='True', cast=bool):
     LOGIN_URL = '%slogin/%s' % (SAML2_URL_PATH, SAML2_DEFAULT_IDP)
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-    BASEDIR = os.path.dirname(path.abspath(__file__))
+    BASEDIR = os.path.dirname(os.path.abspath(__file__))
     SAML2_FILES_BASE = config('SAML2_FILES_BASE', default='/saml/')
     SAML2_REMOTE_METADATA = config('SAML2_REMOTE_METADATA', default='')
     SAML2_REMOTE_PEM_FILE = config('SAML2_REMOTE_PEM_FILE', default='')
