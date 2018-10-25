@@ -313,8 +313,7 @@ def assignment_view(request, course_id=0):
     for item in assignment_list:
         weeks.add(item['week'])
     full = []
-    i = 1
-    for week in sorted(weeks):
+    for i, week in enumerate(sorted(weeks)):
         data = {}
         data["week"] = np.uint64(week).item()
         data["id"] = i
@@ -326,7 +325,6 @@ def assignment_view(request, course_id=0):
                 assignment_due_date_grp['assignment_items'] = item['assign']
                 dd_items.append(assignment_due_date_grp)
         full.append(data)
-        i += 1
     return HttpResponse(json.dumps(full), content_type='application/json')
 
 def get_course_assignments(course_id):
