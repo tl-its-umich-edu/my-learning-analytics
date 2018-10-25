@@ -309,13 +309,12 @@ def assignment_view(request, course_id=0):
         dic['due_date'] = name[1]
         dic['assign'] = json.loads(group.to_json(orient='records'))
         assignment_list.append(dic)
-    week_list = []
+    weeks = set()
     for item in assignment_list:
-        week_list.append(item['week'])
-    weeks = set(week_list)
+        weeks.add(item['week'])
     full = []
     i = 1
-    for week in weeks:
+    for week in sorted(weeks):
         data = {}
         data["week"] = np.uint64(week).item()
         data["id"] = i
