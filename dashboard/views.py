@@ -13,7 +13,7 @@ import pandas as pd
 
 from django.conf import settings
 
-from pinax.eventlog.models import log
+from pinax.eventlog.models import log as eventlog
 
 logger = logging.getLogger(__name__)
 
@@ -35,21 +35,6 @@ EVENT_VIEW_GRADE_DISTRIBUTION="VIEW_GRADE_DISTRIBUTION"
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
-
-def eventlog(current_user, event, obj, extra_json):
-    if obj == None:
-        log(
-            user=current_user,
-            action=event,
-            extra=extra_json
-        )
-    else:
-        log(
-            user=current_user,
-            action=event,
-            object=obj,
-            extra=extra_json
-        )
 
 def gpa_map(grade):
     if grade is None:
@@ -107,7 +92,7 @@ def file_access_within_week(request, course_id=0):
         "grade": grade,
         "course_id": course_id
     }
-    eventlog(request.user, EVENT_VIEW_FILE_ACCESS, None, json.dumps(data))
+    eventlog(request.user, EVENT_VIEW_FILE_ACCESS, extra=data)
 
 
     # get total number of student within the course_id
@@ -240,7 +225,7 @@ def grade_distribution(request, course_id=0):
     data = {
         "course_id": course_id
     }
-    eventlog(request.user, EVENT_VIEW_GRADE_DISTRIBUTION, None, json.dumps(data))
+    eventlog(request.user, EVENT_VIEW_GRADE_DISTRIBUTION, extra=data)
 
     return HttpResponse(df.to_json(orient='records'))
 
@@ -287,7 +272,7 @@ def assignment_view(request, course_id=0):
         "course_id": course_id,
         "percent_selection": percent_selection
     }
-    eventlog(request.user, EVENT_VIEW_ASSIGNMENT_PLANNING, None, json.dumps(data))
+    eventlog(request.user, EVENT_VIEW_ASSIGNMENT_PLANNING, extra=data)
 
     logger.info('selection from assignment Planning {}'.format(percent_selection))
 
