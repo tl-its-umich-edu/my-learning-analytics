@@ -46,8 +46,8 @@
     <footer>
         <hr>
         <div class="row">
-            <div class="col text-left">Copyright © 2018 The Regents of the University of Michigan</div>
-            <div class="col text-right">Last updated on {{last_updated|date:"m/d/Y P T"}}</div>
+            <div id="footer-left" class="col text-left"><span id="copyright">Copyright © 2018 The Regents of the University of Michigan</span></div>
+            <div id="footer-right" class="col text-right"><span id="updated">Data last updated on {{last_updated|date:"m/d/Y P T"}}</span><span id="version">:Version {% include "git_head_version.html" %}</span></div>
         </div>
     </footer>
 </body>

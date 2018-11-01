@@ -12,7 +12,7 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
 
 # apt-utils needs to be installed separately
 RUN apt-get update && \ 
-    apt-get install -y --no-install-recommends nodejs yarn python3-dev xmlsec1 cron && \
+    apt-get install -y --no-install-recommends nodejs yarn python3-dev xmlsec1 cron git && \
     apt-get clean -y
 
 #https://github.com/jwilder/dockerize
@@ -45,6 +45,8 @@ COPY mysql/init.sql /docker-entrypoint-initdb.d
 # Sets the local timezone of the docker image
 ENV TZ=America/Detroit
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN git rev-parse --short HEAD > /dashboard/dashboard/templates/git_head_version.html
 
 CMD ["/start.sh"]
 # done!
