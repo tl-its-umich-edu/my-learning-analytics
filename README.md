@@ -1,25 +1,27 @@
-# student-dashboard-django
+# my-learning-analytics
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0fd487531e244c0ebbfbc25e8753c484)](https://app.codacy.com/app/ITS_Teaching_And_Learning/student-dashboard-django?utm_source=github.com&utm_medium=referral&utm_content=tl-its-umich-edu/student-dashboard-django&utm_campaign=Badge_Grade_Settings)
 
-student dashboard based on django framework
+My Learning Analytics based on django framework
+
 ## Environment configuration
 There is some environment configuration and addtional files needed for this app to run. You can put this in a file called .env for testing. 
 
 Configuration:
 
-Copy the file `.env.sample` to `.env` and fill in with the values for local testing.
+Copy the file `.env.sample` to `.env` and fill in with the values for local testing. You may also provide a .env file if you have one.
 
-On OpenShift fill these in the appropriate places.
+On OpenShift fill these in the appropriate places to provide the environment.
 
-The bq_cred.json is service account for Big Query, it neesd to be supplied and put into the secrets directory and setup in the environment.
+# Secrets
 
-The dashboard/saml directory needs to contain 4 files for SAML configuration. These are currently hard-coded in settings.py though the path comes from the environment SAML2_FILES_BASE.
+The bq_cred.json is service account for Big Query, it neesd to be supplied and put into the /secrets directory and setup in the environment.
+
+(Openshift Only) The /secrets/saml directory needs to contain 4 files for SAML configuration. These are currently hard-coded in settings.py though the path comes from the environment SAML2_FILES_BASE.
 
 	remote-metadata.xml 
 	student-dashboard-saml.key
 	student-dashboard-saml.pem
-
 
 ## Docker commands for deploying the app
 1. Tear down running application and db instances:
@@ -28,10 +30,9 @@ The dashboard/saml directory needs to contain 4 files for SAML configuration. Th
 `docker-compose build`
 3. Run the application in a detached mode: `docker-compose up -d`
 4. Place all of your secrets in a directory and copy it into the docker with
+(If your secrets are in ~/secrets use this)
 `docker cp ~/secrets student_dashboard:/secrets`
-
-
-4. Initialize the MySQL database with mysql/init.sql: `http://localhost:5001/load_data`
+5. Initialize the MySQL database by loading the users and files on the next step. You'll need to be on VPN for this to work.
 
 ## Load user, file, file access data into database (Local)
 Users and files are loaded now with the cron job. This is run on a separate pod in Openshift when the environment variable `IS_CRON_POD=true`.
@@ -60,9 +61,6 @@ ADMINS=User1, user1@example.com, User2, user2@example.com%
 
 See the .env.sample for more information.
 
-
-
-
 For local testing, make sure your secrets are added and your VPN is active. Then run this command on a running container to execute the cronjob
 
 `docker exec -it student_dashboard /bin/bash -c "python manage.py migrate django_cron && python manage.py runcrons --force"`
@@ -73,6 +71,8 @@ After about 30-60 seconds the crons should all run and you should have data! In 
 `docker exec -t -i student_dashboard_mysql /bin/bash`
 1. login as `mysql -u <user> -p`
 2. `use student_dashboard`
+
+The MySQL container is exposed on port 5306. You can connect to it from your localhost.
 
 ## Clean outdated docker images
 The docker artifacts will take up more disk spaces as time goes on, you can clean up docker containers, networks images and optionally volumes using the command below.
