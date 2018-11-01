@@ -15,7 +15,7 @@ On OpenShift fill these in the appropriate places to provide the environment.
 
 # Secrets
 
-The bq_cred.json is service account for Big Query, it neesd to be supplied and put into the /secrets directory and setup in the environment.
+The bq_cred.json is service account for Big Query, it needs to be supplied and put into the /secrets directory and setup in the environment.
 
 (Openshift Only) The /secrets/saml directory needs to contain 4 files for SAML configuration. These are currently hard-coded in settings.py though the path comes from the environment SAML2_FILES_BASE.
 
