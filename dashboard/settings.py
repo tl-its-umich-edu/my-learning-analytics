@@ -46,6 +46,9 @@ WATCHMAN_TOKEN = config('DJANGO_WATCHMAN_TOKEN', default=None)
 
 WATCHMAN_TOKEN_NAME = config('DJANGO_WATCHMAN_TOKEN_NAME', default='token')
 
+# Only report on the default database
+WATCHMAN_DATABASES = ('default',)
+
 # Application definition
 
 INSTALLED_APPS = [
