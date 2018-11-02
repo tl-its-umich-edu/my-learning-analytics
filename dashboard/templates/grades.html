@@ -14,12 +14,12 @@
             <div class ="error"></div>
             </div>
         {% endblock %}
-        {% block js %}
-            <script src="{% static 'd3-v4/build/d3.min.js' %}"></script>
-            <script src="/static/js/grade_distribution.js"></script>
-        {% endblock %}
     {% else %}
         Grade Distribution view is hidden for this course.
     {% endif %}
+{% endblock %}
+{% block js %}
+    <script src="{% static 'd3-v4/build/d3.min.js' %}"></script>
+    <script src="/static/js/grade_distribution.js"></script>
 {% endblock %}
 

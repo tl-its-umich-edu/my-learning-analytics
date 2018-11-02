@@ -216,8 +216,13 @@ def grade_distribution(request, course_id=0):
         return HttpResponse(json.dumps({}), content_type='application/json')
     number_of_students = df.shape[0]
     df = df[df['current_grade'].notnull()]
-    df['current_grade_mod'] = df['current_grade'].apply(lambda x: x.replace("100","99.99"))
-    average_grade = df['current_grade'].astype(float).mean().round(2)
+    df['current_grade'] = df['current_grade'].astype(float)
+    if df[df['current_grade'] > 100.0].shape[0] > 0:
+        df['more_than_100_percent'] = True
+    else:
+        df['more_than_100_percent'] = False
+        df['current_grade'] = df['current_grade'].apply(lambda x: 99.99 if x == 100.00 else x)
+    average_grade = df['current_grade'].mean().round(2)
     df['tot_students'] = number_of_students
     df['grade_avg'] = average_grade
 

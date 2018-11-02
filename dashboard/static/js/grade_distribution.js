@@ -20,8 +20,9 @@ var makeGraph = function () {
 
         // get the current grade
         bin_grades = [];
+        data_more_than_100_percent = singleDataPoint.more_than_100_percent;
         data.forEach(function (e) {
-            bin_grades.push(e.current_grade_mod)
+            bin_grades.push(e.current_grade)
         })
 
         var width = 1000,
@@ -37,9 +38,10 @@ var makeGraph = function () {
         height = height - margin.top - margin.bottom;
         g = svg.append("g")
             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        var domain_values = (data_more_than_100_percent) ? [0, 110] : [0, 100]
 
         var x = d3.scaleLinear()
-            .domain([0, 100]).nice()
+            .domain(domain_values).nice()
             .rangeRound([0, width]);
 
         var bins = d3.histogram()
@@ -157,7 +159,7 @@ var makeGraph = function () {
                 .text("a simple tooltip");
         }
 
-        var gradeDetailsHtml = 
+        var gradeDetailsHtml =
             '<span>Number of students: <b>' + totalStudents + '</b></span><br>' +
             '<span>Average grade: <b>' + gradeAverage + '</b></span><br>';
         if(myscore==null) {
