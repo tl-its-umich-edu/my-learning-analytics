@@ -46,7 +46,7 @@ COPY mysql/init.sql /docker-entrypoint-initdb.d
 ENV TZ=America/Detroit
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN git rev-parse --short HEAD > /dashboard/dashboard/templates/git_head_version.html
+#RUN git rev-parse --short HEAD > /dashboard/dashboard/templates/git_head_version.html
 
 CMD ["/start.sh"]
 # done!
