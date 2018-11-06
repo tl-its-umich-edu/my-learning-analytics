@@ -48,18 +48,8 @@ RUN_AT_TIMES=2:00
 # (Unix Cron) - Run every 5 minutes
 CRONTAB_SCHEDULE=*/5 * * * * 
 
-Some additional options are available for cron control
-
-# (Django Cron) How many minutes to retry after a failure
-CRON_RETRY_AFTER_FAILURE_MINS=5
-
-# (Django Cron) How many failures before a email is send out and retries are stopped
-CRON_MIN_NUM_FAILURES=3
-
-Make sure your admins are defined like this, Name, Email Address if you want emails sent
-ADMINS=User1, user1@example.com, User2, user2@example.com%
-
 See the .env.sample for more information.
+=======
 
 For local testing, make sure your secrets are added and your VPN is active. Then run this command on a running container to execute the cronjob
 

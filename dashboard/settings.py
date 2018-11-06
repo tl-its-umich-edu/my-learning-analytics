@@ -13,9 +13,8 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 
 from decouple import config, Csv
-from debug_toolbar import settings as dt_settings
 
-PROJECT_NAME = "My Learning Analytics"
+from debug_toolbar import settings as dt_settings
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -85,7 +84,6 @@ MIDDLEWARE_CLASSES = [
 
 CRON_CLASSES = [
     "dashboard.cron.DashboardCronJob",
-    "django_cron.cron.FailedRunsNotificationCronJob",
 ]
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -325,20 +323,11 @@ DEFAULT_UDW_COURSE_IDS = [UDW_ID_PREFIX + course_id for course_id in DEFAULT_COU
 # set the current term id from config
 CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
 
-# Time to run cron, use the old RUN_AT_TIMES as a fallback
-CRON_RUN_AT_TIMES = config('CRON_RUN_AT_TIMES', default=config("RUN_AT_TIMES", default=""), cast=Csv())
-
-# Time to retry crons after failures
-CRON_RETRY_AFTER_FAILURE_MINS = config('CRON_RETRY_AFTER_FAILURE_MINS', default=None)
-
-# Minimum number of failures before an email is sent to ADMINS
-CRON_MIN_NUM_FAILURES = config('CRON_MIN_NUM_FAILURES', default=10, cast=int)
-
-FAILED_RUNS_CRONJOB_EMAIL_PREFIX = config('CRON_FAILED_RUNS_CRONJOB_EMAIL_PREFIX', default="[{0} :Cron Failure]".format(PROJECT_NAME))
-
+# Time to run cron
+RUN_AT_TIMES = config('RUN_AT_TIMES', default="", cast= Csv())
 
 # Add any settings you need to be available to templates in this array
-SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX','PROJECT_NAME']
+SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX',]
 
 # Method to show the user, if they're authenticated and superuser
 def show_debug_toolbar(request):
@@ -349,10 +338,3 @@ DEBUG_TOOLBAR_PANELS = dt_settings.PANELS_DEFAULTS
 DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TOOLBAR_CALLBACK" : show_debug_toolbar,
 }
-
-# Get Admins array
-ADMINS = config("ADMINS", default="", cast=Csv())
-
-# If admins is set and even convert to a list of tuples
-if ADMINS and len(ADMINS) > 0 and len(ADMINS) % 2 == 0:
-    ADMINS = list(zip(ADMINS[::2], ADMINS[1::2]))
