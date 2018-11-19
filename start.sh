@@ -15,7 +15,7 @@ if [ -z "${GUNICORN_TIMEOUT}" ]; then
 fi
 
 echo "Waiting for DB"
-dockerize -wait tcp://${MYSQL_HOST}:${MYSQL_PORT} -timeout 15s
+wait-port ${MYSQL_HOST}:${MYSQL_PORT} -t 15000
 
 echo Running python startups
 python manage.py migrate

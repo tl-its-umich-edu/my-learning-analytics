@@ -15,12 +15,6 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends nodejs yarn python3-dev xmlsec1 cron && \
     apt-get clean -y
 
-#https://github.com/jwilder/dockerize
-ENV DOCKERIZE_VERSION v0.6.1
-RUN curl -sLO "https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz" \
-    && tar -C /usr/local/bin -xzvf "dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz" \
-    && rm "dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz"
-
 # COPY startup script into known file location in container
 COPY start.sh /start.sh
 
@@ -33,8 +27,10 @@ COPY manage.py /manage.py
 
 COPY data/* /data/
 
+# Install wait-port globally, install rest from the package
+RUN yarn global add wait-port@"~0.2.2" && \
+    yarn install && \ 
 # This is needed to clean up the examples files as these cause collectstatic to fail (and take up extra space)
-RUN yarn install && \ 
     find /usr/lib/node_modules /dashboard/node_modules -type d -name "examples" -print0 | xargs -0 rm -rf && \
 # This DJANGO_SECRET_KEY is set here just so collectstatic runs with an empty key. It can be set to anything
     echo yes | DJANGO_SECRET_KEY="collectstatic" python manage.py collectstatic --verbosity 0
