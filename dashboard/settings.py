@@ -106,6 +106,7 @@ TEMPLATES = [
                 'dashboard.context_processors.current_user_course_id',
                 'dashboard.context_processors.course_view_option',
                 'dashboard.context_processors.last_updated',
+                'dashboard.context_processors.get_build_info',
             ],
         },
     },

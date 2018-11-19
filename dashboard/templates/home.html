@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+{% if user.is_superuser %}
+<button style="position:fixed;left:0;top:60px;width:20px;height:20px;background:transparent;border: none !important;"
+        onclick="$('#build-info').toggle()">&nbsp;</button>
+{% endif %}
 My Learning Analytics: This site must be launched from Canvas.
 {% endblock %}
