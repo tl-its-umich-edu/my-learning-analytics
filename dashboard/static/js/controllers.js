@@ -11,8 +11,8 @@ visApp.controller('mainController', ['$scope', 'Get','$location', '$anchorScroll
             $scope.plan = data.data.plan
             $scope.progress = data.data.progress
             // call the js file onload only
-            if (call == 1) {
-                $.getScript("/static/js/assign-progress.js")
+            if (call == 'assign-progress.js') {
+                $.getScript("/static/js/"+call)
             }
             scrollId = 1
             $scope.plan.find(function (e) {
@@ -31,7 +31,7 @@ visApp.controller('mainController', ['$scope', 'Get','$location', '$anchorScroll
     $scope.percent = [{ "value": 0, "text": "0% (all)" }, { "value": 2, "text": "2%" },{ "value": 5, "text": "5%" },
         { "value": 10, "text": "10%" },{ "value": 20, "text": "20%" },{ "value": 50, "text": "50%" },{ "value": 75, "text": "75%" }];
     $scope.percent_filter=$scope.percent[0].value;
-    dataCall(1);
+    dataCall('assign-progress.js');
 
     $scope.updatePercentFilter = function() {
         dataCall();

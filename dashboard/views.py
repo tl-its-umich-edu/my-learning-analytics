@@ -257,36 +257,35 @@ def assignments(request, course_id=0):
     if assignments_in_course.empty:
         return HttpResponse(json.dumps([]), content_type='application/json')
 
-    assignment_submissions = get_user_assignment_submission(current_user, assignments_in_course,course_id)
+    assignment_submissions = get_user_assignment_submission(current_user, assignments_in_course, course_id)
 
     df = pd.merge(assignments_in_course, assignment_submissions, on='assignment_id', how='left')
     if df.empty:
-        logger.info('There are no assignment data in the course %s for user %s '%(course_id, current_user))
+        logger.info('There are no assignment data in the course %s for user %s ' % (course_id, current_user))
         return HttpResponse(json.dumps([]), content_type='application/json')
 
     df.sort_values(by='due_date', inplace=True)
     df.drop(columns=['assignment_id', 'due_date'], inplace=True)
     df.drop_duplicates(keep='first', inplace=True)
 
-    df3 = df[df['towards_final_grade']>0.0]
+    df3 = df[df['towards_final_grade'] > 0.0]
     df3[['score']] = df3[['score']].astype(float)
-    df3['percent_gotten']=df3.apply(user_percent,axis=1)
-    df3['graded']= df3['graded'].fillna(False)
+    df3['percent_gotten'] = df3.apply(user_percent, axis=1)
+    df3['graded'] = df3['graded'].fillna(False)
     df3[['score']] = df3[['score']].astype(float)
-    df3['percent_gotten']=df3.apply(user_percent,axis=1)
-    df3.sort_values(by=['graded','due_date_mod'], ascending=[False,True],inplace = True)
+    df3['percent_gotten'] = df3.apply(user_percent, axis=1)
+    df3.sort_values(by=['graded', 'due_date_mod'], ascending=[False, True], inplace=True)
     df3.reset_index(inplace=True)
-    df3.drop(columns=['index'],inplace=True)
+    df3.drop(columns=['index'], inplace=True)
 
-    assignment_data={}
-    assignment_data['progress']=json.loads(df3.to_json(orient='records'))
-
+    assignment_data = {}
+    assignment_data['progress'] = json.loads(df3.to_json(orient='records'))
 
     # Group the data according the assignment prep view
     df2 = df[df['towards_final_grade'] >= percent_selection]
     df2.reset_index(inplace=True)
     df2.drop(columns=['index'], inplace=True)
-    logger.debug('The Dataframe for the assignment planning %s ' %df2)
+    logger.debug('The Dataframe for the assignment planning %s ' % df2)
     grouped = df2.groupby(['week', 'due_dates'])
 
     assignment_list = []
@@ -307,7 +306,7 @@ def assignments(request, course_id=0):
     for i, week in enumerate(weeks):
         data = {}
         data["week"] = np.uint64(week).item()
-        data["id"] = i+1
+        data["id"] = i + 1
         dd_items = data["due_date_items"] = []
         for item in assignment_list:
             assignment_due_date_grp = {}
@@ -316,7 +315,7 @@ def assignments(request, course_id=0):
                 assignment_due_date_grp['assignment_items'] = item['assign']
                 dd_items.append(assignment_due_date_grp)
         full.append(data)
-    assignment_data['plan']=json.loads(json.dumps(full))
+    assignment_data['plan'] = json.loads(json.dumps(full))
     return HttpResponse(json.dumps(assignment_data), content_type='application/json')
 
 
