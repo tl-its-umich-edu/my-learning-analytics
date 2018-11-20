@@ -7,14 +7,18 @@
 
 {% block content %}
 {% if course_view_option.show_assignment_planning %}
+<div ng-controller="mainController" ng-app="visApp">
 <div class="container-fluid">
     <h5 style="padding-left: 10px">Progress toward Final Grade</h5>
     <div id="chart"></div>
+    <div ng-show="progress.length == 0" class="alert alert-info">
+        There's no assignment progress data
+    </div>
 </div>
 <br><br>
 <div class="container-fluid">
 <div class="row">
-<div style="padding-left: 40px"  class="col-lg" ng-controller="mainController" ng-app="visApp">
+<div style="padding-left: 40px"  class="col-lg">
     <div class="row">
         <div class="column">
             <h5>Assignments Due By Date</h5>
@@ -42,7 +46,7 @@
     {% verbatim %}
     <div class="table-style">
         <table class="table table_container">
-            <tr ng-if="data.length!=0" ng-repeat="week in data" id="{{week.id}}">
+            <tr ng-if="plan.length!=0" ng-repeat="week in plan" id="{{week.id}}">
                 <td ng-if="!week.due_date_items[0].assignment_items[0].current_week" >Week {{week.week}}</td>
                 <td ng-if="week.due_date_items[0].assignment_items[0].current_week" class="current-week-indicator">Week {{week.week}}</td>
                 <td class="table_container table_container1">
@@ -86,8 +90,8 @@
 
             </tr>
 
-            <td ng-show="data.length == 0">
-                There's no data for selection
+            <td ng-show="plan.length == 0">
+                There's no assignment planning data for selection
             </td>
 
         </table>
@@ -98,6 +102,7 @@
 </div>
 </div>
 </div>
+</div>
 {% else %}
     Assignment Planning view is hidden for this course.
 {% endif %}
@@ -105,7 +110,6 @@
 
 {% block js %}
 <script src="{% static 'd3-v4/build/d3.min.js' %}"></script>
-<script src="/static/js/assign-progress.js"></script>
 <script src="{% static 'js/app.js' %}"></script>
 <script src="{% static 'js/controllers.js' %}"></script>
 <script src="{% static 'js/factories.js' %}"></script>
