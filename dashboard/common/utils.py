@@ -10,4 +10,5 @@ def get_build_info():
     git_branch=config("OPENSHIFT_BUILD_REFERENCE",default="")
     build_source=config("OPENSHIFT_BUILD_SOURCE",default="")
     build_name=config("OPENSHIFT_BUILD_NAME",default="")
-    return 'Build_Namespace:'+build_namespace+' Build_Name:'+build_name+' Git_Source: '+build_source+' Git_Branch:'+git_branch+' Git_Commit:'+git_commit
+    return f'Build_Namespace:{build_namespace} Build_Name: {build_name} Git_Source: {build_source} Git_Branch: {git_branch} Git_Commit: {git_commit}'
+
