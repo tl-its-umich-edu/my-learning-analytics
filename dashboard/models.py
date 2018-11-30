@@ -13,10 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 class AcademicTerms(models.Model):
-    term_id = models.AutoField(primary_key=True, verbose_name="Term Id")
+    id = models.BigIntegerField(primary_key=True, verbose_name="Term Id")
+    canvas_id = models.BigIntegerField(verbose_name="Canvas Id")
     name = models.CharField(max_length=255, verbose_name="Name")
-    start_date = models.DateField(verbose_name="Start Date")
-    end_date = models.DateField(verbose_name="End Date")
+    date_start = models.DateField(verbose_name="Start Date")
+    date_end = models.DateField(verbose_name="End Date")
 
     def __str__(self):
         return self.name

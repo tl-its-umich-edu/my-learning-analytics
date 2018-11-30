@@ -328,6 +328,9 @@ UDW_FILE_ID_PREFIX = config("UDW_FILE_ID_PREFIX", default="1770000000")
 # set the current term id from config
 CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
 
+# set the earliest start date for terms
+EARLIEST_TERM_DATE = config('EARLIEST_TERM_DATE', default='2016-11-15')
+
 # Time to run cron
 RUN_AT_TIMES = config('RUN_AT_TIMES', default="", cast= Csv())
 

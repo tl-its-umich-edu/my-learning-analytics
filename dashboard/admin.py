@@ -1,16 +1,13 @@
 from django.contrib import admin
 from django.conf import settings
 
-from .models import AcademicTerms, CourseViewOption, Course
+from .models import CourseViewOption, Course
 
 class CourseInline(admin.TabularInline):
     model = Course
 
 class CourseViewOptionInline(admin.StackedInline):
     model = CourseViewOption
-
-class AcademicTermAdmin(admin.ModelAdmin):
-    inlines = [CourseInline,]
 
 class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseViewOptionInline,]
@@ -20,6 +17,4 @@ class CourseAdmin(admin.ModelAdmin):
         obj.id = settings.UDW_ID_PREFIX + obj.canvas_id
         return super(CourseAdmin, self).save_model(request, obj, form, change)
         
-
-admin.site.register (AcademicTerms, AcademicTermAdmin)
 admin.site.register (Course, CourseAdmin)
