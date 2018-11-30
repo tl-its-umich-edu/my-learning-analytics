@@ -180,14 +180,24 @@ STATICFILES_FINDERS = (
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    # Gunicorns logging format https://github.com/benoitc/gunicorn/blob/19.x/gunicorn/glogging.py
+    'formatters': {
+        "generic": {
+            "format": "%(asctime)s [%(process)d] [%(levelname)s] %(message)s",
+            "datefmt": "[%Y-%m-%d %H:%M:%S %z]",
+            "class": "logging.Formatter",
+        }
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'generic',
         },
     },
     'loggers': {
         'django': {
             'handlers': ['console'],
+            'propagate': False,
             'level': config('DJANGO_LOG_LEVEL', default='INFO'),
         },
         '': {
