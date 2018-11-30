@@ -34,6 +34,10 @@ The bq_cred.json is service account for Big Query, it needs to be supplied and p
 `docker cp ~/secrets student_dashboard:/secrets`
 5. Initialize the MySQL database by loading the users and files on the next step. You'll need to be on VPN for this to work.
 
+## Add a default course to test with
+
+TODO
+
 ## Load user, file, file access data into database (Local)
 Users and files are loaded now with the cron job. This is run on a separate pod in Openshift when the environment variable `IS_CRON_POD=true`.
 

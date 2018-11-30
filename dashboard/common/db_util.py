@@ -6,6 +6,7 @@ from datetime import datetime
 from dateutil.parser import parse
 
 from django_cron.models import CronJobLog
+from dashboard.models import Course
 
 logger = logging.getLogger(__name__)
 
@@ -82,3 +83,17 @@ def get_canvas_data_date():
     except Exception:
         logger.info("Value could not be found from metadata", exc_info = True)
     return datetime.min
+
+def get_supported_courses():
+    """Returns the list of supported courses from the database
+    
+    :return: [List of supported course ids]
+    :rtype: [list of str]
+    """
+
+    try:
+        c = Course.objects.get()
+        return end_time
+    except Course.DoesNotExist:
+        logger.info("Courses did not exist", exc_info = True)
+    return []

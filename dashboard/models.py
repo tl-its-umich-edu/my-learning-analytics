@@ -73,7 +73,7 @@ class AssignmentWeightConsideration(models.Model):
 
 class Course(models.Model):
     id = models.CharField(primary_key=True, max_length=255, verbose_name="Canvas Course Id")
-    term_id = models.ForeignKey(AcademicTerms, verbose_name="Term Id", on_delete=models.SET_NULL, db_column='term_id')
+    term_id = models.ForeignKey(AcademicTerms, verbose_name="Term Id", on_delete=models.SET_NULL, db_column='term_id', null=True)
     name = models.CharField(max_length=255, verbose_name="Name")
 
     def __str__(self):
@@ -120,7 +120,7 @@ class Submission(models.Model):
     graded_date = models.DateTimeField(blank=True, null=True, verbose_name="Graded DateTime")
 
     def __str__(self):
-        return "TODO"
+        return f"Submission Id {self.id} for assignment id {self.assignment_id} for course id {self.course_id} for user id {self.user_id}"
 
     class Meta:
         managed = False
@@ -154,13 +154,14 @@ class User(models.Model):
         unique_together = (('id', 'course_id'),)
 
 class FileAccess(models.Model):
-    file = models.OneToOneField(File, on_delete=models.CASCADE, primary_key=True, verbose_name="File")
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, verbose_name="User")
+    file_id = models.OneToOneField(File, on_delete=models.CASCADE, primary_key=True, verbose_name="File")
+    user_id = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, verbose_name="User")
     access_time = models.DateTimeField(verbose_name="Access Time")
 
     def __str__(self):
-        return f"File {self.file} accessed by {self.user}"
+        return f"File {self.file_id} accessed by {self.user_id}"
 
     class Meta:
         managed = False
         db_table = 'file_access'
+        unique_together = (('file_id', 'user_id'),)
