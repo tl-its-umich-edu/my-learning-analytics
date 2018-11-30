@@ -36,6 +36,7 @@ The bq_cred.json is service account for Big Query, it needs to be supplied and p
 
 ## Add a default course to test with
 
+<<<<<<< HEAD
 There are some default courses pre-populated by the mysql/init.sql script. If you'd like to add additional courses you need to add them as an admin user. (See next section on adding an admin user)
 
 ## Create a super user to test login. 
