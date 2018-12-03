@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS course (
   canvas_id CHAR(255)    NOT NULL,
   term_id INT UNSIGNED    NOT NULL DEFAULT 1,
   name    CHAR(255)      NOT NULL DEFAULT '',
-  PRIMARY KEY (id)
+  PRIMARY KEY (canvas_id)
 );
 
 CREATE TABLE IF NOT EXISTS file_access (
