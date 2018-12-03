@@ -72,7 +72,8 @@ class AssignmentWeightConsideration(models.Model):
         db_table = 'assignment_weight_consideration'
 
 class Course(models.Model):
-    id = models.CharField(primary_key=True, max_length=255, verbose_name="Canvas Course Id")
+    id = models.CharField(primary_key=True, max_length=255, verbose_name="Unizin Course Id", db_column='id', editable=False)
+    canvas_id = models.CharField(max_length=255, verbose_name="Canvas Course Id", db_column='canvas_id')
     term_id = models.ForeignKey(AcademicTerms, verbose_name="Term Id", on_delete=models.SET_NULL, db_column='term_id', null=True)
     name = models.CharField(max_length=255, verbose_name="Name")
 

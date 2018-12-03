@@ -320,7 +320,7 @@ else:
     LOGIN_REDIRECT_URL = '/'
     
 # This is fixed from UDW
-UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000")
+UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000", cast=str)
 
 # This is fixed from UDW
 UDW_FILE_ID_PREFIX = config("UDW_FILE_ID_PREFIX", default="1770000000")
