@@ -508,22 +508,22 @@ makeSlider = function () {
     var TOTAL_WEEKS = 16;
 
     // default to be the first week
-    var currentWeeKNumber = 1;
+    var currentWeekNumber = 1;
 
-    $.getJSON("/api/v1/get_current_week_number", function (initResult) {
+    $.getJSON("/api/v1/get_current_week_number/"+dashboard.course_id, function (initResult) {
         if (initResult.length === 0) {
             // return no data
             return "no data";
         }
-        currentWeeKNumber = initResult.currentWeekNumber;
+        currentWeekNumber = initResult.currentWeekNumber;
         // start week defaults to be two weeks ago
-        var twoWeeksBeforeCurrentWeek = WEEK_PREFIX + Math.max(1, currentWeeKNumber - WEEK_IN_ADVANCE)
+        var twoWeeksBeforeCurrentWeek = WEEK_PREFIX + Math.max(1, currentWeekNumber - WEEK_IN_ADVANCE)
 
         var i;
         var weekArray = [];
         var currentWeek ="Week 2";
         for (i = 1; i < TOTAL_WEEKS; i++) {
-            if (i === currentWeeKNumber) {
+            if (i === currentWeekNumber) {
                 currentWeek = CURRENT_WEEK_PREFIX + i;
                 weekArray.push(currentWeek);
             }
