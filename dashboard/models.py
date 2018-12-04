@@ -11,7 +11,22 @@ from django.db import models
 import logging
 logger = logging.getLogger(__name__)
 
-import datetime
+from datetime import datetime
+
+class AcademicTermsQuerySet(models.QuerySet):
+    def course_date_start(self, course_id):
+        try:
+            return self.get(course__id=str(course_id)).date_start
+        except AcademicTerms.DoesNotExist:
+            logger.debug(f"Could not find term for course {course_id}")
+            return datetime.min
+
+class AcademicTermsManager(models.Manager):
+    def get_queryset(self):
+        return AcademicTermsQuerySet(self.model, using=self._db)
+
+    def course_date_start(self, course_id):
+        return self.get_queryset().course_date_start(course_id)
 
 class AcademicTerms(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Term Id")
@@ -19,7 +34,8 @@ class AcademicTerms(models.Model):
     name = models.CharField(max_length=255, verbose_name="Name")
     date_start = models.DateField(verbose_name="Start Date")
     date_end = models.DateField(verbose_name="End Date")
-
+    
+    objects = AcademicTermsManager()
 
     def __str__(self):
         return self.name
@@ -29,8 +45,6 @@ class AcademicTerms(models.Model):
         db_table = 'academic_terms'
         verbose_name = "Academic Terms"
         verbose_name_plural = "Academic Terms"
-
-
 
 class Assignment(models.Model):
     id = models.CharField(primary_key=True, max_length=255, verbose_name="Assignment Id")
@@ -91,10 +105,10 @@ class CourseQuerySet(models.QuerySet):
 
 class CourseManager(models.Manager):
     def get_queryset(self):
-        return AcademicTermsQuerySet(self.model, using=self._db)
+        return CourseQuerySet(self.model, using=self._db)
 
     def get_supported_courses(self):
-        return CourseQuerySet(self.model, using=self._db)
+        return self.get_queryset().get_supported_courses()
 
 
 class Course(models.Model):
