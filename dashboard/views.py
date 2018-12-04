@@ -53,15 +53,15 @@ def gpa_map(grade):
 
 def get_current_week_number(request, course_id=0):
     # get current term start date
-    term_date_start = AcademicTerms.objects.filter(course__id=course_id).date_start
+    term_date_start = AcademicTerms.objects.course_date_start(course_id).date()
 
     today = datetime.now().date()
 
-    logger.info(term_date_start.date())
+    logger.info(term_date_start)
     logger.info(today)
 
     ## calculate the week number
-    currentWeekNumber = math.ceil((today - term_date_start.date()).days/7)
+    currentWeekNumber = math.ceil((today - term_date_start).days/7)
 
     # construct json
     data = {}
@@ -99,7 +99,7 @@ def file_access_within_week(request, course_id=0):
     total_number_student = total_number_student_df.iloc[0,0]
     logger.debug("course_id_string" + course_id + " total student=" + str(total_number_student))
 
-    term_date_start = AcademicTerms.objects.filter(course__id=course_id).date_start
+    term_date_start = AcademicTerms.objects.course_date_start(course_id)
 
     start = term_date_start + timedelta(days=(week_num_start * 7))
     end = term_date_start + timedelta(days=(week_num_end * 7))
@@ -111,7 +111,7 @@ def file_access_within_week(request, course_id=0):
     sqlString = "SELECT a.file_id as file_id, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id " \
                 "FROM file f, file_access a, user u, course c, academic_terms t  " \
                 "WHERE a.file_id =f.ID and a.user_id = u.ID  " \
-                "and f.course_id = c.id and c.term_id = t.term_id " \
+                "and f.course_id = c.id and c.term_id = t.id " \
                 "and a.access_time > %(start_time)s " \
                 "and a.access_time < %(end_time)s " \
                 "and f.course_id = %(course_id)s "
@@ -407,7 +407,7 @@ def is_weight_considered(course_id):
 
 def get_term_dates_for_course(course_id):
     logger.info(get_term_dates_for_course.__name__)
-    sql = "select a.date_start from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.term_id;"
+    sql = "select a.date_start from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.id;"
     df = pd.read_sql(sql, conn, params={"course_id": course_id}, parse_dates={'date_start': '%Y-%m-%d'})
     return df['date_start'].iloc[0]
 
