@@ -2,6 +2,7 @@ from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.contrib import auth
 from django.db import connection as conn
+from dashboard.models import AcademicTerms, Course
 
 import random, math, json, logging
 from datetime import datetime, timedelta
@@ -50,20 +51,17 @@ def gpa_map(grade):
     else:
         return GRADE_LOW
 
-def get_current_week_number(request):
-    # get term start date
-    # TODO: term id hardcoded now
-    termSqlString = "SELECT start_date FROM academic_terms where term_id = 2"
-    termDf = pd.read_sql(termSqlString, conn)
-    # 2018-09-04 04:00:00
-    termStartDate =termDf.iloc[0]['start_date']
+def get_current_week_number(request, course_id=0):
+    # get current term start date
+    term_start_date = AcademicTerms.objects.filter(course__id=course_id).start_date
+
     today = datetime.now().date()
 
-    logger.info(termStartDate.date())
+    logger.info(term_start_date.date())
     logger.info(today)
 
     ## calculate the week number
-    currentWeekNumber = math.ceil((today - termStartDate.date()).days/7)
+    currentWeekNumber = math.ceil((today - term_start_date.date()).days/7)
 
     # construct json
     data = {}
@@ -101,10 +99,8 @@ def file_access_within_week(request, course_id=0):
     total_number_student = total_number_student_df.iloc[0,0]
     logger.debug("course_id_string" + course_id + " total student=" + str(total_number_student))
 
-    ## TODO: term id hardcoded now
-    termSqlString = "SELECT start_date FROM academic_terms where term_id = 2"
-    termDf = pd.read_sql(termSqlString, conn)
-    term_start_date =termDf.iloc[0]['start_date']
+    term_start_date = AcademicTerms.objects.filter(course__id=course_id).start_date
+
     start = term_start_date + timedelta(days=(week_num_start * 7))
     end = term_start_date + timedelta(days=(week_num_end * 7))
     logger.debug("term_start=" + str(term_start_date) + " start=" + str(start) + " end=" + str(end))

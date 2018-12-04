@@ -11,6 +11,7 @@ from django.db import models
 import logging
 logger = logging.getLogger(__name__)
 
+import datetime
 
 class AcademicTerms(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Term Id")
@@ -18,6 +19,7 @@ class AcademicTerms(models.Model):
     name = models.CharField(max_length=255, verbose_name="Name")
     date_start = models.DateField(verbose_name="Start Date")
     date_end = models.DateField(verbose_name="End Date")
+
 
     def __str__(self):
         return self.name
@@ -27,6 +29,8 @@ class AcademicTerms(models.Model):
         db_table = 'academic_terms'
         verbose_name = "Academic Terms"
         verbose_name_plural = "Academic Terms"
+
+
 
 class Assignment(models.Model):
     id = models.CharField(primary_key=True, max_length=255, verbose_name="Assignment Id")
@@ -72,11 +76,34 @@ class AssignmentWeightConsideration(models.Model):
         managed = False
         db_table = 'assignment_weight_consideration'
 
+class CourseQuerySet(models.QuerySet):
+    def get_supported_courses(self):
+        """Returns the list of supported courses from the database
+        
+        :return: [List of supported course ids]
+        :rtype: [list of str (possibly prefixed depending on parameter)]
+        """
+        try:
+            return self.values_list('id', flat=True)
+        except Course.DoesNotExist:
+            logger.info("Courses did not exist", exc_info = True)
+        return []
+
+class CourseManager(models.Manager):
+    def get_queryset(self):
+        return AcademicTermsQuerySet(self.model, using=self._db)
+
+    def get_supported_courses(self):
+        return CourseQuerySet(self.model, using=self._db)
+
+
 class Course(models.Model):
     id = models.CharField(primary_key=True, max_length=255, verbose_name="Unizin Course Id", db_column='id', editable=False)
     canvas_id = models.CharField(max_length=255, verbose_name="Canvas Course Id", db_column='canvas_id')
     term_id = models.ForeignKey(AcademicTerms, verbose_name="Term Id", on_delete=models.SET_NULL, db_column='term_id', null=True)
     name = models.CharField(max_length=255, verbose_name="Name")
+    
+    objects = CourseManager()
 
     def __str__(self):
         return self.name
