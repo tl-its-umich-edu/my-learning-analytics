@@ -53,15 +53,15 @@ def gpa_map(grade):
 
 def get_current_week_number(request, course_id=0):
     # get current term start date
-    term_start_date = AcademicTerms.objects.filter(course__id=course_id).start_date
+    term_date_start = AcademicTerms.objects.filter(course__id=course_id).date_start
 
     today = datetime.now().date()
 
-    logger.info(term_start_date.date())
+    logger.info(term_date_start.date())
     logger.info(today)
 
     ## calculate the week number
-    currentWeekNumber = math.ceil((today - term_start_date.date()).days/7)
+    currentWeekNumber = math.ceil((today - term_date_start.date()).days/7)
 
     # construct json
     data = {}
@@ -99,11 +99,11 @@ def file_access_within_week(request, course_id=0):
     total_number_student = total_number_student_df.iloc[0,0]
     logger.debug("course_id_string" + course_id + " total student=" + str(total_number_student))
 
-    term_start_date = AcademicTerms.objects.filter(course__id=course_id).start_date
+    term_date_start = AcademicTerms.objects.filter(course__id=course_id).date_start
 
-    start = term_start_date + timedelta(days=(week_num_start * 7))
-    end = term_start_date + timedelta(days=(week_num_end * 7))
-    logger.debug("term_start=" + str(term_start_date) + " start=" + str(start) + " end=" + str(end))
+    start = term_date_start + timedelta(days=(week_num_start * 7))
+    end = term_date_start + timedelta(days=(week_num_end * 7))
+    logger.debug("term_start=" + str(term_date_start) + " start=" + str(start) + " end=" + str(end))
 
 
     # get time range based on week number passed in via request
@@ -407,9 +407,9 @@ def is_weight_considered(course_id):
 
 def get_term_dates_for_course(course_id):
     logger.info(get_term_dates_for_course.__name__)
-    sql = "select a.start_date from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.term_id;"
-    df = pd.read_sql(sql, conn, params={"course_id": course_id}, parse_dates={'start_date': '%Y-%m-%d'})
-    return df['start_date'].iloc[0]
+    sql = "select a.date_start from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.term_id;"
+    df = pd.read_sql(sql, conn, params={"course_id": course_id}, parse_dates={'date_start': '%Y-%m-%d'})
+    return df['date_start'].iloc[0]
 
 
 def df_default_display_settings():
