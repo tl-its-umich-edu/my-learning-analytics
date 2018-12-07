@@ -34,7 +34,31 @@ The bq_cred.json is service account for Big Query, it needs to be supplied and p
 `docker cp ~/secrets student_dashboard:/secrets`
 5. Initialize the MySQL database by loading the users and files on the next step. You'll need to be on VPN for this to work.
 
-## Load user, file, file access data into database (Local)
+## Add a default course to test with
+
+There are some default courses pre-populated by the mysql/init.sql script. If you'd like to add additional courses you need to add them as an admin user. (See next section on adding an admin user)
+
+## Create a super user to test login. 
+
+On the both local dev and remote the users are stored in the local database. However on local the users have to be created via the command line, on Openshift they are created either manually in the database or when logged in via Shibboleth.
+
+# Localhost (Dev) process
+
+The password will be displayed to the scree unless you specify it with --password. You can run this multiple times to change a password but you need to delete/modify super users via the Admin login (appears when logged in as admin). You can also add new users in there.
+
+`docker exec -it student_dashboard python manage.py createuser --superuser --username=root --email=root@example.edu`
+
+You can create regular users to test with without the superuser flag via the command line without using the --superuser.
+
+`docker exec -it student_dashboard python manage.py createuser --username=student --email=student@example.edu`
+
+Note: You can also make a user a "super user" by connecting to the database, editing the record in auth_user and setting is_staff=1 and is_superuser=1.
+
+# Openshift process
+
+You should login via Shibboleth into the application. Once you do that for the first admin you'll have to go into the database auth_user table and change is_staff and is_superuser to both be true. After doing this you can change future users with any admin via the GUI.
+
+## Load user, file, file access data into database
 Users and files are loaded now with the cron job. This is run on a separate pod in Openshift when the environment variable `IS_CRON_POD=true`.
 
 Crons are configured in this project with django-cron. Django-cron is executed whenever `python manage.py runcrons` is run but it is limited via a few environment variables.
@@ -74,17 +98,7 @@ This will remove everything! (images, containers, volumes)
 
 ## Testing tips!
 
-1. Create a super user to test login. Run this command below. The password will be printed unless you specify it with --password. You can run this multiple times to change a password but you need to delete/modify super users via the Admin login (appears when logged in as admin). You can also add new users in there.
-
-`docker exec -it student_dashboard python manage.py createuser --superuser --username=root --email=root@example.edu`
-
-You can create regular users to test with without the superuser flag via the command line without using the --superuser.
-
-`docker exec -it student_dashboard python manage.py createuser --username=student --email=student@example.edu`
-
-Note: You can also make a user a "super user" by connecting to the database, editing the record in auth_user and setting is_staff=1 and is_superuser=1.
-
-2. Connect to the docker and edit some files!
+1. Connect to the docker and edit some files!
 
 `docker exec -it student_dashboard /bin/bash`
 then install a text editor like vim
@@ -92,11 +106,11 @@ then install a text editor like vim
 
 Then you can edit your files! (Probably in /dashboard/dashboard)
 
-3. Restart the gunicorn to read the configuration. This is useful to avoid a redeploy.
+2. Restart the gunicorn to read the configuration. This is useful to avoid a redeploy.
 
 `docker exec student_dashboard pkill -HUP gunicorn`
 
-4. The django-debug-toolbar is available for debugging. For this to be displayed.
+3. The django-debug-toolbar is available for debugging. For this to be displayed.
   - The environment needs to be DEBUG (set DJANGO_DEBUG=true in your .env)
   - You have to be authenticated and a "super user" account. See step #1
   - The method that controls this access is in show_debug_toolbar(request):

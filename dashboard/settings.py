@@ -320,16 +320,10 @@ else:
     LOGIN_REDIRECT_URL = '/'
     
 # This is fixed from UDW
-UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000")
+UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000", cast=str)
 
 # This is fixed from UDW
 UDW_FILE_ID_PREFIX = config("UDW_FILE_ID_PREFIX", default="1770000000")
-
-# TODO: Select a default course for user from database, just here so things don't all break
-DEFAULT_COURSE_IDS = config("CANVAS_COURSE_IDS", default="0", cast=Csv())
-
-# Course IDS with the UDW ID appended to them
-DEFAULT_UDW_COURSE_IDS = [UDW_ID_PREFIX + course_id for course_id in DEFAULT_COURSE_IDS]  
 
 # set the current term id from config
 CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
