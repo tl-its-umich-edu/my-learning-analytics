@@ -48,11 +48,18 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
 
     # drop duplicates
     df.drop_duplicates(keep='first', inplace=True)
+    
+    logger.debug("Duplicates dropped")
+    logger.debug(df)
 
     logger.debug(" table: " + mysql_table + " insert size: " + str(df.shape[0]))
 
     # write to MySQL
-    df.to_sql(con=engine, name=mysql_table, if_exists='append', index=False)
+    try:
+        df.to_sql(con=engine, name=mysql_table, if_exists='append', index=False)
+    except Exception as e:
+        logger.debug(e)
+        raise
 
     # returns the row size of dataframe
     return f"inserted + {str(df.shape[0])} rows in table {mysql_table} for course {UDW_course_id};"
@@ -107,7 +114,8 @@ class DashboardCronJob(CronJobBase):
                         and e.workflow_state='active' ) as e 
                         where p.user_id=u.id 
                         and u.id = e.user_id 
-                        and c.enrollment_id =  e.enrollment_id
+                        and c.enrollment_id =  e.enrollment_id 
+                        and p.sis_user_id is not null
                         """
             logger.debug(user_sql)
 
