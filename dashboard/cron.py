@@ -42,7 +42,7 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
     logger.debug(df)
 
     # Sql returns boolean value so grouping course info along with it so that this could be stored in the DB table.
-    if table_identifier == 'weight':
+    if table_identifier == 'weight' and UDW_course_id:
         df['course_id']=UDW_course_id
         df.columns=['consider_weight','course_id']
 
@@ -55,7 +55,7 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
     df.to_sql(con=engine, name=mysql_table, if_exists='append', index=False)
 
     # returns the row size of dataframe
-    return  "inserted " + str(df.shape[0]) + " rows in table " + mysql_table + " for course " + UDW_course_id + ";"
+    return f"inserted + {str(df.shape[0])} rows in table {mysql_table} for course {UDW_course_id};"
 
 # execute database query
 def executeDbQuery(query):
@@ -329,12 +329,31 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
+    def update_with_udw_term(self):
+        # cron status
+        status = ""
+
+        logger.debug("in update with udw term")
+
+        # delete all records in the table first
+        status += deleteAllRecordInTable("academic_terms")
+
+        #select file record from UDW
+        term_sql = f"select id, canvas_id, name, date_start, date_end from enrollment_term_dim where date_start > '{settings.EARLIEST_TERM_DATE}'"
+        logger.debug(term_sql)
+        status += util_function(None, term_sql, 'academic_terms')
+
+        return status
+
     def do(self):
         logger.info("************ dashboard cron tab")
 
         status = ""
 
         status += "Start cron at: " +  str(datetime.datetime.now()) + ";"
+
+        logger.info("************ term")
+        status += self.update_with_udw_term()
 
         logger.info("************ user")
         status += self.update_with_udw_user()

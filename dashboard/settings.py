@@ -325,8 +325,9 @@ UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000", cast=str)
 # This is fixed from UDW
 UDW_FILE_ID_PREFIX = config("UDW_FILE_ID_PREFIX", default="1770000000")
 
-# set the current term id from config
-CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
+# This is to set a date so that MyLA will track all terms with start date after this date.
+
+EARLIEST_TERM_DATE = config('EARLIEST_TERM_DATE', default='2016-11-15')
 
 # Time to run cron
 RUN_AT_TIMES = config('RUN_AT_TIMES', default="", cast= Csv())
