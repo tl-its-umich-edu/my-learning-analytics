@@ -48,9 +48,6 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
 
     # drop duplicates
     df.drop_duplicates(keep='first', inplace=True)
-    
-    logger.debug("Duplicates dropped")
-    logger.debug(df)
 
     logger.debug(" table: " + mysql_table + " insert size: " + str(df.shape[0]))
 
@@ -58,7 +55,7 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
     try:
         df.to_sql(con=engine, name=mysql_table, if_exists='append', index=False)
     except Exception as e:
-        logger.debug(e)
+        logger.warn(e)
         raise
 
     # returns the row size of dataframe
