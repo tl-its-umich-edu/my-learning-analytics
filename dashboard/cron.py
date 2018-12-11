@@ -55,7 +55,7 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
     try:
         df.to_sql(con=engine, name=mysql_table, if_exists='append', index=False)
     except Exception as e:
-        logger.warn(e)
+        logger.exception(f"Error running to_sql on table {mysql_table}")
         raise
 
     # returns the row size of dataframe
