@@ -264,6 +264,12 @@ def assignments(request, course_id=0):
     df.drop(columns=['assignment_id', 'due_date'], inplace=True)
     df.drop_duplicates(keep='first', inplace=True)
 
+    # don't show the avg scores for student when individual assignment is not graded as canvas currently don't show it
+    # instructor might not ever see the avg score as he don't have grade in assignment. we don't have role described in the flow to open the gates for him
+    if not request.user.is_superuser:
+        df['avg_score']= df.apply(no_show_avg_score_for_ungraded_assignments, axis=1)
+    df['avg_score']=df['avg_score'].fillna('N/A')
+
     df3 = df[df['towards_final_grade'] > 0.0]
     df3[['score']] = df3[['score']].astype(float)
     df3['percent_gotten'] = df3.apply(user_percent, axis=1)
@@ -316,9 +322,13 @@ def assignments(request, course_id=0):
 
 
 def get_course_assignments(course_id):
-    sql="select assignment_id,name,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from " \
-        "(select id as assignment_id,assignment_group_id, local_date as due_date,name,points_possible from assignment where course_id = %(course_id)s) as a join " \
-        "(select id, group_points, weight,drop_lowest,drop_highest from assignment_groups) as ag on ag.id=a.assignment_group_id"
+
+    sql=f"""select assign.*,sub.avg_score from
+            (select assignment_id,name,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from
+            (select a.id as assignment_id,a.assignment_group_id, a.local_date as due_date,a.name,a.points_possible from assignment as a  where a.course_id =%(course_id)s) as a join
+            (select id, group_points, weight,drop_lowest,drop_highest from assignment_groups) as ag on ag.id=a.assignment_group_id) as assign left join
+            (select distinct assignment_id,avg_score from submission where course_id=%(course_id)s) as sub on sub.assignment_id = assign.assignment_id
+            """
 
     assignments_in_course = pd.read_sql(sql,conn,params={'course_id': course_id}, parse_dates={'due_date': '%Y-%m-%d'})
     # No assignments found in the course
@@ -363,10 +373,10 @@ def get_user_assignment_submission(current_user,assignments_in_course_df, course
     return assignment_submissions
 
 
-def hide_score_on_mute(row):
-    if row['grade_muted'] and row['score'] is not None:
-        return None
-    else:return row['score']
+def no_show_avg_score_for_ungraded_assignments(row):
+    if row['score'] is None:
+        return 'N/A'
+    else: return row['avg_score']
 
 
 def user_percent(row):

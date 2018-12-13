@@ -76,6 +76,7 @@ CREATE TABLE IF NOT EXISTS submission(
  user_id  CHAR(255)    NOT NULL,
  score CHAR(255),
  graded_date TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+ avg_score FLOAT,
  PRIMARY KEY  (id)
 );
 

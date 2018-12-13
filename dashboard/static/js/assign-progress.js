@@ -82,6 +82,7 @@ jQuery(document).ready(function ($) {
                 "Due at: <b>" + (d.due_dates) + "</b><br>" +
                 "Your grade is: <b>" + ((!d.score) ? "Not available" : (d.score)) + "</b><br>" +
                 "Total Points Possible: <b>" + (d.points_possible) + "</b><br>" +
+                "Avg Assignment Grade: <b>" + (d.avg_score) + "</b><br>" +
                 "Percentage worth in final grade: <b>" + (d.towards_final_grade) + "%</b><br>" +
                 ((d.drop_lowest != 0) ? "The lowest <b>" + d.drop_lowest + "</b> scores will dropped from this assignment group" : '') +
                 ((d.drop_highest != 0) ? "The highest <b>" + d.drop_highest + "</b> scores will dropped from this assignment group" : '');
