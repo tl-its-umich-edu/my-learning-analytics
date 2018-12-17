@@ -264,7 +264,6 @@ def assignments(request, course_id=0):
     df.drop(columns=['assignment_id', 'due_date'], inplace=True)
     df.drop_duplicates(keep='first', inplace=True)
 
-    # don't show the avg scores for student when individual assignment is not graded as canvas currently don't show it
     # instructor might not ever see the avg score as he don't have grade in assignment. we don't have role described in the flow to open the gates for him
     if not request.user.is_superuser:
         df['avg_score']= df.apply(no_show_avg_score_for_ungraded_assignments, axis=1)
@@ -372,7 +371,7 @@ def get_user_assignment_submission(current_user,assignments_in_course_df, course
         assignment_submissions.drop(columns=['graded_date'], inplace=True)
     return assignment_submissions
 
-
+# don't show the avg scores for student when individual assignment is not graded as canvas currently don't show it
 def no_show_avg_score_for_ungraded_assignments(row):
     if row['score'] is None:
         return 'N/A'
