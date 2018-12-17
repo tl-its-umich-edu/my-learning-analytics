@@ -59,7 +59,7 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
         raise
 
     # returns the row size of dataframe
-    return f"inserted + {str(df.shape[0])} rows in table {mysql_table} for course {UDW_course_id};"
+    return f"inserted + {str(df.shape[0])} rows in table {mysql_table} for course {UDW_course_id}\n"
 
 # execute database query
 def executeDbQuery(query):
@@ -72,7 +72,7 @@ def deleteAllRecordInTable(tableName):
     # delete all records in the table first
     executeDbQuery(f"delete from {tableName}")
 
-    return "records removed from " + tableName + ";"
+    return "records removed from " + tableName + "\n"
 
 # cron job to populate course and user tables
 class DashboardCronJob(CronJobBase):
@@ -230,7 +230,7 @@ class DashboardCronJob(CronJobBase):
                                 # write to MySQL
                                 df.to_sql(con=engine, name='file_access', if_exists='append', index=False)
 
-                                returnString += str(df.shape[0]) + " rows for course " + UDW_course_id + ";"
+                                returnString += str(df.shape[0]) + " rows for course " + UDW_course_id + "\n"
                                 logger.info(returnString)
 
         else:
@@ -356,7 +356,7 @@ class DashboardCronJob(CronJobBase):
 
         status = ""
 
-        status += "Start cron at: " +  str(datetime.datetime.now()) + ";"
+        status += "Start cron at: " +  str(datetime.datetime.now()) + "\n"
 
         logger.info("************ term")
         status += self.update_with_udw_term()
@@ -379,7 +379,7 @@ class DashboardCronJob(CronJobBase):
         logger.info("************ informational")
         status += self.update_unizin_metadata()
 
-        status += "End cron at: " +  str(datetime.datetime.now()) + ";"
+        status += "End cron at: " +  str(datetime.datetime.now()) + "\n"
 
         logger.info("************ total status=" + status + "/n/n")
 
