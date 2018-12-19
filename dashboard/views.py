@@ -267,7 +267,7 @@ def assignments(request, course_id=0):
     # instructor might not ever see the avg score as he don't have grade in assignment. we don't have role described in the flow to open the gates for him
     if not request.user.is_superuser:
         df['avg_score']= df.apply(no_show_avg_score_for_ungraded_assignments, axis=1)
-    df['avg_score']=df['avg_score'].fillna('N/A')
+    df['avg_score']=df['avg_score'].fillna('Not Available')
 
     df3 = df[df['towards_final_grade'] > 0.0]
     df3[['score']] = df3[['score']].astype(float)
@@ -374,7 +374,7 @@ def get_user_assignment_submission(current_user,assignments_in_course_df, course
 # don't show the avg scores for student when individual assignment is not graded as canvas currently don't show it
 def no_show_avg_score_for_ungraded_assignments(row):
     if row['score'] is None:
-        return 'N/A'
+        return 'Not Available'
     else: return row['avg_score']
 
 
