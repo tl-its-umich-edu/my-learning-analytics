@@ -17,7 +17,7 @@ class AcademicTermsQuerySet(models.QuerySet):
     def course_date_start(self, course_id):
         try:
             return self.get(course__id=str(course_id)).date_start
-        except AcademicTerms.DoesNotExist:
+        except self.model.DoesNotExist:
             logger.debug(f"Could not find term for course {course_id}")
             return datetime.min
 
@@ -99,7 +99,7 @@ class CourseQuerySet(models.QuerySet):
         """
         try:
             return self.values_list('id', flat=True)
-        except Course.DoesNotExist:
+        except self.model.DoesNotExist:
             logger.info("Courses did not exist", exc_info = True)
         return []
 
@@ -140,6 +140,23 @@ class CourseViewOption(models.Model):
     class Meta:
         managed = False
         db_table = 'course_view_option'
+    
+    def json(self):
+        """Format the json output that we want for this record
+        
+        This should be of the format canvas_id : {options}
+        :return: JSON formatted CourseViewOption
+        :rtype: Dict
+        """
+
+        return {
+            self.course.canvas_id: {
+                'course_name': self.course.name, 
+                'show_files_accessed': self.show_files_accessed,
+                'show_assignment_planning': self.show_assignment_planning,
+                'show_grade_distribution': self.show_grade_distribution
+            }
+        }
 
 class File(models.Model):
     id = models.CharField(primary_key=True, max_length=255, verbose_name="File Id")
