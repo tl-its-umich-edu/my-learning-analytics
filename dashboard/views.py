@@ -4,7 +4,7 @@ from django.contrib import auth
 from django.db import connection as conn
 from django.core import serializers
 
-from dashboard.models import AcademicTerms, Course, CourseViewOption
+from dashboard.models import AcademicTerms, CourseViewOption
 
 
 
