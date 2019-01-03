@@ -480,7 +480,6 @@ var makeGraph = function(url) {
 
 };
 
-var CURRENT_WEEK_PREFIX = "Now - Week ";
 var WEEK_PREFIX = "Week ";
 // default to show two weeks in advance
 var WEEK_IN_ADVANCE = 2;
@@ -494,49 +493,52 @@ function cleanWeekInputNum(weekNumString)
     return value;
 }
 
-function makeGrapBasedOnGradeAndSlide(grade, silderValues)
+function makeGrapBasedOnGradeAndSlide(grade, sliderValues)
 {
     // parse to get start and end week number
-    var startWeek = cleanWeekInputNum(silderValues[0]);
-    var endWeek = cleanWeekInputNum(silderValues[1]);
+    var startWeek = cleanWeekInputNum(sliderValues[0]);
+    var endWeek = cleanWeekInputNum(sliderValues[1]);
     makeGraph('/api/v1/courses/'+dashboard.course_id+'/file_access_within_week?week_num_start=' + startWeek + "&week_num_end=" + endWeek + "&grade=" + grade);
 }
 
 var mySlider;
 var makeSlider;
 makeSlider = function () {
-    var TOTAL_WEEKS = 16;
-
     // default to be the first week
     var currentWeekNumber = 1;
 
-    $.getJSON("/api/v1/get_current_week_number/"+dashboard.course_id, function (initResult) {
+    $.getJSON("/api/v1/courses/"+dashboard.course_id+"/info", function (initResult) {
         if (initResult.length === 0) {
             // return no data
             return "no data";
         }
-        currentWeekNumber = initResult.currentWeekNumber;
-        // start week defaults to be two weeks ago
-        var twoWeeksBeforeCurrentWeek = WEEK_PREFIX + Math.max(1, currentWeekNumber - WEEK_IN_ADVANCE)
+        currentWeekNumber = initResult.current_week_number;
+        totalWeeks = initResult.total_weeks
 
         var i;
         var weekArray = [];
-        var currentWeek ="Week 2";
-        for (i = 1; i < TOTAL_WEEKS; i++) {
+        var minWeek = WEEK_PREFIX + "1"
+        var maxWeek = WEEK_PREFIX + totalWeeks
+
+        for (i = 1; i <= totalWeeks; i++) {
+            weekName = WEEK_PREFIX + i
             if (i === currentWeekNumber) {
-                currentWeek = CURRENT_WEEK_PREFIX + i;
-                weekArray.push(currentWeek);
+                weekName = weekName + " (Now)";
+                // Set the default minimum to be 1 less or WEEKS_IN_ADVANCE less
+                minWeekNum = Math.max(1, currentWeekNumber - WEEK_IN_ADVANCE)
+                // If it's the current week, set the value to the current, otherwise set it to some other calculated week
+                minWeek = (minWeekNum === i) ? weekName : WEEK_PREFIX + minWeekNum;
+                // Set the max to be the current
+                maxWeek = weekName
             }
-            else {
-                weekArray.push(WEEK_PREFIX + i);
-            }
+            weekArray.push(weekName);
         }
 
         mySlider = new rSlider({
             target: '#slider',
             values: weekArray,
             range: true, // range slider
-            set: [twoWeeksBeforeCurrentWeek, currentWeek], // an array of preselected values
+            set: [minWeek, maxWeek], // an array of preselected values
             scale: true,
             tooltip: false,
             onChange: function (values) {
