@@ -486,14 +486,16 @@ var WEEK_IN_ADVANCE = 2;
 
 function cleanWeekInputNum(weekNumString)
 {
-    // get rid of "Now - Week " or "Week " substring
     // return only the week integer number
-    var value = weekNumString.replace(CURRENT_WEEK_PREFIX, "");
-    value = value.replace(WEEK_PREFIX, "");
-    return value;
+    const match = weekNumString.match(/\d+/);
+    if (match != null) {
+        return match[0];
+    }
+    // If no match just return the uncleaned string
+    return weekNumString;
 }
 
-function makeGrapBasedOnGradeAndSlide(grade, sliderValues)
+function makeGraphBasedOnGradeAndSlide(grade, sliderValues)
 {
     // parse to get start and end week number
     var startWeek = cleanWeekInputNum(sliderValues[0]);
@@ -546,7 +548,7 @@ makeSlider = function () {
                 // argument values represents current values
                 var grade = $('#grade').val();
                 $("#slider_label").html(" from <b>" + valuesParts[0] + "</b> to <b>" + valuesParts[1] + "</b>");
-                makeGrapBasedOnGradeAndSlide(grade, valuesParts);
+                makeGraphBasedOnGradeAndSlide(grade, valuesParts);
             }
         });
     });
@@ -555,7 +557,7 @@ makeSlider = function () {
 $('#grade').change(function() {
     // make new graph based on the grade selection
     var sliderValues = mySlider.getValue().split(",");
-    makeGrapBasedOnGradeAndSlide($('#grade').val(), sliderValues);
+    makeGraphBasedOnGradeAndSlide($('#grade').val(), sliderValues);
 
 });
 
