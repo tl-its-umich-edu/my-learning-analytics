@@ -8,7 +8,6 @@
 from __future__ import unicode_literals
 
 from django.db import models
-
 import logging
 logger = logging.getLogger(__name__)
 
@@ -21,7 +20,7 @@ class AcademicTermsQuerySet(models.QuerySet):
         except self.model.DoesNotExist:
             logger.debug(f"Could not find term for course {course_id}")
             return datetime.min
-    
+
 class AcademicTermsManager(models.Manager):
     def get_queryset(self):
         return AcademicTermsQuerySet(self.model, using=self._db)
@@ -35,7 +34,7 @@ class AcademicTerms(models.Model):
     name = models.CharField(max_length=255, verbose_name="Name")
     date_start = models.DateField(verbose_name="Start Date")
     date_end = models.DateField(verbose_name="End Date")
-
+    
     objects = AcademicTermsManager()
 
     def __str__(self):
