@@ -51,6 +51,9 @@ urlpatterns = [
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignments', login_required(views.assignments), name='assignments'),
     url(r'^api/v1/get_current_week_number/(?P<course_id>[0-9]+)', login_required(views.get_current_week_number), name='get_current_week_number'),
 
+    # This is a public view of the courses we have enabled
+    url(r'^api/v1/courses_enabled', views.courses_enabled, name='courses_enabled'),
+
     url(r'^su/', include('django_su.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

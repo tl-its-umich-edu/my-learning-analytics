@@ -2,7 +2,11 @@ from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.contrib import auth
 from django.db import connection as conn
-from dashboard.models import AcademicTerms, Course
+from django.core import serializers
+
+from dashboard.models import AcademicTerms, CourseViewOption
+
+
 
 import random, math, json, logging
 from datetime import datetime, timedelta
@@ -433,3 +437,13 @@ def logout(request):
     logger.info('User %s logging out.' % request.user.username)
     auth.logout(request)
     return redirect(settings.LOGOUT_REDIRECT_URL)
+
+def courses_enabled(request):
+    """ Returns json for all courses we currntly support and are enabled
+    
+    """
+    data = {}
+    for cvo in CourseViewOption.objects.all():
+        data.update(cvo.json())
+
+    return HttpResponse(json.dumps(data), content_type='application/json')
