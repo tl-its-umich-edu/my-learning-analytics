@@ -4,6 +4,14 @@ import sys
 import warnings
 
 if __name__ == "__main__":
+
+    if os.environ.get("PTVSD_DEBUG", False):
+        import ptvsd
+        try: 
+            ptvsd.enable_attach(address = (os.environ.get("PTVSD_ADDRESS",'0.0.0.0'), os.environ.get("PTVSD_PORT", 3000)))
+        except:
+            pass
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dashboard.settings")
 
     # Regex for which modules to ignore warnings from

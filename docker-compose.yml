@@ -31,6 +31,7 @@ services:
       - .:/code
     ports:
       - "5001:5000"
+      - "3001:3000"
     depends_on:
       - mysql
     env_file:
