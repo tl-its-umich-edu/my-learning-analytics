@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import json
 
 from decouple import config, Csv
 
@@ -318,6 +319,25 @@ if config('STUDENT_DASHBOARD_SAML', default='True', cast=bool):
 else:
     AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
     LOGIN_REDIRECT_URL = '/'
+
+# Give an opportunity to disable LTI
+if config('STUDENT_DASHBOARD_LTI', default='False', cast=bool):
+    INSTALLED_APPS += ('django_lti_auth',)
+
+    PYLTI_CONFIG = {
+        "consumers": json.loads(config("PYLTI_CONFIG_CONSUMERS", default="{}", cast=str)),
+        "method_hooks":{
+            "valid_lti_request": "dashboard.lti.valid_lti_request",
+            #"invalid_lti_request": "dashboard.lti.invalid_lti_request"
+        },
+        "next_url": "home"
+    }
+    LTI_PERSON_SOURCED_ID_FIELD = config('LTI_PERSON_SOURCED_ID_FIELD',
+        default="lis_person_sourcedid", cast=str)
+    LTI_EMAIL_FIELD = config('LTI_EMAIL_FIELD',
+        default="lis_person_contact_email_primary", cast=str)
+    LTI_CANVAS_COURSE_ID_FIELD = config('LTI_CANVAS_COURSE_ID_FIELD',
+        default="custom_canvas_course_id", cast=str)
 
 # This is fixed from UDW
 UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000", cast=str)
