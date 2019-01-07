@@ -345,6 +345,9 @@ UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000", cast=str)
 # This is fixed from UDW
 UDW_FILE_ID_PREFIX = config("UDW_FILE_ID_PREFIX", default="1770000000")
 
+# Allow enabling/disabling the View options globally
+VIEWS_DISABLED = config('VIEWS_DISABLED', default='', cast=Csv())
+
 # This is to set a date so that MyLA will track all terms with start date after this date.
 
 EARLIEST_TERM_DATE = config('EARLIEST_TERM_DATE', default='2016-11-15')

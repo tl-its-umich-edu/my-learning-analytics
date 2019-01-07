@@ -418,10 +418,11 @@ class DashboardCronJob(CronJobBase):
 
         status += self.submission()
         status += self.weight_consideration()
-
+        
         logger.info("** file")
-        status += self.update_with_udw_file()
-        status += self.update_with_bq_access()
+        if 'show_files_accessed' not in settings.VIEWS_DISABLED:
+            status += self.update_with_udw_file()
+            status += self.update_with_bq_access()
 
         logger.info("** informational")
         status += self.update_unizin_metadata()
