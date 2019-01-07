@@ -22,6 +22,7 @@ services:
     ports:
       - "5306:3306"
     volumes:
+      - ./.data/mysql:/var/lib/mysql
       - ./mysql:/docker-entrypoint-initdb.d/:ro
     container_name: student_dashboard_mysql
   web:
@@ -29,6 +30,8 @@ services:
     command: bash -c "./start.sh"
     volumes:
       - .:/code
+      # use the container's node_modules folder (don't override)
+      - /code/node_modules/
     ports:
       - "5001:5000"
       - "3000:3000"
@@ -37,4 +40,6 @@ services:
       - mysql
     env_file:
       - .env
+    environment:
+      - GUNICORN_RELOAD=True
     container_name: student_dashboard
