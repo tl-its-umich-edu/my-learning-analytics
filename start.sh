@@ -41,7 +41,7 @@ else
 
         # Get the environment from docker saved
         # https://ypereirareis.github.io/blog/2016/02/29/docker-crontab-environment-variables/
-        printenv | sed 's/^\([a-zA-Z0-9_]*\)=\(.*\)$/export \1="\2"/g' >> $HOME/.profile
+        printenv | sed "s/^\([a-zA-Z0-9_]*\)=\(.*\)$/export \1='\2'/g" >> $HOME/.profile
 
         echo "${CRONTAB_SCHEDULE} . $HOME/.profile; python /dashboard/manage.py runcrons >> /var/log/cron.log 2>&1" | crontab
         crontab -l && cron -L 15 && tail -f /var/log/cron.log
