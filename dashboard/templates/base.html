@@ -68,7 +68,7 @@
 <script>
 // Setup a top level js object to hold global values
 var dashboard = {
-{% if course_id %}"course_id": '{{settings.UDW_ID_PREFIX}}'+'{{ course_id }}',
+{% if course_id %}"course_id": '{{settings.DATA_WAREHOUSE_ID_PREFIX}}'+'{{ course_id }}',
 {% else %}"course_id": 0,
 {% endif %}
 };

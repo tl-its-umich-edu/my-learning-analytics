@@ -12,12 +12,6 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_PORT=${MYSQL_PORT}
-
-      - UDW_ENDPOINT=${UDW_ENDPOINT}
-      - UDW_USER=${UDW_USER}
-      - UDW_PASSWORD=${UDW_PASSWORD}
-      - UDW_PORT=${UDW_PORT}
-      - UDW_DATABASE=${UDW_DATABASE}
     entrypoint: ['docker-entrypoint.sh', '--default-authentication-plugin=mysql_native_password']
     ports:
       - "5306:3306"

@@ -130,13 +130,13 @@ DATABASES = {
         'HOST': config('MYSQL_HOST', default='localhost'),
         'PORT': config('MYSQL_PORT', default=3306, cast=int),
     },
-    'UDW': {
-        'ENGINE': config('UDW_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': config('UDW_DATABASE', default=''),
-        'USER': config('UDW_USER', default=''),
-        'PASSWORD': config('UDW_PASSWORD', default=''),
-        'HOST': config('UDW_HOST', default=config('UDW_ENDPOINT', default='')),
-        'PORT': config('UDW_PORT', default=5432, cast=int),
+    'DATA_WAREHOUSE': {
+        'ENGINE': config('DATA_WAREHOUSE_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': config('DATA_WAREHOUSE_DATABASE', default=''),
+        'USER': config('DATA_WAREHOUSE_USER', default=''),
+        'PASSWORD': config('DATA_WAREHOUSE_PASSWORD', default=''),
+        'HOST': config('DATA_WAREHOUSE_HOST', default=''),
+        'PORT': config('DATA_WAREHOUSE_PORT', default=5432, cast=int),
     }
 }
 
@@ -339,11 +339,14 @@ if config('STUDENT_DASHBOARD_LTI', default='False', cast=bool):
     LTI_CANVAS_COURSE_ID_FIELD = config('LTI_CANVAS_COURSE_ID_FIELD',
         default="custom_canvas_course_id", cast=str)
 
-# This is fixed from UDW
-UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000", cast=str)
+# controls whether Unizin specific features/data is available from the Canvas Data source
+DATA_WAREHOUSE_IS_UNIZIN = config("DATA_WAREHOUSE_IS_UNIZIN", default=True, cast=bool)
 
-# This is fixed from UDW
-UDW_FILE_ID_PREFIX = config("UDW_FILE_ID_PREFIX", default="1770000000")
+# This is fixed from DATA_WAREHOUSE
+DATA_WAREHOUSE_ID_PREFIX = config("DATA_WAREHOUSE_ID_PREFIX", default="17700000000", cast=str)
+
+# This is fixed from DATA_WAREHOUSE
+DATA_WAREHOUSE_FILE_ID_PREFIX = config("DATA_WAREHOUSE_FILE_ID_PREFIX", default="1770000000")
 
 # Allow enabling/disabling the View options globally
 VIEWS_DISABLED = config('VIEWS_DISABLED', default='', cast=Csv())
@@ -356,7 +359,7 @@ EARLIEST_TERM_DATE = config('EARLIEST_TERM_DATE', default='2016-11-15')
 RUN_AT_TIMES = config('RUN_AT_TIMES', default="", cast= Csv())
 
 # Add any settings you need to be available to templates in this array
-SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX']
+SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'DATA_WAREHOUSE_ID_PREFIX']
 
 # Method to show the user, if they're authenticated and superuser
 def show_debug_toolbar(request):
