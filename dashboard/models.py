@@ -144,7 +144,7 @@ class CourseQuerySet(models.QuerySet):
         """Returns the list of supported courses from the database
         
         :return: [List of supported course ids]
-        :rtype: [list of str (possibly prefixed depending on parameter)]
+        :rtype: [list of str (possibly incremented depending on parameter)]
         """
         try:
             return self.values_list('id', flat=True)
