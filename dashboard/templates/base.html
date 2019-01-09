@@ -23,7 +23,7 @@
     {% include "su/is_su.html" %}
     <header class="row border-between">
         <div class="col-md-4 text-left">
-            <a href="/courses/{{ current_user_course_id }}/"> My Learning Analytics</a> {% if course_id %} : {{ course_name }} {% endif %}
+            <a href="/courses/{{ current_user_course_id }}/">My Learning Analytics</a> {% if course_id %} : {{ course_name }} {% endif %}
         </div>
         <div class="col-md-4 text-center lead">
             {% use_macro title %}
