@@ -304,7 +304,7 @@ if config('STUDENT_DASHBOARD_SAML', default='True', cast=bool):
 
     ACS_DEFAULT_REDIRECT_URL = config('DJANGO_ACS_DEFAULT_REDIRECT', default='/')
     LOGIN_REDIRECT_URL = config('DJANGO_LOGIN_REDIRECT_URL', default='/')
-    
+
     LOGOUT_REDIRECT_URL = config('DJANGO_LOGOUT_REDIRECT_URL',default='/')
 
     SAML_CREATE_UNKNOWN_USER = True
@@ -315,10 +315,10 @@ if config('STUDENT_DASHBOARD_SAML', default='True', cast=bool):
         'givenName': ('first_name', ),
         'sn': ('last_name', ),
     }
-else: 
+else:
     AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
     LOGIN_REDIRECT_URL = '/'
-    
+
 # This is fixed from UDW
 UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000", cast=str)
 
@@ -333,7 +333,7 @@ EARLIEST_TERM_DATE = config('EARLIEST_TERM_DATE', default='2016-11-15')
 RUN_AT_TIMES = config('RUN_AT_TIMES', default="", cast= Csv())
 
 # Add any settings you need to be available to templates in this array
-SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX',]
+SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX']
 
 # Method to show the user, if they're authenticated and superuser
 def show_debug_toolbar(request):
