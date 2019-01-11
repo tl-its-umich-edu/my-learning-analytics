@@ -1,20 +1,22 @@
-from django.shortcuts import redirect
-from django.http import HttpResponse
-from django.contrib import auth
-from django.db import connection as conn
-from dashboard.models import AcademicTerms, Course
-
-import random, math, json, logging
+import json
+import logging
+import math
 from datetime import datetime, timedelta
-
-from decouple import config
 
 import numpy as np
 import pandas as pd
-
+from decouple import config
 from django.conf import settings
-
+from django.contrib import auth
+from django.db import connection as conn
+from django.http import HttpResponse
+from django.shortcuts import redirect
 from pinax.eventlog.models import log as eventlog
+from dashboard.event_logs_types.event_logs_types import EventLogTypes
+
+from django.core.exceptions import ObjectDoesNotExist
+
+from dashboard.models import AcademicTerms, UserDefaultSelection
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +32,6 @@ GRADE_C="70-79"
 GRADE_LOW="low_grade"
 NO_GRADE_STRING = "NO_GRADE"
 
-EVENT_VIEW_FILE_ACCESS="VIEW_FILE_ACCESS"
-EVENT_VIEW_ASSIGNMENT_PLANNING="VIEW_ASSIGNMENT_PLANNING"
-EVENT_VIEW_GRADE_DISTRIBUTION="VIEW_GRADE_DISTRIBUTION"
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
@@ -90,7 +89,7 @@ def file_access_within_week(request, course_id=0):
         "grade": grade,
         "course_id": course_id
     }
-    eventlog(request.user, EVENT_VIEW_FILE_ACCESS, extra=data)
+    eventlog(request.user, EventLogTypes.EVENT_VIEW_FILE_ACCESS.value, extra=data)
 
 
     # get total number of student within the course_id
@@ -226,9 +225,59 @@ def grade_distribution(request, course_id=0):
     data = {
         "course_id": course_id
     }
-    eventlog(request.user, EVENT_VIEW_GRADE_DISTRIBUTION, extra=data)
+    eventlog(request.user, EventLogTypes.EVENT_VIEW_GRADE_DISTRIBUTION.value, extra=data)
 
     return HttpResponse(df.to_json(orient='records'))
+
+
+def update_user_default_selection_for_views(request, course_id=0):
+    logger.info(update_user_default_selection_for_views.__name__)
+    current_user = request.user.get_username()
+    default_selection = dict(request.GET)
+    logger.info('dic: {}'.format(default_selection))
+    default_type = [*default_selection][0]
+    default_type_value = default_selection.get(default_type)[0]
+    logger.info(f"request to set default for type: {default_type} and default_type value: {default_type_value}")
+
+    # json for eventlog
+    data = {
+        "course_id": course_id,
+        "default_type": default_type,
+        "default_value": default_type_value
+    }
+    eventlog(request.user, EventLogTypes.EVENT_VIEW_SET_DEFAULT.value, extra=data)
+    key = 'default'
+    try:
+        obj, create_or_update_bool = UserDefaultSelection.objects.set_user_defaults(course_id, current_user,
+                                                                                    default_type,
+                                                                                    default_type_value)
+        logger.info(
+            f"""setting default returns with success with response {obj.__dict__} and entry created or Updated: {create_or_update_bool}
+                        for user {current_user} in course {course_id} """)
+        value = 'success'
+    except (ObjectDoesNotExist, Exception) as e:
+        logger.info(f"updating default failed due to {e} for user {current_user} in course: {course_id} ")
+        value = 'fail'
+    return HttpResponse(json.dumps({key: value}))
+
+
+def get_user_default_selection(request, course_id=0):
+    logger.info(get_user_default_selection.__name__)
+    user_id = request.user.get_username()
+    default_view_type = request.GET.get('default_type')
+    key = 'default'
+    no_user_default_response = json.dumps({key: ''})
+    logger.info(f"the default option request from user {user_id} in course {course_id} of type: {default_view_type}")
+    default_value = UserDefaultSelection.objects.get_user_defaults(course_id, user_id, default_view_type)
+    logger.info(f"""default option check returned from DB for user: {user_id} course {course_id} and type: 
+                    {default_view_type} is {default_value}""")
+    if not default_value:
+        logger.info(
+            f"user {user_id} in course {course_id} don't have any defaults values set type {default_view_type}")
+        return HttpResponse(no_user_default_response, content_type='application/json')
+    result = json.dumps({key: default_value})
+    logger.info(f"user {user_id} in course {course_id} for type {default_view_type} defaults: {result}")
+    return HttpResponse(result, content_type='application/json')
 
 
 def assignments(request, course_id=0):
@@ -244,7 +293,7 @@ def assignments(request, course_id=0):
         "course_id": course_id,
         "percent_selection": percent_selection
     }
-    eventlog(request.user, EVENT_VIEW_ASSIGNMENT_PLANNING, extra=data)
+    eventlog(request.user, EventLogTypes.EVENT_VIEW_ASSIGNMENT_PLANNING.value, extra=data)
 
     logger.info('selection from assignment Planning {}'.format(percent_selection))
 

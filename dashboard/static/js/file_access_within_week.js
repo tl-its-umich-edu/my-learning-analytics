@@ -504,11 +504,13 @@ function makeGrapBasedOnGradeAndSlide(grade, silderValues)
 
 var mySlider;
 var makeSlider;
+var default_selection;
 makeSlider = function () {
     var TOTAL_WEEKS = 16;
 
     // default to be the first week
     var currentWeekNumber = 1;
+    getUserDefaults();
 
     $.getJSON("/api/v1/get_current_week_number/"+dashboard.course_id, function (initResult) {
         if (initResult.length === 0) {
@@ -550,13 +552,64 @@ makeSlider = function () {
     });
 };
 
+var getUserDefaults = function (){
+    $.getJSON("/api/v1/courses/" + dashboard.course_id + "/get_user_default_selection?default_type=file", function (results) {
+        if (results.default === '') {
+            default_selection = $('#grade').val()
+        } else {
+            default_selection = results.default;
+        }
+        $("#grade").val(default_selection);
+        $("#default_selection").hide();
+        $("#label_for_default_selection").html("Current default");
+    });
+}
+
+default_selection_logic_on_grade_selection = function(){
+    let selected_value = $('#grade').val();
+    if (selected_value === default_selection) {
+        $("#default_selection").hide()
+        $('#default_selection').prop('checked', false);
+        $("#label_for_default_selection").html("Current default");
+
+
+    } else {
+        $("#default_selection").show();
+        $("#label_for_default_selection").html("Reset as my default")
+    }
+}
+
+update_default_selection = function(selection){
+    $.getJSON("/api/v1/courses/" + dashboard.course_id + "/set_user_default_selection?file=" + selection, function (initResult) {
+        if (initResult.default === 'fail') {
+            $("#label_for_default_selection").html("default not updated");
+            $('#default_selection').prop('checked', false);
+            return;
+        }
+        default_selection = $('#grade').val();
+    });
+}
+
 $('#grade').change(function() {
     // make new graph based on the grade selection
     var sliderValues = mySlider.getValue().split(",");
+    default_selection_logic_on_grade_selection()
     makeGrapBasedOnGradeAndSlide($('#grade').val(), sliderValues);
 
 });
 
+// onchange of the reset by default selection
+$('#default_selection').change(function(){
+    selection = $('#grade').val();
+    if ($(this).is(":checked")) {
+        $("#default_selection").hide()
+        $('#default_selection').prop('checked', false);
+        $("#label_for_default_selection").html("Current default");
+    }
+    update_default_selection(selection)
+})
+
 makeSlider();
+
 
 makeGraph();

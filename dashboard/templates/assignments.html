@@ -23,9 +23,14 @@
         <div class="column">
             <h5>Assignments Due By Date</h5>
             <span>Show assignments that weigh at least</span>
+            {% verbatim %}
             <p ng-show="percentFilterEnabled">
                 <select ng-change="updatePercentFilter()" ng-model="percent_filter" ng-options="obj.value as obj.text for obj in percent"></select>
+                &nbsp;
+                <input ng-show="isResetMyDefaultCheckboxEnabled" type="checkbox" ng-model="default_selection_model" ng-change="sendDefaults()">
+                <label>{{default_setting.msg}}</label>
             </p>
+            {% endverbatim %}
         </div>
         <div class="column">
             <span>Assignment Status: </span><br>
