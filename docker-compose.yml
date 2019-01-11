@@ -4,7 +4,7 @@ services:
 
   mysql:
     image: mysql:5.7.22
-    restart: always
+    restart: on-failure
     environment:
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_DATABASE=${MYSQL_DATABASE}

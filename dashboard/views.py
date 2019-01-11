@@ -2,6 +2,10 @@ from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.contrib import auth
 from django.db import connection as conn
+from dashboard.models import AcademicTerms, Course, CourseViewOption
+from django.core.exceptions import ObjectDoesNotExist
+
+from django.forms.models import model_to_dict
 
 import random, math, json, logging
 from datetime import datetime, timedelta
@@ -50,25 +54,48 @@ def gpa_map(grade):
     else:
         return GRADE_LOW
 
-def get_current_week_number(request):
-    # get term start date
-    # TODO: term id hardcoded now
-    termSqlString = "SELECT start_date FROM academic_terms where term_id = 2"
-    termDf = pd.read_sql(termSqlString, conn)
-    # 2018-09-04 04:00:00
-    termStartDate =termDf.iloc[0]['start_date']
-    today = datetime.now().date()
+def get_course_info(request, course_id=0):
+    """Returns JSON data about a course
+    
+    :param request: HTTP Request
+    :type request: Request
+    :param course_id: Unizin Course ID, defaults to 0
+    :param course_id: int, optional
+    :return: JSON to be used 
+    :rtype: str
+    """
 
-    logger.info(termStartDate.date())
-    logger.info(today)
+    today = datetime.today()
 
-    ## calculate the week number
-    currentWeekNumber = math.ceil((today - termStartDate.date()).days/7)
+    try:
+        course = Course.objects.get(id=course_id)
+    except ObjectDoesNotExist:
+        return HttpResponse("{}")
 
-    # construct json
-    data = {}
-    data['currentWeekNumber'] = currentWeekNumber
-    return HttpResponse(json.dumps(data))
+    resp = model_to_dict(course)
+    # Fill in the actual term
+    term = course.term_id
+
+    # Replace the year in the end date with start date (Hack to get around far out years)
+    # This should be replaced in the future via an API call so the terms have correct end years, or Canvas data adjusted
+    if (term.date_end.year - term.date_start.year) > 1:
+        logger.debug(f'{term.date_end.year} - {term.date_start.year} greater than 1 so setting end year to match start year.')
+        term.date_end = term.date_end.replace(year=term.date_start.year)
+
+    current_week_number = math.ceil((today - term.date_start).days/7)
+    total_weeks = math.ceil((term.date_end - term.date_start).days/7)
+    
+    resp['term'] = model_to_dict(term)
+
+    # Have a fixed maximum number of weeks
+    if total_weeks > settings.MAX_DEFAULT_WEEKS:
+        logger.debug(f'{total_weeks} is greater than {settings.MAX_DEFAULT_WEEKS} setting total weeks to default.')
+        total_weeks = settings.MAX_DEFAULT_WEEKS
+        
+    resp['current_week_number'] = current_week_number
+    resp['total_weeks'] = total_weeks
+
+    return HttpResponse(json.dumps(resp, default=str))
 
 # show percentage of users who read the file within prior n weeks
 def file_access_within_week(request, course_id=0):
@@ -101,13 +128,11 @@ def file_access_within_week(request, course_id=0):
     total_number_student = total_number_student_df.iloc[0,0]
     logger.debug("course_id_string" + course_id + " total student=" + str(total_number_student))
 
-    ## TODO: term id hardcoded now
-    termSqlString = "SELECT start_date FROM academic_terms where term_id = 2"
-    termDf = pd.read_sql(termSqlString, conn)
-    term_start_date =termDf.iloc[0]['start_date']
-    start = term_start_date + timedelta(days=(week_num_start * 7))
-    end = term_start_date + timedelta(days=(week_num_end * 7))
-    logger.debug("term_start=" + str(term_start_date) + " start=" + str(start) + " end=" + str(end))
+    term_date_start = AcademicTerms.objects.course_date_start(course_id)
+
+    start = term_date_start + timedelta(days=(week_num_start * 7))
+    end = term_date_start + timedelta(days=(week_num_end * 7))
+    logger.debug("term_start=" + str(term_date_start) + " start=" + str(start) + " end=" + str(end))
 
 
     # get time range based on week number passed in via request
@@ -115,7 +140,7 @@ def file_access_within_week(request, course_id=0):
     sqlString = "SELECT a.file_id as file_id, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id " \
                 "FROM file f, file_access a, user u, course c, academic_terms t  " \
                 "WHERE a.file_id =f.ID and a.user_id = u.ID  " \
-                "and f.course_id = c.id and c.term_id = t.term_id " \
+                "and f.course_id = c.id and c.term_id = t.id " \
                 "and a.access_time > %(start_time)s " \
                 "and a.access_time < %(end_time)s " \
                 "and f.course_id = %(course_id)s "
@@ -235,37 +260,8 @@ def grade_distribution(request, course_id=0):
     return HttpResponse(df.to_json(orient='records'))
 
 
-def assignment_progress(request, course_id=0):
-    logger.info(assignment_progress.__name__)
-
-    current_user = request.user.get_username()
-    df_default_display_settings()
-
-    assignments_in_course = get_course_assignments(course_id)
-    if assignments_in_course.empty:
-        return HttpResponse(json.dumps({}), content_type='application/json')
-    assignment_submissions = get_user_assignment_submission(current_user, assignments_in_course,course_id)
-
-    df = pd.merge(assignments_in_course, assignment_submissions, on='assignment_id', how='left')
-    if df.empty:
-        logger.info('There are no assignment data in the course %s for user %s '%(course_id, current_user))
-        return HttpResponse(json.dumps([]), content_type='application/json')
-
-    df['graded']= df['graded'].fillna(False)
-    df.sort_values(by='due_date', inplace=True)
-    df.drop(columns=['assignment_id', 'due_date'], inplace=True)
-    df.drop_duplicates(keep='first', inplace=True)
-    df = df[df['towards_final_grade']>0.0]
-    df[['score']] = df[['score']].astype(float)
-    df['percent_gotten']=df.apply(user_percent,axis=1)
-    df.sort_values(by=['graded','due_date_mod'], ascending=[False,True],inplace = True)
-    df.reset_index(inplace=True)
-    df.drop(columns=['index'],inplace=True)
-    logger.debug('The Dataframe for the assignment progress %s ' %df)
-    return HttpResponse(df.to_json(orient='records'))
-
-def assignment_view(request, course_id=0):
-    logger.info(assignment_view.__name__)
+def assignments(request, course_id=0):
+    logger.info(assignments.__name__)
 
     current_user = request.user.get_username()
     df_default_display_settings()
@@ -286,22 +282,40 @@ def assignment_view(request, course_id=0):
     if assignments_in_course.empty:
         return HttpResponse(json.dumps([]), content_type='application/json')
 
-    assignment_submissions = get_user_assignment_submission(current_user, assignments_in_course,course_id)
+    assignment_submissions = get_user_assignment_submission(current_user, assignments_in_course, course_id)
 
     df = pd.merge(assignments_in_course, assignment_submissions, on='assignment_id', how='left')
     if df.empty:
-        logger.info('There are no assignment data in the course %s for user %s '%(course_id, current_user))
+        logger.info('There are no assignment data in the course %s for user %s ' % (course_id, current_user))
         return HttpResponse(json.dumps([]), content_type='application/json')
 
     df.sort_values(by='due_date', inplace=True)
     df.drop(columns=['assignment_id', 'due_date'], inplace=True)
     df.drop_duplicates(keep='first', inplace=True)
 
+    # instructor might not ever see the avg score as he don't have grade in assignment. we don't have role described in the flow to open the gates for him
+    if not request.user.is_superuser:
+        df['avg_score']= df.apply(no_show_avg_score_for_ungraded_assignments, axis=1)
+    df['avg_score']=df['avg_score'].fillna('Not available')
+
+    df3 = df[df['towards_final_grade'] > 0.0]
+    df3[['score']] = df3[['score']].astype(float)
+    df3['percent_gotten'] = df3.apply(user_percent, axis=1)
+    df3['graded'] = df3['graded'].fillna(False)
+    df3[['score']] = df3[['score']].astype(float)
+    df3['percent_gotten'] = df3.apply(user_percent, axis=1)
+    df3.sort_values(by=['graded', 'due_date_mod'], ascending=[False, True], inplace=True)
+    df3.reset_index(inplace=True)
+    df3.drop(columns=['index'], inplace=True)
+
+    assignment_data = {}
+    assignment_data['progress'] = json.loads(df3.to_json(orient='records'))
+
     # Group the data according the assignment prep view
     df2 = df[df['towards_final_grade'] >= percent_selection]
     df2.reset_index(inplace=True)
     df2.drop(columns=['index'], inplace=True)
-    logger.debug('The Dataframe for the assignment planning %s ' %df2)
+    logger.debug('The Dataframe for the assignment planning %s ' % df2)
     grouped = df2.groupby(['week', 'due_dates'])
 
     assignment_list = []
@@ -322,7 +336,7 @@ def assignment_view(request, course_id=0):
     for i, week in enumerate(weeks):
         data = {}
         data["week"] = np.uint64(week).item()
-        data["id"] = i+1
+        data["id"] = i + 1
         dd_items = data["due_date_items"] = []
         for item in assignment_list:
             assignment_due_date_grp = {}
@@ -331,12 +345,18 @@ def assignment_view(request, course_id=0):
                 assignment_due_date_grp['assignment_items'] = item['assign']
                 dd_items.append(assignment_due_date_grp)
         full.append(data)
-    return HttpResponse(json.dumps(full), content_type='application/json')
+    assignment_data['plan'] = json.loads(json.dumps(full))
+    return HttpResponse(json.dumps(assignment_data), content_type='application/json')
+
 
 def get_course_assignments(course_id):
-    sql="select assignment_id,name,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from " \
-        "(select id as assignment_id,assignment_group_id, local_date as due_date,name,points_possible from assignment where course_id = %(course_id)s) as a join " \
-        "(select id, group_points, weight,drop_lowest,drop_highest from assignment_groups) as ag on ag.id=a.assignment_group_id"
+
+    sql=f"""select assign.*,sub.avg_score from
+            (select assignment_id,name,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from
+            (select a.id as assignment_id,a.assignment_group_id, a.local_date as due_date,a.name,a.points_possible from assignment as a  where a.course_id =%(course_id)s) as a join
+            (select id, group_points, weight,drop_lowest,drop_highest from assignment_groups) as ag on ag.id=a.assignment_group_id) as assign left join
+            (select distinct assignment_id,avg_score from submission where course_id=%(course_id)s) as sub on sub.assignment_id = assign.assignment_id
+            """
 
     assignments_in_course = pd.read_sql(sql,conn,params={'course_id': course_id}, parse_dates={'due_date': '%Y-%m-%d'})
     # No assignments found in the course
@@ -380,11 +400,11 @@ def get_user_assignment_submission(current_user,assignments_in_course_df, course
         assignment_submissions.drop(columns=['graded_date'], inplace=True)
     return assignment_submissions
 
-
-def hide_score_on_mute(row):
-    if row['grade_muted'] and row['score'] is not None:
-        return None
-    else:return row['score']
+# don't show the avg scores for student when individual assignment is not graded as canvas currently don't show it
+def no_show_avg_score_for_ungraded_assignments(row):
+    if row['score'] is None:
+        return 'Not available'
+    else: return row['avg_score']
 
 
 def user_percent(row):
@@ -425,9 +445,9 @@ def is_weight_considered(course_id):
 
 def get_term_dates_for_course(course_id):
     logger.info(get_term_dates_for_course.__name__)
-    sql = "select a.start_date from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.term_id;"
-    df = pd.read_sql(sql, conn, params={"course_id": course_id}, parse_dates={'start_date': '%Y-%m-%d'})
-    return df['start_date'].iloc[0]
+    sql = "select a.date_start from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.id;"
+    df = pd.read_sql(sql, conn, params={"course_id": course_id}, parse_dates={'date_start': '%Y-%m-%d'})
+    return df['date_start'].iloc[0]
 
 
 def df_default_display_settings():
@@ -442,3 +462,13 @@ def logout(request):
     logger.info('User %s logging out.' % request.user.username)
     auth.logout(request)
     return redirect(settings.LOGOUT_REDIRECT_URL)
+
+def courses_enabled(request):
+    """ Returns json for all courses we currntly support and are enabled
+    
+    """
+    data = {}
+    for cvo in CourseViewOption.objects.all():
+        data.update(cvo.json())
+
+    return HttpResponse(json.dumps(data), content_type='application/json')

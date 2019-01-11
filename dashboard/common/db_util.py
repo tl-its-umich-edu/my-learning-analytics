@@ -6,6 +6,9 @@ from datetime import datetime
 from dateutil.parser import parse
 
 from django_cron.models import CronJobLog
+from dashboard.models import Course
+
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +21,7 @@ def get_course_name_from_id(course_id):
     :rtype: [str]
     """
     logger.info(get_course_name_from_id.__name__)
-    course_id = str(django.conf.settings.UDW_ID_PREFIX) + str(course_id)
+    course_id = settings.UDW_ID_PREFIX + str(course_id)
     course_name = ""
     if (course_id):
         with django.db.connection.cursor() as cursor:
@@ -31,7 +34,7 @@ def get_course_name_from_id(course_id):
 def get_course_view_options (course_id):
 
     logger.info(get_course_view_options.__name__)
-    course_id = str(django.conf.settings.UDW_ID_PREFIX) + str(course_id)
+    course_id = settings.UDW_ID_PREFIX + str(course_id)
     logger.debug("course_id=" + str(course_id))
     course_view_option = ""
     if (course_id):
@@ -59,7 +62,7 @@ def get_default_user_course_id(user_id):
         row = cursor.fetchone()
         if (row != None):
             #Remove the UDW_ID_PREFIX and just return the course_id
-            course_id = str(row[0]).replace(str(django.conf.settings.UDW_ID_PREFIX),"")
+            course_id = str(row[0]).replace(settings.UDW_ID_PREFIX, "")
     return course_id
 
 def get_last_cron_run():

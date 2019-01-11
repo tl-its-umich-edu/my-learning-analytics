@@ -7,18 +7,20 @@ flush privileges;
 use student_dashboard;
 
 CREATE TABLE IF NOT EXISTS academic_terms (
-  term_id    INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  id         BIGINT UNSIGNED NOT NULL,
+  canvas_id  CHAR(255) NOT NULL,
   name       CHAR(255)    NOT NULL DEFAULT '',
-  start_date TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  end_date   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY  (term_id)
+  date_start TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+  date_end   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY  (id)
 );
 
 CREATE TABLE IF NOT EXISTS course (
   id      CHAR(255)      NOT NULL,
-  term_id INT UNSIGNED    NOT NULL DEFAULT 1,
+  canvas_id CHAR(255)    NOT NULL,
+  term_id BIGINT UNSIGNED    NOT NULL DEFAULT 1,
   name    CHAR(255)      NOT NULL DEFAULT '',
-  PRIMARY KEY (id)
+  PRIMARY KEY (canvas_id)
 );
 
 CREATE TABLE IF NOT EXISTS file_access (
@@ -74,6 +76,7 @@ CREATE TABLE IF NOT EXISTS submission(
  user_id  CHAR(255)    NOT NULL,
  score CHAR(255),
  graded_date TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+ avg_score FLOAT,
  PRIMARY KEY  (id)
 );
 
@@ -97,18 +100,16 @@ CREATE TABLE IF NOT EXISTS unizin_metadata (
 
 
 -- insert terms
-INSERT INTO academic_terms (NAME, start_date, end_date) VALUES ('SUMMER 2018', '2018-06-27 04:00:00',  '2018-08-17 23:59:59' );
-INSERT INTO academic_terms (NAME, start_date, end_date) VALUES ('FALL 2018', '2018-09-03 04:00:00',  '2018-12-24 23:59:59' );
+INSERT INTO academic_terms (id, canvas_id, name, date_start, date_end) VALUES (17700000000000108, 108, 'SUMMER 2018', '2018-06-27 04:00:00',  '2018-08-17 23:59:59' );
+INSERT INTO academic_terms (id, canvas_id, name, date_start, date_end) VALUES (17700000000000111, 111, 'FALL 2018', '2018-09-03 04:00:00',  '2018-12-24 23:59:59' );
 -- insert course
-INSERT INTO course (id, name, term_id) VALUES ('17700000000230745', 'STATS 250 SU 2018', 1);
-INSERT INTO course (id, name, term_id) VALUES ('17700000000252307', 'SI 110 001 FA 2018', 2);
-INSERT INTO course (id, name, term_id) VALUES ('17700000000245664', 'SI 664 002 FA 2018', 2);
-INSERT INTO course (id, name, term_id) VALUES ('17700000000283292', 'HMP 654 001 FA 2018', 2);
+INSERT INTO course (canvas_id, id, name, term_id) VALUES ('230745', '17700000000230745', 'STATS 250 SU 2018', 17700000000000108);
+INSERT INTO course (canvas_id, id, name, term_id) VALUES ('252307', '17700000000252307', 'SI 110 001 FA 2018', 17700000000000111);
+INSERT INTO course (canvas_id, id, name, term_id) VALUES ('245664', '17700000000245664', 'SI 664 002 FA 2018', 17700000000000111);
+INSERT INTO course (canvas_id, id, name, term_id) VALUES ('283292', '17700000000283292', 'HMP 654 001 FA 2018', 17700000000000111);
 -- insert course view options
-INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('17700000000252307', TRUE, TRUE, FALSE);
+INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('17700000000230745', TRUE, TRUE, FALSE);
 INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('17700000000245664', TRUE, TRUE, TRUE);
 INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('17700000000283292', TRUE, TRUE, TRUE);
-
-
 
 COMMIT;

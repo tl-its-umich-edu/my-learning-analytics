@@ -106,6 +106,7 @@ TEMPLATES = [
                 'dashboard.context_processors.current_user_course_id',
                 'dashboard.context_processors.course_view_option',
                 'dashboard.context_processors.last_updated',
+                'dashboard.context_processors.get_build_info',
             ],
         },
     },
@@ -179,14 +180,24 @@ STATICFILES_FINDERS = (
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    # Gunicorns logging format https://github.com/benoitc/gunicorn/blob/19.x/gunicorn/glogging.py
+    'formatters': {
+        "generic": {
+            "format": "%(asctime)s [%(process)d] [%(levelname)s] %(message)s",
+            "datefmt": "[%Y-%m-%d %H:%M:%S %z]",
+            "class": "logging.Formatter",
+        }
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'generic',
         },
     },
     'loggers': {
         'django': {
             'handlers': ['console'],
+            'propagate': False,
             'level': config('DJANGO_LOG_LEVEL', default='INFO'),
         },
         '': {
@@ -293,7 +304,7 @@ if config('STUDENT_DASHBOARD_SAML', default='True', cast=bool):
 
     ACS_DEFAULT_REDIRECT_URL = config('DJANGO_ACS_DEFAULT_REDIRECT', default='/')
     LOGIN_REDIRECT_URL = config('DJANGO_LOGIN_REDIRECT_URL', default='/')
-    
+
     LOGOUT_REDIRECT_URL = config('DJANGO_LOGOUT_REDIRECT_URL',default='/')
 
     SAML_CREATE_UNKNOWN_USER = True
@@ -304,30 +315,25 @@ if config('STUDENT_DASHBOARD_SAML', default='True', cast=bool):
         'givenName': ('first_name', ),
         'sn': ('last_name', ),
     }
-else: 
+else:
     AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
     LOGIN_REDIRECT_URL = '/'
-    
+
 # This is fixed from UDW
-UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000")
+UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000", cast=str)
 
 # This is fixed from UDW
 UDW_FILE_ID_PREFIX = config("UDW_FILE_ID_PREFIX", default="1770000000")
 
-# TODO: Select a default course for user from database, just here so things don't all break
-DEFAULT_COURSE_IDS = config("CANVAS_COURSE_IDS", default="0", cast=Csv())
+# This is to set a date so that MyLA will track all terms with start date after this date.
 
-# Course IDS with the UDW ID appended to them
-DEFAULT_UDW_COURSE_IDS = [UDW_ID_PREFIX + course_id for course_id in DEFAULT_COURSE_IDS]  
-
-# set the current term id from config
-CURRENT_CANVAS_TERM_ID =config('CURRENT_CANVAS_TERM_ID', default="2")
+EARLIEST_TERM_DATE = config('EARLIEST_TERM_DATE', default='2016-11-15')
 
 # Time to run cron
 RUN_AT_TIMES = config('RUN_AT_TIMES', default="", cast= Csv())
 
 # Add any settings you need to be available to templates in this array
-SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX',]
+SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX']
 
 # Method to show the user, if they're authenticated and superuser
 def show_debug_toolbar(request):
@@ -338,3 +344,6 @@ DEBUG_TOOLBAR_PANELS = dt_settings.PANELS_DEFAULTS
 DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TOOLBAR_CALLBACK" : show_debug_toolbar,
 }
+
+# Number of weeks max to allow by default. some begin/end dates in Canvas aren't correct
+MAX_DEFAULT_WEEKS = config("MAX_DEFAULT_WEEKS", default=16, cast=int)

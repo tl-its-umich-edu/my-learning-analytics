@@ -48,9 +48,11 @@ urlpatterns = [
     # get file access patterns
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/file_access_within_week', login_required(views.file_access_within_week), name='file_access_within_week'),
-    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignment_view', login_required(views.assignment_view), name='assignment_view'),
-    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignment_progress', login_required(views.assignment_progress), name='assignment_progress'),
-    url(r'^api/v1/get_current_week_number', login_required(views.get_current_week_number), name='get_current_week_number'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignments', login_required(views.assignments), name='assignments'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/info', login_required(views.get_course_info), name='get_course_info'),
+
+    # This is a public view of the courses we have enabled
+    url(r'^api/v1/courses_enabled', views.courses_enabled, name='courses_enabled'),
 
     url(r'^su/', include('django_su.urls')),
 
