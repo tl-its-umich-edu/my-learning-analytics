@@ -1,13 +1,8 @@
-from django.shortcuts import redirect
-from django.http import HttpResponse
-from django.contrib import auth
-from django.db import connection as conn
-from dashboard.models import AcademicTerms, Course, CourseViewOption
-from django.core.exceptions import ObjectDoesNotExist
+from dashboard.models import Course, CourseViewOption
 
 from django.forms.models import model_to_dict
 
-import random, math, json, logging
+import math, json, logging
 from datetime import datetime, timedelta
 
 import numpy as np
