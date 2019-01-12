@@ -118,8 +118,8 @@ INSERT INTO course (canvas_id, id, name, term_id) VALUES ('252307', '17700000000
 INSERT INTO course (canvas_id, id, name, term_id) VALUES ('245664', '17700000000245664', 'SI 664 002 FA 2018', 17700000000000111);
 INSERT INTO course (canvas_id, id, name, term_id) VALUES ('283292', '17700000000283292', 'HMP 654 001 FA 2018', 17700000000000111);
 -- insert course view options
-INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('252307', TRUE, TRUE, FALSE);
-INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('245664', TRUE, TRUE, TRUE);
-INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('283292', TRUE, TRUE, TRUE);
+INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('17700000000230745', TRUE, TRUE, FALSE);
+INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('17700000000245664', TRUE, TRUE, TRUE);
+INSERT INTO course_view_option (course_id, show_files_accessed, show_assignment_planning, show_grade_distribution) VALUES ('17700000000283292', TRUE, TRUE, TRUE);
 
 COMMIT;

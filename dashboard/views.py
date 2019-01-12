@@ -1,6 +1,13 @@
-import json
-import logging
-import math
+from django.shortcuts import redirect
+from django.http import HttpResponse
+from django.contrib import auth
+from django.db import connection as conn
+from dashboard.models import AcademicTerms, Course, CourseViewOption
+from django.core.exceptions import ObjectDoesNotExist
+
+from django.forms.models import model_to_dict
+
+import random, math, json, logging
 from datetime import datetime, timedelta
 
 import numpy as np
@@ -50,22 +57,48 @@ def gpa_map(grade):
     else:
         return GRADE_LOW
 
-def get_current_week_number(request, course_id=0):
-    # get current term start date
-    term_date_start = AcademicTerms.objects.course_date_start(course_id).date()
+def get_course_info(request, course_id=0):
+    """Returns JSON data about a course
+    
+    :param request: HTTP Request
+    :type request: Request
+    :param course_id: Unizin Course ID, defaults to 0
+    :param course_id: int, optional
+    :return: JSON to be used 
+    :rtype: str
+    """
 
-    today = datetime.now().date()
+    today = datetime.today()
 
-    logger.info(term_date_start)
-    logger.info(today)
+    try:
+        course = Course.objects.get(id=course_id)
+    except ObjectDoesNotExist:
+        return HttpResponse("{}")
 
-    ## calculate the week number
-    currentWeekNumber = math.ceil((today - term_date_start).days/7)
+    resp = model_to_dict(course)
+    # Fill in the actual term
+    term = course.term_id
 
-    # construct json
-    data = {}
-    data['currentWeekNumber'] = currentWeekNumber
-    return HttpResponse(json.dumps(data))
+    # Replace the year in the end date with start date (Hack to get around far out years)
+    # This should be replaced in the future via an API call so the terms have correct end years, or Canvas data adjusted
+    if (term.date_end.year - term.date_start.year) > 1:
+        logger.debug(f'{term.date_end.year} - {term.date_start.year} greater than 1 so setting end year to match start year.')
+        term.date_end = term.date_end.replace(year=term.date_start.year)
+
+    current_week_number = math.ceil((today - term.date_start).days/7)
+    total_weeks = math.ceil((term.date_end - term.date_start).days/7)
+    
+    resp['term'] = model_to_dict(term)
+
+    # Have a fixed maximum number of weeks
+    if total_weeks > settings.MAX_DEFAULT_WEEKS:
+        logger.debug(f'{total_weeks} is greater than {settings.MAX_DEFAULT_WEEKS} setting total weeks to default.')
+        total_weeks = settings.MAX_DEFAULT_WEEKS
+        
+    resp['current_week_number'] = current_week_number
+    resp['total_weeks'] = total_weeks
+
+    return HttpResponse(json.dumps(resp, default=str))
 
 # show percentage of users who read the file within prior n weeks
 def file_access_within_week(request, course_id=0):
@@ -482,3 +515,13 @@ def logout(request):
     logger.info('User %s logging out.' % request.user.username)
     auth.logout(request)
     return redirect(settings.LOGOUT_REDIRECT_URL)
+
+def courses_enabled(request):
+    """ Returns json for all courses we currntly support and are enabled
+    
+    """
+    data = {}
+    for cvo in CourseViewOption.objects.all():
+        data.update(cvo.json())
+
+    return HttpResponse(json.dumps(data), content_type='application/json')

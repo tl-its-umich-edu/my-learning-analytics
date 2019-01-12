@@ -17,7 +17,7 @@ class AcademicTermsQuerySet(models.QuerySet):
     def course_date_start(self, course_id):
         try:
             return self.get(course__id=str(course_id)).date_start
-        except AcademicTerms.DoesNotExist:
+        except self.model.DoesNotExist:
             logger.debug(f"Could not find term for course {course_id}")
             return datetime.min
 
@@ -53,7 +53,7 @@ class UserDefaultQuerySet(models.QuerySet):
             return self.get(course_id=str(course_id),
                             user_id=str(user_id),
                             default_view_type=str(default_view_type)).default_view_value
-        except (UserDefaultSelection.DoesNotExist, Exception) as e:
+        except (self.model.DoesNotExist, Exception) as e:
             logger.error(f"""Couldn't get the default value for in course: {course_id} for user: {user_id} 
                          with default_view_type: {default_view_type} due to {e} """)
             return None
@@ -62,7 +62,7 @@ class UserDefaultQuerySet(models.QuerySet):
         try:
             return self.update_or_create(course_id=course_id, user_id=user_id, default_view_type=default_view_type,
                                          defaults={'default_view_value': default_view_value})
-        except (UserDefaultSelection.DoesNotExist, Exception) as e:
+        except (self.model.DoesNotExist, Exception) as e:
             logger.error(f"""Error when updating or creating default setting in course: {course_id} for user: {user_id} 
                              with default_view_type: {default_view_type} and value: {default_view_value} due to {e} """)
             raise e
@@ -147,7 +147,7 @@ class CourseQuerySet(models.QuerySet):
         """
         try:
             return self.values_list('id', flat=True)
-        except Course.DoesNotExist:
+        except self.model.DoesNotExist:
             logger.info("Courses did not exist", exc_info = True)
         return []
 
@@ -188,6 +188,23 @@ class CourseViewOption(models.Model):
     class Meta:
         managed = False
         db_table = 'course_view_option'
+    
+    def json(self):
+        """Format the json output that we want for this record
+        
+        This should be of the format canvas_id : {options}
+        :return: JSON formatted CourseViewOption
+        :rtype: Dict
+        """
+
+        return {
+            self.course.canvas_id: {
+                'cn': self.course.name, 
+                'fa': int(self.show_files_accessed),
+                'ap': int(self.show_assignment_planning),
+                'gd': int(self.show_grade_distribution),
+            }
+        }
 
 class File(models.Model):
     id = models.CharField(primary_key=True, max_length=255, verbose_name="File Id")
