@@ -55,7 +55,6 @@ visApp.controller('mainController', ['$scope', 'Get','$location', '$anchorScroll
 
 
     $scope.updatePercentFilter = function () {
-        console.log("update percent filter call")
         if ($scope.percent_filter !== $scope.default_selection_value_holder && $scope.percent_filter !== 0) {
             $scope.isResetMyDefaultCheckboxEnabled = true
             $scope.default_setting.msg = "Reset as my default"

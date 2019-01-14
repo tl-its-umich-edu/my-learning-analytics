@@ -556,7 +556,7 @@ makeSlider = function () {
     });
 };
 
-var getUserDefaults = function (){
+getUserDefaults = function (){
     $.getJSON("/api/v1/courses/" + dashboard.course_id + "/get_user_default_selection?default_type=file", function (results) {
         if (results.default === '') {
             default_selection = $('#grade').val()
@@ -598,7 +598,6 @@ $('#grade').change(function() {
     // make new graph based on the grade selection
     var sliderValues = mySlider.getValue().split(",");
     default_selection_logic_on_grade_selection()
-    makeGrapBasedOnGradeAndSlide($('#grade').val(), sliderValues);
     makeGraphBasedOnGradeAndSlide($('#grade').val(), sliderValues);
 
 });
