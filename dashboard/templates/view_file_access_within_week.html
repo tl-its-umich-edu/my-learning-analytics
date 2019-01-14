@@ -21,6 +21,7 @@
 {% block content %}
     {% if course_view_option.show_files_accessed %}
         <!-- week slider -->
+        <div class="text-center">Select a start and end week</div>
         <div class="slider-container">
             <input type="text" id="slider" class="slider">
         </div>
@@ -33,7 +34,7 @@
             <option value="90-100" >90-100%</option>
             <option value="80-89" >80-89%</option>
             <option value="70-79" >70-79%</option>
-        </select> <span id="slider_label"> from week 1 to: </span></h6>
+        </select> from week <span id="slider_label"> 1 to: </span></h6>
         <br/>
         <div id="chart"></div>
     {% else %}
