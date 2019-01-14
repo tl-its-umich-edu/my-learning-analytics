@@ -21,13 +21,14 @@
 {% block content %}
     {% if course_view_option.show_files_accessed %}
         <!-- week slider -->
+        <div class="text-center">Select a start and end week</div>
         <div class="slider-container">
             <input type="text" id="slider" class="slider">
         </div>
         <input type="hidden" name="slider_num" id="slider_num" />
         <div/>
         <br/>
-        <h6 class="text-center">Files accessed <span id="slider_label"> from week 1 to: </span> by students with
+        <h6 class="text-center">Files accessed from week <span id="slider_label"> 1 to: </span> by students with
         <select class="grade" name="grade" id="grade">
             <option value="all" selected>All Grades</option>
             <option value="90-100" >90-100%</option>
