@@ -7,6 +7,7 @@
 
 {% block content %}
 {% if course_view_option.show_assignment_planning %}
+{% verbatim %}
 <div ng-controller="mainController" ng-app="visApp">
 <div class="container-fluid">
     <h5 style="padding-left: 10px">Progress toward Final Grade</h5>
@@ -23,14 +24,12 @@
         <div class="column">
             <h5>Assignments Due By Date</h5>
             <span>Show assignments that weigh at least</span>
-            {% verbatim %}
             <p ng-show="percentFilterEnabled">
                 <select ng-change="updatePercentFilter()" ng-model="percent_filter" ng-options="obj.value as obj.text for obj in percent"></select>
                 &nbsp;
                 <input ng-show="isResetMyDefaultCheckboxEnabled" type="checkbox" ng-model="default_selection_model" ng-change="sendDefaults()">
                 <label>{{default_setting.msg}}</label>
             </p>
-            {% endverbatim %}
         </div>
         <div class="column">
             <span>Assignment Status: </span><br>
@@ -48,7 +47,6 @@
         <th style="text-align: left;padding: 0px;">Percent of final grade</th>
         </thead>
     </table>
-    {% verbatim %}
     <div class="table-style">
         <table class="table table_container">
             <tr ng-if="plan.length!=0" ng-repeat="week in plan" id="{{week.id}}">
