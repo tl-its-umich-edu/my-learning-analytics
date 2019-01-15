@@ -98,14 +98,14 @@ CREATE TABLE IF NOT EXISTS unizin_metadata (
     pvalue VARCHAR(100)
 );
 
--- CREATE TABLE IF NOT EXISTS user_default_selection (
---      id int NOT NULL AUTO_INCREMENT,
---      course_id CHAR(255),
---      user_id CHAR(255),
---      default_view_type CHAR(225),
---      default_view_value CHAR(225),
---      PRIMARY KEY (course_id, user_id, default_view_type)
--- );
+CREATE TABLE IF NOT EXISTS user_default_selection (
+     id int NOT NULL AUTO_INCREMENT,
+     course_id CHAR(255),
+     user_id CHAR(255),
+     default_view_type CHAR(225),
+     default_view_value CHAR(225),
+     PRIMARY KEY (id,course_id, user_id, default_view_type)
+);
 
 
 
