@@ -34,6 +34,13 @@ The bq_cred.json is service account for Big Query, it needs to be supplied and p
 `docker cp ~/secrets student_dashboard:/secrets`
 5. Initialize the MySQL database by loading the users and files on the next step. You'll need to be on VPN for this to work.
 
+## Making migration using Django models
+1. get into the docker machine `docker exec -t -i student_dashboard_mysql /bin/bash`
+2. creating the file `./manage.py makemigrations dashboard`.  This should say changes detected if any 
+3. applying the changes to DB `./manage.py migrate dashboard`. 
+4. exit
+5. `docker cp student_dashboard:/dashboard/migrations/0001_initial.py dashboard/migrations` 
+
 ## Add a default course to test with
 
 There are some default courses pre-populated by the mysql/init.sql script. If you'd like to add additional courses you need to add them as an admin user. (See next section on adding an admin user)

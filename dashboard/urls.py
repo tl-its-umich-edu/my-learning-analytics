@@ -49,6 +49,8 @@ urlpatterns = [
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/grade_distribution', login_required(views.grade_distribution), name='grade_distribution'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/file_access_within_week', login_required(views.file_access_within_week), name='file_access_within_week'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignments', login_required(views.assignments), name='assignments'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/set_user_default_selection', login_required(views.update_user_default_selection_for_views), name='update_user_default_selection_for_views'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/get_user_default_selection', login_required(views.get_user_default_selection), name='get_user_default_selection'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/info', login_required(views.get_course_info), name='get_course_info'),
 
     # This is a public view of the courses we have enabled
