@@ -480,7 +480,6 @@ var makeGraph = function(url) {
 
 };
 
-var WEEK_PREFIX = "Week ";
 // default to show two weeks in advance
 var WEEK_IN_ADVANCE = 2;
 
@@ -521,17 +520,17 @@ makeSlider = function () {
 
         var i;
         var weekArray = [];
-        var minWeek = WEEK_PREFIX + "1"
-        var maxWeek = WEEK_PREFIX + totalWeeks
+        var minWeek = "1"
+        var maxWeek = totalWeeks
 
         for (i = 1; i <= totalWeeks; i++) {
-            weekName = WEEK_PREFIX + i
+            weekName = i
             if (i === currentWeekNumber) {
                 weekName = weekName + " (Now)";
                 // Set the default minimum to be 1 less or WEEKS_IN_ADVANCE less
                 minWeekNum = Math.max(1, currentWeekNumber - WEEK_IN_ADVANCE)
                 // If it's the current week, set the value to the current, otherwise set it to some other calculated week
-                minWeek = (minWeekNum === i) ? weekName : WEEK_PREFIX + minWeekNum;
+                minWeek = (minWeekNum === i) ? weekName : minWeekNum;
                 // Set the max to be the current
                 maxWeek = weekName
             }
