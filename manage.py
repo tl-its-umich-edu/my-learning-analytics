@@ -9,7 +9,7 @@ if __name__ == "__main__":
         import ptvsd
         try: 
             ptvsd.enable_attach(address = (os.environ.get("PTVSD_ADDRESS",'0.0.0.0'), os.environ.get("PTVSD_PORT", 3000)))
-        except:
+        except Exception as e:
             pass
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dashboard.settings")
