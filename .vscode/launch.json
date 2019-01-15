@@ -12,7 +12,7 @@
                 }
             ],
             "port": 3001,
-            "host": "localhost",
+            "host": "localhost"
         }
     ]
 }
