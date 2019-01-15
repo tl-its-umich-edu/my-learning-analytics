@@ -7,8 +7,8 @@
 
 {% block content %}
 {% if course_view_option.show_assignment_planning %}
-{% verbatim %}
 <div ng-controller="mainController" ng-app="visApp">
+    {% verbatim %}
 <div class="container-fluid">
     <h5 style="padding-left: 10px">Progress toward Final Grade</h5>
     <div id="chart"></div>

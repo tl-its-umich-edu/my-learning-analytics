@@ -548,7 +548,7 @@ makeSlider = function () {
                 var valuesParts = values.split(",");
                 // argument values represents current values
                 var grade = $('#grade').val();
-                $("#slider_label").html(" from <b>" + valuesParts[0] + "</b> to <b>" + valuesParts[1] + "</b>");
+                $("#slider_label").html(" <b>" + valuesParts[0] + "</b> to <b>" + valuesParts[1] + "</b>");
                 makeGraphBasedOnGradeAndSlide(grade, valuesParts);
             }
         });

@@ -89,7 +89,7 @@ class UserDefaultSelection(models.Model):
     objects = UserDefaultManager()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'user_default_selection'
         unique_together = (('user_id', 'course_id', 'default_view_type'),)
 
