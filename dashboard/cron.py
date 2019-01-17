@@ -61,8 +61,7 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
     # returns the row size of dataframe
     return f"inserted + {str(df.shape[0])} rows in table {mysql_table} for course {UDW_course_id}\n"
 
-# Exit with log if UDW dataset is missing courses
-def data_validation (incoming_courses,existing_courses):
+    # exit cron with log if UDW dataset is missing courses
     incoming_courses = df['course_id']
     existing_courses = get_queryset().get_supported_courses()
 
@@ -73,7 +72,6 @@ def data_validation (incoming_courses,existing_courses):
                     continue
                 else:
                     logger.exception(f"missing {course} from incoming dataset from UDW.")
-
                     return
 
     except Exception:
@@ -168,8 +166,6 @@ class DashboardCronJob(CronJobBase):
         status = ""
 
         logger.debug("in update with udw file")
-
-        #Log an error if the course is invalid
 
         # delete all records in the table first
         status += deleteAllRecordInTable("file")

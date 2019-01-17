@@ -5,7 +5,7 @@
 My Learning Analytics based on django framework
 
 ## Environment configuration
-There is some environment configuration and addtional files needed for this app to run. You can put this in a file called .env for testing. 
+There is some environment configuration and addtional files needed for this app to run. You can put this in a file called .env for testing.
 
 Configuration:
 
@@ -19,7 +19,7 @@ The bq_cred.json is service account for Big Query, it needs to be supplied and p
 
 (Openshift Only) The /secrets/saml directory needs to contain 4 files for SAML configuration. These are currently hard-coded in settings.py though the path comes from the environment SAML2_FILES_BASE.
 
-	remote-metadata.xml 
+	remote-metadata.xml
 	student-dashboard-saml.key
 	student-dashboard-saml.pem
 
@@ -38,7 +38,7 @@ The bq_cred.json is service account for Big Query, it needs to be supplied and p
 
 There are some default courses pre-populated by the mysql/init.sql script. If you'd like to add additional courses you need to add them as an admin user. (See next section on adding an admin user)
 
-## Create a super user to test login. 
+## Create a super user to test login.
 
 On the both local dev and remote the users are stored in the local database. However on local the users have to be created via the command line, on Openshift they are created either manually in the database or when logged in via Shibboleth.
 
@@ -70,7 +70,7 @@ This is configured with these values
 RUN_AT_TIMES=2:00
 
 # (Unix Cron) - Run every 5 minutes
-CRONTAB_SCHEDULE=*/5 * * * * 
+CRONTAB_SCHEDULE=*/5 * * * *
 
 See the .env.sample for more information.
 =======
@@ -115,3 +115,7 @@ Then you can edit your files! (Probably in /dashboard/dashboard)
   - You have to be authenticated and a "super user" account. See step #1
   - The method that controls this access is in show_debug_toolbar(request):
   - Configuration of the panels is in DEBUG_TOOLBAR_PANELS as described on https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-panels
+
+	4. For testing the cronjob on Localhost:
+	- Remove the preceding "/" for the correct path on the "GOOGLE_APPLICATION_CREDENTIALS=/secrets/bq_cred.json" line in the .env file
+	- Example: "GOOGLE_APPLICATION_CREDENTIALS=secrets/bq_cred.json"
