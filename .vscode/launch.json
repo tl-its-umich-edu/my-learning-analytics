@@ -2,7 +2,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "api docker",
+            "name": "MyLA Docker Django",
+            "type": "python",
+            "request": "attach",
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "/dashboard"
+                }
+            ],
+            "port": 3000,
+            "host": "localhost"
+        },
+        {
+            "name": "MyLA Docker Cron",
             "type": "python",
             "request": "attach",
             "pathMappings": [
