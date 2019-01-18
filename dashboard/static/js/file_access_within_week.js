@@ -18,6 +18,10 @@ var mini_margin = {top: 50, right: 10, bottom: 50, left: 10},
     mini_width = 100 - mini_margin.left - mini_margin.right,
     mini_height = 400 - mini_margin.top - mini_margin.bottom;
 
+const REMEMBER_MY_SETTING = 'Remember my setting';
+const MY_CURRENT_SETTING = 'My current setting';
+const SETTING_NOT_UPDATED_MSG = 'Setting not updated';
+
 var makeGraph = function(url) {
 
     var data = [],
@@ -564,28 +568,28 @@ getUserDefaults = function (){
         }
         $("#grade").val(default_selection);
         $("#default_selection").hide();
-        $("#label_for_default_selection").html("Current default");
+        $("#label_for_default_selection").html(MY_CURRENT_SETTING);
     });
 }
 
 default_selection_logic_on_grade_selection = function(){
     let selected_value = $('#grade').val();
     if (selected_value === default_selection) {
-        $("#default_selection").hide()
+        $("#default_selection").hide();
         $('#default_selection').prop('checked', false);
-        $("#label_for_default_selection").html("Current default");
+        $("#label_for_default_selection").html(MY_CURRENT_SETTING);
 
 
     } else {
         $("#default_selection").show();
-        $("#label_for_default_selection").html("Reset as my default")
+        $("#label_for_default_selection").html(REMEMBER_MY_SETTING);
     }
 }
 
 update_default_selection = function(selection){
     $.getJSON("/api/v1/courses/" + dashboard.course_id + "/set_user_default_selection?file=" + selection, function (initResult) {
         if (initResult.default === 'fail') {
-            $("#label_for_default_selection").html("default not updated");
+            $("#label_for_default_selection").html(SETTING_NOT_UPDATED_MSG);
             $('#default_selection').prop('checked', false);
             return;
         }
@@ -596,7 +600,7 @@ update_default_selection = function(selection){
 $('#grade').change(function() {
     // make new graph based on the grade selection
     var sliderValues = mySlider.getValue().split(",");
-    default_selection_logic_on_grade_selection()
+    default_selection_logic_on_grade_selection();
     makeGraphBasedOnGradeAndSlide($('#grade').val(), sliderValues);
 
 });
@@ -605,9 +609,9 @@ $('#grade').change(function() {
 $('#default_selection').change(function(){
     selection = $('#grade').val();
     if ($(this).is(":checked")) {
-        $("#default_selection").hide()
+        $("#default_selection").hide();
         $('#default_selection').prop('checked', false);
-        $("#label_for_default_selection").html("Current default");
+        $("#label_for_default_selection").html(MY_CURRENT_SETTING);
     }
     update_default_selection(selection)
 })
