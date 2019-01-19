@@ -144,7 +144,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'America/Detroit'
+TIME_ZONE = config("TIME_ZONE", default=config("TZ", "America/Detroit"))
 
 USE_I18N = True
 
