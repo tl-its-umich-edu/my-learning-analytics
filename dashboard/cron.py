@@ -101,10 +101,10 @@ class DashboardCronJob(CronJobBase):
                             where c.id = '{course_id}'
                             """
                 logger.debug(course_sql)
-                df = pd.read_sql(course_sql, conns['UDW'])
+                course_df = pd.read_sql(course_sql, conns['UDW'])
 
                 # error out when course id is invalid
-                if df.empty:
+                if course_df.empty:
                     logger.error(f"""Course {course_id} is invalid. """)
                     invalid_course_id_list.append(course_id)
 
