@@ -80,6 +80,36 @@ class DashboardCronJob(CronJobBase):
     schedule = Schedule(run_at_times=settings.RUN_AT_TIMES)
     code = 'dashboard.DashboardCronJob'    # a unique code
 
+    # verify whether course ids are valid
+    def verify_course_ids(self):
+        # whether all course ids are valid ids
+        invalid_course_id_list = []
+
+        logger.debug("in checking course")
+
+        # loop through multiple course ids
+        for course_id in Course.objects.get_supported_courses():
+            if not course_id.isdigit():
+                # course id can only have digit character inside
+                logger.error(f"""Course {course_id} is invalid. """)
+                invalid_course_id_list.append(course_id)
+            else:
+                # select course based on course id
+                course_sql = f"""select * 
+                            from course_dim c
+                            where c.id = '{course_id}'
+                            """
+                logger.debug(course_sql)
+                course_df = pd.read_sql(course_sql, conns['UDW'])
+
+                # error out when course id is invalid
+                if course_df.empty:
+                    logger.error(f"""Course {course_id} don't have the entry in data warehouse yet. """)
+                    invalid_course_id_list.append(course_id)
+
+
+        return invalid_course_id_list
+
     # update USER records from UDW
     def update_with_udw_user(self):
 
@@ -358,6 +388,17 @@ class DashboardCronJob(CronJobBase):
 
         status += "Start cron at: " +  str(datetime.datetime.now()) + "\n"
 
+        invalid_course_id_list = self.verify_course_ids()
+        logger.debug(f"invalid id {invalid_course_id_list}")
+        if len(invalid_course_id_list) > 0:
+            # error out and stop cron job
+            status += f"ERROR: Those course ids are invalid: {invalid_course_id_list}\n"
+            status += "End cron at: " +  str(datetime.datetime.now()) + "\n"
+            logger.info("************ total status=" + status + "/n/n")
+            return status
+
+        # continue cron tasks
+
         logger.info("************ term")
         status += self.update_with_udw_term()
 
@@ -375,7 +416,7 @@ class DashboardCronJob(CronJobBase):
 
         status += self.submission()
         status += self.weight_consideration()
-        
+
         logger.info("************ informational")
         status += self.update_unizin_metadata()
 
