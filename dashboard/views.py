@@ -519,4 +519,10 @@ def courses_enabled(request):
     for cvo in CourseViewOption.objects.all():
         data.update(cvo.json())
 
-    return HttpResponse(json.dumps(data), content_type='application/json')
+    callback = request.GET.get('callback')
+    # Return json
+    if callback is None:
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    # Return jsonp
+    else:
+        return HttpResponse("{0}({1})".format(callback, json.dumps(data)), content_type='application/json')
