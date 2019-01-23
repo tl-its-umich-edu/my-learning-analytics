@@ -199,7 +199,6 @@ class CourseViewOption(models.Model):
 
         return {
             self.course.canvas_id: {
-                'cn': self.course.name, 
                 'fa': int(self.show_files_accessed),
                 'ap': int(self.show_assignment_planning),
                 'gd': int(self.show_grade_distribution),
