@@ -48,23 +48,24 @@ urlpatterns = [
     url(r'^courses/(?P<course_id>[0-9]+|)', login_required(TemplateView.as_view(template_name='courses.html')), name="courses"),
 
     # Thse URL's are data patterns
-    # get file access patterns
+    # GET access patterns
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/grade_distribution', 
         cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.grade_distribution)), name='grade_distribution'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/file_access_within_week', 
         cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.file_access_within_week)), name='file_access_within_week'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignments', 
         cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.assignments)), name='assignments'),
-    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/set_user_default_selection', 
-        cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.update_user_default_selection_for_views)), name='update_user_default_selection_for_views'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/get_user_default_selection', 
         cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.get_user_default_selection)), name='get_user_default_selection'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/info', 
         cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.get_course_info)), name='get_course_info'),
-
     # This is a public view of the courses we have enabled
     url(r'^api/v1/courses_enabled', 
         cache_page(settings.CLIENT_CACHE_TIME)(views.courses_enabled), name='courses_enabled'),
+
+    # PUT/POST access patterns
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/set_user_default_selection', 
+        login_required(views.update_user_default_selection_for_views), name='update_user_default_selection_for_views'),
 
     url(r'^su/', include('django_su.urls')),
 
