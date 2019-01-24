@@ -570,7 +570,7 @@ getUserDefaults = function (){
         $("#default_selection").hide();
         $("#label_for_default_selection").html(MY_CURRENT_SETTING);
     });
-}
+};
 
 default_selection_logic_on_grade_selection = function(){
     let selected_value = $('#grade').val();
@@ -584,18 +584,30 @@ default_selection_logic_on_grade_selection = function(){
         $("#default_selection").show();
         $("#label_for_default_selection").html(REMEMBER_MY_SETTING);
     }
-}
+};
 
 update_default_selection = function(selection){
-    $.getJSON("/api/v1/courses/" + dashboard.course_id + "/set_user_default_selection?file=" + selection, function (initResult) {
-        if (initResult.default === 'fail') {
-            $("#label_for_default_selection").html(SETTING_NOT_UPDATED_MSG);
-            $('#default_selection').prop('checked', false);
-            return;
+    let data = {"file":selection};
+    // https://docs.djangoproject.com/en/2.1/ref/csrf/#acquiring-the-token-if-csrf-use-sessions-or-csrf-cookie-httponly-is-true
+    $.ajax({
+        url: "/api/v1/courses/" + dashboard.course_id + "/set_user_default_selection",
+        method: 'PUT',
+        data: JSON.stringify(data),
+        beforeSend: function( xhr ) {
+            if(!this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", putToken);
+            }
+        },
+        success: function (initResult) {
+            if (initResult.default === 'fail') {
+                $("#label_for_default_selection").html(SETTING_NOT_UPDATED_MSG);
+                $('#default_selection').prop('checked', false);
+                return;
+            }
+            default_selection = $('#grade').val();
         }
-        default_selection = $('#grade').val();
     });
-}
+};
 
 $('#grade').change(function() {
     // make new graph based on the grade selection
@@ -614,7 +626,7 @@ $('#default_selection').change(function(){
         $("#label_for_default_selection").html(MY_CURRENT_SETTING);
     }
     update_default_selection(selection)
-})
+});
 
 makeSlider();
 

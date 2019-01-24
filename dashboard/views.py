@@ -261,12 +261,11 @@ def grade_distribution(request, course_id=0):
 def update_user_default_selection_for_views(request, course_id=0):
     logger.info(update_user_default_selection_for_views.__name__)
     current_user = request.user.get_username()
-    default_selection = dict(request.GET)
-    logger.info('dic: {}'.format(default_selection))
-    default_type = [*default_selection][0]
-    default_type_value = default_selection.get(default_type)[0]
+    default_selection = json.loads(request.body.decode("utf-8"))
+    logger.info(default_selection)
+    default_type = list(default_selection.keys())[0]
+    default_type_value = default_selection.get(default_type)
     logger.info(f"request to set default for type: {default_type} and default_type value: {default_type_value}")
-
     # json for eventlog
     data = {
         "course_id": course_id,
@@ -286,7 +285,7 @@ def update_user_default_selection_for_views(request, course_id=0):
     except (ObjectDoesNotExist, Exception) as e:
         logger.info(f"updating default failed due to {e} for user {current_user} in course: {course_id} ")
         value = 'fail'
-    return HttpResponse(json.dumps({key: value}))
+    return HttpResponse(json.dumps({key: value}),content_type='application/json')
 
 
 def get_user_default_selection(request, course_id=0):

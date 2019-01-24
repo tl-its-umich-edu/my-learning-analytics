@@ -43,6 +43,10 @@
     {% endif %}
 {% endblock %}
 {% block js %}
+     {% csrf_token %}
+    <script type="text/javascript">
+    var putToken = jQuery("[name=csrfmiddlewaretoken]").val();
+    </script>
     <script src="{% static 'd3/d3.js' %}"></script>
     <script src="{% static 'd3-tip/dist/index.js' %}"></script>
     <script src="{% static 'js/rSlider.min.js' %}"></script>
