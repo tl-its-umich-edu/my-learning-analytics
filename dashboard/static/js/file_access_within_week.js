@@ -593,6 +593,7 @@ update_default_selection = function(selection){
         url: "/api/v1/courses/" + dashboard.course_id + "/set_user_default_selection",
         method: 'PUT',
         data: JSON.stringify(data),
+        contentType: "application/json; charset=utf-8",
         beforeSend: function( xhr ) {
             if(!this.crossDomain) {
                 xhr.setRequestHeader("X-CSRFToken", putToken);
