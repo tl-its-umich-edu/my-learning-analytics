@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-import os
-import sys
-import warnings
+import os, sys, warnings, logging
+
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
 
@@ -12,8 +12,8 @@ if __name__ == "__main__":
             # If the user wants to wait to start until it's attached call this
             if (os.environ.get("PTVSD_WAIT_FOR_ATTACH", False)):
                 ptvsd.wait_for_attach()
-        except Exception as e:
-            pass
+        except OSError:
+            logger.warn("Could not start PTVSD. This is normal if it's already enabled and you're running manage for something else.")
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dashboard.settings")
 
