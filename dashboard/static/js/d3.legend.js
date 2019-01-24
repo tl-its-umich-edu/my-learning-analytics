@@ -6,9 +6,9 @@
                 items = {},
                 svg = d3.select(g.property("nearestViewportElement")),
                 legendPadding = g.attr("data-style-padding") || 5,
-                legendTitle = g.attr("data-legend-title")
+                legendTitle = g.attr("data-legend-title"),
                 lb = g.selectAll(".legend-box").data([true]),
-                li = g.selectAll(".legend-items").data([true]),
+                li = g.selectAll(".legend-items").data([true])
             lb.enter().append("g").classed("legend-box",true)
             li.enter().append("g").classed("legend-items",true)
 
@@ -29,7 +29,7 @@
                 .call(function(d) { d.exit().remove()})
                 .attr("y",function(d,i) { return i+"em"})
                 .attr("x","1em")
-                .text(function(d) { ;return d.key})
+                .text(function(d) { return d.key})
 
             li.selectAll("circle")
                 .data(items,function(d) { return d.key})

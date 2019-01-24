@@ -1,8 +1,8 @@
 var makeGraph = function () {
     $.getJSON("/api/v1/courses/"+dashboard.course_id+"/grade_distribution", function (initResult) {
-        data = initResult;
+        var data = initResult;
         if(_.isEmpty(data)){
-            var gradeInfo = d3.select("#chart").append("div")
+            d3.select("#chart").append("div")
                 .attr("class", "alert alert-info")
                 .attr("role","alert")
                 .style("font-size", "20px")
@@ -11,23 +11,22 @@ var makeGraph = function () {
             return;
         }
         // over all course statistics
-        singleDataPoint = data[0];
-        totalStudents = singleDataPoint.tot_students;
-        gradeAverage = singleDataPoint.grade_avg;
-        standardGradeDeviation = singleDataPoint.grade_stdev;
-        myscore=singleDataPoint.current_user_grade
-        myscoreText= singleDataPoint.current_user_grade+"%"
+        var singleDataPoint = data[0];
+        var totalStudents = singleDataPoint.tot_students;
+        var gradeAverage = singleDataPoint.grade_avg;
+        var myscore=singleDataPoint.current_user_grade
+        var myscoreText= singleDataPoint.current_user_grade+"%"
 
         // get the current grade
-        bin_grades = [];
-        get_domain_upper_limit=singleDataPoint.graph_upper_limit;
+        var bin_grades = [];
+        var get_domain_upper_limit=singleDataPoint.graph_upper_limit;
         data.forEach(function (e) {
             bin_grades.push(e.current_grade)
         })
 
         var width = 1000,
             height = 300;
-        margin = {top: 30, right: 30, bottom: 30, left: 30};
+        var margin = {top: 30, right: 30, bottom: 30, left: 30};
 
         var svg = d3.select("#chart").append("svg")
             .attr('width', '100%')
@@ -36,7 +35,7 @@ var makeGraph = function () {
             .attr("preserveAspectRatio", "xMinYMin")
         width = width - margin.left - margin.right,
         height = height - margin.top - margin.bottom;
-        g = svg.append("g")
+        var g = svg.append("g")
             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
         var domain_values = [0,get_domain_upper_limit]
 
@@ -46,8 +45,7 @@ var makeGraph = function () {
 
         var bins = d3.histogram()
             .domain(x.domain())
-            .thresholds(x.ticks(40))
-            (bin_grades);
+            .thresholds(x.ticks(40))(bin_grades);
 
         var y = d3.scaleLinear()
             .domain([0, d3.max(bins, function (d) {
@@ -143,7 +141,7 @@ var makeGraph = function () {
                 .text('MyGrade')
 
         // Line Tooltip showing users current grade
-        var div = d3.select("body").append("div")
+        d3.select("body").append("div")
             .attr("class", "tooltips")
             .style("opacity", 0);
 
@@ -165,12 +163,12 @@ var makeGraph = function () {
         if(myscore==null) {
             gradeDetailsHtml += '<span><b>There are no grades yet for you in this course</b></span><br>';
         }
-        var gradeInfo = d3.select(".grade-info").append("div")
+        d3.select(".grade-info").append("div")
             .attr("class", "grade-details")
             .html(gradeDetailsHtml);
 
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-        var gradeInfo = d3.select(".error").append("div")
+    }).fail(function() {
+        d3.select(".error").append("div")
             .attr("class", "alert alert-danger")
             .attr("role","alert")
             .style("font-size", "20px")
