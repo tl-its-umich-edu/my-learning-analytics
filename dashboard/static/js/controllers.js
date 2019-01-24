@@ -1,10 +1,10 @@
-visApp.controller('mainController', ['$scope', 'Get','$location', '$anchorScroll', function($scope, Get,$location,$anchorScroll) {
+visApp.controller('mainController', ['$scope', 'Service','$location', '$anchorScroll', function($scope, Service,$location,$anchorScroll) {
     function dataCall(call, default_value){
         if (typeof default_value !== 'undefined') {
             $scope.percent_filter = default_value;
         }
         var dataFile = '/api/v1/courses/' + dashboard.course_id + '/assignments?percent=' + $scope.percent_filter;
-        Get.getData(dataFile).then(function (data) {
+        Service.getData(dataFile).then(function (data) {
             if (_.isEmpty(data.data)) {
                 $scope.plan = [];
                 $scope.progress = [];
@@ -31,7 +31,7 @@ visApp.controller('mainController', ['$scope', 'Get','$location', '$anchorScroll
     // get the user default selection from DB and if not available selects the first item from the dropdown list
     get_default_selection = function () {
         let get_defaults_url = '/api/v1/courses/' + dashboard.course_id + '/get_user_default_selection?default_type=assignment';
-        let re = Get.getData(get_defaults_url)
+        let re = Service.getData(get_defaults_url)
         re.then(function (data) {
             if (_.isEmpty(data.data.default)) {
                 default_value = $scope.percent[0].value;
@@ -71,8 +71,9 @@ visApp.controller('mainController', ['$scope', 'Get','$location', '$anchorScroll
     $scope.sendDefaults = function () {
         $scope.isResetMyDefaultCheckboxEnabled = false;
         if ($scope.default_selection_model) {
-            var defaultsURL = '/api/v1/courses/' + dashboard.course_id + '/set_user_default_selection?assignment=' + $scope.percent_filter;
-            Get.getData(defaultsURL).then(function (data) {
+            var url = '/api/v1/courses/' + dashboard.course_id + '/set_user_default_selection';
+            let putData = {"assignment":$scope.percent_filter};
+            Service.putDefaults(url, putData).then(function(data){
                 if (data.data.default === 'fail') {
                     $scope.default_setting.msg = SETTING_NOT_UPDATED_MSG;
                     $scope.default_selection_model = false;
