@@ -347,3 +347,5 @@ DEBUG_TOOLBAR_CONFIG = {
 
 # Number of weeks max to allow by default. some begin/end dates in Canvas aren't correct
 MAX_DEFAULT_WEEKS = config("MAX_DEFAULT_WEEKS", default=16, cast=int)
+
+CLIENT_CACHE_TIME = config("CLIENT_CACHE_TIME", default=3600, cast=int)
