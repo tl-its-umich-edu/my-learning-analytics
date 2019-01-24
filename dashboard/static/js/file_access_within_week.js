@@ -45,16 +45,16 @@ var makeGraph = function(url) {
         .offset([-10, 0])
         .html(function(d) {
             // split file link and file name
-            var parts = d.file_name.split("|");
+            var selfString
             if (d.self_access_count == 0) {
-                self_string = "You haven't viewed this file. ";
+                selfString = "You haven't viewed this file. ";
             } else if (d.self_access_count == 1) {
-                self_string = "You have read the file once on " + new Date(d.self_access_last_time).toDateString() + ".";
+                selfString = "You have read the file once on " + new Date(d.self_access_last_time).toDateString() + ".";
             } else {
-                self_string = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time).toDateString() + ".";
+                selfString = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time).toDateString() + ".";
 
             }
-            return self_string;
+            return selfString;
         })
     /////////////////////////////////////////////////////////////
     ////////////////////// Brush functions //////////////////////
@@ -148,14 +148,14 @@ var makeGraph = function(url) {
                 return (extent[0] - mini_yScale.rangeBand() + 1e-2 <= mini_yScale(d)) && (mini_yScale(d) <= extent[1] - 1e-2); });
         //Update the colors of the mini chart - Make everything outside the brush grey
         d3.select(".miniGroup").selectAll(".bar")
-            .style("fill", function(d, i) {
+            .style("fill", function(d) {
                 if (d.self_access_count > 0 ) {
                     return COLOR_ACCESSED_FILE;
                 } else {
                     return COLOR_NOT_ACCESSED_FILE;
                 }
             })
-            .style("opacity", function(d, i) {
+            .style("opacity", function(d) {
                 if (selected.indexOf(d.file_name) > -1) {
                     return "1";
                 } else {
@@ -265,11 +265,11 @@ var makeGraph = function(url) {
             .style("clip-path", "url(#clip)")
             .attr("class","mainGroup");
 
-        var miniGroup = svg.append("g")
+        svg.append("g")
             .attr("class","miniGroup")
             .attr("transform","translate(" + (main_margin.left + main_width + main_margin.right + mini_margin.left) + "," + mini_margin.top + ")");
 
-        var brushGroup = svg.append("g")
+        svg.append("g")
             .attr("class","brushGroup")
             .attr("transform","translate(" + (main_margin.left + main_width + main_margin.right + mini_margin.left) + "," + mini_margin.top + ")");
 
@@ -297,7 +297,7 @@ var makeGraph = function(url) {
             .outerTickSize(8);
 
         //Add group for the x axis
-        xlabel=d3.select(".mainGroupWrapper")
+        var xlabel = d3.select(".mainGroupWrapper")
             .append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(" + 0 + "," + (main_height + 5) + ")");
@@ -520,19 +520,18 @@ makeSlider = function () {
             return "no data";
         }
         currentWeekNumber = initResult.current_week_number;
-        totalWeeks = initResult.total_weeks
+        var totalWeeks = initResult.total_weeks
 
-        var i;
         var weekArray = [];
         var minWeek = "1"
         var maxWeek = totalWeeks
 
-        for (i = 1; i <= totalWeeks; i++) {
-            weekName = i
+        for (let i = 1; i <= totalWeeks; i++) {
+            var weekName = i
             if (i === currentWeekNumber) {
                 weekName = weekName + " (Now)";
                 // Set the default minimum to be 1 less or WEEKS_IN_ADVANCE less
-                minWeekNum = Math.max(1, currentWeekNumber - WEEK_IN_ADVANCE)
+                var minWeekNum = Math.max(1, currentWeekNumber - WEEK_IN_ADVANCE)
                 // If it's the current week, set the value to the current, otherwise set it to some other calculated week
                 minWeek = (minWeekNum === i) ? weekName : minWeekNum;
                 // Set the max to be the current
@@ -559,7 +558,7 @@ makeSlider = function () {
     });
 };
 
-getUserDefaults = function (){
+var getUserDefaults = function (){
     $.getJSON("/api/v1/courses/" + dashboard.course_id + "/get_user_default_selection?default_type=file", function (results) {
         if (results.default === '') {
             default_selection = $('#grade').val()
@@ -572,7 +571,7 @@ getUserDefaults = function (){
     });
 };
 
-default_selection_logic_on_grade_selection = function(){
+var default_selection_logic_on_grade_selection = function(){
     let selected_value = $('#grade').val();
     if (selected_value === default_selection) {
         $("#default_selection").hide();
@@ -586,7 +585,7 @@ default_selection_logic_on_grade_selection = function(){
     }
 };
 
-update_default_selection = function(selection){
+let update_default_selection = function(selection){
     let data = {"file":selection};
     // https://docs.djangoproject.com/en/2.1/ref/csrf/#acquiring-the-token-if-csrf-use-sessions-or-csrf-cookie-httponly-is-true
     $.ajax({
@@ -620,7 +619,7 @@ $('#grade').change(function() {
 
 // onchange of the reset by default selection
 $('#default_selection').change(function(){
-    selection = $('#grade').val();
+    var selection = $('#grade').val();
     if ($(this).is(":checked")) {
         $("#default_selection").hide();
         $('#default_selection').prop('checked', false);
