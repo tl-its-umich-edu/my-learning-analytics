@@ -31,18 +31,17 @@ class AcademicTermsManager(models.Manager):
 
 class AcademicTerms(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Term Id")
-    canvas_id = models.BigIntegerField(verbose_name="Canvas Id")
+    canvas_id = models.CharField(max_length=255, verbose_name="Canvas Id")
     name = models.CharField(max_length=255, verbose_name="Name")
-    date_start = models.DateField(verbose_name="Start Date")
-    date_end = models.DateField(verbose_name="End Date")
-    
+    date_start = models.DateTimeField(verbose_name="Start Date", blank=True, null=True)
+    date_end = models.DateTimeField(verbose_name="End Date", blank=True, null=True)
+
     objects = AcademicTermsManager()
 
     def __str__(self):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'academic_terms'
         verbose_name = "Academic Terms"
         verbose_name_plural = "Academic Terms"
@@ -82,22 +81,21 @@ class UserDefaultManager(models.Manager):
 
 class UserDefaultSelection(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
-    user_id = models.CharField(max_length=255, verbose_name="SIS Id")
-    course_id = models.CharField(max_length=255, verbose_name="Course Id")
-    default_view_type = models.CharField(max_length=255, verbose_name="Default Type")
-    default_view_value = models.CharField(max_length=255, verbose_name="Default Value")
+    course_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="Course Id")
+    user_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="SIS Id")
+    default_view_type = models.CharField(max_length=255, blank=True, null=True, verbose_name="Default Type")
+    default_view_value = models.CharField(max_length=255, blank=True, null=True, verbose_name="Default Value")
 
     objects = UserDefaultManager()
 
     class Meta:
-        managed = False
         db_table = 'user_default_selection'
         unique_together = (('user_id', 'course_id', 'default_view_type'),)
 
 
 class Assignment(models.Model):
     id = models.CharField(primary_key=True, max_length=255, verbose_name="Assignment Id")
-    name = models.CharField(max_length=255, verbose_name="Name")
+    name = models.CharField(max_length=255, verbose_name="Name", default='')
     due_date = models.DateTimeField(blank=True, null=True, verbose_name="Due DateTime")
     local_date = models.DateTimeField(blank=True, null=True, verbose_name="Local DateTime")
     points_possible = models.CharField(max_length=255, blank=True, null=True, verbose_name="Points Possible")
@@ -108,13 +106,12 @@ class Assignment(models.Model):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'assignment'
 
 
 class AssignmentGroups(models.Model):
     id = models.CharField(primary_key=True, max_length=255, verbose_name="Assignment Group Id")
-    name = models.CharField(max_length=255, verbose_name="Name")
+    name = models.CharField(max_length=255, verbose_name="Name", default='')
     weight = models.CharField(max_length=255, blank=True, null=True, verbose_name="Weight")
     group_points = models.CharField(max_length=255, blank=True, null=True, verbose_name="Group Points")
     course_id = models.CharField(max_length=255, verbose_name="Course Id")
@@ -125,7 +122,6 @@ class AssignmentGroups(models.Model):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'assignment_groups'
         verbose_name = "Assignment Groups"
         verbose_name_plural = "Assignment Groups"
@@ -133,10 +129,9 @@ class AssignmentGroups(models.Model):
 
 class AssignmentWeightConsideration(models.Model):
     course_id = models.CharField(primary_key=True, max_length=255, verbose_name="Course Id")
-    consider_weight = models.IntegerField(blank=True, null=True, verbose_name="Consider Weight")
+    consider_weight = models.NullBooleanField(blank=True, default=False, verbose_name="Consider Weight")
 
     class Meta:
-        managed = False
         db_table = 'assignment_weight_consideration'
 
 class CourseQuerySet(models.QuerySet):
@@ -163,16 +158,15 @@ class CourseManager(models.Manager):
 class Course(models.Model):
     id = models.CharField(primary_key=True, max_length=255, verbose_name="Unizin Course Id", db_column='id', editable=False)
     canvas_id = models.CharField(max_length=255, verbose_name="Canvas Course Id", db_column='canvas_id')
-    term_id = models.ForeignKey(AcademicTerms, verbose_name="Term Id", on_delete=models.SET_NULL, db_column='term_id', null=True)
+    term_id = models.ForeignKey(AcademicTerms, verbose_name="Term Id", on_delete=models.SET_NULL, db_column='term_id', null=True, db_constraint=False)
     name = models.CharField(max_length=255, verbose_name="Name")
-    
+
     objects = CourseManager()
 
     def __str__(self):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'course'
         verbose_name = "Course"
 
@@ -193,7 +187,6 @@ class CourseViewOption(models.Model):
         return retval
 
     class Meta:
-        managed = False
         db_table = 'course_view_option'
         verbose_name = "Course View Option"
     
@@ -227,7 +220,6 @@ class File(models.Model):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'file'
 
 
@@ -238,12 +230,12 @@ class Submission(models.Model):
     user_id = models.CharField(max_length=255, verbose_name="User Id")
     score = models.CharField(max_length=255, blank=True, null=True, verbose_name="Score")
     graded_date = models.DateTimeField(blank=True, null=True, verbose_name="Graded DateTime")
+    avg_score = models.FloatField(blank=True, null=True, verbose_name="Average Grade")
 
     def __str__(self):
         return f"Submission Id {self.id} for assignment id {self.assignment_id} for course id {self.course_id} for user id {self.user_id}"
 
     class Meta:
-        managed = False
         db_table = 'submission'
 
 
@@ -252,7 +244,6 @@ class UnizinMetadata(models.Model):
     pvalue = models.CharField(max_length=100, blank=True, null=True, verbose_name="Value")
 
     class Meta:
-        managed = False
         db_table = 'unizin_metadata'
 
 
@@ -261,7 +252,7 @@ class User(models.Model):
     name = models.CharField(max_length=255, verbose_name="Name")
     sis_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="SIS Id")
     sis_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="SIS Name")
-    course_id = models.CharField(max_length=255, verbose_name="Course Id")
+    course_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="Course Id")
     current_grade = models.CharField(max_length=255, blank=True, null=True, verbose_name="Current Grade")
     final_grade = models.CharField(max_length=255, blank=True, null=True, verbose_name="Final Grade")
 
@@ -269,19 +260,17 @@ class User(models.Model):
         return self.name
 
     class Meta:
-        managed = False
         db_table = 'user'
         unique_together = (('id', 'course_id'),)
 
 class FileAccess(models.Model):
-    file_id = models.OneToOneField(File, on_delete=models.CASCADE, primary_key=True, verbose_name="File")
-    user_id = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, verbose_name="User")
+    file_id = models.ForeignKey(File, on_delete=models.CASCADE, verbose_name="File")
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="User")
     access_time = models.DateTimeField(verbose_name="Access Time")
 
     def __str__(self):
         return f"File {self.file_id} accessed by {self.user_id}"
 
     class Meta:
-        managed = False
         db_table = 'file_access'
         unique_together = (('file_id', 'user_id'),)

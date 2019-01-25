@@ -51,29 +51,50 @@ Environment variables:
 
 `LTI_CANVAS_COURSE_ID_FIELD`: LTI launch field containing the course's canvas id (default: `custom_canvas_course_id`).
 
-# Docker commands for deploying the app
-1. Tear down running application and db instances:
-`docker-compose down`
-2. Build the application:
+# Docker commands for initialing the app for development
+1. Build the application:
 `docker-compose build`
-3. Run the application in a detached mode: `docker-compose up -d`
-4. Place all of your secrets in a directory and copy it into the docker with
+2. Run the application in a detached mode: `docker-compose up -d`
+3. Place all of your secrets in a directory and copy it into the docker with
 (If your secrets are in ~/secrets use this)
 `docker cp ~/secrets student_dashboard:/secrets`
-5. Initialize the MySQL database by loading the users and files on the next step. You'll need to be on VPN for this to work.
+4. Initialize the MySQL database tables: `docker exec -it student_dashboard ./manage.py migrate`
 
-## Making migration using Django models
-1. get into the docker machine `docker exec -t -i student_dashboard_mysql /bin/bash`
-2. creating the file `./manage.py makemigrations dashboard`.  This should say changes detected if any 
-3. applying the changes to DB `./manage.py migrate dashboard`. 
-4. exit
-5. `docker cp student_dashboard:/dashboard/migrations/0001_initial.py dashboard/migrations` 
+# Populate initial database terms and courses
 
-## Add a default course to test with
+Before adding adding initial terms and courses, ensure that the `DATA_WAREHOUSE_ID_TEMPLATE` environment variable is set correctly
 
-There are some default courses pre-populated by the mysql/init.sql script. If you'd like to add additional courses you need to add them as an admin user. (See next section on adding an admin user)
+### Add terms
 
-## Create a super user to test login. 
+    docker exec -it student_dashboard bash
+    ./manage.py term --term_id=108 --name='SUMMER 2018' --date_start='2018-06-27 04:00:00' --date_end='2018-08-17 23:59:59'
+    ./manage.py term --term_id=111 --name='FALL 2018' --date_start='2018-09-03 04:00:00' --date_end='2018-12-24 23:59:59'
+    exit
+
+### Add courses
+
+    docker exec -it student_dashboard bash
+    ./manage.py course --course_id=230745 --term_id=108 --name="STATS 250 SU 2018"
+    ./manage.py course --course_id=252307 --term_id=111 --name="SI 110 001 FA 2018"
+    ./manage.py course --course_id=245664 --term_id=111 --name="SI 664 002 FA 2018"
+    ./manage.py course --course_id=283292 --term_id=111 --name="HMP 654 001 FA 2018"
+    exit
+
+# Docker commands for running app
+
+Start the app
+
+    docker-compose up -d
+
+Stop the app
+
+    docker-compose stop
+
+Tear down the app completely
+
+    docker-compose down
+
+# Create a super user to test login.
 
 On the both local dev and remote the users are stored in the local database. However on local the users have to be created via the command line, on Openshift they are created either manually in the database or when logged in via Shibboleth.
 

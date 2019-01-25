@@ -35,9 +35,6 @@ RUN yarn global add wait-port@"~0.2.2" && \
 # This DJANGO_SECRET_KEY is set here just so collectstatic runs with an empty key. It can be set to anything
     echo yes | DJANGO_SECRET_KEY="collectstatic" python manage.py collectstatic --verbosity 0
 
-# This sets up some initial MySQL tables
-COPY mysql/init.sql /docker-entrypoint-initdb.d
-
 # Sets the local timezone of the docker image
 ARG TZ
 ENV TZ ${TZ:-America/Detroit}
