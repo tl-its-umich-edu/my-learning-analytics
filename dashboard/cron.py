@@ -54,38 +54,18 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
     # write to MySQL
     try:
         df.to_sql(con=engine, name=mysql_table, if_exists='append', index=False)
-    except Exception:
+    except Exception as e:
         logger.exception(f"Error running to_sql on table {mysql_table}")
         raise
 
     # returns the row size of dataframe
     return f"inserted + {str(df.shape[0])} rows in table {mysql_table} for course {UDW_course_id}\n"
 
-# Exit with log if UDW dataset is missing courses
-def data_validation (incoming_courses,existing_courses):
-    incoming_courses = df['course_id']
-    existing_courses = get_queryset().get_supported_courses()
-
-    try:
-        for course in existing_courses:
-                if course in incoming_courses:
-                    print(f"{course} found")
-                    continue
-                else:
-                    logger.exception(f"missing {course} from incoming dataset from UDW.")
-
-                    return
-
-    except Exception:
-        logger.exception(f"Missing course data for {mysql_table}")
-        raise
-
 # execute database query
 def executeDbQuery(query):
     with engine.connect() as connection:
         connection.detach()
         connection.execute(query)
-
 
 # remove all records inside the specified table
 def deleteAllRecordInTable(tableName):
@@ -145,23 +125,23 @@ class DashboardCronJob(CronJobBase):
         for UDW_course_id in Course.objects.get_supported_courses():
 
             # select all student registered for the course
-            user_sql = f"""select u.name AS name,
-                        p.sis_user_id AS sis_id,
-                        p.unique_name AS sis_name,
-                        u.global_canvas_id AS id,
-                        c.current_score AS current_grade,
-                        c.final_score AS final_grade,
-                        '{UDW_course_id}' as course_id
-                        from user_dim u,
-                        pseudonym_dim p,
-                        course_score_fact c,
-                        (select e.user_id as user_id, e.id as enrollment_id from enrollment_dim e
-                        where e.course_id = '{UDW_course_id}'
-                        and e.type='StudentEnrollment'
-                        and e.workflow_state='active' ) as e
-                        where p.user_id=u.id
-                        and u.id = e.user_id
-                        and c.enrollment_id =  e.enrollment_id
+            user_sql = f"""select u.name AS name, 
+                        p.sis_user_id AS sis_id, 
+                        p.unique_name AS sis_name, 
+                        u.global_canvas_id AS id, 
+                        c.current_score AS current_grade, 
+                        c.final_score AS final_grade, 
+                        '{UDW_course_id}' as course_id 
+                        from user_dim u, 
+                        pseudonym_dim p, 
+                        course_score_fact c, 
+                        (select e.user_id as user_id, e.id as enrollment_id from enrollment_dim e 
+                        where e.course_id = '{UDW_course_id}' 
+                        and e.type='StudentEnrollment' 
+                        and e.workflow_state='active' ) as e 
+                        where p.user_id=u.id 
+                        and u.id = e.user_id 
+                        and c.enrollment_id =  e.enrollment_id 
                         and p.sis_user_id is not null
                         """
             logger.debug(user_sql)
@@ -199,17 +179,13 @@ class DashboardCronJob(CronJobBase):
 
         logger.debug("in update with udw file")
 
-        #Log an error if the course is invalid
-
         # delete all records in the table first
         status += deleteAllRecordInTable("file")
-
-
 
         #select file record from UDW
         for UDW_course_id in Course.objects.get_supported_courses():
             file_sql = f"""select concat({settings.UDW_FILE_ID_PREFIX}, canvas_id) as ID, display_name as NAME, course_id as COURSE_ID from file_dim
-                        where file_state ='available'
+                        where file_state ='available' 
                         and course_id='{UDW_course_id}'
                         order by canvas_id
                         """
@@ -302,7 +278,7 @@ class DashboardCronJob(CronJobBase):
         # update groups
         #Loading the assignment groups inforamtion along with weight/points associated ith arn assignment
         logger.debug("update_assignment_groups(): ")
-
+        
         # loop through multiple course ids
         for UDW_course_id in Course.objects.get_supported_courses():
             assignment_groups_sql = f"""with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{UDW_course_id}' and ad.visibility = 'everyone' and ad.workflow_state='published'),
@@ -332,7 +308,7 @@ class DashboardCronJob(CronJobBase):
                             (select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone 'America/New_York' as local_date,
                             ad.title AS name,af.course_id AS course_id,af.assignment_id AS id,
                             af.points_possible AS points_possible,af.assignment_group_id AS assignment_group_id
-                            from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{UDW_course_id}'
+                            from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{UDW_course_id}' 
                             and ad.visibility = 'everyone' and ad.workflow_state='published')
                             select * from assignment_info
                             """
@@ -449,3 +425,5 @@ class DashboardCronJob(CronJobBase):
         logger.info("************ total status=" + status + "/n/n")
 
         return status
+
+
