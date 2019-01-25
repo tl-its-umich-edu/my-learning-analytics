@@ -98,6 +98,16 @@ CREATE TABLE IF NOT EXISTS unizin_metadata (
     pvalue VARCHAR(100)
 );
 
+CREATE TABLE IF NOT EXISTS user_default_selection (
+     id int NOT NULL AUTO_INCREMENT,
+     course_id CHAR(255),
+     user_id CHAR(255),
+     default_view_type CHAR(225),
+     default_view_value CHAR(225),
+     PRIMARY KEY (id,course_id, user_id, default_view_type)
+);
+
+
 
 -- insert terms
 INSERT INTO academic_terms (id, canvas_id, name, date_start, date_end) VALUES (17700000000000108, 108, 'SUMMER 2018', '2018-06-27 04:00:00',  '2018-08-17 23:59:59' );

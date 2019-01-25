@@ -1,4 +1,4 @@
-visApp.factory('Get', function ($http) {
+visApp.factory('Service', function ($http) {
   return {
     getData: function (url) {
       return $http.get(url, {cache: false}).then(
@@ -11,6 +11,15 @@ visApp.factory('Get', function ($http) {
           return result;
         }
       );
+    },
+    putDefaults: function (url,data) {
+      return $http.put(url, data).then(
+          function success(result) {
+            return result;
+          },
+          function error(result) {
+            return result;
+          });
     }
   };
 });

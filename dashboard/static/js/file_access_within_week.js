@@ -18,6 +18,10 @@ var mini_margin = {top: 50, right: 10, bottom: 50, left: 10},
     mini_width = 100 - mini_margin.left - mini_margin.right,
     mini_height = 400 - mini_margin.top - mini_margin.bottom;
 
+const REMEMBER_MY_SETTING = 'Remember my setting';
+const MY_CURRENT_SETTING = 'My current setting';
+const SETTING_NOT_UPDATED_MSG = 'Setting not updated';
+
 var makeGraph = function(url) {
 
     var data = [],
@@ -480,7 +484,6 @@ var makeGraph = function(url) {
 
 };
 
-var WEEK_PREFIX = "Week ";
 // default to show two weeks in advance
 var WEEK_IN_ADVANCE = 2;
 
@@ -505,9 +508,11 @@ function makeGraphBasedOnGradeAndSlide(grade, sliderValues)
 
 var mySlider;
 var makeSlider;
+var default_selection;
 makeSlider = function () {
     // default to be the first week
     var currentWeekNumber = 1;
+    getUserDefaults();
 
     $.getJSON("/api/v1/courses/"+dashboard.course_id+"/info", function (initResult) {
         if (initResult.length === 0) {
@@ -519,17 +524,17 @@ makeSlider = function () {
 
         var i;
         var weekArray = [];
-        var minWeek = WEEK_PREFIX + "1"
-        var maxWeek = WEEK_PREFIX + totalWeeks
+        var minWeek = "1"
+        var maxWeek = totalWeeks
 
         for (i = 1; i <= totalWeeks; i++) {
-            weekName = WEEK_PREFIX + i
+            weekName = i
             if (i === currentWeekNumber) {
                 weekName = weekName + " (Now)";
                 // Set the default minimum to be 1 less or WEEKS_IN_ADVANCE less
                 minWeekNum = Math.max(1, currentWeekNumber - WEEK_IN_ADVANCE)
                 // If it's the current week, set the value to the current, otherwise set it to some other calculated week
-                minWeek = (minWeekNum === i) ? weekName : WEEK_PREFIX + minWeekNum;
+                minWeek = (minWeekNum === i) ? weekName : minWeekNum;
                 // Set the max to be the current
                 maxWeek = weekName
             }
@@ -547,20 +552,84 @@ makeSlider = function () {
                 var valuesParts = values.split(",");
                 // argument values represents current values
                 var grade = $('#grade').val();
-                $("#slider_label").html(" from <b>" + valuesParts[0] + "</b> to <b>" + valuesParts[1] + "</b>");
+                $("#slider_label").html(" <b>" + valuesParts[0] + "</b> to <b>" + valuesParts[1] + "</b>");
                 makeGraphBasedOnGradeAndSlide(grade, valuesParts);
             }
         });
     });
 };
 
+getUserDefaults = function (){
+    $.getJSON("/api/v1/courses/" + dashboard.course_id + "/get_user_default_selection?default_type=file", function (results) {
+        if (results.default === '') {
+            default_selection = $('#grade').val()
+        } else {
+            default_selection = results.default;
+        }
+        $("#grade").val(default_selection);
+        $("#default_selection").hide();
+        $("#label_for_default_selection").html(MY_CURRENT_SETTING);
+    });
+};
+
+default_selection_logic_on_grade_selection = function(){
+    let selected_value = $('#grade').val();
+    if (selected_value === default_selection) {
+        $("#default_selection").hide();
+        $('#default_selection').prop('checked', false);
+        $("#label_for_default_selection").html(MY_CURRENT_SETTING);
+
+
+    } else {
+        $("#default_selection").show();
+        $("#label_for_default_selection").html(REMEMBER_MY_SETTING);
+    }
+};
+
+update_default_selection = function(selection){
+    let data = {"file":selection};
+    // https://docs.djangoproject.com/en/2.1/ref/csrf/#acquiring-the-token-if-csrf-use-sessions-or-csrf-cookie-httponly-is-true
+    $.ajax({
+        url: "/api/v1/courses/" + dashboard.course_id + "/set_user_default_selection",
+        method: 'PUT',
+        data: JSON.stringify(data),
+        contentType: "application/json; charset=utf-8",
+        beforeSend: function( xhr ) {
+            if(!this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", putToken);
+            }
+        },
+        success: function (initResult) {
+            if (initResult.default === 'fail') {
+                $("#label_for_default_selection").html(SETTING_NOT_UPDATED_MSG);
+                $('#default_selection').prop('checked', false);
+                return;
+            }
+            default_selection = $('#grade').val();
+        }
+    });
+};
+
 $('#grade').change(function() {
     // make new graph based on the grade selection
     var sliderValues = mySlider.getValue().split(",");
+    default_selection_logic_on_grade_selection();
     makeGraphBasedOnGradeAndSlide($('#grade').val(), sliderValues);
 
 });
 
+// onchange of the reset by default selection
+$('#default_selection').change(function(){
+    selection = $('#grade').val();
+    if ($(this).is(":checked")) {
+        $("#default_selection").hide();
+        $('#default_selection').prop('checked', false);
+        $("#label_for_default_selection").html(MY_CURRENT_SETTING);
+    }
+    update_default_selection(selection)
+});
+
 makeSlider();
+
 
 makeGraph();
