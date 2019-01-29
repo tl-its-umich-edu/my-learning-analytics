@@ -56,7 +56,7 @@ urlpatterns = [
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignments', 
         cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.assignments)), name='assignments'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/get_user_default_selection', 
-        cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.get_user_default_selection)), name='get_user_default_selection'),
+        (login_required(views.get_user_default_selection)), name='get_user_default_selection'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/info', 
         cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.get_course_info)), name='get_course_info'),
     # This is a public view of the courses we have enabled
