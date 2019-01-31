@@ -233,9 +233,9 @@ class DashboardCronJob(CronJobBase):
                                 query = '''select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, "$.object.id"), 35) AS STRING) AS file_id,
                                         SUBSTR(JSON_EXTRACT_SCALAR(event, "$.membership.member.id"), 29) AS user_id,
                                         datetime(EVENT_TIME) as access_time
-                                        FROM learning_datasets.enriched_events
+                                        FROM event_store.events
                                         where JSON_EXTRACT_SCALAR(event, "$.edApp.id") = \'http://umich.instructure.com/\'
-                                        and event_type = \'NavigationEvent\'
+                                        and type = \'NavigationEvent\'
                                         and JSON_EXTRACT_SCALAR(event, "$.object.name") = \'attachment\'
                                         and JSON_EXTRACT_SCALAR(event, "$.action") = \'NavigatedTo\'
                                         and JSON_EXTRACT_SCALAR(event, "$.membership.member.id") is not null
