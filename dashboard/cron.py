@@ -211,6 +211,7 @@ class DashboardCronJob(CronJobBase):
         datasets = list(bigquery_client.list_datasets())
         project = bigquery_client.project
 
+        total_bytes_billed = 0
         # list all datasets
         if datasets:
             logger.debug('Datasets in project {}:'.format(project))
@@ -225,7 +226,6 @@ class DashboardCronJob(CronJobBase):
                     for table in tables:
                         if ("enriched_events" == table.table_id):
                             logger.debug('\t{}'.format("found table"))
-
                             # loop through multiple course ids
                             for UDW_course_id in Course.objects.get_supported_courses():
 
@@ -249,7 +249,10 @@ class DashboardCronJob(CronJobBase):
                                 job_config.query_parameters = query_params
 
                                 # Location must match that of the dataset(s) referenced in the query.
-                                df = bigquery_client.query(query, location='US', job_config=job_config).to_dataframe()
+                                bq_query = bigquery_client.query(query, location='US', job_config=job_config)
+                                #bq_query.result()
+                                df = bq_query.to_dataframe()
+                                total_bytes_billed += bq_query.total_bytes_billed
 
                                 logger.debug("df row number=" + str(df.shape[0]))
                                 # drop duplicates
@@ -264,8 +267,9 @@ class DashboardCronJob(CronJobBase):
                                 logger.info(returnString)
 
         else:
-            returnString += "BigQuery project does not contain any datasets."
+            status += "BigQuery project does not contain any datasets.\n"
 
+        status +=(f"\nTotal Bytes billed for this BQ Call: {total_bytes_billed}")
         return status
 
     def update_groups(self):
