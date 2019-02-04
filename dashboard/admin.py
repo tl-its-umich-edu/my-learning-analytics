@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.conf import settings
+from django.utils.safestring import mark_safe
+from django.template.defaultfilters import linebreaksbr
 
 from .models import CourseViewOption, Course
 
@@ -11,6 +13,13 @@ class CourseViewOptionInline(admin.StackedInline):
 
 class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseViewOptionInline,]
+    list_display = ('name', 'term_id','_courseviewoption')
+    list_select_related = True
+
+    # Need this method to correctly display the line breaks
+    def _courseviewoption(self, obj):
+        return mark_safe(linebreaksbr(obj.courseviewoption))
+    _courseviewoption.short_description = "Course View Option(s)"
 
     # When saving the course, update the id based on canvas id
     def save_model(self, request, obj, form, change):
