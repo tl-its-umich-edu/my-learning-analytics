@@ -21,7 +21,7 @@ echo Running python startups
 python manage.py migrate
 
 if [ -z "${IS_CRON_POD}" ]; then
-    if [ -z "{PTVSD_DEBUG}" ]; then
+    if [ -z "${PTVSD_DEBUG}" ]; then
         # Start Gunicorn processes
         echo Starting Gunicorn for production
 
@@ -33,7 +33,7 @@ if [ -z "${IS_CRON_POD}" ]; then
         # Currently ptvsd doesn't work with gunicorn
         # https://github.com/Microsoft/vscode-python/issues/2138
         echo Starting Runserver for development
-        exec python manage.py runserver --noreload --nothreading 0.0.0.0:${GUNICORN_PORT}
+        exec python manage.py runserver --noreload 0.0.0.0:${GUNICORN_PORT}
 
     fi
 else
