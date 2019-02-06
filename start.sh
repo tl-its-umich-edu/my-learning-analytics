@@ -21,13 +21,21 @@ echo Running python startups
 python manage.py migrate
 
 if [ -z "${IS_CRON_POD}" ]; then
-    # Start Gunicorn processes
-    echo Starting Gunicorn.
+    if [ -z "{PTVSD_DEBUG}" ]; then
+        # Start Gunicorn processes
+        echo Starting Gunicorn for production
 
-    # application pod
-    exec gunicorn dashboard.wsgi:application \
-        --bind 0.0.0.0:${GUNICORN_PORT} \
-        --workers="${GUNICORN_WORKERS}"
+        # application pod
+        exec gunicorn dashboard.wsgi:application \
+            --bind 0.0.0.0:${GUNICORN_PORT} \
+            --workers="${GUNICORN_WORKERS}"
+    else 
+        # Currently ptvsd doesn't work with gunicorn
+        # https://github.com/Microsoft/vscode-python/issues/2138
+        echo Starting Runserver for development
+        exec python manage.py runserver --noreload --nothreading 0.0.0.0:${GUNICORN_PORT}
+
+    fi
 else
     if [ -z "${CRONTAB_SCHEDULE}" ]; then
         echo "CRONTAB_SCHEDULE environment variable not set, crontab cannot be started. Please set this to a crontab acceptable format."
