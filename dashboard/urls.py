@@ -33,7 +33,7 @@ import watchman.views
 
 urlpatterns = [
     url(r'^$', 
-        cache_page(settings.CLIENT_CACHE_TIME)(TemplateView.as_view(template_name='home.html')), name = 'home'),
+        TemplateView.as_view(template_name='home.html'), name = 'home'),
     url(r'^status/', include('watchman.urls')),
     url(r'^status/bare_status$', watchman.views.bare_status),
 
