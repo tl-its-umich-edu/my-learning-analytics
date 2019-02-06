@@ -3,18 +3,18 @@
 /////////////////////////////////////////////////////////////
 
 // colors used for different file states
-var COLOR_ACCESSED_FILE ="steelblue",
+let COLOR_ACCESSED_FILE ="steelblue",
     COLOR_NOT_ACCESSED_FILE = "gray";
 
 //Added only for the mouse wheel
-var zoomer = d3.behavior.zoom()
+let zoomer = d3.behavior.zoom()
     .on("zoom", null);
 
-var main_margin = {top: 50, right: 10, bottom: 50, left: 300},
+let main_margin = {top: 50, right: 10, bottom: 50, left: 300},
     main_width = 1000 - main_margin.left - main_margin.right,
     main_height = 400 - main_margin.top - main_margin.bottom;
 
-var mini_margin = {top: 50, right: 10, bottom: 50, left: 10},
+let mini_margin = {top: 50, right: 10, bottom: 50, left: 10},
     mini_width = 100 - mini_margin.left - mini_margin.right,
     mini_height = 400 - mini_margin.top - mini_margin.bottom;
 
@@ -22,9 +22,9 @@ const REMEMBER_MY_SETTING = 'Remember my setting';
 const MY_CURRENT_SETTING = 'My current setting';
 const SETTING_NOT_UPDATED_MSG = 'Setting not updated';
 
-var makeGraph = function(url) {
+let makeGraph = function(url) {
 
-    var data = [],
+    let data = [],
         svg,
         defs,
         gBrush,
@@ -40,12 +40,12 @@ var makeGraph = function(url) {
 
     d3.selectAll("div#chart > *").remove();
 
-    var tip = d3.tip()
+    let tip = d3.tip()
         .attr('class', 'd3-tip')
         .offset([-10, 0])
         .html(function(d) {
             // split file link and file name
-            var selfString
+            let selfString
             if (d.self_access_count == 0) {
                 selfString = "You haven't viewed this file. ";
             } else if (d.self_access_count == 1) {
@@ -68,7 +68,7 @@ var makeGraph = function(url) {
         /////////////////////////////////////////////////////////////
 
         //DATA JOIN
-        var bar = d3.select(".mainGroup").selectAll(".bar")
+        let bar = d3.select(".mainGroup").selectAll(".bar")
             .data(data, function(d) { return d.file_name; });
         //UPDATE
         bar
@@ -98,7 +98,7 @@ var makeGraph = function(url) {
         // append text to bars
         // only when the bar is fully displayed
         svg.selectAll(".label").remove();
-        var texts = svg.selectAll(".label")
+        let texts = svg.selectAll(".label")
             .data(data)
             .enter()
             .append("text");
@@ -123,14 +123,14 @@ var makeGraph = function(url) {
 
     //First function that runs on a brush move
     function brushmove() {
-        var extent = brush.extent();
+        let extent = brush.extent();
 
         /////////////////////////////////////////////////////////////
         ///////////////////// Update the axes ///////////////////////
         /////////////////////////////////////////////////////////////
 
         //Reset the part that is visible on the big chart
-        var originalRange = main_yZoom.range();
+        let originalRange = main_yZoom.range();
         main_yZoom.domain( extent );
 
         //Update the domain of the x & y scale of the big bar chart
@@ -143,7 +143,7 @@ var makeGraph = function(url) {
             .call(main_yAxis);
 
         //Which bars are still "selected"
-        var selected = mini_yScale.domain()
+        let selected = mini_yScale.domain()
             .filter(function(d) {
                 return (extent[0] - mini_yScale.rangeBand() + 1e-2 <= mini_yScale(d)) && (mini_yScale(d) <= extent[1] - 1e-2); });
         //Update the colors of the mini chart - Make everything outside the brush grey
@@ -168,7 +168,7 @@ var makeGraph = function(url) {
             .style("font-size", textScale(selected.length));
     /*
         //Find the new max of the bars to update the x scale
-        var newMaxXScale = d3.max(data, function(d) { return selected.indexOf(d.file_name) > -1 ? d.total_count : 0; });
+        let newMaxXScale = d3.max(data, function(d) { return selected.indexOf(d.file_name) > -1 ? d.total_count : 0; });
         main_xScale.domain([0, newMaxXScale]);
 
         //Update the x axis of the big chart
@@ -189,7 +189,7 @@ var makeGraph = function(url) {
     //Based on http://bl.ocks.org/mbostock/6498000
     //What to do when the user clicks on another location along the brushable bar chart
     function brushcenter() {
-        var target = d3.event.target,
+        let target = d3.event.target,
             extent = brush.extent(),
             size = extent[1] - extent[0],
             range = mini_yScale.range(),
@@ -212,7 +212,7 @@ var makeGraph = function(url) {
     function scroll() {
 
         //Mouse scroll on the mini chart
-        var extent = brush.extent(),
+        let extent = brush.extent(),
             size = extent[1] - extent[0],
             range = mini_yScale.range(),
             y0 = d3.min(range),
@@ -257,7 +257,7 @@ var makeGraph = function(url) {
 
         svg.call(tip);
 
-        var mainGroup = svg.append("g")
+        let mainGroup = svg.append("g")
             .attr("class","mainGroupWrapper")
             .attr("transform","translate(" + main_margin.left + "," + main_margin.top + ")")
             .append("g") //another one for the clip path - due to not wanting to clip the labels
@@ -297,7 +297,7 @@ var makeGraph = function(url) {
             .outerTickSize(8);
 
         //Add group for the x axis
-        var xlabel = d3.select(".mainGroupWrapper")
+        let xlabel = d3.select(".mainGroupWrapper")
             .append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(" + 0 + "," + (main_height + 5) + ")");
@@ -334,7 +334,7 @@ var makeGraph = function(url) {
         d3.select(".mainGroup").select(".y.axis").call(main_yAxis);
 
         d3.selectAll(".y .tick text").each(function(d) {
-            var parts = d.split("|");
+            let parts = d.split("|");
             const a = d3.select(this.parentNode).append("a")
                 .attr("xlink:target","_blank")
                 .attr("xlink:href", parts[0])//change this for your function
@@ -345,7 +345,7 @@ var makeGraph = function(url) {
 
         // update the tick text
         main_yAxis.tickFormat(function(d) {
-            var parts = d.split("|");
+            let parts = d.split("|");
             return parts[1];
         });
 
@@ -365,7 +365,7 @@ var makeGraph = function(url) {
         ///////////////////////// Create brush //////////////////////
         /////////////////////////////////////////////////////////////
         //What should the first extent of the brush become - a bit arbitrary this
-        var brushExtent = Math.min(5, data.length-1)
+        let brushExtent = Math.min(5, data.length-1)
 
         brush = d3.svg.brush()
             .y(mini_yScale)
@@ -407,7 +407,7 @@ var makeGraph = function(url) {
         /////////////////////////////////////////////////////////////
         //The mini brushable bar
         //DATA JOIN
-        var mini_bar = d3.select(".miniGroup").selectAll(".bar")
+        let mini_bar = d3.select(".miniGroup").selectAll(".bar")
             .data(data, function(d) { return d.file_name; });
         //UDPATE
         mini_bar
@@ -440,21 +440,21 @@ var makeGraph = function(url) {
 
         //////////////////////////////////
         // add legend
-        var w = 550 - main_margin.left - main_margin.right,
+        let w = 550 - main_margin.left - main_margin.right,
             h = 350 - main_margin.top - main_margin.bottom,
             legend_box_length = 10,
             legend_box_text_interval = 15,
             legend_interval = 20,
             legend_y = -50;
-        var legendLabels = [ ["Files I haven't viewed", COLOR_NOT_ACCESSED_FILE],
+        let legendLabels = [ ["Files I haven't viewed", COLOR_NOT_ACCESSED_FILE],
             ["Files I've viewed", COLOR_ACCESSED_FILE] ];
-        var legend = svg.append("g")
+        let legend = svg.append("g")
             .attr("class", "legend")
             //.attr("height", 100)
             //.attr("width", 100)
             .attr('transform', 'translate(-100,50)');
 
-        var legendRect = legend.selectAll('rect').data(legendLabels);
+        let legendRect = legend.selectAll('rect').data(legendLabels);
 
         legendRect.enter()
             .append("rect")
@@ -469,7 +469,7 @@ var makeGraph = function(url) {
                 return d[1];
             });
 
-        var legendText = legend.selectAll('text').data(legendLabels);
+        let legendText = legend.selectAll('text').data(legendLabels);
         legendText.enter()
             .append("text")
         legendText
@@ -485,7 +485,7 @@ var makeGraph = function(url) {
 };
 
 // default to show two weeks in advance
-var WEEK_IN_ADVANCE = 2;
+let WEEK_IN_ADVANCE = 2;
 
 function cleanWeekInputNum(weekNumString)
 {
@@ -501,17 +501,17 @@ function cleanWeekInputNum(weekNumString)
 function makeGraphBasedOnGradeAndSlide(grade, sliderValues)
 {
     // parse to get start and end week number
-    var startWeek = cleanWeekInputNum(sliderValues[0]);
-    var endWeek = cleanWeekInputNum(sliderValues[1]);
+    let startWeek = cleanWeekInputNum(sliderValues[0]);
+    let endWeek = cleanWeekInputNum(sliderValues[1]);
     makeGraph('/api/v1/courses/'+dashboard.course_id+'/file_access_within_week?week_num_start=' + startWeek + "&week_num_end=" + endWeek + "&grade=" + grade);
 }
 
-var mySlider;
-var makeSlider;
-var default_selection;
+let mySlider;
+let makeSlider;
+let default_selection;
 makeSlider = function () {
     // default to be the first week
-    var currentWeekNumber = 1;
+    let currentWeekNumber = 1;
     getUserDefaults();
 
     $.getJSON("/api/v1/courses/"+dashboard.course_id+"/info", function (initResult) {
@@ -520,18 +520,18 @@ makeSlider = function () {
             return "no data";
         }
         currentWeekNumber = initResult.current_week_number;
-        var totalWeeks = initResult.total_weeks
+        let totalWeeks = initResult.total_weeks
 
-        var weekArray = [];
-        var minWeek = "1"
-        var maxWeek = totalWeeks
+        let weekArray = [];
+        let minWeek = "1"
+        let maxWeek = totalWeeks
 
         for (let i = 1; i <= totalWeeks; i++) {
-            var weekName = i
+            let weekName = i
             if (i === currentWeekNumber) {
                 weekName = weekName + " (Now)";
                 // Set the default minimum to be 1 less or WEEKS_IN_ADVANCE less
-                var minWeekNum = Math.max(1, currentWeekNumber - WEEK_IN_ADVANCE)
+                let minWeekNum = Math.max(1, currentWeekNumber - WEEK_IN_ADVANCE)
                 // If it's the current week, set the value to the current, otherwise set it to some other calculated week
                 minWeek = (minWeekNum === i) ? weekName : minWeekNum;
                 // Set the max to be the current
@@ -548,9 +548,9 @@ makeSlider = function () {
             scale: true,
             tooltip: false,
             onChange: function (values) {
-                var valuesParts = values.split(",");
+                let valuesParts = values.split(",");
                 // argument values represents current values
-                var grade = $('#grade').val();
+                let grade = $('#grade').val();
                 $("#slider_label").html(" <b>" + valuesParts[0] + "</b> to <b>" + valuesParts[1] + "</b>");
                 makeGraphBasedOnGradeAndSlide(grade, valuesParts);
             }
@@ -558,7 +558,7 @@ makeSlider = function () {
     });
 };
 
-var getUserDefaults = function (){
+let getUserDefaults = function (){
     $.getJSON("/api/v1/courses/" + dashboard.course_id + "/get_user_default_selection?default_type=file", function (results) {
         if (results.default === '') {
             default_selection = $('#grade').val()
@@ -571,7 +571,7 @@ var getUserDefaults = function (){
     });
 };
 
-var default_selection_logic_on_grade_selection = function(){
+let default_selection_logic_on_grade_selection = function(){
     let selected_value = $('#grade').val();
     if (selected_value === default_selection) {
         $("#default_selection").hide();
@@ -611,7 +611,7 @@ let update_default_selection = function(selection){
 
 $('#grade').change(function() {
     // make new graph based on the grade selection
-    var sliderValues = mySlider.getValue().split(",");
+    let sliderValues = mySlider.getValue().split(",");
     default_selection_logic_on_grade_selection();
     makeGraphBasedOnGradeAndSlide($('#grade').val(), sliderValues);
 
@@ -619,7 +619,7 @@ $('#grade').change(function() {
 
 // onchange of the reset by default selection
 $('#default_selection').change(function(){
-    var selection = $('#grade').val();
+    let selection = $('#grade').val();
     if ($(this).is(":checked")) {
         $("#default_selection").hide();
         $('#default_selection').prop('checked', false);
