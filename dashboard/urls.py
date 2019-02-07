@@ -50,15 +50,15 @@ urlpatterns = [
     # Thse URL's are data patterns
     # GET access patterns
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/grade_distribution', 
-        cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.grade_distribution)), name='grade_distribution'),
+        login_required(views.grade_distribution), name='grade_distribution'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/file_access_within_week', 
-        cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.file_access_within_week)), name='file_access_within_week'),
+        login_required(views.file_access_within_week), name='file_access_within_week'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignments', 
-        cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.assignments)), name='assignments'),
+        login_required(views.assignments), name='assignments'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/get_user_default_selection', 
-        (login_required(views.get_user_default_selection)), name='get_user_default_selection'),
+        login_required(views.get_user_default_selection), name='get_user_default_selection'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/info', 
-        cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.get_course_info)), name='get_course_info'),
+        login_required(views.get_course_info), name='get_course_info'),
     # This is a public view of the courses we have enabled
     url(r'^api/v1/courses_enabled', 
         cache_page(settings.CLIENT_CACHE_TIME)(views.courses_enabled), name='courses_enabled'),
