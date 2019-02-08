@@ -183,11 +183,16 @@ class CourseViewOption(models.Model):
     show_grade_distribution = models.BooleanField(blank=False, null=False, verbose_name="Show Grade Distribution View")
 
     def __str__(self):
-        return f"Course options for {self.course}"
+        retval = ""
+        if self.show_files_accessed: retval += "Files Accessed\n"
+        if self.show_assignment_planning: retval += "Assignment Planning\n"
+        if self.show_grade_distribution: retval += "Grade Distribution\n"
+        return retval
 
     class Meta:
         managed = False
         db_table = 'course_view_option'
+        verbose_name = "Course View Option"
     
     def json(self):
         """Format the json output that we want for this record
