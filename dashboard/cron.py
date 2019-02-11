@@ -271,7 +271,7 @@ class DashboardCronJob(CronJobBase):
 
         total_tbytes_billed = total_bytes_billed / 1024 / 1024 / 1024 / 1024
         # $5 per TB as of Feb 2019 https://cloud.google.com/bigquery/pricing
-        total_tbytes_price = 5 * total_tbytes_billed
+        total_tbytes_price = round(5 * total_tbytes_billed, 2)
         status +=(f"TBytes billed for BQ: {total_tbytes_billed} = ${total_tbytes_price}\n")
         return status
 
