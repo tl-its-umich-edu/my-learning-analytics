@@ -37,7 +37,7 @@ engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}?cha
                                port = db_port))
 
 # Split a list into *size* shorter pieces
-def split_list(l: list, size: int = 10):
+def split_list(l: list, size: int = 20):
     return [l[i:i + size] for i in range(0, len(l), size)]
 
 # the util function
@@ -231,7 +231,7 @@ class DashboardCronJob(CronJobBase):
                         if ("enriched_events" == table.table_id):
                             logger.debug('\t{}'.format("found table"))
                             # loop through multiple course ids, 10 at a time
-                            for UDW_course_ids in split_list(Course.objects.get_supported_courses()):
+                            for UDW_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
 
                                 # query to retrieve all file access events for one course
                                 query = """select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS file_id,
