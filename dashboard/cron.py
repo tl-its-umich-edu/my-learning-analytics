@@ -36,6 +36,10 @@ engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}?cha
                                host = db_host,
                                port = db_port))
 
+# Split a list into *size* shorter pieces
+def split_list(l: list, size: int = 10):
+    return [l[i:i + size] for i in range(0, len(l), size)]
+
 # the util function
 def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None):
     df = pd.read_sql(sql_string, conns['UDW'])
@@ -226,24 +230,25 @@ class DashboardCronJob(CronJobBase):
                     for table in tables:
                         if ("enriched_events" == table.table_id):
                             logger.debug('\t{}'.format("found table"))
-                            # loop through multiple course ids
-                            for UDW_course_id in Course.objects.get_supported_courses():
+                            # loop through multiple course ids, 10 at a time
+                            for UDW_course_ids in split_list(Course.objects.get_supported_courses()):
 
                                 # query to retrieve all file access events for one course
-                                query = '''select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, "$.object.id"), 35) AS STRING) AS file_id,
-                                        SUBSTR(JSON_EXTRACT_SCALAR(event, "$.membership.member.id"), 29) AS user_id,
+                                query = """select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS file_id,
+                                        SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS user_id,
                                         datetime(EVENT_TIME) as access_time
                                         FROM event_store.events
-                                        where JSON_EXTRACT_SCALAR(event, "$.edApp.id") = \'http://umich.instructure.com/\'
-                                        and type = \'NavigationEvent\'
-                                        and JSON_EXTRACT_SCALAR(event, "$.object.name") = \'attachment\'
-                                        and JSON_EXTRACT_SCALAR(event, "$.action") = \'NavigatedTo\'
-                                        and JSON_EXTRACT_SCALAR(event, "$.membership.member.id") is not null
-                                        and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) = @course_id
-                                        '''
+                                        where JSON_EXTRACT_SCALAR(event, '$.edApp.id') = 'http://umich.instructure.com/'
+                                        and type = 'NavigationEvent'
+                                        and JSON_EXTRACT_SCALAR(event, '$.object.name') = 'attachment'
+                                        and JSON_EXTRACT_SCALAR(event, '$.action') = 'NavigatedTo'
+                                        and JSON_EXTRACT_SCALAR(event, '$.membership.member.id') is not null
+                                        and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) IN UNNEST(@course_ids)
+                                        """
                                 logger.debug(query)
+                                logger.debug(UDW_course_ids)
                                 query_params =[
-                                    bigquery.ScalarQueryParameter('course_id', 'STRING', UDW_course_id),
+                                    bigquery.ArrayQueryParameter('course_ids', 'STRING', UDW_course_ids),
                                 ]
                                 job_config = bigquery.QueryJobConfig()
                                 job_config.query_parameters = query_params
@@ -263,7 +268,7 @@ class DashboardCronJob(CronJobBase):
                                 # write to MySQL
                                 df.to_sql(con=engine, name='file_access', if_exists='append', index=False)
 
-                                returnString += str(df.shape[0]) + " rows for course " + UDW_course_id + "\n"
+                                returnString += str(df.shape[0]) + " rows for courses " + ",".join(UDW_course_ids) + "\n"
                                 logger.info(returnString)
 
         else:
