@@ -8,6 +8,8 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -202,13 +204,18 @@ class CourseViewOption(models.Model):
         :rtype: Dict
         """
 
-        return {
-            self.course.canvas_id: {
-                'fa': int(self.show_files_accessed),
-                'ap': int(self.show_assignment_planning),
-                'gd': int(self.show_grade_distribution),
+        try:
+            return {
+                self.course.canvas_id: {
+                    'fa': int(self.show_files_accessed),
+                    'ap': int(self.show_assignment_planning),
+                    'gd': int(self.show_grade_distribution),
+                }
             }
-        }
+        except ObjectDoesNotExist:
+            logger.warn(f"CourseViewOption does not exist in Course table, skipping")
+            return ""
+
 
 class File(models.Model):
     id = models.CharField(primary_key=True, max_length=255, verbose_name="File Id")

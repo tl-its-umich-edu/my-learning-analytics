@@ -26,7 +26,10 @@ services:
       - ./mysql:/docker-entrypoint-initdb.d/:ro
     container_name: student_dashboard_mysql
   web:
-    build: .
+    build:
+      context: .
+      args:
+        TZ: ${TZ}
     command: bash -c "./start.sh"
     volumes:
       - .:/code
