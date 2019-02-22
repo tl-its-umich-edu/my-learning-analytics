@@ -39,7 +39,8 @@ RUN yarn global add wait-port@"~0.2.2" && \
 COPY mysql/init.sql /docker-entrypoint-initdb.d
 
 # Sets the local timezone of the docker image
-ENV TZ=America/Detroit
+ARG TZ
+ENV TZ ${TZ:-America/Detroit}
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 CMD ["/start.sh"]
