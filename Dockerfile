@@ -20,8 +20,8 @@ COPY start.sh /start.sh
 
 # EXPOSE port 5000 to allow communication to/from server
 EXPOSE 5000
-WORKDIR /dashboard/
-COPY . /dashboard/
+WORKDIR /code/
+COPY . /code/
 
 COPY manage.py /manage.py
 
@@ -31,7 +31,7 @@ COPY data/* /data/
 RUN yarn global add wait-port@"~0.2.2" && \
     yarn install && \ 
 # This is needed to clean up the examples files as these cause collectstatic to fail (and take up extra space)
-    find /usr/lib/node_modules /dashboard/node_modules -type d -name "examples" -print0 | xargs -0 rm -rf && \
+    find /usr/lib/node_modules /code/node_modules -type d -name "examples" -print0 | xargs -0 rm -rf && \
 # This DJANGO_SECRET_KEY is set here just so collectstatic runs with an empty key. It can be set to anything
     echo yes | DJANGO_SECRET_KEY="collectstatic" python manage.py collectstatic --verbosity 0
 

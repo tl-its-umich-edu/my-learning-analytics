@@ -112,7 +112,7 @@ This will remove everything! (images, containers, volumes)
     then install a text editor like vim
     `apt-get -y install vim`
 
-Then you can edit your files! (Probably in /dashboard/dashboard)
+Then you can edit your files! (Probably in /code/dashboard)
 
 2. Restart the gunicorn to read the configuration. This is useful to avoid a redeploy.
 

@@ -118,5 +118,6 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+.data/
 .data
 node_modules
