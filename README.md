@@ -129,3 +129,7 @@ Then you can edit your files! (Probably in /dashboard/dashboard)
     A few variables are available to be defined in the .env file to enable this but minimally you have to set PTVSD_DEBUG=True. Currently docker-compose.yml opens 2 ports that can be used current, 3000 and 3001. If you need more you can open them.
 
     If you want to conenct to the cron job you'll have to use a different port as Django uses 3000 by default and also wait for attach.
+
+## License check
+
+MyLA is licenced under Apache v2.0. There is a file myla_licence_compat.ini that can be used with [Python Licence Check](https://github.com/dhatim/python-license-check) to check any new dependencies and their licences.
