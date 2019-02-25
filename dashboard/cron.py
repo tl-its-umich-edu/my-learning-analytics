@@ -124,26 +124,16 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         for UDW_course_id in Course.objects.get_supported_courses():
 
-            # select all student registered for the course
-            user_sql = f"""select u.name AS name, 
-                        p.sis_user_id AS sis_id, 
-                        p.unique_name AS sis_name, 
-                        u.global_canvas_id AS id, 
-                        c.current_score AS current_grade, 
-                        c.final_score AS final_grade, 
-                        '{UDW_course_id}' as course_id 
-                        from user_dim u, 
-                        pseudonym_dim p, 
-                        course_score_fact c, 
-                        (select e.user_id as user_id, e.id as enrollment_id from enrollment_dim e 
-                        where e.course_id = '{UDW_course_id}' 
-                        and e.type='StudentEnrollment' 
-                        and e.workflow_state='active' ) as e 
-                        where p.user_id=u.id 
-                        and u.id = e.user_id 
-                        and c.enrollment_id =  e.enrollment_id 
-                        and p.sis_user_id is not null
-                        """
+
+            user_sql=f"""with
+  enroll_data as  (select id as enroll_id, user_id from enrollment_dim where course_id='{UDW_course_id}' and type = 'StudentEnrollment' and workflow_state= 'active'),
+  user_info as ( select p.unique_name,p.sis_user_id, u.name, u.id as user_id, u.global_canvas_id from pseudonym_dim p join user_dim u on u.id = p.user_id where p.sis_user_id is not null),
+  user_enroll as (select u.unique_name, u.sis_user_id, u.name, u.user_id, e.enroll_id, u.global_canvas_id from enroll_data e join user_info u on e.user_id= u.user_id),
+  course_fact as (select enrollment_id, current_score, final_score from course_score_fact where course_id='{UDW_course_id}'),
+  final as (select u.global_canvas_id as id,u.name, u.sis_user_id as sis_id, u.unique_name as sis_name,'{UDW_course_id}' as course_id, c.current_score as current_grade, c.final_score as final_grade
+             from user_enroll u left join course_fact c on u.enroll_id= c.enrollment_id)
+      select * from final
+                      """
             logger.debug(user_sql)
 
             status += util_function(UDW_course_id, user_sql, 'user')
