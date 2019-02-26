@@ -33,7 +33,7 @@ import watchman.views
 
 urlpatterns = [
     url(r'^$', 
-        cache_page(settings.CLIENT_CACHE_TIME)(TemplateView.as_view(template_name='home.html')), name = 'home'),
+        TemplateView.as_view(template_name='home.html'), name = 'home'),
     url(r'^status/', include('watchman.urls')),
     url(r'^status/bare_status$', watchman.views.bare_status),
 
@@ -50,15 +50,15 @@ urlpatterns = [
     # Thse URL's are data patterns
     # GET access patterns
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/grade_distribution', 
-        cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.grade_distribution)), name='grade_distribution'),
+        login_required(views.grade_distribution), name='grade_distribution'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/file_access_within_week', 
-        cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.file_access_within_week)), name='file_access_within_week'),
+        login_required(views.file_access_within_week), name='file_access_within_week'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignments', 
-        cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.assignments)), name='assignments'),
+        login_required(views.assignments), name='assignments'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/get_user_default_selection', 
-        (login_required(views.get_user_default_selection)), name='get_user_default_selection'),
+        login_required(views.get_user_default_selection), name='get_user_default_selection'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/info', 
-        cache_page(settings.CLIENT_CACHE_TIME)(login_required(views.get_course_info)), name='get_course_info'),
+        login_required(views.get_course_info), name='get_course_info'),
     # This is a public view of the courses we have enabled
     url(r'^api/v1/courses_enabled', 
         cache_page(settings.CLIENT_CACHE_TIME)(views.courses_enabled), name='courses_enabled'),
@@ -88,7 +88,11 @@ else:
         url(r'^accounts/logout', auth_views.LoginView.as_view(), name='logout'),
      )
 
- 
+if apps.is_installed('django_lti_auth'):
+    urlpatterns += (
+        url(r'^lti/', include('django_lti_auth.urls')),
+    )
+
 if apps.is_installed('registration'):
     urlpatterns += (
         # This URL *does* need a trailing slash because of the include

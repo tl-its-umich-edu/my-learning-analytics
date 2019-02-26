@@ -8,6 +8,8 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -183,11 +185,16 @@ class CourseViewOption(models.Model):
     show_grade_distribution = models.BooleanField(blank=False, null=False, verbose_name="Show Grade Distribution View")
 
     def __str__(self):
-        return f"Course options for {self.course}"
+        retval = ""
+        if self.show_files_accessed: retval += "Files Accessed\n"
+        if self.show_assignment_planning: retval += "Assignment Planning\n"
+        if self.show_grade_distribution: retval += "Grade Distribution\n"
+        return retval
 
     class Meta:
         managed = False
         db_table = 'course_view_option'
+        verbose_name = "Course View Option"
     
     def json(self):
         """Format the json output that we want for this record
@@ -197,13 +204,18 @@ class CourseViewOption(models.Model):
         :rtype: Dict
         """
 
-        return {
-            self.course.canvas_id: {
-                'fa': int(self.show_files_accessed),
-                'ap': int(self.show_assignment_planning),
-                'gd': int(self.show_grade_distribution),
+        try:
+            return {
+                self.course.canvas_id: {
+                    'fa': int(self.show_files_accessed),
+                    'ap': int(self.show_assignment_planning),
+                    'gd': int(self.show_grade_distribution),
+                }
             }
-        }
+        except ObjectDoesNotExist:
+            logger.warn(f"CourseViewOption does not exist in Course table, skipping")
+            return ""
+
 
 class File(models.Model):
     id = models.CharField(primary_key=True, max_length=255, verbose_name="File Id")
