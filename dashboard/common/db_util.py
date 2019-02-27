@@ -43,9 +43,9 @@ def get_course_view_options (course_id):
             row = cursor.fetchone()
             if (row != None):
                 course_view_option = {}
-                course_view_option['show_files_accessed'] = row[0]
-                course_view_option['show_assignment_planning'] = row[1]
-                course_view_option['show_grade_distribution'] = row[2]
+                course_view_option['show_files_accessed'] = row[0] and 'show_files_accessed' not in settings.VIEWS_DISABLED
+                course_view_option['show_assignment_planning'] = row[1] and 'show_assignment_planning' not in settings.VIEWS_DISABLED
+                course_view_option['show_grade_distribution'] = row[2] and 'show_grade_distribution' not in settings.VIEWS_DISABLED
     return course_view_option
 
 def get_default_user_course_id(user_id):

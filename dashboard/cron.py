@@ -59,7 +59,7 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
         raise
 
     # returns the row size of dataframe
-    return f"inserted + {str(df.shape[0])} rows in table {mysql_table} for course {UDW_course_id}\n"
+    return f"{str(df.shape[0])} {mysql_table} : {UDW_course_id}\n"
 
 # execute database query
 def executeDbQuery(query):
@@ -72,7 +72,7 @@ def deleteAllRecordInTable(tableName):
     # delete all records in the table first
     executeDbQuery(f"delete from {tableName}")
 
-    return "records removed from " + tableName + "\n"
+    return f"delete : {tableName}\n"
 
 # cron job to populate course and user tables
 class DashboardCronJob(CronJobBase):
@@ -209,6 +209,7 @@ class DashboardCronJob(CronJobBase):
         datasets = list(bigquery_client.list_datasets())
         project = bigquery_client.project
 
+        total_bytes_billed = 0
         # list all datasets
         if datasets:
             logger.debug('Datasets in project {}:'.format(project))
@@ -223,7 +224,6 @@ class DashboardCronJob(CronJobBase):
                     for table in tables:
                         if ("enriched_events" == table.table_id):
                             logger.debug('\t{}'.format("found table"))
-
                             # loop through multiple course ids
                             for UDW_course_id in Course.objects.get_supported_courses():
 
@@ -247,7 +247,10 @@ class DashboardCronJob(CronJobBase):
                                 job_config.query_parameters = query_params
 
                                 # Location must match that of the dataset(s) referenced in the query.
-                                df = bigquery_client.query(query, location='US', job_config=job_config).to_dataframe()
+                                bq_query = bigquery_client.query(query, location='US', job_config=job_config)
+                                #bq_query.result()
+                                df = bq_query.to_dataframe()
+                                total_bytes_billed += bq_query.total_bytes_billed
 
                                 logger.debug("df row number=" + str(df.shape[0]))
                                 # drop duplicates
@@ -262,8 +265,12 @@ class DashboardCronJob(CronJobBase):
                                 logger.info(returnString)
 
         else:
-            returnString += "BigQuery project does not contain any datasets."
+            status += "BQ project does not contain any datasets.\n"
 
+        total_tbytes_billed = total_bytes_billed / 1024 / 1024 / 1024 / 1024
+        # $5 per TB as of Feb 2019 https://cloud.google.com/bigquery/pricing
+        total_tbytes_price = round(5 * total_tbytes_billed, 2)
+        status +=(f"TBytes billed for BQ: {total_tbytes_billed} = ${total_tbytes_price}\n")
         return status
 
     def update_groups(self):
@@ -380,47 +387,47 @@ class DashboardCronJob(CronJobBase):
         return status
 
     def do(self):
-        logger.info("************ dashboard cron tab")
+        logger.info("** dashboard cron tab")
 
         status = ""
 
-        status += "Start cron at: " +  str(datetime.datetime.now()) + "\n"
+        status += "Start cron: " +  str(datetime.datetime.now()) + "\n"
 
         invalid_course_id_list = self.verify_course_ids()
         logger.debug(f"invalid id {invalid_course_id_list}")
         if len(invalid_course_id_list) > 0:
             # error out and stop cron job
             status += f"ERROR: Those course ids are invalid: {invalid_course_id_list}\n"
-            status += "End cron at: " +  str(datetime.datetime.now()) + "\n"
+            status += "End cron: " +  str(datetime.datetime.now()) + "\n"
             logger.info("************ total status=" + status + "/n/n")
-            return status
+            return (status,)
 
         # continue cron tasks
 
-        logger.info("************ term")
+        logger.info("** term")
         status += self.update_with_udw_term()
 
-        logger.info("************ user")
+        logger.info("** user")
         status += self.update_with_udw_user()
 
-
-        logger.info("************ file")
-        status += self.update_with_udw_file()
-        status += self.update_with_bq_access()
-
-        logger.info("************ assignment")
+        logger.info("** assignment")
         status += self.update_groups()
         status += self.update_assignment()
 
         status += self.submission()
         status += self.weight_consideration()
+        
+        logger.info("** file")
+        if 'show_files_accessed' not in settings.VIEWS_DISABLED:
+            status += self.update_with_udw_file()
+            status += self.update_with_bq_access()
 
-        logger.info("************ informational")
+        logger.info("** informational")
         status += self.update_unizin_metadata()
 
-        status += "End cron at: " +  str(datetime.datetime.now()) + "\n"
+        status += "End cron: " +  str(datetime.datetime.now()) + "\n"
 
-        logger.info("************ total status=" + status + "/n/n")
+        logger.info("************ total status=" + status + "\n")
 
         return status
 

@@ -23,7 +23,35 @@ The bq_cred.json is service account for Big Query, it needs to be supplied and p
 	student-dashboard-saml.key
 	student-dashboard-saml.pem
 
-## Docker commands for deploying the app
+# Control course view options
+
+View options can be controlled at the global and course level. If a view is disabled globally, it will be disabled for each course, even if previously enabled at the course level. If a view is not globally disabled, it can still be disabled at the course level.
+
+`VIEWS_DISABLED` comma delimited list of views to disable (default empty). The expected name of the view is the same as the view's column name in the `course_view_option` table. Example value of `show_files_accessed,show_grade_distribution` will disable both the Files Accessed and Grade Distribution views.
+
+Note that by default all views are enabled when a course is added.
+
+# LTI v1.1.1 Configuration
+
+Only basic LTI launches are supported at the moment (automatic account creation and redirection to the correct course). New courses are not added nor are course view options modified.
+
+The relative LTI launch url is `/lti/auth/` (ex: `https://example.com/lti/auth`).
+
+Environment variables:
+
+`STUDENT_DASHBOARD_LTI`: Set to True to enable LTI (default false).
+
+`PYLTI_CONFIG_CONSUMERS`: JSON string of supported LTI Consumers (default none). Formated `{ "LTI_CONSUMER_KEY_1": { "secret": "LTI_CONSUMER_SECRET_1" } }`.
+
+`LTI_PERSON_SOURCED_ID_FIELD`: LTI launch field containing the user's SIS ID (default: `lis_person_sourcedid`). Useful for retrieving SIS ID from custom LTI launch fields if `lis_person_sourcedid` is not available.
+
+`LTI_EMAIL_FIELD`: LTI launch field containing the user's email address (default: `lis_person_contact_email_primary`). Useful for retrieving email from custom LTI launch fields if `lis_person_contact_email_primary` is not available.
+
+`LTI_EMAIL_FIELD`: LTI launch field containing the user's email address (default: `lis_person_contact_email_primary`).
+
+`LTI_CANVAS_COURSE_ID_FIELD`: LTI launch field containing the course's canvas id (default: `custom_canvas_course_id`).
+
+# Docker commands for deploying the app
 1. Tear down running application and db instances:
 `docker-compose down`
 2. Build the application:
@@ -93,7 +121,7 @@ After about 30-60 seconds the crons should all run and you should have data! In 
 1. login as `mysql -u <user> -p`
 2. `use student_dashboard`
 
-The MySQL container is exposed on port 5306. You can connect to it from your localhost.
+    The MySQL container is exposed on port 5306. You can connect to it from your localhost.
 
 ## Clean outdated docker images
 The docker artifacts will take up more disk spaces as time goes on, you can clean up docker containers, networks images and optionally volumes using the command below.
@@ -107,18 +135,29 @@ This will remove everything! (images, containers, volumes)
 
 1. Connect to the docker and edit some files!
 
-`docker exec -it student_dashboard /bin/bash`
-then install a text editor like vim
-`apt-get -y install vim`
+    `docker exec -it student_dashboard /bin/bash`
 
-Then you can edit your files! (Probably in /dashboard/dashboard)
+    then install a text editor like vim
+    `apt-get -y install vim`
+
+Then you can edit your files! (Probably in /code/dashboard)
 
 2. Restart the gunicorn to read the configuration. This is useful to avoid a redeploy.
 
-`docker exec student_dashboard pkill -HUP gunicorn`
+    `docker exec student_dashboard pkill -HUP gunicorn`
 
 3. The django-debug-toolbar is available for debugging. For this to be displayed.
   - The environment needs to be DEBUG (set DJANGO_DEBUG=true in your .env)
   - You have to be authenticated and a "super user" account. See step #1
   - The method that controls this access is in show_debug_toolbar(request):
   - Configuration of the panels is in DEBUG_TOOLBAR_PANELS as described on https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-panels
+
+4. VsCode is supported via PTVSD for debugging the code running in Docker. See this information here for details https://code.visualstudio.com/docs/python/debugging#_remote-debugging
+
+    A few variables are available to be defined in the .env file to enable this but minimally you have to set PTVSD_DEBUG=True. Currently docker-compose.yml opens 2 ports that can be used current, 3000 and 3001. If you need more you can open them.
+
+    If you want to conenct to the cron job you'll have to use a different port as Django uses 3000 by default and also wait for attach.
+
+## License check
+
+MyLA is licenced under Apache v2.0. There is a file myla_licence_compat.ini that can be used with [Python Licence Check](https://github.com/dhatim/python-license-check) to check any new dependencies and their licences.

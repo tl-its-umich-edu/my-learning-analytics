@@ -88,7 +88,11 @@ else:
         url(r'^accounts/logout', auth_views.LoginView.as_view(), name='logout'),
      )
 
- 
+if apps.is_installed('django_lti_auth'):
+    urlpatterns += (
+        url(r'^lti/', include('django_lti_auth.urls')),
+    )
+
 if apps.is_installed('registration'):
     urlpatterns += (
         # This URL *does* need a trailing slash because of the include

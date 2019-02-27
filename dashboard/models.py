@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.conf import settings
 import logging
 logger = logging.getLogger(__name__)
 
@@ -178,16 +179,23 @@ class Course(models.Model):
 
 class CourseViewOption(models.Model):
     course = models.OneToOneField(Course, on_delete=models.CASCADE, primary_key=True, verbose_name="Course View Option Id")
-    show_files_accessed = models.BooleanField(blank=False, null=False, verbose_name="Show Files Accessed View")
-    show_assignment_planning = models.BooleanField(blank=False, null=False, verbose_name="Show Assignment Planning View")
-    show_grade_distribution = models.BooleanField(blank=False, null=False, verbose_name="Show Grade Distribution View")
+    show_files_accessed = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Files Accessed View")
+    show_assignment_planning = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Assignment Planning View")
+    show_grade_distribution = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Grade Distribution View")
+
+    VIEWS = ['show_files_accessed', 'show_assignment_planning', 'show_grade_distribution']
 
     def __str__(self):
-        return f"Course options for {self.course}"
+        retval = ""
+        if self.show_files_accessed and 'show_files_accessed' not in settings.VIEWS_DISABLED: retval += "Files Accessed\n"
+        if self.show_assignment_planning and 'show_assignment_planning' not in settings.VIEWS_DISABLED: retval += "Assignment Planning\n"
+        if self.show_grade_distribution and 'show_grade_distribution' not in settings.VIEWS_DISABLED: retval += "Grade Distribution\n"
+        return retval
 
     class Meta:
         managed = False
         db_table = 'course_view_option'
+        verbose_name = "Course View Option"
     
     def json(self):
         """Format the json output that we want for this record
@@ -197,13 +205,18 @@ class CourseViewOption(models.Model):
         :rtype: Dict
         """
 
-        return {
-            self.course.canvas_id: {
-                'fa': int(self.show_files_accessed),
-                'ap': int(self.show_assignment_planning),
-                'gd': int(self.show_grade_distribution),
+        try:
+            return {
+                self.course.canvas_id: {
+                    'fa': int(self.show_files_accessed and 'show_files_accessed' not in settings.VIEWS_DISABLED),
+                    'ap': int(self.show_assignment_planning and 'show_assignment_planning' not in settings.VIEWS_DISABLED),
+                    'gd': int(self.show_grade_distribution and 'show_grade_distribution' not in settings.VIEWS_DISABLED),
+                }
             }
-        }
+        except ObjectDoesNotExist:
+            logger.warn(f"CourseViewOption does not exist in Course table, skipping")
+            return ""
+
 
 class File(models.Model):
     id = models.CharField(primary_key=True, max_length=255, verbose_name="File Id")
