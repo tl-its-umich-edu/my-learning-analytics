@@ -184,10 +184,8 @@ class DashboardCronJob(CronJobBase):
 
         #select file record from UDW
         for UDW_course_id in Course.objects.get_supported_courses():
-            file_sql = f"""select concat({settings.UDW_FILE_ID_PREFIX}, canvas_id) as ID, display_name as NAME, course_id as COURSE_ID from file_dim
-                        where file_state ='available' 
-                        and course_id='{UDW_course_id}'
-                        order by canvas_id
+            file_sql = f"""select id, display_name as name,course_id as COURSE_ID from file_dim where file_state ='available' 
+                           and course_id='{UDW_course_id}'
                         """
 
             status += util_function(UDW_course_id, file_sql, 'file')
