@@ -228,7 +228,8 @@ class DashboardCronJob(CronJobBase):
                     for table in tables:
                         if ("enriched_events" == table.table_id):
                             logger.debug('\t{}'.format("found table"))
-                            # loop through multiple course ids, 10 at a time
+                            # loop through multiple course ids, 20 at a time 
+                            # (This is set by the CRON_BQ_IN_LIMIT from settings)
                             for udw_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
 
                                 # query to retrieve all file access events for one course
