@@ -187,9 +187,9 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("file")
 
         #select file record from UDW
-        for UDW_course_id in Course.objects.get_supported_courses():
+        for udw_course_id in Course.objects.get_supported_courses():
             file_sql = f"""select id, display_name as name,course_id as COURSE_ID from file_dim where file_state ='available' 
-                           and course_id='{UDW_course_id}'
+                           and course_id='{udw_course_id}'
                         """
 
             status += util_function(udw_course_id, file_sql, 'file')
