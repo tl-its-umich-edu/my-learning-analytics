@@ -210,65 +210,49 @@ class DashboardCronJob(CronJobBase):
         # Instantiates a client
         bigquery_client = bigquery.Client()
 
-        datasets = list(bigquery_client.list_datasets())
-        project = bigquery_client.project
-
+        # BQ Total Bytes Billed to report to status
         total_bytes_billed = 0
-        # list all datasets
-        if datasets:
-            logger.debug('Datasets in project {}:'.format(project))
-            for dataset in datasets:
-                logger.debug('\t{}'.format(dataset.dataset_id))
 
-                # choose the right dataset
-                if ("learning_datasets" == dataset.dataset_id):
-                    # list all tables
-                    dataset_ref = bigquery_client.dataset(dataset.dataset_id)
-                    tables = list(bigquery_client.list_tables(dataset_ref))
-                    for table in tables:
-                        if ("enriched_events" == table.table_id):
-                            logger.debug('\t{}'.format("found table"))
-                            # loop through multiple course ids, 20 at a time 
-                            # (This is set by the CRON_BQ_IN_LIMIT from settings)
-                            for udw_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
+        # loop through multiple course ids, 20 at a time
+        # (This is set by the CRON_BQ_IN_LIMIT from settings)
+        for udw_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
+            # query to retrieve all file access events for one course
+            query = """select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS file_id,
+                    SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS user_id,
+                    datetime(EVENT_TIME) as access_time
+                    FROM event_store.events
+                    where JSON_EXTRACT_SCALAR(event, '$.edApp.id') = 'http://umich.instructure.com/'
+                    and type = 'NavigationEvent'
+                    and JSON_EXTRACT_SCALAR(event, '$.object.name') = 'attachment'
+                    and JSON_EXTRACT_SCALAR(event, '$.action') = 'NavigatedTo'
+                    and JSON_EXTRACT_SCALAR(event, '$.membership.member.id') is not null
+                    and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) IN UNNEST(@course_ids)
+                    """
+            logger.debug(query)
+            logger.debug(udw_course_ids)
+            query_params = [
+                bigquery.ArrayQueryParameter('course_ids', 'STRING', udw_course_ids),
+            ]
+            job_config = bigquery.QueryJobConfig()
+            job_config.query_parameters = query_params
 
-                                # query to retrieve all file access events for one course
-                                query = """select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS file_id,
-                                        SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS user_id,
-                                        datetime(EVENT_TIME) as access_time
-                                        FROM event_store.events
-                                        where JSON_EXTRACT_SCALAR(event, '$.edApp.id') = 'http://umich.instructure.com/'
-                                        and type = 'NavigationEvent'
-                                        and JSON_EXTRACT_SCALAR(event, '$.object.name') = 'attachment'
-                                        and JSON_EXTRACT_SCALAR(event, '$.action') = 'NavigatedTo'
-                                        and JSON_EXTRACT_SCALAR(event, '$.membership.member.id') is not null
-                                        and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) IN UNNEST(@course_ids)
-                                        """
-                                logger.debug(query)
-                                logger.debug(udw_course_ids)
-                                query_params =[
-                                    bigquery.ArrayQueryParameter('course_ids', 'STRING', udw_course_ids),
-                                ]
-                                job_config = bigquery.QueryJobConfig()
-                                job_config.query_parameters = query_params
+            # Location must match that of the dataset(s) referenced in the query.
+            bq_query = bigquery_client.query(query, location='US', job_config=job_config)
+            #bq_query.result()
+            df = bq_query.to_dataframe()
+            total_bytes_billed += bq_query.total_bytes_billed
 
-                                # Location must match that of the dataset(s) referenced in the query.
-                                bq_query = bigquery_client.query(query, location='US', job_config=job_config)
-                                #bq_query.result()
-                                df = bq_query.to_dataframe()
-                                total_bytes_billed += bq_query.total_bytes_billed
+            logger.debug("df row number=" + str(df.shape[0]))
+            # drop duplicates
+            df.drop_duplicates(["file_id", "user_id", "access_time"], keep='first', inplace=True)
 
-                                logger.debug("df row number=" + str(df.shape[0]))
-                                # drop duplicates
-                                df.drop_duplicates(["file_id", "user_id", "access_time"], keep='first', inplace=True)
+            logger.debug("after drop duplicates, df row number=" + str(df.shape[0]))
 
-                                logger.debug("after drop duplicates, df row number=" + str(df.shape[0]))
+            # write to MySQL
+            df.to_sql(con=engine, name='file_access', if_exists='append', index=False)
 
-                                # write to MySQL
-                                df.to_sql(con=engine, name='file_access', if_exists='append', index=False)
-
-                                return_string += str(df.shape[0]) + " rows for courses " + ",".join(udw_course_ids) + "\n"
-                                logger.info(return_string)
+            return_string += str(df.shape[0]) + " rows for courses " + ",".join(udw_course_ids) + "\n"
+            logger.info(return_string)
 
         else:
             status += "BQ project does not contain any datasets.\n"
