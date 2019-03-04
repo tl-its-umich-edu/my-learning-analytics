@@ -11,6 +11,13 @@ class CourseInline(admin.TabularInline):
 class CourseViewOptionInline(admin.StackedInline):
     model = CourseViewOption
 
+    exclude = ()
+
+    # exclude disabled views
+    for view in CourseViewOption.VIEWS:
+        if view in settings.VIEWS_DISABLED:
+            exclude += (view,)
+
 class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseViewOptionInline,]
     list_display = ('name', 'term_id','_courseviewoption')
