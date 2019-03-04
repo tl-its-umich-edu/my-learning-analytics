@@ -217,6 +217,7 @@ class DashboardCronJob(CronJobBase):
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
         for udw_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
             # query to retrieve all file access events for one course
+            # There is no catch if this query fails, event_store.events needs to exist
             query = """select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS file_id,
                     SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS user_id,
                     datetime(EVENT_TIME) as access_time
@@ -253,9 +254,6 @@ class DashboardCronJob(CronJobBase):
 
             return_string += str(df.shape[0]) + " rows for courses " + ",".join(udw_course_ids) + "\n"
             logger.info(return_string)
-
-        else:
-            status += "BQ project does not contain any datasets.\n"
 
         total_tbytes_billed = total_bytes_billed / 1024 / 1024 / 1024 / 1024
         # $5 per TB as of Feb 2019 https://cloud.google.com/bigquery/pricing
