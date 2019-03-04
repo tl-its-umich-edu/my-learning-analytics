@@ -135,14 +135,14 @@ def file_access_within_week(request, course_id=0):
 
     # get time range based on week number passed in via request
 
-    sqlString = "SELECT a.file_id as file_id, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id " \
-                "FROM file f, file_access a, user u, course c, academic_terms t  " \
-                "WHERE a.file_id =f.ID and a.user_id = u.ID  " \
-                "and f.course_id = c.id and c.term_id = t.id " \
-                "and a.access_time > %(start_time)s " \
-                "and a.access_time < %(end_time)s " \
-                "and f.course_id = %(course_id)s " \
-                "and u.course_id = %(course_id)s "
+    sqlString = f"""SELECT a.file_id as file_id, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id
+                    FROM file f, file_access a, user u, course c, academic_terms t
+                    WHERE a.file_id =f.ID and a.user_id = u.ID
+                    and f.course_id = c.id and c.term_id = t.id
+                    and a.access_time > %(start_time)s
+                    and a.access_time < %(end_time)s
+                    and f.course_id = %(course_id)s
+                    and u.course_id = %(course_id)s """
 
     startTimeString = start.strftime('%Y%m%d') + "000000"
     endTimeString = end.strftime('%Y%m%d') + "000000"
