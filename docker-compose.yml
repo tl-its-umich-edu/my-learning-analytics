@@ -1,4 +1,4 @@
-version: '2'
+version: '3.7'
 
 services:
 
@@ -19,8 +19,6 @@ services:
       args:
         TZ: ${TZ}
     command: bash -c "./start.sh"
-    env_file:
-        - .env
     volumes:
       - .:/code
       # use the container's node_modules folder (don't override)
@@ -32,6 +30,19 @@ services:
       - "3001:3001"
     depends_on:
       - mysql
+      - webpack_watcher
+    env_file:
+      - .env
     environment:
       - GUNICORN_RELOAD=True
     container_name: student_dashboard
+  webpack_watcher:
+    build:
+      context: .
+      target: node-webpack
+    command: npm run watch
+    volumes:
+      - .:/usr/src/app
+      # use the container's node_modules folder (don't override)
+      - /usr/src/app/node_modules/
+    container_name: webpack_watcher

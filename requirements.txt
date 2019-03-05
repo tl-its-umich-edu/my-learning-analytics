@@ -39,3 +39,4 @@ pinax-eventlog>=2.0.3,<2.99
 ptvsd>=4.2.0,<4.2.99
 django-ptvsd-debug==1.0.3
 django-lti-auth==1.0.0
+django-webpack-loader==0.6.0

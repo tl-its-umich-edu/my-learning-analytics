@@ -122,3 +122,5 @@ dmypy.json
 .data/
 .data
 node_modules
+
+webpack-stats.json
