@@ -2,15 +2,140 @@
   "name": "dashboard",
   "version": "0.0.1",
   "dependencies": {
-    "angular":"1.7.3",
-    "angular-resource":"1.7.3",
-    "d3": "~3.5",
+    "@justin0022/emoji-feedback": "^1.1.1",
+    "@material-ui/core": "^3.9.2",
+    "@material-ui/icons": "^3.0.2",
+    "angular": "1.7.3",
+    "angular-resource": "1.7.3",
+    "bfj": "6.1.1",
+    "bootstrap": "~4.1.3",
+    "d3": "^5.9.0",
     "d3-v4": "npm:d3@~4",
-    "d3-tip":"~0.9.1",
+    "d3-sankey": "^0.7.1",
+    "d3-tip": "^0.9.1",
     "jquery": "~3.3.1",
-    "underscore":"",
-    "bootstrap": "~4.3.1",
-	"popper.js":"^1.14.3",
-    "moment":""
+    "moment": "",
+    "popper.js": "^1.14.3",
+    "react": "^16.8.4",
+    "react-app-polyfill": "^0.2.1",
+    "react-dev-utils": "^7.0.3",
+    "react-dom": "^16.8.4",
+    "react-router-dom": "^4.3.1",
+    "underscore": "",
+    "victory": "^32.0.0"
+  },
+  "babel": {
+    "presets": [
+      "react-app"
+    ]
+  },
+  "scripts": {
+    "prod": "BABEL_ENV=production webpack --config webpack.config.js --mode production",
+    "build": "BABEL_ENV=development webpack --config webpack.config.js --mode development --display-error-details",
+    "watch": "BABEL_ENV=development webpack --config webpack.config.js --watch --mode development --display-error-details"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!src/**/*.d.ts"
+    ],
+    "resolver": "jest-pnp-resolver",
+    "setupFiles": [
+      "react-app-polyfill/jsdom"
+    ],
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "<rootDir>/src/**/?(*.)(spec|test).{js,jsx,ts,tsx}"
+    ],
+    "testEnvironment": "jsdom",
+    "testURL": "http://localhost",
+    "transform": {
+      "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
+      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
+      "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
+    },
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$",
+      "^.+\\.module\\.(css|sass|scss)$"
+    ],
+    "moduleNameMapper": {
+      "^react-native$": "react-native-web",
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+    },
+    "moduleFileExtensions": [
+      "web.js",
+      "js",
+      "web.ts",
+      "ts",
+      "web.tsx",
+      "tsx",
+      "json",
+      "web.jsx",
+      "jsx",
+      "node"
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@svgr/webpack": "^4.1.0",
+    "@webpack-cli/init": "^0.1.3",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "9.0.0",
+    "babel-loader": "^8.0.5",
+    "babel-plugin-named-asset-import": "^0.3.1",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-react-app": "^7.0.1",
+    "babel-register": "^6.26.0",
+    "case-sensitive-paths-webpack-plugin": "2.1.2",
+    "chalk": "^2.4.2",
+    "css-loader": "^1.0.0",
+    "eslint": "5.6.0",
+    "eslint-config-react-app": "^3.0.7",
+    "eslint-loader": "2.1.1",
+    "eslint-plugin-flowtype": "2.50.1",
+    "eslint-plugin-import": "2.14.0",
+    "eslint-plugin-jsx-a11y": "6.1.2",
+    "eslint-plugin-react": "7.11.1",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "file-loader": "2.0.0",
+    "fork-ts-checker-webpack-plugin-alt": "0.4.14",
+    "fs-extra": "7.0.0",
+    "html-webpack-plugin": "4.0.0-alpha.2",
+    "identity-obj-proxy": "3.0.0",
+    "jest": "^24.1.0",
+    "jest-pnp-resolver": "1.0.1",
+    "jest-resolve": "23.6.0",
+    "mini-css-extract-plugin": "0.4.3",
+    "node-sass": "^4.11.0",
+    "optimize-css-assets-webpack-plugin": "5.0.1",
+    "pnp-webpack-plugin": "1.1.0",
+    "postcss-flexbugs-fixes": "4.1.0",
+    "postcss-loader": "3.0.0",
+    "postcss-preset-env": "6.3.1",
+    "postcss-safe-parser": "4.0.1",
+    "resolve": "1.8.1",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.0",
+    "terser-webpack-plugin": "1.1.0",
+    "typeface-roboto": "0.0.54",
+    "url-loader": "1.1.1",
+    "webpack": "^4.29.6",
+    "webpack-bundle-tracker": "^0.4.2-beta",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.2.1",
+    "webpack-manifest-plugin": "2.0.4",
+    "workbox-webpack-plugin": "3.6.3"
   }
 }

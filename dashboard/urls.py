@@ -46,6 +46,8 @@ urlpatterns = [
 
     # This is the courses catch-all
     url(r'^courses/(?P<course_id>[0-9]+|)', login_required(TemplateView.as_view(template_name='courses.html')), name="courses"),
+    url(r'^test/courses/(?P<course_id>[0-9]+|)', login_required(TemplateView.as_view(template_name='frontend/index.html')), name="test"),
+
 
     # Thse URL's are data patterns
     # GET access patterns

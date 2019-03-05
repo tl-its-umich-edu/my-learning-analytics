@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'macros',
     'debug_toolbar',
     'pinax.eventlog',
+    'webpack_loader'
 ]
 
 # The order of this is important. It says DebugToolbar should be on top but
@@ -121,6 +122,18 @@ TEMPLATES = [
     },
 ]
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'assets'),
+)
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'dist/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
+}
+
 ROOT_URLCONF = 'dashboard.urls'
 
 WSGI_APPLICATION = 'dashboard.wsgi.application'
@@ -145,6 +158,17 @@ DATABASES = {
         'PASSWORD': config('DATA_WAREHOUSE_PASSWORD', default=''),
         'HOST': config('DATA_WAREHOUSE_HOST', default=''),
         'PORT': config('DATA_WAREHOUSE_PORT', default=5432, cast=int),
+    }
+}
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'dist/', # must end with slash
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'TIMEOUT': None,
+        'IGNORE': [r'.+\.hot-update.js', r'.+\.map']
     }
 }
 

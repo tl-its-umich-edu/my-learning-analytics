@@ -24,29 +24,13 @@ services:
       args:
         TZ: ${TZ}
     command: bash -c "./start.sh"
-    volumes:
-      - .:/code
-      # use the container's node_modules folder (don't override)
-      - /code/node_modules/
-      - /code/static/
     ports:
       - "5001:5000"
-      - "3000:3000"
-      - "3001:3001"
     depends_on:
       - mysql
-      - webpack_watcher
     env_file:
       - .env
     environment:
-      - GUNICORN_RELOAD=True
+      - DJANGO_DEBUG=False
+      - DEBUG=False
     container_name: student_dashboard
-  webpack_watcher:
-    build:
-      context: .
-      target: node-webpack
-    command: yarn run watch
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules/
-    container_name: webpack_watcher

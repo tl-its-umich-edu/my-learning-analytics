@@ -241,6 +241,8 @@ def file_access_within_week(request, course_id=0):
 def grade_distribution(request, course_id=0):
     logger.info(grade_distribution.__name__)
 
+    course_id = int(str(settings.UDW_ID_PREFIX) + course_id)
+
     current_user = request.user.get_username()
     grade_score_sql = "select current_grade,(select current_grade from user where sis_name=" \
                       "%(current_user)s and course_id=%(course_id)s) as current_user_grade from user where course_id=%(course_id)s"
@@ -319,6 +321,8 @@ def get_user_default_selection(request, course_id=0):
 
 def assignments(request, course_id=0):
     logger.info(assignments.__name__)
+
+    course_id = int(str(settings.UDW_ID_PREFIX) + course_id)
 
     current_user = request.user.get_username()
     df_default_display_settings()
