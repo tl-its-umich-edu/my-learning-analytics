@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  mysql:
+    image: mysql:5.7.22
+    restart: on-failure
+    environment:
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_PORT=${MYSQL_PORT}
+    entrypoint: ['docker-entrypoint.sh', '--default-authentication-plugin=mysql_native_password']
+    ports:
+      - "5306:3306"
+    volumes:
+      - ./.data/mysql:/var/lib/mysql
+      - ./mysql:/docker-entrypoint-initdb.d/:ro
+    container_name: student_dashboard_mysql
+  web:
+    build:
+      context: .
+      args:
+        TZ: ${TZ}
+    command: bash -c "./start.sh"
+    ports:
+      - "5001:5000"
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+    environment:
+      - DJANGO_DEBUG=False
+      - DEBUG=False
+    container_name: student_dashboard

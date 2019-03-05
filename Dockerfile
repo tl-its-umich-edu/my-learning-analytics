@@ -1,44 +1,57 @@
+# build react components for production mode
+FROM node:11.10-alpine AS node-webpack
+WORKDIR /usr/src/app
+
+# NOTE: package.json and webpack.config.js not likely to change between dev builds
+COPY package.json webpack.config.js /usr/src/app/
+RUN npm install
+
+# NOTE: assets/ likely to change between dev builds
+COPY assets /usr/src/app/assets
+RUN npm run prod && \
+    # src is no longer needed (saves time for collect static)
+    rm -rf /usr/src/app/assets/src
+
+
+
+
+# build node libraries for production mode
+FROM node-webpack AS node-prod-deps
+
+RUN npm install --save wait-port@"~0.2.2" && \
+    npm prune --production && \
+    # This is needed to clean up the examples files as these cause collectstatic to fail (and take up extra space)
+    find /usr/src/app/node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
+
 # FROM directive instructing base image to build upon
-FROM python:3.6
-
-COPY requirements.txt /requirements.txt
-
-RUN pip install -r /requirements.txt
-
-# Yarn is not yet in the repo, need to add it
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-
-# apt-utils needs to be installed separately
-RUN apt-get update && \ 
-    apt-get install -y --no-install-recommends vim-tiny jq nodejs yarn python3-dev xmlsec1 cron && \
-    apt-get clean -y
-
-# COPY startup script into known file location in container
-COPY start.sh /start.sh
+FROM python:3.6 AS app
 
 # EXPOSE port 5000 to allow communication to/from server
 EXPOSE 5000
-WORKDIR /code/
+WORKDIR /code
+
+# NOTE: requirements.txt not likely to change between dev builds
+COPY requirements.txt /code/requirements.txt
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends vim-tiny jq python3-dev xmlsec1 cron && \
+    apt-get clean -y && \
+    pip install -r requirements.txt
+
+# NOTE: project files likely to change between dev builds
 COPY . /code/
+# copy built react and node libraries for production mode
+COPY --from=node-prod-deps /usr/src/app/package-lock.json /code/package-lock.json
+COPY --from=node-prod-deps /usr/src/app/webpack-stats.json /code/webpack-stats.json
+COPY --from=node-prod-deps /usr/src/app/assets /code/assets
+COPY --from=node-prod-deps /usr/src/app/node_modules /code/node_modules
 
-COPY manage.py /manage.py
-
-COPY data/* /data/
-
-# Install wait-port globally, install rest from the package
-RUN yarn global add wait-port@"~0.2.2" && \
-    yarn install && \ 
-# This is needed to clean up the examples files as these cause collectstatic to fail (and take up extra space)
-    find /usr/lib/node_modules /code/node_modules -type d -name "examples" -print0 | xargs -0 rm -rf && \
 # This DJANGO_SECRET_KEY is set here just so collectstatic runs with an empty key. It can be set to anything
-    echo yes | DJANGO_SECRET_KEY="collectstatic" python manage.py collectstatic --verbosity 0
+RUN echo yes | DJANGO_SECRET_KEY="collectstatic" python manage.py collectstatic --verbosity 0
 
 # Sets the local timezone of the docker image
 ARG TZ
 ENV TZ ${TZ:-America/Detroit}
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-CMD ["/start.sh"]
+CMD ["/code/start.sh"]
 # done!

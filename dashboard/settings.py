@@ -33,9 +33,13 @@ except FileNotFoundError as fnfe:
     ENV = os.environ
 
 LOGOUT_URL = '/accounts/logout'
+LOGIN_URL = '/accounts/login'
 
 # Google Analytics ID
 GA_ID = ENV.get('GA_ID', '')
+
+# This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
+SITE_ID = 1
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
@@ -72,6 +76,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
+    'django.contrib.flatpages',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'django_cron',
@@ -79,6 +85,7 @@ INSTALLED_APPS = [
     'macros',
     'debug_toolbar',
     'pinax.eventlog',
+    'webpack_loader',
     'rules.apps.AutodiscoverRulesConfig',
 ]
 
@@ -117,16 +124,31 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django_su.context_processors.is_su',
                 'django_settings_export.settings_export',
-                'dashboard.context_processors.course_name',
                 'dashboard.context_processors.current_user_course_id',
-                'dashboard.context_processors.current_user_incremented_course_id',
-                'dashboard.context_processors.course_view_option',
+                'dashboard.context_processors.current_user_courses_info',
                 'dashboard.context_processors.last_updated',
                 'dashboard.context_processors.get_build_info',
             ],
         },
     },
 ]
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'assets'),
+)
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'dist/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
+}
+
+NPM_FILE_PATTERNS = {
+    'bootstrap': ['dist/css/*'],
+    'jquery': ['dist/jquery.min.js']
+}
 
 ROOT_URLCONF = 'dashboard.urls'
 
@@ -182,14 +204,14 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 # Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
 
-YARN_ROOT_PATH = BASE_DIR
+NPM_ROOT_PATH = BASE_DIR
 
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'yarn.finders.YarnFinder',
+    'npm.finders.NpmFinder',
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -342,6 +364,7 @@ if ENV.get('STUDENT_DASHBOARD_SAML', True):
 else:
     AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
     LOGIN_REDIRECT_URL = '/'
+    LOGOUT_REDIRECT_URL='/'
 
 # Give an opportunity to disable LTI
 if ENV.get('STUDENT_DASHBOARD_LTI', False):
