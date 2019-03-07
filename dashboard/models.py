@@ -15,6 +15,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from datetime import datetime
+from model_utils import Choices
 
 class AcademicTermsQuerySet(models.QuerySet):
     def course_date_start(self, course_id):
@@ -254,6 +255,15 @@ class UnizinMetadata(models.Model):
 
 
 class User(models.Model):
+    ENROLLMENT_TYPES = Choices(
+        ('StudentEnrollment', 'Student'),
+        #('StudentViewEnrollment', 'Student View'),
+        ('TaEnrollment', 'Teaching Assistant'),
+        ('TeacherEnrollment', 'Instructor'),
+        #('DesignerEnrollment', 'Designer'),
+        #('ObserverEnrollment', 'Observer'),
+    )
+
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
     user_id = models.CharField(null=False, blank=False, max_length=255, verbose_name="User Id")
     name = models.CharField(max_length=255, verbose_name="Name")
@@ -262,6 +272,7 @@ class User(models.Model):
     course_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="Course Id")
     current_grade = models.CharField(max_length=255, blank=True, null=True, verbose_name="Current Grade")
     final_grade = models.CharField(max_length=255, blank=True, null=True, verbose_name="Final Grade")
+    enrollment_type = models.CharField(max_length=50, choices=ENROLLMENT_TYPES, blank=True, null=True, verbose_name="Enrollment Type")
 
     def __str__(self):
         return self.name

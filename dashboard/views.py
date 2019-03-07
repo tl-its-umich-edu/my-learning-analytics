@@ -1,6 +1,5 @@
-from dashboard.models import Course, CourseViewOption
-
 from django.forms.models import model_to_dict
+from rules.contrib.views import permission_required, objectgetter
 
 import math, json, logging
 from datetime import datetime, timedelta
@@ -13,13 +12,14 @@ from django.conf import settings
 from django.contrib import auth
 from django.db import connection as conn
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from dashboard.models import AcademicTerms, UserDefaultSelection
+from dashboard.models import AcademicTerms, UserDefaultSelection, \
+    Course, CourseViewOption
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +53,31 @@ def gpa_map(grade):
     else:
         return GRADE_LOW
 
+def get_home_template(request):
+    return render(request, 'home.html')
+
+@permission_required('dashboard.get_grades_template',
+    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
+def get_grades_template(request, course_id=0):
+    return render(request, 'grades.html', {'course_id': course_id})
+
+@permission_required('dashboard.get_assignments_template',
+    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
+def get_assignments_template(request, course_id=0):
+    return render(request, 'assignments.html', {'course_id': course_id})
+
+@permission_required('dashboard.get_files_template',
+    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
+def get_files_template(request, course_id=0):
+    return render(request, 'view_file_access_within_week.html', {'course_id': course_id})
+
+@permission_required('dashboard.get_course_template',
+    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
+def get_course_template(request, course_id=0):
+    return render(request, 'courses.html', {'course_id': course_id})
+
+@permission_required('dashboard.get_course_info',
+    fn=objectgetter(Course, 'course_id'), raise_exception=True)
 def get_course_info(request, course_id=0):
     """Returns JSON data about a course
     
@@ -98,6 +123,8 @@ def get_course_info(request, course_id=0):
     return HttpResponse(json.dumps(resp, default=str))
 
 # show percentage of users who read the file within prior n weeks
+@permission_required('dashboard.file_access_within_week',
+    fn=objectgetter(Course, 'course_id'), raise_exception=True)
 def file_access_within_week(request, course_id=0):
 
     current_user=request.user.get_username()
@@ -123,7 +150,7 @@ def file_access_within_week(request, course_id=0):
 
 
     # get total number of student within the course_id
-    total_number_student_sql = "select count(*) from user where course_id = %(course_id)s"
+    total_number_student_sql = "select count(*) from user where course_id = %(course_id)s and enrollment_type='StudentEnrollment'"
     if (grade == GRADE_A):
         total_number_student_sql += " and current_grade >= 90"
     elif (grade == GRADE_B):
@@ -151,7 +178,8 @@ def file_access_within_week(request, course_id=0):
                     and a.access_time > %(start_time)s
                     and a.access_time < %(end_time)s
                     and f.course_id = %(course_id)s
-                    and u.course_id = %(course_id)s """
+                    and u.course_id = %(course_id)s
+                    and u.enrollment_type = 'StudentEnrollment' """
 
     startTimeString = start.strftime('%Y%m%d') + "000000"
     endTimeString = end.strftime('%Y%m%d') + "000000"
@@ -239,12 +267,15 @@ def file_access_within_week(request, course_id=0):
     return HttpResponse(output_df.to_json(orient='records'))
 
 
+@permission_required('dashboard.grade_distribution',
+    fn=objectgetter(Course, 'course_id'), raise_exception=True)
 def grade_distribution(request, course_id=0):
     logger.info(grade_distribution.__name__)
 
     current_user = request.user.get_username()
     grade_score_sql = "select current_grade,(select current_grade from user where sis_name=" \
-                      "%(current_user)s and course_id=%(course_id)s) as current_user_grade from user where course_id=%(course_id)s"
+                      "%(current_user)s and course_id=%(course_id)s) as current_user_grade " \
+                      "from user where course_id=%(course_id)s and enrollment_type='StudentEnrollment';"
     df = pd.read_sql(grade_score_sql, conn, params={"current_user": current_user,'course_id': course_id})
     if df.empty or df['current_grade'].isnull().all():
         return HttpResponse(json.dumps({}), content_type='application/json')
@@ -269,6 +300,8 @@ def grade_distribution(request, course_id=0):
     return HttpResponse(df.to_json(orient='records'))
 
 
+@permission_required('dashboard.update_user_default_selection_for_views',
+    fn=objectgetter(Course, 'course_id'), raise_exception=True)
 def update_user_default_selection_for_views(request, course_id=0):
     logger.info(update_user_default_selection_for_views.__name__)
     current_user = request.user.get_username()
@@ -299,6 +332,8 @@ def update_user_default_selection_for_views(request, course_id=0):
     return HttpResponse(json.dumps({key: value}),content_type='application/json')
 
 
+@permission_required('dashboard.get_user_default_selection',
+    fn=objectgetter(Course, 'course_id'), raise_exception=True)
 def get_user_default_selection(request, course_id=0):
     logger.info(get_user_default_selection.__name__)
     user_id = request.user.get_username()
@@ -318,6 +353,8 @@ def get_user_default_selection(request, course_id=0):
     return HttpResponse(result, content_type='application/json')
 
 
+@permission_required('dashboard.assignments',
+    fn=objectgetter(Course, 'course_id'), raise_exception=True)
 def assignments(request, course_id=0):
     logger.info(assignments.__name__)
 
@@ -568,6 +605,7 @@ def logout(request):
     auth.logout(request)
     return redirect(settings.LOGOUT_REDIRECT_URL)
 
+@permission_required('dashboard.courses_enabled', raise_exception=True)
 def courses_enabled(request):
     """ Returns json for all courses we currntly support and are enabled
     
