@@ -49,7 +49,7 @@ function AssignmentPlanning (props) {
     return tableArray
   }
 
-  const assignmentPlanningTable = plan => (
+  const AssignmentTable = plan => (
     <Table className={classes.table}
       tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
       tableData={generateAssignmentTable(plan)
@@ -57,7 +57,8 @@ function AssignmentPlanning (props) {
           const percentOfFinalGrade = row.pop()
           row.push(<HorizontalBar
             data={[{ label: 'grade', data: percentOfFinalGrade }]}
-            aspectRatio={0.1}
+            width={200}
+            height={20}
           />)
           return row
         })
@@ -88,7 +89,7 @@ function AssignmentPlanning (props) {
                     <MenuItem value={75}>75%</MenuItem>
                   </Select>
                 </FormControl>
-                {assignmentPlanningTable(assignmentData.plan)}
+                {AssignmentTable(assignmentData.plan)}
               </>
               : <Spinner />
             }
