@@ -49,22 +49,6 @@ function AssignmentPlanning (props) {
     return tableArray
   }
 
-  const assignmentPlanningTable = plan => (
-    <Table className={classes.table}
-      tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
-      tableData={generateAssignmentTable(plan)
-        .map(row => {
-          const percentOfFinalGrade = row.pop()
-          row.push(<HorizontalBar
-            data={[{ label: 'grade', data: percentOfFinalGrade }]}
-            aspectRatio={0.1}
-          />)
-          return row
-        })
-      }
-    />
-  )
-
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
@@ -88,7 +72,20 @@ function AssignmentPlanning (props) {
                     <MenuItem value={75}>75%</MenuItem>
                   </Select>
                 </FormControl>
-                {assignmentPlanningTable(assignmentData.plan)}
+                <Table className={classes.table}
+                  tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
+                  tableData={generateAssignmentTable(assignmentData.plan)
+                    .map(row => {
+                      const percentOfFinalGrade = row.pop()
+                      row.push(<HorizontalBar
+                        data={[{ label: 'grade', data: percentOfFinalGrade }]}
+                        width={200}
+                        height={20}
+                      />)
+                      return row
+                    })
+                  }
+                />
               </>
               : <Spinner />
             }
