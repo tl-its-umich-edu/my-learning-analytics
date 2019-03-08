@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 
-function createHorizontalBar ({ data, width, height, el, tip }) {
+function createHorizontalBar ({ width, height, data, el, tip }) {
   const margin = { top: 0, bottom: 0, left: 0, right: 0 }
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
