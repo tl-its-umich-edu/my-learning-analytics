@@ -22,7 +22,7 @@ fi
 
 
 echo "Waiting for DB"
-wait-port ${MYSQL_HOST}:${MYSQL_PORT} -t 15000
+wait-port ${MYSQL_HOST}:${MYSQL_PORT} -t 30000
 
 echo Running python startups
 python manage.py migrate
