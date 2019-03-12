@@ -59,7 +59,7 @@ const standardDeviation = values => {
   return toTwoDecimal(stdDev)
 }
 
-export {
+export default {
   average,
   pearsonCorrelation,
   standardDeviation
