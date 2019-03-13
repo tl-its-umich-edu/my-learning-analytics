@@ -27,7 +27,7 @@ function AssignmentPlanning (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
   const [assignmentFilter, setAssignmentFilter] = useState(0)
-  const assignmentData = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/assignments?percent=${assignmentFilter}`)
+  const [loaded, assignmentData] = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/assignments?percent=${assignmentFilter}`)
 
   const generateAssignmentTable = plan => {
     const tableArray = plan.reduce((acc, weekItem) => {
@@ -72,27 +72,24 @@ function AssignmentPlanning (props) {
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom >Assignment Planning</Typography >
-            {assignmentData
-              ? <>
-                <FormControl className={classes.formControl}>
-                  <InputLabel>Courses</InputLabel>
-                  <Select
-                    value={assignmentFilter}
-                    onChange={event => setAssignmentFilter(event.target.value)}
-                  >
-                    <MenuItem value={0}>0% (all)</MenuItem>
-                    <MenuItem value={2}>2%</MenuItem>
-                    <MenuItem value={5}>5%</MenuItem>
-                    <MenuItem value={10}>10%</MenuItem>
-                    <MenuItem value={20}>20%</MenuItem>
-                    <MenuItem value={50}>50%</MenuItem>
-                    <MenuItem value={75}>75%</MenuItem>
-                  </Select>
-                </FormControl>
-                {AssignmentTable(assignmentData.plan)}
-              </>
-              : <Spinner />
-            }
+            <>
+              <FormControl className={classes.formControl}>
+                <InputLabel>Courses</InputLabel>
+                <Select
+                  value={assignmentFilter}
+                  onChange={event => setAssignmentFilter(event.target.value)}
+                >
+                  <MenuItem value={0}>0% (all)</MenuItem>
+                  <MenuItem value={2}>2%</MenuItem>
+                  <MenuItem value={5}>5%</MenuItem>
+                  <MenuItem value={10}>10%</MenuItem>
+                  <MenuItem value={20}>20%</MenuItem>
+                  <MenuItem value={50}>50%</MenuItem>
+                  <MenuItem value={75}>75%</MenuItem>
+                </Select>
+              </FormControl>
+              {loaded ? AssignmentTable(assignmentData.plan) : <Spinner />}
+            </>
           </Paper>
         </Grid>
       </Grid>
