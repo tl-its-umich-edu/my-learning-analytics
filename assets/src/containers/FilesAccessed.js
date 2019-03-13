@@ -20,14 +20,14 @@ const styles = theme => ({
 function FilesAccessed (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
-  const assignmentData = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/assignments?percent=0`)
+  const [loaded, assignmentData] = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/assignments?percent=0`)
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Typography variant='h5' gutterBottom >Grade Distribution</Typography >
-            {assignmentData
+            <Typography variant='h5' gutterBottom >Files Accessed</Typography >
+            {loaded
               ? <> </>
               : <Spinner />}
           </Paper>
