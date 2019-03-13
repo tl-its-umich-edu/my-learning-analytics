@@ -1,27 +1,30 @@
 # build react components for production mode
-FROM node:11.10-slim AS node-webpack
+FROM node:11.10-alpine AS node-webpack
 WORKDIR /usr/src/app
 
-# NOTE:package.json not likely to change between dev builds
+# NOTE: package.json and webpack.config.js not likely to change between dev builds
 COPY package.json webpack.config.js /usr/src/app/
-RUN yarn install
+RUN npm install
 
-# NOTE:assets/ likely to change between dev builds
+# NOTE: assets/ likely to change between dev builds
 COPY assets /usr/src/app/assets
-RUN yarn run prod && \
+RUN npm run prod && \
     # src is no longer needed (saves time for collect static)
-    rm -rf /code/assets/src
+    rm -rf /usr/src/app/assets/src
 
-FROM node:11.10-slim AS node-prod-deps
-WORKDIR /usr/src/app
 
-# NOTE:package.json not likely to change between dev builds
-COPY package.json /usr/src/app/
-ENV NODE_ENV production
-RUN yarn install --production && \
-    yarn add wait-port@"~0.2.2" && \
+
+
+# build node libraries for production mode
+FROM node-webpack AS node-prod-deps
+
+RUN npm install --save wait-port@"~0.2.2" && \
+    npm prune --production && \
     # This is needed to clean up the examples files as these cause collectstatic to fail (and take up extra space)
     find /usr/src/app/node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
+
+
+
 
 # FROM directive instructing base image to build upon
 FROM python:3.6 AS app
@@ -39,10 +42,10 @@ RUN apt-get update && \
 
 # NOTE: project files likely to change between dev builds
 COPY . /code/
-# copy build react components for production mode
-COPY --from=node-webpack /usr/src/app/assets /code/assets
-COPY --from=node-webpack /usr/src/app/webpack-stats.json /code/webpack-stats.json
-# copy node libraries for production mode
+# copy built react and node libraries for production mode
+COPY --from=node-prod-deps /usr/src/app/package-lock.json /code/package-lock.json
+COPY --from=node-prod-deps /usr/src/app/webpack-stats.json /code/webpack-stats.json
+COPY --from=node-prod-deps /usr/src/app/assets /code/assets
 COPY --from=node-prod-deps /usr/src/app/node_modules /code/node_modules
 
 # This DJANGO_SECRET_KEY is set here just so collectstatic runs with an empty key. It can be set to anything
