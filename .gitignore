@@ -120,6 +120,7 @@ dmypy.json
 
 .data/
 .data
-node_modules
+node_modules/
+package-lock.json
 
 webpack-stats.json

@@ -28,14 +28,14 @@ const styles = theme => ({
 function GradeDistribution (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
-  const gradeData = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/grade_distribution`)
+  const [loaded, gradeData] = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/grade_distribution`)
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom >Grade Distribution</Typography >
-            {gradeData
+            {loaded
               ? <>
                 <Grid item xs={12} sm={4} lg={2}>
                   <Table className={classes.table} tableData={[
