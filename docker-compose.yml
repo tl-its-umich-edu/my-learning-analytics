@@ -23,7 +23,7 @@ services:
       context: .
       args:
         TZ: ${TZ}
-    command: bash -c "./start.sh"
+    command: bash -c "/code/start.sh"
     volumes:
       - .:/code
       # use the container's node_modules folder (don't override)
@@ -45,8 +45,9 @@ services:
     build:
       context: .
       target: node-webpack
-    command: yarn run watch
+    command: npm run watch
     volumes:
       - .:/usr/src/app
+      # use the container's node_modules folder (don't override)
       - /usr/src/app/node_modules/
     container_name: webpack_watcher

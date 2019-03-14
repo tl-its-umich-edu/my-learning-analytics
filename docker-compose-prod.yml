@@ -23,7 +23,7 @@ services:
       context: .
       args:
         TZ: ${TZ}
-    command: bash -c "./start.sh"
+    command: bash -c "/code/start.sh"
     ports:
       - "5001:5000"
     depends_on:
