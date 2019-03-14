@@ -49,8 +49,12 @@ function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel
     .call(g => g.append('text')
       .attr('x', aWidth - margin.right)
       .attr('y', -4)
-      .attr('fill', '#000')
+      .attr('fill', 'rgba(0, 0, 0, 0.87)')
       .attr('text-anchor', 'end')
+      .attr('font-size', '0.875rem')
+      .attr('font-weight', '400')
+      .attr('font-family', 'Roboto Helvetica Arial sans-serif')
+      .attr('line-height', '1.46429em')
       .text(xAxisLabel)
     )
 
@@ -61,9 +65,14 @@ function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel
     .call(g => g.select('.domain').remove())
     .call(g => g.select('.tick:last-of-type text').clone()
       .attr('x', 4)
-      .attr('fill', '#000')
+      .attr('fill', 'rgba(0, 0, 0, 0.87)')
+      .attr('text-anchor', 'end')
+      .attr('font-size', '0.875rem')
+      .attr('font-weight', '400')
+      .attr('font-family', 'Roboto Helvetica Arial sans-serif')
+      .attr('line-height', '1.46429em')
       .attr('text-anchor', 'start')
-      .html(yAxisLabel).attr('dy', -4)
+      .text(yAxisLabel).attr('dy', -4)
     )
 
   svg.append('g')
@@ -86,6 +95,11 @@ function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel
       .attr('d', '1em')
       .attr('y', margin.bottom)
       .text('My Grade')
+      .attr('font-size', '0.875rem')
+      .attr('font-weight', '400')
+      .attr('font-family', 'Roboto Helvetica Arial sans-serif')
+      .attr('line-height', '1.46429em')
+      .attr('text-anchor', 'start')
   }
 
   if (tip) {
