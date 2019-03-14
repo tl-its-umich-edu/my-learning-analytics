@@ -101,7 +101,6 @@ function createHistogram ({ data, width, height, el, xAxisLabel, yAxisLabel, myG
       .attr('line-height', '1.46429em')
       .attr('text-anchor', 'start')
   }
-
 }
 
 export default createHistogram
