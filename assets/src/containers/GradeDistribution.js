@@ -37,27 +37,31 @@ function GradeDistribution (props) {
             <Typography variant='h5' gutterBottom >Grade Distribution</Typography >
             {loaded
               ? <>
-                <Grid item xs={12} sm={4} lg={2}>
-                  <Table className={classes.table} tableData={[
-                    ['Number of Students', <strong>{gradeData.length}</strong>],
-                    ['Average Grade', <strong>{average(gradeData.map(x => x.current_grade))}%</strong>],
-                    ['My Grade', <strong>{gradeData[0].current_user_grade}%</strong>]
-                  ]} />
+                <Grid container>
+                  <Grid item xs={12} lg={2}>
+                    <Table className={classes.table} tableData={[
+                      ['My Grade', <strong>{gradeData[0].current_user_grade ? `${gradeData[0].current_user_grade}%` : 'There are no grades yet for you in this course'}</strong>],
+                      ['Average Grade', <strong>{average(gradeData.map(x => x.current_grade))}%</strong>],
+                      ['Number of Students', <strong>{gradeData.length}</strong>]
+                    ]} />
+                  </Grid>
+                  <Grid item xs={12} lg={10}>
+                    <Histogram
+                      data={gradeData.map(x => x.current_grade)}
+                      tip={createToolTip(d => renderToString(
+                        <Paper className={classes.paper}>
+                          <Table className={classes.table} tableData={[
+                            ['Number of Students', <strong>{d.length}</strong>],
+                            ['Average Grade', <strong>{average(d)}%</strong>]
+                          ]} />
+                        </Paper>
+                      ))}
+                      aspectRatio={0.3}
+                      xAxisLabel={'Grade %'}
+                      yAxisLabel={'Number of Students'}
+                      myGrade={gradeData[0].current_user_grade} />
+                  </Grid>
                 </Grid>
-                <Histogram
-                  data={gradeData.map(x => x.current_grade)}
-                  tip={createToolTip(d => renderToString(
-                    <Paper className={classes.paper}>
-                      <Table className={classes.table} tableData={[
-                        ['Number of Students', <strong>{d.length}</strong>],
-                        ['Average Grade', <strong>{average(d)}%</strong>]
-                      ]} />
-                    </Paper>
-                  ))}
-                  aspectRatio={0.3}
-                  xAxisLabel={'Grade %'}
-                  yAxisLabel={'Number of Students'}
-                  myGrade={gradeData[0].current_user_grade} />
               </> : <Spinner />}
           </Paper>
         </Grid>
