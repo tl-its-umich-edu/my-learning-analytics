@@ -29,36 +29,47 @@ function GradeDistribution (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
   const [loaded, gradeData] = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/grade_distribution`)
+
+  const tableBuilder = (loaded, assignmentData, table) => {
+    if (!gradeData || Object.keys(gradeData).length === 0) {
+      return (<p>No data provided</p>)
+    } else if (loaded) {
+      return (
+        <>
+          <Grid item xs={12} sm={4} lg={2}>
+            <Table className={classes.table} tableData={[
+              ['Number of Students', <strong>{gradeData.length}</strong>],
+              ['Average Grade', <strong>{average(gradeData.map(x => x.current_grade))}%</strong>],
+              ['My Grade', <strong>{gradeData[0].current_user_grade}%</strong>]
+            ]} />
+          </Grid>
+          <Histogram
+            data={gradeData.map(x => x.current_grade)}
+            tip={createToolTip(d => renderToString(
+              <Paper className={classes.paper}>
+                <Table className={classes.table} tableData={[
+                  ['Number of Students', <strong>{d.length}</strong>],
+                  ['Average Grade', <strong>{average(d)}%</strong>]
+                ]} />
+              </Paper>
+            ))}
+            aspectRatio={0.3}
+            xAxisLabel={'Grade %'}
+            yAxisLabel={'Number of Students'}
+            myGrade={gradeData[0].current_user_grade} />
+        </>
+      )
+    } 
+    return <Spinner />
+  }
+
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom >Grade Distribution</Typography >
-            {loaded
-              ? <>
-                <Grid item xs={12} sm={4} lg={2}>
-                  <Table className={classes.table} tableData={[
-                    ['Number of Students', <strong>{gradeData.length}</strong>],
-                    ['Average Grade', <strong>{average(gradeData.map(x => x.current_grade))}%</strong>],
-                    ['My Grade', <strong>{gradeData[0].current_user_grade}%</strong>]
-                  ]} />
-                </Grid>
-                <Histogram
-                  data={gradeData.map(x => x.current_grade)}
-                  tip={createToolTip(d => renderToString(
-                    <Paper className={classes.paper}>
-                      <Table className={classes.table} tableData={[
-                        ['Number of Students', <strong>{d.length}</strong>],
-                        ['Average Grade', <strong>{average(d)}%</strong>]
-                      ]} />
-                    </Paper>
-                  ))}
-                  aspectRatio={0.3}
-                  xAxisLabel={'Grade %'}
-                  yAxisLabel={'Number of Students'}
-                  myGrade={gradeData[0].current_user_grade} />
-              </> : <Spinner />}
+             { tableBuilder(loaded, gradeData) }
           </Paper>
         </Grid>
       </Grid>

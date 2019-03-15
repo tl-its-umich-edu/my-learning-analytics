@@ -66,6 +66,15 @@ function AssignmentPlanning (props) {
     />
   )
 
+  const tableBuilder = (loaded, assignmentData, table) => {
+    if (!assignmentData || Object.keys(assignmentData).length === 0) {
+      return (<p>No data provided</p>)
+    } else if (loaded) {
+      return AssignmentTable(assignmentData.plan)
+    } 
+    return <Spinner />
+  }
+
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
@@ -88,7 +97,7 @@ function AssignmentPlanning (props) {
                   <MenuItem value={75}>75%</MenuItem>
                 </Select>
               </FormControl>
-              {loaded ? AssignmentTable(assignmentData.plan) : <Spinner />}
+              { tableBuilder(loaded, assignmentData) }
             </>
           </Paper>
         </Grid>
