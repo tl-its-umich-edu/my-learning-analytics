@@ -9,7 +9,8 @@ import Typography from '@material-ui/core/Typography';
 const styles = theme => ({
     card: {
       maxWidth: 325,
-      display: "flex"
+      display: "flex",
+      margin: theme.spacing.unit * 1,
     },
     media: {
       height: 140,
@@ -39,7 +40,7 @@ const SelectCard = props => {
         <CardActionArea>
           <CardMedia
             className={classes.media}
-            image={props.images[0]}
+            image={cardData.image}
             title={cardData.title}
           />
           <CardContent className={classes.content}>

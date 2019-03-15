@@ -19,10 +19,6 @@ const styles = theme => ({
 function IndexPage (props) {
     const { classes, location } = props;
     const courseId = location.pathname.split('/')[1]
-    const images = [
-        "../static/images/assignments_planning_icon.png",
-        "../static/images/file_access_trends_icon.png"
-    ]
     return (
         <Grid container spacing={16} className={classes.root}>
             <Grid item xs={12}>
