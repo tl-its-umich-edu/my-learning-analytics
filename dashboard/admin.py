@@ -30,7 +30,7 @@ class CourseAdmin(admin.ModelAdmin):
 
     # When saving the course, update the id based on canvas id
     def save_model(self, request, obj, form, change):
-        obj.id = settings.UDW_ID_PREFIX + obj.canvas_id
+        obj.id = settings.DATA_WAREHOUSE_ID_PREFIX + obj.canvas_id
         return super(CourseAdmin, self).save_model(request, obj, form, change)
         
 admin.site.register (Course, CourseAdmin)

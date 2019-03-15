@@ -14,14 +14,14 @@ logger = logging.getLogger(__name__)
 
 def get_course_name_from_id(course_id):
     """[Get the long course name from the id]
-    
-    :param course_id: [Canvas course ID without UDW PREFIX]
+
+    :param course_id: [Canvas course ID without DATA_WAREHOUSE PREFIX]
     :type course_id: [str]
     :return: [Course Name of course or blank not found]
     :rtype: [str]
     """
     logger.info(get_course_name_from_id.__name__)
-    course_id = settings.UDW_ID_PREFIX + str(course_id)
+    course_id = settings.DATA_WAREHOUSE_ID_PREFIX + str(course_id)
     course_name = ""
     if (course_id):
         with django.db.connection.cursor() as cursor:
@@ -34,7 +34,7 @@ def get_course_name_from_id(course_id):
 def get_course_view_options (course_id):
 
     logger.info(get_course_view_options.__name__)
-    course_id = settings.UDW_ID_PREFIX + str(course_id)
+    course_id = settings.DATA_WAREHOUSE_ID_PREFIX + str(course_id)
     logger.debug("course_id=" + str(course_id))
     course_view_option = ""
     if (course_id):
@@ -61,8 +61,8 @@ def get_default_user_course_id(user_id):
         cursor.execute("SELECT course_id FROM user WHERE sis_name= %s ORDER BY course_id DESC LIMIT 1", [user_id])
         row = cursor.fetchone()
         if (row != None):
-            #Remove the UDW_ID_PREFIX and just return the course_id
-            course_id = str(row[0]).replace(settings.UDW_ID_PREFIX, "")
+            #Remove the DATA_WAREHOUSE_ID_PREFIX and just return the course_id
+            course_id = str(row[0]).replace(settings.DATA_WAREHOUSE_ID_PREFIX, "")
     return course_id
 
 def get_last_cron_run():
@@ -75,6 +75,9 @@ def get_last_cron_run():
     return datetime.min
 
 def get_canvas_data_date():
+    if not settings.DATA_WAREHOUSE_IS_UNIZIN:
+        return get_last_cron_run()
+
     try:
         with django.db.connection.cursor() as cursor:
             cursor.execute("SELECT pvalue from unizin_metadata where pkey = 'canvasdatadate'")
