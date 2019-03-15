@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 
-function createHorizontalBar ({ width, height, data, el, tip }) {
+function createHorizontalBar ({ data, width, height, el, tip }) {
   const margin = { top: 0, bottom: 0, left: 0, right: 0 }
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
@@ -18,14 +18,23 @@ function createHorizontalBar ({ width, height, data, el, tip }) {
     .attr('width', aWidth)
     .attr('height', aHeight)
 
-  const bar = svg.selectAll('.bar')
+  const bar = svg.selectAll('g')
     .data(data).enter()
-    .append('rect')
-    .attr('class', 'bar')
+    .append('g')
+
+  bar.append('rect')
     .attr('x', d => x(0))
-    .attr('width', d => x(d.data) - x(0))
+    .attr('width', d => d.data === 0
+      ? 2
+      : x(d.data) - x(0))
     .attr('y', d => y(d.label))
     .attr('height', y.bandwidth())
+    .attr('fill', d => d.graded ? '#a0d4ee' : '#e1e1e1')
+
+  bar.append('text')
+    .attr('x', aWidth - 30)
+    .attr('y', d => y(d.label) + 12)
+    .text(d => `${d.data}%`)
 
   if (tip) {
     svg.call(tip)

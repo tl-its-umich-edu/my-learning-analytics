@@ -6,6 +6,7 @@ import GradeDistribution from './GradeDistribution'
 import AssignmentPlanning from './AssignmentPlanning'
 import FilesAccessed from './FilesAccessed'
 import IndexPage from './IndexPage'
+import WhatIfGrade from './WhatIfGrade'
 
 function App () {
   const [sideDrawerState, setSideDrawerState] = useState(false)
@@ -25,6 +26,7 @@ function App () {
         <Route path='/:courseId/grades' component={GradeDistribution} />
         <Route path='/:courseId/assignment' component={AssignmentPlanning} />
         <Route path='/:courseId/files' component={FilesAccessed} />
+        <Route path='/:courseId/whatif' component={WhatIfGrade} />
       </div>
     </Router>
   )

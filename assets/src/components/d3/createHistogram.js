@@ -35,7 +35,7 @@ function createHistogram ({ data, width, height, el, xAxisLabel, yAxisLabel, myG
 
   bar.append('text')
     .attr('x', d => x((d.x1 + d.x0) / 2))
-    .attr('y', d => y(d.length) + margin.top-5)
+    .attr('y', d => y(d.length) + margin.top - 5)
     .attr('text-anchor', 'middle')
     .attr('fill', 'white')
     .text(d => d.length === 0 ? '' : d.length)

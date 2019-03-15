@@ -17,6 +17,8 @@ class AlwaysChangedModelForm(ModelForm):
             return True
         return super(AlwaysChangedModelForm, self).has_changed()
 
+class CourseInline(admin.TabularInline):
+    model = Course
 
 class CourseViewOptionInline(admin.StackedInline):
     model = CourseViewOption

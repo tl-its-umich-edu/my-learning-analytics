@@ -131,7 +131,6 @@ export const histogramDataMoreThan100Percent = Object.freeze(
   ]
 )
 
-
 export const horizontalBarChartData = Object.freeze(
   [
     {

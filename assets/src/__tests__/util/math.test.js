@@ -1,7 +1,32 @@
-import { average } from '../../util/math'
+/* global describe, it, expect */
+
+import * as math from '../../util/math'
+
+describe('roundToOneDecimal', () => {
+  it('takes a number and returns a number rounded to one decimal place', () => {
+    expect(math.roundToOneDecimcal(0)).toEqual(0)
+    expect(math.roundToOneDecimcal(10.1)).toEqual(10.1)
+    expect(math.roundToOneDecimcal(10.11)).toEqual(10.1)
+    expect(math.roundToOneDecimcal(10.15)).toEqual(10.2)
+    expect(math.roundToOneDecimcal(10.16)).toEqual(10.2)
+  })
+})
+
+describe('roundToTwoDecimal', () => {
+  it('takes a number and returns a number rounded to two decimal places', () => {
+    expect(math.roundToTwoDecimal(0)).toEqual(0)
+    expect(math.roundToTwoDecimal(10.15)).toEqual(10.15)
+    expect(math.roundToTwoDecimal(10.11)).toEqual(10.11)
+    // sad reality of js' floating point precision woes, 10.155 * 100 = 1015.4999999999
+    expect(math.roundToTwoDecimal(10.155)).toEqual(10.15)
+    expect(math.roundToTwoDecimal(10.156)).toEqual(10.16)
+  })
+})
 
 describe('average', () => {
   it('takes an array of numbers and calculates average', () => {
-    expect(average([1,2,3,4,5])).toEqual(3)
+    expect(math.average([])).toEqual(null)
+    expect(math.average([1])).toEqual(1)
+    expect(math.average([1, 2, 3, 4, 5])).toEqual(3)
   })
 })
