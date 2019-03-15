@@ -1,7 +1,18 @@
+/* global fetch */
 import { useState, useEffect } from 'react'
-import get from '../service/api'
 
 const cache = new Map()
+// https://sudo.isl.co/fetch-me-that-json-from-django/
+const get = url => {
+  return fetch(url,{
+    headers: {
+      'Accept': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    credentials: 'include'
+  })
+    .then(res => res.json())
+}
 
 const useFetch = dataURL => {
   const [data, setData] = useState(null)
