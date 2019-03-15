@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import SelectCard from '../components/SelectCard';
-import { Link, withRouter } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import routes from '../routes/routes'
 
 const styles = theme => ({
@@ -17,8 +17,8 @@ const styles = theme => ({
 })
 
 function IndexPage (props) {
-    const { classes, location } = props;
-    const courseId = location.pathname.split('/')[1]
+    const { classes, match } = props;
+    const currentCourseId = match.params.courseId
     return (
         <Grid container spacing={16} className={classes.root}>
             <Grid item xs={12}>
@@ -28,9 +28,9 @@ function IndexPage (props) {
                 spacing={8}
                 >
                 {
-                    routes(courseId).map((props, key) => 
+                    routes(currentCourseId).map((props, key) => 
                     <Link style={{ textDecoration: 'none' }} to={props.path} key={key}>
-                        <SelectCard cardData = {props} images={images} />
+                        <SelectCard cardData = {props} />
                     </Link>
                 )}
                 </Grid>
