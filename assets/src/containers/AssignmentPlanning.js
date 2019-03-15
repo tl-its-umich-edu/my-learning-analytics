@@ -1,16 +1,18 @@
 import React, { useState } from 'react'
 import useFetch from '../hooks/useFetch'
 import { withStyles } from '@material-ui/core/styles'
+import { renderToString } from 'react-dom/server'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Spinner from '../components/Spinner'
 import Typography from '@material-ui/core/Typography'
 import Select from '@material-ui/core/Select'
 import FormControl from '@material-ui/core/FormControl'
-import InputLabel from '@material-ui/core/InputLabel'
 import MenuItem from '@material-ui/core/MenuItem'
 import Table from '../components/Table'
+import ProgressBar from '../components/ProgressBar'
 import HorizontalBar from '../components/HorizontalBar'
+import createToolTip from '../util/createToolTip'
 
 const styles = theme => ({
   root: {
@@ -50,7 +52,7 @@ function AssignmentPlanning (props) {
   }
 
   const AssignmentTable = plan => (
-    <Table className={classes.table}
+    <Table
       tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
       tableData={generateAssignmentTable(plan)
         .map(row => {
@@ -78,14 +80,35 @@ function AssignmentPlanning (props) {
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Typography variant='h5' gutterBottom >Assignment Planning</Typography >
             <>
+            <Typography variant='h5' gutterBottom >Progress toward Final Grade</Typography >
+            {assignmentData ? <ProgressBar
+              data={assignmentData.progress}
+              aspectRatio={0.12}
+              tip={createToolTip(d => renderToString(
+                <Paper className={classes.paper}>
+                  <Table tableData={[
+                    ['Assignment', <strong>{d.name}</strong>],
+                    ['Due at', <strong>{d.due_dates}</strong>],
+                    ['Your grade', <strong>{d.score ? `${d.score}%` : 'Not available'}</strong>],
+                    ['Total points possible', <strong>{d.points_possible}</strong>],
+                    ['Avg assignment grade', <strong>{d.avg_score}</strong>],
+                    ['Percentage worth in final grade', <strong>{d.towards_final_grade}%</strong>]
+                  ]} />
+                </Paper>
+              ))} /> : <Spinner />}
+            </ >
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper className={classes.paper}>
+            <>
+              <Typography variant='h5' gutterBottom >Assignments Due by Date</Typography >
               <FormControl className={classes.formControl}>
-                <InputLabel>Courses</InputLabel>
+                <Typography>Show assignments that weigh at least</Typography>
                 <Select
                   value={assignmentFilter}
-                  onChange={event => setAssignmentFilter(event.target.value)}
-                >
+                  onChange={event => setAssignmentFilter(event.target.value)}>
                   <MenuItem value={0}>0% (all)</MenuItem>
                   <MenuItem value={2}>2%</MenuItem>
                   <MenuItem value={5}>5%</MenuItem>
