@@ -35,7 +35,7 @@ function GradeDistribution (props) {
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom >Grade Distribution</Typography >
-            {loaded
+            {(loaded && gradeData) 
               ? <>
                 <Grid item xs={12} sm={4} lg={2}>
                   <Table className={classes.table} tableData={[
