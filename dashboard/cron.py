@@ -274,14 +274,15 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids
         for data_warehouse_course_id in Course.objects.get_supported_courses():
-            assignment_groups_sql = f"""with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{data_warehouse_course_id}' and ad.visibility = 'everyone' and ad.workflow_state='published'),
-                                    assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf on agd.id = agf.assignment_group_id  where agd.course_id='{data_warehouse_course_id}' and workflow_state='available'),
-                                    assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join (select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id ),
-                                    assign_rules as (select DISTINCT ad.assignment_group_id,agr.drop_lowest,agr.drop_highest from assignment_details ad join assignment_group_rule_dim agr on ad.assignment_group_id=agr.assignment_group_id),
-                                    assignment_grp_points as (select ag.*, am.group_points AS group_points from assignment_grp ag join assign_more am on ag.assignment_group_id = am.assignment_group_id),
-                                    assign_final as (select assignment_group_id AS id, course_id AS course_id, group_weight AS weight, name AS name, group_points AS group_points from assignment_grp_points)
-                                    select g.*, ar.drop_lowest,ar.drop_highest from assign_rules ar join assign_final g on ar.assignment_group_id=g.id
-                                    """
+            assignment_groups_sql= f"""with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{data_warehouse_course_id}' and ad.visibility = 'everyone' and ad.workflow_state='published'),
+            assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf on agd.id = agf.assignment_group_id  where agd.course_id='{data_warehouse_course_id}' and workflow_state='available'),
+            assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join (select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id ),
+            grp_full as (select a.group_points, b.assignment_group_id from assign_more a right join assignment_grp b on a.assignment_group_id = b.assignment_group_id),
+            assign_rules as (select DISTINCT ad.assignment_group_id,agr.drop_lowest,agr.drop_highest from grp_full ad join assignment_group_rule_dim agr on ad.assignment_group_id=agr.assignment_group_id),
+            assignment_grp_points as (select ag.*, am.group_points AS group_points from assignment_grp ag join grp_full am on ag.assignment_group_id = am.assignment_group_id),
+            assign_final as (select assignment_group_id AS id, course_id AS course_id, group_weight AS weight, name AS name, group_points AS group_points from assignment_grp_points)
+            select g.*, ar.drop_lowest,ar.drop_highest from assign_rules ar join assign_final g on ar.assignment_group_id=g.id;
+                                   """
             status += util_function(data_warehouse_course_id, assignment_groups_sql, 'assignment_groups')
 
         return status

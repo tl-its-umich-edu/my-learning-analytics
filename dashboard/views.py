@@ -349,10 +349,9 @@ def assignments(request, course_id=0):
 
     df3 = df[df['towards_final_grade'] > 0.0]
     df3[['score']] = df3[['score']].astype(float)
-    df3['percent_gotten'] = df3.apply(user_percent, axis=1)
     df3['graded'] = df3['graded'].fillna(False)
     df3[['score']] = df3[['score']].astype(float)
-    df3['percent_gotten'] = df3.apply(user_percent, axis=1)
+    df3['percent_gotten'] = df3.apply(lambda x: user_percent(x), axis=1)
     df3.sort_values(by=['graded', 'due_date_mod'], ascending=[False, True], inplace=True)
     df3.reset_index(inplace=True)
     df3.drop(columns=['index'], inplace=True)
@@ -401,9 +400,9 @@ def assignments(request, course_id=0):
 def get_course_assignments(course_id):
 
     sql=f"""select assign.*,sub.avg_score from
-            (select assignment_id,name,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from
-            (select a.id as assignment_id,a.assignment_group_id, a.local_date as due_date,a.name,a.points_possible from assignment as a  where a.course_id =%(course_id)s) as a join
-            (select id, group_points, weight,drop_lowest,drop_highest from assignment_groups) as ag on ag.id=a.assignment_group_id) as assign left join
+            (select assignment_id,name,assign_grp_name,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from
+            (select a.id as assignment_id,a.assignment_group_id, a.local_date as due_date,a.name,a.points_possible from assignment as a  where a.course_id =%(course_id)s) as app right join
+            (select id, name as assign_grp_name, group_points, weight,drop_lowest,drop_highest from assignment_groups where course_id=%(course_id)s) as ag on ag.id=app.assignment_group_id) as assign left join
             (select distinct assignment_id,avg_score from submission where course_id=%(course_id)s) as sub on sub.assignment_id = assign.assignment_id
             """
 
@@ -417,8 +416,12 @@ def get_course_assignments(course_id):
     assignments_in_course[['points_possible','group_points']]=assignments_in_course[['points_possible','group_points']].fillna(0)
     assignments_in_course[['points_possible', 'group_points','weight']] = assignments_in_course[['points_possible', 'group_points','weight']].astype(float)
     consider_weight=is_weight_considered(course_id)
+    hidden_assignments = are_weighted_assignments_hidden(course_id)
     total_points=assignments_in_course['points_possible'].sum()
-    assignments_in_course['towards_final_grade']=assignments_in_course.apply(lambda x: percent_calculation(consider_weight, total_points,x), axis=1)
+    # if assignment group is weighted and no assignments added yet then assignment name will be nothing so situation is specific to that
+    if hidden_assignments:
+        assignments_in_course['name'] = assignments_in_course['name'].fillna(assignments_in_course['assign_grp_name']+' Group Place Holder Assignments')
+    assignments_in_course['towards_final_grade']=assignments_in_course.apply(lambda x: percent_calculation(consider_weight, total_points,hidden_assignments, x), axis=1)
     assignments_in_course['calender_week']=assignments_in_course['due_date'].dt.week
     assignments_in_course['calender_week']=assignments_in_course['calender_week'].fillna(0).astype(int)
     min_week=find_min_week(course_id)
@@ -464,10 +467,26 @@ def user_percent(row):
         return row['towards_final_grade']
 
 
-def percent_calculation(consider_weight,total_points,row):
+def percent_calculation(consider_weight,total_points,hidden_assignments,row):
+    """
+    This function handles how much % an assignment worth in a course. The cases
+    includes 1. assignments groups has weights and no hidden assignments in them
+    2. vanilla case default group, no weights, and irrespective if assignment are hidden or not
+    3. assignment groups has weights, hidden or no assignments in them
+
+    :param consider_weight:
+    :param total_points:
+    :param hidden_assignments:
+    :param row:
+    :return:
+    """
+    if hidden_assignments and consider_weight and row['group_points'] == 0:
+        return round(row['weight'],2)
+    if hidden_assignments and consider_weight and row['group_points'] != 0:
+        return round((row['points_possible']/row['group_points'])*row['weight'],2)
     if consider_weight and row['group_points']!=0:
         return round((row['points_possible']/row['group_points'])*row['weight'],2)
-    else:
+    if not consider_weight:
         return round((row['points_possible']/total_points)*100,2)
 
 
@@ -497,6 +516,36 @@ def get_term_dates_for_course(course_id):
     sql = "select a.date_start from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.id;"
     df = pd.read_sql(sql, conn, params={"course_id": course_id}, parse_dates={'date_start': '%Y-%m-%d'})
     return df['date_start'].iloc[0]
+
+
+def are_weighted_assignments_hidden(course_id):
+    """
+    if assignments are weighted then assignment groups weight totals =100% . The code is checking if assignment groups
+    has group points corresponding to group weight and if not assignments are hidden
+    :param course_id:
+    :return:
+    """
+    logger.info(are_weighted_assignments_hidden.__name__)
+    sql = "select weight, group_points from assignment_groups where course_id=%(course_id)s"
+    df = pd.read_sql(sql, conn, params={"course_id": course_id})
+    # df.to_json(f'assign_hidden_{course_id}.json', orient='records')
+    df['weight'] = df['weight'].astype(int)
+    tot_weight = df['weight'].sum()
+    if tot_weight > 0:
+        df['hidden'] = 0
+        df = df[df['weight'] > 0]
+        df = df.reset_index(drop=True)
+        df.loc[0, 'hidden'] = df.loc[0, 'weight']
+        for i in range(1, len(df)):
+            if df.loc[i, 'group_points']:
+                df.loc[i, 'hidden'] = df.loc[i - 1, 'hidden'] + df.loc[i, 'weight']
+        if df['hidden'].max() == 100:
+            logger.info(f"weighted assignments in course {course_id} are not hidden")
+            return False
+        else:
+            logger.info(f"few weighted assignments in course {course_id} are hidden")
+            return True
+
 
 
 def df_default_display_settings():
