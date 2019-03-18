@@ -29,6 +29,7 @@ function GradeDistribution (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
   const [loaded, gradeData] = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/grade_distribution`)
+  console.log(gradeData)
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
@@ -59,7 +60,8 @@ function GradeDistribution (props) {
                       aspectRatio={0.3}
                       xAxisLabel={'Grade %'}
                       yAxisLabel={'Number of Students'}
-                      myGrade={gradeData[0].current_user_grade} />
+                      myGrade={gradeData[0].current_user_grade}
+                      maxGrade={gradeData[0].graph_upper_limit} />
                   </Grid>
                 </Grid>
               </> : <Spinner />}

@@ -1,12 +1,12 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 
-function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel, myGrade }) {
+function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100 }) {
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   const x = d3.scaleLinear()
-    .domain([0, 100]).nice()
+    .domain([0, maxGrade]).nice()
     .range([margin.left, aWidth - margin.right])
 
   const bins = d3.histogram()
