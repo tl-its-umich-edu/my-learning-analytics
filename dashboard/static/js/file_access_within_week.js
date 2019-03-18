@@ -3,8 +3,8 @@
 /////////////////////////////////////////////////////////////
 
 // colors used for different file states
-var COLOR_ACCESSED_FILE ="steelblue",
-    COLOR_NOT_ACCESSED_FILE = "gray";
+let COLOR_ACCESSED_FILE ="steelblue",
+    COLOR_NOT_ACCESSED_FILE = "#e1e1e1";
 
 //Added only for the mouse wheel
 var zoomer = d3.behavior.zoom()
