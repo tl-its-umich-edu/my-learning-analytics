@@ -23,7 +23,9 @@ function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel
 
   const bar = svg.selectAll('rect')
     .data(bins).enter()
-    .append('rect')
+    .append('g')
+
+  bar.append('rect')
     .attr('x', d => x(d.x0) + 1)
     .attr('width', d => Math.max(0, x(d.x1) - x(d.x0) - 1))
     .attr('y', d => y(d.length))
@@ -31,12 +33,11 @@ function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel
     .attr('fill', 'steelblue')
 
   bar.append('text')
-    .attr('y', 10)
-    .attr('x', (x(bins[0].x1) - x(bins[0].x0)) / 2)
-    .attr('height', d => height - y(d.length) - 50)
+    .attr('x', d => x((d.x1 + d.x0) / 2))
+    .attr('y', d => y(d.length) + 14)
     .attr('text-anchor', 'middle')
-    .attr('color', 'white')
-    .text(d => d === 0 ? d.length : '')
+    .attr('fill', 'white')
+    .text(d => d.length === 0 ? '' : d.length)
 
   const xAxis = g => g
     .attr(`transform`, `translate(0, ${aHeight - margin.bottom})`)
@@ -90,10 +91,10 @@ function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel
       .attr('stroke', 'darkorange')
       .attr('stroke-width', '2')
     svg.append('text')
-      .attr('x', x(myGrade) - 100)
+      .attr('x', x(myGrade) - 110)
       .attr('d', '1em')
       .attr('y', margin.bottom - 5)
-      .text(`My Grade: ${myGrade}`)
+      .text(`My Grade: ${myGrade}%`)
       .attr('font-size', '0.875rem')
       .attr('font-weight', '400')
       .attr('font-family', 'Roboto Helvetica Arial sans-serif')
