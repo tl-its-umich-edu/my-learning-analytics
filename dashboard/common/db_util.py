@@ -36,7 +36,7 @@ def get_course_name_from_id(course_id):
     :return: [Course Name of course or blank not found]
     :rtype: [str]
     """
-    logger.info(get_course_name_from_id.__name__)
+    logger.debug(get_course_name_from_id.__name__)
     course_id = canvas_id_to_incremented_id(course_id)
     course_name = ""
     if (course_id):
