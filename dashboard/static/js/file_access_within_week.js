@@ -4,7 +4,7 @@
 
 // colors used for different file states
 let COLOR_ACCESSED_FILE ="steelblue",
-    COLOR_NOT_ACCESSED_FILE = "gray";
+    COLOR_NOT_ACCESSED_FILE = "#e1e1e1";
 
 //Added only for the mouse wheel
 let zoomer = d3.behavior.zoom()
