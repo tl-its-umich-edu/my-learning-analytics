@@ -304,7 +304,7 @@ var makeGraph = function(url) {
         xlabel.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
             .attr("transform", "translate(" + main_width/2 + ", " + 40 + ")")  // center below axis
-            .text("Percentage of All Students in the Course")
+            .text("Percentage of All Students in the Selected Grade Range")
             .style("font-size", "14px");
 
         //Create y axis object

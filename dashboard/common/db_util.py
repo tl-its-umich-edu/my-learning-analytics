@@ -20,8 +20,8 @@ def get_course_name_from_id(course_id):
     :return: [Course Name of course or blank not found]
     :rtype: [str]
     """
-    logger.info(get_course_name_from_id.__name__)
     course_id = settings.UDW_ID_PREFIX + str(course_id)
+    logger.debug(get_course_name_from_id.__name__)
     course_name = ""
     if (course_id):
         with django.db.connection.cursor() as cursor:
