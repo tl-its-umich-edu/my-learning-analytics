@@ -419,14 +419,16 @@ def get_course_assignments(course_id):
     consider_weight=is_weight_considered(course_id)
     total_points=assignments_in_course['points_possible'].sum()
     assignments_in_course['towards_final_grade']=assignments_in_course.apply(lambda x: percent_calculation(consider_weight, total_points,x), axis=1)
-    assignments_in_course['calender_week']=assignments_in_course['due_date'].dt.week
-    assignments_in_course['calender_week']=assignments_in_course['calender_week'].fillna(0).astype(int)
+    assignments_in_course['calendar_week']=assignments_in_course['due_date'].dt.week
+    assignments_in_course['calendar_week']=assignments_in_course['calendar_week'].fillna(0).astype(int)
     min_week=find_min_week(course_id)
-    max_week=assignments_in_course['calender_week'].max()
+    max_week=assignments_in_course['calendar_week'].max()
+    if (min_week > max_week):
+        raise ValueError(f"Minimum week {min_week} is greater maximum weekthan {max_week}. Check term dates are correct.")
     week_list = [x for x in range(min_week,max_week+1)]
-    assignments_in_course['week']=assignments_in_course['calender_week'].apply(lambda x: 0 if x == 0 else week_list.index(x)+1)
+    assignments_in_course['week']=assignments_in_course['calendar_week'].apply(lambda x: 0 if x == 0 else week_list.index(x)+1)
     assignments_in_course.sort_values(by='due_date', inplace = True)
-    assignments_in_course['current_week']=assignments_in_course['calender_week'].apply(lambda x: find_current_week(x))
+    assignments_in_course['current_week']=assignments_in_course['calendar_week'].apply(lambda x: find_current_week(x))
     assignments_in_course['due_date_mod'] =assignments_in_course['due_date'].astype(str).apply(lambda x:x.split()[0])
     assignments_in_course['due_dates']= pd.to_datetime(assignments_in_course['due_date_mod']).dt.strftime('%m/%d')
     assignments_in_course['due_dates'].replace('NaT','N/A',inplace=True)
