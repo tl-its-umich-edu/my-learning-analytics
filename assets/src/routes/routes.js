@@ -3,18 +3,24 @@ import { Grade } from '@material-ui/icons'
 const routes = courseId => [
   {
     path: `/${courseId}/grades`,
-    sidebarName: 'Grade Distribution',
-    icon: Grade
+    title: 'Grade Distribution',
+    icon: Grade,
+    description: "See where your grade sits within the course grade distribution.",
+    image: "/static/images/grade_distribution_icon.png",
   },
   {
     path: `/${courseId}/assignment`,
-    sidebarName: 'Assignment Planning',
-    icon: Grade
+    title: 'Assignment Planning',
+    icon: Grade,
+    description: "See what assignments have the greatest impact on your grade.",
+    image: "/static/images/assignments_planning_icon.png",
   },
   {
     path: `/${courseId}/files`,
-    sidebarName: 'Files Accessed',
-    icon: Grade
+    title: 'Files Accessed',
+    icon: Grade,
+    description: "See what files you and your peers are reading.",
+    image: "/static/images/file_access_trends_icon.png",
   }
 ]
 
