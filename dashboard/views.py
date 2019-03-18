@@ -122,9 +122,16 @@ def file_access_within_week(request, course_id=0):
 
     # get total number of student within the course_id
     total_number_student_sql = "select count(*) from user where course_id = %(course_id)s"
+    if (grade == GRADE_A):
+        total_number_student_sql += " and current_grade >= 90"
+    elif (grade == GRADE_B):
+        total_number_student_sql += " and current_grade >= 80 and current_grade < 90"
+    elif (grade == GRADE_C):
+        total_number_student_sql += " and current_grade >= 70 and current_grade < 80"
+
     total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": course_id})
     total_number_student = total_number_student_df.iloc[0,0]
-    logger.debug("course_id_string" + course_id + " total student=" + str(total_number_student))
+    logger.info("course_id_string" + course_id + " total student=" + str(total_number_student))
 
     term_date_start = AcademicTerms.objects.course_date_start(course_id)
 
@@ -146,10 +153,10 @@ def file_access_within_week(request, course_id=0):
 
     startTimeString = start.strftime('%Y%m%d') + "000000"
     endTimeString = end.strftime('%Y%m%d') + "000000"
-    logger.debug(sqlString);
-    logger.debug("start time=" + startTimeString + " end_time=" + endTimeString);
+    logger.debug(sqlString)
+    logger.debug("start time=" + startTimeString + " end_time=" + endTimeString)
     df = pd.read_sql(sqlString, conn, params={"start_time": startTimeString,"end_time": endTimeString, "course_id": course_id})
-    logger.debug(df);
+    logger.debug(df)
 
     # return if there is no data during this interval
     if (df.empty):
@@ -194,7 +201,7 @@ def file_access_within_week(request, course_id=0):
                     "where a.user_id = u.id " \
                     "and a.file_id = f.ID " \
                     "and u.sis_name=%(current_user)s " \
-                    "group by CONCAT(f.id, ';', f.name)";
+                    "group by CONCAT(f.id, ';', f.name)"
     logger.debug(selfSqlString)
     logger.debug("current_user=" + current_user)
 
@@ -235,7 +242,7 @@ def grade_distribution(request, course_id=0):
 
     current_user = request.user.get_username()
     grade_score_sql = "select current_grade,(select current_grade from user where sis_name=" \
-                      "%(current_user)s and course_id=%(course_id)s) as current_user_grade from user where course_id=%(course_id)s;"
+                      "%(current_user)s and course_id=%(course_id)s) as current_user_grade from user where course_id=%(course_id)s"
     df = pd.read_sql(grade_score_sql, conn, params={"current_user": current_user,'course_id': course_id})
     if df.empty or df['current_grade'].isnull().all():
         return HttpResponse(json.dumps({}), content_type='application/json')
@@ -513,7 +520,7 @@ def is_weight_considered(course_id):
 
 def get_term_dates_for_course(course_id):
     logger.info(get_term_dates_for_course.__name__)
-    sql = "select a.date_start from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.id;"
+    sql = "select a.date_start from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.id"
     df = pd.read_sql(sql, conn, params={"course_id": course_id}, parse_dates={'date_start': '%Y-%m-%d'})
     return df['date_start'].iloc[0]
 
