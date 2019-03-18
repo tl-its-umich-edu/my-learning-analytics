@@ -346,7 +346,7 @@ def assignments(request, course_id=0):
         return HttpResponse(json.dumps([]), content_type='application/json')
 
     df.sort_values(by='due_date', inplace=True)
-    df.drop(columns=['assignment_id', 'due_date'], inplace=True)
+    df.drop(columns=['assignment_id', 'due_date','grp_id'], inplace=True)
     df.drop_duplicates(keep='first', inplace=True)
 
     # instructor might not ever see the avg score as he don't have grade in assignment. we don't have role described in the flow to open the gates for him
@@ -407,9 +407,9 @@ def assignments(request, course_id=0):
 def get_course_assignments(course_id):
 
     sql=f"""select assign.*,sub.avg_score from
-            (select assignment_id,name,assign_grp_name,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from
+            (select assignment_id,name,assign_grp_name,grp_id,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from
             (select a.id as assignment_id,a.assignment_group_id, a.local_date as due_date,a.name,a.points_possible from assignment as a  where a.course_id =%(course_id)s) as app right join
-            (select id, name as assign_grp_name, group_points, weight,drop_lowest,drop_highest from assignment_groups where course_id=%(course_id)s) as ag on ag.id=app.assignment_group_id) as assign left join
+            (select id, name as assign_grp_name, id as grp_id, group_points, weight,drop_lowest,drop_highest from assignment_groups where course_id=%(course_id)s) as ag on ag.id=app.assignment_group_id) as assign left join
             (select distinct assignment_id,avg_score from submission where course_id=%(course_id)s) as sub on sub.assignment_id = assign.assignment_id
             """
 
@@ -423,11 +423,12 @@ def get_course_assignments(course_id):
     assignments_in_course[['points_possible','group_points']]=assignments_in_course[['points_possible','group_points']].fillna(0)
     assignments_in_course[['points_possible', 'group_points','weight']] = assignments_in_course[['points_possible', 'group_points','weight']].astype(float)
     consider_weight=is_weight_considered(course_id)
-    hidden_assignments = are_weighted_assignments_hidden(course_id)
+    df2 = assignments_in_course[['weight','group_points','grp_id']].drop_duplicates()
+    hidden_assignments = are_weighted_assignments_hidden(course_id, df2)
     total_points=assignments_in_course['points_possible'].sum()
     # if assignment group is weighted and no assignments added yet then assignment name will be nothing so situation is specific to that
     if hidden_assignments:
-        assignments_in_course['name'] = assignments_in_course['name'].fillna(assignments_in_course['assign_grp_name']+' Group Place Holder Assignments')
+        assignments_in_course['name'] = assignments_in_course['name'].fillna(assignments_in_course['assign_grp_name']+' Group Unavailable Assignments')
     assignments_in_course['towards_final_grade']=assignments_in_course.apply(lambda x: percent_calculation(consider_weight, total_points,hidden_assignments, x), axis=1)
     assignments_in_course['calender_week']=assignments_in_course['due_date'].dt.week
     assignments_in_course['calender_week']=assignments_in_course['calender_week'].fillna(0).astype(int)
@@ -525,7 +526,7 @@ def get_term_dates_for_course(course_id):
     return df['date_start'].iloc[0]
 
 
-def are_weighted_assignments_hidden(course_id):
+def are_weighted_assignments_hidden(course_id, df):
     """
     if assignments are weighted then assignment groups weight totals =100% . The code is checking if assignment groups
     has group points corresponding to group weight and if not assignments are hidden
@@ -533,9 +534,6 @@ def are_weighted_assignments_hidden(course_id):
     :return:
     """
     logger.info(are_weighted_assignments_hidden.__name__)
-    sql = "select weight, group_points from assignment_groups where course_id=%(course_id)s"
-    df = pd.read_sql(sql, conn, params={"course_id": course_id})
-    # df.to_json(f'assign_hidden_{course_id}.json', orient='records')
     df['weight'] = df['weight'].astype(int)
     tot_weight = df['weight'].sum()
     if tot_weight > 0:
