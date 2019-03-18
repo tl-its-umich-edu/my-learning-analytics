@@ -29,7 +29,6 @@ function GradeDistribution (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
   const [loaded, gradeData] = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/grade_distribution`)
-  console.log(gradeData)
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
