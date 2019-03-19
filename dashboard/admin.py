@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django import forms
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.template.defaultfilters import linebreaksbr
@@ -16,9 +17,6 @@ class AlwaysChangedModelForm(ModelForm):
             return True
         return super(AlwaysChangedModelForm, self).has_changed()
 
-class CourseInline(admin.TabularInline):
-    model = Course
-
 class CourseViewOptionInline(admin.StackedInline):
     model = CourseViewOption
     form = AlwaysChangedModelForm
@@ -30,8 +28,20 @@ class CourseViewOptionInline(admin.StackedInline):
         if view in settings.VIEWS_DISABLED:
             exclude += (view,)
 
+class CourseForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        exclude = ()
+
+    def clean(self):
+        canvas_id = self.cleaned_data.get('canvas_id')
+        if not canvas_id or not canvas_id.isdigit():
+            raise forms.ValidationError(f"Course ID {canvas_id} must be an integer value")
+        return self.cleaned_data
+
 class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseViewOptionInline,]
+    form = CourseForm
     list_display = ('name', 'term_id','_courseviewoption')
     list_select_related = True
 
