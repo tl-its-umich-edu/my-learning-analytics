@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Case insenstive match
+shopt -s nocaseglob
+
 echo $DJANGO_SETTINGS_MODULE
 
 if [ -z "${GUNICORN_WORKERS}" ]; then
@@ -27,8 +30,10 @@ wait-port ${MYSQL_HOST}:${MYSQL_PORT} -t 30000
 echo Running python startups
 python manage.py migrate
 
-if [ -z "${IS_CRON_POD}" ]; then
-    if [ -z "${PTVSD_DEBUG}" ]; then
+# If these values aren't set or they're set to false
+# This syntax substitutes False if null or unset
+if [ "${IS_CRON_POD:-"False"}" == "False" ]; then
+    if [ "${PTVSD_ENABLE:-"False"}" == "False" ]; then
         # Start Gunicorn processes
         echo Starting Gunicorn for production
 
@@ -41,7 +46,9 @@ if [ -z "${IS_CRON_POD}" ]; then
         # Currently ptvsd doesn't work with gunicorn
         # https://github.com/Microsoft/vscode-python/issues/2138
         echo Starting Runserver for development
-        exec python manage.py runserver --noreload 0.0.0.0:${GUNICORN_PORT}
+        export PYTHONPATH="/code:$PYTHONPATH"
+        export DJANGO_SETTINGS_MODULE=dashboard.settings
+        exec django-admin runserver --ptvsd 0.0.0.0:${GUNICORN_PORT}
 
     fi
 else
