@@ -11,10 +11,10 @@ from django.forms.models import ModelForm
 # Always save the OneToOne Fields
 # https://stackoverflow.com/a/3734700/3708872
 class AlwaysChangedModelForm(ModelForm):
-    def has_changed(self, initial, data):
-        if self.instance.pk is None:
+    def has_changed(self):
+        if not self.instance.pk:
             return True
-        return super(AlwaysChangedModelForm, self).has_changed(initial, data)
+        return super(AlwaysChangedModelForm, self).has_changed()
 
 class CourseInline(admin.TabularInline):
     model = Course
