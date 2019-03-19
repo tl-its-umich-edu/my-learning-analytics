@@ -6,15 +6,15 @@ from django.template.defaultfilters import linebreaksbr
 from dashboard.common.db_util import canvas_id_to_incremented_id
 from .models import CourseViewOption, Course
 
-from django.forms.models import BaseInlineFormSet, ModelForm
+from django.forms.models import ModelForm
 
 # Always save the OneToOne Fields
 # https://stackoverflow.com/a/3734700/3708872
 class AlwaysChangedModelForm(ModelForm):
-    def has_changed(self, *args, **kwargs):
+    def has_changed(self, initial, data):
         if self.instance.pk is None:
             return True
-        return super(AlwaysChangedModelForm, self).has_changed(*args, **kwargs)
+        return super(AlwaysChangedModelForm, self).has_changed(initial, data)
 
 class CourseInline(admin.TabularInline):
     model = Course
