@@ -1,46 +1,6 @@
 /* global describe, test, expect */
 import createScatterplot from '../../components/d3/createScatterplot'
-
-const scatterplotData = Object.freeze(
-  [
-    {
-      'x': 10,
-      'y': 10
-    },
-    {
-      'x': 10,
-      'y': 11
-    },
-    {
-      'x': 11,
-      'y': 10
-    },
-    {
-      'x': 30,
-      'y': 30
-    },
-    {
-      'x': 70,
-      'y': 66
-    },
-    {
-      'x': 90,
-      'y': 90
-    },
-    {
-      'x': 100,
-      'y': 89
-    },
-    {
-      'x': 40,
-      'y': 77
-    },
-    {
-      'x': 60,
-      'y': 69
-    }
-  ]
-)
+import { scatterplotData } from '../testData/d3TestData'
 
 describe('createScatterplot', () => {
   test('should build a scatter plot', () => {

@@ -71,7 +71,8 @@
       "web.jsx",
       "jsx",
       "node"
-    ]
+    ],
+    "testPathIgnorePatterns": ["testData"]
   },
   "devDependencies": {
     "@babel/core": "~7.3.4",

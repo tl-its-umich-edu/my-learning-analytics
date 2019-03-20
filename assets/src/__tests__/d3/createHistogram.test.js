@@ -1,21 +1,6 @@
 /* global describe, test, expect */
 import createHistogram from '../../components/d3/createHistogram'
-
-const histogramData = Object.freeze(
-  [
-    34,
-    35,
-    40,
-    55,
-    60,
-    61,
-    75,
-    83,
-    92,
-    97,
-    100
-  ]
-)
+import { histogramData } from '../testData/d3TestData'
 
 describe('createHistogram', () => {
   test('should build a histogram', () => {
