@@ -63,7 +63,7 @@ def get_course_info(request, course_id=0):
     :return: JSON to be used 
     :rtype: str
     """
-
+    course_id = canvas_id_to_incremented_id(course_id)
     today = datetime.today()
 
     try:
@@ -100,6 +100,8 @@ def get_course_info(request, course_id=0):
 # show percentage of users who read the file within prior n weeks
 def file_access_within_week(request, course_id=0):
 
+    course_id = canvas_id_to_incremented_id(course_id)
+
     current_user=request.user.get_username()
 
     logger.debug("current_user=" + current_user)
@@ -133,7 +135,7 @@ def file_access_within_week(request, course_id=0):
 
     total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": course_id})
     total_number_student = total_number_student_df.iloc[0,0]
-    logger.info("course_id_string" + course_id + " total student=" + str(total_number_student))
+    logger.debug(f"course_id_string {course_id} total student {total_number_student}")
 
     term_date_start = AcademicTerms.objects.course_date_start(course_id)
 
@@ -236,7 +238,7 @@ def file_access_within_week(request, course_id=0):
     output_df.drop(columns=['file_id_part', 'file_name_part', 'file_id_name'], inplace=True)
     logger.debug(output_df.to_json(orient='records'))
 
-    return HttpResponse(output_df.to_json(orient='records'))
+    return HttpResponse(output_df.to_json(orient='records'),content_type='application/json')
 
 
 def grade_distribution(request, course_id=0):
