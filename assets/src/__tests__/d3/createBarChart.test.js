@@ -1,38 +1,6 @@
 /* global describe, test, expect */
 import createBarChart from '../../components/d3/createBarChart'
-
-const barChartData = Object.freeze(
-  [
-    {
-      'label': 'Bob',
-      'data': 12
-    },
-    {
-      'label': 'Robin',
-      'data': 34
-    },
-    {
-      'label': 'Anne',
-      'data': 78
-    },
-    {
-      'label': 'Mark',
-      'data': 23
-    },
-    {
-      'label': 'Joe',
-      'data': 10
-    },
-    {
-      'label': 'Eve',
-      'data': 44
-    },
-    {
-      'label': 'Karen',
-      'data': 4
-    }
-  ]
-)
+import { barChartData } from '../testData/d3TestData'
 
 describe('createBarChart', () => {
   test('should build a bar chart', () => {
