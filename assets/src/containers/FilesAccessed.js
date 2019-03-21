@@ -1,10 +1,10 @@
 import React from 'react'
-import useFetch from '../hooks/useFetch'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import Spinner from '../components/Spinner'
+import useFilesAccessedAssignmentData from '../../src/service/api'
 
 const styles = theme => ({
   root: {
@@ -20,7 +20,7 @@ const styles = theme => ({
 function FilesAccessed (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
-  const [loaded, assignmentData] = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/assignments?percent=0`)
+  const [loaded, assignmentData] = useFilesAccessedAssignmentData
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>

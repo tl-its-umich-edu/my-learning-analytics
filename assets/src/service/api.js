@@ -1,8 +1,5 @@
-/* global fetch */
+import useFetch from '../hooks/useFetch'
 
-const get = url => {
-  return fetch(url)
-    .then(res => res.json())
-}
-
-export default get
+export const useGradeData = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/grade_distribution`)
+export const useAssignmentPlanningData = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/assignments?percent=${assignmentFilter}`)
+export const useFilesAccessedAssignmentData = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/assignments?percent=0`)
