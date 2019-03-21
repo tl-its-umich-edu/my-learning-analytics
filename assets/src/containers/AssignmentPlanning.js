@@ -70,7 +70,7 @@ function AssignmentPlanning (props) {
     if (!assignmentData || Object.keys(assignmentData).length === 0) {
       return (<p>No data provided</p>)
     }
-    return AssignmentTable(assignmentData)
+    return AssignmentTable(assignmentData.plan)
   }
 
   return (
@@ -95,7 +95,7 @@ function AssignmentPlanning (props) {
                   <MenuItem value={75}>75%</MenuItem>
                 </Select>
               </FormControl>
-              {loaded ? tableBuilder(assignmentData.plan) : <Spinner />}
+              {loaded ? tableBuilder(assignmentData) : <Spinner />}
             </>
           </Paper>
         </Grid>
