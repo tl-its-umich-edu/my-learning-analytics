@@ -4,7 +4,7 @@
 
 // colors used for different file states
 let COLOR_ACCESSED_FILE ="steelblue",
-    COLOR_NOT_ACCESSED_FILE = "gray";
+    COLOR_NOT_ACCESSED_FILE = "#e1e1e1";
 
 //Added only for the mouse wheel
 let zoomer = d3.behavior.zoom()
@@ -304,7 +304,7 @@ let makeGraph = function(url) {
         xlabel.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
             .attr("transform", "translate(" + main_width/2 + ", " + 40 + ")")  // center below axis
-            .text("Percentage of All Students in the Course")
+            .text("Percentage of All Students in the Selected Grade Range")
             .style("font-size", "14px");
 
         //Create y axis object

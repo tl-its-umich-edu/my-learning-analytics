@@ -49,9 +49,17 @@ WATCHMAN_TOKEN_NAME = config('DJANGO_WATCHMAN_TOKEN_NAME', default='token')
 # Only report on the default database
 WATCHMAN_DATABASES = ('default',)
 
+# Defaults for PTVSD
+PTVSD_ENABLE = config("PTVSD_ENABLE", default=False, cast=bool)
+PTVSD_REMOTE_ADDRESS = config("PTVSD_REMOTE_ADDRESS", default="0.0.0.0")
+PTVSD_REMOTE_PORT = config("PTVSD_REMOTE_PORT", default=3000, cast=int)
+PTVSD_WAIT_FOR_ATTACH = config("PTVSD_WAIT_FOR_ATTACH", default=False, cast=bool)
+
 # Application definition
 
 INSTALLED_APPS = [
+    'dashboard',
+    'django_ptvsd',
     'django_su',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -60,7 +68,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
-    'dashboard',
     'django_cron',
     'watchman',
     'macros',
@@ -105,6 +112,7 @@ TEMPLATES = [
                 'django_settings_export.settings_export',
                 'dashboard.context_processors.course_name',
                 'dashboard.context_processors.current_user_course_id',
+                'dashboard.context_processors.current_user_incremented_course_id',
                 'dashboard.context_processors.course_view_option',
                 'dashboard.context_processors.last_updated',
                 'dashboard.context_processors.get_build_info',
@@ -130,13 +138,13 @@ DATABASES = {
         'HOST': config('MYSQL_HOST', default='localhost'),
         'PORT': config('MYSQL_PORT', default=3306, cast=int),
     },
-    'UDW': {
-        'ENGINE': config('UDW_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': config('UDW_DATABASE', default=''),
-        'USER': config('UDW_USER', default=''),
-        'PASSWORD': config('UDW_PASSWORD', default=''),
-        'HOST': config('UDW_HOST', default=config('UDW_ENDPOINT', default='')),
-        'PORT': config('UDW_PORT', default=5432, cast=int),
+    'DATA_WAREHOUSE': {
+        'ENGINE': config('DATA_WAREHOUSE_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': config('DATA_WAREHOUSE_DATABASE', default=''),
+        'USER': config('DATA_WAREHOUSE_USER', default=''),
+        'PASSWORD': config('DATA_WAREHOUSE_PASSWORD', default=''),
+        'HOST': config('DATA_WAREHOUSE_HOST', default=''),
+        'PORT': config('DATA_WAREHOUSE_PORT', default=5432, cast=int),
     }
 }
 
@@ -339,11 +347,14 @@ if config('STUDENT_DASHBOARD_LTI', default='False', cast=bool):
     LTI_CANVAS_COURSE_ID_FIELD = config('LTI_CANVAS_COURSE_ID_FIELD',
         default="custom_canvas_course_id", cast=str)
 
-# This is fixed from UDW
-UDW_ID_PREFIX = config("UDW_ID_PREFIX", default="17700000000", cast=str)
+# controls whether Unizin specific features/data is available from the Canvas Data source
+DATA_WAREHOUSE_IS_UNIZIN = config("DATA_WAREHOUSE_IS_UNIZIN", default=True, cast=bool)
 
-# This is fixed from UDW
-UDW_FILE_ID_PREFIX = config("UDW_FILE_ID_PREFIX", default="1770000000")
+# This is used to fix ids from Canvas Data which are incremented by some large number
+CANVAS_DATA_ID_INCREMENT = config("CANVAS_DATA_ID_INCREMENT", default="17700000000000000", cast=int)
+
+# Allow enabling/disabling the View options globally
+VIEWS_DISABLED = config('VIEWS_DISABLED', default='', cast=Csv())
 
 # This is to set a date so that MyLA will track all terms with start date after this date.
 
@@ -353,7 +364,7 @@ EARLIEST_TERM_DATE = config('EARLIEST_TERM_DATE', default='2016-11-15')
 RUN_AT_TIMES = config('RUN_AT_TIMES', default="", cast= Csv())
 
 # Add any settings you need to be available to templates in this array
-SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'UDW_ID_PREFIX']
+SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID']
 
 # Method to show the user, if they're authenticated and superuser
 def show_debug_toolbar(request):
@@ -369,3 +380,5 @@ DEBUG_TOOLBAR_CONFIG = {
 MAX_DEFAULT_WEEKS = config("MAX_DEFAULT_WEEKS", default=16, cast=int)
 
 CLIENT_CACHE_TIME = config("CLIENT_CACHE_TIME", default=3600, cast=int)
+
+CRON_BQ_IN_LIMIT = config("CRON_BQ_IN_LIMIT", default=20, cast=int)

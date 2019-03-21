@@ -23,6 +23,14 @@ The bq_cred.json is service account for Big Query, it needs to be supplied and p
 	student-dashboard-saml.key
 	student-dashboard-saml.pem
 
+# Control course view options
+
+View options can be controlled at the global and course level. If a view is disabled globally, it will be disabled for each course, even if previously enabled at the course level. If a view is not globally disabled, it can still be disabled at the course level.
+
+`VIEWS_DISABLED` comma delimited list of views to disable (default empty). The expected name of the view is the same as the view's column name in the `course_view_option` table. Example value of `show_files_accessed,show_grade_distribution` will disable both the Files Accessed and Grade Distribution views.
+
+Note that by default all views are enabled when a course is added.
+
 # LTI v1.1.1 Configuration
 
 Only basic LTI launches are supported at the moment (automatic account creation and redirection to the correct course). New courses are not added nor are course view options modified.
@@ -146,9 +154,11 @@ Then you can edit your files! (Probably in /code/dashboard)
 
 4. VsCode is supported via PTVSD for debugging the code running in Docker. See this information here for details https://code.visualstudio.com/docs/python/debugging#_remote-debugging
 
-    A few variables are available to be defined in the .env file to enable this but minimally you have to set PTVSD_DEBUG=True. Currently docker-compose.yml opens 2 ports that can be used current, 3000 and 3001. If you need more you can open them.
+    A few variables are available to be defined in the .env file to enable this but minimally you have to set PTVSD_ENABLE=True. Currently docker-compose.yml opens 2 ports that can be used current, 3000 and 3001. If you need more you can open them. You can configure these with other variables. See the .env.sample for examples.
 
     If you want to conenct to the cron job you'll have to use a different port as Django uses 3000 by default and also wait for attach.
+
+    This debug mode currently only works with django-admin commands (not gunicorn or manage.py) 
 
 ## License check
 
