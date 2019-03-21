@@ -1,10 +1,18 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import Spinner from '../components/Spinner'
-import { useFilesAccessedAssignmentData } from '../service/api'
+import Checkbox from '@material-ui/core/Checkbox'
+import RangeSlider from '../components/RangeSlider'
+import FormControl from '@material-ui/core/FormControl'
+import Select from '@material-ui/core/Select'
+import MenuItem from '@material-ui/core/MenuItem'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import { useInfoData } from '../service/api'
+import { useUserSettingData } from '../service/api'
+import FileAccessChart from '../components/FileAccessChart'
 
 const styles = theme => ({
   root: {
@@ -14,21 +22,148 @@ const styles = theme => ({
   paper: {
     padding: theme.spacing.unit * 2,
     color: theme.palette.text.secondary
-  }
+  },
+  formController: {
+    display: "flex",
+    marginTop: theme.spacing.unit * 2,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  checkBox: {
+    marginLeft: 20,
+  },
 })
 
 function FilesAccessed (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
-  const [loaded, assignmentData] = useFilesAccessedAssignmentData(currentCourseId)
+  const [minMaxWeek, setMinMaxWeek] = useState([]) // Should be updated from info
+  const [curWeek, setCurWeek] = useState(0) // Should be updated from info
+  const [weekRange, setWeekRange] = useState([]) // Should be depend on curWeek
+  const [saveSettingState, setSaveSetting] = useState(false)
+  const [gradeRange, setGradeRange] = useState("All") // Should be fetched from default
+  const [infoLoaded, infoData] = useInfoData(currentCourseId)
+  const [settingLoaded, settingData] = useUserSettingData(currentCourseId) // Used to update default setting
+  const [fileAccessData, setFileAccessData] = useState([])
+  const [fileAccessDataLoaded, setFileAccessDataLoaded] = useState(false)
+  // const [loaded, fileData] = useFilesAccessedData(currentCourseId, weekRange[0], weekRange[1], gradeRange)
+  const [dataControllerLoad, setDataControllerLoad] = useState(0)
+
+  useEffect(() => {
+    // Fetch info data and update slider length, slider range, and current week
+    if (infoLoaded) {
+      setMinMaxWeek([1, infoData.total_weeks])
+      if (infoData.current_week_number > infoData.total_weeks) {
+        setWeekRange([1, infoData.total_weeks])
+      } else if (infoData.current_week_number < 3) {
+        setCurWeek(infoData.current_week_number)
+        setWeekRange([1, infoData.current_week_number])
+      } else {
+        setCurWeek(infoData.current_week_number)
+        setWeekRange([infoData.current_week_number - 2, infoData.current_week_number])
+      }
+      setDataControllerLoad(dataControllerLoad + 1);
+    }
+  }, [infoLoaded])
+
+  useEffect(() => {
+    // Fetch grade range from default setting if any
+    if (settingLoaded) {
+      if (settingData.default !== "") {
+        setGradeRange(settingData.default)
+      }
+      setDataControllerLoad(dataControllerLoad + 1);
+    }
+  }, [settingLoaded])
+
+  useEffect(() => {
+    // Fetch data once all the setting data is fetched
+    if (dataControllerLoad === 2) {
+      const dataURL = `http://localhost:5001/api/v1/courses/${currentCourseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRange}`
+      fetch(dataURL)
+        .then(res => res.json())
+        .then(data => {
+          setFileAccessData(data)
+          setFileAccessDataLoaded(true)
+        })
+    }
+  }, [dataControllerLoad, weekRange, gradeRange])
+
+  const onWeekChangeHandler = value => {
+    // Update week range slider
+    setWeekRange(value)
+  }
+
+  const gradeRangeHandler = event => {
+    // Update grade range selection
+    setGradeRange(event.target.value)
+  }
+
+  const saveSettingHandler = () => {
+    setSaveSetting(!saveSettingState)
+  }
+
+  const FileAccessChartBuilder = (fileData) => {
+    if (!fileData || fileData.length === 0) {
+      return (<p>No data provided</p>)
+    }
+    return (
+    <Grid item xs={12} lg={10}>
+      <FileAccessChart
+        data={fileData}
+        aspectRatio={0.3}
+      />
+    </Grid>
+    )
+  }
+
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Typography variant='h5' gutterBottom >Files Accessed</Typography >
-            {loaded
-              ? <> </>
+            <Typography variant='h5' gutterBottom className = "title">Files Accessed</Typography >
+              {dataControllerLoad === 2 ? <RangeSlider
+                curWeek = {curWeek}
+                className = "slider"
+                startWeek = {weekRange[0]}
+                endWeek = {weekRange[1]}
+                min = {minMaxWeek[0]}
+                max = {minMaxWeek[1]}
+                onWeekChange = {onWeekChangeHandler}
+              />: ""}
+              <div className={classes.formController}>
+                <p>File accessed from week <b>{weekRange[0]} { weekRange[0] === curWeek ? " (Now)": "" }</b> to <b>{weekRange[1]}{ weekRange[1] === curWeek ? " (Now)": "" }</b> with these grades:</p>
+                <FormControl className={classes.formControl}>
+                  <Select
+                    value={gradeRange}
+                    onChange={gradeRangeHandler}
+                    inputProps={{
+                      name: 'grade',
+                      id: 'grade-range',
+                    }}
+                  >
+                    <MenuItem value="All">All</MenuItem>
+                    <MenuItem value="90-100">90-100%</MenuItem>
+                    <MenuItem value="80-89">80-89%</MenuItem>
+                    <MenuItem value="70-79">70-79%</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl className={classes.checkBox}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                      checked={saveSettingState}
+                      onChange={saveSettingHandler}
+                      value="checked"
+                      />
+                    }
+                    label="Remember my setting"
+                  />
+                </FormControl>
+              </div>
+            {fileAccessDataLoaded
+              ? FileAccessChartBuilder(fileAccessData)
               : <Spinner />}
           </Paper>
         </Grid>
