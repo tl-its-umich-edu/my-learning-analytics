@@ -32,7 +32,7 @@ function createProgressBar ({ data, width, height, el, tip }) {
     .attr('width', aWidth)
     .attr('height', aHeight)
 
-  const bar = svg.selectAll('bar')
+  const bar = svg.selectAll('g')
     .data(data).enter()
     .append('g')
 
