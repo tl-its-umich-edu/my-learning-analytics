@@ -43,7 +43,9 @@ function AssignmentPlanning (props) {
         assignmentItems.forEach(assignment => {
           const assignmentName = assignment.name
           const percentOfFinalGrade = assignment.towards_final_grade
-          acc.push([week, dueDate, assignmentName, percentOfFinalGrade])
+          const graded = assignment.graded
+          const barData = { percentOfFinalGrade, graded }
+          acc.push([week, dueDate, assignmentName, barData])
         })
       })
       return acc
@@ -56,9 +58,9 @@ function AssignmentPlanning (props) {
       tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
       tableData={generateAssignmentTable(plan)
         .map(row => {
-          const percentOfFinalGrade = row.pop()
+          const { percentOfFinalGrade, graded } = row.pop()
           row.push(<HorizontalBar
-            data={[{ label: 'grade', data: percentOfFinalGrade }]}
+            data={[{ label: 'grade', data: percentOfFinalGrade, graded }]}
             width={200}
             height={20}
           />)
@@ -81,22 +83,22 @@ function AssignmentPlanning (props) {
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <>
-            <Typography variant='h5' gutterBottom >Progress toward Final Grade</Typography >
-            {assignmentData ? <ProgressBar
-              data={assignmentData.progress}
-              aspectRatio={0.12}
-              tip={createToolTip(d => renderToString(
-                <Paper className={classes.paper}>
-                  <Table tableData={[
-                    ['Assignment', <strong>{d.name}</strong>],
-                    ['Due at', <strong>{d.due_dates}</strong>],
-                    ['Your grade', <strong>{d.score ? `${d.score}%` : 'Not available'}</strong>],
-                    ['Total points possible', <strong>{d.points_possible}</strong>],
-                    ['Avg assignment grade', <strong>{d.avg_score}</strong>],
-                    ['Percentage worth in final grade', <strong>{d.towards_final_grade}%</strong>]
-                  ]} />
-                </Paper>
-              ))} /> : <Spinner />}
+              <Typography variant='h5' gutterBottom>Progress toward Final Grade</Typography >
+              {assignmentData ? <ProgressBar
+                data={assignmentData.progress}
+                aspectRatio={0.12}
+                tip={createToolTip(d => renderToString(
+                  <Paper className={classes.paper}>
+                    <Table tableData={[
+                      ['Assignment', <strong>{d.name}</strong>],
+                      ['Due at', <strong>{d.due_dates}</strong>],
+                      ['Your grade', <strong>{d.score ? `${d.score}%` : 'Not available'}</strong>],
+                      ['Total points possible', <strong>{d.points_possible}</strong>],
+                      ['Avg assignment grade', <strong>{d.avg_score}</strong>],
+                      ['Percentage worth in final grade', <strong>{d.towards_final_grade}%</strong>]
+                    ]} />
+                  </Paper>
+                ))} /> : <Spinner />}
             </ >
           </Paper>
         </Grid>

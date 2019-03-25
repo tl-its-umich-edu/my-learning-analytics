@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 
 function createProgressBar ({ data, width, height, el, tip }) {
-  const margin = { top: 20, right: 20, bottom: 20, left: 20 }
+  const margin = { top: 20, right: 20, bottom: 20, left: 50 }
   let [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   // prevent height from being too tall or too short
@@ -47,8 +47,14 @@ function createProgressBar ({ data, width, height, el, tip }) {
     .style('outline-style', 'solid')
     .style('outline-width', '1px')
 
+  // bar.append('text')
+  //   .attr('x', (_, i) => x(calculatePercentSoFar(i)))
+  //   .attr('y', margin.top + y.bandwidth() / 2)
+  //   .text(d => d.name)
+  //   .style('font-size', '0.875rem')
+
   const xAxis = g => g
-    .attr(`transform`, `translate(0, ${aHeight - margin.bottom})`)
+    .attr('transform', `translate(0, ${aHeight - margin.bottom})`)
     .call(d3
       .axisBottom(x)
       .tickFormat(d => `${d}%`)
@@ -104,6 +110,8 @@ function createProgressBar ({ data, width, height, el, tip }) {
 
   if (tip) {
     tip.direction('s')
+      .offset([0, 60])
+      .style('max-width', '300px')
     svg.call(tip)
     bar
       .on('mouseover', tip.show)
