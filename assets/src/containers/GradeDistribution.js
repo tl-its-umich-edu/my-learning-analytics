@@ -9,7 +9,7 @@ import Spinner from '../components/Spinner'
 import createToolTip from '../util/createToolTip'
 import Table from '../components/Table'
 import { average } from '../util/math'
-import useGradeData from '../../src/service/api'
+import { useGradeData } from '../service/api'
 
 const styles = theme => ({
   root: {
@@ -28,7 +28,7 @@ const styles = theme => ({
 function GradeDistribution (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
-  const [loaded, gradeData] = useGradeData
+  const [loaded, gradeData] = useGradeData(currentCourseId)
 
   const tableBuilder = (gradeData) => {
     if (!gradeData || Object.keys(gradeData).length === 0) {

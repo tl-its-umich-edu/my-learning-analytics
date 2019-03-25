@@ -10,7 +10,7 @@ import InputLabel from '@material-ui/core/InputLabel'
 import MenuItem from '@material-ui/core/MenuItem'
 import Table from '../components/Table'
 import HorizontalBar from '../components/HorizontalBar'
-import useAssignmentPlanningData from '../../src/service/api'
+import { useAssignmentPlanningData } from '../service/api'
 
 const styles = theme => ({
   root: {
@@ -27,7 +27,7 @@ function AssignmentPlanning (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
   const [assignmentFilter, setAssignmentFilter] = useState(0)
-  const [loaded, assignmentData] = useAssignmentPlanningData
+  const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, assignmentFilter)
 
   const generateAssignmentTable = plan => {
     const tableArray = plan.reduce((acc, weekItem) => {

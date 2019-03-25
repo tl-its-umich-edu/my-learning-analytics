@@ -4,7 +4,7 @@ import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import Spinner from '../components/Spinner'
-import useFilesAccessedAssignmentData from '../../src/service/api'
+import { useFilesAccessedAssignmentData } from '../service/api'
 
 const styles = theme => ({
   root: {
@@ -20,7 +20,7 @@ const styles = theme => ({
 function FilesAccessed (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
-  const [loaded, assignmentData] = useFilesAccessedAssignmentData
+  const [loaded, assignmentData] = useFilesAccessedAssignmentData(currentCourseId)
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
