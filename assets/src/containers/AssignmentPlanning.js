@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import useFetch from '../hooks/useFetch'
 import { withStyles } from '@material-ui/core/styles'
 import { renderToString } from 'react-dom/server'
 import Paper from '@material-ui/core/Paper'
@@ -13,6 +12,7 @@ import Table from '../components/Table'
 import ProgressBar from '../components/ProgressBar'
 import HorizontalBar from '../components/HorizontalBar'
 import createToolTip from '../util/createToolTip'
+import { useAssignmentPlanningData } from '../service/api'
 
 const styles = theme => ({
   root: {
@@ -29,7 +29,7 @@ function AssignmentPlanning (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
   const [assignmentFilter, setAssignmentFilter] = useState(0)
-  const [loaded, assignmentData] = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/assignments?percent=${assignmentFilter}`)
+  const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, assignmentFilter)
 
   const generateAssignmentTable = plan => {
     const tableArray = plan.reduce((acc, weekItem) => {
