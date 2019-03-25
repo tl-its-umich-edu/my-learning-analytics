@@ -1,6 +1,5 @@
 import React from 'react'
 import { renderToString } from 'react-dom/server'
-import useFetch from '../hooks/useFetch'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
@@ -10,6 +9,7 @@ import Spinner from '../components/Spinner'
 import createToolTip from '../util/createToolTip'
 import Table from '../components/Table'
 import { average } from '../util/math'
+import { useGradeData } from '../service/api'
 
 const styles = theme => ({
   root: {
@@ -28,12 +28,12 @@ const styles = theme => ({
 function GradeDistribution (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
-  const [loaded, gradeData] = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/grade_distribution`)
+  const [loaded, gradeData] = useGradeData(currentCourseId)
 
   const tableBuilder = (gradeData) => {
     if (!gradeData || Object.keys(gradeData).length === 0) {
       return (<p>No data provided</p>)
-    } 
+    }
     return (
       <>
         <Grid item xs={12} sm={4} lg={2}>
