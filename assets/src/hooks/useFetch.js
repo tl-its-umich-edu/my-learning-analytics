@@ -1,7 +1,12 @@
+/* global fetch */
 import { useState, useEffect } from 'react'
-import get from '../service/api'
 
 const cache = new Map()
+
+const get = url => {
+  return fetch(url)
+    .then(res => res.json())
+}
 
 const useFetch = dataURL => {
   const [data, setData] = useState(null)

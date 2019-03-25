@@ -14,6 +14,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
+from dashboard.common.db_util import canvas_id_to_incremented_id
 
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -46,31 +47,18 @@ def gpa_map(grade):
     else:
         return GRADE_LOW
 
+
 def get_home_template(request):
-    return render(request, 'home.html')
+    return render(request, 'frontend/index.html')
 
-@permission_required('dashboard.get_grades_template',
-    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
-def get_grades_template(request, course_id=0):
-    return render(request, 'grades.html', {'course_id': course_id})
-
-@permission_required('dashboard.get_assignments_template',
-    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
-def get_assignments_template(request, course_id=0):
-    return render(request, 'assignments.html', {'course_id': course_id})
-
-@permission_required('dashboard.get_files_template',
-    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
-def get_files_template(request, course_id=0):
-    return render(request, 'view_file_access_within_week.html', {'course_id': course_id})
-
-@permission_required('dashboard.get_course_template',
+@permission_required('dashboard.get_home_courses_template',
     fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
 def get_course_template(request, course_id=0):
-    return render(request, 'courses.html', {'course_id': course_id})
+    return render(request, 'frontend/index.html', {'course_id': course_id})
+
 
 @permission_required('dashboard.get_course_info',
-    fn=objectgetter(Course, 'course_id'), raise_exception=True)
+    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
 def get_course_info(request, course_id=0):
     """Returns JSON data about a course
 
@@ -81,7 +69,7 @@ def get_course_info(request, course_id=0):
     :return: JSON to be used
     :rtype: str
     """
-
+    course_id = canvas_id_to_incremented_id(course_id)
     today = timezone.now()
 
     try:
@@ -117,8 +105,10 @@ def get_course_info(request, course_id=0):
 
 # show percentage of users who read the file within prior n weeks
 @permission_required('dashboard.file_access_within_week',
-    fn=objectgetter(Course, 'course_id'), raise_exception=True)
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def file_access_within_week(request, course_id=0):
+
+    course_id = canvas_id_to_incremented_id(course_id)
 
     current_user=request.user.get_username()
 
@@ -257,15 +247,15 @@ def file_access_within_week(request, course_id=0):
     output_df.drop(columns=['file_id_part', 'file_name_part', 'file_id_name'], inplace=True)
     logger.debug(output_df.to_json(orient='records'))
 
-    return HttpResponse(output_df.to_json(orient='records'))
+    return HttpResponse(output_df.to_json(orient='records'),content_type='application/json')
 
 
 @permission_required('dashboard.grade_distribution',
-    fn=objectgetter(Course, 'course_id'), raise_exception=True)
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def grade_distribution(request, course_id=0):
     logger.info(grade_distribution.__name__)
 
-    course_id = int(str(settings.UDW_ID_PREFIX) + course_id)
+    course_id = canvas_id_to_incremented_id(course_id)
 
     current_user = request.user.get_username()
     grade_score_sql = "select current_grade,(select current_grade from user where sis_name=" \
@@ -296,9 +286,10 @@ def grade_distribution(request, course_id=0):
 
 
 @permission_required('dashboard.update_user_default_selection_for_views',
-    fn=objectgetter(Course, 'course_id'), raise_exception=True)
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def update_user_default_selection_for_views(request, course_id=0):
     logger.info(update_user_default_selection_for_views.__name__)
+    course_id = canvas_id_to_incremented_id(course_id)
     current_user = request.user.get_username()
     default_selection = json.loads(request.body.decode("utf-8"))
     logger.info(default_selection)
@@ -328,9 +319,10 @@ def update_user_default_selection_for_views(request, course_id=0):
 
 
 @permission_required('dashboard.get_user_default_selection',
-    fn=objectgetter(Course, 'course_id'), raise_exception=True)
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def get_user_default_selection(request, course_id=0):
     logger.info(get_user_default_selection.__name__)
+    course_id = canvas_id_to_incremented_id(course_id)
     user_sis_name = request.user.get_username()
     default_view_type = request.GET.get('default_type')
     key = 'default'
@@ -349,11 +341,11 @@ def get_user_default_selection(request, course_id=0):
 
 
 @permission_required('dashboard.assignments',
-    fn=objectgetter(Course, 'course_id'), raise_exception=True)
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def assignments(request, course_id=0):
     logger.info(assignments.__name__)
 
-    course_id = int(str(settings.UDW_ID_PREFIX) + course_id)
+    course_id = canvas_id_to_incremented_id(course_id)
 
     current_user = request.user.get_username()
     df_default_display_settings()
