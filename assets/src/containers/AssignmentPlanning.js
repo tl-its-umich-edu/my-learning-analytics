@@ -126,7 +126,7 @@ function AssignmentPlanning(props) {
                 <Typography style={{ display: 'inline' }}> Graded</Typography>
                 <br />
                 <div className={classes.ungraded} />
-                <Typography style={{ display: 'inline' }}> Ungraded</Typography>
+                <Typography style={{ display: 'inline' }}> Not Yet graded</Typography>
                 <br />
               </Grid>
             </Grid>
