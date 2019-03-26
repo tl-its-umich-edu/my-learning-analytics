@@ -22,10 +22,22 @@ const styles = theme => ({
   paper: {
     padding: theme.spacing.unit * 2,
     color: theme.palette.text.secondary
+  },
+  graded: {
+    width: '10px',
+    height: '10px',
+    background: 'lightskyblue',
+    display: 'inline-block'
+  },
+  ungraded: {
+    width: '10px',
+    height: '10px',
+    background: 'gray',
+    display: 'inline-block'
   }
 })
 
-function AssignmentPlanning (props) {
+function AssignmentPlanning(props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
   const [assignmentFilter, setAssignmentFilter] = useState(0)
@@ -92,7 +104,7 @@ function AssignmentPlanning (props) {
                     <Table tableData={[
                       ['Assignment', <strong>{d.name}</strong>],
                       ['Due at', <strong>{d.due_dates}</strong>],
-                      ['Your grade', <strong>{d.score ? `${d.score}%` : 'Not available'}</strong>],
+                      ['Your grade', <strong>{d.score ? `${d.score}` : 'Not available'}</strong>],
                       ['Total points possible', <strong>{d.points_possible}</strong>],
                       ['Avg assignment grade', <strong>{d.avg_score}</strong>],
                       ['Percentage worth in final grade', <strong>{d.towards_final_grade}%</strong>]
@@ -104,24 +116,35 @@ function AssignmentPlanning (props) {
         </Grid>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <>
-              <Typography variant='h5' gutterBottom >Assignments Due by Date</Typography >
-              <FormControl className={classes.formControl}>
-                <Typography>Show assignments that weigh at least</Typography>
-                <Select
-                  value={assignmentFilter}
-                  onChange={event => setAssignmentFilter(event.target.value)}>
-                  <MenuItem value={0}>0% (all)</MenuItem>
-                  <MenuItem value={2}>2%</MenuItem>
-                  <MenuItem value={5}>5%</MenuItem>
-                  <MenuItem value={10}>10%</MenuItem>
-                  <MenuItem value={20}>20%</MenuItem>
-                  <MenuItem value={50}>50%</MenuItem>
-                  <MenuItem value={75}>75%</MenuItem>
-                </Select>
-              </FormControl>
-              {loaded ? tableBuilder(assignmentData.plan) : <Spinner />}
-            </>
+            <Grid container>
+              <Grid item xs={12} md={10}>
+                <Typography variant='h5' gutterBottom >Assignments Due by Date</Typography >
+              </Grid>
+              <Grid item xs={12} md={2}>
+                <Typography variant='h6'>Assignment Status</Typography>
+                <div className={classes.graded} />
+                <Typography style={{ display: 'inline' }}> Graded</Typography>
+                <br />
+                <div className={classes.ungraded} />
+                <Typography style={{ display: 'inline' }}> Ungraded</Typography>
+                <br />
+              </Grid>
+            </Grid>
+            <FormControl>
+              <Typography>Show assignments that weigh at least</Typography>
+              <Select
+                value={assignmentFilter}
+                onChange={event => setAssignmentFilter(event.target.value)}>
+                <MenuItem value={0}>0% (all)</MenuItem>
+                <MenuItem value={2}>2%</MenuItem>
+                <MenuItem value={5}>5%</MenuItem>
+                <MenuItem value={10}>10%</MenuItem>
+                <MenuItem value={20}>20%</MenuItem>
+                <MenuItem value={50}>50%</MenuItem>
+                <MenuItem value={75}>75%</MenuItem>
+              </Select>
+            </FormControl>
+            {loaded ? tableBuilder(assignmentData.plan) : <Spinner />}
           </Paper>
         </Grid>
       </Grid>

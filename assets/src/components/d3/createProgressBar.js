@@ -58,11 +58,10 @@ function createProgressBar ({ data, width, height, el, tip }) {
     .call(d3
       .axisBottom(x)
       .tickFormat(d => `${d}%`)
-      .ticks(width > 750 ? 20 : 10)
+      .ticks(width > 750 ? 20 : width > 500 ? 10 : 5)
     )
 
   const currentIndex = data.filter(x => x.graded).length
-
   const currentLine = svg.append('g')
 
   currentLine
@@ -76,7 +75,7 @@ function createProgressBar ({ data, width, height, el, tip }) {
 
   currentLine.append('text')
     .attr('text-anchor', 'middle')
-    .attr('x', x(calculatePercentSoFar(currentIndex)) - 24)
+    .attr('x', x(calculatePercentSoFar(currentIndex)) - 26)
     .attr('y', margin.top)
     .attr('dy', -7)
     .attr('fill', 'darkorange')
@@ -97,7 +96,7 @@ function createProgressBar ({ data, width, height, el, tip }) {
 
   maxLine.append('text')
     .attr('text-anchor', 'middle')
-    .attr('x', x(calculatePercentSoFar(data.length)) - 38)
+    .attr('x', x(calculatePercentSoFar(data.length)) - 42)
     .attr('y', margin.top)
     .attr('dy', -7)
     .attr('fill', 'green')
