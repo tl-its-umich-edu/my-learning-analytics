@@ -43,18 +43,14 @@ function AssignmentPlanning (props) {
   const [assignmentFilter, setAssignmentFilter] = useState(0)
   const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, assignmentFilter)
 
-  const AssignmentTable = plan => (
-    <TableAssignment
-      tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
-      tableData={plan}
-    />
-  )
-
-  const tableBuilder = (assignmentData) => {
+  const tableBuilder = assignmentData => {
     if (!assignmentData || Object.keys(assignmentData).length === 0) {
-      return (<p>No data provided</p>)
+      return (<Typography>No data provided</Typography>)
     }
-    return AssignmentTable(assignmentData)
+    return <TableAssignment
+      tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
+      tableData={assignmentData}
+    />
   }
 
   return (
