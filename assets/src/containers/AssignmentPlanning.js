@@ -12,7 +12,6 @@ import Table from '../components/Table'
 import ProgressBar from '../components/ProgressBar'
 import createToolTip from '../util/createToolTip'
 import { useAssignmentPlanningData } from '../service/api'
-import HorizontalBar from '../components/HorizontalBar'
 import TableAssignment from '../components/TableAssignment'
 
 const styles = theme => ({
