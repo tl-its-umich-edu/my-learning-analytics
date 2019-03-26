@@ -24,7 +24,9 @@ function createHorizontalBar ({ data, width, height, el, tip }) {
 
   bar.append('rect')
     .attr('x', d => x(0))
-    .attr('width', d => x(d.data) - x(0))
+    .attr('width', d => d.data === 0
+      ? 2
+      : x(d.data) - x(0))
     .attr('y', d => y(d.label))
     .attr('height', y.bandwidth())
     .attr('fill', d => d.graded ? '#a0d4ee' : '#e1e1e1')
