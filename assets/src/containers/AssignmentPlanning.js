@@ -10,9 +10,9 @@ import FormControl from '@material-ui/core/FormControl'
 import MenuItem from '@material-ui/core/MenuItem'
 import Table from '../components/Table'
 import ProgressBar from '../components/ProgressBar'
-import HorizontalBar from '../components/HorizontalBar'
 import createToolTip from '../util/createToolTip'
 import { useAssignmentPlanningData } from '../service/api'
+import TableAssignment from '../components/TableAssignment'
 
 const styles = theme => ({
   root: {
@@ -66,19 +66,9 @@ function AssignmentPlanning(props) {
   }
 
   const AssignmentTable = plan => (
-    <Table
+    <TableAssignment
       tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
-      tableData={generateAssignmentTable(plan)
-        .map(row => {
-          const { percentOfFinalGrade, graded } = row.pop()
-          row.push(<HorizontalBar
-            data={[{ label: 'grade', data: percentOfFinalGrade, graded }]}
-            width={200}
-            height={20}
-          />)
-          return row
-        })
-      }
+      tableData={plan}
     />
   )
 
@@ -126,7 +116,7 @@ function AssignmentPlanning(props) {
                 <Typography style={{ display: 'inline' }}> Graded</Typography>
                 <br />
                 <div className={classes.ungraded} />
-                <Typography style={{ display: 'inline' }}> Not Yet graded</Typography>
+                <Typography style={{ display: 'inline' }}> Not Yet Graded</Typography>
                 <br />
               </Grid>
             </Grid>
