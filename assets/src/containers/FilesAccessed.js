@@ -1,13 +1,15 @@
-import 'rc-slider/assets/index.css';
-import 'rc-tooltip/assets/bootstrap.css';
 import React, {useState} from 'react'
-import Slider, {Range} from 'rc-slider'
-import useFetch from '../hooks/useFetch'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import Spinner from '../components/Spinner'
+import Checkbox from '@material-ui/core/Checkbox';
+import RangeSlider from '../components/RangeSlider';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import { useFilesAccessedAssignmentData } from '../service/api'
 
 const styles = theme => ({
@@ -18,53 +20,90 @@ const styles = theme => ({
   paper: {
     padding: theme.spacing.unit * 2,
     color: theme.palette.text.secondary
+  },
+  formController: {
+    display: "flex",
+    marginTop: theme.spacing.unit * 2,
+    alignItems: "center",
+    justifyContent: "center"
   }
 })
 
 function FilesAccessed (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
-  const [loaded, fileData] = useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/file_access_within_week`)
+  const [loaded, fileData] = useFilesAccessedAssignmentData(currentCourseId)
 
-  const inputState = useState({
-    cur_week: 1,
-    length: 10,
-  });
   const [startWeek, setStartWeek] = useState(1);
-  const [endWeek, setEndWeek] = useState(1);
+  const [endWeek, setEndWeek] = useState(17);
+  const [gradeRange, setGradeRange] = useState("All");
+  const [saveSettingState, setSaveSetting] = useState(false);
 
-  let info = {"canvas_id": "245664", "term_id": 17700000000000111, "name": "SI 664 001 FA 2018", "term": {"id": 17700000000000111, "canvas_id": "111", "name": "Fall 2018", "date_start": "2018-09-04 00:00:00", "date_end": "2018-12-31 00:00:00"}, "current_week_number": 28, "total_weeks": 17}
-
-  const onStartWeekChange = (event) => {
-      // Update start week
-      setStartWeek(startWeek + event.target.value);
+  const onWeekChangeHandler = value => {
+      // Update week range
+      setStartWeek(value[0]);
+      setEndWeek(value[1]);
   }
 
-  const onEndWeekChange = (event) => {
-      // Update end week
-      setEndWeek(endWeek + event.target.value);
+  const gradeRangeHandler = event => {
+    setGradeRange(event.target.value);
   }
 
-  // const tableBuilder = (fileData) => {
-  //   console.log(JSON.parse(fileData));
-  //   if (!fileData || fileData.length === 0) {
-  //     return (<p>No data provided</p>)
-  //   }
-  //   return (<> </>)
-  // }
-  const wrapperStyle = { width: "100%", margin: 50 };
+  const saveSettingHandler = () => {
+    setSaveSetting(!saveSettingState);
+  }
+
+  const tableBuilder = (fileData) => {
+    if (!fileData || fileData.length === 0) {
+      return (<p>No data provided</p>)
+    }
+    return (<> </>)
+  }
+
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom >Files Accessed</Typography >
-              <div style={wrapperStyle}>
-                <p>Range with custom handle</p>
-                <Range min={0} max={20} defaultValue={[3, 10]} tipFormatter={value => `${value}%`} marks={{ 1: 1, 2: 2, 20: 20 }}/>
+              <RangeSlider 
+                startWeek = {startWeek}
+                endWeek = {endWeek}
+                curWeek = {10}
+                onWeekChange = {onWeekChangeHandler}
+              />
+              <div className={classes.formController}>
+                <p>{`File accessed from week ${startWeek} to ${endWeek} with grades:`}</p>
+                <FormControl className={classes.formControl}>
+                  <Select
+                    value={gradeRange}
+                    onChange={gradeRangeHandler}
+                    inputProps={{
+                      name: 'grade',
+                      id: 'grade-range',
+                    }}
+                  >
+                    <MenuItem value="All">All</MenuItem>
+                    <MenuItem value="90-100%">90-100%</MenuItem>
+                    <MenuItem value="80-89%">80-89%</MenuItem>
+                    <MenuItem value="70-79%">70-79%</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl className={classes.checkBox}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                      checked={saveSettingState}
+                      onChange={saveSettingHandler}
+                      value="checked"
+                      />
+                    }
+                    label="Remember my setting"
+                  />
+                </FormControl>
               </div>
             {loaded
-              ? <></>
+              ? tableBuilder(fileData)
               : <Spinner />}
           </Paper>
         </Grid>
