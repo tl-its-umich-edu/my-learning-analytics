@@ -10,9 +10,10 @@ import FormControl from '@material-ui/core/FormControl'
 import MenuItem from '@material-ui/core/MenuItem'
 import Table from '../components/Table'
 import ProgressBar from '../components/ProgressBar'
-import HorizontalBar from '../components/HorizontalBar'
 import createToolTip from '../util/createToolTip'
 import { useAssignmentPlanningData } from '../service/api'
+import HorizontalBar from '../components/HorizontalBar'
+import TableAssignment from '../components/TableAssignment'
 
 const styles = theme => ({
   root: {
@@ -37,48 +38,16 @@ const styles = theme => ({
   }
 })
 
-function AssignmentPlanning(props) {
+function AssignmentPlanning (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
   const [assignmentFilter, setAssignmentFilter] = useState(0)
   const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, assignmentFilter)
 
-  const generateAssignmentTable = plan => {
-    const tableArray = plan.reduce((acc, weekItem) => {
-      const week = weekItem.week
-      const dueDateItems = weekItem.due_date_items
-
-      dueDateItems.forEach(dueDateItem => {
-        const dueDate = dueDateItem.due_date
-        const assignmentItems = dueDateItem.assignment_items
-
-        assignmentItems.forEach(assignment => {
-          const assignmentName = assignment.name
-          const percentOfFinalGrade = assignment.towards_final_grade
-          const graded = assignment.graded
-          const barData = { percentOfFinalGrade, graded }
-          acc.push([week, dueDate, assignmentName, barData])
-        })
-      })
-      return acc
-    }, [])
-    return tableArray
-  }
-
   const AssignmentTable = plan => (
-    <Table
+    <TableAssignment
       tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
-      tableData={generateAssignmentTable(plan)
-        .map(row => {
-          const { percentOfFinalGrade, graded } = row.pop()
-          row.push(<HorizontalBar
-            data={[{ label: 'grade', data: percentOfFinalGrade, graded }]}
-            width={200}
-            height={20}
-          />)
-          return row
-        })
-      }
+      tableData={plan}
     />
   )
 
@@ -126,7 +95,7 @@ function AssignmentPlanning(props) {
                 <Typography style={{ display: 'inline' }}> Graded</Typography>
                 <br />
                 <div className={classes.ungraded} />
-                <Typography style={{ display: 'inline' }}> Not Yet graded</Typography>
+                <Typography style={{ display: 'inline' }}> Not Yet Graded</Typography>
                 <br />
               </Grid>
             </Grid>

@@ -1,0 +1,117 @@
+// modified from https://demos.creative-tim.com/material-dashboard-react/?_ga=2.12819711.913135977.1549993496-494583875.1549993496#/table
+
+import React from 'react'
+import withStyles from '@material-ui/core/styles/withStyles'
+import Table from '@material-ui/core/Table'
+import TableHead from '@material-ui/core/TableHead'
+import TableRow from '@material-ui/core/TableRow'
+import TableBody from '@material-ui/core/TableBody'
+import TableCell from '@material-ui/core/TableCell'
+import HorizontalBar from '../components/HorizontalBar'
+
+const tableStyle = theme => ({
+  table: {
+    marginBottom: '0',
+    width: '100%',
+    maxWidth: '100%',
+    backgroundColor: 'transparent',
+    borderSpacing: '0',
+    borderCollapse: 'collapse'
+  },
+  tableHeadCell: {
+    color: 'inherit',
+    fontSize: '1em'
+  },
+  tableCell: {
+    lineHeight: '1.42857143',
+    padding: '12px 8px',
+    verticalAlign: 'middle'
+  },
+  tableResponsive: {
+    width: '100%',
+    marginTop: theme.spacing.unit * 3,
+    overflowX: 'auto'
+  }
+})
+
+const generateAssignmentTable = plan => {
+  const tableArray = plan.reduce((acc, weekItem) => {
+    const week = `Week ${weekItem.week}`
+    const dueDateItems = weekItem.due_date_items
+
+    dueDateItems.forEach(dueDateItem => {
+      const dueDate = dueDateItem.due_date
+      const assignmentItems = dueDateItem.assignment_items
+
+      assignmentItems.forEach(assignment => {
+        const assignmentName = assignment.name
+        const percentOfFinalGrade = assignment.towards_final_grade
+        const graded = assignment.graded
+        const barData = { percentOfFinalGrade, graded }
+        acc.push([week, dueDate, assignmentName, barData])
+      })
+    })
+    return acc
+  }, [])
+  return tableArray
+}
+
+function CustomAssignmentTable (props) {
+  const { classes, tableHead, tableData } = props
+  const data = generateAssignmentTable(tableData)
+    .map(row => {
+      const { percentOfFinalGrade, graded } = row.pop()
+      row.push(<HorizontalBar
+        data={[{ label: 'grade', data: percentOfFinalGrade, graded }]}
+        width={200}
+        height={20}
+      />)
+      return row
+    })
+  return (
+    <div className={classes.tableResponsive}>
+      <Table>
+        {tableHead !== undefined ? (
+          <TableHead>
+            <TableRow>
+              {tableHead.map((prop, key) => {
+                return (<TableCell className={classes.tableCell + ' ' + classes.tableHeadCell}
+                  key={key}>{prop}</TableCell>)
+              })}
+            </TableRow>
+          </TableHead>
+        ) : null}
+        <TableBody>
+          {data.map((row, i) => {
+            return (
+              <TableRow key={i}>
+                {row.map((prop, j) => {
+                  let displayProp = true
+                  let displayBorder = true
+                  if (data[i - 1]) {
+                    if (data[i][0] === data[i - 1][0] && j < 2) {
+                      displayProp = false
+                    }
+                  }
+                  if (data[i + 1]) {
+                    if (data[i][0] === data[i + 1][0] && j < 2) {
+                      console.log(data[i][0] === data[i + 1][0] && j < 2)
+                      displayBorder = false
+                    }
+                  }
+                  return (
+                    <TableCell className={classes.tableCell} key={j} style={displayBorder ? {} : { borderBottom: 'none' }}>
+                      {displayProp ? prop : null}
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            )
+          })}
+        </TableBody>
+      </Table>
+    </div >
+  )
+}
+
+export default withStyles(tableStyle)(CustomAssignmentTable)
