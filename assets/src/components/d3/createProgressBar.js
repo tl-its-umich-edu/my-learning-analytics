@@ -53,7 +53,10 @@ function createProgressBar ({ data, width, height, el, tip }) {
     .text(d => {
       const name = d.name
       const widthOfRect = x(d.percent_gotten) - margin.left
-      const displayable = name.slice(0, Math.floor(widthOfRect / 9)) + '...'
+      const charsThatCanFit = Math.floor(widthOfRect / 9)
+      const displayable = name.length < charsThatCanFit
+        ? name
+        : name.slice(0, Math.floor(widthOfRect / 9)) + '...'
       return displayable
     })
     .style('font-size', '0.875rem')
