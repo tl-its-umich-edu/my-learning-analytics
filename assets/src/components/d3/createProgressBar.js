@@ -47,11 +47,17 @@ function createProgressBar ({ data, width, height, el, tip }) {
     .style('outline-style', 'solid')
     .style('outline-width', '1px')
 
-  // bar.append('text')
-  //   .attr('x', (_, i) => x(calculatePercentSoFar(i)))
-  //   .attr('y', margin.top + y.bandwidth() / 2)
-  //   .text(d => d.name)
-  //   .style('font-size', '0.875rem')
+  bar.append('text')
+    .attr('x', (_, i) => x(calculatePercentSoFar(i)))
+    .attr('y', margin.top + y.bandwidth() / 2)
+    .text(d => {
+      const name = d.name
+      const widthOfRect = x(d.percent_gotten) - margin.left
+      const displayable = name.slice(0, Math.floor(widthOfRect / 9)) + '...'
+      return displayable
+    })
+    .style('font-size', '0.875rem')
+    .style('text-overflow', 'ellipsis')
 
   const xAxis = g => g
     .attr('transform', `translate(0, ${aHeight - margin.bottom})`)
