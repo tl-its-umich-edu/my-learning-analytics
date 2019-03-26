@@ -4,12 +4,10 @@ import 'rc-tooltip/assets/bootstrap.css';
 import {Range} from 'rc-slider';
 
 const rangeSlider = props => {
-    // input: curWeek, startWeek, endWeek, 
-    // output: startWeekChange, endWeekChange
-
     const wrapperStyle = { width: "100%" };
     const marks = {};
-    for (let week = props.startWeek; week <= props.endWeek; week++) {
+    
+    for (let week = props.min; week <= props.max; week++) {
         marks[week] = `${week}`
     }
     
@@ -18,8 +16,8 @@ const rangeSlider = props => {
             <p>Select a start and end week</p>
             <Range 
             allowCross={false} 
-            min={props.startWeek} 
-            max={props.endWeek} 
+            min={props.min} 
+            max={props.max} 
             onChange={props.onWeekChange}
             defaultValue={[props.curWeek - 2, props.curWeek]} 
             marks = {marks} />

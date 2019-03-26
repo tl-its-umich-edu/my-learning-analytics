@@ -33,7 +33,7 @@ function FilesAccessed (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
   const [loaded, fileData] = useFilesAccessedAssignmentData(currentCourseId)
-
+  // const [minWeek]
   const [startWeek, setStartWeek] = useState(1);
   const [endWeek, setEndWeek] = useState(17);
   const [gradeRange, setGradeRange] = useState("All");
@@ -69,7 +69,9 @@ function FilesAccessed (props) {
               <RangeSlider 
                 startWeek = {startWeek}
                 endWeek = {endWeek}
-                curWeek = {10}
+                curWeek = {7}
+                min = {0}
+                max = {17}
                 onWeekChange = {onWeekChangeHandler}
               />
               <div className={classes.formController}>
