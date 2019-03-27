@@ -38,11 +38,11 @@ function SideDrawer (props) {
           <Link to={props.path} className={classes.sideDrawerLinks} key={key}>
             <ListItem
               button
-              key={props.sidebarName}
+              key={props.title}
               selected={selectedIndex === key}
               onClick={() => setSelectedIndex(key)}>
               <ListItemIcon><props.icon /></ListItemIcon>
-              <ListItemText primary={props.sidebarName} />
+              <ListItemText primary={props.title} />
             </ListItem>
           </Link>
         ))}
