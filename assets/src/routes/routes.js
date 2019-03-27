@@ -21,6 +21,13 @@ const routes = courseId => [
     icon: Grade,
     description: "See what files you and your peers are reading.",
     image: "/static/images/file_access_trends_icon.png",
+  },
+  {
+    path: `/${courseId}/whatif`,
+    title: 'What If Grade',
+    icon: Grade,
+    description: "Grade calculator.",
+    image: "/static/images/file_access_trends_icon.png",
   }
 ]
 
