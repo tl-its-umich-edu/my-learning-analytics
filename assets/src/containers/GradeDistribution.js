@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography'
 import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
-import { average } from '../util/math'
+import { average, roundToOneDecimcal } from '../util/math'
 
 const styles = theme => ({
   root: {
@@ -39,7 +39,10 @@ function GradeDistribution (props) {
                 <Grid container>
                   <Grid item xs={12} lg={2}>
                     <Table className={classes.table} tableData={[
-                      ['My Grade', <strong>{gradeData[0].current_user_grade ? `${gradeData[0].current_user_grade}%` : 'There are no grades yet for you in this course'}</strong>],
+                      ['My Grade', <strong>{gradeData[0].current_user_grade
+                        ? `${roundToOneDecimcal(gradeData[0].current_user_grade)}%`
+                        : 'There are no grades yet for you in this course'}</strong>
+                      ],
                       ['Average Grade', <strong>{average(gradeData.map(x => x.current_grade))}%</strong>],
                       ['Number of Students', <strong>{gradeData.length}</strong>]
                     ]} />
