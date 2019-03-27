@@ -7,7 +7,6 @@ import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
-import createToolTip from '../util/createToolTip'
 import Table from '../components/Table'
 import { average } from '../util/math'
 
