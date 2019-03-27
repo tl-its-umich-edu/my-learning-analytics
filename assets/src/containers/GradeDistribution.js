@@ -48,14 +48,6 @@ function GradeDistribution (props) {
                   <Grid item xs={12} lg={10}>
                     <Histogram
                       data={gradeData.map(x => x.current_grade)}
-                      tip={createToolTip(d => renderToString(
-                        <Paper className={classes.paper}>
-                          <Table className={classes.table} tableData={[
-                            ['Number of Students', <strong>{d.length}</strong>],
-                            ['Average Grade', <strong>{average(d)}%</strong>]
-                          ]} />
-                        </Paper>
-                      ))}
                       aspectRatio={0.3}
                       xAxisLabel={'Grade %'}
                       yAxisLabel={'Number of Students'}

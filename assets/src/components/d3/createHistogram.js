@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 
-function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100 }) {
+function createHistogram ({ data, width, height, el, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100 }) {
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
@@ -34,7 +34,7 @@ function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel
 
   bar.append('text')
     .attr('x', d => x((d.x1 + d.x0) / 2))
-    .attr('y', d => y(d.length) + 14)
+    .attr('y', d => y(d.length) + margin.top-5)
     .attr('text-anchor', 'middle')
     .attr('fill', 'white')
     .text(d => d.length === 0 ? '' : d.length)
@@ -92,22 +92,15 @@ function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel
       .attr('stroke-width', '2')
     svg.append('text')
       .attr('x', x(myGrade) - 110)
-      .attr('d', '1em')
-      .attr('y', margin.bottom - 5)
+      .attr('y', margin.top-5)
       .text(`My Grade: ${myGrade}%`)
       .attr('font-size', '0.875rem')
-      .attr('font-weight', '400')
+      .attr('font-weight', 'bold')
       .attr('font-family', 'Roboto Helvetica Arial sans-serif')
       .attr('line-height', '1.46429em')
       .attr('text-anchor', 'start')
   }
 
-  if (tip) {
-    svg.call(tip)
-    bar
-      .on('mouseover', tip.show)
-      .on('mouseout', tip.hide)
-  }
 }
 
 export default createHistogram
