@@ -15,7 +15,7 @@ function GradeSlider (props) {
             align={'left'}
             style={{ paddingBottom: '10px' }}
             variant='caption'>
-            Weighting: {`${weight}%`}
+            Weight: {`${weight}%`}
           </Typography>
         </Grid>
         {!isGraded

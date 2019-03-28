@@ -3,8 +3,8 @@ import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
-import Table from '@material-ui/core/Table'
-import CustomTable from '../components/Table'
+import MTable from '@material-ui/core/Table'
+import Table from '../components/Table'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
@@ -44,10 +44,6 @@ const styles = theme => ({
     width: '100%',
     marginTop: theme.spacing.unit * 3,
     overflowX: 'auto'
-  },
-  gradeTable: {
-    width: '300px',
-    align: 'right'
   }
 })
 
@@ -60,8 +56,6 @@ function WhatIfGrade (props) {
   const [whatIfGrade, setWhatIfGrade] = useState(0)
   const [showWeightedScores, setShowWeightedScores] = useState(false)
   const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, 0)
-
-  console.log(assignmentData)
 
   const calculateActualGrade = assignmentData => {
     const gradedAssignments = assignmentData.progress.filter(x => x.graded)
@@ -112,60 +106,65 @@ function WhatIfGrade (props) {
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom>What If Grade Calculator</Typography>
-            <CustomTable className={classes.gradeTable} tableData={[
-              ['Current Grade', <strong>`${actualGrade}%`</strong>],
-              ['What If Grade', <strong>`${whatIfGrade}%`</strong>]
-            ]} />
             {assignments
-              ? <Table className={classes.table}>
-                <TableHead>
-                  <TableRow>
-                    {[
-                      'Assignment Name',
-                      'Actual Grade',
-                      'What-If Grade'
-                    ].map((prop, key) => {
+              ? <>
+                <Grid container justify='flex-end'>
+                  <Grid item xs={12} md={3}>
+                    <Table tableData={[
+                      ['Current Grade', <strong>{`${actualGrade}%`}</strong>],
+                      ['What If Grade', <strong>{`${whatIfGrade}%`}</strong>]
+                    ]} />
+                  </Grid>
+                </Grid>
+                <MTable className={classes.table}>
+                  <TableHead>
+                    <TableRow>
+                      {[
+                        'Assignment Name',
+                        'Actual Grade',
+                        'What-If Grade'
+                      ].map((prop, key) => {
+                        return (
+                          <TableCell
+                            className={classes.tableCell + ' ' + classes.tableHeadCell}
+                            key={key}
+                          >
+                            {prop}
+                          </TableCell>
+                        )
+                      })}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {Object.keys(assignments).map(key => {
                       return (
-                        <TableCell
-                          className={classes.tableCell + ' ' + classes.tableHeadCell}
-                          key={key}
-                        >
-                          {prop}
-                        </TableCell>
+                        <TableRow key={key}>
+                          <TableCell className={classes.tableCell}>
+                            {assignments[key].assignmentName}
+                          </TableCell>
+                          <TableCell className={classes.tableCell}>
+                            {assignments[key].isGraded
+                              ? `${assignments[key].actualGrade}%`
+                              : <Typography>―</Typography>}
+                          </TableCell>
+                          <TableCell className={classes.tableCell}>
+                            <GradeSlider
+                              grade={assignments[key].whatIfGrade}
+                              setWhatIfGrade={whatIfGrade => {
+                                const assignment = assignments[key]
+                                assignment.whatIfGrade = whatIfGrade
+                                setAssignments({ ...assignments, [key]: assignment })
+                              }}
+                              isGraded={assignments[key].isGraded}
+                              weight={assignments[key].percentOfFinalGrade}
+                            />
+                          </TableCell>
+                        </TableRow>
                       )
-                    })}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {Object.keys(assignments).map(key => {
-                    return (
-                      <TableRow key={key}>
-                        <TableCell className={classes.tableCell}>
-                          {assignments[key].assignmentName}
-                        </TableCell>
-                        <TableCell className={classes.tableCell}>
-                          {assignments[key].isGraded
-                            ? `${assignments[key].actualGrade}%`
-                            : <Typography>―</Typography>}
-                        </TableCell>
-                        <TableCell className={classes.tableCell}>
-                          <GradeSlider
-                            grade={assignments[key].whatIfGrade}
-                            setWhatIfGrade={whatIfGrade => {
-                              const assignment = assignments[key]
-                              assignment.whatIfGrade = whatIfGrade
-                              setAssignments({ ...assignments, [key]: assignment })
-                            }}
-                            isGraded={assignments[key].isGraded}
-                            weight={assignments[key].percentOfFinalGrade}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })
-                  }
-                </TableBody>
-              </Table> : <Spinner />}
+                    })
+                    }
+                  </TableBody>
+                </MTable> </> : <Spinner />}
           </Paper>
         </Grid>
       </Grid>
