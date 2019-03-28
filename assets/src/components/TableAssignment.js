@@ -89,13 +89,21 @@ function CustomAssignmentTable (props) {
                   let displayProp = true
                   let displayBorder = true
                   if (data[i - 1]) {
-                    if (data[i][0] === data[i - 1][0] && j < 2) {
+                    // first item in the row the logic handles display of week property
+                    if (j == 0 && data[i][0] === data[i - 1][0]) {
+                      displayProp = false
+                    }
+                    // second item in the row the logic handles display of Due date property
+                    if(j == 1 && data[i][1] === data[i-1][1]){
                       displayProp = false
                     }
                   }
                   if (data[i + 1]) {
-                    if (data[i][0] === data[i + 1][0] && j < 2) {
-                      console.log(data[i][0] === data[i + 1][0] && j < 2)
+                    if (j == 0 && data[i][0] === data[i + 1][0]) {
+                      displayBorder = false
+                    }
+
+                    if (j == 1 && data[i][1] === data[i + 1][1]) {
                       displayBorder = false
                     }
                   }
