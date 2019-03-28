@@ -61,14 +61,14 @@ function WhatIfGrade (props) {
       const assignments = assignmentData.progress.reduce((acc, assignment, i) => {
         const assignmentName = assignment.name
         const isGraded = assignment.graded
-        const actualGrade = isGraded ? (assignment.score / assignment.points_possible) : null
+        const actualGrade = isGraded ? roundToOneDecimcal(assignment.score / assignment.points_possible * 100) : null
         const percentOfFinalGrade = assignment.towards_final_grade
         acc[i] = {
           assignmentName,
           isGraded,
           actualGrade,
           percentOfFinalGrade,
-          whatIfGrade: 100
+          whatIfGrade: isGraded ? actualGrade : 100
         }
         return acc
       }, {})
@@ -89,7 +89,7 @@ function WhatIfGrade (props) {
                     {[
                       'Assignment Name',
                       'Actual Grade',
-                      '"What-If" Grade'
+                      'What-If Grade'
                     ].map((prop, key) => {
                       return (
                         <TableCell
@@ -110,7 +110,9 @@ function WhatIfGrade (props) {
                           {assignments[key].assignmentName}
                         </TableCell>
                         <TableCell className={classes.tableCell}>
-                          {assignments[key].isGraded ? `${roundToOneDecimcal(actualGrade * 100)}%` : null}
+                          {assignments[key].isGraded
+                            ? `${assignments[key].actualGrade}%`
+                            : null}
                         </TableCell>
                         <TableCell className={classes.tableCell}>
                           <GradeSlider
@@ -120,6 +122,7 @@ function WhatIfGrade (props) {
                               assignment.whatIfGrade = whatIfGrade
                               setAssignments({ ...assignments, [key]: assignment })
                             }}
+                            isGraded={assignments[key].isGraded}
                           />
                         </TableCell>
                       </TableRow>
