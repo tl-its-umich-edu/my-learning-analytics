@@ -8,6 +8,8 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
+import Spinner from '../components/Spinner'
+import { useAssignmentPlanningData } from '../service/api'
 
 const styles = theme => ({
   root: {
@@ -42,22 +44,25 @@ const styles = theme => ({
   }
 })
 
-function WhatIfGrade(props) {
-  const { classes } = props
-
+function WhatIfGrade (props) {
+  const { classes, match } = props
+  const currentCourseId = match.params.courseId
+  const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, 0)
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom>What If Grade Calculator</Typography>
-            <Table className={classes.table}>
-              <TableHead>
-                <TableRow>
-                  {[
-                    'Assignment Name',
-                    'Actual Grade',
-                    '"What-If" Grade'].map((prop, key) => {
+            {loaded
+              ? <Table className={classes.table}>
+                <TableHead>
+                  <TableRow>
+                    {[
+                      'Assignment Name',
+                      'Actual Grade',
+                      '"What-If" Grade'
+                    ].map((prop, key) => {
                       return (
                         <TableCell
                           className={classes.tableCell + ' ' + classes.tableHeadCell}
@@ -67,12 +72,34 @@ function WhatIfGrade(props) {
                         </TableCell>
                       )
                     })}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-
-              </TableBody>
-            </Table>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {assignmentData.progress.map((assignment, i) => {
+                    const assignmentName = assignment.name
+                    const isGraded = assignment.isGraded
+                    const actualGrade = isGraded ? (assignment.score / assignment.points_possible) : null
+                    console.log(actualGrade)
+                    const percentOfFinalGrade = assignment.towards_final_grade
+                    return (
+                      <TableRow key={i}>
+                        <TableCell className={classes.tableCell}>
+                          {assignmentName}
+                        </TableCell>
+                        <TableCell className={classes.tableCell}>
+                          {actualGrade}
+                        </TableCell>
+                        <TableCell className={classes.tableCell}>
+                          {
+                            // add in slider here
+                          }
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
+                  }
+                </TableBody>
+              </Table> : <Spinner />}
           </Paper>
         </Grid>
       </Grid>
