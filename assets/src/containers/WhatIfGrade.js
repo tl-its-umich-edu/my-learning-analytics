@@ -4,6 +4,7 @@ import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import Table from '@material-ui/core/Table'
+import CustomTable from '../components/Table'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
@@ -43,6 +44,10 @@ const styles = theme => ({
     width: '100%',
     marginTop: theme.spacing.unit * 3,
     overflowX: 'auto'
+  },
+  gradeTable: {
+    width: '300px',
+    align: 'right'
   }
 })
 
@@ -55,6 +60,24 @@ function WhatIfGrade (props) {
   const [whatIfGrade, setWhatIfGrade] = useState(0)
   const [showWeightedScores, setShowWeightedScores] = useState(false)
   const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, 0)
+
+  console.log(assignmentData)
+
+  const calculateActualGrade = assignmentData => {
+    const gradedAssignments = assignmentData.progress.filter(x => x.graded)
+    const [totalPointsEarned, totalPointsPossible] = gradedAssignments.reduce((acc, cur) => {
+      acc[0] += cur.percent_gotten
+      acc[1] += cur.towards_final_grade
+      return acc
+    }, [0, 0])
+    return roundToOneDecimcal(totalPointsEarned / totalPointsPossible * 100)
+  }
+
+  const calculateWhatIfGrade = assignments => {
+    const arrOfAssignments = Object.keys(assignments).map(key => assignments[key])
+    const whatIfGrade = arrOfAssignments.reduce((acc, cur) => (acc += cur.percentOfFinalGrade * cur.whatIfGrade / 100), 0)
+    return roundToOneDecimcal(whatIfGrade)
+  }
 
   useEffect(() => {
     if (loaded) {
@@ -73,8 +96,15 @@ function WhatIfGrade (props) {
         return acc
       }, {})
       setAssignments(assignments)
+      setActualGrade(calculateActualGrade(assignmentData))
     }
   }, [loaded])
+
+  useEffect(() => {
+    if (assignments) {
+      setWhatIfGrade(calculateWhatIfGrade(assignments))
+    }
+  })
 
   return (
     <div className={classes.root}>
@@ -82,6 +112,10 @@ function WhatIfGrade (props) {
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom>What If Grade Calculator</Typography>
+            <CustomTable className={classes.gradeTable} tableData={[
+              ['Current Grade', <strong>`${actualGrade}%`</strong>],
+              ['What If Grade', <strong>`${whatIfGrade}%`</strong>]
+            ]} />
             {assignments
               ? <Table className={classes.table}>
                 <TableHead>
@@ -112,7 +146,7 @@ function WhatIfGrade (props) {
                         <TableCell className={classes.tableCell}>
                           {assignments[key].isGraded
                             ? `${assignments[key].actualGrade}%`
-                            : <Typography>-</Typography>}
+                            : <Typography>―</Typography>}
                         </TableCell>
                         <TableCell className={classes.tableCell}>
                           <GradeSlider
@@ -123,6 +157,7 @@ function WhatIfGrade (props) {
                               setAssignments({ ...assignments, [key]: assignment })
                             }}
                             isGraded={assignments[key].isGraded}
+                            weight={assignments[key].percentOfFinalGrade}
                           />
                         </TableCell>
                       </TableRow>
