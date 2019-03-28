@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
@@ -9,6 +9,8 @@ import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import Spinner from '../components/Spinner'
+import GradeSlider from '../components/GradeSlider'
+import { roundToOneDecimcal } from '../util/math'
 import { useAssignmentPlanningData } from '../service/api'
 
 const styles = theme => ({
@@ -47,14 +49,40 @@ const styles = theme => ({
 function WhatIfGrade (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
+
+  const [assignments, setAssignments] = useState(null)
+  const [actualGrade, setActualGrade] = useState(0)
+  const [whatIfGrade, setWhatIfGrade] = useState(0)
+  const [showWeightedScores, setShowWeightedScores] = useState(false)
   const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, 0)
+
+  useEffect(() => {
+    if (loaded) {
+      const assignments = assignmentData.progress.reduce((acc, assignment, i) => {
+        const assignmentName = assignment.name
+        const isGraded = assignment.graded
+        const actualGrade = isGraded ? (assignment.score / assignment.points_possible) : null
+        const percentOfFinalGrade = assignment.towards_final_grade
+        acc[i] = {
+          assignmentName,
+          isGraded,
+          actualGrade,
+          percentOfFinalGrade,
+          whatIfGrade: 100
+        }
+        return acc
+      }, {})
+      setAssignments(assignments)
+    }
+  }, [loaded])
+
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom>What If Grade Calculator</Typography>
-            {loaded
+            {assignments
               ? <Table className={classes.table}>
                 <TableHead>
                   <TableRow>
@@ -75,24 +103,24 @@ function WhatIfGrade (props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {assignmentData.progress.map((assignment, i) => {
-                    const assignmentName = assignment.name
-                    const isGraded = assignment.graded
-                    const actualGrade = isGraded ? (assignment.score / assignment.points_possible) : null
-                    console.log(actualGrade)
-                    const percentOfFinalGrade = assignment.towards_final_grade
+                  {Object.keys(assignments).map(key => {
                     return (
-                      <TableRow key={i}>
+                      <TableRow key={key}>
                         <TableCell className={classes.tableCell}>
-                          {assignmentName}
+                          {assignments[key].assignmentName}
                         </TableCell>
                         <TableCell className={classes.tableCell}>
-                          {actualGrade}
+                          {assignments[key].isGraded ? `${roundToOneDecimcal(actualGrade * 100)}%` : null}
                         </TableCell>
                         <TableCell className={classes.tableCell}>
-                          {
-                            // add in slider here
-                          }
+                          <GradeSlider
+                            grade={assignments[key].whatIfGrade}
+                            setWhatIfGrade={whatIfGrade => {
+                              const assignment = assignments[key]
+                              assignment.whatIfGrade = whatIfGrade
+                              setAssignments({ ...assignments, [key]: assignment })
+                            }}
+                          />
                         </TableCell>
                       </TableRow>
                     )
