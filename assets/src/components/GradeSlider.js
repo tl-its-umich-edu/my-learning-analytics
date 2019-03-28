@@ -4,12 +4,12 @@ import { Typography } from '@material-ui/core'
 import Grid from '@material-ui/core/Grid'
 
 function GradeSlider (props) {
-  const { grade, setWhatIfGrade, isGraded, weight } = props
+  const { grade, setWhatIfGrade, isGraded, weight, actualGrade } = props
   const [sliderValue, setSliderValue] = useState(grade)
 
   return (
     <>
-      <Grid container>
+      <Grid container spacing={16}>
         <Grid item xs={6}>
           <Typography
             align={'left'}
@@ -18,14 +18,13 @@ function GradeSlider (props) {
             Weight: {`${weight}%`}
           </Typography>
         </Grid>
-        {!isGraded
-          ? <Grid item xs={6}>
-            <Typography
-              align={'right'}
-              style={{ paddingBottom: '10px' }}>
-              {`${sliderValue}%`}
-            </Typography>
-          </Grid> : null}
+        <Grid item xs={6}>
+          <Typography
+            align={'right'}
+            style={{ paddingBottom: '10px' }}>
+            {isGraded ? `${actualGrade}%` : `${sliderValue}%`}
+          </Typography>
+        </Grid>
       </Grid>
       <Slider
         value={sliderValue}
