@@ -6,10 +6,8 @@ import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
-import createToolTip from '../util/createToolTip'
 import Table from '../components/Table'
-import { average } from '../util/math'
-import { useGradeData } from '../service/api'
+import { average, roundToOneDecimcal } from '../util/math'
 
 const styles = theme => ({
   root: {
@@ -66,8 +64,31 @@ function GradeDistribution (props) {
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Typography variant='h5' gutterBottom>Grade Distribution</Typography >
-             {loaded ? tableBuilder(gradeData) : <Spinner />}
+            <Typography variant='h5' gutterBottom >Grade Distribution</Typography >
+            {loaded
+              ? <>
+                <Grid container>
+                  <Grid item xs={12} lg={2}>
+                    <Table className={classes.table} tableData={[
+                      ['My Grade', <strong>{gradeData[0].current_user_grade
+                        ? `${roundToOneDecimcal(gradeData[0].current_user_grade)}%`
+                        : 'There are no grades yet for you in this course'}</strong>
+                      ],
+                      ['Average Grade', <strong>{average(gradeData.map(x => x.current_grade))}%</strong>],
+                      ['Number of Students', <strong>{gradeData.length}</strong>]
+                    ]} />
+                  </Grid>
+                  <Grid item xs={12} lg={10}>
+                    <Histogram
+                      data={gradeData.map(x => x.current_grade)}
+                      aspectRatio={0.3}
+                      xAxisLabel={'Grade %'}
+                      yAxisLabel={'Number of Students'}
+                      myGrade={gradeData[0].current_user_grade}
+                      maxGrade={gradeData[0].graph_upper_limit} />
+                  </Grid>
+                </Grid>
+              </> : <Spinner />}
           </Paper>
         </Grid>
       </Grid>

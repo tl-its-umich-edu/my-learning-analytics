@@ -77,7 +77,7 @@ function WhatIfGrade (props) {
                 <TableBody>
                   {assignmentData.progress.map((assignment, i) => {
                     const assignmentName = assignment.name
-                    const isGraded = assignment.isGraded
+                    const isGraded = assignment.graded
                     const actualGrade = isGraded ? (assignment.score / assignment.points_possible) : null
                     console.log(actualGrade)
                     const percentOfFinalGrade = assignment.towards_final_grade
