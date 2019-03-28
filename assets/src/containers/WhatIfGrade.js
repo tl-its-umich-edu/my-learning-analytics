@@ -112,7 +112,7 @@ function WhatIfGrade (props) {
                         <TableCell className={classes.tableCell}>
                           {assignments[key].isGraded
                             ? `${assignments[key].actualGrade}%`
-                            : null}
+                            : <Typography>-</Typography>}
                         </TableCell>
                         <TableCell className={classes.tableCell}>
                           <GradeSlider
