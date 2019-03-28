@@ -10,7 +10,10 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import { useFilesAccessedAssignmentData } from '../service/api'
+import { useFilesAccessedData } from '../service/api';
+import { useInfoData } from '../service/api';
+import { useUserSettingData } from '../service/api';
+import HorizontalHistogram from '../components/HorizontalHistogram';
 
 const styles = theme => ({
   root: {
@@ -31,18 +34,29 @@ const styles = theme => ({
 
 function FilesAccessed (props) {
   const { classes, match } = props
-  const currentCourseId = match.params.courseId
-  const [loaded, fileData] = useFilesAccessedAssignmentData(currentCourseId)
-  // const [minWeek]
-  const [startWeek, setStartWeek] = useState(1);
-  const [endWeek, setEndWeek] = useState(17);
+  const currentCourseId = match.params.courseId;
+  const [minMaxWeek, setMinMaxWeek] = useState([1, 17]);
+  const [curWeek, setCurWeek] = useState(7);
+  const [weekRange, setWeekRange] = useState([curWeek - 2, curWeek]);
   const [gradeRange, setGradeRange] = useState("All");
   const [saveSettingState, setSaveSetting] = useState(false);
+  const [infoLoaded, infoData] = useInfoData(currentCourseId);
+  const [settingLoaded, settingData] = useUserSettingData(currentCourseId);
+  const [loaded, fileData] = useFilesAccessedData(currentCourseId, weekRange[0], weekRange[1], gradeRange);
+
+  // if (settingLoaded && settingData.length !== 0) {
+  //   // If user has default setting data, use setting data
+  //   setGradeRange(settingData)
+  // }
+
+  // if (infoLoaded && infoData.length !== 0) {
+  //   // Set current week to info data
+  //   setWeekRange([10, ]);
+  // }
 
   const onWeekChangeHandler = value => {
       // Update week range
-      setStartWeek(value[0]);
-      setEndWeek(value[1]);
+      setWeekRange(value);
   }
 
   const gradeRangeHandler = event => {
@@ -54,10 +68,22 @@ function FilesAccessed (props) {
   }
 
   const tableBuilder = (fileData) => {
+    console.log(fileData)
     if (!fileData || fileData.length === 0) {
       return (<p>No data provided</p>)
     }
-    return (<> </>)
+    return (
+    <>
+      <HorizontalHistogram
+        activeColor = {''}
+        data={fileData}
+        width = {640}
+        height = {480}
+        xAxisLabel={'Number of Students'}
+        yAxisLabel={'File Name'}
+      />
+    </>
+    )
   }
 
   return (
@@ -67,15 +93,14 @@ function FilesAccessed (props) {
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom >Files Accessed</Typography >
               <RangeSlider 
-                startWeek = {startWeek}
-                endWeek = {endWeek}
-                curWeek = {7}
-                min = {0}
-                max = {17}
+                startWeek = {weekRange[0]}
+                endWeek = {weekRange[1]}
+                min = {minMaxWeek[0]}
+                max = {minMaxWeek[1]}
                 onWeekChange = {onWeekChangeHandler}
               />
               <div className={classes.formController}>
-                <p>{`File accessed from week ${startWeek} to ${endWeek} with grades:`}</p>
+                <p>{`File accessed from week ${weekRange[0]} to ${weekRange[1]} with grades:`}</p>
                 <FormControl className={classes.formControl}>
                   <Select
                     value={gradeRange}
@@ -86,9 +111,9 @@ function FilesAccessed (props) {
                     }}
                   >
                     <MenuItem value="All">All</MenuItem>
-                    <MenuItem value="90-100%">90-100%</MenuItem>
-                    <MenuItem value="80-89%">80-89%</MenuItem>
-                    <MenuItem value="70-79%">70-79%</MenuItem>
+                    <MenuItem value="90-100">90-100%</MenuItem>
+                    <MenuItem value="80-89">80-89%</MenuItem>
+                    <MenuItem value="70-79">70-79%</MenuItem>
                   </Select>
                 </FormControl>
                 <FormControl className={classes.checkBox}>

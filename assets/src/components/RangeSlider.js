@@ -17,9 +17,9 @@ const rangeSlider = props => {
             <Range 
             allowCross={false} 
             min={props.min} 
-            max={props.max} 
+            max={props.max}
             onChange={props.onWeekChange}
-            defaultValue={[props.curWeek - 2, props.curWeek]} 
+            defaultValue={[props.startWeek, props.endWeek]}
             marks = {marks} />
         </div>)
 }
