@@ -72,46 +72,60 @@ function createProgressBar ({ data, width, height, el, tip }) {
 
   const currentIndex = data.filter(x => x.graded).length
   const currentLine = svg.append('g')
+   // only show currentline when assignments are graded
+  if(currentIndex != 0) {
+    currentLine
+      .append('line')
+      .attr('x1', x(calculatePercentSoFar(currentIndex)))
+      .attr('x2', x(calculatePercentSoFar(currentIndex)))
+      .attr('y1', 0)
+      .attr('y2', aHeight - margin.bottom)
+      .attr('stroke', 'darkorange')
+      .attr('stroke-width', '1')
 
-  currentLine
-    .append('line')
-    .attr('x1', x(calculatePercentSoFar(currentIndex)))
-    .attr('x2', x(calculatePercentSoFar(currentIndex)))
-    .attr('y1', 0)
-    .attr('y2', aHeight - margin.bottom)
-    .attr('stroke', 'darkorange')
-    .attr('stroke-width', '1')
-
-  currentLine.append('text')
-    .attr('text-anchor', 'middle')
-    .attr('x', x(calculatePercentSoFar(currentIndex)) - 26)
-    .attr('y', margin.top)
-    .attr('dy', -7)
-    .attr('fill', 'darkorange')
-    .attr('font-size', '12px')
-    .attr('font-weight', 'bold')
-    .text('Current')
+    currentLine.append('text')
+      .attr('text-anchor', 'middle')
+      .attr('x', x(calculatePercentSoFar(currentIndex)) - 26)
+      .attr('y', margin.top)
+      .attr('dy', -7)
+      .attr('fill', 'darkorange')
+      .attr('font-size', '12px')
+      .attr('font-weight', 'bold')
+      .text('Current')
+  }
 
   const maxLine = svg.append('g')
 
-  maxLine
-    .append('line')
-    .attr('x1', x(calculatePercentSoFar(data.length)))
-    .attr('x2', x(calculatePercentSoFar(data.length)))
-    .attr('y1', 0)
-    .attr('y2', aHeight - margin.bottom)
-    .attr('stroke', 'green')
-    .attr('stroke-width', '1')
+  // login to show the maxLine based on the graded and ungraded data
+  const showMaxLine = (data) => {
+    // filtering the graded and ungraded values, list would be either 2 or 1
+    const gradedList = [...new Set(data.map(item => item.graded))]
+    if(gradedList.length >1){
+      return false
+    }
+    return gradedList[0]
+  }
 
-  maxLine.append('text')
-    .attr('text-anchor', 'middle')
-    .attr('x', x(calculatePercentSoFar(data.length)) - 42)
-    .attr('y', margin.top)
-    .attr('dy', -7)
-    .attr('fill', 'green')
-    .attr('font-size', '12px')
-    .attr('font-weight', 'bold')
-    .text('Max Possible')
+  if(!showMaxLine(data)) {
+    maxLine
+      .append('line')
+      .attr('x1', x(calculatePercentSoFar(data.length)))
+      .attr('x2', x(calculatePercentSoFar(data.length)))
+      .attr('y1', 0)
+      .attr('y2', aHeight - margin.bottom)
+      .attr('stroke', 'green')
+      .attr('stroke-width', '1')
+
+    maxLine.append('text')
+      .attr('text-anchor', 'middle')
+      .attr('x', x(calculatePercentSoFar(data.length)) - 42)
+      .attr('y', margin.top)
+      .attr('dy', -7)
+      .attr('fill', 'green')
+      .attr('font-size', '12px')
+      .attr('font-weight', 'bold')
+      .text('Max Possible')
+  }
 
   svg.append('g')
     .call(xAxis)
