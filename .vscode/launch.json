@@ -8,7 +8,7 @@
             "pathMappings": [
                 {
                     "localRoot": "${workspaceFolder}",
-                    "remoteRoot": "/dashboard"
+                    "remoteRoot": "/code"
                 }
             ],
             "port": 3000,
@@ -21,7 +21,7 @@
             "pathMappings": [
                 {
                     "localRoot": "${workspaceFolder}",
-                    "remoteRoot": "/dashboard"
+                    "remoteRoot": "/code"
                 }
             ],
             "port": 3001,

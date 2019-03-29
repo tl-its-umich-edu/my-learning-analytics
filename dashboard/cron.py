@@ -36,14 +36,18 @@ engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}?cha
                                host = db_host,
                                port = db_port))
 
+# Split a list into *size* shorter pieces
+def split_list(a_list: list, size: int = 20):
+    return [a_list[i:i + size] for i in range(0, len(a_list), size)]
+
 # the util function
-def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None):
-    df = pd.read_sql(sql_string, conns['UDW'])
+def util_function(data_warehouse_course_id, sql_string, mysql_table, table_identifier=None):
+    df = pd.read_sql(sql_string, conns['DATA_WAREHOUSE'])
     logger.debug(df)
 
     # Sql returns boolean value so grouping course info along with it so that this could be stored in the DB table.
-    if table_identifier == 'weight' and UDW_course_id:
-        df['course_id']=UDW_course_id
+    if table_identifier == 'weight' and data_warehouse_course_id:
+        df['course_id']=data_warehouse_course_id
         df.columns=['consider_weight','course_id']
 
     # drop duplicates
@@ -59,7 +63,7 @@ def util_function(UDW_course_id, sql_string, mysql_table, table_identifier=None)
         raise
 
     # returns the row size of dataframe
-    return f"{str(df.shape[0])} {mysql_table} : {UDW_course_id}\n"
+    return f"{str(df.shape[0])} {mysql_table} : {data_warehouse_course_id}\n"
 
 # execute database query
 def executeDbQuery(query):
@@ -95,12 +99,12 @@ class DashboardCronJob(CronJobBase):
                 invalid_course_id_list.append(course_id)
             else:
                 # select course based on course id
-                course_sql = f"""select * 
+                course_sql = f"""select *
                             from course_dim c
                             where c.id = '{course_id}'
                             """
                 logger.debug(course_sql)
-                course_df = pd.read_sql(course_sql, conns['UDW'])
+                course_df = pd.read_sql(course_sql, conns['DATA_WAREHOUSE'])
 
                 # error out when course id is invalid
                 if course_df.empty:
@@ -110,47 +114,43 @@ class DashboardCronJob(CronJobBase):
 
         return invalid_course_id_list
 
-    # update USER records from UDW
-    def update_with_udw_user(self):
+    # update USER records from DATA_WAREHOUSE
+    def update_user(self):
 
         # cron status
         status = ""
 
-        logger.debug("in update with udw user")
+        logger.debug("in update with data warehouse user")
 
         # delete all records in the table first
         status += deleteAllRecordInTable("user")
 
         # loop through multiple course ids
-        for UDW_course_id in Course.objects.get_supported_courses():
+        for data_warehouse_course_id in Course.objects.get_supported_courses():
+
 
             # select all student registered for the course
-            user_sql = f"""select u.name AS name, 
-                        p.sis_user_id AS sis_id, 
-                        p.unique_name AS sis_name, 
-                        u.global_canvas_id AS id, 
-                        c.current_score AS current_grade, 
-                        c.final_score AS final_grade, 
-                        '{UDW_course_id}' as course_id 
-                        from user_dim u, 
-                        pseudonym_dim p, 
-                        course_score_fact c, 
-                        (select e.user_id as user_id, e.id as enrollment_id from enrollment_dim e 
-                        where e.course_id = '{UDW_course_id}' 
-                        and e.type='StudentEnrollment' 
-                        and e.workflow_state='active' ) as e 
-                        where p.user_id=u.id 
-                        and u.id = e.user_id 
-                        and c.enrollment_id =  e.enrollment_id 
-                        and p.sis_user_id is not null
-                        """
+            user_sql=f"""with
+                         enroll_data as (select id as enroll_id, user_id from enrollment_dim where course_id='{data_warehouse_course_id}' 
+                                         and type = 'StudentEnrollment' and workflow_state= 'active'),
+                         user_info as (select p.unique_name,p.sis_user_id, u.name, u.id as user_id, u.global_canvas_id 
+                                        from pseudonym_dim p join user_dim u on u.id = p.user_id where p.sis_user_id is not null),
+                         user_enroll as (select u.unique_name, u.sis_user_id, u.name, u.user_id, e.enroll_id, 
+                                         u.global_canvas_id from enroll_data e join user_info u on e.user_id= u.user_id),
+                         course_fact as (select enrollment_id, current_score, final_score from course_score_fact 
+                                         where course_id='{data_warehouse_course_id}'),
+                         final as (select u.global_canvas_id as id,u.name, u.sis_user_id as sis_id, u.unique_name as sis_name,
+                                   '{data_warehouse_course_id}' as course_id, c.current_score as current_grade, c.final_score as final_grade
+                                    from user_enroll u left join course_fact c on u.enroll_id= c.enrollment_id)
+                         select * from final
+                      """
             logger.debug(user_sql)
 
-            status += util_function(UDW_course_id, user_sql, 'user')
+            status += util_function(data_warehouse_course_id, user_sql, 'user')
 
         return status
 
-    # update unizin metadata from UDW
+    # update unizin metadata from DATA_WAREHOUSE
     def update_unizin_metadata(self):
 
         # cron status
@@ -172,23 +172,23 @@ class DashboardCronJob(CronJobBase):
 
 
 
-    # update file records from UDW
-    def update_with_udw_file(self):
+    # update file records from DATA_WAREHOUSE
+    def update_file(self):
         # cron status
         status = ""
 
-        logger.debug("in update with udw file")
+        logger.debug("in update with data warehouse file")
 
         # delete all records in the table first
         status += deleteAllRecordInTable("file")
 
-        #select file record from UDW
-        for UDW_course_id in Course.objects.get_supported_courses():
-            file_sql = f"""select id, display_name as name,course_id as COURSE_ID from file_dim where file_state ='available' 
-                           and course_id='{UDW_course_id}'
+        #select file record from DATA_WAREHOUSE
+        for data_warehouse_course_id in Course.objects.get_supported_courses():
+            file_sql = f"""select id, display_name as name,course_id as COURSE_ID from file_dim where file_state ='available'
+                           and course_id='{data_warehouse_course_id}'
                         """
 
-            status += util_function(UDW_course_id, file_sql, 'file')
+            status += util_function(data_warehouse_course_id, file_sql, 'file')
         return status
 
     # update FILE_ACCESS records from BigQuery
@@ -201,71 +201,55 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("file_access")
 
         # return string with concatenated SQL insert result
-        returnString = ""
+        return_string = ""
 
         # Instantiates a client
         bigquery_client = bigquery.Client()
 
-        datasets = list(bigquery_client.list_datasets())
-        project = bigquery_client.project
-
+        # BQ Total Bytes Billed to report to status
         total_bytes_billed = 0
-        # list all datasets
-        if datasets:
-            logger.debug('Datasets in project {}:'.format(project))
-            for dataset in datasets:
-                logger.debug('\t{}'.format(dataset.dataset_id))
 
-                # choose the right dataset
-                if ("learning_datasets" == dataset.dataset_id):
-                    # list all tables
-                    dataset_ref = bigquery_client.dataset(dataset.dataset_id)
-                    tables = list(bigquery_client.list_tables(dataset_ref))
-                    for table in tables:
-                        if ("enriched_events" == table.table_id):
-                            logger.debug('\t{}'.format("found table"))
-                            # loop through multiple course ids
-                            for UDW_course_id in Course.objects.get_supported_courses():
+        # loop through multiple course ids, 20 at a time
+        # (This is set by the CRON_BQ_IN_LIMIT from settings)
+        for data_warehouse_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
+            # query to retrieve all file access events for one course
+            # There is no catch if this query fails, event_store.events needs to exist
+            query = """select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS file_id,
+                    SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS user_id,
+                    datetime(EVENT_TIME) as access_time
+                    FROM event_store.events
+                    where JSON_EXTRACT_SCALAR(event, '$.edApp.id') = 'http://umich.instructure.com/'
+                    and type = 'NavigationEvent'
+                    and JSON_EXTRACT_SCALAR(event, '$.object.name') = 'attachment'
+                    and JSON_EXTRACT_SCALAR(event, '$.action') = 'NavigatedTo'
+                    and JSON_EXTRACT_SCALAR(event, '$.membership.member.id') is not null
+                    and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) IN UNNEST(@course_ids)
+                    """
+            logger.debug(query)
+            logger.debug(data_warehouse_course_ids)
+            query_params = [
+                bigquery.ArrayQueryParameter('course_ids', 'STRING', data_warehouse_course_ids),
+            ]
+            job_config = bigquery.QueryJobConfig()
+            job_config.query_parameters = query_params
 
-                                # query to retrieve all file access events for one course
-                                query = '''select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, "$.object.id"), 35) AS STRING) AS file_id,
-                                        SUBSTR(JSON_EXTRACT_SCALAR(event, "$.membership.member.id"), 29) AS user_id,
-                                        datetime(EVENT_TIME) as access_time
-                                        FROM event_store.events
-                                        where JSON_EXTRACT_SCALAR(event, "$.edApp.id") = \'http://umich.instructure.com/\'
-                                        and type = \'NavigationEvent\'
-                                        and JSON_EXTRACT_SCALAR(event, "$.object.name") = \'attachment\'
-                                        and JSON_EXTRACT_SCALAR(event, "$.action") = \'NavigatedTo\'
-                                        and JSON_EXTRACT_SCALAR(event, "$.membership.member.id") is not null
-                                        and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) = @course_id
-                                        '''
-                                logger.debug(query)
-                                query_params =[
-                                    bigquery.ScalarQueryParameter('course_id', 'STRING', UDW_course_id),
-                                ]
-                                job_config = bigquery.QueryJobConfig()
-                                job_config.query_parameters = query_params
+            # Location must match that of the dataset(s) referenced in the query.
+            bq_query = bigquery_client.query(query, location='US', job_config=job_config)
+            #bq_query.result()
+            df = bq_query.to_dataframe()
+            total_bytes_billed += bq_query.total_bytes_billed
 
-                                # Location must match that of the dataset(s) referenced in the query.
-                                bq_query = bigquery_client.query(query, location='US', job_config=job_config)
-                                #bq_query.result()
-                                df = bq_query.to_dataframe()
-                                total_bytes_billed += bq_query.total_bytes_billed
+            logger.debug("df row number=" + str(df.shape[0]))
+            # drop duplicates
+            df.drop_duplicates(["file_id", "user_id", "access_time"], keep='first', inplace=True)
 
-                                logger.debug("df row number=" + str(df.shape[0]))
-                                # drop duplicates
-                                df.drop_duplicates(["file_id", "user_id", "access_time"], keep='first', inplace=True)
+            logger.debug("after drop duplicates, df row number=" + str(df.shape[0]))
 
-                                logger.debug("after drop duplicates, df row number=" + str(df.shape[0]))
+            # write to MySQL
+            df.to_sql(con=engine, name='file_access', if_exists='append', index=False)
 
-                                # write to MySQL
-                                df.to_sql(con=engine, name='file_access', if_exists='append', index=False)
-
-                                returnString += str(df.shape[0]) + " rows for course " + UDW_course_id + "\n"
-                                logger.info(returnString)
-
-        else:
-            status += "BQ project does not contain any datasets.\n"
+            return_string += str(df.shape[0]) + " rows for courses " + ",".join(data_warehouse_course_ids) + "\n"
+            logger.info(return_string)
 
         total_tbytes_billed = total_bytes_billed / 1024 / 1024 / 1024 / 1024
         # $5 per TB as of Feb 2019 https://cloud.google.com/bigquery/pricing
@@ -283,18 +267,19 @@ class DashboardCronJob(CronJobBase):
         # update groups
         #Loading the assignment groups inforamtion along with weight/points associated ith arn assignment
         logger.debug("update_assignment_groups(): ")
-        
+
         # loop through multiple course ids
-        for UDW_course_id in Course.objects.get_supported_courses():
-            assignment_groups_sql = f"""with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{UDW_course_id}' and ad.visibility = 'everyone' and ad.workflow_state='published'),
-                                    assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf on agd.id = agf.assignment_group_id  where agd.course_id='{UDW_course_id}' and workflow_state='available'),
-                                    assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join (select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id ),
-                                    assign_rules as (select DISTINCT ad.assignment_group_id,agr.drop_lowest,agr.drop_highest from assignment_details ad join assignment_group_rule_dim agr on ad.assignment_group_id=agr.assignment_group_id),
-                                    assignment_grp_points as (select ag.*, am.group_points AS group_points from assignment_grp ag join assign_more am on ag.assignment_group_id = am.assignment_group_id),
-                                    assign_final as (select assignment_group_id AS id, course_id AS course_id, group_weight AS weight, name AS name, group_points AS group_points from assignment_grp_points)
-                                    select g.*, ar.drop_lowest,ar.drop_highest from assign_rules ar join assign_final g on ar.assignment_group_id=g.id
-                                    """
-            status += util_function(UDW_course_id, assignment_groups_sql, 'assignment_groups')
+        for data_warehouse_course_id in Course.objects.get_supported_courses():
+            assignment_groups_sql= f"""with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{data_warehouse_course_id}' and ad.visibility = 'everyone' and ad.workflow_state='published'),
+            assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf on agd.id = agf.assignment_group_id  where agd.course_id='{data_warehouse_course_id}' and workflow_state='available'),
+            assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join (select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id ),
+            grp_full as (select a.group_points, b.assignment_group_id from assign_more a right join assignment_grp b on a.assignment_group_id = b.assignment_group_id),
+            assign_rules as (select DISTINCT ad.assignment_group_id,agr.drop_lowest,agr.drop_highest from grp_full ad join assignment_group_rule_dim agr on ad.assignment_group_id=agr.assignment_group_id),
+            assignment_grp_points as (select ag.*, am.group_points AS group_points from assignment_grp ag join grp_full am on ag.assignment_group_id = am.assignment_group_id),
+            assign_final as (select assignment_group_id AS id, course_id AS course_id, group_weight AS weight, name AS name, group_points AS group_points from assignment_grp_points)
+            select g.*, ar.drop_lowest,ar.drop_highest from assign_rules ar join assign_final g on ar.assignment_group_id=g.id;
+                                   """
+            status += util_function(data_warehouse_course_id, assignment_groups_sql, 'assignment_groups')
 
         return status
 
@@ -308,16 +293,16 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("assignment")
 
         # loop through multiple course ids
-        for UDW_course_id in Course.objects.get_supported_courses():
+        for data_warehouse_course_id in Course.objects.get_supported_courses():
             assignment_sql = f"""with assignment_info as
                             (select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone 'America/New_York' as local_date,
                             ad.title AS name,af.course_id AS course_id,af.assignment_id AS id,
                             af.points_possible AS points_possible,af.assignment_group_id AS assignment_group_id
-                            from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{UDW_course_id}' 
+                            from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{data_warehouse_course_id}'
                             and ad.visibility = 'everyone' and ad.workflow_state='published')
                             select * from assignment_info
                             """
-            status += util_function(UDW_course_id, assignment_sql,'assignment')
+            status += util_function(data_warehouse_course_id, assignment_sql,'assignment')
 
         return status
 
@@ -333,17 +318,17 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("submission")
 
         # loop through multiple course ids
-        for UDW_course_id in Course.objects.get_supported_courses():
-            submission_url = f"""with sub_fact as (select submission_id, assignment_id, course_id, user_id, global_canvas_id, published_score from submission_fact sf join user_dim u on sf.user_id = u.id where course_id = '{UDW_course_id}'),
-                             enrollment as (select  distinct(user_id) from enrollment_dim where course_id = '{UDW_course_id}' and workflow_state='active' and type = 'StudentEnrollment'),
+        for data_warehouse_course_id in Course.objects.get_supported_courses():
+            submission_url = f"""with sub_fact as (select submission_id, assignment_id, course_id, user_id, global_canvas_id, published_score from submission_fact sf join user_dim u on sf.user_id = u.id where course_id = '{data_warehouse_course_id}'),
+                             enrollment as (select  distinct(user_id) from enrollment_dim where course_id = '{data_warehouse_course_id}' and workflow_state='active' and type = 'StudentEnrollment'),
                              sub_with_enroll as (select sf.* from sub_fact sf join enrollment e on e.user_id = sf.user_id),
                              submission_time as (select sd.id, sd.graded_at from submission_dim sd join sub_fact suf on sd.id=suf.submission_id),
-                             assign_fact as (select s.*,a.title from assignment_dim a join sub_with_enroll s on s.assignment_id=a.id where a.course_id='{UDW_course_id}' and a.workflow_state='published' and muted = false),
+                             assign_fact as (select s.*,a.title from assignment_dim a join sub_with_enroll s on s.assignment_id=a.id where a.course_id='{data_warehouse_course_id}' and a.workflow_state='published' and muted = false),
                              assign_sub_time as (select a.*, t.graded_at from assign_fact a join submission_time t on a.submission_id = t.id),
                              all_assign_sub as (select submission_id AS id, assignment_id AS assignment_id, course_id, global_canvas_id AS user_id, published_score AS score, graded_at AS graded_date from assign_sub_time order by assignment_id)
                              select f.*, f1.avg_score from all_assign_sub f join (select assignment_id, round(avg(score),1) as avg_score from all_assign_sub group by assignment_id) as f1 on f.assignment_id = f1.assignment_id
                              """
-            status += util_function(UDW_course_id, submission_url,'submission')
+            status += util_function(data_warehouse_course_id, submission_url,'submission')
 
         return status
 
@@ -359,27 +344,27 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("assignment_weight_consideration")
 
         # loop through multiple course ids
-        for UDW_course_id in Course.objects.get_supported_courses():
+        for data_warehouse_course_id in Course.objects.get_supported_courses():
             is_weight_considered_url = f"""with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact
-                                        where course_id = '{UDW_course_id}' group by course_id having sum(group_weight)>1)
+                                        where course_id = '{data_warehouse_course_id}' group by course_id having sum(group_weight)>1)
                                         (select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)
                                         """
-            status += util_function(UDW_course_id, is_weight_considered_url,'assignment_weight_consideration', 'weight')
+            status += util_function(data_warehouse_course_id, is_weight_considered_url,'assignment_weight_consideration', 'weight')
 
             logger.debug(status+"\n\n")
 
         return status
 
-    def update_with_udw_term(self):
+    def update_term(self):
         # cron status
         status = ""
 
-        logger.debug("in update with udw term")
+        logger.debug("in update with data warehouse term")
 
         # delete all records in the table first
         status += deleteAllRecordInTable("academic_terms")
 
-        #select file record from UDW
+        #select term records from DATA_WAREHOUSE
         term_sql = f"select id, canvas_id, name, date_start, date_end from enrollment_term_dim where date_start > '{settings.EARLIEST_TERM_DATE}'"
         logger.debug(term_sql)
         status += util_function(None, term_sql, 'academic_terms')
@@ -405,10 +390,10 @@ class DashboardCronJob(CronJobBase):
         # continue cron tasks
 
         logger.info("** term")
-        status += self.update_with_udw_term()
+        status += self.update_term()
 
         logger.info("** user")
-        status += self.update_with_udw_user()
+        status += self.update_user()
 
         logger.info("** assignment")
         status += self.update_groups()
@@ -416,14 +401,15 @@ class DashboardCronJob(CronJobBase):
 
         status += self.submission()
         status += self.weight_consideration()
-        
+
         logger.info("** file")
         if 'show_files_accessed' not in settings.VIEWS_DISABLED:
-            status += self.update_with_udw_file()
+            status += self.update_file()
             status += self.update_with_bq_access()
 
-        logger.info("** informational")
-        status += self.update_unizin_metadata()
+        if settings.DATA_WAREHOUSE_IS_UNIZIN:
+            logger.info("** informational")
+            status += self.update_unizin_metadata()
 
         status += "End cron: " +  str(datetime.datetime.now()) + "\n"
 
