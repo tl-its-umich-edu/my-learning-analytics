@@ -24,10 +24,30 @@ const styles = theme => ({
   paper: {
     padding: theme.spacing.unit * 2,
     color: theme.palette.text.secondary
+  },
+  sliderCell: {
+    minWidth: '250px'
   }
 })
 
-function WhatIfGrade(props) {
+const calculateActualGrade = assignmentData => {
+  const gradedAssignments = assignmentData.progress.filter(x => x.graded)
+  const [totalPointsEarned, totalPointsPossible] = gradedAssignments.reduce((acc, cur) => {
+    acc[0] += cur.percent_gotten
+    acc[1] += cur.towards_final_grade
+    return acc
+  }, [0, 0])
+  return roundToOneDecimcal(totalPointsEarned / totalPointsPossible * 100)
+}
+
+const calculateWhatIfGrade = assignments => {
+  const arrOfAssignments = Object.keys(assignments).map(key => assignments[key])
+  const whatIfGrade = arrOfAssignments
+    .reduce((acc, cur) => (acc += cur.percentOfFinalGrade * cur.whatIfGrade / 100), 0)
+  return roundToOneDecimcal(whatIfGrade)
+}
+
+function WhatIfGrade (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
 
@@ -35,23 +55,6 @@ function WhatIfGrade(props) {
   const [assignments, setAssignments] = useState(null)
   const [actualGrade, setActualGrade] = useState(0)
   const [whatIfGrade, setWhatIfGrade] = useState(0)
-
-  const calculateActualGrade = assignmentData => {
-    const gradedAssignments = assignmentData.progress.filter(x => x.graded)
-    const [totalPointsEarned, totalPointsPossible] = gradedAssignments.reduce((acc, cur) => {
-      acc[0] += cur.percent_gotten
-      acc[1] += cur.towards_final_grade
-      return acc
-    }, [0, 0])
-    return roundToOneDecimcal(totalPointsEarned / totalPointsPossible * 100)
-  }
-
-  const calculateWhatIfGrade = assignments => {
-    const arrOfAssignments = Object.keys(assignments).map(key => assignments[key])
-    const whatIfGrade = arrOfAssignments
-      .reduce((acc, cur) => (acc += cur.percentOfFinalGrade * cur.whatIfGrade / 100), 0)
-    return roundToOneDecimcal(whatIfGrade)
-  }
 
   useEffect(() => {
     if (loaded) {
@@ -71,6 +74,7 @@ function WhatIfGrade(props) {
         }
         return acc
       }, {})
+
       setAssignments(assignments)
       setActualGrade(calculateActualGrade(assignmentData))
     }
@@ -91,14 +95,26 @@ function WhatIfGrade(props) {
             {assignments
               ? <>
                 <Grid container justify='flex-end'>
-                  <Grid item xs={6} md={3}>
+                  <Grid item xs={12} md={6}>
                     <Card>
                       <CardContent>
                         <Table tableData={[
-                          ['What-If Grade', <strong>{`${whatIfGrade}%`} {(whatIfGrade - actualGrade) > 0
-                            ? <p style={{ color: 'green', display: 'inline' }}>{`(+${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}</p>
-                            : <p style={{ color: 'red', display: 'inline' }}>{`(${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}</p>}</strong>],
-                          ['Current Grade', <strong>{`${actualGrade}%`}</strong>]
+                          [
+                            <Typography variant='h6'>What-If Grade</Typography>,
+                            <Typography variant='h6'>
+                              {`${whatIfGrade}% `}
+                              {(whatIfGrade - actualGrade) > 0
+                                ? <span style={{ color: 'green', display: 'inline' }}>
+                                  {`(+${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}
+                                </span>
+                                : <span style={{ color: 'red', display: 'inline' }}>
+                                  {`(${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}
+                                </span>}
+                            </Typography>
+                          ],
+                          [<Typography variant='h6'>Current Grade</Typography>,
+                            <Typography variant='h6'>{`${actualGrade}%`}</Typography>
+                          ]
                         ]} />
                       </CardContent>
                     </Card>
@@ -134,7 +150,7 @@ function WhatIfGrade(props) {
                               Weight: {`${assignments[key].percentOfFinalGrade}%`}
                             </Typography>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className={classes.sliderCell}>
                             <GradeSlider
                               grade={assignments[key].whatIfGrade}
                               setWhatIfGrade={value => {

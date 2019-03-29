@@ -1,5 +1,4 @@
 import React, { memo } from 'react'
-import { Typography } from '@material-ui/core'
 import Tooltip from 'rc-tooltip'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
@@ -36,6 +35,7 @@ function GradeSlider (props) {
       disabled={isGraded}
       handle={handle}
       tipFormatter={value => `${value}%`}
+      marks={{ 50: '50%', 100: '100%' }}
     />
   )
 }
