@@ -132,7 +132,6 @@ function WhatIfGrade (props) {
                               }}
                               isGraded={assignments[key].isGraded}
                               weight={assignments[key].percentOfFinalGrade}
-                              actualGrade={assignments[key].actualGrade}
                             />
                           </TableCell>
                         </TableRow>
