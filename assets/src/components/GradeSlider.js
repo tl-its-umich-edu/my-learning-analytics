@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
-import Slider from '@material-ui/lab/Slider'
+// import Slider from '@material-ui/lab/Slider'
 import { Typography } from '@material-ui/core'
 import Grid from '@material-ui/core/Grid'
+import 'rc-slider/assets/index.css'
+import Tooltip from 'rc-tooltip'
+import Slider from 'rc-slider'
 
 function GradeSlider (props) {
   const { grade, setWhatIfGrade, isGraded, weight, actualGrade } = props
@@ -27,13 +30,12 @@ function GradeSlider (props) {
         </Grid>
       </Grid>
       <Slider
-        value={sliderValue}
+        defaultValue={sliderValue}
         min={0}
         max={100}
         step={1}
-        aria-labelledby='label'
-        onChange={(_, value) => setSliderValue(value)}
-        onDragEnd={() => setWhatIfGrade(sliderValue)}
+        onChange={value => setSliderValue(value)}
+        onAfterChange={() => setWhatIfGrade(sliderValue)}
         disabled={isGraded}
       />
     </>

@@ -47,7 +47,8 @@ function WhatIfGrade (props) {
 
   const calculateWhatIfGrade = assignments => {
     const arrOfAssignments = Object.keys(assignments).map(key => assignments[key])
-    const whatIfGrade = arrOfAssignments.reduce((acc, cur) => (acc += cur.percentOfFinalGrade * cur.whatIfGrade / 100), 0)
+    const whatIfGrade = arrOfAssignments
+      .reduce((acc, cur) => (acc += cur.percentOfFinalGrade * cur.whatIfGrade / 100), 0)
     return roundToOneDecimcal(whatIfGrade)
   }
 
@@ -56,7 +57,9 @@ function WhatIfGrade (props) {
       const assignments = assignmentData.progress.reduce((acc, assignment, i) => {
         const assignmentName = assignment.name
         const isGraded = assignment.graded
-        const actualGrade = isGraded ? roundToOneDecimcal(assignment.score / assignment.points_possible * 100) : null
+        const actualGrade = isGraded
+          ? roundToOneDecimcal(assignment.score / assignment.points_possible * 100)
+          : null
         const percentOfFinalGrade = assignment.towards_final_grade
         acc[i] = {
           assignmentName,
