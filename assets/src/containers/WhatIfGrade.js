@@ -27,7 +27,7 @@ const styles = theme => ({
   }
 })
 
-function WhatIfGrade (props) {
+function WhatIfGrade(props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
 
@@ -35,7 +35,6 @@ function WhatIfGrade (props) {
   const [assignments, setAssignments] = useState(null)
   const [actualGrade, setActualGrade] = useState(0)
   const [whatIfGrade, setWhatIfGrade] = useState(0)
-  const [showWeightedScores, setShowWeightedScores] = useState(false)
 
   const calculateActualGrade = assignmentData => {
     const gradedAssignments = assignmentData.progress.filter(x => x.graded)
@@ -128,6 +127,12 @@ function WhatIfGrade (props) {
                         <TableRow key={key}>
                           <TableCell>
                             {assignments[key].assignmentName}
+                            <Typography
+                              align={'left'}
+                              style={{ paddingBottom: '10px' }}
+                              variant='caption'>
+                              Weight: {`${assignments[key].percentOfFinalGrade}%`}
+                            </Typography>
                           </TableCell>
                           <TableCell>
                             <GradeSlider
@@ -138,7 +143,6 @@ function WhatIfGrade (props) {
                                 setAssignments({ ...assignments, [key]: assignment })
                               }}
                               isGraded={assignments[key].isGraded}
-                              weight={assignments[key].percentOfFinalGrade}
                             />
                           </TableCell>
                         </TableRow>

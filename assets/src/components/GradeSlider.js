@@ -24,27 +24,19 @@ const handle = props => {
 }
 
 function GradeSlider (props) {
-  const { grade, setWhatIfGrade, isGraded, weight } = props
+  const { grade, setWhatIfGrade, isGraded } = props
 
   return (
-    <>
-      <Typography
-        align={'left'}
-        style={{ paddingBottom: '10px' }}
-        variant='caption'>
-        Weight: {`${weight}%`}
-      </Typography>
-      <SliderWithTip
-        defaultValue={grade}
-        min={0}
-        max={100}
-        step={1}
-        onAfterChange={value => setWhatIfGrade(value)}
-        disabled={isGraded}
-        handle={handle}
-        tipFormatter={value => `${value}%`}
-      />
-    </>
+    <SliderWithTip
+      defaultValue={grade}
+      min={0}
+      max={100}
+      step={1}
+      onAfterChange={value => setWhatIfGrade(value)}
+      disabled={isGraded}
+      handle={handle}
+      tipFormatter={value => `${value}%`}
+    />
   )
 }
 
