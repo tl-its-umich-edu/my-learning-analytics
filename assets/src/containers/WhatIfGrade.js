@@ -31,11 +31,11 @@ function WhatIfGrade (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
 
+  const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, 0)
   const [assignments, setAssignments] = useState(null)
   const [actualGrade, setActualGrade] = useState(0)
   const [whatIfGrade, setWhatIfGrade] = useState(0)
   const [showWeightedScores, setShowWeightedScores] = useState(false)
-  const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, 0)
 
   const calculateActualGrade = assignmentData => {
     const gradedAssignments = assignmentData.progress.filter(x => x.graded)
@@ -96,10 +96,10 @@ function WhatIfGrade (props) {
                     <Card>
                       <CardContent>
                         <Table tableData={[
-                          ['Current Grade', <strong>{`${actualGrade}%`}</strong>],
                           ['What-If Grade', <strong>{`${whatIfGrade}%`} {(whatIfGrade - actualGrade) > 0
                             ? <p style={{ color: 'green', display: 'inline' }}>{`(+${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}</p>
-                            : <p style={{ color: 'red', display: 'inline' }}>{`(${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}</p>}</strong>]
+                            : <p style={{ color: 'red', display: 'inline' }}>{`(${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}</p>}</strong>],
+                          ['Current Grade', <strong>{`${actualGrade}%`}</strong>]
                         ]} />
                       </CardContent>
                     </Card>
@@ -143,8 +143,7 @@ function WhatIfGrade (props) {
                           </TableCell>
                         </TableRow>
                       )
-                    })
-                    }
+                    })}
                   </TableBody>
                 </MTable>
               </> : <Spinner />}
