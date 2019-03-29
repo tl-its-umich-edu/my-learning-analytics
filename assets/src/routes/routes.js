@@ -24,9 +24,9 @@ const routes = courseId => [
   },
   {
     path: `/${courseId}/whatif`,
-    title: 'What If Grade',
+    title: 'What-If Grade',
     icon: Grade,
-    description: "Grade calculator.",
+    description: "Use this tool to calculate your what-if grade.",
     image: "/static/images/file_access_trends_icon.png",
   }
 ]
