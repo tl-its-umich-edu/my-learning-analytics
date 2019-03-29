@@ -11,6 +11,8 @@ import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import Spinner from '../components/Spinner'
 import GradeSlider from '../components/GradeSlider'
+import Card from '@material-ui/core/Card'
+import CardContent from '@material-ui/core/CardContent'
 import { roundToOneDecimcal } from '../util/math'
 import { useAssignmentPlanningData } from '../service/api'
 
@@ -86,15 +88,21 @@ function WhatIfGrade (props) {
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Typography variant='h5' gutterBottom>What If Grade Calculator</Typography>
+            <Typography variant='h5' gutterBottom>What-If Grade Calculator</Typography>
             {assignments
               ? <>
                 <Grid container justify='flex-end'>
                   <Grid item xs={12} md={3}>
-                    <Table tableData={[
-                      ['Current Grade', <strong>{`${actualGrade}%`}</strong>],
-                      ['What If Grade', <strong>{`${whatIfGrade}%`}</strong>]
-                    ]} />
+                    <Card>
+                      <CardContent>
+                        <Table tableData={[
+                          ['Current Grade', <strong>{`${actualGrade}%`}</strong>],
+                          ['What-If Grade', <strong>{`${whatIfGrade}%`} {(whatIfGrade - actualGrade) > 0
+                            ? <p style={{ color: 'green', display: 'inline' }}>{`(+${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}</p>
+                            : <p style={{ color: 'red', display: 'inline' }}>{`(${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}</p>}</strong>]
+                        ]} />
+                      </CardContent>
+                    </Card>
                   </Grid>
                 </Grid>
                 <MTable className={classes.table}>
@@ -107,8 +115,7 @@ function WhatIfGrade (props) {
                         return (
                           <TableCell
                             className={classes.tableCell + ' ' + classes.tableHeadCell}
-                            key={key}
-                          >
+                            key={key}>
                             {prop}
                           </TableCell>
                         )
@@ -125,9 +132,9 @@ function WhatIfGrade (props) {
                           <TableCell>
                             <GradeSlider
                               grade={assignments[key].whatIfGrade}
-                              setWhatIfGrade={whatIfGrade => {
+                              setWhatIfGrade={value => {
                                 const assignment = assignments[key]
-                                assignment.whatIfGrade = whatIfGrade
+                                assignment.whatIfGrade = value
                                 setAssignments({ ...assignments, [key]: assignment })
                               }}
                               isGraded={assignments[key].isGraded}
@@ -139,7 +146,8 @@ function WhatIfGrade (props) {
                     })
                     }
                   </TableBody>
-                </MTable> </> : <Spinner />}
+                </MTable>
+              </> : <Spinner />}
           </Paper>
         </Grid>
       </Grid>

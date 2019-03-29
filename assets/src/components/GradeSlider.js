@@ -1,9 +1,8 @@
-import React from 'react'
-// import Slider from '@material-ui/lab/Slider'
+import React, { memo } from 'react'
 import { Typography } from '@material-ui/core'
-import 'rc-slider/assets/index.css'
 import Tooltip from 'rc-tooltip'
 import Slider from 'rc-slider'
+import 'rc-slider/assets/index.css'
 
 const createSliderWithTooltip = Slider.createSliderWithTooltip
 const SliderWithTip = createSliderWithTooltip(Slider)
@@ -49,4 +48,4 @@ function GradeSlider (props) {
   )
 }
 
-export default GradeSlider
+export default memo(GradeSlider)
