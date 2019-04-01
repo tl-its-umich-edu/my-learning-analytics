@@ -127,6 +127,7 @@ function WhatIfGrade (props) {
           <TableRow>
             {[
               'Assignment Name',
+              'Current Grade',
               'What-If Grade'
             ].map((prop, key) => {
               return (
@@ -151,6 +152,12 @@ function WhatIfGrade (props) {
                     variant='caption'>
                     Weight: {`${assignments[key].percentOfFinalGrade}%`}
                   </Typography>
+                </TableCell>
+                <TableCell>
+                  {assignments[key].actualGrade
+                  ? assignments[key].actualGrade
+                  : '-'
+                  }
                 </TableCell>
                 <TableCell className={classes.sliderCell}>
                   <GradeSlider
