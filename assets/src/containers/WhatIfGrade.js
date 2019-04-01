@@ -51,12 +51,22 @@ const isDataValid = data => {
   return data && Object.keys(data).length !== 0;
 }
 
+const formatDate = date => {
+  let d = new Date(date)
+  const months = ['Jan', 'Feb', 'Mar','Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  let month = months[d.getMonth() + 1],
+  day = d.getDate(),
+  year = d.getFullYear()
+  return month + ' ' + day + ', ' + year
+}
+
 function WhatIfGrade (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
 
   const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, 0)
   const [assignments, setAssignments] = useState(null)
+  const [dueDate] = useState(null);
   const [actualGrade, setActualGrade] = useState(0)
   const [whatIfGrade, setWhatIfGrade] = useState(0)
 
@@ -65,6 +75,7 @@ function WhatIfGrade (props) {
       const assignments = assignmentData.progress.reduce((acc, assignment, i) => {
         const assignmentName = assignment.name
         const isGraded = assignment.graded
+        const dueDate = assignment.due_date_mod || ''
         const actualGrade = isGraded
           ? roundToOneDecimcal(assignment.score / assignment.points_possible * 100)
           : null
@@ -72,6 +83,7 @@ function WhatIfGrade (props) {
         acc[i] = {
           assignmentName,
           isGraded,
+          dueDate,
           actualGrade,
           percentOfFinalGrade,
           whatIfGrade: isGraded ? actualGrade : 100
@@ -127,6 +139,7 @@ function WhatIfGrade (props) {
           <TableRow>
             {[
               'Assignment Name',
+              'Due Date',
               'Current Grade',
               'What-If Grade'
             ].map((prop, key) => {
@@ -154,10 +167,10 @@ function WhatIfGrade (props) {
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  {assignments[key].actualGrade
-                  ? assignments[key].actualGrade
-                  : '-'
-                  }
+                  {formatDate(assignments[key].dueDate) || '-'}
+                </TableCell>
+                <TableCell>
+                  {assignments[key].actualGrade || '-'}
                 </TableCell>
                 <TableCell className={classes.sliderCell}>
                   <GradeSlider
