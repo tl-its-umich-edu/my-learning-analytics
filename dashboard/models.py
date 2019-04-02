@@ -220,7 +220,7 @@ class CourseViewOption(models.Model):
             else:
                 return options
         except ObjectDoesNotExist:
-            logger.warn(f"CourseViewOption does not exist in Course table, skipping")
+            logger.warning(f"CourseViewOption does not exist in Course table, skipping")
             return ""
 
 
