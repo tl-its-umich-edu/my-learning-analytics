@@ -47,6 +47,17 @@ const calculateWhatIfGrade = assignments => {
   return roundToOneDecimcal(whatIfGrade)
 }
 
+const isDataValid = data => data && Object.keys(data).length !== 0
+
+const formatDate = date => {
+  let d = new Date(date)
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  let month = months[d.getMonth() + 1]
+  let day = d.getDate()
+  let year = d.getFullYear()
+  return month + ' ' + day + ', ' + year
+}
+
 function WhatIfGrade (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
@@ -57,10 +68,11 @@ function WhatIfGrade (props) {
   const [whatIfGrade, setWhatIfGrade] = useState(0)
 
   useEffect(() => {
-    if (loaded) {
+    if (loaded && isDataValid(assignmentData)) {
       const assignments = assignmentData.progress.reduce((acc, assignment, i) => {
         const assignmentName = assignment.name
         const isGraded = assignment.graded
+        const dueDate = assignment.due_date_mod || ''
         const actualGrade = isGraded
           ? roundToOneDecimcal(assignment.score / assignment.points_possible * 100)
           : null
@@ -68,6 +80,7 @@ function WhatIfGrade (props) {
         acc[i] = {
           assignmentName,
           isGraded,
+          dueDate,
           actualGrade,
           percentOfFinalGrade,
           whatIfGrade: isGraded ? actualGrade : 100
@@ -86,87 +99,105 @@ function WhatIfGrade (props) {
     }
   })
 
+  const buildWhatIfGradeView = assignments => {
+    if (!isDataValid(assignments)) {
+      return (<p>No data provided</p>)
+    }
+    return (
+    <>
+      <Grid container justify='flex-end'>
+        <Grid item xs={12} md={6}>
+          <Card>
+            <CardContent>
+              <Table tableData={[
+                [
+                  <Typography variant='h6'>What-If Grade</Typography>,
+                  <Typography variant='h6'>
+                    {`${whatIfGrade}% `}
+                    {(whatIfGrade - actualGrade) > 0
+                      ? <span style={{ color: 'green', display: 'inline' }}>
+                        {`(+${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}
+                      </span>
+                      : <span style={{ color: 'red', display: 'inline' }}>
+                        {`(${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}
+                      </span>}
+                  </Typography>
+                ],
+                [<Typography variant='h6'>Current Grade</Typography>,
+                  <Typography variant='h6'>{`${actualGrade}%`}</Typography>
+                ]
+              ]} />
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+      <MTable className={classes.table}>
+        <TableHead>
+          <TableRow>
+            {[
+              'Assignment Name',
+              'Due Date',
+              'Current Grade',
+              'What-If Grade'
+            ].map((prop, key) => {
+              return (
+                <TableCell
+                  className={classes.tableCell + ' ' + classes.tableHeadCell}
+                  key={key}>
+                  {prop}
+                </TableCell>
+              )
+            })}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {Object.keys(assignments).map(key => {
+            return (
+              <TableRow key={key}>
+                <TableCell>
+                  {assignments[key].assignmentName}
+                  <Typography
+                    align={'left'}
+                    style={{ paddingBottom: '10px' }}
+                    variant='caption'>
+                    Weight: {`${assignments[key].percentOfFinalGrade}%`}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  {formatDate(assignments[key].dueDate) || '-'}
+                </TableCell>
+                <TableCell>
+                  {assignments[key].actualGrade || '-'}
+                </TableCell>
+                <TableCell className={classes.sliderCell}>
+                  <GradeSlider
+                    grade={assignments[key].whatIfGrade}
+                    setWhatIfGrade={value => {
+                      const assignment = assignments[key]
+                      assignment.whatIfGrade = value
+                      setAssignments({ ...assignments, [key]: assignment })
+                    }}
+                    isGraded={assignments[key].isGraded}
+                  />
+                </TableCell>
+              </TableRow>
+            )
+          })}
+        </TableBody>
+      </MTable>
+    </>
+    )
+  }
+
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Typography variant='h5' gutterBottom>What-If Grade Calculator</Typography>
-            {assignments
-              ? <>
-                <Grid container justify='flex-end'>
-                  <Grid item xs={12} md={6}>
-                    <Card>
-                      <CardContent>
-                        <Table tableData={[
-                          [
-                            <Typography variant='h6'>What-If Grade</Typography>,
-                            <Typography variant='h6'>
-                              {`${whatIfGrade}% `}
-                              {(whatIfGrade - actualGrade) > 0
-                                ? <span style={{ color: 'green', display: 'inline' }}>
-                                  {`(+${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}
-                                </span>
-                                : <span style={{ color: 'red', display: 'inline' }}>
-                                  {`(${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}
-                                </span>}
-                            </Typography>
-                          ],
-                          [<Typography variant='h6'>Current Grade</Typography>,
-                            <Typography variant='h6'>{`${actualGrade}%`}</Typography>
-                          ]
-                        ]} />
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                </Grid>
-                <MTable className={classes.table}>
-                  <TableHead>
-                    <TableRow>
-                      {[
-                        'Assignment Name',
-                        'What-If Grade'
-                      ].map((prop, key) => {
-                        return (
-                          <TableCell
-                            className={classes.tableCell + ' ' + classes.tableHeadCell}
-                            key={key}>
-                            {prop}
-                          </TableCell>
-                        )
-                      })}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {Object.keys(assignments).map(key => {
-                      return (
-                        <TableRow key={key}>
-                          <TableCell>
-                            {assignments[key].assignmentName}
-                            <Typography
-                              align={'left'}
-                              style={{ paddingBottom: '10px' }}
-                              variant='caption'>
-                              Weight: {`${assignments[key].percentOfFinalGrade}%`}
-                            </Typography>
-                          </TableCell>
-                          <TableCell className={classes.sliderCell}>
-                            <GradeSlider
-                              grade={assignments[key].whatIfGrade}
-                              setWhatIfGrade={value => {
-                                const assignment = assignments[key]
-                                assignment.whatIfGrade = value
-                                setAssignments({ ...assignments, [key]: assignment })
-                              }}
-                              isGraded={assignments[key].isGraded}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
-                  </TableBody>
-                </MTable>
-              </> : <Spinner />}
+            <Typography variant='h5' gutterBottom >What-If Grade Calculator</Typography >
+            {loaded
+              ? buildWhatIfGradeView(assignments)
+              : <Spinner />}
           </Paper>
         </Grid>
       </Grid>

@@ -154,9 +154,11 @@ Then you can edit your files! (Probably in /code/dashboard)
 
 4. VsCode is supported via PTVSD for debugging the code running in Docker. See this information here for details https://code.visualstudio.com/docs/python/debugging#_remote-debugging
 
-    A few variables are available to be defined in the .env file to enable this but minimally you have to set PTVSD_DEBUG=True. Currently docker-compose.yml opens 2 ports that can be used current, 3000 and 3001. If you need more you can open them.
+    A few variables are available to be defined in the .env file to enable this but minimally you have to set PTVSD_ENABLE=True. Currently docker-compose.yml opens 2 ports that can be used current, 3000 and 3001. If you need more you can open them. You can configure these with other variables. See the .env.sample for examples.
 
     If you want to conenct to the cron job you'll have to use a different port as Django uses 3000 by default and also wait for attach.
+
+    This debug mode currently only works with django-admin commands (not gunicorn or manage.py) 
 
 ## License check
 
