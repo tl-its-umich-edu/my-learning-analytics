@@ -15,6 +15,7 @@ import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
 import { roundToOneDecimcal } from '../util/math'
 import { useAssignmentPlanningData } from '../service/api'
+import { formatDate } from '../util/data'
 
 const styles = theme => ({
   root: {
@@ -26,7 +27,7 @@ const styles = theme => ({
     color: theme.palette.text.secondary
   },
   sliderCell: {
-    minWidth: '250px'
+    minWidth: '150px'
   }
 })
 
@@ -49,15 +50,6 @@ const calculateWhatIfGrade = assignments => {
 
 const isDataValid = data => data && Object.keys(data).length !== 0
 
-const formatDate = date => {
-  let d = new Date(date)
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  let month = months[d.getMonth() + 1]
-  let day = d.getDate()
-  let year = d.getFullYear()
-  return month + ' ' + day + ', ' + year
-}
-
 function WhatIfGrade (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
@@ -73,10 +65,10 @@ function WhatIfGrade (props) {
         const assignmentName = assignment.name
         const isGraded = assignment.graded
         const dueDate = assignment.due_date_mod || ''
+        const percentOfFinalGrade = assignment.towards_final_grade
         const actualGrade = isGraded
           ? roundToOneDecimcal(assignment.score / assignment.points_possible * 100)
           : null
-        const percentOfFinalGrade = assignment.towards_final_grade
         acc[i] = {
           assignmentName,
           isGraded,
@@ -104,88 +96,83 @@ function WhatIfGrade (props) {
       return (<p>No data provided</p>)
     }
     return (
-    <>
-      <Grid container justify='flex-end'>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Table tableData={[
-                [
-                  <Typography variant='h6'>What-If Grade</Typography>,
-                  <Typography variant='h6'>
-                    {`${whatIfGrade}% `}
-                    {(whatIfGrade - actualGrade) > 0
-                      ? <span style={{ color: 'green', display: 'inline' }}>
-                        {`(+${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}
-                      </span>
-                      : <span style={{ color: 'red', display: 'inline' }}>
-                        {`(${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}
-                      </span>}
-                  </Typography>
-                ],
-                [<Typography variant='h6'>Current Grade</Typography>,
-                  <Typography variant='h6'>{`${actualGrade}%`}</Typography>
-                ]
-              ]} />
-            </CardContent>
-          </Card>
+      <>
+        <Grid container justify='flex-end'>
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Table
+                  tableHead={['What-If Grade', 'Current Grade']}
+                  tableData={[[
+                    <Typography variant='h6'>
+                      {`${whatIfGrade}% `}
+                      {(whatIfGrade - actualGrade) > 0
+                        ? <span style={{ color: 'green', display: 'inline' }}>
+                          {`(+${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}
+                        </span>
+                        : <span style={{ color: 'red', display: 'inline' }}>
+                          {`(${roundToOneDecimcal(whatIfGrade - actualGrade)}%)`}
+                        </span>}
+                    </Typography>,
+                    <Typography variant='h6'>{`${actualGrade}%`}</Typography>
+                  ]]} />
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
-      </Grid>
-      <MTable className={classes.table}>
-        <TableHead>
-          <TableRow>
-            {[
-              'Assignment Name',
-              'Due Date',
-              'Current Grade',
-              'What-If Grade'
-            ].map((prop, key) => {
+        <MTable className={classes.table}>
+          <TableHead>
+            <TableRow>
+              {[
+                'Assignment Name',
+                'Due Date',
+                'Weight',
+                'Current Grade',
+                'What-If Grade'
+              ].map((prop, key) => {
+                return (
+                  <TableCell
+                    className={classes.tableCell + ' ' + classes.tableHeadCell}
+                    key={key}>
+                    {prop}
+                  </TableCell>
+                )
+              })}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {Object.keys(assignments).map(key => {
               return (
-                <TableCell
-                  className={classes.tableCell + ' ' + classes.tableHeadCell}
-                  key={key}>
-                  {prop}
-                </TableCell>
+                <TableRow key={key}>
+                  <TableCell>
+                    {assignments[key].assignmentName}
+                  </TableCell>
+                  <TableCell>
+                    {formatDate(assignments[key].dueDate) || '-'}
+                  </TableCell>
+                  <TableCell>
+                    {`${assignments[key].percentOfFinalGrade}%`}
+                  </TableCell>
+                  <TableCell>
+                    {assignments[key].actualGrade ? `${assignments[key].actualGrade}%` : '-'}
+                  </TableCell>
+                  <TableCell className={classes.sliderCell}>
+                    <GradeSlider
+                      grade={assignments[key].whatIfGrade}
+                      setWhatIfGrade={value => {
+                        const assignment = assignments[key]
+                        assignment.whatIfGrade = value
+                        setAssignments({ ...assignments, [key]: assignment })
+                      }}
+                      isGraded={assignments[key].isGraded}
+                    />
+                  </TableCell>
+                </TableRow>
               )
             })}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {Object.keys(assignments).map(key => {
-            return (
-              <TableRow key={key}>
-                <TableCell>
-                  {assignments[key].assignmentName}
-                  <Typography
-                    align={'left'}
-                    style={{ paddingBottom: '10px' }}
-                    variant='caption'>
-                    Weight: {`${assignments[key].percentOfFinalGrade}%`}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  {formatDate(assignments[key].dueDate) || '-'}
-                </TableCell>
-                <TableCell>
-                  {assignments[key].actualGrade ? `${assignments[key].actualGrade}%` : '-'}
-                </TableCell>
-                <TableCell className={classes.sliderCell}>
-                  <GradeSlider
-                    grade={assignments[key].whatIfGrade}
-                    setWhatIfGrade={value => {
-                      const assignment = assignments[key]
-                      assignment.whatIfGrade = value
-                      setAssignments({ ...assignments, [key]: assignment })
-                    }}
-                    isGraded={assignments[key].isGraded}
-                  />
-                </TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </MTable>
-    </>
+          </TableBody>
+        </MTable>
+      </>
     )
   }
 
