@@ -167,7 +167,7 @@ function WhatIfGrade (props) {
                   {formatDate(assignments[key].dueDate) || '-'}
                 </TableCell>
                 <TableCell>
-                  {assignments[key].actualGrade || '-'}
+                  {assignments[key].actualGrade ? `${assignments[key].actualGrade}%` : '-'}
                 </TableCell>
                 <TableCell className={classes.sliderCell}>
                   <GradeSlider
