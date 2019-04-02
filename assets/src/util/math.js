@@ -1,9 +1,9 @@
-const roundToTwoDecimal = int => Math.round(int * 100) / 100
-const roundToOneDecimcal = int => Math.round(int * 10) / 10
+const roundToOneDecimcal = num => Math.round(num * 10) / 10
+const roundToTwoDecimal = num => Math.round(num * 100) / 100
 
-const average = arr => roundToOneDecimcal(
+const average = arr => arr.length > 0 ? roundToOneDecimcal(
   arr.reduce((acc, cur) => acc + cur, 0) / arr.length
-)
+) : null
 
 const pearsonCorrelation = (prefs, p1, p2) => {
   let si = []
@@ -61,10 +61,29 @@ const standardDeviation = values => {
   return roundToTwoDecimal(stdDev)
 }
 
+const calculateActualGrade = assignmentData => {
+  const gradedAssignments = assignmentData.progress.filter(x => x.graded)
+  const [totalPointsEarned, totalPointsPossible] = gradedAssignments.reduce((acc, cur) => {
+    acc[0] += cur.percent_gotten
+    acc[1] += cur.towards_final_grade
+    return acc
+  }, [0, 0])
+  return roundToOneDecimcal(totalPointsEarned / totalPointsPossible * 100)
+}
+
+const calculateWhatIfGrade = assignments => {
+  const arrOfAssignments = Object.keys(assignments).map(key => assignments[key])
+  const whatIfGrade = arrOfAssignments
+    .reduce((acc, cur) => (acc += cur.percentOfFinalGrade * cur.whatIfGrade / 100), 0)
+  return roundToOneDecimcal(whatIfGrade)
+}
+
 export {
   average,
   pearsonCorrelation,
   standardDeviation,
   roundToOneDecimcal,
-  roundToTwoDecimal
+  roundToTwoDecimal,
+  calculateActualGrade,
+  calculateWhatIfGrade
 }

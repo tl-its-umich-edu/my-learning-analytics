@@ -13,9 +13,9 @@ import Spinner from '../components/Spinner'
 import GradeSlider from '../components/GradeSlider'
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
-import { roundToOneDecimcal } from '../util/math'
+import { roundToOneDecimcal, calculateWhatIfGrade, calculateActualGrade } from '../util/math'
 import { useAssignmentPlanningData } from '../service/api'
-import { formatDate } from '../util/data'
+import { formatDate, isValid } from '../util/data'
 
 const styles = theme => ({
   root: {
@@ -31,25 +31,6 @@ const styles = theme => ({
   }
 })
 
-const calculateActualGrade = assignmentData => {
-  const gradedAssignments = assignmentData.progress.filter(x => x.graded)
-  const [totalPointsEarned, totalPointsPossible] = gradedAssignments.reduce((acc, cur) => {
-    acc[0] += cur.percent_gotten
-    acc[1] += cur.towards_final_grade
-    return acc
-  }, [0, 0])
-  return roundToOneDecimcal(totalPointsEarned / totalPointsPossible * 100)
-}
-
-const calculateWhatIfGrade = assignments => {
-  const arrOfAssignments = Object.keys(assignments).map(key => assignments[key])
-  const whatIfGrade = arrOfAssignments
-    .reduce((acc, cur) => (acc += cur.percentOfFinalGrade * cur.whatIfGrade / 100), 0)
-  return roundToOneDecimcal(whatIfGrade)
-}
-
-const isDataValid = data => data && Object.keys(data).length !== 0
-
 function WhatIfGrade (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
@@ -60,7 +41,7 @@ function WhatIfGrade (props) {
   const [whatIfGrade, setWhatIfGrade] = useState(0)
 
   useEffect(() => {
-    if (loaded && isDataValid(assignmentData)) {
+    if (loaded && isValid(assignmentData)) {
       const assignments = assignmentData.progress.reduce((acc, assignment, i) => {
         const assignmentName = assignment.name
         const isGraded = assignment.graded
@@ -92,7 +73,7 @@ function WhatIfGrade (props) {
   })
 
   const buildWhatIfGradeView = assignments => {
-    if (!isDataValid(assignments)) {
+    if (!isValid(assignments)) {
       return (<p>No data provided</p>)
     }
     return (

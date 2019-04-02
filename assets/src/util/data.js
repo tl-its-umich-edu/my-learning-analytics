@@ -7,6 +7,9 @@ const formatDate = date => {
   return month + ' ' + day + ', ' + year
 }
 
+const isValid = data => data && Object.keys(data).length !== 0
+
 export {
-  formatDate
+  formatDate,
+  isValid
 }
