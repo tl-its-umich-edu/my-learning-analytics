@@ -47,16 +47,14 @@ const calculateWhatIfGrade = assignments => {
   return roundToOneDecimcal(whatIfGrade)
 }
 
-const isDataValid = data => {
-  return data && Object.keys(data).length !== 0;
-}
+const isDataValid = data => data && Object.keys(data).length !== 0
 
 const formatDate = date => {
   let d = new Date(date)
-  const months = ['Jan', 'Feb', 'Mar','Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  let month = months[d.getMonth() + 1],
-  day = d.getDate(),
-  year = d.getFullYear()
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  let month = months[d.getMonth() + 1]
+  let day = d.getDate()
+  let year = d.getFullYear()
   return month + ' ' + day + ', ' + year
 }
 
@@ -66,7 +64,6 @@ function WhatIfGrade (props) {
 
   const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, 0)
   const [assignments, setAssignments] = useState(null)
-  const [dueDate] = useState(null);
   const [actualGrade, setActualGrade] = useState(0)
   const [whatIfGrade, setWhatIfGrade] = useState(0)
 
