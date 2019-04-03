@@ -77,21 +77,22 @@ function WhatIfGrade (props) {
     }
   })
 
-  useEffect(() => {
-    // sort date
-    if (sortColumnID === 1) {
-      if (sortDirection === 'desc') {
+  // useEffect(() => {
+  //   console.log('sorting')
+  //   // sort date
+  //   if (sortColumnID === 1) {
+  //     if (sortDirection === 'desc') {
 
-      }
-    } else {
-      // sort weight
-      if (sortDirection === 'desc') {
-        setAssignments(assignments.sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade))
-      } else {
-        setAssignments(assignments.sort((a, b) => b.percentOfFinalGrade - a.percentOfFinalGrade))
-      }
-    }
-  }, [sortColumnID, sortDirection])
+  //     }
+  //   } else {
+  //     // sort weight
+  //     if (sortDirection === 'desc') {
+  //       setAssignments(assignments.sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade))
+  //     } else {
+  //       setAssignments(assignments.sort((a, b) => b.percentOfFinalGrade - a.percentOfFinalGrade))
+  //     }
+  //   }
+  // }, [sortColumnID, sortDirection])
 
   const buildWhatIfGradeView = assignments => {
     if (!isValid(assignments)) {
@@ -147,6 +148,13 @@ function WhatIfGrade (props) {
                           onClick={() => {
                             setSortColumnID(key)
                             setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc')
+                            if (key === 2) {
+                              if (sortDirection === 'desc') {
+                                setAssignments(assignments.sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade))
+                              } else {
+                                setAssignments(assignments.sort((a, b) => b.percentOfFinalGrade - a.percentOfFinalGrade))
+                              }
+                            }
                           }}
                         >
                           {prop}
@@ -161,6 +169,7 @@ function WhatIfGrade (props) {
           </TableHead>
           <TableBody>
             {assignments.map((assignment, i) => {
+              // console.log(assignments)
               return (
                 <TableRow key={i}>
                   <TableCell>

@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useState } from 'react'
 import Tooltip from 'rc-tooltip'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
@@ -8,7 +8,7 @@ const SliderWithTip = createSliderWithTooltip(Slider)
 const Handle = Slider.Handle
 
 const handle = props => {
-  const { value, dragging, index, ...restProps } = props
+  const { value, index, ...restProps } = props
   return (
     <Tooltip
       prefixCls='rc-slider-tooltip'
@@ -24,14 +24,19 @@ const handle = props => {
 
 function GradeSlider (props) {
   const { grade, setWhatIfGrade, isGraded } = props
+  console.log(grade, isGraded)
+
+  const [sliderGrade, setSliderGrade] = useState(grade)
 
   return (
     <SliderWithTip
+      defaultValue={grade}
       value={grade}
       min={0}
       max={100}
       step={1}
-      onAfterChange={value => setWhatIfGrade(value)}
+      onAfterChange={() => setWhatIfGrade(sliderGrade)}
+      onChange={value => setSliderGrade(value)}
       disabled={isGraded}
       handle={handle}
       tipFormatter={value => `${value}%`}
@@ -40,4 +45,4 @@ function GradeSlider (props) {
   )
 }
 
-export default memo(GradeSlider)
+export default GradeSlider
