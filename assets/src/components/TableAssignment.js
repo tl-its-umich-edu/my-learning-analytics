@@ -20,7 +20,11 @@ const tableStyle = theme => ({
   },
   tableHeadCell: {
     color: 'inherit',
-    fontSize: '1em'
+    fontSize: '1em',
+    position: 'sticky',
+    top: 0,
+    backgroundColor: "#fff",
+
   },
   tableCell: {
     lineHeight: '1.42857143',
@@ -28,10 +32,11 @@ const tableStyle = theme => ({
     verticalAlign: 'middle'
   },
   tableResponsive: {
-    width: '100%',
+    width: '70%',
+    height: 400,
     marginTop: theme.spacing.unit * 3,
-    overflowX: 'auto'
-  }
+    overflowX: 'auto',
+  },
 })
 
 const generateAssignmentTable = plan => {
@@ -47,7 +52,7 @@ const generateAssignmentTable = plan => {
         const assignmentName = assignment.name
         const percentOfFinalGrade = assignment.towards_final_grade
         const graded = assignment.graded
-        const barData = { percentOfFinalGrade, graded }
+        const barData = {percentOfFinalGrade, graded}
         acc.push([week, dueDate, assignmentName, barData])
       })
     })
@@ -56,18 +61,33 @@ const generateAssignmentTable = plan => {
   return tableArray
 }
 
-function CustomAssignmentTable (props) {
-  const { classes, tableHead, tableData } = props
+const getCurrentWeek = data => {
+  let weekIndicator = ''
+  data.forEach(item => {
+    let week = item.week
+    let currentWeek = item.due_date_items[0].assignment_items[0].current_week;
+    if (currentWeek) {
+      weekIndicator = `Week ${week}`
+    }
+
+  })
+  return weekIndicator
+}
+
+
+function CustomAssignmentTable(props) {
+  const {classes, tableHead, tableData} = props
   const data = generateAssignmentTable(tableData)
     .map(row => {
-      const { percentOfFinalGrade, graded } = row.pop()
+      const {percentOfFinalGrade, graded} = row.pop()
       row.push(<HorizontalBar
-        data={[{ label: 'grade', data: percentOfFinalGrade, graded }]}
+        data={[{label: 'grade', data: percentOfFinalGrade, graded}]}
         width={200}
         height={20}
       />)
       return row
     })
+  const currentWeek = getCurrentWeek(tableData)
   return (
     <div className={classes.tableResponsive}>
       <Table>
@@ -76,7 +96,7 @@ function CustomAssignmentTable (props) {
             <TableRow>
               {tableHead.map((prop, key) => {
                 return (<TableCell className={classes.tableCell + ' ' + classes.tableHeadCell}
-                  key={key}>{prop}</TableCell>)
+                                   key={key}>{prop}</TableCell>)
               })}
             </TableRow>
           </TableHead>
@@ -85,40 +105,54 @@ function CustomAssignmentTable (props) {
           {data.map((row, i) => {
             return (
               <TableRow key={i}>
-                {row.map((prop, j) => {
-                  let displayProp = true
-                  let displayBorder = true
-                  if (data[i - 1]) {
-                    // first item in the row the logic handles display of week property
-                    if (j == 0 && data[i][0] === data[i - 1][0]) {
-                      displayProp = false
-                    }
-                    // second item in the row the logic handles display of Due date property
-                    if(j == 1 && data[i][1] === data[i-1][1]){
-                      displayProp = false
-                    }
-                  }
-                  if (data[i + 1]) {
-                    if (j == 0 && data[i][0] === data[i + 1][0]) {
-                      displayBorder = false
-                    }
+                {
+                  row.map((prop, j) => {
+                    let displayProp = true
+                    let displayBorder = true
+                    let isCurrentWeek = false
+                    if (data[i - 1]) {
+                      // first item in the row the logic handles display of week property
+                      if (j == 0 && data[i][0] === data[i - 1][0]) {
+                        displayProp = false
+                      }
+                      // second item in the row the logic handles display of Due date property
+                      if (j == 1 && data[i][1] === data[i - 1][1]) {
+                        displayProp = false
+                      }
 
-                    if (j == 1 && data[i][1] === data[i + 1][1]) {
-                      displayBorder = false
                     }
-                  }
-                  return (
-                    <TableCell className={classes.tableCell} key={j} style={displayBorder ? {} : { borderBottom: 'none' }}>
-                      {displayProp ? prop : null}
-                    </TableCell>
-                  )
-                })}
+                    if (data[i + 1]) {
+                      if (j == 0 && data[i][0] === data[i + 1][0]) {
+                        displayBorder = false
+                      }
+
+                      if (j == 1 && data[i][1] === data[i + 1][1]) {
+                        displayBorder = false
+                      }
+                    }
+                    if (j == 0 && data[i][0] === currentWeek) {
+                      isCurrentWeek = true
+                    }
+                    let borderAndCurrentWeekStyle = {}
+                    if (!displayBorder) {
+                      borderAndCurrentWeekStyle['borderBottom'] = 'none'
+                    }
+                    if (isCurrentWeek) {
+                      borderAndCurrentWeekStyle['color'] = 'orange'
+                    }
+                    return (
+                      <TableCell className={classes.tableCell} key={j} style={borderAndCurrentWeekStyle}>
+                        {displayProp ? prop : null}
+                      </TableCell>
+                    )
+                  })
+                }
               </TableRow>
             )
           })}
         </TableBody>
       </Table>
-    </div >
+    </div>
   )
 }
 
