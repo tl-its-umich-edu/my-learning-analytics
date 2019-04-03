@@ -101,12 +101,12 @@ function createProgressBar ({ data, width, height, el, tip }) {
     // filtering the graded and ungraded values, list would be either 2 or 1
     const gradedList = [...new Set(data.map(item => item.graded))]
     if(gradedList.length >1){
-      return false
+      return true
     }
-    return gradedList[0]
+    return !gradedList[0]
   }
 
-  if(!showMaxLine(data)) {
+  if(showMaxLine(data)) {
     maxLine
       .append('line')
       .attr('x1', x(calculatePercentSoFar(data.length)))
