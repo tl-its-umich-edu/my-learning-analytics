@@ -8,7 +8,7 @@ const SliderWithTip = createSliderWithTooltip(Slider)
 const Handle = Slider.Handle
 
 const handle = props => {
-  const { value, dragging, index, ...restProps } = props
+  const { value, index, ...restProps } = props
   return (
     <Tooltip
       prefixCls='rc-slider-tooltip'
@@ -27,7 +27,7 @@ function GradeSlider (props) {
 
   return (
     <SliderWithTip
-      value={grade}
+      defaultValue={grade}
       min={0}
       max={100}
       step={1}
