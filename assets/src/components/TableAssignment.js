@@ -23,8 +23,7 @@ const tableStyle = theme => ({
     fontSize: '1em',
     position: 'sticky',
     top: 0,
-    backgroundColor: "#fff",
-
+    backgroundColor: '#fff'
   },
   tableCell: {
     lineHeight: '1.42857143',
@@ -35,8 +34,8 @@ const tableStyle = theme => ({
     width: '70%',
     height: 400,
     marginTop: theme.spacing.unit * 3,
-    overflowX: 'auto',
-  },
+    overflowX: 'auto'
+  }
 })
 
 const generateAssignmentTable = plan => {
@@ -52,7 +51,7 @@ const generateAssignmentTable = plan => {
         const assignmentName = assignment.name
         const percentOfFinalGrade = assignment.towards_final_grade
         const graded = assignment.graded
-        const barData = {percentOfFinalGrade, graded}
+        const barData = { percentOfFinalGrade, graded }
         acc.push([week, dueDate, assignmentName, barData])
       })
     })
@@ -65,23 +64,21 @@ const getCurrentWeek = data => {
   let weekIndicator = ''
   data.forEach(item => {
     let week = item.week
-    let currentWeek = item.due_date_items[0].assignment_items[0].current_week;
+    let currentWeek = item.due_date_items[0].assignment_items[0].current_week
     if (currentWeek) {
       weekIndicator = `Week ${week}`
     }
-
   })
   return weekIndicator
 }
 
-
-function CustomAssignmentTable(props) {
-  const {classes, tableHead, tableData} = props
+function CustomAssignmentTable (props) {
+  const { classes, tableHead, tableData } = props
   const data = generateAssignmentTable(tableData)
     .map(row => {
-      const {percentOfFinalGrade, graded} = row.pop()
+      const { percentOfFinalGrade, graded } = row.pop()
       row.push(<HorizontalBar
-        data={[{label: 'grade', data: percentOfFinalGrade, graded}]}
+        data={[{ label: 'grade', data: percentOfFinalGrade, graded }]}
         width={200}
         height={20}
       />)
@@ -95,8 +92,12 @@ function CustomAssignmentTable(props) {
           <TableHead>
             <TableRow>
               {tableHead.map((prop, key) => {
-                return (<TableCell className={classes.tableCell + ' ' + classes.tableHeadCell}
-                                   key={key}>{prop}</TableCell>)
+                return (
+                  <TableCell
+                    className={classes.tableCell + ' ' + classes.tableHeadCell}
+                    key={key}>
+                    {prop}
+                  </TableCell>)
               })}
             </TableRow>
           </TableHead>
@@ -112,25 +113,24 @@ function CustomAssignmentTable(props) {
                     let isCurrentWeek = false
                     if (data[i - 1]) {
                       // first item in the row the logic handles display of week property
-                      if (j == 0 && data[i][0] === data[i - 1][0]) {
+                      if (j === 0 && data[i][0] === data[i - 1][0]) {
                         displayProp = false
                       }
                       // second item in the row the logic handles display of Due date property
-                      if (j == 1 && data[i][1] === data[i - 1][1]) {
+                      if (j === 1 && data[i][1] === data[i - 1][1]) {
                         displayProp = false
                       }
-
                     }
                     if (data[i + 1]) {
-                      if (j == 0 && data[i][0] === data[i + 1][0]) {
+                      if (j === 0 && data[i][0] === data[i + 1][0]) {
                         displayBorder = false
                       }
 
-                      if (j == 1 && data[i][1] === data[i + 1][1]) {
+                      if (j === 1 && data[i][1] === data[i + 1][1]) {
                         displayBorder = false
                       }
                     }
-                    if (j == 0 && data[i][0] === currentWeek) {
+                    if (j === 0 && data[i][0] === currentWeek) {
                       isCurrentWeek = true
                     }
                     let borderAndCurrentWeekStyle = {}

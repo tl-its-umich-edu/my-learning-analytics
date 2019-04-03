@@ -72,8 +72,8 @@ function createProgressBar ({ data, width, height, el, tip }) {
 
   const currentIndex = data.filter(x => x.graded).length
   const currentLine = svg.append('g')
-   // only show currentline when assignments are graded
-  if(currentIndex != 0) {
+  // only show currentline when assignments are graded
+  if (currentIndex !== 0) {
     currentLine
       .append('line')
       .attr('x1', x(calculatePercentSoFar(currentIndex)))
@@ -100,13 +100,13 @@ function createProgressBar ({ data, width, height, el, tip }) {
   const showMaxLine = (data) => {
     // filtering the graded and ungraded values, list would be either 2 or 1
     const gradedList = [...new Set(data.map(item => item.graded))]
-    if(gradedList.length >1){
+    if (gradedList.length > 1) {
       return true
     }
     return !gradedList[0]
   }
 
-  if(showMaxLine(data)) {
+  if (showMaxLine(data)) {
     maxLine
       .append('line')
       .attr('x1', x(calculatePercentSoFar(data.length)))
