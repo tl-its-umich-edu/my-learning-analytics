@@ -1,12 +1,13 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
-import { margin } from '../../constants/chartConstants'
+import { roundToOneDecimcal } from '../../util/math'
 
-function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel, myGrade }) {
+function createHistogram ({ data, width, height, el, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100 }) {
+  const margin = { top: 20, right: 20, bottom: 50, left: 40 }
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   const x = d3.scaleLinear()
-    .domain([0, 100]).nice()
+    .domain([0, maxGrade]).nice()
     .range([margin.left, aWidth - margin.right])
 
   const bins = d3.histogram()
@@ -23,7 +24,9 @@ function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel
 
   const bar = svg.selectAll('rect')
     .data(bins).enter()
-    .append('rect')
+    .append('g')
+
+  bar.append('rect')
     .attr('x', d => x(d.x0) + 1)
     .attr('width', d => Math.max(0, x(d.x1) - x(d.x0) - 1))
     .attr('y', d => y(d.length))
@@ -31,12 +34,11 @@ function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel
     .attr('fill', 'steelblue')
 
   bar.append('text')
-    .attr('y', 10)
-    .attr('x', (x(bins[0].x1) - x(bins[0].x0)) / 2)
-    .attr('height', d => height - y(d.length) - 50)
+    .attr('x', d => x((d.x1 + d.x0) / 2))
+    .attr('y', d => y(d.length) + margin.top-5)
     .attr('text-anchor', 'middle')
-    .attr('color', 'white')
-    .text(d => d === 0 ? d.length : '')
+    .attr('fill', 'white')
+    .text(d => d.length === 0 ? '' : d.length)
 
   const xAxis = g => g
     .attr(`transform`, `translate(0, ${aHeight - margin.bottom})`)
@@ -47,11 +49,14 @@ function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel
       .tickFormat(d => `${d}%`)
     )
     .call(g => g.append('text')
-      .attr('x', aWidth - margin.right)
-      .attr('y', -4)
-      .attr('fill', '#000')
-      .attr('text-anchor', 'end')
-      .text(xAxisLabel)
+      .attr('x', aWidth / 2)
+      .attr('y', 40)
+      .attr('fill', 'rgba(0, 0, 0, 0.87)')
+      .attr('font-size', '0.875rem')
+      .attr('font-weight', '400')
+      .attr('font-family', 'Roboto Helvetica Arial sans-serif')
+      .attr('line-height', '1.46429em')
+      .text(xAxisLabel).attr('dy', -4)
     )
 
   const yAxis = g => g
@@ -61,9 +66,14 @@ function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel
     .call(g => g.select('.domain').remove())
     .call(g => g.select('.tick:last-of-type text').clone()
       .attr('x', 4)
-      .attr('fill', '#000')
+      .attr('fill', 'rgba(0, 0, 0, 0.87)')
+      .attr('text-anchor', 'end')
+      .attr('font-size', '0.875rem')
+      .attr('font-weight', '400')
+      .attr('font-family', 'Roboto Helvetica Arial sans-serif')
+      .attr('line-height', '1.46429em')
       .attr('text-anchor', 'start')
-      .html(yAxisLabel).attr('dy', -4)
+      .text(yAxisLabel).attr('dy', -4)
     )
 
   svg.append('g')
@@ -82,18 +92,16 @@ function createHistogram ({ data, width, height, el, tip, xAxisLabel, yAxisLabel
       .attr('stroke', 'darkorange')
       .attr('stroke-width', '2')
     svg.append('text')
-      .attr('x', x(myGrade))
-      .attr('d', '1em')
-      .attr('y', margin.bottom)
-      .text('My Grade')
+      .attr('x', x(myGrade) - 110)
+      .attr('y', margin.top-5)
+      .text(`My Grade: ${roundToOneDecimcal(myGrade)}%`)
+      .attr('font-size', '0.875rem')
+      .attr('font-weight', 'bold')
+      .attr('font-family', 'Roboto Helvetica Arial sans-serif')
+      .attr('line-height', '1.46429em')
+      .attr('text-anchor', 'start')
   }
 
-  if (tip) {
-    svg.call(tip)
-    bar
-      .on('mouseover', tip.show)
-      .on('mouseout', tip.hide)
-  }
 }
 
 export default createHistogram

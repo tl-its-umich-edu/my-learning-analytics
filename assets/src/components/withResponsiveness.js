@@ -3,14 +3,16 @@ import { createResize } from '../util/chart'
 
 const withResponsiveness = ChartComponent => props => {
   const { aspectRatio = 0.75 } = props
-
+  const minimumWidth = 400
   const [el, setEl] = useState(null)
   const [width, setWidth] = useState(null)
 
   const setContainer = el => {
     if (el) {
       setEl(el)
-      setWidth(el.getBoundingClientRect().width)
+      setWidth(el.getBoundingClientRect().width > minimumWidth
+        ? el.getBoundingClientRect().width
+        : minimumWidth)
     }
   }
 
