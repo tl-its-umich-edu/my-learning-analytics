@@ -112,6 +112,26 @@ export const histogramData = Object.freeze(
   ]
 )
 
+export const histogramDataMoreThan100Percent = Object.freeze(
+  [
+    34,
+    35,
+    40,
+    55,
+    60,
+    61,
+    75,
+    83,
+    92,
+    97,
+    100,
+    101.3,
+    103.5,
+    105
+  ]
+)
+
+
 export const horizontalBarChartData = Object.freeze(
   [
     {
