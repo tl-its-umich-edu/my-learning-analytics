@@ -5,6 +5,7 @@ import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import MTable from '@material-ui/core/Table'
 import Table from '../components/Table'
+import TableSortLabel from '@material-ui/core/TableSortLabel'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
@@ -13,6 +14,7 @@ import Spinner from '../components/Spinner'
 import GradeSlider from '../components/GradeSlider'
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
+import Tooltip from '@material-ui/core/Tooltip'
 import { roundToOneDecimcal, calculateWhatIfGrade, calculateActualGrade } from '../util/math'
 import { useAssignmentPlanningData } from '../service/api'
 import { formatDate, isValid } from '../util/data'
@@ -39,6 +41,9 @@ function WhatIfGrade (props) {
   const [assignments, setAssignments] = useState(null)
   const [actualGrade, setActualGrade] = useState(0)
   const [whatIfGrade, setWhatIfGrade] = useState(0)
+
+  const [sortColumnID, setSortColumnID] = useState(1)
+  const [sortDirection, setSortDirection] = useState('desc')
 
   useEffect(() => {
     if (loaded && isValid(assignmentData)) {
@@ -115,7 +120,24 @@ function WhatIfGrade (props) {
                   <TableCell
                     className={classes.tableCell + ' ' + classes.tableHeadCell}
                     key={key}>
-                    {prop}
+                    {(key === 1 || key === 2)
+                      ? <Tooltip
+                        title='Sort'
+                        placement={'bottom'}
+                        enterDelay={300}>
+                        <TableSortLabel
+                          active={key === sortColumnID}
+                          direction={sortDirection}
+                          onClick={() => {
+                            setSortColumnID(key)
+                            setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc')
+                          }}
+                        >
+                          {prop}
+                        </TableSortLabel>
+                      </Tooltip>
+                      : <>{prop}</>
+                    }
                   </TableCell>
                 )
               })}
