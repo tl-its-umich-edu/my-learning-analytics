@@ -85,10 +85,11 @@ function WhatIfGrade (props) {
       }
     } else {
       // sort weight
-      console.log(assignments)
-      return sortDirection === 'desc'
-        ? assignments.sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade)
-        : assignments.sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade).reverse()
+      if (sortDirection === 'desc') {
+        setAssignments(assignments.sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade))
+      } else {
+        setAssignments(assignments.sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade).reverse())
+      }
     }
   }, [sortColumnID, sortDirection])
 
