@@ -77,23 +77,6 @@ function WhatIfGrade (props) {
     }
   })
 
-  // useEffect(() => {
-  //   console.log('sorting')
-  //   // sort date
-  //   if (sortColumnID === 1) {
-  //     if (sortDirection === 'desc') {
-
-  //     }
-  //   } else {
-  //     // sort weight
-  //     if (sortDirection === 'desc') {
-  //       setAssignments(assignments.sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade))
-  //     } else {
-  //       setAssignments(assignments.sort((a, b) => b.percentOfFinalGrade - a.percentOfFinalGrade))
-  //     }
-  //   }
-  // }, [sortColumnID, sortDirection])
-
   const buildWhatIfGradeView = assignments => {
     if (!isValid(assignments)) {
       return (<p>No data provided</p>)
