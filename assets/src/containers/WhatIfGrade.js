@@ -47,7 +47,7 @@ function WhatIfGrade (props) {
 
   useEffect(() => {
     if (loaded && isValid(assignmentData)) {
-      const assignments = assignmentData.progress.reduce((acc, assignment, i) => {
+      const assignments = assignmentData.progress.reduce((acc, assignment) => {
         const assignmentName = assignment.name
         const isGraded = assignment.graded
         const dueDate = assignment.due_date_mod || ''
@@ -55,16 +55,16 @@ function WhatIfGrade (props) {
         const actualGrade = isGraded
           ? roundToOneDecimcal(assignment.score / assignment.points_possible * 100)
           : null
-        acc[i] = {
+        acc.push({
           assignmentName,
           isGraded,
           dueDate,
           actualGrade,
           percentOfFinalGrade,
           whatIfGrade: isGraded ? actualGrade : 100
-        }
+        })
         return acc
-      }, {})
+      }, [])
 
       setAssignments(assignments)
       setActualGrade(calculateActualGrade(assignmentData))
@@ -76,6 +76,21 @@ function WhatIfGrade (props) {
       setWhatIfGrade(calculateWhatIfGrade(assignments))
     }
   })
+
+  useEffect(() => {
+    // sort date
+    if (sortColumnID === 1) {
+      if (sortDirection === 'desc') {
+
+      }
+    } else {
+      // sort weight
+      console.log(assignments)
+      return sortDirection === 'desc'
+        ? assignments.sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade)
+        : assignments.sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade).reverse()
+    }
+  }, [sortColumnID, sortDirection])
 
   const buildWhatIfGradeView = assignments => {
     if (!isValid(assignments)) {
@@ -144,30 +159,29 @@ function WhatIfGrade (props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {Object.keys(assignments).map(key => {
+            {assignments.map((assignment, i) => {
               return (
-                <TableRow key={key}>
+                <TableRow key={i}>
                   <TableCell>
-                    {assignments[key].assignmentName}
+                    {assignment.assignmentName}
                   </TableCell>
                   <TableCell>
-                    {formatDate(assignments[key].dueDate) || '-'}
+                    {formatDate(assignment.dueDate) || '-'}
                   </TableCell>
                   <TableCell>
-                    {`${assignments[key].percentOfFinalGrade}%`}
+                    {`${assignment.percentOfFinalGrade}%`}
                   </TableCell>
                   <TableCell>
-                    {assignments[key].actualGrade ? `${assignments[key].actualGrade}%` : '-'}
+                    {assignment.actualGrade ? `${assignment.actualGrade}%` : '-'}
                   </TableCell>
                   <TableCell className={classes.sliderCell}>
                     <GradeSlider
-                      grade={assignments[key].whatIfGrade}
+                      grade={assignment.whatIfGrade}
                       setWhatIfGrade={value => {
-                        const assignment = assignments[key]
                         assignment.whatIfGrade = value
-                        setAssignments({ ...assignments, [key]: assignment })
+                        setAssignments([ ...assignments.slice(0, i), assignment, ...assignments.slice(i + 1) ])
                       }}
-                      isGraded={assignments[key].isGraded}
+                      isGraded={assignment.isGraded}
                     />
                   </TableCell>
                 </TableRow>
