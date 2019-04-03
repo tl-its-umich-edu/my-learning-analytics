@@ -152,7 +152,6 @@ function WhatIfGrade (props) {
           </TableHead>
           <TableBody>
             {assignments.map((assignment, i) => {
-              // console.log(assignments)
               return (
                 <TableRow key={i}>
                   <TableCell>
