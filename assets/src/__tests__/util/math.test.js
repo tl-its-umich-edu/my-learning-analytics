@@ -17,6 +17,7 @@ describe('roundToTwoDecimal', () => {
     expect(math.roundToTwoDecimal(0)).toEqual(0)
     expect(math.roundToTwoDecimal(10.15)).toEqual(10.15)
     expect(math.roundToTwoDecimal(10.11)).toEqual(10.11)
+    // sad reality of js' floating point precision woes, 10.155 * 100 = 1015.4999999999
     expect(math.roundToTwoDecimal(10.155)).toEqual(10.15)
     expect(math.roundToTwoDecimal(10.156)).toEqual(10.16)
   })
