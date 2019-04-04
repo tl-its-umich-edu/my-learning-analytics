@@ -105,7 +105,7 @@ function WhatIfGrade (props) {
       } else return setAssignments(sortedByDate.reverse())
     }
     if (key === 2) {
-      const sortedByWeight = sortByDate(assignments).sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade)
+      const sortedByWeight = sortByDate(assignments).sort((a, b) => b.percentOfFinalGrade - a.percentOfFinalGrade)
       if (sortDirection === 'desc') {
         setAssignments(sortedByWeight)
       } else {
