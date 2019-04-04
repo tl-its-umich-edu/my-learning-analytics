@@ -68,6 +68,7 @@ function WhatIfGrade (props) {
 
       setAssignments(assignments)
       setActualGrade(calculateActualGrade(assignmentData))
+      setWhatIfGrade(calculateWhatIfGrade(assignments))
     }
   }, [loaded])
 
@@ -80,11 +81,32 @@ function WhatIfGrade (props) {
   const handleSortClick = key => {
     setSortColumnID(key)
     setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc')
-    if (key === 2) {
+    if (key === 1) {
+      const sortedByDate = assignments.sort((a, b) => {
+        const [aYear, aMonth, aDay] = a.dueDate.split('-')
+        const [bYear, bMonth, bDay] = b.dueDate.split('-')
+
+        if (aYear > bYear) return -1
+        if (aYear < bYear) return 1
+
+        if (aMonth > bMonth) return -1
+        if (aMonth < bMonth) return 1
+
+        if (aDay > bDay) return -1
+        if (aDay > bDay) return 1
+
+        else return 0
+      })
       if (sortDirection === 'desc') {
-        setAssignments(assignments.sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade))
+        return setAssignments(sortedByDate)
+      } else return setAssignments(sortedByDate.reverse())
+    }
+    if (key === 2) {
+      const sortedByWeight = assignments.sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade)
+      if (sortDirection === 'desc') {
+        setAssignments(sortedByWeight)
       } else {
-        setAssignments(assignments.sort((a, b) => b.percentOfFinalGrade - a.percentOfFinalGrade))
+        setAssignments(sortedByWeight.reverse())
       }
     }
   }
