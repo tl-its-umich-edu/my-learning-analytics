@@ -77,6 +77,18 @@ function WhatIfGrade (props) {
     }
   })
 
+  const handleSortClick = key => {
+    setSortColumnID(key)
+    setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc')
+    if (key === 2) {
+      if (sortDirection === 'desc') {
+        setAssignments(assignments.sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade))
+      } else {
+        setAssignments(assignments.sort((a, b) => b.percentOfFinalGrade - a.percentOfFinalGrade))
+      }
+    }
+  }
+
   const buildWhatIfGradeView = assignments => {
     if (!isValid(assignments)) {
       return (<p>No data provided</p>)
@@ -128,17 +140,7 @@ function WhatIfGrade (props) {
                         <TableSortLabel
                           active={key === sortColumnID}
                           direction={sortDirection}
-                          onClick={() => {
-                            setSortColumnID(key)
-                            setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc')
-                            if (key === 2) {
-                              if (sortDirection === 'desc') {
-                                setAssignments(assignments.sort((a, b) => a.percentOfFinalGrade - b.percentOfFinalGrade))
-                              } else {
-                                setAssignments(assignments.sort((a, b) => b.percentOfFinalGrade - a.percentOfFinalGrade))
-                              }
-                            }
-                          }}
+                          onClick={() => handleSortClick(key)}
                         >
                           {prop}
                         </TableSortLabel>
