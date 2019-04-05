@@ -10,9 +10,10 @@ const styles = theme => ({
         flexGrow: 1,
       },
     wrapper: {
-        marginTop: theme.spacing.unit * 2,
+        maxWidth: 1023,
+        margin: theme.spacing.unit * 2 + "px auto",
         flexDirection: "row",
-        justifyContent: "center"
+        justifyContent: "flex-start"
     },
 })
 
