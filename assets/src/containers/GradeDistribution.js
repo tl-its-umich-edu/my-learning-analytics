@@ -1,8 +1,4 @@
 import React from 'react'
-<<<<<<< HEAD
-import { renderToString } from 'react-dom/server'
-=======
->>>>>>> react
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
@@ -10,11 +6,7 @@ import Typography from '@material-ui/core/Typography'
 import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
-<<<<<<< HEAD
-import { average } from '../util/math'
-=======
 import { average, roundToOneDecimcal } from '../util/math'
->>>>>>> react
 import { useGradeData } from '../service/api'
 
 const styles = theme => ({
@@ -36,40 +28,11 @@ function GradeDistribution (props) {
   const currentCourseId = match.params.courseId
   const [loaded, gradeData] = useGradeData(currentCourseId)
 
-<<<<<<< HEAD
-  const tableBuilder = (gradeData) => {
-=======
   const buildGradeView = gradeData => {
->>>>>>> react
     if (!gradeData || Object.keys(gradeData).length === 0) {
       return (<p>No data provided</p>)
     }
     return (
-<<<<<<< HEAD
-      <>
-        <Grid item xs={12} sm={4} lg={2}>
-          <Table className={classes.table} tableData={[
-            ['Number of Students', <strong>{gradeData.length}</strong>],
-            ['Average Grade', <strong>{average(gradeData.map(x => x.current_grade))}%</strong>],
-            ['My Grade', <strong>{gradeData[0].current_user_grade}%</strong>]
-          ]} />
-        </Grid>
-        <Histogram
-          data={gradeData.map(x => x.current_grade)}
-          tip={createToolTip(d => renderToString(
-            <Paper className={classes.paper}>
-              <Table className={classes.table} tableData={[
-                ['Number of Students', <strong>{d.length}</strong>],
-                ['Average Grade', <strong>{average(d)}%</strong>]
-              ]} />
-            </Paper>
-          ))}
-          aspectRatio={0.3}
-          xAxisLabel={'Grade %'}
-          yAxisLabel={'Number of Students'}
-          myGrade={gradeData[0].current_user_grade} />
-      </>
-=======
       <Grid container>
         <Grid item xs={12} lg={2}>
           <Table className={classes.table} tableData={[
@@ -91,7 +54,6 @@ function GradeDistribution (props) {
             maxGrade={gradeData[0].graph_upper_limit} />
         </Grid>
       </Grid>
->>>>>>> react
     )
   }
 
@@ -101,13 +63,9 @@ function GradeDistribution (props) {
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom >Grade Distribution</Typography >
-<<<<<<< HEAD
-             {loaded ? tableBuilder(gradeData) : <Spinner />}
-=======
             {loaded
               ? buildGradeView(gradeData)
               : <Spinner />}
->>>>>>> react
           </Paper>
         </Grid>
       </Grid>
