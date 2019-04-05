@@ -15,6 +15,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
+from dashboard.common.db_util import canvas_id_to_incremented_id
 
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -122,9 +123,16 @@ def file_access_within_week(request, course_id=0):
 
     # get total number of student within the course_id
     total_number_student_sql = "select count(*) from user where course_id = %(course_id)s"
+    if (grade == GRADE_A):
+        total_number_student_sql += " and current_grade >= 90"
+    elif (grade == GRADE_B):
+        total_number_student_sql += " and current_grade >= 80 and current_grade < 90"
+    elif (grade == GRADE_C):
+        total_number_student_sql += " and current_grade >= 70 and current_grade < 80"
+
     total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": course_id})
     total_number_student = total_number_student_df.iloc[0,0]
-    logger.debug("course_id_string" + course_id + " total student=" + str(total_number_student))
+    logger.info("course_id_string" + course_id + " total student=" + str(total_number_student))
 
     term_date_start = AcademicTerms.objects.course_date_start(course_id)
 
@@ -146,10 +154,10 @@ def file_access_within_week(request, course_id=0):
 
     startTimeString = start.strftime('%Y%m%d') + "000000"
     endTimeString = end.strftime('%Y%m%d') + "000000"
-    logger.debug(sqlString);
-    logger.debug("start time=" + startTimeString + " end_time=" + endTimeString);
+    logger.debug(sqlString)
+    logger.debug("start time=" + startTimeString + " end_time=" + endTimeString)
     df = pd.read_sql(sqlString, conn, params={"start_time": startTimeString,"end_time": endTimeString, "course_id": course_id})
-    logger.debug(df);
+    logger.debug(df)
 
     # return if there is no data during this interval
     if (df.empty):
@@ -194,7 +202,7 @@ def file_access_within_week(request, course_id=0):
                     "where a.user_id = u.id " \
                     "and a.file_id = f.ID " \
                     "and u.sis_name=%(current_user)s " \
-                    "group by CONCAT(f.id, ';', f.name)";
+                    "group by CONCAT(f.id, ';', f.name)"
     logger.debug(selfSqlString)
     logger.debug("current_user=" + current_user)
 
@@ -233,11 +241,11 @@ def file_access_within_week(request, course_id=0):
 def grade_distribution(request, course_id=0):
     logger.info(grade_distribution.__name__)
 
-    course_id = int(str(settings.UDW_ID_PREFIX) + course_id)
+    course_id = canvas_id_to_incremented_id(course_id)
 
     current_user = request.user.get_username()
     grade_score_sql = "select current_grade,(select current_grade from user where sis_name=" \
-                      "%(current_user)s and course_id=%(course_id)s) as current_user_grade from user where course_id=%(course_id)s;"
+                      "%(current_user)s and course_id=%(course_id)s) as current_user_grade from user where course_id=%(course_id)s"
     df = pd.read_sql(grade_score_sql, conn, params={"current_user": current_user,'course_id': course_id})
     if df.empty or df['current_grade'].isnull().all():
         return HttpResponse(json.dumps({}), content_type='application/json')
@@ -314,7 +322,7 @@ def get_user_default_selection(request, course_id=0):
 def assignments(request, course_id=0):
     logger.info(assignments.__name__)
 
-    course_id = int(str(settings.UDW_ID_PREFIX) + course_id)
+    course_id = canvas_id_to_incremented_id(course_id)
 
     current_user = request.user.get_username()
     df_default_display_settings()
@@ -343,7 +351,7 @@ def assignments(request, course_id=0):
         return HttpResponse(json.dumps([]), content_type='application/json')
 
     df.sort_values(by='due_date', inplace=True)
-    df.drop(columns=['assignment_id', 'due_date'], inplace=True)
+    df.drop(columns=['assignment_id', 'due_date','grp_id'], inplace=True)
     df.drop_duplicates(keep='first', inplace=True)
 
     # instructor might not ever see the avg score as he don't have grade in assignment. we don't have role described in the flow to open the gates for him
@@ -353,10 +361,9 @@ def assignments(request, course_id=0):
 
     df3 = df[df['towards_final_grade'] > 0.0]
     df3[['score']] = df3[['score']].astype(float)
-    df3['percent_gotten'] = df3.apply(user_percent, axis=1)
     df3['graded'] = df3['graded'].fillna(False)
     df3[['score']] = df3[['score']].astype(float)
-    df3['percent_gotten'] = df3.apply(user_percent, axis=1)
+    df3['percent_gotten'] = df3.apply(lambda x: user_percent(x), axis=1)
     df3.sort_values(by=['graded', 'due_date_mod'], ascending=[False, True], inplace=True)
     df3.reset_index(inplace=True)
     df3.drop(columns=['index'], inplace=True)
@@ -405,9 +412,9 @@ def assignments(request, course_id=0):
 def get_course_assignments(course_id):
 
     sql=f"""select assign.*,sub.avg_score from
-            (select assignment_id,name,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from
-            (select a.id as assignment_id,a.assignment_group_id, a.local_date as due_date,a.name,a.points_possible from assignment as a  where a.course_id =%(course_id)s) as a join
-            (select id, group_points, weight,drop_lowest,drop_highest from assignment_groups) as ag on ag.id=a.assignment_group_id) as assign left join
+            (select assignment_id,name,assign_grp_name,grp_id,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from
+            (select a.id as assignment_id,a.assignment_group_id, a.local_date as due_date,a.name,a.points_possible from assignment as a  where a.course_id =%(course_id)s) as app right join
+            (select id, name as assign_grp_name, id as grp_id, group_points, weight,drop_lowest,drop_highest from assignment_groups where course_id=%(course_id)s) as ag on ag.id=app.assignment_group_id) as assign left join
             (select distinct assignment_id,avg_score from submission where course_id=%(course_id)s) as sub on sub.assignment_id = assign.assignment_id
             """
 
@@ -421,8 +428,13 @@ def get_course_assignments(course_id):
     assignments_in_course[['points_possible','group_points']]=assignments_in_course[['points_possible','group_points']].fillna(0)
     assignments_in_course[['points_possible', 'group_points','weight']] = assignments_in_course[['points_possible', 'group_points','weight']].astype(float)
     consider_weight=is_weight_considered(course_id)
+    df2 = assignments_in_course[['weight','group_points','grp_id']].drop_duplicates()
+    hidden_assignments = are_weighted_assignments_hidden(course_id, df2)
     total_points=assignments_in_course['points_possible'].sum()
-    assignments_in_course['towards_final_grade']=assignments_in_course.apply(lambda x: percent_calculation(consider_weight, total_points,x), axis=1)
+    # if assignment group is weighted and no assignments added yet then assignment name will be nothing so situation is specific to that
+    if hidden_assignments:
+        assignments_in_course['name'] = assignments_in_course['name'].fillna(assignments_in_course['assign_grp_name']+' Group Unavailable Assignments')
+    assignments_in_course['towards_final_grade']=assignments_in_course.apply(lambda x: percent_calculation(consider_weight, total_points,hidden_assignments, x), axis=1)
     assignments_in_course['calender_week']=assignments_in_course['due_date'].dt.week
     assignments_in_course['calender_week']=assignments_in_course['calender_week'].fillna(0).astype(int)
     min_week=find_min_week(course_id)
@@ -468,10 +480,26 @@ def user_percent(row):
         return row['towards_final_grade']
 
 
-def percent_calculation(consider_weight,total_points,row):
+def percent_calculation(consider_weight,total_points,hidden_assignments,row):
+    """
+    This function handles how much % an assignment worth in a course. The cases
+    includes 1. assignments groups has weights and no hidden assignments in them
+    2. vanilla case default group, no weights, and irrespective if assignment are hidden or not
+    3. assignment groups has weights, hidden or no assignments in them
+
+    :param consider_weight:
+    :param total_points:
+    :param hidden_assignments:
+    :param row:
+    :return:
+    """
+    if hidden_assignments and consider_weight and row['group_points'] == 0:
+        return round(row['weight'],2)
+    if hidden_assignments and consider_weight and row['group_points'] != 0:
+        return round((row['points_possible']/row['group_points'])*row['weight'],2)
     if consider_weight and row['group_points']!=0:
         return round((row['points_possible']/row['group_points'])*row['weight'],2)
-    else:
+    if not consider_weight:
         return round((row['points_possible']/total_points)*100,2)
 
 
@@ -498,9 +526,36 @@ def is_weight_considered(course_id):
 
 def get_term_dates_for_course(course_id):
     logger.info(get_term_dates_for_course.__name__)
-    sql = "select a.date_start from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.id;"
+    sql = "select a.date_start from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.id"
     df = pd.read_sql(sql, conn, params={"course_id": course_id}, parse_dates={'date_start': '%Y-%m-%d'})
     return df['date_start'].iloc[0]
+
+
+def are_weighted_assignments_hidden(course_id, df):
+    """
+    if assignments are weighted then assignment groups weight totals =100% . The code is checking if assignment groups
+    has group points corresponding to group weight and if not assignments are hidden
+    :param course_id:
+    :return:
+    """
+    logger.info(are_weighted_assignments_hidden.__name__)
+    df['weight'] = df['weight'].astype(int)
+    tot_weight = df['weight'].sum()
+    if tot_weight > 0:
+        df['hidden'] = 0
+        df = df[df['weight'] > 0]
+        df = df.reset_index(drop=True)
+        df.loc[0, 'hidden'] = df.loc[0, 'weight']
+        for i in range(1, len(df)):
+            if df.loc[i, 'group_points']:
+                df.loc[i, 'hidden'] = df.loc[i - 1, 'hidden'] + df.loc[i, 'weight']
+        if df['hidden'].max() == 100:
+            logger.info(f"weighted assignments in course {course_id} are not hidden")
+            return False
+        else:
+            logger.info(f"few weighted assignments in course {course_id} are hidden")
+            return True
+
 
 
 def df_default_display_settings():

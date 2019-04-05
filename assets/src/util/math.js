@@ -1,7 +1,9 @@
-const toTwoDecimal = decimal => Math.round(decimal * 100) / 100
+const roundToTwoDecimal = int => Math.round(int * 100) / 100
+const roundToOneDecimcal = int => Math.round(int * 10) / 10
 
-const average = arr =>
-  Math.round((arr.reduce((acc, cur) => acc + cur, 0) / arr.length) * 10) / 10
+const average = arr => roundToOneDecimcal(
+  arr.reduce((acc, cur) => acc + cur, 0) / arr.length
+)
 
 const pearsonCorrelation = (prefs, p1, p2) => {
   let si = []
@@ -56,11 +58,13 @@ const standardDeviation = values => {
   const avgSquareDiff = squareDiffs.reduce((acc, cur) => (acc + cur), 0) / squareDiffs.length
 
   const stdDev = Math.sqrt(avgSquareDiff)
-  return toTwoDecimal(stdDev)
+  return roundToTwoDecimal(stdDev)
 }
 
 export {
   average,
   pearsonCorrelation,
-  standardDeviation
+  standardDeviation,
+  roundToOneDecimcal,
+  roundToTwoDecimal
 }
