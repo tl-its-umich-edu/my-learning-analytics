@@ -9,10 +9,15 @@ const styles = theme => ({
     root: {
         flexGrow: 1,
       },
-    wrapper: {
-        marginTop: theme.spacing.unit * 2,
-        flexDirection: "row",
+    container: {
+        display: "flex",
         justifyContent: "center"
+    },
+    wrapper: {
+        maxWidth: 1023,
+        margin: theme.spacing.unit * 2 + "px auto",
+        flexDirection: "row",
+        justifyContent: "flex-start"
     },
 })
 
@@ -21,7 +26,7 @@ function IndexPage (props) {
     const currentCourseId = match.params.courseId
     return (
         <Grid container spacing={16} className={classes.root}>
-            <Grid item xs={12}>
+            <Grid item xs={12} className={classes.container}>
                 <Grid 
                 container 
                 className={classes.wrapper} 
