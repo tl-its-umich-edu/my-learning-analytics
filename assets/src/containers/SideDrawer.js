@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Drawer from '@material-ui/core/Drawer'
 import List from '@material-ui/core/List'
@@ -7,6 +7,8 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import { Link, withRouter } from 'react-router-dom'
 import routes from '../routes/routes'
+import Spinner from '../components/Spinner'
+import { useCourseInfo } from '../service/api'
 
 const styles = {
   list: {
@@ -30,11 +32,19 @@ function SideDrawer (props) {
 
   const courseId = location.pathname.split('/')[1]
   const [selectedIndex, setSelectedIndex] = useState(false)
+  const [loaded, courseInfo] = useCourseInfo(courseId)
+  const [activeCourseViews, setActiveCourseViews] = useState({})
+
+  useEffect(() => {
+    if (loaded) {
+      setActiveCourseViews(courseInfo.course_view_options)
+    }
+  }, [loaded])
 
   const sideList = (
     <div className={classes.list}>
       <List>
-        {routes(courseId).map((props, key) => (
+        {routes(courseId, activeCourseViews).map((props, key) => (
           <Link to={props.path} className={classes.sideDrawerLinks} key={key}>
             <ListItem
               button
@@ -59,7 +69,9 @@ function SideDrawer (props) {
           onClick={() => toggleDrawer(!sideDrawerState)}
           onKeyDown={() => toggleDrawer(!sideDrawerState)}
         >
-          {sideList}
+          {loaded
+            ? sideList
+          : <Spinner />}
         </div>
       </Drawer>
     </div>

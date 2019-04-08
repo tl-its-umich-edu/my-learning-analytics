@@ -37,7 +37,16 @@ const styles = theme => ({
 })
 
 function DashboardAppBar (props) {
-  const { classes, onMenuBarClick, sideDrawerState, user } = props
+  const {
+    classes,
+    onMenuBarClick,
+    sideDrawerState,
+    user,
+    location
+  } = props
+
+  const courseId = location.pathname.split('/')[1]
+  const path = `/${courseId}`
 
   // const [notificationEl, setNotificationEl] = useState(null)
   const [avatarEl, setAvatarEl] = useState(null)
@@ -57,7 +66,7 @@ function DashboardAppBar (props) {
           </IconButton>
           <Button>
             <Typography variant='h6' color='inherit' className={classes.grow}>
-              <Link to='/' className={classes.homeButton}>My Learning Analytics</Link>
+              <Link to={path} className={classes.homeButton}>My Learning Analytics</Link>
             </Typography>
           </Button>
           <div className={classes.grow} />

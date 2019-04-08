@@ -64,6 +64,8 @@ def get_course_info(request, course_id=0):
     :rtype: str
     """
 
+    course_id = canvas_id_to_incremented_id(course_id)
+
     today = datetime.today()
 
     try:
