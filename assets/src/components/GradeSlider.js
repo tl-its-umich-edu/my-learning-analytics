@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
 
@@ -10,9 +10,15 @@ function GradeSlider (props) {
 
   const [sliderGrade, setSliderGrade] = useState(grade)
 
+  useEffect(() => {
+    if (grade !== sliderGrade) {
+      setSliderGrade(grade)
+    }
+  }, [grade])
+
   return (
     <SliderWithTip
-      value={grade}
+      value={sliderGrade}
       min={0}
       max={100}
       step={1}
