@@ -41,7 +41,6 @@ function WhatIfGrade (props) {
   const [assignments, setAssignments] = useState(null)
   const [actualGrade, setActualGrade] = useState(0)
   const [whatIfGrade, setWhatIfGrade] = useState(0)
-
   const [sortColumnID, setSortColumnID] = useState(1)
   const [sortDirection, setSortDirection] = useState('desc')
 
@@ -105,7 +104,8 @@ function WhatIfGrade (props) {
       } else return setAssignments(sortedByDate.reverse())
     }
     if (key === 2) {
-      const sortedByWeight = sortByDate(assignments).sort((a, b) => b.percentOfFinalGrade - a.percentOfFinalGrade)
+      const sortedByWeight = sortByDate(assignments)
+        .sort((a, b) => b.percentOfFinalGrade - a.percentOfFinalGrade)
       if (sortDirection === 'desc') {
         setAssignments(sortedByWeight)
       } else {
