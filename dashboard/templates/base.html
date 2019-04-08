@@ -62,7 +62,9 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', '{{ settings.GA_ID }}');
+    gtag('config', '{{ settings.GA_ID }}', {
+        'page_path': location.pathname + location.search + location.hash
+    });
 </script>
 {% endif %}
 <script>

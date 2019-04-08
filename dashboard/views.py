@@ -93,6 +93,7 @@ def get_course_info(request, course_id=0):
         
     resp['current_week_number'] = current_week_number
     resp['total_weeks'] = total_weeks
+    resp['course_view_options'] = CourseViewOption.objects.get(course=course).json(include_id=False)
 
     return HttpResponse(json.dumps(resp, default=str))
 
