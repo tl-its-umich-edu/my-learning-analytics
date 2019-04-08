@@ -55,14 +55,16 @@ def gpa_map(grade):
 
 def get_course_info(request, course_id=0):
     """Returns JSON data about a course
-    
+
     :param request: HTTP Request
     :type request: Request
     :param course_id: Unizin Course ID, defaults to 0
     :param course_id: int, optional
-    :return: JSON to be used 
+    :return: JSON to be used
     :rtype: str
     """
+
+    course_id = canvas_id_to_incremented_id(course_id)
 
     today = datetime.today()
 
@@ -83,14 +85,14 @@ def get_course_info(request, course_id=0):
 
     current_week_number = math.ceil((today - term.date_start).days/7)
     total_weeks = math.ceil((term.date_end - term.date_start).days/7)
-    
+
     resp['term'] = model_to_dict(term)
 
     # Have a fixed maximum number of weeks
     if total_weeks > settings.MAX_DEFAULT_WEEKS:
         logger.debug(f'{total_weeks} is greater than {settings.MAX_DEFAULT_WEEKS} setting total weeks to default.')
         total_weeks = settings.MAX_DEFAULT_WEEKS
-        
+
     resp['current_week_number'] = current_week_number
     resp['total_weeks'] = total_weeks
     resp['course_view_options'] = CourseViewOption.objects.get(course=course).json(include_id=False)
@@ -309,7 +311,7 @@ def get_user_default_selection(request, course_id=0):
     no_user_default_response = json.dumps({key: ''})
     logger.info(f"the default option request from user {user_id} in course {course_id} of type: {default_view_type}")
     default_value = UserDefaultSelection.objects.get_user_defaults(course_id, user_id, default_view_type)
-    logger.info(f"""default option check returned from DB for user: {user_id} course {course_id} and type: 
+    logger.info(f"""default option check returned from DB for user: {user_id} course {course_id} and type:
                     {default_view_type} is {default_value}""")
     if not default_value:
         logger.info(
@@ -574,7 +576,7 @@ def logout(request):
 
 def courses_enabled(request):
     """ Returns json for all courses we currntly support and are enabled
-    
+
     """
     data = {}
     for cvo in CourseViewOption.objects.all():

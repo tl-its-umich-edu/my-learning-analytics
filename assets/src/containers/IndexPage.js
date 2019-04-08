@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 import SelectCard from '../components/SelectCard'
 import { Link } from 'react-router-dom'
 import routes from '../routes/routes'
+import Spinner from '../components/Spinner'
+import { useCourseInfo } from '../service/api'
 
 const styles = theme => ({
   root: {
@@ -21,24 +23,34 @@ const styles = theme => ({
   }
 })
 
-function IndexPage (props) {
+function IndexPage(props) {
   const { classes, match } = props
-  const currentCourseId = match.params.courseId
+  const courseId = match.params.courseId
+  const [loaded, courseInfo] = useCourseInfo(courseId)
+  const [activeCourseViews, setActiveCourseViews] = useState({})
+
+  useEffect(() => {
+    if (loaded) {
+      setActiveCourseViews(courseInfo.course_view_options)
+    }
+  }, [loaded])
+
   return (
     <Grid container spacing={16} className={classes.root}>
       <Grid item xs={12} className={classes.container}>
-        <Grid
-          container
-          className={classes.wrapper}
-          spacing={8}
-        >
-          {
-            routes(currentCourseId).map((props, key) =>
+        {loaded
+          ? <Grid
+            container
+            className={classes.wrapper}
+            spacing={8}
+          >
+            {routes(courseId, activeCourseViews).map((props, key) =>
               <Link style={{ textDecoration: 'none' }} to={props.path} key={key}>
                 <SelectCard cardData={props} />
               </Link>
             )}
-        </Grid>
+          </Grid>
+        : <Spinner />}
       </Grid>
     </Grid>
   )
