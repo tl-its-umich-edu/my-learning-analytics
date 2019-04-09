@@ -9,6 +9,8 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -197,24 +199,28 @@ class CourseViewOption(models.Model):
         db_table = 'course_view_option'
         verbose_name = "Course View Option"
     
-    def json(self):
+    def json(self, include_id=True):
         """Format the json output that we want for this record
         
+        :param include_id: Whether or not to include the id in the return 
         This should be of the format canvas_id : {options}
         :return: JSON formatted CourseViewOption
         :rtype: Dict
         """
 
         try:
-            return {
-                self.course.canvas_id: {
-                    'fa': int(self.show_files_accessed and 'show_files_accessed' not in settings.VIEWS_DISABLED),
-                    'ap': int(self.show_assignment_planning and 'show_assignment_planning' not in settings.VIEWS_DISABLED),
-                    'gd': int(self.show_grade_distribution and 'show_grade_distribution' not in settings.VIEWS_DISABLED),
-                }
-            }
+            options = {'fa': int(self.show_files_accessed and 'show_files_accessed'
+                                 not in settings.VIEWS_DISABLED),
+                       'ap': int(self.show_assignment_planning and 'show_assignment_planning'
+                                 not in settings.VIEWS_DISABLED),
+                       'gd': int(self.show_grade_distribution and 'show_grade_distribution'
+                                 not in settings.VIEWS_DISABLED),}
+            if include_id:
+                return {self.course.canvas_id: options}
+            else:
+                return options
         except ObjectDoesNotExist:
-            logger.warn(f"CourseViewOption does not exist in Course table, skipping")
+            logger.warning(f"CourseViewOption does not exist in Course table, skipping")
             return ""
 
 
