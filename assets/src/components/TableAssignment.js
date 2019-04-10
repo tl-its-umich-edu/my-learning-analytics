@@ -32,7 +32,7 @@ const tableStyle = theme => ({
     verticalAlign: 'middle'
   },
   tableResponsive: {
-    // width: '70%',
+    width: '70%',
     height: 400,
     marginTop: theme.spacing.unit * 3,
     overflowX: 'auto'
@@ -103,7 +103,7 @@ function CustomAssignmentTable (props) {
               displayBorder = false
             }
           }
-          if (j === 0 && i === currentWeek) {
+          if (j === 0 && data[i][0] === `Week ${currentWeek}`) {
             isCurrentWeek = true
           }
           let borderAndCurrentWeekStyle = {}
@@ -125,13 +125,21 @@ function CustomAssignmentTable (props) {
 
   useEffect(() => {
     if (currentWeekRow.current) {
-      const tableHeaderOffset = 56
+      const tableHeaderOffset = 50
       tableRef.current.parentNode.scrollTo({
-        top: currentWeekRow.current.offsetTop - tableHeaderOffset,
+        top: currentWeekRow.current.offsetTop-tableHeaderOffset,
         behavior: 'smooth'
       })
     }
   })
+
+  const isItFirstCurrentWeekIndicator= i => {
+    let firstIndicatorOfCurrentWeek = data[i][0] === `Week ${currentWeek}`
+    if(firstIndicatorOfCurrentWeek && data[i-1] && data[i][0] === data[i - 1][0]){
+      firstIndicatorOfCurrentWeek=false
+    }
+    return firstIndicatorOfCurrentWeek;
+  }
 
   return (
     <div className={classes.tableResponsive}>
@@ -152,10 +160,9 @@ function CustomAssignmentTable (props) {
             </TableHead>
           ) : null}
           <TableBody>
-            {data.map((row, i) => {
-              return currentWeek === i
-                ? <RootRef rootRef={currentWeekRow} key={i}>{tableRow(row, i)}</RootRef>
-                : tableRow(row, i)
+            {
+              data.map((row, i) => {
+              return isItFirstCurrentWeekIndicator(i) ? <RootRef rootRef={currentWeekRow} key={i}>{tableRow(row, i)}</RootRef> : tableRow(row, i)
             })}
           </TableBody>
         </Table>

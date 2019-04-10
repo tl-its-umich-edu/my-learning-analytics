@@ -39,7 +39,7 @@ const styles = theme => ({
 
 const getCurrentWeek = assignmentData => {
   // default week
-  let currentWeek = 0
+  let currentWeek = null
   assignmentData.forEach(item => {
     let weekStatus = item.due_date_items[0].assignment_items[0].current_week
     if (weekStatus) {
