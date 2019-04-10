@@ -1,6 +1,7 @@
 // modified from https://demos.creative-tim.com/material-dashboard-react/?_ga=2.12819711.913135977.1549993496-494583875.1549993496#/table
 
-import React from 'react'
+import React, { useRef, useEffect, useState } from 'react'
+import RootRef from '@material-ui/core/RootRef'
 import withStyles from '@material-ui/core/styles/withStyles'
 import Table from '@material-ui/core/Table'
 import TableHead from '@material-ui/core/TableHead'
@@ -31,7 +32,7 @@ const tableStyle = theme => ({
     verticalAlign: 'middle'
   },
   tableResponsive: {
-    width: '70%',
+    // width: '70%',
     height: 400,
     marginTop: theme.spacing.unit * 3,
     overflowX: 'auto'
@@ -60,20 +61,11 @@ const generateAssignmentTable = plan => {
   return tableArray
 }
 
-const getCurrentWeek = data => {
-  let weekIndicator = ''
-  data.forEach(item => {
-    let week = item.week
-    let currentWeek = item.due_date_items[0].assignment_items[0].current_week
-    if (currentWeek) {
-      weekIndicator = `Week ${week}`
-    }
-  })
-  return weekIndicator
-}
-
 function CustomAssignmentTable (props) {
-  const { classes, tableHead, tableData } = props
+  const { classes, tableHead, tableData, currentWeek } = props
+  const currentWeekRow = useRef(null)
+  const tableRef = useRef(null)
+
   const data = generateAssignmentTable(tableData)
     .map(row => {
       const { percentOfFinalGrade, graded } = row.pop()
@@ -84,74 +76,90 @@ function CustomAssignmentTable (props) {
       />)
       return row
     })
-  const currentWeek = getCurrentWeek(tableData)
+
+  const tableRow = (row, i) => (
+    <TableRow key={i}>
+      {
+        row.map((prop, j) => {
+          let displayProp = true
+          let displayBorder = true
+          let isCurrentWeek = false
+          if (data[i - 1]) {
+            // first item in the row the logic handles display of week property
+            if (j === 0 && data[i][0] === data[i - 1][0]) {
+              displayProp = false
+            }
+            // second item in the row the logic handles display of Due date property
+            if (j === 1 && data[i][1] === data[i - 1][1]) {
+              displayProp = false
+            }
+          }
+          if (data[i + 1]) {
+            if (j === 0 && data[i][0] === data[i + 1][0]) {
+              displayBorder = false
+            }
+
+            if (j === 1 && data[i][1] === data[i + 1][1]) {
+              displayBorder = false
+            }
+          }
+          if (j === 0 && data[i][0] === currentWeek) {
+            isCurrentWeek = true
+          }
+          let borderAndCurrentWeekStyle = {}
+          if (!displayBorder) {
+            borderAndCurrentWeekStyle['borderBottom'] = 'none'
+          }
+          if (isCurrentWeek) {
+            borderAndCurrentWeekStyle['color'] = 'orange'
+          }
+          return (
+            <TableCell className={classes.tableCell} key={j} style={borderAndCurrentWeekStyle}>
+              {displayProp ? prop : null}
+            </TableCell>
+          )
+        })
+      }
+    </TableRow>
+  )
+
+  useEffect(() => {
+    if (currentWeekRow.current) {
+      const tableHeaderOffset = 56
+      tableRef.current.parentNode.scrollTo({
+        top: currentWeekRow.current.offsetTop - tableHeaderOffset,
+        behavior: 'smooth'
+      })
+    }
+  })
+
   return (
     <div className={classes.tableResponsive}>
-      <Table>
-        {tableHead !== undefined ? (
-          <TableHead>
-            <TableRow>
-              {tableHead.map((prop, key) => {
-                return (
-                  <TableCell
-                    className={classes.tableCell + ' ' + classes.tableHeadCell}
-                    key={key}>
-                    {prop}
-                  </TableCell>)
-              })}
-            </TableRow>
-          </TableHead>
-        ) : null}
-        <TableBody>
-          {data.map((row, i) => {
-            return (
-              <TableRow key={i}>
-                {
-                  row.map((prop, j) => {
-                    let displayProp = true
-                    let displayBorder = true
-                    let isCurrentWeek = false
-                    if (data[i - 1]) {
-                      // first item in the row the logic handles display of week property
-                      if (j === 0 && data[i][0] === data[i - 1][0]) {
-                        displayProp = false
-                      }
-                      // second item in the row the logic handles display of Due date property
-                      if (j === 1 && data[i][1] === data[i - 1][1]) {
-                        displayProp = false
-                      }
-                    }
-                    if (data[i + 1]) {
-                      if (j === 0 && data[i][0] === data[i + 1][0]) {
-                        displayBorder = false
-                      }
-
-                      if (j === 1 && data[i][1] === data[i + 1][1]) {
-                        displayBorder = false
-                      }
-                    }
-                    if (j === 0 && data[i][0] === currentWeek) {
-                      isCurrentWeek = true
-                    }
-                    let borderAndCurrentWeekStyle = {}
-                    if (!displayBorder) {
-                      borderAndCurrentWeekStyle['borderBottom'] = 'none'
-                    }
-                    if (isCurrentWeek) {
-                      borderAndCurrentWeekStyle['color'] = 'orange'
-                    }
-                    return (
-                      <TableCell className={classes.tableCell} key={j} style={borderAndCurrentWeekStyle}>
-                        {displayProp ? prop : null}
-                      </TableCell>
-                    )
-                  })
-                }
+      <RootRef rootRef={tableRef} >
+        <Table ref={tableRef}>
+          {tableHead !== undefined ? (
+            <TableHead>
+              <TableRow>
+                {tableHead.map((prop, key) => {
+                  return (
+                    <TableCell
+                      className={classes.tableCell + ' ' + classes.tableHeadCell}
+                      key={key}>
+                      {prop}
+                    </TableCell>)
+                })}
               </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
+            </TableHead>
+          ) : null}
+          <TableBody>
+            {data.map((row, i) => {
+              return currentWeek === i
+                ? <RootRef rootRef={currentWeekRow} key={i}>{tableRow(row, i)}</RootRef>
+                : tableRow(row, i)
+            })}
+          </TableBody>
+        </Table>
+      </RootRef>
     </div>
   )
 }

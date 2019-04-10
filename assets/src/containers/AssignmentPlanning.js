@@ -37,21 +37,34 @@ const styles = theme => ({
   }
 })
 
+const getCurrentWeek = assignmentData => {
+  // default week
+  let currentWeek = 0
+  assignmentData.forEach(item => {
+    let weekStatus = item.due_date_items[0].assignment_items[0].current_week
+    if (weekStatus) {
+      currentWeek = item.week
+    }
+  })
+  return currentWeek
+}
+
+const assignmentTable = assignmentData => {
+  if (!assignmentData || Object.keys(assignmentData).length === 0) {
+    return (<Typography>No data provided</Typography>)
+  }
+  return <TableAssignment
+    tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
+    tableData={assignmentData}
+    currentWeek={getCurrentWeek(assignmentData)}
+  />
+}
+
 function AssignmentPlanning (props) {
   const { classes, match } = props
   const currentCourseId = match.params.courseId
   const [assignmentFilter, setAssignmentFilter] = useState(0)
   const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, assignmentFilter)
-
-  const tableBuilder = assignmentData => {
-    if (!assignmentData || Object.keys(assignmentData).length === 0) {
-      return (<Typography>No data provided</Typography>)
-    }
-    return <TableAssignment
-      tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
-      tableData={assignmentData}
-    />
-  }
 
   return (
     <div className={classes.root}>
@@ -108,7 +121,7 @@ function AssignmentPlanning (props) {
                 <MenuItem value={75}>75%</MenuItem>
               </Select>
             </FormControl>
-            {loaded ? tableBuilder(assignmentData.plan) : <Spinner />}
+            {loaded ? assignmentTable(assignmentData.plan) : <Spinner />}
           </Paper>
         </Grid>
       </Grid>
