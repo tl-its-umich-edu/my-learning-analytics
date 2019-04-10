@@ -103,7 +103,7 @@ function CustomAssignmentTable (props) {
               displayBorder = false
             }
           }
-          if (j === 0 && data[i][0] === currentWeek) {
+          if (j === 0 && i === currentWeek) {
             isCurrentWeek = true
           }
           let borderAndCurrentWeekStyle = {}
