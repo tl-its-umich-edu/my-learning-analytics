@@ -1,6 +1,6 @@
 // modified from https://demos.creative-tim.com/material-dashboard-react/?_ga=2.12819711.913135977.1549993496-494583875.1549993496#/table
 
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect } from 'react'
 import RootRef from '@material-ui/core/RootRef'
 import withStyles from '@material-ui/core/styles/withStyles'
 import Table from '@material-ui/core/Table'
@@ -62,7 +62,7 @@ const generateAssignmentTable = plan => {
 }
 
 function CustomAssignmentTable (props) {
-  const { classes, tableHead, tableData, currentWeek } = props
+  const { classes, tableHead, tableData, currentWeek = null } = props
   const currentWeekRow = useRef(null)
   const tableRef = useRef(null)
 
@@ -127,18 +127,18 @@ function CustomAssignmentTable (props) {
     if (currentWeekRow.current) {
       const tableHeaderOffset = 50
       tableRef.current.parentNode.scrollTo({
-        top: currentWeekRow.current.offsetTop-tableHeaderOffset,
+        top: currentWeekRow.current.offsetTop - tableHeaderOffset,
         behavior: 'smooth'
       })
     }
   })
 
-  const isItFirstCurrentWeekIndicator= i => {
+  const isItFirstCurrentWeekIndicator = i => {
     let firstIndicatorOfCurrentWeek = data[i][0] === `Week ${currentWeek}`
-    if(firstIndicatorOfCurrentWeek && data[i-1] && data[i][0] === data[i - 1][0]){
-      firstIndicatorOfCurrentWeek=false
+    if (firstIndicatorOfCurrentWeek && data[i - 1] && data[i][0] === data[i - 1][0]) {
+      firstIndicatorOfCurrentWeek = false
     }
-    return firstIndicatorOfCurrentWeek;
+    return firstIndicatorOfCurrentWeek
   }
 
   return (
@@ -162,8 +162,10 @@ function CustomAssignmentTable (props) {
           <TableBody>
             {
               data.map((row, i) => {
-              return isItFirstCurrentWeekIndicator(i) ? <RootRef rootRef={currentWeekRow} key={i}>{tableRow(row, i)}</RootRef> : tableRow(row, i)
-            })}
+                return isItFirstCurrentWeekIndicator(i)
+                  ? <RootRef rootRef={currentWeekRow} key={i}>{tableRow(row, i)}</RootRef>
+                  : tableRow(row, i)
+              })}
           </TableBody>
         </Table>
       </RootRef>
