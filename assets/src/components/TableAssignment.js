@@ -9,6 +9,10 @@ import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import HorizontalBar from '../components/HorizontalBar'
+import createToolTip from '../util/createToolTip'
+import { renderToString } from 'react-dom/server'
+import Paper from '@material-ui/core/Paper'
+import Typography from '@material-ui/core/Typography'
 
 const tableStyle = theme => ({
   table: {
@@ -36,6 +40,10 @@ const tableStyle = theme => ({
     height: 400,
     marginTop: theme.spacing.unit * 3,
     overflowX: 'auto'
+  },
+  paper: {
+    padding: theme.spacing.unit * 2,
+    color: theme.palette.text.secondary
   }
 })
 
@@ -52,7 +60,9 @@ const generateAssignmentTable = plan => {
         const assignmentName = assignment.name
         const percentOfFinalGrade = assignment.towards_final_grade
         const graded = assignment.graded
-        const barData = { percentOfFinalGrade, graded }
+        const pointsPossible = assignment.points_possible
+        const score = assignment.score
+        const barData = { percentOfFinalGrade, graded, pointsPossible, score }
         acc.push([week, dueDate, assignmentName, barData])
       })
     })
@@ -65,14 +75,31 @@ function CustomAssignmentTable (props) {
   const { classes, tableHead, tableData, currentWeek = null } = props
   const currentWeekRow = useRef(null)
   const tableRef = useRef(null)
+  const toolTipContent = (data) => {
+    // if assignment is no points eg. reading as part of the course work
+    if (data.pointsPossible === 0) {
+      return 'No Points'
+    }
+    // student assignment is not graded, hence score will be null
+    if (data.score === null) {
+      return `NA/${data.pointsPossible}`
+    }
+    return `${data.score}/${data.pointsPossible}`
+  }
 
   const data = generateAssignmentTable(tableData)
     .map(row => {
-      const { percentOfFinalGrade, graded } = row.pop()
+      const { percentOfFinalGrade, graded, pointsPossible, score } = row.pop()
       row.push(<HorizontalBar
-        data={[{ label: 'grade', data: percentOfFinalGrade, graded }]}
+        data={[{ label: 'grade', data: percentOfFinalGrade, graded, pointsPossible, score }]}
         width={200}
         height={20}
+        tip={createToolTip(d =>
+          renderToString(
+            <Paper className={classes.paper}>
+              <Typography component="p">Score: {toolTipContent(d)}</Typography>
+            </Paper>
+          ))}
       />)
       return row
     })
@@ -143,7 +170,7 @@ function CustomAssignmentTable (props) {
 
   return (
     <div className={classes.tableResponsive}>
-      <RootRef rootRef={tableRef} >
+      <RootRef rootRef={tableRef}>
         <Table ref={tableRef}>
           {tableHead !== undefined ? (
             <TableHead>
