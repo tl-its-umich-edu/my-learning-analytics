@@ -62,7 +62,9 @@ const generateAssignmentTable = plan => {
         const graded = assignment.graded
         const pointsPossible = assignment.points_possible
         const score = assignment.score
-        const barData = { percentOfFinalGrade, graded, pointsPossible, score }
+        const dropLowest = assignment.drop_lowest
+        const dropHighest = assignment.drop_highest
+        const barData = { percentOfFinalGrade, graded, pointsPossible, score, dropLowest, dropHighest }
         acc.push([week, dueDate, assignmentName, barData])
       })
     })
@@ -89,15 +91,24 @@ function CustomAssignmentTable (props) {
 
   const data = generateAssignmentTable(tableData)
     .map(row => {
-      const { percentOfFinalGrade, graded, pointsPossible, score } = row.pop()
+      const { percentOfFinalGrade, graded, pointsPossible, score, dropLowest, dropHighest } = row.pop()
       row.push(<HorizontalBar
-        data={[{ label: 'grade', data: percentOfFinalGrade, graded, pointsPossible, score }]}
+        data={[{ label: 'grade', data: percentOfFinalGrade, graded, pointsPossible, score, dropLowest, dropHighest }]}
         width={200}
         height={20}
         tip={createToolTip(d =>
           renderToString(
             <Paper className={classes.paper}>
               <Typography component="p">Score: {toolTipContent(d)}</Typography>
+              {d.dropLowest != 0 ?
+                <Typography component="p">
+                  The lowest <strong>{d.dropLowest}</strong> scores will dropped from this assigment group
+                </Typography> : ''
+              }
+              {d.dropHighest != 0 ?
+                <Typography component="p">
+                  The highest <strong>{d.dropHighest}</strong> scores will dropped from this assigment group
+                </Typography> : ''}
             </Paper>
           ))}
       />)
@@ -140,10 +151,33 @@ function CustomAssignmentTable (props) {
           if (isCurrentWeek) {
             borderAndCurrentWeekStyle['color'] = 'orange'
           }
+          // styling for assignment title column
+          if (j === 2) {
+            borderAndCurrentWeekStyle['width'] = '30%'
+            borderAndCurrentWeekStyle['maxWidth'] = 0
+            borderAndCurrentWeekStyle['overflow'] = 'hidden'
+            borderAndCurrentWeekStyle['textOverflow'] = 'ellipsis'
+            borderAndCurrentWeekStyle['whiteSpace'] = 'nowrap'
+            borderAndCurrentWeekStyle['borderRight'] = '0.1em solid rgba(224, 224, 224, 1)'
+          }
+          // for week/due_date column don't need much space as the text length is fixed
+          if (j < 1) {
+            borderAndCurrentWeekStyle['width'] = '10%'
+          }
+          // for the horizontal bar we want the bar touching the line
+          if (j === 3) {
+            borderAndCurrentWeekStyle['paddingLeft'] = 0
+          }
           return (
-            <TableCell className={classes.tableCell} key={j} style={borderAndCurrentWeekStyle}>
-              {displayProp ? prop : null}
-            </TableCell>
+            j === 2 ?
+              <TableCell title={displayProp ? prop : null} className={classes.tableCell} key={j}
+                         style={borderAndCurrentWeekStyle}>
+                {displayProp ? prop : null}
+              </TableCell> :
+              <TableCell className={classes.tableCell} key={j} style={borderAndCurrentWeekStyle}>
+                {displayProp ? prop : null}
+              </TableCell>
+
           )
         })
       }
