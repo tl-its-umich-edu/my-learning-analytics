@@ -82,7 +82,7 @@ class UserDefaultManager(models.Manager):
 class UserDefaultSelection(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
     course_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="Course Id")
-    user_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="SIS Id")
+    user_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="User Id")
     default_view_type = models.CharField(max_length=255, blank=True, null=True, verbose_name="Default Type")
     default_view_value = models.CharField(max_length=255, blank=True, null=True, verbose_name="Default Value")
 

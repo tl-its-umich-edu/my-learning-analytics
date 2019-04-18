@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from dashboard.models import Course, CourseViewOption, AcademicTerms
-from dashboard.common.db_util import canvas_id_to_prefixed_id
+from dashboard.common.db_util import canvas_id_to_incremented_id
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -13,8 +13,8 @@ class Command(BaseCommand):
         term_id = options.get('term_id')
         name = options.get('name')
 
-        prefixed_course_id = canvas_id_to_prefixed_id(course_id)
-        prefixed_term_id = canvas_id_to_prefixed_id(term_id)
+        prefixed_course_id = canvas_id_to_incremented_id(course_id)
+        prefixed_term_id = canvas_id_to_incremented_id(term_id)
 
         try:
             term_obj = AcademicTerms.objects.get(id=prefixed_term_id)

@@ -150,7 +150,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='Table Id')),
                 ('course_id', models.CharField(blank=True, max_length=255, null=True, verbose_name='Course Id')),
-                ('user_id', models.CharField(blank=True, max_length=255, null=True, verbose_name='SIS Id')),
+                ('user_id', models.CharField(blank=True, max_length=255, null=True, verbose_name='User Id')),
                 ('default_view_type', models.CharField(blank=True, max_length=255, null=True, verbose_name='Default Type')),
                 ('default_view_value', models.CharField(blank=True, max_length=255, null=True, verbose_name='Default Value')),
             ],

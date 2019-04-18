@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from dashboard.models import AcademicTerms
-from dashboard.common.db_util import canvas_id_to_prefixed_id
+from dashboard.common.db_util import canvas_id_to_incremented_id
 from datetime import datetime
 
 class Command(BaseCommand):
@@ -16,7 +16,7 @@ class Command(BaseCommand):
         date_start = datetime.strptime(options.get('date_start'), '%Y-%m-%d %H:%M:%S')
         date_end = datetime.strptime(options.get('date_end'), '%Y-%m-%d %H:%M:%S')
 
-        prefixed_term_id = canvas_id_to_prefixed_id(term_id)
+        prefixed_term_id = canvas_id_to_incremented_id(term_id)
 
         try:
             term_obj = AcademicTerms.objects.get(id=prefixed_term_id)
