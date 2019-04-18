@@ -60,11 +60,9 @@ Environment variables:
 `docker cp ~/secrets student_dashboard:/secrets`
 4. Initialize the MySQL database tables: `docker exec -it student_dashboard ./manage.py migrate`
 
-# Populate initial database terms and courses
+# Populate initial demo terms and courses
 
-Before adding adding initial terms and courses, ensure that the `DATA_WAREHOUSE_ID_TEMPLATE` environment variable is set correctly
-
-### Add courses and terms
+Before adding adding initial terms and courses, ensure that the `CANVAS_DATA_ID_INCREMENT` environment variable is set correctly
 
     docker exec -it student_dashboard bash ./demo_init.sh
 
