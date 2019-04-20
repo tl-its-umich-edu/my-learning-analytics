@@ -4,6 +4,7 @@ from django.forms.models import model_to_dict
 
 import math, json, logging
 from datetime import datetime, timedelta
+from django.utils import timezone
 
 import numpy as np
 import pandas as pd
@@ -63,7 +64,7 @@ def get_course_info(request, course_id=0):
     :rtype: str
     """
 
-    today = datetime.today()
+    today = timezone.now()
 
     try:
         course = Course.objects.get(id=course_id)
@@ -506,7 +507,7 @@ def find_min_week(course_id):
 
 
 def find_current_week(row):
-    current_date = datetime.now()
+    current_date = timezone.now()
     year,week,dow = current_date.isocalendar() #dow = day of week
     if row == week:
         return True
