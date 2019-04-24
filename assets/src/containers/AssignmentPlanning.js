@@ -172,14 +172,23 @@ function AssignmentPlanning (props) {
                 aspectRatio={0.12}
                 tip={createToolTip(d => renderToString(
                   <Paper className={classes.paper}>
-                    <Table tableData={[
-                      ['Assignment', <strong>{d.name}</strong>],
-                      ['Due at', <strong>{d.due_dates}</strong>],
-                      ['Your grade', <strong>{d.score ? `${d.score}` : 'Not available'}</strong>],
-                      ['Total points possible', <strong>{d.points_possible}</strong>],
-                      ['Avg assignment grade', <strong>{d.avg_score}</strong>],
-                      ['Percentage worth in final grade', <strong>{d.towards_final_grade}%</strong>]
-                    ]}/>
+                    <Typography>
+                      Assignment: <strong>{d.name}</strong><br/>
+                      Due at: <strong>{d.due_dates}</strong><br/>
+                      Your grade: <strong>{d.score ? `${d.score}` : 'Not available'}</strong><br/>
+                      Total points possible: <strong>{d.points_possible}</strong><br/>
+                      Avg assignment grade: <strong>{d.avg_score}</strong><br/>
+                      Percentage worth in final grade: <strong>{d.towards_final_grade}%</strong><br/>
+                    </Typography>
+                    {parseInt(d.drop_lowest) !== 0 ?
+                      <Typography component="p">
+                        The lowest <strong>{d.drop_lowest}</strong> scores will dropped from this assigment group
+                      </Typography> : ''
+                    }
+                    {parseInt(d.drop_highest) !== 0 ?
+                      <Typography component="p">
+                        The highest <strong>{d.drop_highest}</strong> scores will dropped from this assigment group
+                      </Typography> : ''}
                   </Paper>
                 ))}/> : <Spinner/>}
             </ >
