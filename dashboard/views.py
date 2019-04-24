@@ -264,6 +264,7 @@ def grade_distribution(request, course_id=0):
 
 def update_user_default_selection_for_views(request, course_id=0):
     logger.info(update_user_default_selection_for_views.__name__)
+    course_id = int(str(settings.UDW_ID_PREFIX) + course_id)
     current_user = request.user.get_username()
     default_selection = json.loads(request.body.decode("utf-8"))
     logger.info(default_selection)
@@ -294,6 +295,7 @@ def update_user_default_selection_for_views(request, course_id=0):
 
 def get_user_default_selection(request, course_id=0):
     logger.info(get_user_default_selection.__name__)
+    course_id = int(str(settings.UDW_ID_PREFIX) + course_id)
     user_id = request.user.get_username()
     default_view_type = request.GET.get('default_type')
     key = 'default'

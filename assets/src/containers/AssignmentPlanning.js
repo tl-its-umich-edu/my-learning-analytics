@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { renderToString } from 'react-dom/server'
 import Paper from '@material-ui/core/Paper'
@@ -11,8 +11,9 @@ import MenuItem from '@material-ui/core/MenuItem'
 import Table from '../components/Table'
 import ProgressBar from '../components/ProgressBar'
 import createToolTip from '../util/createToolTip'
-import { useAssignmentPlanningData } from '../service/api'
 import TableAssignment from '../components/TableAssignment'
+import Checkbox from '@material-ui/core/Checkbox'
+import Cookie from 'js-cookie'
 
 const styles = theme => ({
   root: {
@@ -46,6 +47,14 @@ const getCurrentWeek = assignmentData => {
   })
 }
 
+const defaultFetchOptions = {
+  headers: {
+    'Accept': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest'
+  },
+  credentials: 'include'
+}
+
 const assignmentTable = assignmentData => {
   if (!assignmentData || Object.keys(assignmentData).length === 0) {
     return (<Typography>No data provided</Typography>)
@@ -59,9 +68,97 @@ const assignmentTable = assignmentData => {
 
 function AssignmentPlanning (props) {
   const { classes, match } = props
+  const currentSetting = 'My current setting'
+  const rememberSetting = 'Remember my setting'
+  const settingNotUpdated = 'Setting not updated'
   const currentCourseId = match.params.courseId
-  const [assignmentFilter, setAssignmentFilter] = useState(0)
-  const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, assignmentFilter)
+  // initial default value that we get from backend and updated value when user save the default setting
+  const [defaultValue, setDefaultValue] = useState('')
+  // assignment data and weight controller
+  const [assignmentFilter, setAssignmentFilter] = useState('')
+  const [assignmentData, setAssignmentData] = useState('')
+
+  // defaults setting controllers
+  const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
+  const [defaultLabel, setDefaultLabel] = useState(currentSetting)
+
+  const changeDefaultSetting = (event) => {
+    const didUserChecked = event.target.checked
+
+    setDefaultCheckedState(didUserChecked)
+    setDefaultLabel(didUserChecked ? currentSetting : rememberSetting)
+
+    if (didUserChecked) {
+      // Django rejects PUT/DELETE/POST calls with out CSRF token.
+      const csrfToken = Cookie.get('csrftoken')
+      const body = { assignment: assignmentFilter }
+      const dataURL = `http://localhost:5001/api/v1/courses/${currentCourseId}/set_user_default_selection`
+
+      defaultFetchOptions.headers['X-CSRFToken'] = csrfToken
+      defaultFetchOptions['method'] = 'PUT'
+      defaultFetchOptions['body'] = JSON.stringify(body)
+
+      fetch(dataURL, defaultFetchOptions)
+        .then(res => res.json())
+        .then(data => {
+          const res = data.default
+          if (res === 'success') {
+            setDefaultValue(assignmentFilter)
+            setDefaultCheckedState(true)
+            return
+          }
+          setDefaultLabel(settingNotUpdated)
+        })
+    }
+  }
+
+  const onChangeAssignmentList = event => {
+    const value = event.target.value
+    setAssignmentFilter(value)
+    if (defaultValue === value) {
+      setDefaultCheckedState(true)
+      setDefaultLabel(currentSetting)
+    } else {
+      setDefaultCheckedState(false)
+      setDefaultLabel(rememberSetting)
+    }
+
+  }
+  const firstUpdate = useRef(true)
+
+  useEffect(() => {
+      const fetchOptions = { method: 'get', ...defaultFetchOptions }
+      const dataURL = `http://localhost:5001/api/v1/courses/${currentCourseId}/get_user_default_selection?default_type=assignment`
+      fetch(dataURL, fetchOptions)
+        .then(res => res.json())
+        .then(data => {
+          if (data.default === '') {
+            setAssignmentFilter(0)
+            setDefaultValue(0)
+
+          } else {
+            setAssignmentFilter(data.default)
+            setDefaultValue(parseInt(data.default))
+          }
+        })
+    }, []
+  )
+  // https://stackoverflow.com/questions/53253940/make-react-useeffect-hook-not-run-on-initial-render
+  // getting the assignment content call needs to happen after the defaults otherwise 2 data fetches happen
+  useEffect(() => {
+      if (firstUpdate.current) {
+        firstUpdate.current = false
+        return
+      }
+      const fetchOptions = { method: 'get', ...defaultFetchOptions }
+      const dataURL = `http://localhost:5001/api/v1/courses/${currentCourseId}/assignments?percent=${assignmentFilter}`
+      fetch(dataURL, fetchOptions)
+        .then(res => res.json())
+        .then(data => {
+          setAssignmentData(data)
+        })
+    }, [assignmentFilter]
+  )
 
   return (
     <div className={classes.root}>
@@ -69,7 +166,7 @@ function AssignmentPlanning (props) {
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <>
-              <Typography variant='h5' gutterBottom>Progress toward Final Grade</Typography >
+              <Typography variant='h5' gutterBottom>Progress toward Final Grades the </Typography>
               {assignmentData ? <ProgressBar
                 data={assignmentData.progress}
                 aspectRatio={0.12}
@@ -82,9 +179,9 @@ function AssignmentPlanning (props) {
                       ['Total points possible', <strong>{d.points_possible}</strong>],
                       ['Avg assignment grade', <strong>{d.avg_score}</strong>],
                       ['Percentage worth in final grade', <strong>{d.towards_final_grade}%</strong>]
-                    ]} />
+                    ]}/>
                   </Paper>
-                ))} /> : <Spinner />}
+                ))}/> : <Spinner/>}
             </ >
           </Paper>
         </Grid>
@@ -92,33 +189,42 @@ function AssignmentPlanning (props) {
           <Paper className={classes.paper}>
             <Grid container>
               <Grid item xs={12} md={10}>
-                <Typography variant='h5' gutterBottom >Assignments Due by Date</Typography >
+                <Typography variant='h5' gutterBottom>Assignments Due by Date</Typography>
               </Grid>
               <Grid item xs={12} md={2}>
                 <Typography variant='h6'>Assignment Status</Typography>
-                <div className={classes.graded} />
+                <div className={classes.graded}/>
                 <Typography style={{ display: 'inline' }}> Graded</Typography>
-                <br />
-                <div className={classes.ungraded} />
+                <br/>
+                <div className={classes.ungraded}/>
                 <Typography style={{ display: 'inline' }}> Not Yet Graded</Typography>
-                <br />
+                <br/>
               </Grid>
             </Grid>
             <FormControl>
               <Typography>Show assignments that weigh at least</Typography>
-              <Select
-                value={assignmentFilter}
-                onChange={event => setAssignmentFilter(event.target.value)}>
-                <MenuItem value={0}>0% (all)</MenuItem>
-                <MenuItem value={2}>2%</MenuItem>
-                <MenuItem value={5}>5%</MenuItem>
-                <MenuItem value={10}>10%</MenuItem>
-                <MenuItem value={20}>20%</MenuItem>
-                <MenuItem value={50}>50%</MenuItem>
-                <MenuItem value={75}>75%</MenuItem>
-              </Select>
+              <div style={{ display: 'flex' }}>
+                <Select
+                  value={assignmentFilter}
+                  onChange={onChangeAssignmentList}>
+                  <MenuItem value={0}>0% (all)</MenuItem>
+                  <MenuItem value={2}>2%</MenuItem>
+                  <MenuItem value={5}>5%</MenuItem>
+                  <MenuItem value={10}>10%</MenuItem>
+                  <MenuItem value={20}>20%</MenuItem>
+                  <MenuItem value={50}>50%</MenuItem>
+                  <MenuItem value={75}>75%</MenuItem>
+                </Select>
+                {defaultCheckboxState ? <div style={{ padding: '10px' }}></div> : <Checkbox
+                  checked={defaultCheckboxState}
+                  onChange={changeDefaultSetting}
+                  value="checked"
+                />}
+                <div style={{ padding: '15px 2px' }}>{defaultLabel}</div>
+              </div>
             </FormControl>
-            {loaded ? assignmentTable(assignmentData.plan) : <Spinner />}
+            {/*in case of no data empty list is sent*/}
+            {assignmentData ? assignmentTable(assignmentData.plan) : <Spinner/>}
           </Paper>
         </Grid>
       </Grid>
