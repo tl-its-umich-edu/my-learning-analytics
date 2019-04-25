@@ -1,11 +1,17 @@
+import React, { useState } from 'react'
 import createHistogram from './d3/createHistogram'
-import withResponsiveness from './withResponsiveness'
-import createChartComponent from './createChartComponent'
-import compose from '../util/compose'
+import useChart from '../hooks/useChart'
+import useResponsiveness from '../hooks/useResponsiveness'
 
-const Histogram = compose(
-  withResponsiveness,
-  createChartComponent
-)(createHistogram)
+function Histogram (props) {
+  const [el, setEl] = useState(null)
+
+  const [width, height] = useResponsiveness({ ...props, el })
+  useChart({ ...props, el, width, height }, createHistogram)
+
+  return (
+    <div ref={el => setEl(el)} />
+  )
+}
 
 export default Histogram
