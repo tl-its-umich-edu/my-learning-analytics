@@ -62,13 +62,15 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', '{{ settings.GA_ID }}');
+    gtag('config', '{{ settings.GA_ID }}', {
+        'page_path': location.pathname + location.search + location.hash
+    });
 </script>
 {% endif %}
 <script>
 // Setup a top level js object to hold global values
 var dashboard = {
-{% if course_id %}"course_id": '{{settings.UDW_ID_PREFIX}}'+'{{ course_id }}',
+{% if course_id %}"course_id": '{{ current_user_incremented_course_id }}',
 {% else %}"course_id": 0,
 {% endif %}
 };

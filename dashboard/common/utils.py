@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_build_info():
-    logger.info(get_build_info.__name__)
+    logger.debug(get_build_info.__name__)
     git_commit=config("OPENSHIFT_BUILD_COMMIT",default="")
     build_namespace=config("OPENSHIFT_BUILD_NAMESPACE",default="")
     git_branch=config("OPENSHIFT_BUILD_REFERENCE",default="master")
