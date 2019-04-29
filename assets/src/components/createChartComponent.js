@@ -3,7 +3,7 @@ import { destroyChart } from '../util/chart'
 
 const createChartComponent = chart => memo(props => {
   const { data } = props
-  const [el, setEl] = useState(null)
+  const [domElement, setDomElement] = useState(null)
 
   useEffect(() => {
     if (el && data) {
@@ -13,7 +13,7 @@ const createChartComponent = chart => memo(props => {
   })
 
   return (
-    <div ref={el => setEl(el)} />
+    <div ref={domElement => setDomElement(domElement)} />
   )
 })
 

@@ -4,13 +4,13 @@ import useCreateChart from '../hooks/useCreateChart'
 import useResponsiveness from '../hooks/useResponsiveness'
 
 function Histogram (props) {
-  const [el, setEl] = useState(null)
+  const [domElement, setDomElement] = useState(null)
 
-  const [width, height] = useResponsiveness({ ...props, el })
-  useCreateChart({ ...props, el, width, height }, createHistogram)
+  const [width, height] = useResponsiveness({ ...props, domElement })
+  useCreateChart({ ...props, domElement, width, height }, createHistogram)
 
   return (
-    <div ref={el => setEl(el)} />
+    <div ref={domElement => setDomElement(domElement)} />
   )
 }
 
