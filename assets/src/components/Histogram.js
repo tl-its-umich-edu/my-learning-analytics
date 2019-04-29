@@ -7,7 +7,7 @@ function Histogram (props) {
   const [el, setEl] = useState(null)
 
   const [width, height] = useResponsiveness({ ...props, el })
-  useChart({ ...props, el, width, height }, createHistogram)
+  useCreateChart({ ...props, el, width, height }, createHistogram)
 
   return (
     <div ref={el => setEl(el)} />
