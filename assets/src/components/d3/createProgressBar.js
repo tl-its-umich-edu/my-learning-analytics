@@ -52,9 +52,9 @@ function createProgressBar ({ data, width, height, el, tip }) {
     .style('outline-color', 'rgb(255, 255, 255)')
     .style('outline-style', 'solid')
     .style('outline-width', '1px')
-    .on('mouseover',function () {
+    .on('mouseover', function () {
       const x = d3.mouse(this)[0]
-      const percentVariation = ((aWidth - x)/aWidth)*100
+      const percentVariation = ((aWidth - x) / aWidth) * 100
       if (percentVariation < 7) {
         tipPosition('sw')
       } else {
@@ -97,7 +97,6 @@ function createProgressBar ({ data, width, height, el, tip }) {
   const currentLine = svg.append('g')
   // only show currentline when assignments are graded
   if (currentIndex !== 0) {
-
     currentLine
       .append('line')
       .attr('x1', x(calculatePercentSoFar(currentIndex)))
@@ -124,8 +123,6 @@ function createProgressBar ({ data, width, height, el, tip }) {
   const showMaxLine = (data) => {
     // filtering the graded and ungraded values, list would be either 2 or 1
     const gradedList = [...new Set(data.map(item => item.graded))]
-
-  if(!showMaxLine(data)) {
     if (gradedList.length > 1) {
       return true
     }
@@ -157,9 +154,6 @@ function createProgressBar ({ data, width, height, el, tip }) {
     .call(xAxis)
 
   if (tip) {
-    tip.direction('s')
-      .offset([0, 60])
-      .style('max-width', '300px')
     svg.call(tip)
     bar
       .on('mouseover', tip.show)

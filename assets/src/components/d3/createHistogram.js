@@ -93,7 +93,7 @@ function createHistogram ({ data, width, height, el, xAxisLabel, yAxisLabel, myG
       .attr('stroke-width', '2')
     svg.append('text')
       .attr('x', x(myGrade) - 110)
-      .attr('y', margin.top-5)
+      .attr('y', margin.top - 5)
       .text(`My Grade: ${roundToOneDecimcal(myGrade)}%`)
       .attr('font-size', '0.875rem')
       .attr('font-weight', 'bold')
