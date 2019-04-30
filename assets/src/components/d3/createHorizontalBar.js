@@ -23,20 +23,26 @@ function createHorizontalBar ({ data, width, height, el, tip }) {
     .append('g')
 
   bar.append('rect')
-    .attr('x', d => x(0))
+    .attr('x', d => {
+      x(0)
+    })
     .attr('width', d => d.data === 0
-      ? 2
-      : x(d.data) - x(0))
-    .attr('y', d => y(d.label))
+      ? 4
+      : (x(d.data) - x(0)) + 4)
+    .attr('y', d => {
+      y(d.label)
+    })
     .attr('height', y.bandwidth())
     .attr('fill', d => d.graded ? '#a0d4ee' : '#e1e1e1')
 
+  // appending text end of the bar with some padding
   bar.append('text')
-    .attr('x', aWidth - 30)
+    .attr('x', d => x(d.data) - x(0) + 6)
     .attr('y', d => y(d.label) + 12)
     .text(d => `${d.data}%`)
 
   if (tip) {
+    tip.direction('e')
     svg.call(tip)
     bar
       .on('mouseover', tip.show)

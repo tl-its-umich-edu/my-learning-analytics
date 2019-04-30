@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { renderToString } from 'react-dom/server'
 import Paper from '@material-ui/core/Paper'
@@ -37,8 +37,39 @@ const styles = theme => ({
   }
 })
 
+const getCurrentWeek = assignmentData => {
+  assignmentData.forEach(item => {
+    let weekStatus = item.due_date_items[0].assignment_items[0].current_week
+    if (weekStatus) {
+      return item.week
+    }
+  })
+}
+
+const defaultFetchOptions = {
+  headers: {
+    'Accept': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest'
+  },
+  credentials: 'include'
+}
+
+const assignmentTable = assignmentData => {
+  if (!assignmentData || Object.keys(assignmentData).length === 0) {
+    return (<Typography>No data provided</Typography>)
+  }
+  return <TableAssignment
+    tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
+    tableData={assignmentData}
+    currentWeek={getCurrentWeek(assignmentData)}
+  />
+}
+
 function AssignmentPlanning (props) {
   const { classes, match } = props
+  const currentSetting = 'My current setting'
+  const rememberSetting = 'Remember my setting'
+  const settingNotUpdated = 'Setting not updated'
   const currentCourseId = match.params.courseId
   const [assignmentFilter, setAssignmentFilter] = useState(0)
   const [loaded, assignmentData] = useAssignmentPlanningData(currentCourseId, assignmentFilter)
@@ -52,7 +83,6 @@ function AssignmentPlanning (props) {
       tableData={assignmentData}
     />
   }
-
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
@@ -109,6 +139,7 @@ function AssignmentPlanning (props) {
               </Select>
             </FormControl>
             {loaded ? tableBuilder(assignmentData.plan) : <Spinner />}
+
           </Paper>
         </Grid>
       </Grid>

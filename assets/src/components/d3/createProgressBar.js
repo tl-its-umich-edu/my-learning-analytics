@@ -36,6 +36,12 @@ function createProgressBar ({ data, width, height, el, tip }) {
     .data(data).enter()
     .append('g')
 
+  const tipPosition = (direction = 's') => {
+    tip.direction(direction)
+      .offset([0, 60])
+      .style('max-width', '300px')
+  }
+
   bar.append('rect')
     .attr('width', d => x(d.percent_gotten) - margin.left)
     .attr('x', (_, i) => x(calculatePercentSoFar(i)))
@@ -46,6 +52,23 @@ function createProgressBar ({ data, width, height, el, tip }) {
     .style('outline-color', 'rgb(255, 255, 255)')
     .style('outline-style', 'solid')
     .style('outline-width', '1px')
+    .on('mouseover',function () {
+      const x = d3.mouse(this)[0]
+      const percentVariation = ((aWidth - x)/aWidth)*100
+      if (percentVariation < 7) {
+        tipPosition('sw')
+      } else {
+        tipPosition('s')
+      }
+      d3.select(this)
+        .attr('fill', d => d.graded ? '#a0d4ee' : '#e1e1e1')
+        .style('outline', '1px solid black')
+    })
+    .on('mouseout', function () {
+      d3.select(this)
+        .attr('fill', d => d.graded ? '#a0d4ee' : '#e1e1e1')
+        .style('outline', '1px solid rgb(255, 255, 255)')
+    })
 
   bar.append('text')
     .attr('x', (_, i) => x(calculatePercentSoFar(i)))
@@ -72,8 +95,9 @@ function createProgressBar ({ data, width, height, el, tip }) {
 
   const currentIndex = data.filter(x => x.graded).length
   const currentLine = svg.append('g')
-   // only show currentline when assignments are graded
-  if(currentIndex != 0) {
+  // only show currentline when assignments are graded
+  if (currentIndex !== 0) {
+
     currentLine
       .append('line')
       .attr('x1', x(calculatePercentSoFar(currentIndex)))
@@ -100,13 +124,15 @@ function createProgressBar ({ data, width, height, el, tip }) {
   const showMaxLine = (data) => {
     // filtering the graded and ungraded values, list would be either 2 or 1
     const gradedList = [...new Set(data.map(item => item.graded))]
-    if(gradedList.length >1){
-      return false
-    }
-    return gradedList[0]
-  }
 
   if(!showMaxLine(data)) {
+    if (gradedList.length > 1) {
+      return true
+    }
+    return !gradedList[0]
+  }
+
+  if (showMaxLine(data)) {
     maxLine
       .append('line')
       .attr('x1', x(calculatePercentSoFar(data.length)))
