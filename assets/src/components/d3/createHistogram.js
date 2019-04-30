@@ -54,7 +54,6 @@ function createHistogram ({ data, width, height, el, xAxisLabel, yAxisLabel, myG
       .attr('fill', 'rgba(0, 0, 0, 0.87)')
       .attr('font-size', '0.875rem')
       .attr('font-weight', '400')
-      .attr('font-family', 'Roboto Helvetica Arial sans-serif')
       .attr('line-height', '1.46429em')
       .text(xAxisLabel).attr('dy', -4)
     )
@@ -70,7 +69,6 @@ function createHistogram ({ data, width, height, el, xAxisLabel, yAxisLabel, myG
       .attr('text-anchor', 'end')
       .attr('font-size', '0.875rem')
       .attr('font-weight', '400')
-      .attr('font-family', 'Roboto Helvetica Arial sans-serif')
       .attr('line-height', '1.46429em')
       .attr('text-anchor', 'start')
       .text(yAxisLabel).attr('dy', -4)
@@ -97,7 +95,6 @@ function createHistogram ({ data, width, height, el, xAxisLabel, yAxisLabel, myG
       .text(`My Grade: ${roundToOneDecimcal(myGrade)}%`)
       .attr('font-size', '0.875rem')
       .attr('font-weight', 'bold')
-      .attr('font-family', 'Roboto Helvetica Arial sans-serif')
       .attr('line-height', '1.46429em')
       .attr('text-anchor', 'start')
   }
