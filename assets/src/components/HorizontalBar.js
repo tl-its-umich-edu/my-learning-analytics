@@ -1,9 +1,15 @@
 import createHorizontalBar from './d3/createHorizontalBar'
-import createChartComponent from './createChartComponent'
-import compose from '../util/compose'
+import React, { useState } from 'react'
+import useCreateChart from '../hooks/useCreateChart'
 
-const HorizontalBar = compose(
-  createChartComponent
-)(createHorizontalBar)
+function HorizontalBar (props) {
+  const [domElement, setDomElement] = useState(null)
+  useCreateChart({ ...props, domElement }, createHorizontalBar)
+
+  return (
+    <div ref={domElement => setDomElement(domElement)}/>
+  )
+
+}
 
 export default HorizontalBar
