@@ -1,11 +1,16 @@
 import createProgressBar from './d3/createProgressBar'
-import withResponsiveness from './withResponsiveness'
-import createChartComponent from './createChartComponent'
-import compose from '../util/compose'
+import React, { useState } from 'react'
+import useResponsiveness from '../hooks/useResponsiveness'
+import useCreateChart from '../hooks/useCreateChart'
 
-const ProgressBar = compose(
-  withResponsiveness,
-  createChartComponent
-)(createProgressBar)
+function ProgressBar (props) {
+  const [domElement, setDomElement] = useState(null)
+
+  const [width, height] = useResponsiveness({ ...props, domElement })
+  useCreateChart({ ...props, domElement, width, height }, createProgressBar)
+  return (
+    <div ref={domElement => setDomElement(domElement)}/>
+  )
+}
 
 export default ProgressBar

@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 
-function createHorizontalBar ({ data, width, height, el, tip }) {
+function createHorizontalBar ({ data, width, height, domElement, tip }) {
   const margin = { top: 0, bottom: 0, left: 0, right: 0 }
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
@@ -14,7 +14,7 @@ function createHorizontalBar ({ data, width, height, el, tip }) {
     .range([aHeight - margin.bottom, margin.top])
     .padding(0.1)
 
-  const svg = d3.select(el).append('svg')
+  const svg = d3.select(domElement).append('svg')
     .attr('width', aWidth)
     .attr('height', aHeight)
 
