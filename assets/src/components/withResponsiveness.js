@@ -4,28 +4,28 @@ import { createResize } from '../util/chart'
 const withResponsiveness = ChartComponent => props => {
   const { aspectRatio = 0.75 } = props
   const minimumWidth = 400
-  const [domElement, setDomElement] = useState(null)
+  const [el, setEl] = useState(null)
   const [width, setWidth] = useState(null)
 
-  const setContainer = domElement => {
-    if (domElement) {
-      setDomElement(domElement)
-      setWidth(domElement.getBoundingClientRect().width > minimumWidth
-        ? domElement.getBoundingClientRect().width
+  const setContainer = el => {
+    if (el) {
+      setEl(el)
+      setWidth(el.getBoundingClientRect().width > minimumWidth
+        ? el.getBoundingClientRect().width
         : minimumWidth)
     }
   }
 
   useEffect(() => {
     const optimizedResize = createResize()
-    optimizedResize.add(() => setContainer(domElement))
+    optimizedResize.add(() => setContainer(el))
     return optimizedResize.remove
   })
 
   const notNull = (width !== null)
 
   return (
-    <div ref={domElement => setContainer(domElement)}>
+    <div ref={el => setContainer(el)}>
       {notNull && <ChartComponent width={width} height={width * aspectRatio} {...props} /> }
     </div>
   )
