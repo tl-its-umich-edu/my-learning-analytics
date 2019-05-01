@@ -2,12 +2,12 @@ import { useEffect } from 'react'
 import { destroyChart } from '../util/chart'
 
 const useCreateChart = (props, chart) => {
-  const { el, data, width } = props
+  const { domElement, data, width } = props
 
   useEffect(() => {
-    if (el && data && width) {
-      chart({ ...props, el, data })
-      return () => destroyChart(el)
+    if (domElement && data && width) {
+      chart({ ...props, domElement, data })
+      return () => destroyChart(domElement)
     }
   })
 }
