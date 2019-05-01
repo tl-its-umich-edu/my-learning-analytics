@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import { margin } from '../../constants/chartConstants'
 
-function createBarChart ({ data, width, height, el, tip }) {
+function createBarChart ({ data, width, height, domElement, tip }) {
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   const x = d3.scaleBand()
@@ -14,7 +14,7 @@ function createBarChart ({ data, width, height, el, tip }) {
     .domain([0, d3.max(data, d => d.data)]).nice()
     .range([aHeight - margin.bottom, margin.top])
 
-  const svg = d3.select(el).append('svg')
+  const svg = d3.select(domElement).append('svg')
     .attr('width', aWidth)
     .attr('height', aHeight)
 

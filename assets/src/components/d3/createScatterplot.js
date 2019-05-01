@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import { margin } from '../../constants/chartConstants'
 
-function createScatterplot ({ data, width, height, el, tip, xAxisLabel, yAxisLabel }) {
+function createScatterplot ({ data, width, height, domElement, tip, xAxisLabel, yAxisLabel }) {
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   const x = d3.scaleLinear()
@@ -13,7 +13,7 @@ function createScatterplot ({ data, width, height, el, tip, xAxisLabel, yAxisLab
     .domain([0, 100])
     .range([aHeight - margin.bottom, margin.top])
 
-  const svg = d3.select(el).append('svg')
+  const svg = d3.select(domElement).append('svg')
     .attr('width', aWidth)
     .attr('height', aHeight)
 

@@ -1,11 +1,17 @@
+import React, { useState } from 'react'
 import createBarChart from './d3/createBarChart'
-import withResponsiveness from './withResponsiveness'
-import createChartComponent from './createChartComponent'
-import compose from '../util/compose'
+import useResponsiveness from '../hooks/useResponsiveness'
+import useCreateChart from '../hooks/useCreateChart'
 
-const BarChart = compose(
-  withResponsiveness,
-  createChartComponent
-)(createBarChart)
+function BarChart (props) {
+  const [domElement, setDomElement] = useState(null)
+
+  const [width, height] = useResponsiveness({ ...props, domElement })
+  useCreateChart({ ...props, domElement, width, height }, createBarChart)
+
+  return (
+    <div ref={domElement => setDomElement(domElement)} />
+  )
+}
 
 export default BarChart

@@ -2,10 +2,10 @@ import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import { margin } from '../../constants/chartConstants'
 
-function createMapChart ({ data, width, height, el, tip }) {
+function createMapChart ({ data, width, height, domElement, tip }) {
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
-  const svg = d3.select(el).append('svg')
+  const svg = d3.select(domElement).append('svg')
     .attr('width', aWidth)
     .attr('height', aHeight)
 

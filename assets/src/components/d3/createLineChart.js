@@ -4,7 +4,7 @@ import { margin } from '../../constants/chartConstants'
 import createSVG from './createSVG'
 import createLine from './createLine'
 
-function createLineChart ({ data, width, height, el }) {
+function createLineChart ({ data, width, height, domElement }) {
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   const x = d3.scaleLinear()
@@ -23,7 +23,7 @@ function createLineChart ({ data, width, height, el }) {
     .attr('transform', `translate(${margin.left},0)`)
     .call(d3.axisLeft(y))
 
-  const svg = createSVG({ el, width, height })
+  const svg = createSVG({ domElement, width, height })
 
   createLine({ svg, x, y, data })
 

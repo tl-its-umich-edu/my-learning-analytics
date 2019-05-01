@@ -1,11 +1,17 @@
+import React, { useState } from 'react'
 import createLineChart from './d3/createLineChart'
-import withResponsiveness from './withResponsiveness'
-import createChartComponent from './createChartComponent'
-import compose from '../util/compose'
+import useResponsiveness from '../hooks/useResponsiveness'
+import useCreateChart from '../hooks/useCreateChart'
 
-const LineChart = compose(
-  withResponsiveness,
-  createChartComponent
-)(createLineChart)
+function LineChart (props) {
+  const [domElement, setDomElement] = useState(null)
+
+  const [width, height] = useResponsiveness({ ...props, domElement })
+  useCreateChart({ ...props, domElement, width, height }, createLineChart)
+
+  return (
+    <div ref={domElement => setDomElement(domElement)} />
+  )
+}
 
 export default LineChart
