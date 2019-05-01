@@ -42,6 +42,7 @@ const defaultFetchOptions = {
 }
 
 function FilesAccessed (props) {
+  console.log("Files Accessed")
   const { classes, match } = props
   const currentSetting = 'My current setting'
   const rememberSetting = 'Remember my setting'
