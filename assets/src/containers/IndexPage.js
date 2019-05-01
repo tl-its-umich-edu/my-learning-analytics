@@ -23,7 +23,7 @@ const styles = theme => ({
   }
 })
 
-function IndexPage(props) {
+function IndexPage (props) {
   const { classes, match } = props
   const courseId = match.params.courseId
   const [loaded, courseInfo] = useCourseInfo(courseId)
@@ -50,7 +50,7 @@ function IndexPage(props) {
               </Link>
             )}
           </Grid>
-        : <Spinner />}
+          : <Spinner />}
       </Grid>
     </Grid>
   )
