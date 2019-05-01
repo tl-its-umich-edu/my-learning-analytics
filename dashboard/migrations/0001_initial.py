@@ -95,17 +95,6 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='FileAccess',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('access_time', models.DateTimeField(verbose_name='Access Time')),
-                ('file_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dashboard.File', verbose_name='File')),
-            ],
-            options={
-                'db_table': 'file_access',
-            },
-        ),
-        migrations.CreateModel(
             name='Submission',
             fields=[
                 ('id', models.CharField(max_length=255, primary_key=True, serialize=False, verbose_name='Submission Id')),
@@ -133,7 +122,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='User',
             fields=[
-                ('id', models.CharField(max_length=255, primary_key=True, serialize=False, verbose_name='User Id')),
+                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='Table Id')),
+                ('user_id', models.CharField(blank=False, max_length=255, null=False, verbose_name='User Id')),
                 ('name', models.CharField(max_length=255, verbose_name='Name')),
                 ('sis_id', models.CharField(blank=True, max_length=255, null=True, verbose_name='SIS Id')),
                 ('sis_name', models.CharField(blank=True, max_length=255, null=True, verbose_name='SIS Name')),
@@ -168,6 +158,19 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'course_view_option',
+                'verbose_name': 'Course View Option',
+            },
+        ),
+        migrations.CreateModel(
+            name='FileAccess',
+            fields=[
+                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='Table Id')),
+                ('file_id', models.CharField(blank=True, max_length=255, null=False, verbose_name='File Id')),
+                ('user_id', models.CharField(blank=True, max_length=255, null=False, verbose_name='User Id')),
+                ('access_time', models.DateTimeField(verbose_name='Access Time')),
+            ],
+            options={
+                'db_table': 'file_access',
             },
         ),
         migrations.AlterUniqueTogether(
@@ -179,17 +182,8 @@ class Migration(migrations.Migration):
             unique_together=set([('id', 'course_id')]),
         ),
         migrations.AddField(
-            model_name='fileaccess',
-            name='user_id',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dashboard.User', verbose_name='User'),
-        ),
-        migrations.AddField(
             model_name='course',
             name='term_id',
             field=models.ForeignKey(db_column='term_id', db_constraint=False, null=True, on_delete=django.db.models.deletion.SET_NULL, to='dashboard.AcademicTerms', verbose_name='Term Id'),
-        ),
-        migrations.AlterUniqueTogether(
-            name='fileaccess',
-            unique_together=set([('file_id', 'user_id')]),
         ),
     ]

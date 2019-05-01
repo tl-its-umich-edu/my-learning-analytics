@@ -254,7 +254,8 @@ class UnizinMetadata(models.Model):
 
 
 class User(models.Model):
-    id = models.CharField(primary_key=True, max_length=255, verbose_name="User Id")
+    id = models.AutoField(primary_key=True, verbose_name="Table Id")
+    user_id = models.CharField(null=False, blank=False, max_length=255, verbose_name="User Id")
     name = models.CharField(max_length=255, verbose_name="Name")
     sis_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="SIS Id")
     sis_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="SIS Name")
@@ -270,8 +271,9 @@ class User(models.Model):
         unique_together = (('id', 'course_id'),)
 
 class FileAccess(models.Model):
-    file_id = models.ForeignKey(File, on_delete=models.CASCADE, verbose_name="File")
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="User")
+    id = models.AutoField(primary_key=True, verbose_name="Table Id")
+    file_id = models.CharField(blank=True, max_length=255, null=False, verbose_name='File Id')
+    user_id = models.CharField(blank=True, max_length=255, null=False, verbose_name='User Id')
     access_time = models.DateTimeField(verbose_name="Access Time")
 
     def __str__(self):
@@ -279,4 +281,3 @@ class FileAccess(models.Model):
 
     class Meta:
         db_table = 'file_access'
-        unique_together = (('file_id', 'user_id'),)
