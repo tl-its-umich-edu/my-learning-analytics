@@ -3,7 +3,7 @@ import { adjustViewport } from '../../util/chart'
 import d3tip from 'd3-tip'
 import './createFileAccessChart.css'
 
-function createFileAccessChart ({ data, width, height, el }) {
+function createFileAccessChart ({ data, width, height, domElement }) {
     /*
             References:
                 - https://bl.ocks.org/mbostock/34f08d5e11952a80609169b7917d4172
@@ -144,7 +144,7 @@ function createFileAccessChart ({ data, width, height, el }) {
         mini_height = main_height 
 
     // Build the chart
-    let svg = d3.select(el).append("svg")
+    let svg = d3.select(domElement).append("svg")
         .attr("class", "svgWrapper")
         .attr("width", main_width + main_margin.left + main_margin.right + mini_width + mini_margin.left + mini_margin.right)
         .attr("height", main_height + main_margin.top + main_margin.bottom)

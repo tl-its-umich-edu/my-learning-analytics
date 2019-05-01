@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 
-function createProgressBar ({ data, width, height, el, tip }) {
+function createProgressBar ({ data, width, height, domElement, tip }) {
   const margin = { top: 20, right: 20, bottom: 20, left: 50 }
   let [aWidth, aHeight] = adjustViewport(width, height, margin)
 
@@ -28,7 +28,7 @@ function createProgressBar ({ data, width, height, el, tip }) {
   const y = d3.scaleBand()
     .range([aHeight - margin.bottom, margin.top])
 
-  const svg = d3.select(el).append('svg')
+  const svg = d3.select(domElement).append('svg')
     .attr('width', aWidth)
     .attr('height', aHeight)
 
@@ -52,9 +52,9 @@ function createProgressBar ({ data, width, height, el, tip }) {
     .style('outline-color', 'rgb(255, 255, 255)')
     .style('outline-style', 'solid')
     .style('outline-width', '1px')
-    .on('mouseover',function () {
+    .on('mouseover', function () {
       const x = d3.mouse(this)[0]
-      const percentVariation = ((aWidth - x)/aWidth)*100
+      const percentVariation = ((aWidth - x) / aWidth) * 100
       if (percentVariation < 7) {
         tipPosition('sw')
       } else {
