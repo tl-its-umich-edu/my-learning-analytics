@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react'
 import { createResize } from '../util/chart'
 
 const useResponsiveness = props => {
-  const { el, aspectRatio = 0.75 } = props
+  const { domElement, aspectRatio = 0.75 } = props
   const [width, setWidth] = useState(null)
 
   const setContainer = () => {
-    if (el) {
-      setWidth(el.getBoundingClientRect().width)
+    if (domElement) {
+      setWidth(domElement.getBoundingClientRect().width)
     }
   }
 
