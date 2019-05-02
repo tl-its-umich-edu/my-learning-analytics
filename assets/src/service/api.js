@@ -1,6 +1,7 @@
 import useFetch from '../hooks/useFetch'
 
-export const useGradeData = courseId => useFetch(`http://localhost:5001/api/v1/courses/${courseId}/grade_distribution`)
-export const useAssignmentPlanningData = (courseId, assignmentFilter) => useFetch(`http://localhost:5001/api/v1/courses/${courseId}/assignments?percent=${assignmentFilter}`)
-export const useFilesAccessedAssignmentData = courseId => useFetch(`http://localhost:5001/api/v1/courses/${courseId}/assignments?percent=0`)
-export const useCourseInfo = courseId => useFetch(`http://localhost:5001/api/v1/courses/${courseId}/info`)
+export const useGradeData = (currentCourseId) => useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/grade_distribution`)
+export const useAssignmentPlanningData = (currentCourseId, assignmentFilter) => useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/assignments?percent=${assignmentFilter}`)
+export const useFilesAccessedData = (currentCourseId, startWeek, endWeek, gradeRange) => useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/file_access_within_week?week_num_start=${startWeek}&week_num_end=${endWeek}&grade=${gradeRange}`)
+export const useCourseInfo = (currentCourseId) => useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/info`)
+export const useUserSettingData = (currentCourseId) => useFetch(`http://localhost:5001/api/v1/courses/${currentCourseId}/get_user_default_selection?default_type=file`)

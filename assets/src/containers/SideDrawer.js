@@ -8,7 +8,6 @@ import ListItemText from '@material-ui/core/ListItemText'
 import { Link, withRouter } from 'react-router-dom'
 import routes from '../routes/routes'
 import Spinner from '../components/Spinner'
-import { useCourseInfo } from '../service/api'
 
 const styles = {
   list: {
@@ -27,19 +26,18 @@ function SideDrawer (props) {
     classes,
     toggleDrawer,
     sideDrawerState,
-    location
+    courseId,
+    courseInfo
   } = props
 
-  const courseId = location.pathname.split('/')[1]
   const [selectedIndex, setSelectedIndex] = useState(false)
-  const [loaded, courseInfo] = useCourseInfo(courseId)
   const [activeCourseViews, setActiveCourseViews] = useState({})
 
   useEffect(() => {
-    if (loaded) {
+    if (courseInfo) {
       setActiveCourseViews(courseInfo.course_view_options)
     }
-  }, [loaded])
+  }, [courseInfo])
 
   const sideList = (
     <div className={classes.list}>
@@ -67,11 +65,10 @@ function SideDrawer (props) {
           tabIndex={0}
           role='button'
           onClick={() => toggleDrawer(!sideDrawerState)}
-          onKeyDown={() => toggleDrawer(!sideDrawerState)}
-        >
-          {loaded
+          onKeyDown={() => toggleDrawer(!sideDrawerState)} >
+          {courseInfo
             ? sideList
-          : <Spinner />}
+            : <Spinner />}
         </div>
       </Drawer>
     </div>

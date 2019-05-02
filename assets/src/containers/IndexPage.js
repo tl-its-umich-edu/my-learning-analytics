@@ -24,21 +24,19 @@ const styles = theme => ({
 })
 
 function IndexPage (props) {
-  const { classes, match } = props
-  const courseId = match.params.courseId
-  const [loaded, courseInfo] = useCourseInfo(courseId)
+  const { classes, courseInfo, courseId } = props
   const [activeCourseViews, setActiveCourseViews] = useState({})
 
   useEffect(() => {
-    if (loaded) {
+    if (courseInfo) {
       setActiveCourseViews(courseInfo.course_view_options)
     }
-  }, [loaded])
+  }, [courseInfo])
 
   return (
     <Grid container spacing={16} className={classes.root}>
       <Grid item xs={12} className={classes.container}>
-        {loaded
+        {courseInfo
           ? <Grid
             container
             className={classes.wrapper}

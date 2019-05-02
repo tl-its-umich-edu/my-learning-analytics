@@ -24,9 +24,8 @@ const styles = theme => ({
 })
 
 function GradeDistribution (props) {
-  const { classes, match } = props
-  const currentCourseId = match.params.courseId
-  const [loaded, gradeData] = useGradeData(currentCourseId)
+  const { classes, courseId } = props
+  const [loaded, gradeData] = useGradeData(courseId)
 
   const buildGradeView = gradeData => {
     if (!gradeData || Object.keys(gradeData).length === 0) {

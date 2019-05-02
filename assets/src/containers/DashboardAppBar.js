@@ -43,15 +43,12 @@ function DashboardAppBar (props) {
     onMenuBarClick,
     sideDrawerState,
     user,
-    location
+    courseId,
+    courseName
   } = props
-
-  const courseId = location.pathname.split('/')[1]
-  const path = `/${courseId}`
 
   // const [notificationEl, setNotificationEl] = useState(null)
   const [avatarEl, setAvatarEl] = useState(null)
-  const [loaded, courseInfo] = useCourseInfo(courseId)
   const avatarOpen = Boolean(avatarEl)
 
   return (
@@ -67,7 +64,7 @@ function DashboardAppBar (props) {
           </IconButton>
           <Button>
             <Typography variant='h6' color='inherit' className={classes.grow}>
-              <Link to={path} className={classes.homeButton}>My Learning Analytics: {loaded ? courseInfo.name : null} </Link>
+              <Link to={courseId} className={classes.homeButton}>My Learning Analytics: {courseName} </Link>
             </Typography>
           </Button>
           <div className={classes.grow} />

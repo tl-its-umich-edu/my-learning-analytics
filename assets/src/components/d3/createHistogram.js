@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import { roundToOneDecimcal } from '../../util/math'
 
-function createHistogram ({ data, width, height, el, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100 }) {
+function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100 }) {
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
@@ -18,7 +18,7 @@ function createHistogram ({ data, width, height, el, xAxisLabel, yAxisLabel, myG
     .domain([0, d3.max(bins, d => d.length)]).nice()
     .range([aHeight - margin.bottom, margin.top])
 
-  const svg = d3.select(el).append('svg')
+  const svg = d3.select(domElement).append('svg')
     .attr('width', aWidth)
     .attr('height', aHeight)
 
