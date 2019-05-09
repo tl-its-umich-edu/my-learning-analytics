@@ -5,6 +5,7 @@ import Grid from '@material-ui/core/Grid'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import { Typography } from '@material-ui/core'
+import Cookie from 'js-cookie'
 
 const styles = theme => ({
   root: {
@@ -31,17 +32,36 @@ function Login (props) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
+  const csrfToken = Cookie.get('csrftoken')
+
   const handleSubmit = () => {
-    // make post request here
+    const formData = new FormData()
+
+    formData.append('csrfmiddlewaretoken', csrfToken)
+    formData.append('username', username)
+    formData.append('password', password)
+
+    const fetchOptions = {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      credentials: 'include',
+      body: formData
+    }
+
+    fetch('http://localhost:5001/accounts/login', fetchOptions)
+      .then(x => console.log(x))
   }
 
   return (
     <div className={classes.root}>
       <Grid container justify='center'>
-        <Grid item xs={7} >
+        <Grid item xs={7} md={5} lg={4}>
           <Paper className={classes.paper}>
             <Typography variant='h6' gutterBottom>Sign in to My Learning Analytics</Typography>
-            <form onSubmit={handleSubmit} style={{ overflow: 'hidden' }}>
+            <form style={{ overflow: 'hidden' }}>
               <TextField
                 label='Username'
                 className={classes.textField}
@@ -54,7 +74,7 @@ function Login (props) {
                 value={password}
                 onChange={event => setPassword(event.target.value)}
                 margin='normal' />
-              <Button variant='contained' color='primary' className={classes.button}>
+              <Button variant='contained' color='primary' className={classes.button} onClick={handleSubmit}>
                 Sign in
               </Button>
             </form>
