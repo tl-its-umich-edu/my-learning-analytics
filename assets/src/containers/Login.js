@@ -31,6 +31,7 @@ function Login (props) {
   const { classes } = props
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState(false)
 
   const csrfToken = Cookie.get('csrftoken')
 
@@ -52,7 +53,11 @@ function Login (props) {
     }
 
     fetch('http://localhost:5001/accounts/login', fetchOptions)
-      .then(x => console.log(x))
+      .then(res => {
+        const validLogin = res.redirected
+        console.log(validLogin)
+        setError(!validLogin)
+      })
   }
 
   return (
@@ -63,12 +68,14 @@ function Login (props) {
             <Typography variant='h6' gutterBottom>Sign in to My Learning Analytics</Typography>
             <form style={{ overflow: 'hidden' }}>
               <TextField
+                error={error}
                 label='Username'
                 className={classes.textField}
                 value={username}
                 onChange={event => setUsername(event.target.value)}
                 margin='normal' />
               <TextField
+                error={error}
                 label='Password'
                 className={classes.textField}
                 value={password}
