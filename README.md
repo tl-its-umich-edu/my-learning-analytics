@@ -138,6 +138,8 @@ Remove the --volumes to leave volumes without at least one container associated.
 This will remove everything! (images, containers, volumes)
 `docker system prune -a --volumes`
 
+*Docker stores MySQL data locally in the directory `.data`. If you want to fully clean you'll have to remove this folder.*
+
 ## Testing tips!
 
 1. Connect to the docker and edit some files!
@@ -163,7 +165,7 @@ Then you can edit your files! (Probably in /code/dashboard)
 
     A few variables are available to be defined in the .env file to enable this but minimally you have to set PTVSD_ENABLE=True. Currently docker-compose.yml opens 2 ports that can be used current, 3000 and 3001. If you need more you can open them. You can configure these with other variables. See the .env.sample for examples.
 
-    If you want to conenct to the cron job you'll have to use a different port as Django uses 3000 by default and also wait for attach.
+    If you want to connect to the cron job you'll have to use a different port as Django uses 3000 by default and also wait for attach.
 
     Set your breakpoints then run this command in the docker instance! Then connect to the cron configuration. The job will start when you attach the debugger.
     `PTVSD_WAIT_FOR_ATTACH=True PTVSD_ENABLE=TRUE PTVSD_REMOTE_PORT=3001 ./manage-ptvd.py runcrons --force`
