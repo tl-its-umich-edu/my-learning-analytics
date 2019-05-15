@@ -5,7 +5,6 @@ import SelectCard from '../components/SelectCard'
 import { Link } from 'react-router-dom'
 import routes from '../routes/routes'
 import Spinner from '../components/Spinner'
-import { useCourseInfo } from '../service/api'
 
 const styles = theme => ({
   root: {

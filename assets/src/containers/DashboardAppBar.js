@@ -10,7 +10,6 @@ import MenuIcon from '@material-ui/icons/Menu'
 import Avatar from '@material-ui/core/Avatar'
 import Popover from '@material-ui/core/Popover'
 import AvatarModal from '../components/AvatarModal'
-import { useCourseInfo } from '../service/api'
 
 const styles = theme => ({
   root: {
@@ -28,7 +27,8 @@ const styles = theme => ({
   },
   homeButton: {
     textDecoration: 'none',
-    color: 'white'
+    color: 'white',
+    textTransform:'capitalize'
   },
   roundButton: {
     borderRadius: '50%',
@@ -47,7 +47,6 @@ function DashboardAppBar (props) {
     courseName
   } = props
 
-  // const [notificationEl, setNotificationEl] = useState(null)
   const [avatarEl, setAvatarEl] = useState(null)
   const avatarOpen = Boolean(avatarEl)
 
@@ -64,7 +63,7 @@ function DashboardAppBar (props) {
           </IconButton>
           <Button>
             <Typography variant='h6' color='inherit' className={classes.grow}>
-              <Link to={courseId} className={classes.homeButton}>My Learning Analytics: {courseName} </Link>
+              <Link to={{pathname:`/${courseId}`}} className={classes.homeButton}>My Learning Analytics: {courseName} </Link>
             </Typography>
           </Button>
           <div className={classes.grow} />
