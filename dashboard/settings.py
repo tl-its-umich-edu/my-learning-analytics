@@ -376,6 +376,9 @@ CLIENT_CACHE_TIME = config("CLIENT_CACHE_TIME", default=3600, cast=int)
 
 CRON_BQ_IN_LIMIT = config("CRON_BQ_IN_LIMIT", default=20, cast=int)
 
+# Big Query
+EVENT_EDAPP_ID = config("EVENT_EDAPP_ID", default="http://umich.instructure.com/", cast=str)
+
 # IMPORT LOCAL SETTINGS
 # =====================
 try:
