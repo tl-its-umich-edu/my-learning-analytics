@@ -222,13 +222,6 @@ LOGGING = {
 }
 
 
-# IMPORT LOCAL SETTINGS
-# =====================
-try:
-    from settings_local import *
-except ImportError:
-    pass
-
 AUTHENTICATION_BACKENDS = ('django_su.backends.SuBackend',)
 
 #Shib
@@ -382,3 +375,10 @@ MAX_DEFAULT_WEEKS = config("MAX_DEFAULT_WEEKS", default=16, cast=int)
 CLIENT_CACHE_TIME = config("CLIENT_CACHE_TIME", default=3600, cast=int)
 
 CRON_BQ_IN_LIMIT = config("CRON_BQ_IN_LIMIT", default=20, cast=int)
+
+# IMPORT LOCAL SETTINGS
+# =====================
+try:
+    from settings_local import *
+except ImportError:
+    pass
