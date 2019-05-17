@@ -125,7 +125,7 @@ function FilesAccessed (props) {
   useEffect(() => {
     // Fetch data once all the setting data is fetched
     if (dataControllerLoad === 2) {
-      const dataURL = `http://localhost:5001/api/v1/courses/${currentCourseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRange}`
+      const dataURL = `http://localhost:5001/api/v1/courses/${courseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRange}`
       fetch(dataURL)
         .then(res => res.json())
         .then(data => {

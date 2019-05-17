@@ -28,17 +28,23 @@ function App (props) {
           sideDrawerState={sideDrawerState}
           user={user}
           courseName={loaded ? courseInfo.name : null}
-          courseId={courseId} />
+          courseId={courseId}/>
         <SideDrawer
           toggleDrawer={setSideDrawerState}
           sideDrawerState={sideDrawerState}
           courseId={courseId}
-          courseInfo={loaded ? courseInfo : null} />
+          courseInfo={loaded ? courseInfo : null}/>
         <Route path='/:courseId/' exact
-          render={props => <IndexPage {...props} courseInfo={loaded ? courseInfo : null} courseId={courseId} />} />
-        <Route path='/:courseId/grades' render={props => <GradeDistribution {...props} courseId={courseId} />} />
-        <Route path='/:courseId/assignment' render={props => <AssignmentPlanning {...props} courseId={courseId} />} />
-        <Route path='/:courseId/files' render={props => <FilesAccessed {...props} courseId={courseId} />} />
+               render={props => <IndexPage {...props} courseInfo={loaded ? courseInfo : null} courseId={courseId}/>}/>
+        <Route path='/:courseId/grades'
+               render={props => <GradeDistribution {...props} courseInfo={loaded ? courseInfo : null}
+                                                   courseId={courseId}/>}/>
+        <Route path='/:courseId/assignment'
+               render={props => <AssignmentPlanning {...props} courseInfo={loaded ? courseInfo : null}
+                                                    courseId={courseId}/>}/>
+        <Route path='/:courseId/files'
+               render={props => <FilesAccessed {...props} courseInfo={loaded ? courseInfo : null}
+                                               courseId={courseId}/>}/>
       </>
     </Router>
   )
