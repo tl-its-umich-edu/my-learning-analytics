@@ -36,9 +36,6 @@ engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}?cha
                                host = db_host,
                                port = db_port))
 
-local_time_zone = settings.TIME_ZONE
-
-
 # Split a list into *size* shorter pieces
 def split_list(a_list: list, size: int = 20):
     return [a_list[i:i + size] for i in range(0, len(a_list), size)]
@@ -217,7 +214,7 @@ class DashboardCronJob(CronJobBase):
         for data_warehouse_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
             # query to retrieve all file access events for one course
             # There is no catch if this query fails, event_store.events needs to exist
-            query = f"""select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS file_id,
+            query = """select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS file_id,
                     SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS user_id,
                     datetime(EVENT_TIME) as access_time
                     FROM event_store.events
@@ -303,7 +300,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         for data_warehouse_course_id in Course.objects.get_supported_courses():
             assignment_sql = f"""with assignment_info as
-                            (select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone '{local_time_zone}' as local_date,
+                            (select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone '{settings.TIME_ZONE}' as local_date,
                             ad.title AS name,af.course_id AS course_id,af.assignment_id AS id,
                             af.points_possible AS points_possible,af.assignment_group_id AS assignment_group_id
                             from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{data_warehouse_course_id}'
