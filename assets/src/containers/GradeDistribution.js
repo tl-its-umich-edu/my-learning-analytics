@@ -7,7 +7,6 @@ import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
 import { average, roundToOneDecimcal } from '../util/math'
-import { useGradeData } from '../service/api'
 
 const styles = theme => ({
   root: {

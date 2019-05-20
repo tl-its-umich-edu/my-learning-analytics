@@ -66,7 +66,7 @@ const assignmentTable = assignmentData => {
 }
 
 function AssignmentPlanning (props) {
-  const { classes, match } = props
+  const { classes, courseInfo, match } = props
   const currentSetting = 'My current setting'
   const rememberSetting = 'Remember my setting'
   const settingNotUpdated = 'Setting not updated'
@@ -76,6 +76,7 @@ function AssignmentPlanning (props) {
   // assignment data and weight controller
   const [assignmentFilter, setAssignmentFilter] = useState('')
   const [assignmentData, setAssignmentData] = useState('')
+  const [activeAssignmentView, setActiveAssignmentView] = useState(false)
 
   // defaults setting controllers
   const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
@@ -126,25 +127,34 @@ function AssignmentPlanning (props) {
   const firstUpdate = useRef(true)
 
   useEffect(() => {
-      const fetchOptions = { method: 'get', ...defaultFetchOptions }
-      const dataURL = `http://localhost:5001/api/v1/courses/${currentCourseId}/get_user_default_selection?default_type=assignment`
-      fetch(dataURL, fetchOptions)
-        .then(res => res.json())
-        .then(data => {
-          if (data.default === '') {
-            setAssignmentFilter(0)
-            setDefaultValue(0)
+      if (courseInfo) {
+        const ap = courseInfo.course_view_options.ap
+        const viewEnabled = ap === 1 ? true : false
 
-          } else {
-            setAssignmentFilter(data.default)
-            setDefaultValue(parseInt(data.default))
-          }
-        })
-    }, []
+        if (viewEnabled) {
+          const fetchOptions = { method: 'get', ...defaultFetchOptions }
+          const dataURL = `http://localhost:5001/api/v1/courses/${currentCourseId}/get_user_default_selection?default_type=assignment`
+          fetch(dataURL, fetchOptions)
+            .then(res => res.json())
+            .then(data => {
+              if (data.default === '') {
+                setAssignmentFilter(0)
+                setDefaultValue(0)
+
+              } else {
+                setAssignmentFilter(data.default)
+                setDefaultValue(parseInt(data.default))
+              }
+              setActiveAssignmentView(viewEnabled)
+
+            })
+        }
+      }
+    }, [courseInfo]
   )
   // https://stackoverflow.com/questions/53253940/make-react-useeffect-hook-not-run-on-initial-render
   // getting the assignment content call needs to happen after the defaults otherwise 2 data fetches happen
-  useEffect(() => {
+     useEffect(() => {
       if (firstUpdate.current) {
         firstUpdate.current = false
         return
@@ -158,7 +168,15 @@ function AssignmentPlanning (props) {
         })
     }, [assignmentFilter]
   )
-
+  if (!activeAssignmentView) {
+    return (
+      <Grid item xs={12}>
+        <Paper className={classes.paper}>
+          <p>Assignment View is hidden for this course</p>
+        </Paper>
+      </Grid>
+    )
+  }
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
