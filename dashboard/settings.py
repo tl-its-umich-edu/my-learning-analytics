@@ -436,6 +436,8 @@ CANVAS_FILE_POSTFIX = ENV.get("CANVAS_FILE_POSTFIX", "")
 # strings for construct file download url
 
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
+
+FILES_ACCESSED_CONFIG = ENV.get("FILES_ACCESSED_CONFIG", {})
 # IMPORT LOCAL ENV
 # =====================
 try:

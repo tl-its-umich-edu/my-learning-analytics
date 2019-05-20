@@ -3,6 +3,8 @@ from __future__ import print_function #python 3 support
 
 from django.db import connections as conns
 
+from dashboard.common import db_util
+
 import logging
 import datetime
 
@@ -210,28 +212,26 @@ class DashboardCronJob(CronJobBase):
         for data_warehouse_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
             # query to retrieve all file access events for one course
             # There is no catch if this query fails, event_store.events needs to exist
-            query = """select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS file_id,
-                    SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS user_id,
-                    datetime(EVENT_TIME) as access_time
-                    FROM event_store.events
-                    where JSON_EXTRACT_SCALAR(event, '$.edApp.id') = @edApp
-                    and type = 'NavigationEvent'
-                    and JSON_EXTRACT_SCALAR(event, '$.object.name') = 'attachment'
-                    and JSON_EXTRACT_SCALAR(event, '$.action') = 'NavigatedTo'
-                    and JSON_EXTRACT_SCALAR(event, '$.membership.member.id') is not null
-                    and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) IN UNNEST(@course_ids)
-                    """
-            logger.debug(query)
+
+            final_bq_query = []
+            for k, query_obj in settings.FILES_ACCESSED_CONFIG.items():
+                final_bq_query.append(query_obj['query'])
+            final_bq_query = "  UNION ALL   ".join(final_bq_query)
+
+            data_warehouse_course_ids_short = [db_util.incremented_id_to_canvas_id(id) for id in data_warehouse_course_ids]
+
+            logger.debug(final_bq_query)
             logger.debug(data_warehouse_course_ids)
             query_params = [
                 bigquery.ArrayQueryParameter('course_ids', 'STRING', data_warehouse_course_ids),
+                bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
                 bigquery.ScalarQueryParameter('edApp', 'STRING', settings.BIG_QUERY_ED_APP)
             ]
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
 
             # Location must match that of the dataset(s) referenced in the query.
-            bq_query = bigquery_client.query(query, location='US', job_config=job_config)
+            bq_query = bigquery_client.query(final_bq_query, location='US', job_config=job_config)
             #bq_query.result()
             df = bq_query.to_dataframe()
             total_bytes_billed += bq_query.total_bytes_billed
@@ -405,8 +405,11 @@ class DashboardCronJob(CronJobBase):
 
         logger.info("** file")
         if 'show_files_accessed' not in settings.VIEWS_DISABLED:
-            status += self.update_file()
-            status += self.update_with_bq_access()
+            try:
+                status += self.update_file()
+                status += self.update_with_bq_access()
+            except Exception as e:
+                logger.info(e)
 
         if settings.DATA_WAREHOUSE_IS_UNIZIN:
             logger.info("** informational")
