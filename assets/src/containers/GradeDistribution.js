@@ -41,9 +41,10 @@ function GradeDistribution (props) {
       fetch(dataURL, fetchOptions)
         .then(res => res.json())
         .then(data => setGradeData(data))
+    } else {
+      // this will save us from getting lost with spinner when view is disabled and no data is fetched
+      setGradeData({})
     }
-    // this will save us from getting lost with spinner when view is disabled and no data is fetched
-    setGradeData({})
   }, [viewIsActive])
 
   const buildGradeView = gradeData => {
