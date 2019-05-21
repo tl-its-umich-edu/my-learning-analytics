@@ -355,7 +355,7 @@ EARLIEST_TERM_DATE = config('EARLIEST_TERM_DATE', default='2016-11-15')
 
 # This is the ed_app field that will be used to query for Canvas file events
 
-BIG_QUERY_ED_APP = config('BIG_QUERY_ED_APP')
+BIG_QUERY_ED_APP = config('BIG_QUERY_ED_APP', default="http://umich.instructure.com/")
 
 # Time to run cron
 RUN_AT_TIMES = config('RUN_AT_TIMES', default="", cast= Csv())
