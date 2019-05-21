@@ -6,6 +6,7 @@ import GradeDistribution from './GradeDistribution'
 import AssignmentPlanning from './AssignmentPlanning'
 import FilesAccessed from './FilesAccessed'
 import IndexPage from './IndexPage'
+import Spinner from '../components/Spinner'
 import { useCourseInfo } from '../service/api'
 
 function App (props) {
@@ -22,30 +23,34 @@ function App (props) {
 
   return (
     <Router basename='/test/courses/'>
-      <>
-        <DashboardAppBar
-          onMenuBarClick={setSideDrawerState}
-          sideDrawerState={sideDrawerState}
-          user={user}
-          courseName={loaded ? courseInfo.name : null}
-          courseId={courseId} />
-        <SideDrawer
-          toggleDrawer={setSideDrawerState}
-          sideDrawerState={sideDrawerState}
-          courseId={courseId}
-          courseInfo={loaded ? courseInfo : null} />
-        <Route path='/:courseId/' exact
-          render={props => <IndexPage {...props} courseInfo={loaded ? courseInfo : null} courseId={courseId} />} />
-        <Route path='/:courseId/grades'
-          render={props => <GradeDistribution {...props} viewIsActive={loaded ? courseInfo.course_view_options.gd : null}
-            courseId={courseId} />} />
-        <Route path='/:courseId/assignment'
-          render={props => <AssignmentPlanning {...props} courseInfo={loaded ? courseInfo : null}
-            courseId={courseId} />} />
-        <Route path='/:courseId/files'
-          render={props => <FilesAccessed {...props} courseInfo={loaded ? courseInfo : null}
-            courseId={courseId} />} />
-      </>
+      {
+        loaded
+          ? <>
+            <DashboardAppBar
+              onMenuBarClick={setSideDrawerState}
+              sideDrawerState={sideDrawerState}
+              user={user}
+              courseName={courseInfo.name}
+              courseId={courseId} />
+            <SideDrawer
+              toggleDrawer={setSideDrawerState}
+              sideDrawerState={sideDrawerState}
+              courseId={courseId}
+              courseInfo={courseInfo} />
+            <Route path='/:courseId/' exact
+              render={props => <IndexPage {...props} courseInfo={courseInfo} courseId={courseId} />} />
+            <Route path='/:courseId/grades'
+              render={props => <GradeDistribution {...props} viewIsActive={!!courseInfo.course_view_options.gd}
+                courseId={courseId} />} />
+            <Route path='/:courseId/assignment'
+              render={props => <AssignmentPlanning {...props} courseInfo={courseInfo}
+                courseId={courseId} />} />
+            <Route path='/:courseId/files'
+              render={props => <FilesAccessed {...props} courseInfo={courseInfo}
+                courseId={courseId} />} />
+          </>
+          : <Spinner />
+      }
     </Router>
   )
 }
