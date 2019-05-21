@@ -35,19 +35,17 @@ function IndexPage (props) {
   return (
     <Grid container spacing={16} className={classes.root}>
       <Grid item xs={12} className={classes.container}>
-        {courseInfo
-          ? <Grid
-            container
-            className={classes.wrapper}
-            spacing={8}
-          >
-            {routes(courseId, activeCourseViews).map((props, key) =>
-              <Link style={{ textDecoration: 'none' }} to={props.path} key={key}>
-                <SelectCard cardData={props} />
-              </Link>
-            )}
-          </Grid>
-          : <Spinner />}
+        <Grid
+          container
+          className={classes.wrapper}
+          spacing={8}
+        >
+          {routes(courseId, activeCourseViews).map((props, key) =>
+            <Link style={{ textDecoration: 'none' }} to={props.path} key={key}>
+              <SelectCard cardData={props} />
+            </Link>
+          )}
+        </Grid>
       </Grid>
     </Grid>
   )
