@@ -60,12 +60,6 @@ Environment variables:
 `docker cp ~/secrets student_dashboard:/secrets`
 4. Initialize the MySQL database tables: `docker exec -it student_dashboard ./manage.py migrate`
 
-# Populate initial demo terms and courses
-
-Before adding adding initial terms and courses, ensure that the `CANVAS_DATA_ID_INCREMENT` environment variable is set correctly
-
-    docker exec -it student_dashboard bash ./demo_init.sh
-
 # Docker commands for running app
 
 Start the app
@@ -83,6 +77,13 @@ Tear down the app completely
 If you have problems you can connect direct into a specific container with the command
 
     `docker-compose run web /bin/bash
+    
+# Populate initial demo terms and courses
+
+Before adding adding initial terms and courses, ensure that the `CANVAS_DATA_ID_INCREMENT` environment variable is set correctly
+
+    `docker exec -it student_dashboard bash ./demo_init.sh`
+
 # Create a super user to test login.
 
 On the both local dev and remote the users are stored in the local database. However on local the users have to be created via the command line, on Openshift they are created either manually in the database or when logged in via Shibboleth.
