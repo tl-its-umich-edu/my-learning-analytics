@@ -1,0 +1,23 @@
+{
+	"canvas_data":
+		{
+		  "query": "select * from master",
+		  "ed_app": "''",
+		  "app_display_name": "Engage",
+		  "canvas_course_id_format": "SHORT"
+		}, 
+	"kaltura":
+		{
+		  "query": "select * from master",
+		  "ed_app": "''",
+		  "app_display_name": "Engage",
+		  "canvas_course_id_format": "SHORT"
+		}, 
+	"engage":
+		{
+		  "query": "select * from master",
+		  "ed_app": "''",
+		  "app_display_name": "Engage",
+		  "canvas_course_id_format": "SHORT"
+		}
+}

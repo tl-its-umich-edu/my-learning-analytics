@@ -218,7 +218,7 @@ class DashboardCronJob(CronJobBase):
                     SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS user_id,
                     datetime(EVENT_TIME) as access_time
                     FROM event_store.events
-                    where JSON_EXTRACT_SCALAR(event, '$.edApp.id') = 'http://umich.instructure.com/'
+                    where JSON_EXTRACT_SCALAR(event, '$.edApp.id') = @edApp
                     and type = 'NavigationEvent'
                     and JSON_EXTRACT_SCALAR(event, '$.object.name') = 'attachment'
                     and JSON_EXTRACT_SCALAR(event, '$.action') = 'NavigatedTo'
@@ -229,6 +229,7 @@ class DashboardCronJob(CronJobBase):
             logger.debug(data_warehouse_course_ids)
             query_params = [
                 bigquery.ArrayQueryParameter('course_ids', 'STRING', data_warehouse_course_ids),
+                bigquery.ScalarQueryParameter('edApp', 'STRING', settings.BIG_QUERY_ED_APP)
             ]
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
@@ -299,7 +300,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         for data_warehouse_course_id in Course.objects.get_supported_courses():
             assignment_sql = f"""with assignment_info as
-                            (select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone 'America/New_York' as local_date,
+                            (select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone '{settings.TIME_ZONE}' as local_date,
                             ad.title AS name,af.course_id AS course_id,af.assignment_id AS id,
                             af.points_possible AS points_possible,af.assignment_group_id AS assignment_group_id
                             from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{data_warehouse_course_id}'

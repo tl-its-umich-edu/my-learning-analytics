@@ -70,16 +70,19 @@ Before adding adding initial terms and courses, ensure that the `CANVAS_DATA_ID_
 
 Start the app
 
-    docker-compose up -d
+    `docker-compose up -d`
 
 Stop the app
 
-    docker-compose stop
+    `docker-compose stop`
 
 Tear down the app completely
 
-    docker-compose down
+    `docker-compose down`
 
+If you have problems you can connect direct into a specific container with the command
+
+    `docker-compose run web /bin/bash
 # Create a super user to test login.
 
 On the both local dev and remote the users are stored in the local database. However on local the users have to be created via the command line, on Openshift they are created either manually in the database or when logged in via Shibboleth.

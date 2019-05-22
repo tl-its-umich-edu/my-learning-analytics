@@ -200,7 +200,7 @@ def file_access_within_week(request, course_id=0):
     # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
     selfSqlString = "select CONCAT(f.id, ';', f.name) as file_id_name, count(*) as self_access_count, max(a.access_time) as self_access_last_time " \
                     "from file_access a, user u, file f " \
-                    "where a.user_id = u.id " \
+                    "where a.user_id = u.user_id " \
                     "and a.file_id = f.ID " \
                     "and u.sis_name=%(current_user)s " \
                     "group by CONCAT(f.id, ';', f.name)"
