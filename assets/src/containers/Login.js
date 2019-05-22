@@ -28,7 +28,7 @@ const styles = theme => ({
   }
 })
 
-function Login(props) {
+function Login (props) {
   const { classes } = props
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -67,44 +67,41 @@ function Login(props) {
       })
   }
 
-  return (
-    <>
-      {
-        authenticated
-          // this course id should be set programmatically
-          ? <Redirect to='/24693/' />
-          : <div className={classes.root}>
-            <Grid container justify='center'>
-              <Grid item xs={7} md={5} lg={4}>
-                <Paper className={classes.paper}>
-                  <Typography variant='h6' gutterBottom>Sign in to My Learning Analytics</Typography>
-                  <form style={{ overflow: 'hidden' }}>
-                    <TextField
-                      error={error}
-                      label='Username'
-                      className={classes.textField}
-                      value={username}
-                      onChange={event => setUsername(event.target.value)}
-                      margin='normal' />
-                    <TextField
-                      error={error}
-                      label='Password'
-                      type='password'
-                      className={classes.textField}
-                      value={password}
-                      onChange={event => setPassword(event.target.value)}
-                      margin='normal' />
-                    <Button variant='contained' color='primary' className={classes.button} onClick={handleSubmit}>
-                      Sign in
-                    </Button>
-                  </form>
-                </Paper>
-              </Grid>
-            </Grid>
-          </div>
-      }
-    </>
-  )
+  if (authenticated) return (<Redirect to='/24693/' />)
+
+  else {
+    return (
+      <div className={classes.root}>
+        <Grid container justify='center'>
+          <Grid item xs={7} md={5} lg={4}>
+            <Paper className={classes.paper}>
+              <Typography variant='h6' gutterBottom>Sign in to My Learning Analytics</Typography>
+              <form style={{ overflow: 'hidden' }}>
+                <TextField
+                  error={error}
+                  label='Username'
+                  className={classes.textField}
+                  value={username}
+                  onChange={event => setUsername(event.target.value)}
+                  margin='normal' />
+                <TextField
+                  error={error}
+                  label='Password'
+                  type='password'
+                  className={classes.textField}
+                  value={password}
+                  onChange={event => setPassword(event.target.value)}
+                  margin='normal' />
+                <Button variant='contained' color='primary' className={classes.button} onClick={handleSubmit}>
+                  Sign in
+                </Button>
+              </form>
+            </Paper>
+          </Grid>
+        </Grid>
+      </div>
+    )
+  }
 }
 
 export default withStyles(styles)(Login)
