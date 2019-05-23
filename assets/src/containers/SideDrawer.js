@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Drawer from '@material-ui/core/Drawer'
 import List from '@material-ui/core/List'
@@ -31,18 +31,11 @@ function SideDrawer (props) {
   } = props
 
   const [selectedIndex, setSelectedIndex] = useState(false)
-  const [activeCourseViews, setActiveCourseViews] = useState({})
-
-  useEffect(() => {
-    if (courseInfo) {
-      setActiveCourseViews(courseInfo.course_view_options)
-    }
-  }, [courseInfo])
 
   const sideList = (
     <div className={classes.list}>
       <List>
-        {routes(courseId, activeCourseViews).map((props, key) => (
+        {routes(courseId, courseInfo.course_view_options).map((props, key) => (
           <Link to={props.path} className={classes.sideDrawerLinks} key={key}>
             <ListItem
               button

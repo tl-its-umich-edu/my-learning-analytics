@@ -4,7 +4,6 @@ import Grid from '@material-ui/core/Grid'
 import SelectCard from '../components/SelectCard'
 import { Link } from 'react-router-dom'
 import routes from '../routes/routes'
-import Spinner from '../components/Spinner'
 
 const styles = theme => ({
   root: {
@@ -24,13 +23,6 @@ const styles = theme => ({
 
 function IndexPage (props) {
   const { classes, courseInfo, courseId } = props
-  const [activeCourseViews, setActiveCourseViews] = useState({})
-
-  useEffect(() => {
-    if (courseInfo) {
-      setActiveCourseViews(courseInfo.course_view_options)
-    }
-  }, [courseInfo])
 
   return (
     <Grid container spacing={16} className={classes.root}>
@@ -40,7 +32,7 @@ function IndexPage (props) {
           className={classes.wrapper}
           spacing={8}
         >
-          {routes(courseId, activeCourseViews).map((props, key) =>
+          {routes(courseId, courseInfo.course_view_options).map((props, key) =>
             <Link style={{ textDecoration: 'none' }} to={props.path} key={key}>
               <SelectCard cardData={props} />
             </Link>
