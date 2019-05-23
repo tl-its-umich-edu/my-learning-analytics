@@ -18,31 +18,26 @@
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 
     {% block css %} {% endblock %}
+    <script>
+        // Setup a top level js object to hold global values
+        var myla_globals = {
+        {% if course_id %}
+            "course_id": '{{ current_user_incremented_course_id }}',
+        {% else %}
+            "course_id": 0,
+        {% endif %}
+            "is_superuser": {{user.is_superuser|lower}},
+        {% if user.is_authenticated %}
+            "username": '{{ user.get_username }}',
+        {% else %}
+            "username": ""
+        {% endif %}
+
+        };
+    </script>
 </head>
 <body class="container-fluid">
     {% include "su/is_su.html" %}
-    <!--
-    <header class="row border-between">
-        <div class="col-md-4 text-left">
-            <a href="/courses/{{ current_user_course_id }}/">My Learning Analytics</a> {% if course_id %} : {{ course_name }} {% endif %}
-        </div>
-        <div class="col-md-4 text-center lead">
-            {% use_macro title %}
-        </div>
-        <div class="col-md-4 text-right">
-            {% if user.is_authenticated %}
-                <span id="help"></span>
-                <a href="{{ settings.LOGOUT_URL }}">Logout</a> ({{ user.get_username }})
-            {% else %}
-                <a href="{{ settings.LOGIN_URL }}">Login</a>
-            {% endif %}
-            {% if user.is_superuser %}
-                | <a href="/admin">Admin</a>
-            {% endif %}
-        </div>
-        <hr>
-    </header>
-    -->
     {% block content %}
     {% endblock %}
     <footer>
@@ -69,14 +64,6 @@
     });
 </script>
 {% endif %}
-<script>
-// Setup a top level js object to hold global values
-var dashboard = {
-{% if course_id %}"course_id": '{{ current_user_incremented_course_id }}',
-{% else %}"course_id": 0,
-{% endif %}
-};
-</script>
 <script src="{% static 'moment/min/moment.min.js' %}"></script>
 <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
 <script src="{% static 'angular/angular.js' %}"></script>
