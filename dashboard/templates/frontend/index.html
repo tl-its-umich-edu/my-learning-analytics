@@ -1,16 +1,15 @@
+{% extends 'base.html' %}
 {% load render_bundle from webpack_loader %}
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Django React Webpack</title>
+
+{% block title %}Webpack Frontend{% endblock %}
+
+{% block css %}
     <!-- Webpack rendered CSS -->
     {% render_bundle 'main' 'css' %}
-</head>
+{% endblock %}
 
-<body>
+{% block content %}
     <div id="root"></div>
     <!-- Webpack rendered JS -->
     {% render_bundle 'main' 'js' %}
-</body>
-</html>
+{% endblock %}

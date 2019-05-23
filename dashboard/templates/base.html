@@ -21,6 +21,7 @@
 </head>
 <body class="container-fluid">
     {% include "su/is_su.html" %}
+    <!--
     <header class="row border-between">
         <div class="col-md-4 text-left">
             <a href="/courses/{{ current_user_course_id }}/">My Learning Analytics</a> {% if course_id %} : {{ course_name }} {% endif %}
@@ -41,6 +42,7 @@
         </div>
         <hr>
     </header>
+    -->
     {% block content %}
     {% endblock %}
     <footer>
