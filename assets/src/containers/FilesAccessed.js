@@ -51,7 +51,7 @@ function FilesAccessed (props) {
   const [weekRange, setWeekRange] = useState([]) // Should be depend on curWeek
   const [saveSettingState, setSaveSetting] = useState(false)
   const [gradeRange, setGradeRange] = useState('All') // Should be fetched from default
-  const [infoLoaded, infoData] = useCourseInfo(courseId)
+  const [infoLoaded, error, infoData] = useCourseInfo(courseId)
   const [settingLoaded, settingData] = useUserSettingData(courseId) // Used to update default setting
   const [fileAccessData, setFileAccessData] = useState([])
   const [fileAccessDataLoaded, setFileAccessDataLoaded] = useState(false)
