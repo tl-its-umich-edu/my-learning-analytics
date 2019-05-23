@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
+import Typography from '@material-ui/core/Typography'
 import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
 import GradeDistribution from './GradeDistribution'
@@ -7,12 +8,14 @@ import AssignmentPlanning from './AssignmentPlanning'
 import FilesAccessed from './FilesAccessed'
 import IndexPage from './IndexPage'
 import Spinner from '../components/Spinner'
+import Error from './Error'
 import { useCourseInfo } from '../service/api'
 
-function App (props) {
+function App(props) {
   const { match } = props
   const courseId = match.params.courseId
-  const [loaded, courseInfo] = useCourseInfo(courseId)
+  const [loaded, error, courseInfo] = useCourseInfo(courseId)
+  const [validCourse, setValidCourse] = useState(false)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
   const user = {
@@ -20,6 +23,8 @@ function App (props) {
     lastName: 'Lee',
     email: 'something@something.ca'
   }
+
+  if (error) return (<Error>Something went wrong, please try again later.</Error>)
 
   return (
     <Router basename='/test/courses/'>

@@ -11,6 +11,11 @@ const defaultFetchOptions = {
   credentials: 'include'
 }
 
+const handleError = res => {
+  if (!res.ok) throw Error(res.statusText)
+  return res
+}
+
 const useFetch = (dataURL, options) => {
   const fetchOptions = options
     ? { ...options, ...defaultFetchOptions }
@@ -18,6 +23,7 @@ const useFetch = (dataURL, options) => {
 
   const [data, setData] = useState(null)
   const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     if (fetchOptions.method === 'get') {
@@ -28,24 +34,28 @@ const useFetch = (dataURL, options) => {
       } else {
         setLoaded(false)
         fetch(dataURL, fetchOptions)
+          .then(handleError)
           .then(res => res.json())
           .then(data => {
             cache.set(dataURL, data)
             setData(data)
             setLoaded(true)
           })
+          .catch(error => setError(error))
       }
     } else {
       fetch(dataURL, fetchOptions)
+        .then(handleError)
         .then(res => res.json())
         .then(data => {
           setData(data)
           setLoaded(true)
         })
+        .catch(error => setError(error.message))
     }
   }, [dataURL])
 
-  return [loaded, data]
+  return [loaded, error, data]
 }
 
 export default useFetch
