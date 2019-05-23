@@ -32,7 +32,7 @@ function App (props) {
   }, [loaded])
 
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
-  if (loaded && !validCourse) return (<Error>Sorry, MyLA is not active for this course</Error>)
+  if (loaded && !validCourse) return (<Error>Tool is not enabled for this course.</Error>)
 
   return (
     <Router basename='/test/courses/'>

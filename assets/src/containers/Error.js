@@ -23,7 +23,7 @@ function Error (props) {
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Typography variant='h5' gutterBottom>{children}</Typography>
+            <Typography variant='h5' color='error' gutterBottom>{children}</Typography>
           </Paper>
         </Grid>
       </Grid>
