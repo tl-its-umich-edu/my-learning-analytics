@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
@@ -15,7 +15,6 @@ function App (props) {
   const { match } = props
   const courseId = match.params.courseId
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
-  const [validCourse, setValidCourse] = useState(false)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
   // this is temporary
@@ -25,19 +24,13 @@ function App (props) {
     email: 'something@something.ca'
   }
 
-  useEffect(() => {
-    if (loaded && !isObjectEmpty(courseInfo)) {
-      setValidCourse(true)
-    }
-  }, [loaded])
-
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
-  if (loaded && !validCourse) return (<Error>Tool is not enabled for this course.</Error>)
+  if (loaded && isObjectEmpty(courseInfo)) return (<Error>Tool is not enabled for this course.</Error>)
 
   return (
     <Router basename='/test/courses/'>
       {
-        validCourse
+        loaded
           ? <>
             <DashboardAppBar
               onMenuBarClick={setSideDrawerState}
