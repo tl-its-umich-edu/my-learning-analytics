@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
@@ -6,7 +6,10 @@ import Typography from '@material-ui/core/Typography'
 import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
+import Error from './Error'
 import { average, roundToOneDecimcal } from '../util/math'
+import { useGradeData } from '../service/api'
+import { isObjectEmpty } from '../util/object'
 
 const styles = theme => ({
   root: {
@@ -22,39 +25,15 @@ const styles = theme => ({
   }
 })
 
-const defaultFetchOptions = {
-  headers: {
-    'Accept': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest'
-  },
-  credentials: 'include'
-}
-
 function GradeDistribution (props) {
   const { classes, viewIsActive, courseId } = props
-  const [gradeData, setGradeData] = useState(null)
+  const [loaded, error, gradeData] = useGradeData(courseId)
 
-  useEffect(() => {
-    if (viewIsActive) {
-      const fetchOptions = { method: 'get', ...defaultFetchOptions }
-      const dataURL = `http://localhost:5001/api/v1/courses/${courseId}/grade_distribution`
-      fetch(dataURL, fetchOptions)
-        .then(res => res.json())
-        .then(data => setGradeData(data))
-    } else {
-      // this will save us from getting lost with spinner when view is disabled and no data is fetched
-      setGradeData({})
-    }
-  }, [viewIsActive])
+  if (!viewIsActive) return (<Error>Grade Distribution view is hidden for this course.</Error>)
+  if (error) return (<Error>Something went wrong, please try again later.</Error>)
+  if (loaded && isObjectEmpty(gradeData)) return (<Error>No data provided</Error>)
 
   const buildGradeView = gradeData => {
-    if (!viewIsActive) {
-      return (<Typography>Grade Distribution view is hidden for this course.</Typography>)
-    }
-
-    if (!gradeData || Object.keys(gradeData).length === 0) {
-      return (<Typography>No data provided</Typography>)
-    }
     return (
       <Grid container>
         <Grid item xs={12} lg={2}>
@@ -87,7 +66,7 @@ function GradeDistribution (props) {
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom>Grade Distribution</Typography>
             {
-              gradeData
+              loaded
                 ? buildGradeView(gradeData)
                 : <Spinner />
             }
