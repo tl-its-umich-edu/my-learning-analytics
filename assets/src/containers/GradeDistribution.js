@@ -26,8 +26,8 @@ const styles = theme => ({
 })
 
 function GradeDistribution (props) {
-  const { classes, viewIsActive, courseId } = props
-  if (!viewIsActive) return (<Error>Grade Distribution view is hidden for this course.</Error>)
+  const { classes, disabled, courseId } = props
+  if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
 
   const [loaded, error, gradeData] = useGradeData(courseId)
   if (error) return (<Error>Something went wrong, please try again later.</Error>)

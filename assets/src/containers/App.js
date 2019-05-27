@@ -46,7 +46,7 @@ function App (props) {
             <Route path='/:courseId/' exact
               render={props => <IndexPage {...props} courseInfo={courseInfo} courseId={courseId} />} />
             <Route path='/:courseId/grades'
-              render={props => <GradeDistribution {...props} viewIsActive={!!courseInfo.course_view_options.gd}
+              render={props => <GradeDistribution {...props} disabled={!courseInfo.course_view_options.gd}
                 courseId={courseId} />} />
             <Route path='/:courseId/assignment'
               render={props => <AssignmentPlanning {...props} courseInfo={courseInfo}
