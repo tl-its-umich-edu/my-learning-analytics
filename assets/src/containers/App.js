@@ -17,7 +17,7 @@ function App () {
   }
 
   return (
-    <Router basename='/test/courses/'>
+    <Router basename='/courses/'>
       <div>
         <DashboardAppBar onMenuBarClick={setSideDrawerState} sideDrawerState={sideDrawerState} user={user} />
         <SideDrawer toggleDrawer={setSideDrawerState} sideDrawerState={sideDrawerState} />
