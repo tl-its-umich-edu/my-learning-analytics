@@ -1,20 +1,9 @@
 /* global fetch */
 import { useState, useEffect } from 'react'
+import {handleError, defaultFetchOptions} from '../util/data'
 
 const cache = new Map()
 
-const defaultFetchOptions = {
-  headers: {
-    'Accept': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest'
-  },
-  credentials: 'include'
-}
-
-const handleError = res => {
-  if (!res.ok) throw Error(res.statusText)
-  return res
-}
 
 const useFetch = (dataURL, options) => {
   const fetchOptions = options

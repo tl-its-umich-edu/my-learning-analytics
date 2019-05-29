@@ -49,7 +49,7 @@ function App (props) {
               render={props => <GradeDistribution {...props} disabled={!courseInfo.course_view_options.gd}
                 courseId={courseId} />} />
             <Route path='/:courseId/assignment'
-              render={props => <AssignmentPlanning {...props} courseInfo={courseInfo}
+              render={props => <AssignmentPlanning {...props} disabled={!courseInfo.course_view_options.ap}
                 courseId={courseId} />} />
             <Route path='/:courseId/files'
               render={props => <FilesAccessed {...props} courseInfo={courseInfo}
