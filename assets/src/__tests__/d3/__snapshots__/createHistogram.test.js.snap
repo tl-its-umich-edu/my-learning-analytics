@@ -1161,7 +1161,6 @@ exports[`createHistogram should build a histogram 1`] = `
       <text
         dy="-4"
         fill="rgba(0, 0, 0, 0.87)"
-        font-family="Roboto Helvetica Arial sans-serif"
         font-size="0.875rem"
         font-weight="400"
         line-height="1.46429em"
@@ -1264,7 +1263,6 @@ exports[`createHistogram should build a histogram 1`] = `
         <text
           dy="-4"
           fill="rgba(0, 0, 0, 0.87)"
-          font-family="Roboto Helvetica Arial sans-serif"
           font-size="0.875rem"
           font-weight="400"
           line-height="1.46429em"
@@ -2438,7 +2436,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line 1`
       <text
         dy="-4"
         fill="rgba(0, 0, 0, 0.87)"
-        font-family="Roboto Helvetica Arial sans-serif"
         font-size="0.875rem"
         font-weight="400"
         line-height="1.46429em"
@@ -2541,7 +2538,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line 1`
         <text
           dy="-4"
           fill="rgba(0, 0, 0, 0.87)"
-          font-family="Roboto Helvetica Arial sans-serif"
           font-size="0.875rem"
           font-weight="400"
           line-height="1.46429em"
@@ -2560,7 +2556,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line 1`
       y2="0"
     />
     <text
-      font-family="Roboto Helvetica Arial sans-serif"
       font-size="0.875rem"
       font-weight="bold"
       line-height="1.46429em"
@@ -3848,7 +3843,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line an
       <text
         dy="-4"
         fill="rgba(0, 0, 0, 0.87)"
-        font-family="Roboto Helvetica Arial sans-serif"
         font-size="0.875rem"
         font-weight="400"
         line-height="1.46429em"
@@ -3951,7 +3945,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line an
         <text
           dy="-4"
           fill="rgba(0, 0, 0, 0.87)"
-          font-family="Roboto Helvetica Arial sans-serif"
           font-size="0.875rem"
           font-weight="400"
           line-height="1.46429em"
@@ -3970,7 +3963,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line an
       y2="0"
     />
     <text
-      font-family="Roboto Helvetica Arial sans-serif"
       font-size="0.875rem"
       font-weight="bold"
       line-height="1.46429em"
