@@ -27,7 +27,8 @@ const styles = theme => ({
   },
   homeButton: {
     textDecoration: 'none',
-    color: 'white'
+    color: 'white',
+    textTransform:'capitalize'
   },
   roundButton: {
     borderRadius: '50%',
@@ -37,11 +38,16 @@ const styles = theme => ({
 })
 
 function DashboardAppBar (props) {
-  const { classes, onMenuBarClick, sideDrawerState, user } = props
+  const {
+    classes,
+    onMenuBarClick,
+    sideDrawerState,
+    user,
+    courseId,
+    courseName
+  } = props
 
-  // const [notificationEl, setNotificationEl] = useState(null)
   const [avatarEl, setAvatarEl] = useState(null)
-
   const avatarOpen = Boolean(avatarEl)
 
   return (
@@ -57,7 +63,7 @@ function DashboardAppBar (props) {
           </IconButton>
           <Button>
             <Typography variant='h6' color='inherit' className={classes.grow}>
-              <Link to='/' className={classes.homeButton}>My Learning Analytics</Link>
+              <Link to={{pathname:`/${courseId}`}} className={classes.homeButton}>My Learning Analytics: {courseName} </Link>
             </Typography>
           </Button>
           <div className={classes.grow} />

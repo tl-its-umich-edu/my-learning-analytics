@@ -9,9 +9,11 @@ import RangeSlider from '../components/RangeSlider'
 import FormControl from '@material-ui/core/FormControl'
 import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
-import { useInfoData, useUserSettingData } from '../service/api'
+import { useUserSettingData } from '../service/api'
+import { handleError, defaultFetchOptions } from '../util/data'
 import FileAccessChart from '../components/FileAccessChart'
 import Cookie from 'js-cookie'
+import Error from './Error'
 
 const styles = theme => ({
   root: {
@@ -33,30 +35,19 @@ const styles = theme => ({
   },
 })
 
-const defaultFetchOptions = {
-  headers: {
-    'Accept': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest'
-  },
-  credentials: 'include'
-}
+const currentSetting = 'My current setting'
+const rememberSetting = 'Remember my setting'
+const settingNotUpdated = 'Setting not updated'
 
 function FilesAccessed (props) {
-  const { classes, match } = props
-  const currentSetting = 'My current setting'
-  const rememberSetting = 'Remember my setting'
-  const settingNotUpdated = 'Setting not updated'
-
-  const currentCourseId = match.params.courseId
+  const { classes, courseInfo, courseId } = props
+  if (!courseInfo.course_view_options.fa) return (<Error>Files view is hidden for this course.</Error>)
+  const [loaded, error, filesDefaultData] = useUserSettingData(courseId, 'file') // Used to update default setting
   const [minMaxWeek, setMinMaxWeek] = useState([]) // Should be updated from info
   const [curWeek, setCurWeek] = useState(0) // Should be updated from info
   const [weekRange, setWeekRange] = useState([]) // Should be depend on curWeek
-  const [saveSettingState, setSaveSetting] = useState(false)
-  const [gradeRange, setGradeRange] = useState('All') // Should be fetched from default
-  const [infoLoaded, infoData] = useInfoData(currentCourseId)
-  const [settingLoaded, settingData] = useUserSettingData(currentCourseId) // Used to update default setting
-  const [fileAccessData, setFileAccessData] = useState([])
-  const [fileAccessDataLoaded, setFileAccessDataLoaded] = useState(false)
+  const [gradeRangeFilter, setGradeRangeFilter] = useState('') // Should be fetched from default
+  const [fileAccessData, setFileAccessData] = useState('')
   const [dataControllerLoad, setDataControllerLoad] = useState(0)
   // initial default value that we get from backend and updated value when user save the default setting
   const [defaultValue, setDefaultValue] = useState('')
@@ -74,89 +65,102 @@ function FilesAccessed (props) {
     if (didUserChecked) {
       // Django rejects PUT/DELETE/POST calls with out CSRF token.
       const csrfToken = Cookie.get('csrftoken')
-      const body = { file: gradeRange }
-      const dataURL = `http://localhost:5001/api/v1/courses/${currentCourseId}/set_user_default_selection`
+      const body = { file: gradeRangeFilter }
+      const dataURL = `http://localhost:5001/api/v1/courses/${courseId}/set_user_default_selection`
 
       defaultFetchOptions.headers['X-CSRFToken'] = csrfToken
       defaultFetchOptions['method'] = 'PUT'
       defaultFetchOptions['body'] = JSON.stringify(body)
 
       fetch(dataURL, defaultFetchOptions)
+        .then(handleError)
         .then(res => res.json())
         .then(data => {
           const res = data.default
           if (res === 'success') {
-            setGradeRange(gradeRange)
+            setGradeRangeFilter(gradeRangeFilter)
             setDefaultCheckedState(true)
-            setDefaultValue(gradeRange)
+            setDefaultValue(gradeRangeFilter)
             return
           }
           setDefaultLabel(settingNotUpdated)
-        })
+        }).catch(err => {
+        setDefaultLabel(settingNotUpdated)
+      })
     }
   }
 
   useEffect(() => {
     // Fetch info data and update slider length, slider range, and current week
-    if (infoLoaded) {
-      setMinMaxWeek([1, infoData.total_weeks])
-      if (infoData.current_week_number > infoData.total_weeks) {
-        setWeekRange([1, infoData.total_weeks])
-      } else if (infoData.current_week_number < 3) {
-        setCurWeek(infoData.current_week_number)
-        setWeekRange([1, infoData.current_week_number])
+    if (courseInfo) {
+      const totalWeeks = courseInfo.total_weeks
+      const currentWeek = courseInfo.current_week_number
+
+      setMinMaxWeek([1, totalWeeks])
+      if (currentWeek > totalWeeks) {
+        setWeekRange([1, totalWeeks])
+      } else if (currentWeek < 3) {
+        setCurWeek(currentWeek)
+        setWeekRange([1, currentWeek])
       } else {
-        setCurWeek(infoData.current_week_number)
-        setWeekRange([infoData.current_week_number - 2, infoData.current_week_number])
+        setCurWeek(currentWeek)
+        setWeekRange([currentWeek - 2, currentWeek])
       }
       setDataControllerLoad(dataControllerLoad + 1)
     }
-  }, [infoLoaded])
+  }, [courseInfo])
 
   useEffect(() => {
     // Fetch grade range from default setting if any
-    if (settingLoaded) {
-      if (settingData.default !== '') {
-        setGradeRange(settingData.default)
-        setDefaultValue(settingData.default)
+    if (loaded) {
+      if (filesDefaultData.default !== '') {
+        setGradeRangeFilter(filesDefaultData.default)
+        setDefaultValue(filesDefaultData.default)
+      } else {
+        // setting it to default
+        setGradeRangeFilter('All')
+        setDefaultValue('All')
       }
       setDataControllerLoad(dataControllerLoad + 1)
     }
-  }, [settingLoaded])
+  }, [loaded])
 
   useEffect(() => {
     // Fetch data once all the setting data is fetched
     if (dataControllerLoad === 2) {
-      const dataURL = `http://localhost:5001/api/v1/courses/${currentCourseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRange}`
+      const dataURL = `http://localhost:5001/api/v1/courses/${courseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}`
       fetch(dataURL)
+        .then(handleError)
         .then(res => res.json())
         .then(data => {
           setFileAccessData(data)
-          setFileAccessDataLoaded(true)
+        })
+        .catch(err => {
+          setFileAccessData({})
         })
     }
-  }, [dataControllerLoad, weekRange, gradeRange])
+  }, [dataControllerLoad, weekRange, gradeRangeFilter])
 
   const onWeekChangeHandler = value => {
     // Update week range slider
     setWeekRange(value)
   }
 
-  const gradeRangeHandler = event => {
+  const onChangeGradeRangeHandler = event => {
     // Update grade range selection
     const value = event.target.value
-    setGradeRange(value)
-    if(defaultValue === value){
+    setGradeRangeFilter(value)
+    if (defaultValue === value) {
       setDefaultCheckedState(true)
       setDefaultLabel(currentSetting)
-    }else{
+    } else {
       setDefaultCheckedState(false)
       setDefaultLabel(rememberSetting)
     }
   }
 
   const FileAccessChartBuilder = (fileData) => {
-    if (!fileData || fileData.length === 0) {
+    if (!fileData || Object.keys(fileData).length === 0) {
       return (<p>No data provided</p>)
     }
     return (
@@ -168,14 +172,14 @@ function FilesAccessed (props) {
       </Grid>
     )
   }
-
+  if (error) return (<Error>Something went wrong, please try again later.</Error>)
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom className="title">Files Accessed</Typography>
-            {dataControllerLoad === 2 ? <RangeSlider
+            {dataControllerLoad == 2 ? <RangeSlider
               curWeek={curWeek}
               className="slider"
               startWeek={weekRange[0]}
@@ -190,8 +194,8 @@ function FilesAccessed (props) {
                 these grades:</p>
               <FormControl className={classes.formControl}>
                 <Select
-                  value={gradeRange}
-                  onChange={gradeRangeHandler}
+                  value={gradeRangeFilter}
+                  onChange={onChangeGradeRangeHandler}
                   inputProps={{
                     name: 'grade',
                     id: 'grade-range',
@@ -203,14 +207,14 @@ function FilesAccessed (props) {
                   <MenuItem value="70-79">70-79%</MenuItem>
                 </Select>
               </FormControl>
-                {defaultCheckboxState ? <div style={{ padding: '10px' }}></div> : <Checkbox
-                  checked={defaultCheckboxState}
-                  onChange={changeDefaultSetting}
-                  value="checked"
-                />}
-                <div style={{ padding: '15px 2px' }}>{defaultLabel}</div>
+              {defaultCheckboxState ? <div style={{ padding: '10px' }}></div> : <Checkbox
+                checked={defaultCheckboxState}
+                onChange={changeDefaultSetting}
+                value="checked"
+              />}
+              <div style={{ padding: '15px 2px' }}>{defaultLabel}</div>
             </div>
-            {fileAccessDataLoaded
+            {fileAccessData
               ? FileAccessChartBuilder(fileAccessData)
               : <Spinner/>}
           </Paper>

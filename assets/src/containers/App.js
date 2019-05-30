@@ -6,26 +6,57 @@ import GradeDistribution from './GradeDistribution'
 import AssignmentPlanning from './AssignmentPlanning'
 import FilesAccessed from './FilesAccessed'
 import IndexPage from './IndexPage'
+import Spinner from '../components/Spinner'
+import Error from './Error'
+import { isObjectEmpty } from '../util/object'
+import { useCourseInfo } from '../service/api'
 
-function App () {
+function App (props) {
+  const { match } = props
+  const courseId = match.params.courseId
+  const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
+  // this is temporary
   const user = {
     firstName: 'Justin',
     lastName: 'Lee',
     email: 'something@something.ca'
   }
 
+  if (error) return (<Error>Something went wrong, please try again later.</Error>)
+  if (loaded && isObjectEmpty(courseInfo)) return (<Error>Tool is not enabled for this course.</Error>)
+
   return (
     <Router basename='/test/courses/'>
-      <div>
-        <DashboardAppBar onMenuBarClick={setSideDrawerState} sideDrawerState={sideDrawerState} user={user} />
-        <SideDrawer toggleDrawer={setSideDrawerState} sideDrawerState={sideDrawerState} />
-        <Route path='/:courseId' exact component={IndexPage} />
-        <Route path='/:courseId/grades' component={GradeDistribution} />
-        <Route path='/:courseId/assignment' component={AssignmentPlanning} />
-        <Route path='/:courseId/files' component={FilesAccessed} />
-      </div>
+      {
+        loaded
+          ? <>
+            <DashboardAppBar
+              onMenuBarClick={setSideDrawerState}
+              sideDrawerState={sideDrawerState}
+              user={user}
+              courseName={courseInfo.name}
+              courseId={courseId} />
+            <SideDrawer
+              toggleDrawer={setSideDrawerState}
+              sideDrawerState={sideDrawerState}
+              courseId={courseId}
+              courseInfo={courseInfo} />
+            <Route path='/:courseId/' exact
+              render={props => <IndexPage {...props} courseInfo={courseInfo} courseId={courseId} />} />
+            <Route path='/:courseId/grades'
+              render={props => <GradeDistribution {...props} disabled={!courseInfo.course_view_options.gd}
+                courseId={courseId} />} />
+            <Route path='/:courseId/assignment'
+              render={props => <AssignmentPlanning {...props} disabled={!courseInfo.course_view_options.ap}
+                courseId={courseId} />} />
+            <Route path='/:courseId/files'
+              render={props => <FilesAccessed {...props} courseInfo={courseInfo}
+                courseId={courseId} />} />
+          </>
+          : <Spinner />
+      }
     </Router>
   )
 }

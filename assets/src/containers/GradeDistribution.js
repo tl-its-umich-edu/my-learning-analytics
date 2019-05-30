@@ -6,8 +6,10 @@ import Typography from '@material-ui/core/Typography'
 import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
+import Error from './Error'
 import { average, roundToOneDecimcal } from '../util/math'
 import { useGradeData } from '../service/api'
+import { isObjectEmpty } from '../util/object'
 
 const styles = theme => ({
   root: {
@@ -24,14 +26,14 @@ const styles = theme => ({
 })
 
 function GradeDistribution (props) {
-  const { classes, match } = props
-  const currentCourseId = match.params.courseId
-  const [loaded, gradeData] = useGradeData(currentCourseId)
+  const { classes, disabled, courseId } = props
+  if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
+
+  const [loaded, error, gradeData] = useGradeData(courseId)
+  if (error) return (<Error>Something went wrong, please try again later.</Error>)
+  if (loaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
 
   const buildGradeView = gradeData => {
-    if (!gradeData || Object.keys(gradeData).length === 0) {
-      return (<p>No data provided</p>)
-    }
     return (
       <Grid container>
         <Grid item xs={12} lg={2}>
@@ -62,10 +64,12 @@ function GradeDistribution (props) {
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Typography variant='h5' gutterBottom >Grade Distribution</Typography >
-            {loaded
-              ? buildGradeView(gradeData)
-              : <Spinner />}
+            <Typography variant='h5' gutterBottom>Grade Distribution</Typography>
+            {
+              loaded
+                ? buildGradeView(gradeData)
+                : <Spinner />
+            }
           </Paper>
         </Grid>
       </Grid>
