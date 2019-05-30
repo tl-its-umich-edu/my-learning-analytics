@@ -9,7 +9,7 @@ function ProgressBar (props) {
   const [width, height] = useResponsiveness({ ...props, domElement })
   useCreateChart({ ...props, domElement, width, height }, createProgressBar)
   return (
-    <div ref={domElement => setDomElement(domElement)} />
+    <div ref={domElement => setDomElement(domElement)}/>
   )
 }
 
