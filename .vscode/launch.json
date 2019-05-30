@@ -12,7 +12,8 @@
                 }
             ],
             "port": 3000,
-            "host": "localhost"
+            "host": "localhost",
+            "justMyCode": false
         },
         {
             "name": "MyLA Docker Cron",
