@@ -35,14 +35,14 @@ function AvatarModal (props) {
   const url = window.location.href
 
   useEffect(() => {
-    let suffixURL = url.includes('grades')
+    const helpUrlContext = url.includes('grades')
       ? '/grade-distribution'
       : url.includes('assignment')
       ? '/assignment-planning'
       : url.includes('file')
       ? '/files-accessed'
       : ''
-    setHelpURL(`${helpURL}${suffixURL}`)
+    setHelpURL(`${helpURL}${helpUrlContext}`)
   }, [url])
 
   return (
