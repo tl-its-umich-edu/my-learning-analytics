@@ -165,7 +165,7 @@ function AssignmentPlanning (props) {
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <>
-              <Typography variant='h5' gutterBottom>Progress toward Final Grades the </Typography>
+              <Typography variant='h5' gutterBottom>Progress toward Final Grade</Typography>
               {assignmentData ? <ProgressBar
                 data={assignmentData.progress}
                 aspectRatio={0.12}
