@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 import Divider from '@material-ui/core/Divider'
@@ -29,10 +29,22 @@ const styles = theme => ({
 })
 
 function AvatarModal (props) {
-  const {
-    classes,
-    user
-  } = props
+  const { classes, user } = props
+
+  const [helpURL, setHelpURL] = useState('https://sites.google.com/umich.edu/my-learning-analytics-help/home')
+  const url = window.location.href
+
+  useEffect(() => {
+    let suffixURL = url.includes('grades')
+      ? '/grade-distribution'
+      : url.includes('assignment')
+      ? '/assignment-planning'
+      : url.includes('file')
+      ? '/files-accessed'
+      : ''
+    setHelpURL(`${helpURL}${suffixURL}`)
+  }, [url])
+
   return (
     <div className={classes.root}>
       <Grid container>
@@ -56,7 +68,7 @@ function AvatarModal (props) {
               <ListItemIcon>
                 <HelpIcon />
               </ListItemIcon>
-              <ListItemText inset primary='Help' onClick={() => (window.location.href = 'https://sites.google.com/umich.edu/my-learning-analytics-help/home/grade-distribution')} />
+              <ListItemText inset primary='Help' onClick={() => (window.location.href = helpURL)} />
             </ListItem>
             <Divider />
             <ListItem button>
