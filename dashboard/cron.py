@@ -139,7 +139,7 @@ class DashboardCronJob(CronJobBase):
                                          u.global_canvas_id from enroll_data e join user_info u on e.user_id= u.user_id),
                          course_fact as (select enrollment_id, current_score, final_score from course_score_fact 
                                          where course_id='{data_warehouse_course_id}'),
-                         final as (select u.global_canvas_id as id,u.name, u.sis_user_id as sis_id, u.unique_name as sis_name,
+                         final as (select u.global_canvas_id as user_id,u.name, u.sis_user_id as sis_id, u.unique_name as sis_name,
                                    '{data_warehouse_course_id}' as course_id, c.current_score as current_grade, c.final_score as final_grade
                                     from user_enroll u left join course_fact c on u.enroll_id= c.enrollment_id)
                          select * from final
@@ -218,7 +218,7 @@ class DashboardCronJob(CronJobBase):
                     SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS user_id,
                     datetime(EVENT_TIME) as access_time
                     FROM event_store.events
-                    where JSON_EXTRACT_SCALAR(event, '$.edApp.id') = 'http://umich.instructure.com/'
+                    where JSON_EXTRACT_SCALAR(event, '$.edApp.id') = @edApp
                     and type = 'NavigationEvent'
                     and JSON_EXTRACT_SCALAR(event, '$.object.name') = 'attachment'
                     and JSON_EXTRACT_SCALAR(event, '$.action') = 'NavigatedTo'
@@ -229,6 +229,7 @@ class DashboardCronJob(CronJobBase):
             logger.debug(data_warehouse_course_ids)
             query_params = [
                 bigquery.ArrayQueryParameter('course_ids', 'STRING', data_warehouse_course_ids),
+                bigquery.ScalarQueryParameter('edApp', 'STRING', settings.BIG_QUERY_ED_APP)
             ]
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
@@ -245,9 +246,13 @@ class DashboardCronJob(CronJobBase):
 
             logger.debug("after drop duplicates, df row number=" + str(df.shape[0]))
 
+            logger.debug(df)
             # write to MySQL
-            df.to_sql(con=engine, name='file_access', if_exists='append', index=False)
-
+            try:
+                df.to_sql(con=engine, name='file_access', if_exists='append', index=False)
+            except Exception as e:
+                logger.exception("Error running to_sql on table file_access")
+                raise
             return_string += str(df.shape[0]) + " rows for courses " + ",".join(data_warehouse_course_ids) + "\n"
             logger.info(return_string)
 
@@ -295,7 +300,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         for data_warehouse_course_id in Course.objects.get_supported_courses():
             assignment_sql = f"""with assignment_info as
-                            (select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone 'America/New_York' as local_date,
+                            (select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone '{settings.TIME_ZONE}' as local_date,
                             ad.title AS name,af.course_id AS course_id,af.assignment_id AS id,
                             af.points_possible AS points_possible,af.assignment_group_id AS assignment_group_id
                             from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{data_warehouse_course_id}'

@@ -4,6 +4,7 @@ from django.forms.models import model_to_dict
 
 import math, json, logging
 from datetime import datetime, timedelta
+from django.utils import timezone
 
 import numpy as np
 import pandas as pd
@@ -64,7 +65,7 @@ def get_course_info(request, course_id=0):
     :rtype: str
     """
     course_id = canvas_id_to_incremented_id(course_id)
-    today = datetime.today()
+    today = timezone.now()
 
     try:
         course = Course.objects.get(id=course_id)
@@ -148,7 +149,7 @@ def file_access_within_week(request, course_id=0):
 
     sqlString = f"""SELECT a.file_id as file_id, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id
                     FROM file f, file_access a, user u, course c, academic_terms t
-                    WHERE a.file_id =f.ID and a.user_id = u.ID
+                    WHERE a.file_id =f.id and a.user_id = u.user_id
                     and f.course_id = c.id and c.term_id = t.id
                     and a.access_time > %(start_time)s
                     and a.access_time < %(end_time)s
@@ -202,7 +203,7 @@ def file_access_within_week(request, course_id=0):
     # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
     selfSqlString = "select CONCAT(f.id, ';', f.name) as file_id_name, count(*) as self_access_count, max(a.access_time) as self_access_last_time " \
                     "from file_access a, user u, file f " \
-                    "where a.user_id = u.id " \
+                    "where a.user_id = u.user_id " \
                     "and a.file_id = f.ID " \
                     "and u.sis_name=%(current_user)s " \
                     "group by CONCAT(f.id, ';', f.name)"
@@ -456,7 +457,7 @@ def get_course_assignments(course_id):
 
 def get_user_assignment_submission(current_user,assignments_in_course_df, course_id):
     sql = "select assignment_id, score, graded_date from submission where " \
-          "user_id=(select id from user where sis_name = %(current_user)s and course_id = %(course_id)s ) and course_id = %(course_id)s"
+          "user_id=(select user_id from user where sis_name = %(current_user)s and course_id = %(course_id)s ) and course_id = %(course_id)s"
     assignment_submissions = pd.read_sql(sql, conn, params={'course_id': course_id, "current_user": current_user})
     if assignment_submissions.empty:
         logger.info('The user %s seems to be a not student in the course.' % current_user)
@@ -515,7 +516,7 @@ def find_min_week(course_id):
 
 
 def find_current_week(row):
-    current_date = datetime.now()
+    current_date = timezone.now()
     year,week,dow = current_date.isocalendar() #dow = day of week
     if row == week:
         return True

@@ -51,29 +51,40 @@ Environment variables:
 
 `LTI_CANVAS_COURSE_ID_FIELD`: LTI launch field containing the course's canvas id (default: `custom_canvas_course_id`).
 
-# Docker commands for deploying the app
-1. Tear down running application and db instances:
-`docker-compose down`
-2. Build the application:
+# Docker commands for initialing the app for development
+1. Build the application:
 `docker-compose build`
-3. Run the application in a detached mode: `docker-compose up -d`
-4. Place all of your secrets in a directory and copy it into the docker with
+2. Run the application in a detached mode: `docker-compose up -d`
+3. Place all of your secrets in a directory and copy it into the docker with
 (If your secrets are in ~/secrets use this)
 `docker cp ~/secrets student_dashboard:/secrets`
-5. Initialize the MySQL database by loading the users and files on the next step. You'll need to be on VPN for this to work.
+4. Initialize the MySQL database tables: `docker exec -it student_dashboard ./manage.py migrate`
 
-## Making migration using Django models
-1. get into the docker machine `docker exec -t -i student_dashboard_mysql /bin/bash`
-2. creating the file `./manage.py makemigrations dashboard`.  This should say changes detected if any 
-3. applying the changes to DB `./manage.py migrate dashboard`. 
-4. exit
-5. `docker cp student_dashboard:/dashboard/migrations/0001_initial.py dashboard/migrations` 
+# Docker commands for running app
 
-## Add a default course to test with
+Start the app
 
-There are some default courses pre-populated by the mysql/init.sql script. If you'd like to add additional courses you need to add them as an admin user. (See next section on adding an admin user)
+    `docker-compose up -d`
 
-## Create a super user to test login. 
+Stop the app
+
+    `docker-compose stop`
+
+Tear down the app completely
+
+    `docker-compose down`
+
+If you have problems you can connect direct into a specific container with the command
+
+    `docker-compose run web /bin/bash
+    
+# Populate initial demo terms and courses
+
+Before adding adding initial terms and courses, ensure that the `CANVAS_DATA_ID_INCREMENT` environment variable is set correctly
+
+    `docker exec -it student_dashboard bash ./demo_init.sh`
+
+# Create a super user to test login.
 
 On the both local dev and remote the users are stored in the local database. However on local the users have to be created via the command line, on Openshift they are created either manually in the database or when logged in via Shibboleth.
 
@@ -131,6 +142,8 @@ Remove the --volumes to leave volumes without at least one container associated.
 This will remove everything! (images, containers, volumes)
 `docker system prune -a --volumes`
 
+*Docker stores MySQL data locally in the directory `.data`. If you want to fully clean you'll have to remove this folder.*
+
 ## Testing tips!
 
 1. Connect to the docker and edit some files!
@@ -156,7 +169,10 @@ Then you can edit your files! (Probably in /code/dashboard)
 
     A few variables are available to be defined in the .env file to enable this but minimally you have to set PTVSD_ENABLE=True. Currently docker-compose.yml opens 2 ports that can be used current, 3000 and 3001. If you need more you can open them. You can configure these with other variables. See the .env.sample for examples.
 
-    If you want to conenct to the cron job you'll have to use a different port as Django uses 3000 by default and also wait for attach.
+    If you want to connect to the cron job you'll have to use a different port as Django uses 3000 by default and also wait for attach.
+
+    Set your breakpoints then run this command in the docker instance! Then connect to the cron configuration. The job will start when you attach the debugger.
+    `PTVSD_WAIT_FOR_ATTACH=True PTVSD_ENABLE=TRUE PTVSD_REMOTE_PORT=3001 ./manage-ptvd.py runcrons --force`
 
     This debug mode currently only works with django-admin commands (not gunicorn or manage.py) 
 
