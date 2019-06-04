@@ -11,7 +11,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import LogoutIcon from '@material-ui/icons/ExitToApp'
 import HelpIcon from '@material-ui/icons/HelpOutline'
-import SettingsIcon from '@material-ui/icons/Settings'
+import Lock from '@material-ui/icons/Lock'
 
 const styles = theme => ({
   root: {
@@ -33,7 +33,7 @@ const styles = theme => ({
   }
 })
 
-function AvatarModal (props) {
+function AvatarModal(props) {
   const { classes, user } = props
 
   const url = window.location.href
@@ -44,10 +44,10 @@ function AvatarModal (props) {
     const helpUrlContext = url.includes('grades')
       ? '/grade-distribution'
       : url.includes('assignment')
-      ? '/assignment-planning'
-      : url.includes('file')
-      ? '/files-accessed'
-      : ''
+        ? '/assignment-planning'
+        : url.includes('file')
+          ? '/files-accessed'
+          : ''
     setHelpURL(`${helpURL}${helpUrlContext}`)
   }, [url])
 
@@ -78,12 +78,28 @@ function AvatarModal (props) {
               </ListItem>
             </Link>
             <Divider />
+            {
+              user.admin
+                ?
+                <>
+                  <Link style={{ textDecoration: 'none' }} href={`${window.location.origin}/admin`}>
+                    <ListItem button>
+                      <ListItemIcon>
+                        <Lock />
+                      </ListItemIcon>
+                      <ListItemText inset primary='Admin' />
+                    </ListItem>
+                  </Link>
+                  <Divider />
+                </>
+                : null
+            }
             <Link style={{ textDecoration: 'none' }} href={logoutURL}>
               <ListItem button>
                 <ListItemIcon>
                   <LogoutIcon />
                 </ListItemIcon>
-                  <ListItemText inset primary='Logout' style={{ marginLeft: 0 }} />
+                <ListItemText inset primary='Logout' style={{ marginLeft: 0 }} />
               </ListItem>
             </Link>
           </List>
