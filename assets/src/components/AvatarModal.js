@@ -60,9 +60,13 @@ function AvatarModal(props) {
           </Avatar>
         </Grid>
         <Grid item xs={8} container direction='column'>
+          <Typography className={classes.typography}>
+            Signed in as
+          </Typography>
           <Typography
             className={classes.typography}
-            variant='subtitle2'>
+            variant='subtitle1'
+            style={{ marginTop: 0 }}>
             {user.username}
           </Typography>
         </Grid>
