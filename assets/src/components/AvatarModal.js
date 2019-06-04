@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid'
 import Divider from '@material-ui/core/Divider'
 import Typography from '@material-ui/core/Typography'
 import Avatar from '@material-ui/core/Avatar'
+import Link from '@material-ui/core/Link'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
@@ -24,15 +25,20 @@ const styles = theme => ({
     marginTop: '10px',
     marginBottom: '10px',
     marginLeft: 'auto',
-    marginRight: 'auto'
+    marginRight: 'auto',
+  },
+  link: {
+    textDecoration: 'none',
+    marginLeft: 0
   }
 })
 
 function AvatarModal (props) {
   const { classes, user } = props
 
-  const [helpURL, setHelpURL] = useState('https://sites.google.com/umich.edu/my-learning-analytics-help/home')
   const url = window.location.href
+  const [helpURL, setHelpURL] = useState('https://sites.google.com/umich.edu/my-learning-analytics-help/home')
+  const [logoutURL, setLogoutURL] = useState(`${window.location.origin}/accounts/logout/`)
 
   useEffect(() => {
     const helpUrlContext = url.includes('grades')
@@ -64,26 +70,23 @@ function AvatarModal (props) {
         <Grid item xs={12}>
           <List>
             <Divider />
-            <ListItem button>
-              <ListItemIcon>
-                <HelpIcon />
-              </ListItemIcon>
-              <ListItemText inset primary='Help' onClick={() => (window.location.href = helpURL)} />
-            </ListItem>
+            <Link style={{ textDecoration: 'none' }} href={helpURL}>
+              <ListItem button>
+                <ListItemIcon>
+                  <HelpIcon />
+                </ListItemIcon>
+                <ListItemText inset primary='Help' />
+              </ListItem>
+            </Link>
             <Divider />
-            <ListItem button>
-              <ListItemIcon>
-                <SettingsIcon />
-              </ListItemIcon>
-              <ListItemText inset primary='Settings' />
-            </ListItem>
-            <Divider />
-            <ListItem button>
-              <ListItemIcon>
-                <LogoutIcon />
-              </ListItemIcon>
-              <ListItemText inset primary='Logout' onClick={() => (window.location.href = `${window.location.hostname}:${window.location.port}/accounts/logout`)} />
-            </ListItem>
+            <Link style={{ textDecoration: 'none' }} href={logoutURL}>
+              <ListItem button>
+                <ListItemIcon>
+                  <LogoutIcon />
+                </ListItemIcon>
+                  <ListItemText inset primary='Logout' style={{ marginLeft: 0 }} />
+              </ListItem>
+            </Link>
           </List>
         </Grid>
       </Grid>
