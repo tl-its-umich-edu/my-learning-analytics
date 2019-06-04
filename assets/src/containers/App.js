@@ -11,9 +11,7 @@ function App () {
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
   const user = {
-    firstName: 'Justin',
-    lastName: 'Lee',
-    email: 'something@something.ca'
+    username: myla_globals.username
   }
 
   return (

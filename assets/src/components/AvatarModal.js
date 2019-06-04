@@ -56,16 +56,15 @@ function AvatarModal (props) {
       <Grid container>
         <Grid item xs={4}>
           <Avatar className={classes.avatar}>
-            {user.firstName.slice(0, 1)}{user.lastName.slice(0, 1)}
+            {user.username.slice(0, 1)}
           </Avatar>
         </Grid>
         <Grid item xs={8} container direction='column'>
           <Typography
             className={classes.typography}
             variant='subtitle2'>
-            {`${user.firstName} ${user.lastName}`}
+            {user.username}
           </Typography>
-          <Typography variant='subtitle2'>{user.email}</Typography>
         </Grid>
         <Grid item xs={12}>
           <List>
