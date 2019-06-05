@@ -25,16 +25,31 @@
         {% if user.is_authenticated %}
             "username": '{{ user.get_username }}',
         {% else %}
-            "username": ""
+            "username": "",
         {% endif %}
-
-        };
+        {% if settings.GA_ID  %}
+        "GA": '{{ settings.GA_ID }}',
+        {% else %}
+        "GA": "nothing",
+        {% endif %}
+        {% if settings.LOGIN_URL  %}
+        "login": '{{ settings.LOGIN_URL }}',
+        {% else %}
+        "login": "",
+        {% endif %}
+        {% if settings.LOGOUT_URL  %}
+        "logout": '{{ settings.LOGOUT_URL }}',
+        {% else %}
+        "logout": "",
+        {% endif %}
+        }
     </script>
 </head>
 <body>
     {% include "su/is_su.html" %}
     {% block content %}
     {% endblock %}
+    {% csrf_token %}
     <footer>
         <div style="float: left; width: 50%">Copyright © 2018 The Regents of the University of Michigan</div>
         <div style="float: left; width: 50%; text-align: right">Data last updated on {{last_updated|date:"m/d/Y P T"}}</div>
