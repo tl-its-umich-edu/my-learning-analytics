@@ -33,14 +33,14 @@ import watchman.views
 
 urlpatterns = [
     url(r'^$',
-        TemplateView.as_view(template_name='home.html'), name = 'home'),
+        TemplateView.as_view(template_name='frontend/index.html'), name = 'home'),
     url(r'^status/', include('watchman.urls')),
     url(r'^status/bare_status$', watchman.views.bare_status),
 
     url('admin', admin.site.urls),
 
     # This is the courses catch-all
-    url(r'^courses/(?P<course_id>[0-9]+|)', login_required(TemplateView.as_view(template_name='frontend/index.html')), name="test"),
+    # url(r'^courses/(?P<course_id>[0-9]+|)', login_required(TemplateView.as_view(template_name='frontend/index.html')), name="test"),
 
 
     # Thse URL's are data patterns
