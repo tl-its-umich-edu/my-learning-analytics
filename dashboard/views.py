@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 CANVAS_FILE_PREFIX = config("CANVAS_FILE_PREFIX", default="")
 CANVAS_FILE_POSTFIX = config("CANVAS_FILE_POSTFIX", default="")
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
+LECCAP_FILE_PREFIX = "https://leccap.engin.umich.edu/leccap/viewer/r/"
 
 # string for no grade
 GRADE_A="90-100"
@@ -35,6 +36,10 @@ GRADE_C="70-79"
 GRADE_LOW="low_grade"
 NO_GRADE_STRING = "NO_GRADE"
 
+# string for file type
+FILE_TYPE_STRING = "file_type"
+CANVAS_FILE = 0
+LECCAP_FILE = 1
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
@@ -144,7 +149,7 @@ def file_access_within_week(request, course_id=0):
 
     # get time range based on week number passed in via request
 
-    sqlString = f"""SELECT a.file_id as file_id, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id
+    sqlString = f"""SELECT a.file_id as file_id, f.type as file_type, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id
                     FROM file f, file_access a, user u, course c, academic_terms t
                     WHERE a.file_id =f.id and a.user_id = u.user_id
                     and f.course_id = c.id and c.term_id = t.id
@@ -188,12 +193,14 @@ def file_access_within_week(request, course_id=0):
     #df.reset_index(inplace=True)
 
     # zero filled dataframe with file name as row name, and grade as column name
-    output_df=pd.DataFrame(0.0, index=file_id_name, columns=[GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING])
+    output_df=pd.DataFrame(0.0, index=file_id_name, columns=["file_type", GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING])
     output_df=output_df.rename_axis('file_id_name')
 
     for index, row in df.iterrows():
         # set value
         output_df.at[row['file_id_name'], row['grade']] = row['percent']
+        output_df.at[row['file_id_name'], 'file_type'] = row['file_type']
+    #print(output_df)
     output_df.reset_index(inplace=True)
 
     # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
@@ -232,7 +239,8 @@ def file_access_within_week(request, course_id=0):
     output_df.fillna(0, inplace=True) #replace null value with 0
 
     output_df['file_id_part'], output_df['file_name_part'] = output_df['file_id_name'].str.split(';', 1).str
-    output_df['file_name'] = output_df.apply(lambda row: CANVAS_FILE_PREFIX + row.file_id_part + CANVAS_FILE_POSTFIX + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
+    # uses canvas url if file type == 0 (cavas file) and leccap url if not
+    output_df['file_name'] = output_df.apply(lambda row: CANVAS_FILE_PREFIX + row.file_id_part + CANVAS_FILE_POSTFIX + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part if row.file_type == 0.0 else LECCAP_FILE_PREFIX + row.file_id_part + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
     output_df.drop(columns=['file_id_part', 'file_name_part', 'file_id_name'], inplace=True)
     logger.debug(output_df.to_json(orient='records'))
 

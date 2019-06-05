@@ -36,6 +36,14 @@
         </select> &nbsp;<input id= "default_selection" type = checkbox>
             <label id = "label_for_default_selection" for ="default_selection"></label></h6>
         <br/>
+        <h6 class="text-center">Types of files:
+            <select class="file_type" name="file_type" id="file_type">
+                <option value="all_files" selected>All Files</option>
+                <option value="0">Canvas Files Only</option>
+                <option value="1">Lecture Captures Only</option>
+            </select>
+        </h6>
+        
         <div id="chart"></div>
     {% else %}
         Files Accessed view is hidden for this course.
