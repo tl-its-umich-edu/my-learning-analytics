@@ -40,7 +40,7 @@ urlpatterns = [
     url('admin', admin.site.urls),
 
     # This is the courses catch-all
-    # url(r'^courses/(?P<course_id>[0-9]+|)', login_required(TemplateView.as_view(template_name='frontend/index.html')), name="test"),
+    url(r'^courses/(?P<course_id>[0-9]+|)', login_required(TemplateView.as_view(template_name='frontend/index.html')), name="test"),
 
 
     # Thse URL's are data patterns
