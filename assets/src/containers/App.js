@@ -44,28 +44,29 @@ const logoutAdminLogic = (classes,logOutURL,user,admin)=>{
           <Link href={logOutURL} className={classes.link}>Logout</Link>
           <Typography>{user}</Typography>
           {admin?<Link href="/admin" className={classes.link}>Admin</Link>:''}
+
         </Paper>
       </Grid>
     </Grid>
   )
 }
 
-const needToaddlater = ()=>{
-  const user = {
-    username: myla_globals.username,
-    admin: myla_globals.is_superuser
-  }
-  <Router basename='/courses/'>
-    <div>
-      <DashboardAppBar onMenuBarClick={setSideDrawerState} sideDrawerState={sideDrawerState} user={user} />
-      <SideDrawer toggleDrawer={setSideDrawerState} sideDrawerState={sideDrawerState} />
-      <Route path='/:courseId' exact component={IndexPage} />
-      <Route path='/:courseId/grades' component={GradeDistribution} />
-      <Route path='/:courseId/assignment' component={AssignmentPlanning} />
-      <Route path='/:courseId/files' component={FilesAccessed} />
-    </div>
-  </Router>
-}
+// const needToaddlater = ()=>{
+//   const user = {
+//     username: myla_globals.username,
+//     admin: myla_globals.is_superuser
+//   }
+//   <Router basename='/courses/'>
+//     <div>
+//       <DashboardAppBar onMenuBarClick={setSideDrawerState} sideDrawerState={sideDrawerState} user={user} />
+//       <SideDrawer toggleDrawer={setSideDrawerState} sideDrawerState={sideDrawerState} />
+//       <Route path='/:courseId' exact component={IndexPage} />
+//       <Route path='/:courseId/grades' component={GradeDistribution} />
+//       <Route path='/:courseId/assignment' component={AssignmentPlanning} />
+//       <Route path='/:courseId/files' component={FilesAccessed} />
+//     </div>
+//   </Router>
+// }
 
 function App (props) {
   const { match, classes } = props
@@ -92,6 +93,7 @@ function App (props) {
             logoutAdminLogic(classes,logOutURL,user,admin)}
 
         </Toolbar>
+        <p>This is MyLA</p>
       </AppBar>
     </div>
 
