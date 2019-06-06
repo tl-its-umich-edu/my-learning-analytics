@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
 import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
 import GradeDistribution from './GradeDistribution'
@@ -15,9 +15,7 @@ function App () {
     admin: myla_globals.is_superuser
   }
 
-  if (!user.username) return (
-    window.location.href = 'http://localhost:5001/accounts/login'
-  )
+  if (!user.username) return (window.location.href = 'http://localhost:5001/accounts/login')
 
   return (
     <Router basename='/courses/'>
