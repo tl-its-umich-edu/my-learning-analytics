@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 CANVAS_FILE_PREFIX = config("CANVAS_FILE_PREFIX", default="")
 CANVAS_FILE_POSTFIX = config("CANVAS_FILE_POSTFIX", default="")
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
-LECCAP_FILE_PREFIX = "https://leccap.engin.umich.edu/leccap/viewer/r/"
+LECCAP_FILE_PREFIX = config("LECCAP_FILE_PREFIX", default="")
 
 # string for no grade
 GRADE_A="90-100"
@@ -38,8 +38,8 @@ NO_GRADE_STRING = "NO_GRADE"
 
 # string for file type
 FILE_TYPE_STRING = "file_type"
-CANVAS_FILE = 0
-LECCAP_FILE = 1
+CANVAS_FILE = config("CANVAS_FILE", default=0)
+LECCAP_FILE = config("CANVAS_FILE", default=1)
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
@@ -116,12 +116,14 @@ def file_access_within_week(request, course_id=0):
     week_num_start = int(request.GET.get('week_num_start','1'))
     week_num_end = int(request.GET.get('week_num_end','0'))
     grade = request.GET.get('grade','all')
+    file_type = request.GET.get('file_type','all_files')
 
     # json for eventlog
     data = {
         "week_num_start": week_num_start,
         "week_num_end": week_num_end,
         "grade": grade,
+        "file_type": file_type,
         "course_id": course_id
     }
     eventlog(request.user, EventLogTypes.EVENT_VIEW_FILE_ACCESS.value, extra=data)
@@ -227,6 +229,12 @@ def file_access_within_week(request, course_id=0):
                 output_df["total_count"] = output_df[i_grade]
             else:
                 output_df=output_df.drop([i_grade], axis=1)
+
+    if (file_type != "all_files"):
+        file_types = [CANVAS_FILE, LECCAP_FILE]
+        for i_file_types in file_types:
+            if (i_file_types != file_type):
+                output_df = output_df[output_df.file_type == int(file_type)]
 
     # only keep rows where total_count > 0
     output_df = output_df[output_df.total_count > 0]

@@ -498,12 +498,12 @@ function cleanWeekInputNum(weekNumString)
     return weekNumString;
 }
 
-function makeGraphBasedOnGradeAndSlide(grade, sliderValues)
+function makeGraphBasedOnGradeAndSlide(grade, sliderValues, file_type)
 {
     // parse to get start and end week number
     let startWeek = cleanWeekInputNum(sliderValues[0]);
     let endWeek = cleanWeekInputNum(sliderValues[1]);
-    makeGraph('/api/v1/courses/'+dashboard.course_id+'/file_access_within_week?week_num_start=' + startWeek + "&week_num_end=" + endWeek + "&grade=" + grade);
+    makeGraph('/api/v1/courses/'+dashboard.course_id+'/file_access_within_week?week_num_start=' + startWeek + "&week_num_end=" + endWeek + "&grade=" + grade + "&file_type=" + file_type);
 }
 
 let mySlider;
@@ -551,8 +551,9 @@ makeSlider = function () {
                 let valuesParts = values.split(",");
                 // argument values represents current values
                 let grade = $('#grade').val();
+                let file_type = $('#file_type').val();
                 $("#slider_label").html(" <b>" + valuesParts[0] + "</b> to <b>" + valuesParts[1] + "</b>");
-                makeGraphBasedOnGradeAndSlide(grade, valuesParts);
+                makeGraphBasedOnGradeAndSlide(grade, valuesParts, file_type);
             }
         });
     });
@@ -613,7 +614,15 @@ $('#grade').change(function() {
     // make new graph based on the grade selection
     let sliderValues = mySlider.getValue().split(",");
     default_selection_logic_on_grade_selection();
-    makeGraphBasedOnGradeAndSlide($('#grade').val(), sliderValues);
+    makeGraphBasedOnGradeAndSlide($('#grade').val(), sliderValues, $('#file_type').val());
+
+});
+
+$('#file_type').change(function() {
+    // make new graph based on the file selection
+    let sliderValues = mySlider.getValue().split(",");
+    default_selection_logic_on_grade_selection();
+    makeGraphBasedOnGradeAndSlide($('#grade').val(), sliderValues, $('#file_type').val());
 
 });
 

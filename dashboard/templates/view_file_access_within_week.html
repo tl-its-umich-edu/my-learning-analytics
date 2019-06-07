@@ -27,22 +27,22 @@
         </div>
         <input type="hidden" name="slider_num" id="slider_num" />
         <br/>
-        <h6 class="text-center">Files accessed from week <span id="slider_label"> 1 to: </span> by students with these grades:
-        <select class="grade" name="grade" id="grade">
-            <option value="all" selected>All</option>
-            <option value="90-100" >90-100%</option>
-            <option value="80-89" >80-89%</option>
-            <option value="70-79" >70-79%</option>
-        </select> &nbsp;<input id= "default_selection" type = checkbox>
+        <h6 class="text-center">
+            <select class="file_type" name="file_type" id="file_type">
+                <option value="all_files" selected>All</option>
+                <option value="{{ settings.CANVAS_FILE }}">Canvas</option>
+                <option value="{{ settings.LECCAP_FILE }}">Lecture Capture</option>
+            </select>
+            files accessed from week <span id="slider_label"> 1 to: </span> by students with these grades:
+            <select class="grade" name="grade" id="grade">
+                <option value="all" selected>All</option>
+                <option value="90-100" >90-100%</option>
+                <option value="80-89" >80-89%</option>
+                <option value="70-79" >70-79%</option>
+            </select> &nbsp;<input id= "default_selection" type = checkbox>
             <label id = "label_for_default_selection" for ="default_selection"></label></h6>
         <br/>
-        <h6 class="text-center">Types of files:
-            <select class="file_type" name="file_type" id="file_type">
-                <option value="all_files" selected>All Files</option>
-                <option value="0">Canvas Files Only</option>
-                <option value="1">Lecture Captures Only</option>
-            </select>
-        </h6>
+        
         
         <div id="chart"></div>
     {% else %}
