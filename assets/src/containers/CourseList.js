@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
-import Spinner from '../components/Spinner'
 import SelectCard from '../components/SelectCard'
 import Error from './Error'
 import { Link } from 'react-router-dom'
-import { useCourseInfo } from '../service/api'
-import { Typography } from '@material-ui/core';
 
 const styles = theme => ({
   root: {
