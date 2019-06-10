@@ -7,7 +7,7 @@ import 'typeface-roboto'
 // import * as serviceWorker from './serviceWorker'
 
 ReactDOM.render(
-  <Router basename='/test/courses/'>
+  <Router basename='/courses/'>
     <Route path='/:courseId' component={App} />
   </Router>
   , document.getElementById('root')

@@ -28,7 +28,7 @@ function App (props) {
   if (loaded && isObjectEmpty(courseInfo)) return (<Error>Tool is not enabled for this course.</Error>)
 
   return (
-    <Router basename='/test/courses/'>
+    <Router basename='/courses/'>
       {
         loaded
           ? <>
