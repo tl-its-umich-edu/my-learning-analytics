@@ -7,7 +7,8 @@ from dateutil.parser import parse
 
 from django_cron.models import CronJobLog
 from dashboard.models import Course
-
+import json
+import pandas as pd
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -47,6 +48,7 @@ def get_course_name_from_id(course_id):
                 course_name = row[0]
     return course_name
 
+
 def get_course_view_options (course_id):
 
     logger.info(get_course_view_options.__name__)
@@ -64,6 +66,7 @@ def get_course_view_options (course_id):
                 course_view_option['show_grade_distribution'] = row[2] and 'show_grade_distribution' not in settings.VIEWS_DISABLED
     return course_view_option
 
+
 def get_default_user_course_id(user_id):
     """[Get the default course id for the user id from the user table]
     :param user_id: [SIS User ID of the user]
@@ -79,6 +82,32 @@ def get_default_user_course_id(user_id):
         if (row != None):
             course_id = canvas_id_to_incremented_id(row[0])
     return course_id
+
+
+def get_user_courses_info(user_id):
+    logger.info(get_user_courses_info.__name__)
+    course_list = []
+    course_info={}
+    with django.db.connection.cursor() as cursor:
+        cursor.execute("SELECT course_id FROM user WHERE sis_name= %s", [user_id])
+        courses = cursor.fetchall()
+        logger.info(courses)
+        if courses is not None:
+            for course in courses:
+                course_id = incremented_id_to_canvas_id(course[0])
+                logger.info(f"CourseId: {course_id}")
+                course_list.append(int(course_id))
+    if course_list:
+        course_tuple = tuple(course_list)
+        logger.info(course_tuple)
+        with django.db.connection.cursor() as cursor:
+            cursor.execute("select canvas_id, name from course where canvas_id in %s",[course_tuple])
+            course_names = cursor.fetchall()
+            df = pd.DataFrame(list(course_names))
+            df.columns=["course_id", "course_name"]
+            course_info=df.to_json(orient='records')
+    return course_info
+
 
 def get_last_cron_run():
     try:
