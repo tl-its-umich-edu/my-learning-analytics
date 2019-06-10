@@ -30,7 +30,7 @@
         {% if settings.GA_ID  %}
         "GA": '{{ settings.GA_ID }}',
         {% else %}
-        "GA": "nothing",
+        "GA": "",
         {% endif %}
         {% if settings.LOGIN_URL  %}
         "login": '{{ settings.LOGIN_URL }}',
@@ -42,6 +42,12 @@
         {% else %}
         "logout": "",
         {% endif %}
+        {% if current_user_courses_info%}
+            "user_courses_info":'{{current_user_courses_info|safe}}',
+        {% else %}
+            "user_courses_info":"",
+        {% endif %}
+
         }
     </script>
 </head>
