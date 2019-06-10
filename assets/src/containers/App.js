@@ -19,11 +19,11 @@ function App (props) {
 
   // this is temporary
   const user = {
-    firstName: 'Justin',
-    lastName: 'Lee',
-    email: 'something@something.ca'
+    username: myla_globals.username,
+    admin: myla_globals.is_superuser
   }
 
+  if (!user.username) return (window.location.href = 'http://localhost:5001/accounts/login')
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
   if (loaded && isObjectEmpty(courseInfo)) return (<Error>Tool is not enabled for this course.</Error>)
 
