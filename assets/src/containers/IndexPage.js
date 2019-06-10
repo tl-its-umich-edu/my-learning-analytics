@@ -22,8 +22,8 @@ const styles = theme => ({
 })
 
 function IndexPage (props) {
-  const { classes, match } = props
-  const currentCourseId = match.params.courseId
+  const { classes, courseInfo, courseId } = props
+
   return (
     <Grid container spacing={16} className={classes.root}>
       <Grid item xs={12} className={classes.container}>
@@ -32,12 +32,11 @@ function IndexPage (props) {
           className={classes.wrapper}
           spacing={8}
         >
-          {
-            routes(currentCourseId).map((props, key) =>
-              <Link style={{ textDecoration: 'none' }} to={props.path} key={key}>
-                <SelectCard cardData={props} />
-              </Link>
-            )}
+          {routes(courseId, courseInfo.course_view_options).map((props, key) =>
+            <Link style={{ textDecoration: 'none' }} to={props.path} key={key}>
+              <SelectCard cardData={props} />
+            </Link>
+          )}
         </Grid>
       </Grid>
     </Grid>

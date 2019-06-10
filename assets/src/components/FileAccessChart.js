@@ -10,7 +10,7 @@ function FileAccessChart (props) {
   useCreateChart({ ...props, domElement, width, height }, createFileAccessChart)
 
   return (
-    <div ref={domElement => setDomElement(domElement)} />
+    <div ref={domElement => setDomElement(domElement)}/>
   )
 }
 

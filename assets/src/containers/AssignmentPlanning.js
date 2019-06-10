@@ -13,6 +13,9 @@ import createToolTip from '../util/createToolTip'
 import TableAssignment from '../components/TableAssignment'
 import Checkbox from '@material-ui/core/Checkbox'
 import Cookie from 'js-cookie'
+import Error from './Error'
+import { handleError, defaultFetchOptions } from '../util/data'
+import { useUserSettingData } from '../service/api'
 
 const styles = theme => ({
   root: {
@@ -46,14 +49,6 @@ const getCurrentWeek = assignmentData => {
   })
 }
 
-const defaultFetchOptions = {
-  headers: {
-    'Accept': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest'
-  },
-  credentials: 'include'
-}
-
 const assignmentTable = assignmentData => {
   if (!assignmentData || Object.keys(assignmentData).length === 0) {
     return (<Typography>No data provided</Typography>)
@@ -66,20 +61,35 @@ const assignmentTable = assignmentData => {
 }
 
 function AssignmentPlanning (props) {
-  const { classes, match } = props
+  const { classes, disabled, courseId } = props
+  if (disabled) return (<Error>Assignment view is hidden for this course.</Error>)
+  const [loaded, error, assignmentDefaultData] = useUserSettingData(courseId, 'assignment')
+
   const currentSetting = 'My current setting'
   const rememberSetting = 'Remember my setting'
   const settingNotUpdated = 'Setting not updated'
-  const currentCourseId = match.params.courseId
+
   // initial default value that we get from backend and updated value when user save the default setting
   const [defaultValue, setDefaultValue] = useState('')
   // assignment data and weight controller
   const [assignmentFilter, setAssignmentFilter] = useState('')
   const [assignmentData, setAssignmentData] = useState('')
-
   // defaults setting controllers
   const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
+
   const [defaultLabel, setDefaultLabel] = useState(currentSetting)
+  useEffect(() => {
+    if (loaded) {
+      if (assignmentDefaultData.default === '') {
+        setAssignmentFilter(0)
+        setDefaultValue(0)
+
+      } else {
+        setAssignmentFilter(assignmentDefaultData.default)
+        setDefaultValue(parseInt(assignmentDefaultData.default))
+      }
+    }
+  }, [loaded])
 
   const changeDefaultSetting = (event) => {
     const didUserChecked = event.target.checked
@@ -91,13 +101,14 @@ function AssignmentPlanning (props) {
       // Django rejects PUT/DELETE/POST calls with out CSRF token.
       const csrfToken = Cookie.get('csrftoken')
       const body = { assignment: assignmentFilter }
-      const dataURL = `http://localhost:5001/api/v1/courses/${currentCourseId}/set_user_default_selection`
+      const dataURL = `http://localhost:5001/api/v1/courses/${courseId}/set_user_default_selection`
 
       defaultFetchOptions.headers['X-CSRFToken'] = csrfToken
       defaultFetchOptions['method'] = 'PUT'
       defaultFetchOptions['body'] = JSON.stringify(body)
 
       fetch(dataURL, defaultFetchOptions)
+        .then(handleError)
         .then(res => res.json())
         .then(data => {
           const res = data.default
@@ -107,7 +118,9 @@ function AssignmentPlanning (props) {
             return
           }
           setDefaultLabel(settingNotUpdated)
-        })
+        }).catch(err => {
+        setDefaultLabel(settingNotUpdated)
+      })
     }
   }
 
@@ -123,42 +136,26 @@ function AssignmentPlanning (props) {
     }
 
   }
-  const firstUpdate = useRef(true)
 
   useEffect(() => {
-      const fetchOptions = { method: 'get', ...defaultFetchOptions }
-      const dataURL = `http://localhost:5001/api/v1/courses/${currentCourseId}/get_user_default_selection?default_type=assignment`
-      fetch(dataURL, fetchOptions)
-        .then(res => res.json())
-        .then(data => {
-          if (data.default === '') {
-            setAssignmentFilter(0)
-            setDefaultValue(0)
-
-          } else {
-            setAssignmentFilter(data.default)
-            setDefaultValue(parseInt(data.default))
-          }
-        })
-    }, []
-  )
-  // https://stackoverflow.com/questions/53253940/make-react-useeffect-hook-not-run-on-initial-render
-  // getting the assignment content call needs to happen after the defaults otherwise 2 data fetches happen
-  useEffect(() => {
-      if (firstUpdate.current) {
-        firstUpdate.current = false
+      if (!loaded) {
         return
       }
       const fetchOptions = { method: 'get', ...defaultFetchOptions }
-      const dataURL = `http://localhost:5001/api/v1/courses/${currentCourseId}/assignments?percent=${assignmentFilter}`
+      const dataURL = `http://localhost:5001/api/v1/courses/${courseId}/assignments?percent=${assignmentFilter}`
       fetch(dataURL, fetchOptions)
+        .then(handleError)
         .then(res => res.json())
         .then(data => {
           setAssignmentData(data)
         })
+        .catch(err => {
+            setAssignmentData({})
+          }
+        )
     }, [assignmentFilter]
   )
-
+  if (error) return (<Error>Something went wrong, please try again later.</Error>)
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>

@@ -4,6 +4,7 @@ from django.forms.models import model_to_dict
 
 import math, json, logging
 from datetime import datetime, timedelta
+from django.utils import timezone
 
 import numpy as np
 import pandas as pd
@@ -55,16 +56,16 @@ def gpa_map(grade):
 
 def get_course_info(request, course_id=0):
     """Returns JSON data about a course
-    
+
     :param request: HTTP Request
     :type request: Request
     :param course_id: Unizin Course ID, defaults to 0
     :param course_id: int, optional
-    :return: JSON to be used 
+    :return: JSON to be used
     :rtype: str
     """
     course_id = canvas_id_to_incremented_id(course_id)
-    today = datetime.today()
+    today = timezone.now()
 
     try:
         course = Course.objects.get(id=course_id)
@@ -83,14 +84,14 @@ def get_course_info(request, course_id=0):
 
     current_week_number = math.ceil((today - term.date_start).days/7)
     total_weeks = math.ceil((term.date_end - term.date_start).days/7)
-    
+
     resp['term'] = model_to_dict(term)
 
     # Have a fixed maximum number of weeks
     if total_weeks > settings.MAX_DEFAULT_WEEKS:
         logger.debug(f'{total_weeks} is greater than {settings.MAX_DEFAULT_WEEKS} setting total weeks to default.')
         total_weeks = settings.MAX_DEFAULT_WEEKS
-        
+
     resp['current_week_number'] = current_week_number
     resp['total_weeks'] = total_weeks
     resp['course_view_options'] = CourseViewOption.objects.get(course=course).json(include_id=False)
@@ -148,7 +149,7 @@ def file_access_within_week(request, course_id=0):
 
     sqlString = f"""SELECT a.file_id as file_id, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id
                     FROM file f, file_access a, user u, course c, academic_terms t
-                    WHERE a.file_id =f.ID and a.user_id = u.ID
+                    WHERE a.file_id =f.id and a.user_id = u.user_id
                     and f.course_id = c.id and c.term_id = t.id
                     and a.access_time > %(start_time)s
                     and a.access_time < %(end_time)s
@@ -202,7 +203,7 @@ def file_access_within_week(request, course_id=0):
     # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
     selfSqlString = "select CONCAT(f.id, ';', f.name) as file_id_name, count(*) as self_access_count, max(a.access_time) as self_access_last_time " \
                     "from file_access a, user u, file f " \
-                    "where a.user_id = u.id " \
+                    "where a.user_id = u.user_id " \
                     "and a.file_id = f.ID " \
                     "and u.sis_name=%(current_user)s " \
                     "group by CONCAT(f.id, ';', f.name)"
@@ -313,7 +314,7 @@ def get_user_default_selection(request, course_id=0):
     no_user_default_response = json.dumps({key: ''})
     logger.info(f"the default option request from user {user_id} in course {course_id} of type: {default_view_type}")
     default_value = UserDefaultSelection.objects.get_user_defaults(course_id, user_id, default_view_type)
-    logger.info(f"""default option check returned from DB for user: {user_id} course {course_id} and type: 
+    logger.info(f"""default option check returned from DB for user: {user_id} course {course_id} and type:
                     {default_view_type} is {default_value}""")
     if not default_value:
         logger.info(
@@ -456,7 +457,7 @@ def get_course_assignments(course_id):
 
 def get_user_assignment_submission(current_user,assignments_in_course_df, course_id):
     sql = "select assignment_id, score, graded_date from submission where " \
-          "user_id=(select id from user where sis_name = %(current_user)s and course_id = %(course_id)s ) and course_id = %(course_id)s"
+          "user_id=(select user_id from user where sis_name = %(current_user)s and course_id = %(course_id)s ) and course_id = %(course_id)s"
     assignment_submissions = pd.read_sql(sql, conn, params={'course_id': course_id, "current_user": current_user})
     if assignment_submissions.empty:
         logger.info('The user %s seems to be a not student in the course.' % current_user)
@@ -515,7 +516,7 @@ def find_min_week(course_id):
 
 
 def find_current_week(row):
-    current_date = datetime.now()
+    current_date = timezone.now()
     year,week,dow = current_date.isocalendar() #dow = day of week
     if row == week:
         return True
@@ -578,7 +579,7 @@ def logout(request):
 
 def courses_enabled(request):
     """ Returns json for all courses we currntly support and are enabled
-    
+
     """
     data = {}
     for cvo in CourseViewOption.objects.all():
