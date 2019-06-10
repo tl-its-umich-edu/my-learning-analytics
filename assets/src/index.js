@@ -3,12 +3,16 @@ import ReactDOM from 'react-dom'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import './index.css'
 import App from './containers/App'
+import CourseList from './containers/CourseList'
 import 'typeface-roboto'
 // import * as serviceWorker from './serviceWorker'
 
 ReactDOM.render(
   <Router basename='/courses/'>
-    <Route path='/:courseId' component={App} />
+    <>
+      <Route path='/' exact component={CourseList} />
+      <Route path='/:courseId' component={App} />
+    </>
   </Router>
   , document.getElementById('root')
 )

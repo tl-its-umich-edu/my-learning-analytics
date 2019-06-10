@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
+import CourseList from './CourseList'
 import GradeDistribution from './GradeDistribution'
 import AssignmentPlanning from './AssignmentPlanning'
 import FilesAccessed from './FilesAccessed'
@@ -17,7 +18,6 @@ function App (props) {
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
-  // this is temporary
   const user = {
     username: myla_globals.username,
     admin: myla_globals.is_superuser
