@@ -13,11 +13,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% use_macro title %}</title>
-    <!-- Common CSS -->
-    <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.css' %}">
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-
-    {% block css %} {% endblock %}
     <script>
         // Setup a top level js object to hold global values
         var myla_globals = {
@@ -30,22 +25,40 @@
         {% if user.is_authenticated %}
             "username": '{{ user.get_username }}',
         {% else %}
-            "username": ""
+            "username": "",
+        {% endif %}
+        {% if settings.GA_ID  %}
+        "GA": '{{ settings.GA_ID }}',
+        {% else %}
+        "GA": "",
+        {% endif %}
+        {% if settings.LOGIN_URL  %}
+        "login": '{{ settings.LOGIN_URL }}',
+        {% else %}
+        "login": "",
+        {% endif %}
+        {% if settings.LOGOUT_URL  %}
+        "logout": '{{ settings.LOGOUT_URL }}',
+        {% else %}
+        "logout": "",
+        {% endif %}
+        {% if current_user_courses_info%}
+            "user_courses_info":'{{current_user_courses_info|safe}}',
+        {% else %}
+            "user_courses_info":"",
         {% endif %}
 
-        };
+        }
     </script>
 </head>
-<body class="container-fluid">
+<body>
     {% include "su/is_su.html" %}
     {% block content %}
     {% endblock %}
+    {% csrf_token %}
     <footer>
-        <hr>
-        <div class="row">
-            <div class="col text-left">Copyright © 2018 The Regents of the University of Michigan</div>
-            <div class="col text-right">Data last updated on {{last_updated|date:"m/d/Y P T"}}</div>
-        </div>
+        <div style="float: left; width: 50%">Copyright © 2018 The Regents of the University of Michigan</div>
+        <div style="float: left; width: 50%; text-align: right">Data last updated on {{last_updated|date:"m/d/Y P T"}}</div>
         {% if user.is_superuser %}
         <div id="build-info" class="alert alert-info" style="display:none;">{{build}}</div>
         {% endif %}
@@ -64,24 +77,4 @@
     });
 </script>
 {% endif %}
-<script src="{% static 'moment/min/moment.min.js' %}"></script>
-<script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
-<script src="{% static 'angular/angular.js' %}"></script>
-<script src="{% static 'underscore/underscore-min.js' %}"></script>
-<script>
-    $(document).ready(function () {
-        url = window.location.href;
-        var help_link = 'https://sites.google.com/umich.edu/my-learning-analytics-help/home';
-        if (url.includes('grades')) {
-            help_link = help_link + '/grade-distribution';
-        } else if (url.includes('assignments')) {
-            help_link = help_link + '/assignment-planning';
-        } else if (url.includes('file')) {
-            help_link = help_link + '/files-accessed';
-        }
-        $('<a href=' + help_link + ' style="padding-right:10px" target="_blank">Help</a>').insertAfter($('#help'));
-    });
-</script>
-{% block js %}
-{% endblock %}
 </html>

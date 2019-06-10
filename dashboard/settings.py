@@ -27,6 +27,7 @@ PROJECT_ROOT = os.path.abspath(
 )
 
 LOGOUT_URL = '/accounts/logout'
+LOGIN_URL = '/accounts/login'
 
 # Google Analytics ID
 GA_ID = config('GA_ID', default='')
@@ -114,6 +115,7 @@ TEMPLATES = [
                 'dashboard.context_processors.course_name',
                 'dashboard.context_processors.current_user_course_id',
                 'dashboard.context_processors.current_user_incremented_course_id',
+                'dashboard.context_processors.current_user_courses_info',
                 'dashboard.context_processors.course_view_option',
                 'dashboard.context_processors.last_updated',
                 'dashboard.context_processors.get_build_info',
@@ -343,6 +345,7 @@ if config('STUDENT_DASHBOARD_SAML', default='True', cast=bool):
 else:
     AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
     LOGIN_REDIRECT_URL = '/'
+    LOGOUT_REDIRECT_URL='/'
 
 # Give an opportunity to disable LTI
 if config('STUDENT_DASHBOARD_LTI', default='False', cast=bool):
