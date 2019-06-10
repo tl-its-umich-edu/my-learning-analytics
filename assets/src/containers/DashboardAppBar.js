@@ -73,7 +73,7 @@ function DashboardAppBar (props) {
             color='inherit'
             aria-haspopup='true'
             variant='contained'>
-            <Avatar>{user.firstName.slice(0, 1)}{user.lastName.slice(0, 1)}</Avatar>
+            <Avatar>{user.username.slice(0,1)}</Avatar>
           </IconButton>
           <Popover
             open={avatarOpen}
