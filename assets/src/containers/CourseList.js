@@ -23,9 +23,12 @@ const styles = theme => ({
 
 function CourseList (props) {
   const { classes } = props
-  // currently JSON.parse is required because Django is returning string instead of object
-  const userCourseInfo = JSON.parse(myla_globals.user_courses_info)
 
+  if (myla_globals.is_superuser) {
+    return (<Error>You are logged in as '{myla_globals.username}'. Please enter the ID of the course in the URL after '/courses/'.</Error>)
+  }
+
+  const userCourseInfo = JSON.parse(myla_globals.user_courses_info)
   if (!userCourseInfo) return (<Error>You are not enrolled in any courses with MyLA enabled.</Error>)
 
   return (
