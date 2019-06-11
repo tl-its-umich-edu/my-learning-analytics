@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 import SelectCard from '../components/SelectCard'
 import Error from './Error'
+import Typography from '@material-ui/core/Typography'
 import { Link } from 'react-router-dom'
 
 const styles = theme => ({
@@ -32,15 +33,20 @@ function CourseList (props) {
   if (!userCourseInfo) return (<Error>You are not enrolled in any courses with MyLA enabled.</Error>)
 
   return (
-    <Grid container spacing={16} className={classes.root}>
-      <Grid item xs={12} className={classes.container}>
-        {userCourseInfo.map((course, key) =>
-          <Link style={{ textDecoration: 'none' }} to={course.course_id} key={key}>
-            <SelectCard cardData={{ title: course.course_name }} />
-          </Link>
-        )}
+    <div className={classes.root}>
+      <Grid container spacing={16} className={classes.root}>
+        <Grid item xs={4}>
+          <Typography variant='h5'>Please select a course</Typography>
+        </Grid>
+        <Grid item xs={12} className={classes.container}>
+          {userCourseInfo.map((course, key) =>
+            <Link style={{ textDecoration: 'none' }} to={course.course_id} key={key}>
+              <SelectCard cardData={{ title: course.course_name }} />
+            </Link>
+          )}
+        </Grid>
       </Grid>
-    </Grid>
+    </div>
   )
 }
 
