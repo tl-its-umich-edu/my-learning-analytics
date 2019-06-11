@@ -66,7 +66,7 @@ function FilesAccessed (props) {
       // Django rejects PUT/DELETE/POST calls with out CSRF token.
       const csrfToken = Cookie.get('csrftoken')
       const body = { file: gradeRangeFilter }
-      const dataURL = `http://localhost:5001/api/v1/courses/${courseId}/set_user_default_selection`
+      const dataURL = `/api/v1/courses/${courseId}/set_user_default_selection`
 
       defaultFetchOptions.headers['X-CSRFToken'] = csrfToken
       defaultFetchOptions['method'] = 'PUT'
@@ -128,7 +128,7 @@ function FilesAccessed (props) {
   useEffect(() => {
     // Fetch data once all the setting data is fetched
     if (dataControllerLoad === 2) {
-      const dataURL = `http://localhost:5001/api/v1/courses/${courseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}`
+      const dataURL = `/api/v1/courses/${courseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}`
       fetch(dataURL)
         .then(handleError)
         .then(res => res.json())
