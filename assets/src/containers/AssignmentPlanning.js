@@ -101,7 +101,7 @@ function AssignmentPlanning (props) {
       // Django rejects PUT/DELETE/POST calls with out CSRF token.
       const csrfToken = Cookie.get('csrftoken')
       const body = { assignment: assignmentFilter }
-      const dataURL = `http://localhost:5001/api/v1/courses/${courseId}/set_user_default_selection`
+      const dataURL = `/api/v1/courses/${courseId}/set_user_default_selection`
 
       defaultFetchOptions.headers['X-CSRFToken'] = csrfToken
       defaultFetchOptions['method'] = 'PUT'
@@ -142,7 +142,7 @@ function AssignmentPlanning (props) {
         return
       }
       const fetchOptions = { method: 'get', ...defaultFetchOptions }
-      const dataURL = `http://localhost:5001/api/v1/courses/${courseId}/assignments?percent=${assignmentFilter}`
+      const dataURL = `/api/v1/courses/${courseId}/assignments?percent=${assignmentFilter}`
       fetch(dataURL, fetchOptions)
         .then(handleError)
         .then(res => res.json())
