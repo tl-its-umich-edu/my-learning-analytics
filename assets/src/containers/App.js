@@ -23,7 +23,7 @@ function App (props) {
     admin: myla_globals.is_superuser
   }
 
-  if (!user.username) return (window.location.href = 'http://localhost:5001/accounts/login')
+  if (!user.username) return (window.location.href = myla_globals.login)
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
   if (loaded && isObjectEmpty(courseInfo)) return (<Error>Tool is not enabled for this course.</Error>)
 
