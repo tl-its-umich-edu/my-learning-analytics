@@ -1,5 +1,6 @@
 import logging
 from decouple import config
+from datetime import datetime
 logger = logging.getLogger(__name__)
 
 
@@ -14,8 +15,7 @@ def get_build_info():
 
 def get_copyright_info():
     institutions={"umich": "The Regents of the University of Michigan", "iu": "The Trustees of Indiana University", "ubc": "UBC"}
-    institution=config("INSTITUTION",default="")
-    copyright_str="Copyright &copy "
+    institution=config("INSTITUTION",default="umich")
     year=datetime.now().year
-    copyright_str+=str(year)+institutions[institution]
-    return f'Copyright © {year} {institutions[institution]}'
+    copyright_str=institutions[institution]
+    return f'Copyright © {year} {copyright_str}'
