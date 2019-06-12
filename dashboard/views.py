@@ -248,7 +248,7 @@ def file_access_within_week(request, course_id=0):
 
     output_df['file_id_part'], output_df['file_name_part'] = output_df['file_id_name'].str.split(';', 1).str
     # uses canvas url if file type == 0 (cavas file) and leccap url if not
-    output_df['file_name'] = output_df.apply(lambda row: CANVAS_FILE_PREFIX + row.file_id_part + CANVAS_FILE_POSTFIX + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part if row.file_type == 0.0 else LECCAP_FILE_PREFIX + row.file_id_part + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
+    output_df['file_name'] = output_df.apply(lambda row: CANVAS_FILE_PREFIX + row.file_id_part + CANVAS_FILE_POSTFIX + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part if row.file_type == CANVAS_FILE else LECCAP_FILE_PREFIX + row.file_id_part + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
     output_df.drop(columns=['file_id_part', 'file_name_part', 'file_id_name'], inplace=True)
     logger.debug(output_df.to_json(orient='records'))
 
