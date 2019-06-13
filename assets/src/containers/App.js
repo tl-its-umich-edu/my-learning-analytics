@@ -5,6 +5,7 @@ import SideDrawer from './SideDrawer'
 import GradeDistribution from './GradeDistribution'
 import AssignmentPlanning from './AssignmentPlanning'
 import FilesAccessed from './FilesAccessed'
+import Discussion from './Discussion'
 import IndexPage from './IndexPage'
 import Spinner from '../components/Spinner'
 import Error from './Error'
@@ -53,6 +54,9 @@ function App (props) {
                 courseId={courseId} />} />
             <Route path='/:courseId/files'
               render={props => <FilesAccessed {...props} courseInfo={courseInfo}
+                courseId={courseId} />} />
+            <Route path='/:courseId/discussion'
+              render={props => <Discussion {...props} courseInfo={courseInfo}
                 courseId={courseId} />} />
           </>
           : <Spinner />
