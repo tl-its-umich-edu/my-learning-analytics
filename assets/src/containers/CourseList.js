@@ -60,7 +60,7 @@ function CourseList (props) {
       <AppBar className={classes.root} position='static'>
         <Toolbar>
           <Typography variant='h6' color='inherit' className={classes.grow}>
-            My Learning Analytics
+            My Learning Analytics the welcome page
           </Typography>
           <div className={classes.grow} />
           <IconButton
@@ -91,7 +91,7 @@ function CourseList (props) {
       <Grid container spacing={16} className={classes.root}>
         <Grid item xs={12} className={classes.container}>
           {userCourseInfo.map((course, key) =>
-            <Link style={{ textDecoration: 'none' }} to={course.course_id} key={key}>
+            <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
               <SelectCard cardData={{ title: course.course_name }} />
             </Link>
           )}
