@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import Spinner from '../components/Spinner'
 import SimpleCard from '../components/SimpleCard'
+import DiscussionSentenceList from '../components/DiscussionSentenceList'
 import Error from './Error'
 import { isObjectEmpty } from '../util/object'
 
@@ -94,11 +95,7 @@ function Discussion (props) {
           discussionData.keywords.map((keyword, i) => (
             <Grid item xs={3} key={i}>
               <SimpleCard keyword={keyword}>
-                {discussionData.discussion[keyword]
-                  ? discussionData.discussion[keyword]
-                    .map((sentence, i) => <Typography variant='h6' key={i}>(sentence}</Typography>)
-                  : null
-                }
+                <DiscussionSentenceList keyword={keyword} discussion={discussionData.discussion} />
               </SimpleCard>
             </Grid>
           ))
