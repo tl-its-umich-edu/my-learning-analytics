@@ -39,17 +39,17 @@ const styles = theme => ({
 function CourseList (props) {
   const { classes } = props
   if (!myla_globals.username) return (window.location.href = myla_globals.login)
-  if (myla_globals.is_superuser) return (<Paper className={classes.paper}><Typography>Select a course you choose to look in</Typography></Paper>)
 
   const userCourseInfo = (myla_globals.user_courses_info.length !== 0)
     ? JSON.parse(myla_globals.user_courses_info)
     : ''
 
-  if (!userCourseInfo) return (<Error>You are not enrolled in any courses with MyLA enabled.</Error>)
+  const isSuperuser = myla_globals.is_superuser
+  if (!userCourseInfo && !isSuperuser) return (<Error>You are not enrolled in any courses with MyLA enabled.</Error>)
 
   const user = {
     username: myla_globals.username,
-    admin: myla_globals.is_superuser
+    admin: isSuperuser
   }
 
   const [avatarEl, setAvatarEl] = useState(null)
@@ -88,15 +88,18 @@ function CourseList (props) {
           </Popover>
         </Toolbar>
       </AppBar>
-      <Grid container spacing={16} className={classes.root}>
-        <Grid item xs={12} className={classes.container}>
-          {userCourseInfo.map((course, key) =>
-            <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
-              <SelectCard cardData={{ title: course.course_name }} />
-            </Link>
-          )}
+      {isSuperuser ? <Paper className={classes.paper}><Typography>Select a course you choose to look
+          in</Typography></Paper> :
+        <Grid container spacing={16} className={classes.root}>
+          <Grid item xs={12} className={classes.container}>
+            {userCourseInfo.map((course, key) =>
+              <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
+                <SelectCard cardData={{ title: course.course_name }}/>
+              </Link>
+            )}
+          </Grid>
         </Grid>
-      </Grid>
+      }
     </>
   )
 }
