@@ -18,7 +18,7 @@ def canvas_id_to_incremented_id(canvas_id):
     except ValueError:
         return None
 
-    return str(int(canvas_id) + settings.CANVAS_DATA_ID_INCREMENT)
+    return int(canvas_id) + settings.CANVAS_DATA_ID_INCREMENT
 
 def incremented_id_to_canvas_id(incremented_id):
     try:

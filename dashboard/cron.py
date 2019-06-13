@@ -93,23 +93,18 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids
         for course_id in Course.objects.get_supported_courses():
-            if not course_id.isdigit():
-                # course id can only have digit character inside
-                logger.error(f"""Course {course_id} is invalid. """)
-                invalid_course_id_list.append(course_id)
-            else:
-                # select course based on course id
-                course_sql = f"""select *
-                            from course_dim c
-                            where c.id = '{course_id}'
-                            """
-                logger.debug(course_sql)
-                course_df = pd.read_sql(course_sql, conns['DATA_WAREHOUSE'])
+            # select course based on course id
+            course_sql = f"""select *
+                        from course_dim c
+                        where c.id = '{course_id}'
+                        """
+            logger.debug(course_sql)
+            course_df = pd.read_sql(course_sql, conns['DATA_WAREHOUSE'])
 
-                # error out when course id is invalid
-                if course_df.empty:
-                    logger.error(f"""Course {course_id} don't have the entry in data warehouse yet. """)
-                    invalid_course_id_list.append(course_id)
+            # error out when course id is invalid
+            if course_df.empty:
+                logger.error(f"""Course {course_id} don't have the entry in data warehouse yet. """)
+                invalid_course_id_list.append(course_id)
 
 
         return invalid_course_id_list
