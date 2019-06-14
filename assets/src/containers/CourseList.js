@@ -29,7 +29,8 @@ const styles = theme => ({
   },
   paper: {
     padding: theme.spacing.unit * 2,
-    color: theme.palette.text.secondary
+    color: theme.palette.text.secondary,
+    display: 'flex'
   },
   grow: {
     flexGrow: 1
@@ -62,7 +63,7 @@ function CourseList (props) {
           <Typography variant='h6' color='inherit' className={classes.grow}>
             My Learning Analytics the welcome page
           </Typography>
-          <div className={classes.grow} />
+          <div className={classes.grow}/>
           <IconButton
             aria-owns={avatarOpen ? 'simple-popper' : undefined}
             onClick={event => setAvatarEl(event.currentTarget)}
@@ -84,22 +85,31 @@ function CourseList (props) {
               horizontal: 'center'
             }}
           >
-            <AvatarModal user={user} />
+            <AvatarModal user={user}/>
           </Popover>
         </Toolbar>
       </AppBar>
-      {isSuperuser ? <Paper className={classes.paper}><Typography>Select a course you choose to look
-          in</Typography></Paper> :
-        <Grid container spacing={16} className={classes.root}>
-          <Grid item xs={12} className={classes.container}>
-            {userCourseInfo.map((course, key) =>
-              <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
-                <SelectCard cardData={{ title: course.course_name }}/>
-              </Link>
-            )}
+      <div className={classes.root}>
+        {isSuperuser ?
+          <Grid container spacing={16}>
+            <Grid item xs={12}>
+              <Paper className={classes.paper}>
+                <Typography variant='h5' gutterBottom>Select a course of your choice</Typography>
+              </Paper>
+            </Grid>
           </Grid>
-        </Grid>
-      }
+          :
+          <Grid container spacing={16}>
+            <Grid item xs={12} className={classes.container}>
+              {userCourseInfo.map((course, key) =>
+                <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
+                  <SelectCard cardData={{ title: course.course_name }}/>
+                </Link>
+              )}
+            </Grid>
+          </Grid>
+        }
+      </div>
     </>
   )
 }
