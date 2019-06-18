@@ -47,6 +47,16 @@
         {% else %}
             "user_courses_info":"",
         {% endif %}
+        {% if settings.CANVAS_FILE %}
+            "canvas_file": '{{ settings.CANVAS_FILE }}',
+        {% else %}
+            "canvas_file":"0",
+        {% endif %}
+        {% if settings.LECCAP_FILE %}
+            "leccap_file": '{{ settings.LECCAP_FILE }}',
+        {% else %}
+            "leccap_file":"1",
+        {% endif %}
 
         }
     </script>

@@ -47,6 +47,7 @@ function FilesAccessed (props) {
   const [curWeek, setCurWeek] = useState(0) // Should be updated from info
   const [weekRange, setWeekRange] = useState([]) // Should be depend on curWeek
   const [gradeRangeFilter, setGradeRangeFilter] = useState('') // Should be fetched from default
+  const [fileFilter, setFileFilter] = useState('');
   const [fileAccessData, setFileAccessData] = useState('')
   const [dataControllerLoad, setDataControllerLoad] = useState(0)
   // initial default value that we get from backend and updated value when user save the default setting
@@ -55,6 +56,9 @@ function FilesAccessed (props) {
   // defaults setting controllers
   const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
   const [defaultLabel, setDefaultLabel] = useState(currentSetting)
+
+  const canvas_file = myla_globals.canvas_file
+  const leccap_file = myla_globals.leccap_file
 
   const changeDefaultSetting = (event) => {
     const didUserChecked = event.target.checked
@@ -115,10 +119,12 @@ function FilesAccessed (props) {
     if (loaded) {
       if (filesDefaultData.default !== '') {
         setGradeRangeFilter(filesDefaultData.default)
+        setFileFilter(filesDefaultData.default)
         setDefaultValue(filesDefaultData.default)
       } else {
         // setting it to default
         setGradeRangeFilter('All')
+        setFileFilter('all_files')
         setDefaultValue('All')
       }
       setDataControllerLoad(dataControllerLoad + 1)
@@ -128,7 +134,7 @@ function FilesAccessed (props) {
   useEffect(() => {
     // Fetch data once all the setting data is fetched
     if (dataControllerLoad === 2) {
-      const dataURL = `/api/v1/courses/${courseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}`
+      const dataURL = `/api/v1/courses/${courseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&file_type=${fileFilter}`
       fetch(dataURL)
         .then(handleError)
         .then(res => res.json())
@@ -139,7 +145,7 @@ function FilesAccessed (props) {
           setFileAccessData({})
         })
     }
-  }, [dataControllerLoad, weekRange, gradeRangeFilter])
+  }, [dataControllerLoad, weekRange, gradeRangeFilter, fileFilter])
 
   const onWeekChangeHandler = value => {
     // Update week range slider
@@ -157,6 +163,11 @@ function FilesAccessed (props) {
       setDefaultCheckedState(false)
       setDefaultLabel(rememberSetting)
     }
+  }
+
+  const onChangeFileHandler = event => {
+    const value = event.target.value
+    setFileFilter(value)
   }
 
   const FileAccessChartBuilder = (fileData) => {
@@ -189,9 +200,23 @@ function FilesAccessed (props) {
               onWeekChange={onWeekChangeHandler}
             /> : ''}
             <div className={classes.formController}>
-              <p>File accessed from
+              <FormControl className={classes.formControl}>
+                <Select
+                  value={fileFilter}
+                  onChange={onChangeFileHandler}
+                  inputProps={{
+                    name: 'file',
+                    id: 'file-type',
+                  }}
+                >
+                  <MenuItem value="all_files">All</MenuItem>
+                  <MenuItem value={canvas_file}>Canvas</MenuItem>
+                  <MenuItem value={leccap_file}>Lecture Capture</MenuItem>
+                </Select>
+              </FormControl>
+              <p>Files accessed from
                 week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now)' : ''}</b> with
-                these grades:</p>
+                these grades: </p>
               <FormControl className={classes.formControl}>
                 <Select
                   value={gradeRangeFilter}
@@ -202,9 +227,9 @@ function FilesAccessed (props) {
                   }}
                 >
                   <MenuItem value="All">All</MenuItem>
-                  <MenuItem value="90-100">90-100%</MenuItem>
-                  <MenuItem value="80-89">80-89%</MenuItem>
-                  <MenuItem value="70-79">70-79%</MenuItem>
+                  <MenuItem value="90-100"> 90-100%</MenuItem>
+                  <MenuItem value="80-89"> 80-89%</MenuItem>
+                  <MenuItem value="70-79"> 70-79%</MenuItem>
                 </Select>
               </FormControl>
               {defaultCheckboxState ? <div style={{ padding: '10px' }}></div> : <Checkbox
