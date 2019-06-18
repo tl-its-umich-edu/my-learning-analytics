@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 CANVAS_FILE_PREFIX = config("CANVAS_FILE_PREFIX", default="")
 CANVAS_FILE_POSTFIX = config("CANVAS_FILE_POSTFIX", default="")
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
+LECCAP_FILE_PREFIX = config("LECCAP_FILE_PREFIX", default="")
 
 # string for no grade
 GRADE_A="90-100"
@@ -36,6 +37,10 @@ GRADE_C="70-79"
 GRADE_LOW="low_grade"
 NO_GRADE_STRING = "NO_GRADE"
 
+# string for file type
+FILE_TYPE_STRING = "file_type"
+CANVAS_FILE = config("CANVAS_FILE", default=0)
+LECCAP_FILE = config("CANVAS_FILE", default=1)
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
@@ -114,12 +119,14 @@ def file_access_within_week(request, course_id=0):
     week_num_start = int(request.GET.get('week_num_start','1'))
     week_num_end = int(request.GET.get('week_num_end','0'))
     grade = request.GET.get('grade','all')
+    file_type = request.GET.get(FILE_TYPE_STRING, 'all_files')
 
     # json for eventlog
     data = {
         "week_num_start": week_num_start,
         "week_num_end": week_num_end,
         "grade": grade,
+        "file_type": file_type,
         "course_id": course_id
     }
     eventlog(request.user, EventLogTypes.EVENT_VIEW_FILE_ACCESS.value, extra=data)
@@ -147,7 +154,7 @@ def file_access_within_week(request, course_id=0):
 
     # get time range based on week number passed in via request
 
-    sqlString = f"""SELECT a.file_id as file_id, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id
+    sqlString = f"""SELECT a.file_id as file_id, f.type as file_type, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id
                     FROM file f, file_access a, user u, course c, academic_terms t
                     WHERE a.file_id =f.id and a.user_id = u.user_id
                     and f.course_id = c.id and c.term_id = t.id
@@ -191,12 +198,13 @@ def file_access_within_week(request, course_id=0):
     #df.reset_index(inplace=True)
 
     # zero filled dataframe with file name as row name, and grade as column name
-    output_df=pd.DataFrame(0.0, index=file_id_name, columns=[GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING])
+    output_df=pd.DataFrame(0.0, index=file_id_name, columns=[GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING, FILE_TYPE_STRING])
     output_df=output_df.rename_axis('file_id_name')
 
     for index, row in df.iterrows():
         # set value
         output_df.at[row['file_id_name'], row['grade']] = row['percent']
+        output_df.at[row['file_id_name'], 'file_type'] = row['file_type']
     output_df.reset_index(inplace=True)
 
     # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
@@ -224,6 +232,14 @@ def file_access_within_week(request, course_id=0):
             else:
                 output_df=output_df.drop([i_grade], axis=1)
 
+
+    if (file_type != "all_files"):
+        # drop all other files
+        file_types = [CANVAS_FILE, LECCAP_FILE]
+        for i_file_types in file_types:
+            if (i_file_types != int(file_type)):
+                output_df = output_df[output_df.file_type == int(file_type)]
+
     # only keep rows where total_count > 0
     output_df = output_df[output_df.total_count > 0]
 
@@ -235,8 +251,8 @@ def file_access_within_week(request, course_id=0):
     output_df.fillna(0, inplace=True) #replace null value with 0
 
     output_df['file_id_part'], output_df['file_name_part'] = output_df['file_id_name'].str.split(';', 1).str
-    output_df['file_name'] = output_df.apply(lambda row: CANVAS_FILE_PREFIX + row.file_id_part + CANVAS_FILE_POSTFIX + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
-    output_df.drop(columns=['file_id_part', 'file_name_part', 'file_id_name'], inplace=True)
+    # uses canvas url if file type == 0 (cavas file) and leccap url if not
+    output_df['file_name'] = output_df.apply(lambda row: CANVAS_FILE_PREFIX + row.file_id_part + CANVAS_FILE_POSTFIX + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part if row.file_type == 0.0 else LECCAP_FILE_PREFIX + row.file_id_part + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
     logger.debug(output_df.to_json(orient='records'))
 
     return HttpResponse(output_df.to_json(orient='records'),content_type='application/json')
@@ -326,6 +342,7 @@ def get_user_default_selection(request, course_id=0):
 
 
 def assignments(request, course_id=0):
+    
     logger.info(assignments.__name__)
 
     course_id = canvas_id_to_incremented_id(course_id)
