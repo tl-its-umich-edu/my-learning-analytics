@@ -227,9 +227,9 @@ function FilesAccessed (props) {
                   }}
                 >
                   <MenuItem value="All">All</MenuItem>
-                  <MenuItem value="90-100"> 90-100%</MenuItem>
-                  <MenuItem value="80-89"> 80-89%</MenuItem>
-                  <MenuItem value="70-79"> 70-79%</MenuItem>
+                  <MenuItem value="90-100">90-100%</MenuItem>
+                  <MenuItem value="80-89">80-89%</MenuItem>
+                  <MenuItem value="70-79">70-79%</MenuItem>
                 </Select>
               </FormControl>
               {defaultCheckboxState ? <div style={{ padding: '10px' }}></div> : <Checkbox
