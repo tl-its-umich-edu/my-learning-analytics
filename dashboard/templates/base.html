@@ -67,7 +67,7 @@
     {% endblock %}
     {% csrf_token %}
     <footer>
-        <div style="float: left; width: 50%">{{settings.COPYRIGHT}}</div>
+        <div style="float: left; width: 50%">Copyright © 2018 The Regents of the University of Michigan</div>
         <div style="float: left; width: 50%; text-align: right">Data last updated on {{last_updated|date:"m/d/Y P T"}}</div>
         {% if user.is_superuser %}
         <div id="build-info" class="alert alert-info" style="display:none;">{{build}}</div>

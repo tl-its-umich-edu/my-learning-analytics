@@ -17,8 +17,6 @@ from decouple import config, Csv
 
 from debug_toolbar import settings as dt_settings
 
-from dashboard.common import utils
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -33,9 +31,6 @@ LOGIN_URL = '/accounts/login'
 
 # Google Analytics ID
 GA_ID = config('GA_ID', default='')
-
-# Copyright Information
-COPYRIGHT = utils.get_copyright_info()
 
 # File values from .env
 CANVAS_FILE = config('CANVAS_FILE', default='0')
@@ -391,7 +386,7 @@ BIG_QUERY_ED_APP = config('BIG_QUERY_ED_APP', default="http://umich.instructure.
 RUN_AT_TIMES = config('RUN_AT_TIMES', default="", cast= Csv())
 
 # Add any settings you need to be available to templates in this array
-SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'COPYRIGHT', 'CANVAS_FILE', 'LECCAP_FILE']
+SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'CANVAS_FILE', 'LECCAP_FILE']
 
 # Method to show the user, if they're authenticated and superuser
 def show_debug_toolbar(request):
