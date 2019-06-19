@@ -19,7 +19,6 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 
 from django.views.static import serve
-from django.views.generic.base import TemplateView
 
 from django.conf import settings
 from django.conf.urls import include
@@ -32,20 +31,23 @@ from . import views
 import watchman.views
 
 urlpatterns = [
-    url(r'^$', 
-        TemplateView.as_view(template_name='home.html'), name = 'home'),
+    url(r'^$', views.get_home_template, name='home'),
     url(r'^status/', include('watchman.urls')),
     url(r'^status/bare_status$', watchman.views.bare_status),
 
     url('admin', admin.site.urls),
 
     # These URL's are for views, the accept an empty id
-    url(r'^courses/(?P<course_id>[0-9]+|)/?grades', login_required(TemplateView.as_view(template_name='grades.html')), name="grades"),
-    url(r'^courses/(?P<course_id>[0-9]+|)/?assignments', login_required(TemplateView.as_view(template_name='assignments.html')), name="assignments"),
-    url(r'^courses/(?P<course_id>[0-9]+|)/?view_file_access_within_week', login_required(TemplateView.as_view(template_name='view_file_access_within_week.html')), name="view_file_access_within_week"),
+    url(r'^courses/(?P<course_id>[0-9]+|)/?grades',
+        login_required(views.get_grades_template), name="grades"),
+    url(r'^courses/(?P<course_id>[0-9]+|)/?assignments',
+        login_required(views.get_assignments_template), name="assignments"),
+    url(r'^courses/(?P<course_id>[0-9]+|)/?view_file_access_within_week',
+        login_required(views.get_files_template), name="view_file_access_within_week"),
 
     # This is the courses catch-all
-    url(r'^courses/(?P<course_id>[0-9]+|)', login_required(TemplateView.as_view(template_name='courses.html')), name="courses"),
+    url(r'^courses/(?P<course_id>[0-9]+|)',
+        login_required(views.get_course_template), name="courses"),
 
     # Thse URL's are data patterns
     # GET access patterns
