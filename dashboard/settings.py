@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'pinax.eventlog',
     'webpack_loader'
+    'rules.apps.AutodiscoverRulesConfig',
 ]
 
 # The order of this is important. It says DebugToolbar should be on top but
@@ -231,6 +232,11 @@ LOGGING = {
             'propagate': False,
             'level': config('DJANGO_LOG_LEVEL', default='INFO'),
         },
+        'rules': {
+            'handlers': ['console'],
+            'propagate': False,
+            'level': config('RULES_LOG_LEVEL', default='INFO'),
+        },
         '': {
             'level': 'WARNING',
             'handlers': ['console'],
@@ -244,7 +250,17 @@ LOGGING = {
 }
 
 
-AUTHENTICATION_BACKENDS = ('django_su.backends.SuBackend',)
+# IMPORT LOCAL SETTINGS
+# =====================
+try:
+    from settings_local import *
+except ImportError:
+    pass
+
+AUTHENTICATION_BACKENDS = (
+    'rules.permissions.ObjectPermissionBackend',
+    'django_su.backends.SuBackend',
+)
 
 #Shib
 

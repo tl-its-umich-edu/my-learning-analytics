@@ -17,9 +17,9 @@ from django.apps import apps
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
+from django.views.generic.base import TemplateView
 
 from django.views.static import serve
-from django.views.generic.base import TemplateView
 
 from django.conf import settings
 from django.conf.urls import include
@@ -41,7 +41,6 @@ urlpatterns = [
 
     # This is the courses catch-all
     url(r'^courses/(?P<course_id>[0-9]+|)', login_required(TemplateView.as_view(template_name='frontend/index.html')), name="test"),
-
 
     # Thse URL's are data patterns
     # GET access patterns
