@@ -144,6 +144,12 @@ This will remove everything! (images, containers, volumes)
 
 *Docker stores MySQL data locally in the directory `.data`. If you want to fully clean you'll have to remove this folder.*
 
+## Populating Copyright information in footer
+1. Since MyLA can be used by multiple institution, copyright information needs to be entitled to institutions needs. 
+2. Django Flatpages serves the purpose. The display of the copyright content can be controlled from the Django Admin view. 
+3. The url for configuring copyright info must be `/copyright/` since that is used in the `base.html` for pulling the info
+[More info](https://simpleisbetterthancomplex.com/tutorial/2016/10/04/how-to-use-django-flatpages-app.html)
+
 ## Testing tips!
 
 1. Connect to the docker and edit some files!

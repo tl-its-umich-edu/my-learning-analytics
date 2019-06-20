@@ -31,6 +31,8 @@ LOGIN_URL = '/accounts/login'
 
 # Google Analytics ID
 GA_ID = config('GA_ID', default='')
+
+# This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
 SITE_ID = 1
 
 # Quick-start development settings - unsuitable for production
