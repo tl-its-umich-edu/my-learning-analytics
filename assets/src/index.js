@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Route } from 'react-router-dom'
 import './index.css'
 import App from './containers/App'
 import CourseList from './containers/CourseList'
-import 'typeface-roboto'
 // import * as serviceWorker from './serviceWorker'
 
 ReactDOM.render(
