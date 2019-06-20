@@ -128,6 +128,7 @@
     "sass-loader": "~7.1.0",
     "style-loader": "~0.23.1",
     "terser-webpack-plugin": "1.2.3",
+    "typeface-roboto": "0.0.54",
     "url-loader": "1.1.2",
     "victory": "~32.0.1",
     "webpack": "~4.29.6",
