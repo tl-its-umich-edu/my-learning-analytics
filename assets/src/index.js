@@ -3,15 +3,11 @@ import ReactDOM from 'react-dom'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import './index.css'
 import App from './containers/App'
-import CourseList from './containers/CourseList'
 // import * as serviceWorker from './serviceWorker'
 
 ReactDOM.render(
   <Router basename='/'>
-    <>
-      <Route path='/' exact component={CourseList} />
-      <Route path='/courses/:courseId' component={App} />
-    </>
+    <App />
   </Router>
   , document.getElementById('root')
 )

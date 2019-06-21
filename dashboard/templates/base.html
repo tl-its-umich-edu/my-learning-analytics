@@ -62,7 +62,9 @@
         {% else %}
             "user_courses_info":"",
         {% endif %}
-
+        {% if settings.GA_ID %}
+            "google_analytics_id":'{{ settings.GA_ID }}',
+        {% endif %}
         }
 
     </script>
@@ -84,17 +86,4 @@
         {% endif %}
     </footer>
 </body>
-<!-- Common Javascript -->
-{% if settings.GA_ID %}
-<!-- Google analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={{ settings.GA_ID }}"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', '{{ settings.GA_ID }}', {
-        'page_path': location.pathname + location.search + location.hash
-    });
-</script>
-{% endif %}
 </html>
