@@ -64,7 +64,7 @@ function DashboardAppBar (props) {
           <Button>
             <Typography variant='h6' color='inherit' className={classes.grow}>
               <Link
-                to={{ pathname: `/${courseId}` }}
+                to={{ pathname: `/courses/${courseId}` }}
                 className={classes.homeButton}>
                   My Learning Analytics: {courseName}
               </Link>
