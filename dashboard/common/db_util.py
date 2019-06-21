@@ -6,8 +6,6 @@ from datetime import datetime
 from dateutil.parser import parse
 
 from django_cron.models import CronJobLog
-from dashboard.models import Course
-import json
 import pandas as pd
 from django.conf import settings
 
@@ -91,21 +89,19 @@ def get_user_courses_info(user_id):
     with django.db.connection.cursor() as cursor:
         cursor.execute("SELECT course_id FROM user WHERE sis_name= %s", [user_id])
         courses = cursor.fetchall()
-        logger.info(courses)
         if courses is not None:
             for course in courses:
                 course_id = incremented_id_to_canvas_id(course[0])
-                logger.info(f"CourseId: {course_id}")
                 course_list.append(int(course_id))
     if course_list:
         course_tuple = tuple(course_list)
-        logger.info(course_tuple)
         with django.db.connection.cursor() as cursor:
             cursor.execute("select canvas_id, name from course where canvas_id in %s",[course_tuple])
             course_names = cursor.fetchall()
             df = pd.DataFrame(list(course_names))
             df.columns=["course_id", "course_name"]
             course_info=df.to_json(orient='records')
+            logger.info(f"User {user_id} is enrolled in courses {course_info}")
     return course_info
 
 
