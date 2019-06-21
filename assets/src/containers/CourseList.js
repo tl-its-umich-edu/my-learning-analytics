@@ -38,8 +38,10 @@ const styles = theme => ({
 })
 
 function CourseList (props) {
-  const { classes } = props
-  if (!myla_globals.username) return (window.location.href = myla_globals.login)
+  const {
+    classes,
+    user
+  } = props
 
   const userCourseInfo = (myla_globals.user_courses_info.length !== 0)
     ? JSON.parse(myla_globals.user_courses_info)
@@ -47,11 +49,6 @@ function CourseList (props) {
 
   const isSuperuser = myla_globals.is_superuser
   if (!userCourseInfo && !isSuperuser) return (<Error>You are not enrolled in any courses with MyLA enabled.</Error>)
-
-  const user = {
-    username: myla_globals.username,
-    admin: isSuperuser
-  }
 
   const [avatarEl, setAvatarEl] = useState(null)
   const avatarOpen = Boolean(avatarEl)
