@@ -135,7 +135,8 @@ function FilesAccessed (props) {
     // Fetch data once all the setting data is fetched
     if (dataControllerLoad === 2) {
       const dataURL = `/api/v1/courses/${courseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&file_type=${fileFilter}`
-      fetch(dataURL)
+      const fetchOptions = { method: 'get', ...defaultFetchOptions }
+      fetch(dataURL, fetchOptions)
         .then(handleError)
         .then(res => res.json())
         .then(data => {
