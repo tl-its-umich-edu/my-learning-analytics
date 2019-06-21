@@ -18,7 +18,7 @@ module.exports = {
         use: ['style-loader', 'css-loader']
       },
       {
-        test: /\.(bmp|gif|jpe?g|png|woff|woff2|eot|ttf|svg)$/,
+        test: /\.(bmp|gif|jpeg|png|woff|woff2|eot|ttf|svg)$/,
         loader: 'url-loader',
         options: {
           limit: 10000,
