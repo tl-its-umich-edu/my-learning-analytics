@@ -62,17 +62,10 @@
         {% else %}
             "user_courses_info":"",
         {% endif %}
-        {% if settings.CANVAS_FILE %}
-            "canvas_file": '{{ settings.CANVAS_FILE }}',
-        {% else %}
-            "canvas_file":"0",
+        {% if settings.GA_ID %}
+            "google_analytics_id":'{{ settings.GA_ID }}',
         {% endif %}
-        {% if settings.LECCAP_FILE %}
-            "leccap_file": '{{ settings.LECCAP_FILE }}',
-        {% else %}
-            "leccap_file":"1",
-        {% endif %}
-
+        
         }
 
     </script>
@@ -94,17 +87,4 @@
         {% endif %}
     </footer>
 </body>
-<!-- Common Javascript -->
-{% if settings.GA_ID %}
-<!-- Google analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={{ settings.GA_ID }}"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', '{{ settings.GA_ID }}', {
-        'page_path': location.pathname + location.search + location.hash
-    });
-</script>
-{% endif %}
 </html>

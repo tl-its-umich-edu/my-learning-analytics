@@ -120,6 +120,7 @@
     "react-dev-utils": "~8.0.0",
     "react-dom": "~16.8.4",
     "react-router-dom": "~4.3.1",
+    "react-ga": "~2.5.7",
     "resolve": "1.10.0",
     "sass-loader": "~7.1.0",
     "style-loader": "~0.23.1",
