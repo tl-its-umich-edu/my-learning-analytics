@@ -28,7 +28,7 @@ const styles = theme => ({
   homeButton: {
     textDecoration: 'none',
     color: 'white',
-    textTransform:'capitalize'
+    textTransform: 'capitalize'
   },
   roundButton: {
     borderRadius: '50%',
@@ -63,7 +63,11 @@ function DashboardAppBar (props) {
           </IconButton>
           <Button>
             <Typography variant='h6' color='inherit' className={classes.grow}>
-              <Link to={{pathname:`/${courseId}`}} className={classes.homeButton}>My Learning Analytics: {courseName} </Link>
+              <Link
+                to={{ pathname: `/${courseId}` }}
+                className={classes.homeButton}>
+                  My Learning Analytics: {courseName}
+              </Link>
             </Typography>
           </Button>
           <div className={classes.grow} />
@@ -73,7 +77,7 @@ function DashboardAppBar (props) {
             color='inherit'
             aria-haspopup='true'
             variant='contained'>
-            <Avatar>{user.username.slice(0,1)}</Avatar>
+            <Avatar>{user.username.slice(0, 1)}</Avatar>
           </IconButton>
           <Popover
             open={avatarOpen}
