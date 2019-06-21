@@ -134,13 +134,8 @@ WEBPACK_LOADER = {
 }
 
 NPM_FILE_PATTERNS = {
-    'angular': ['angular.js'],
     'bootstrap': ['dist/css/*'],
-    'd3': ['dist/d3.min.js'],
-    'd3-tip': ['dist/index.js'],
-    'jquery': ['dist/jquery.min.js'],
-    'moment': ['min/moment.min.js'],
-    'underscore': ['underscore-min.js'],
+    'jquery': ['dist/jquery.min.js']
 }
 
 ROOT_URLCONF = 'dashboard.urls'

@@ -45,7 +45,6 @@ COPY . /code/
 # copy built react and node libraries for production mode
 COPY --from=node-prod-deps /usr/src/app/package-lock.json /code/package-lock.json
 COPY --from=node-prod-deps /usr/src/app/webpack-stats.json /code/webpack-stats.json
-COPY --from=node-prod-deps /usr/src/app/assets/dist/static /code/static
 COPY --from=node-prod-deps /usr/src/app/assets /code/assets
 COPY --from=node-prod-deps /usr/src/app/node_modules /code/node_modules
 
