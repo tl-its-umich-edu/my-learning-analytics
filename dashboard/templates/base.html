@@ -66,8 +66,11 @@
             "google_analytics_id":'{{ settings.GA_ID }}',
         {% endif %}
         
+        
+        
+        var VALUES = {{ settings.VALUES|safe }}
+        var LABELS = {{ settings.LABELS|safe }}
         }
-
     </script>
 </head>
 <body>

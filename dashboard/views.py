@@ -17,6 +17,7 @@ from django.shortcuts import redirect
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
 from dashboard.common.db_util import canvas_id_to_incremented_id
+from dashboard.common import utils
 
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -39,8 +40,7 @@ NO_GRADE_STRING = "NO_GRADE"
 
 # string for file type
 FILE_TYPE_STRING = "file_type"
-CANVAS_FILE = config("CANVAS_FILE", default=0)
-LECCAP_FILE = config("CANVAS_FILE", default=1)
+FILE_DICT = utils.get_file_info()
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
@@ -232,12 +232,10 @@ def file_access_within_week(request, course_id=0):
             else:
                 output_df=output_df.drop([i_grade], axis=1)
 
-
     if (file_type != "all_files"):
         # drop all other files
-        file_types = [CANVAS_FILE, LECCAP_FILE]
-        for i_file_types in file_types:
-            if (i_file_types != int(file_type)):
+        for file_dict_key, file_dict_value in FILE_DICT.items():
+            if (file_dict_value[1] != int(file_type)):
                 output_df = output_df[output_df.file_type == int(file_type)]
 
     # only keep rows where total_count > 0
