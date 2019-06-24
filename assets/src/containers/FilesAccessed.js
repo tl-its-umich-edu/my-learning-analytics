@@ -57,8 +57,8 @@ function FilesAccessed (props) {
   const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
   const [defaultLabel, setDefaultLabel] = useState(currentSetting)
 
-  const canvas_file = myla_globals.canvas_file
-  const leccap_file = myla_globals.leccap_file
+  const labels = LABELS
+  const values = VALUES
 
   const changeDefaultSetting = (event) => {
     const didUserChecked = event.target.checked
@@ -200,6 +200,7 @@ function FilesAccessed (props) {
               onWeekChange={onWeekChangeHandler}
             /> : ''}
             <div className={classes.formController}>
+
               <FormControl className={classes.formControl}>
                 <Select
                   value={fileFilter}
@@ -210,10 +211,10 @@ function FilesAccessed (props) {
                   }}
                 >
                   <MenuItem value="all_files">All</MenuItem>
-                  <MenuItem value={canvas_file}>Canvas</MenuItem>
-                  <MenuItem value={leccap_file}>Lecture Capture</MenuItem>
+                  <MenuItem value={values.CANVAS_FILE}>{labels.CANVAS_FILE_LABEL}</MenuItem>
+                  <MenuItem value={values.LECCAP_FILE}>{labels.LECCAP_FILE_LABEL}</MenuItem>
                 </Select>
-              </FormControl>
+                </FormControl>
               <p>Files accessed from
                 week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now)' : ''}</b> with
                 these grades: </p>
