@@ -40,7 +40,7 @@ NO_GRADE_STRING = "NO_GRADE"
 
 # string for file type
 FILE_TYPE_STRING = "file_type"
-FILE_DICT = utils.get_file_info()
+FILE_DICT = utils.get_file_dict()
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1

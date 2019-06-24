@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 import json
+from dashboard.common import utils
 
 from decouple import config, Csv
 
@@ -33,8 +34,7 @@ LOGIN_URL = '/accounts/login'
 GA_ID = config('GA_ID', default='')
 
 # File values from .env
-CANVAS_FILE = config('CANVAS_FILE', default='0')
-LECCAP_FILE = config('LECCAP_FILE', default='1')
+FILE_VALUES = utils.get_file_list
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
@@ -386,7 +386,7 @@ BIG_QUERY_ED_APP = config('BIG_QUERY_ED_APP', default="http://umich.instructure.
 RUN_AT_TIMES = config('RUN_AT_TIMES', default="", cast= Csv())
 
 # Add any settings you need to be available to templates in this array
-SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'CANVAS_FILE', 'LECCAP_FILE']
+SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'FILE_VALUES']
 
 # Method to show the user, if they're authenticated and superuser
 def show_debug_toolbar(request):
