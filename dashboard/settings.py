@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 import json
+from dashboard.common import utils
 
 from decouple import config, Csv
 
@@ -32,14 +33,11 @@ LOGIN_URL = '/accounts/login'
 # Google Analytics ID
 GA_ID = config('GA_ID', default='')
 
-<<<<<<< HEAD
 # File values from .env
-CANVAS_FILE = config('CANVAS_FILE', default='0')
-LECCAP_FILE = config('LECCAP_FILE', default='1')
-=======
+FILE_VALUES = utils.get_file_list()
+
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
 SITE_ID = 1
->>>>>>> Adding copyright text using django flatpages (#545)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/

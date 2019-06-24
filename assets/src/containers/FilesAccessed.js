@@ -57,8 +57,7 @@ function FilesAccessed (props) {
   const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
   const [defaultLabel, setDefaultLabel] = useState(currentSetting)
 
-  const labels = LABELS
-  const values = VALUES
+  const file_values = FILE_VALUES 
 
   const changeDefaultSetting = (event) => {
     const didUserChecked = event.target.checked
@@ -211,9 +210,10 @@ function FilesAccessed (props) {
                     id: 'file-type',
                   }}
                 >
-                  <MenuItem value="all_files">All</MenuItem>
-                  <MenuItem value={values.CANVAS_FILE}>{labels.CANVAS_FILE_LABEL}</MenuItem>
-                  <MenuItem value={values.LECCAP_FILE}>{labels.LECCAP_FILE_LABEL}</MenuItem>
+                <MenuItem value="all_files">All</MenuItem>
+                {
+                  file_values.map((el,i) => (<MenuItem key={i} value={el.file_value}>{el.file_name}</MenuItem>))
+                }
                 </Select>
                 </FormControl>
               <p>Files accessed from
