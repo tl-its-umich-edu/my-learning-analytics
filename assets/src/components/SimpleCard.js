@@ -12,7 +12,7 @@ const styles = theme => ({
 })
 
 function SimpleCard (props) {
-  const { classes, keyword, children } = props
+  const { classes, keyword, coherence, children } = props
 
   const [anchorEl, setAnchorEl] = useState(null)
   const open = Boolean(anchorEl)
@@ -22,7 +22,14 @@ function SimpleCard (props) {
       <Card
         className={classes.card}
         onClick={event => setAnchorEl(event.currentTarget)}>
-        <CardContent>
+        <CardContent
+          style={{
+            backgroundColor: coherence > 0.7
+              ? '#3182bd'
+              : coherence > 0.4
+                ? '#9ecae1'
+                : '#deebf7'
+          }} >
           <Typography variant='h6' gutterBottom>
             {keyword}
           </Typography>

@@ -9,10 +9,14 @@ import DiscussionSentenceList from '../components/DiscussionSentenceList'
 import Error from './Error'
 import { isObjectEmpty } from '../util/object'
 
+const color = [
+
+]
+
 const myMockData = [
   {
     keyword: 'conceptual knowledge',
-    coherence: 0.3,
+    coherence: 1,
     usage: [
       'I have conceptual knowledge about this and that',
       'we continue to problematize the entangling of type and qualityin the use of conceptual knowledge and procedural knowledge.',
@@ -219,7 +223,7 @@ function Discussion (props) {
         {
           discussionData.map((word, i) => (
             <Grid item xs={3} key={i}>
-              <SimpleCard keyword={word.keyword} >
+              <SimpleCard keyword={word.keyword} coherence={word.coherence} >
                 <DiscussionSentenceList usage={word.usage} />
               </SimpleCard>
             </Grid>
