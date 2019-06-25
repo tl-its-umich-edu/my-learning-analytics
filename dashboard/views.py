@@ -41,6 +41,7 @@ NO_GRADE_STRING = "NO_GRADE"
 # string for file type
 FILE_TYPE_STRING = "file_type"
 FILE_DICT = utils.get_file_dict()
+FILE_URLS = utils.get_file_urls()
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
@@ -200,11 +201,12 @@ def file_access_within_week(request, course_id=0):
     # zero filled dataframe with file name as row name, and grade as column name
     output_df=pd.DataFrame(0.0, index=file_id_name, columns=[GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING, FILE_TYPE_STRING])
     output_df=output_df.rename_axis('file_id_name')
+    output_df=output_df.astype({FILE_TYPE_STRING: str})
 
     for index, row in df.iterrows():
         # set value
         output_df.at[row['file_id_name'], row['grade']] = row['percent']
-        output_df.at[row['file_id_name'], 'file_type'] = row['file_type']
+        output_df.at[row['file_id_name'], FILE_TYPE_STRING] = row[FILE_TYPE_STRING]
     output_df.reset_index(inplace=True)
 
     # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
@@ -234,9 +236,9 @@ def file_access_within_week(request, course_id=0):
 
     if (file_type != "all_files"):
         # drop all other files
-        for file_dict_key, file_dict_value in FILE_DICT.items():
-            if (file_dict_value[1] != int(file_type)):
-                output_df = output_df[output_df.file_type == int(file_type)]
+        for file_dict_value in FILE_DICT.values():
+            if (file_dict_value[1] != file_type):
+                output_df = output_df[output_df.file_type == file_type]
 
     # only keep rows where total_count > 0
     output_df = output_df[output_df.total_count > 0]
@@ -250,7 +252,7 @@ def file_access_within_week(request, course_id=0):
 
     output_df['file_id_part'], output_df['file_name_part'] = output_df['file_id_name'].str.split(';', 1).str
     # uses canvas url if file type == 0 (cavas file) and leccap url if not
-    output_df['file_name'] = output_df.apply(lambda row: CANVAS_FILE_PREFIX + row.file_id_part + CANVAS_FILE_POSTFIX + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part if row.file_type == 0.0 else LECCAP_FILE_PREFIX + row.file_id_part + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
+    output_df['file_name'] = output_df.apply(lambda row: FILE_URLS[row.file_type][0] + row.file_id_part + FILE_URLS[row.file_type][1] + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
     logger.debug(output_df.to_json(orient='records'))
 
     return HttpResponse(output_df.to_json(orient='records'),content_type='application/json')
