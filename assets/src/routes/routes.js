@@ -3,7 +3,7 @@ import { Grade } from '@material-ui/icons'
 const routes = (courseId, activeViews) => {
   const allViews = [
     {
-      path: `/${courseId}/grades`,
+      path: `/courses/${courseId}/grades`,
       title: 'Grade Distribution',
       icon: Grade,
       description: 'See where your grade sits within the course grade distribution.',
@@ -11,7 +11,7 @@ const routes = (courseId, activeViews) => {
       viewCode: 'gd'
     },
     {
-      path: `/${courseId}/assignments`,
+      path: `/courses/${courseId}/assignments`,
       title: 'Assignment Planning',
       icon: Grade,
       description: 'See what assignments have the greatest impact on your grade.',
@@ -19,7 +19,7 @@ const routes = (courseId, activeViews) => {
       viewCode: 'ap'
     },
     {
-      path: `/${courseId}/files`,
+      path: `/courses/${courseId}/files`,
       title: 'Files Accessed',
       icon: Grade,
       description: 'See what files you and your peers are reading.',

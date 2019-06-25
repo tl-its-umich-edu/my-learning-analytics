@@ -38,7 +38,7 @@ function AvatarModal(props) {
 
   const url = window.location.href
   const [helpURL, setHelpURL] = useState('https://sites.google.com/umich.edu/my-learning-analytics-help/home')
-  const [logoutURL, setLogoutURL] = useState(`${window.location.origin}/accounts/logout/`)
+  const [logoutURL, setLogoutURL] = useState("/accounts/logout")
 
   useEffect(() => {
     const helpUrlContext = url.includes('grades')
@@ -86,7 +86,7 @@ function AvatarModal(props) {
               user.admin
                 ?
                 <>
-                  <Link style={{ textDecoration: 'none' }} href={`${window.location.origin}/admin`}>
+                  <Link style={{ textDecoration: 'none' }} href="/admin">
                     <ListItem button>
                       <ListItemIcon>
                         <Lock />

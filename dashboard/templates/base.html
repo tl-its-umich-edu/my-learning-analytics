@@ -13,11 +13,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% use_macro title %}</title>
+    <style>
+        .django-su-warning {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            color: black;
+            background-size: 50px 50px;
+            background-color: #ffe761;
+            background-image: -webkit-linear-gradient(-45deg, rgba(0, 0, 0, .04) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, .04) 50%, rgba(0, 0, 0, .04) 75%, transparent 75%, transparent);
+            background-image: -moz-linear-gradient(-45deg, rgba(0, 0, 0, .04) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, .04) 50%, rgba(0, 0, 0, .04) 75%, transparent 75%, transparent);
+            background-image: linear-gradient(135deg, rgba(0, 0, 0, .04) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, .04) 50%, rgba(0, 0, 0, .04) 75%, transparent 75%, transparent);
+            text-align: center;
+            z-index: 5000;
+        }
+    </style>
     <script>
         // Setup a top level js object to hold global values
         var myla_globals = {
         {% if course_id %}
-            "course_id": '{{ current_user_incremented_course_id }}',
+            "course_id": '{{ current_user_course_id }}',
         {% else %}
             "course_id": 0,
         {% endif %}
@@ -42,12 +57,14 @@
         {% else %}
         "logout": "",
         {% endif %}
-        {% if current_user_courses_info%}
+        {% if user.is_authenticated%}
             "user_courses_info":'{{current_user_courses_info|safe}}',
         {% else %}
             "user_courses_info":"",
         {% endif %}
-        
+        {% if settings.GA_ID %}
+            "google_analytics_id":'{{ settings.GA_ID }}',
+        {% endif %}
         }
         
         var FILE_VALUES = {{ settings.FILE_VALUES|safe }}
@@ -60,24 +77,15 @@
     {% endblock %}
     {% csrf_token %}
     <footer>
-        <div style="float: left; width: 50%">Copyright © 2018 The Regents of the University of Michigan</div>
+        {% load flatpages %}
+        {% get_flatpages '/copyright/' as flatpages %}
+        <div>
+        <div style="float: left; width: 50%">{{ flatpages.first.content|safe }}</div>
         <div style="float: left; width: 50%; text-align: right">Data last updated on {{last_updated|date:"m/d/Y P T"}}</div>
+        </div>
         {% if user.is_superuser %}
         <div id="build-info" class="alert alert-info" style="display:none;">{{build}}</div>
         {% endif %}
     </footer>
 </body>
-<!-- Common Javascript -->
-{% if settings.GA_ID %}
-<!-- Google analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={{ settings.GA_ID }}"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', '{{ settings.GA_ID }}', {
-        'page_path': location.pathname + location.search + location.hash
-    });
-</script>
-{% endif %}
 </html>

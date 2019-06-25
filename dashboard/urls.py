@@ -81,7 +81,7 @@ else:
     # Login patterns for testing, SAML should be installed in prod
     urlpatterns += (
         url(r'^accounts/login', auth_views.LoginView.as_view(), name='login'),
-        url(r'^accounts/logout', auth_views.LoginView.as_view(), name='logout'),
+        url(r'^accounts/logout', auth_views.logout, name='logout'),
      )
 
 if apps.is_installed('django_lti_auth'):
