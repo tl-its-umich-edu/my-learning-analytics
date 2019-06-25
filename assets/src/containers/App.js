@@ -1,68 +1,34 @@
 import React, { useState } from 'react'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
-import DashboardAppBar from './DashboardAppBar'
-import SideDrawer from './SideDrawer'
-import GradeDistribution from './GradeDistribution'
-import AssignmentPlanning from './AssignmentPlanning'
-import FilesAccessed from './FilesAccessed'
-import Discussion from './Discussion'
-import IndexPage from './IndexPage'
-import Spinner from '../components/Spinner'
-import Error from './Error'
-import { isObjectEmpty } from '../util/object'
-import { useCourseInfo } from '../service/api'
+import { Route, withRouter } from 'react-router-dom'
+import { matchPath } from 'react-router';
+import GoogleAnalyticsTracking from '../components/GoogleAnalyticsTracking'
+import CourseList from './CourseList'
+import Course from './Course'
 
 function App (props) {
-  const { match } = props
-  const courseId = match.params.courseId
-  const [loaded, error, courseInfo] = useCourseInfo(courseId)
-  const [sideDrawerState, setSideDrawerState] = useState(false)
+  const {
+    location
+  } = props
+  const isLoggedIn = !!myla_globals.username
+  // replace with redirect to react login page later
+  if (!isLoggedIn) {
+    return (window.location.href = myla_globals.login)
+  }
 
-  // this is temporary
+  const coursePageMatch = matchPath(location.pathname, '/courses/:courseId/')
+  const courseId = coursePageMatch ? coursePageMatch.params.courseId : null
   const user = {
     username: myla_globals.username,
     admin: myla_globals.is_superuser
   }
-
-  if (!user.username) return (window.location.href = 'http://localhost:5001/accounts/login')
-  if (error) return (<Error>Something went wrong, please try again later.</Error>)
-  if (loaded && isObjectEmpty(courseInfo)) return (<Error>Tool is not enabled for this course.</Error>)
-
   return (
-    <Router basename='/courses/'>
-      {
-        loaded
-          ? <>
-            <DashboardAppBar
-              onMenuBarClick={setSideDrawerState}
-              sideDrawerState={sideDrawerState}
-              user={user}
-              courseName={courseInfo.name}
-              courseId={courseId} />
-            <SideDrawer
-              toggleDrawer={setSideDrawerState}
-              sideDrawerState={sideDrawerState}
-              courseId={courseId}
-              courseInfo={courseInfo} />
-            <Route path='/:courseId/' exact
-              render={props => <IndexPage {...props} courseInfo={courseInfo} courseId={courseId} />} />
-            <Route path='/:courseId/grades'
-              render={props => <GradeDistribution {...props} disabled={!courseInfo.course_view_options.gd}
-                courseId={courseId} />} />
-            <Route path='/:courseId/assignment'
-              render={props => <AssignmentPlanning {...props} disabled={!courseInfo.course_view_options.ap}
-                courseId={courseId} />} />
-            <Route path='/:courseId/files'
-              render={props => <FilesAccessed {...props} courseInfo={courseInfo}
-                courseId={courseId} />} />
-            <Route path='/:courseId/discussion'
-              render={props => <Discussion {...props} courseInfo={courseInfo}
-                courseId={courseId} />} />
-          </>
-          : <Spinner />
-      }
-    </Router>
+    <>
+      <GoogleAnalyticsTracking gaId={myla_globals.google_analytics_id} />
+      <Route path='/' exact render={props => <CourseList {...props} user={user} />} />
+      <Route path='/courses' exact render={props => <CourseList {...props} user={user} />} />
+      { courseId ? <Course user={user} courseId={courseId} {...props} /> : null }
+    </>
   )
 }
 
-export default App
+export default withRouter(App)
