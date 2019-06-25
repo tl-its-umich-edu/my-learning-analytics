@@ -4,8 +4,6 @@ import { withStyles } from '@material-ui/core/styles'
 import Typography from '@material-ui/core/Typography'
 import CardContent from '@material-ui/core/CardContent'
 import Popover from '@material-ui/core/Popover'
-import CardActions from '@material-ui/core/CardActions'
-import Button from '@material-ui/core/Button'
 
 const styles = theme => ({
   card: {

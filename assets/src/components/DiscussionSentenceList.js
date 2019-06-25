@@ -3,17 +3,16 @@ import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
 
 function DiscussionSentenceList (props) {
-  const { discussion, keyword } = props
+  const { usage } = props
 
-  if (!discussion[keyword]) return null
+  if (usage.length === 0) return null
 
   return (
     <Paper>
       {
-        discussion[keyword]
-          .map((sentence, i) => (
-            <Typography variant='h6' key={i}>{sentence}</Typography>
-          ))
+        usage.map((sentence, i) => (
+          <Typography variant='h6' key={i}>{sentence}</Typography>
+        ))
       }
     </Paper>
   )
