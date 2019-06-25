@@ -1,5 +1,4 @@
 import logging
-import json
 from decouple import config
 logger = logging.getLogger(__name__)
 
@@ -35,3 +34,15 @@ def get_file_list():
         temp_dict["file_value"] = temp_str[1]
         file_list.append(temp_dict)
     return file_list
+
+def get_file_urls():
+    file_dict = get_file_dict()
+    file_dict2 = {}
+    for file_key, file_value in file_dict.items():
+        temp_prefix = file_key + "_PREFIX"
+        temp_postfix = file_key + "_POSTFIX"
+        temp_list = []
+        temp_list.append(config(temp_prefix, default=""))
+        temp_list.append(config(temp_postfix, default=""))
+        file_dict2[file_value[1]] = temp_list
+    return file_dict2
