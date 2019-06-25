@@ -27,7 +27,7 @@ const routes = (courseId, activeViews) => {
       viewCode: 'fa'
     },
     {
-      path: `/${courseId}/discussion`,
+      path: `/courses/${courseId}/discussion`,
       title: 'Discussion',
       icon: Grade,
       description: 'See analytics about discussion.',
