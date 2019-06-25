@@ -30,8 +30,6 @@ services:
       - "3001:3001"
     depends_on:
       - mysql
-    env_file:
-      - .env
     environment:
       - GUNICORN_RELOAD=True
     container_name: student_dashboard
