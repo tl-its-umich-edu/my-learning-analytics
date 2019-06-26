@@ -163,7 +163,7 @@ def file_access_within_week(request, course_id=0):
 
     total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": course_id})
     total_number_student = total_number_student_df.iloc[0,0]
-    logger.debug(f"course_id_string {course_id} total student {total_number_student}")
+    logger.info(f"course_id {course_id} total student={total_number_student}")
 
     term_date_start = AcademicTerms.objects.course_date_start(course_id)
 

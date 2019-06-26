@@ -34,7 +34,7 @@ class AcademicTermsManager(models.Manager):
 
 class AcademicTerms(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Term Id")
-    canvas_id = models.CharField(max_length=255, verbose_name="Canvas Id")
+    canvas_id = models.BigIntegerField(verbose_name="Canvas Id")
     name = models.CharField(max_length=255, verbose_name="Name")
     date_start = models.DateTimeField(verbose_name="Start Date", blank=True, null=True)
     date_end = models.DateTimeField(verbose_name="End Date", blank=True, null=True)
@@ -57,7 +57,7 @@ class UserDefaultQuerySet(models.QuerySet):
                             user_id=str(user_id),
                             default_view_type=str(default_view_type)).default_view_value
         except (self.model.DoesNotExist, Exception) as e:
-            logger.error(f"""Couldn't get the default value for in course: {course_id} for user: {user_id} 
+            logger.error(f"""Couldn't get the default value for in course: {course_id} for user: {user_id}
                          with default_view_type: {default_view_type} due to {e} """)
             return None
 
@@ -66,7 +66,7 @@ class UserDefaultQuerySet(models.QuerySet):
             return self.update_or_create(course_id=course_id, user_id=user_id, default_view_type=default_view_type,
                                          defaults={'default_view_value': default_view_value})
         except (self.model.DoesNotExist, Exception) as e:
-            logger.error(f"""Error when updating or creating default setting in course: {course_id} for user: {user_id} 
+            logger.error(f"""Error when updating or creating default setting in course: {course_id} for user: {user_id}
                              with default_view_type: {default_view_type} and value: {default_view_value} due to {e} """)
             raise e
 
@@ -84,8 +84,8 @@ class UserDefaultManager(models.Manager):
 
 class UserDefaultSelection(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
-    course_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="Course Id")
-    user_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="User Id")
+    course_id = models.BigIntegerField(blank=True, null=True, verbose_name="Course Id")
+    user_id = models.BigIntegerField(blank=True, null=True, verbose_name="User Id")
     default_view_type = models.CharField(max_length=255, blank=True, null=True, verbose_name="Default Type")
     default_view_value = models.CharField(max_length=255, blank=True, null=True, verbose_name="Default Value")
 
@@ -97,13 +97,13 @@ class UserDefaultSelection(models.Model):
 
 
 class Assignment(models.Model):
-    id = models.CharField(primary_key=True, max_length=255, verbose_name="Assignment Id")
+    id = models.BigIntegerField(primary_key=True, verbose_name="Assignment Id")
     name = models.CharField(max_length=255, verbose_name="Name", default='')
     due_date = models.DateTimeField(blank=True, null=True, verbose_name="Due DateTime")
     local_date = models.DateTimeField(blank=True, null=True, verbose_name="Local DateTime")
-    points_possible = models.CharField(max_length=255, blank=True, null=True, verbose_name="Points Possible")
-    course_id = models.CharField(max_length=255, verbose_name="Course Id")
-    assignment_group_id = models.CharField(max_length=255, verbose_name="Assignment Group Id")
+    points_possible = models.FloatField(blank=True, null=True, verbose_name="Points Possible")
+    course_id = models.BigIntegerField(verbose_name="Course Id")
+    assignment_group_id = models.BigIntegerField(verbose_name="Assignment Group Id")
 
     def __str__(self):
         return self.name
@@ -113,13 +113,13 @@ class Assignment(models.Model):
 
 
 class AssignmentGroups(models.Model):
-    id = models.CharField(primary_key=True, max_length=255, verbose_name="Assignment Group Id")
+    id = models.BigIntegerField(primary_key=True, verbose_name="Assignment Group Id")
     name = models.CharField(max_length=255, verbose_name="Name", default='')
-    weight = models.CharField(max_length=255, blank=True, null=True, verbose_name="Weight")
-    group_points = models.CharField(max_length=255, blank=True, null=True, verbose_name="Group Points")
-    course_id = models.CharField(max_length=255, verbose_name="Course Id")
-    drop_lowest = models.CharField(max_length=255, blank=True, null=True, verbose_name="Drop Lowest")
-    drop_highest = models.CharField(max_length=255, blank=True, null=True, verbose_name="Drop Highest")
+    weight = models.FloatField(blank=True, null=True, verbose_name="Weight")
+    group_points = models.FloatField(blank=True, null=True, verbose_name="Group Points")
+    course_id = models.BigIntegerField(verbose_name="Course Id")
+    drop_lowest = models.IntegerField(blank=True, null=True, verbose_name="Drop Lowest")
+    drop_highest = models.IntegerField(blank=True, null=True, verbose_name="Drop Highest")
 
     def __str__(self):
         return self.name
@@ -131,7 +131,7 @@ class AssignmentGroups(models.Model):
 
 
 class AssignmentWeightConsideration(models.Model):
-    course_id = models.CharField(primary_key=True, max_length=255, verbose_name="Course Id")
+    course_id = models.BigIntegerField(primary_key=True, verbose_name="Course Id")
     consider_weight = models.NullBooleanField(blank=True, default=False, verbose_name="Consider Weight")
 
     class Meta:
@@ -140,7 +140,7 @@ class AssignmentWeightConsideration(models.Model):
 class CourseQuerySet(models.QuerySet):
     def get_supported_courses(self):
         """Returns the list of supported courses from the database
-        
+
         :return: [List of supported course ids]
         :rtype: [list of str (possibly incremented depending on parameter)]
         """
@@ -159,8 +159,8 @@ class CourseManager(models.Manager):
 
 
 class Course(models.Model):
-    id = models.CharField(primary_key=True, max_length=255, verbose_name="Unizin Course Id", db_column='id', editable=False)
-    canvas_id = models.CharField(max_length=255, verbose_name="Canvas Course Id", db_column='canvas_id')
+    id = models.BigIntegerField(primary_key=True, verbose_name="Unizin Course Id", db_column='id', editable=False)
+    canvas_id = models.BigIntegerField(verbose_name="Canvas Course Id", db_column='canvas_id')
     term_id = models.ForeignKey(AcademicTerms, verbose_name="Term Id", on_delete=models.SET_NULL, db_column='term_id', null=True, db_constraint=False)
     name = models.CharField(max_length=255, verbose_name="Name")
 
@@ -192,11 +192,11 @@ class CourseViewOption(models.Model):
     class Meta:
         db_table = 'course_view_option'
         verbose_name = "Course View Option"
-    
+
     def json(self, include_id=True):
         """Format the json output that we want for this record
-        
-        :param include_id: Whether or not to include the id in the return 
+
+        :param include_id: Whether or not to include the id in the return
         This should be of the format canvas_id : {options}
         :return: JSON formatted CourseViewOption
         :rtype: Dict
@@ -219,9 +219,9 @@ class CourseViewOption(models.Model):
 
 
 class File(models.Model):
-    id = models.CharField(primary_key=True, max_length=255, verbose_name="File Id")
+    id = models.BigIntegerField(primary_key=True, verbose_name="File Id")
     name = models.TextField(verbose_name="File Name")
-    course_id = models.CharField(max_length=255, verbose_name="Course Id")
+    course_id = models.BigIntegerField(verbose_name="Course Id")
 
     def __str__(self):
         return self.name
@@ -231,11 +231,11 @@ class File(models.Model):
 
 
 class Submission(models.Model):
-    id = models.CharField(primary_key=True, max_length=255, verbose_name="Submission Id")
-    assignment_id = models.CharField(max_length=255, verbose_name="Assignment Id")
-    course_id = models.CharField(max_length=255, verbose_name="Course Id")
-    user_id = models.CharField(max_length=255, verbose_name="User Id")
-    score = models.CharField(max_length=255, blank=True, null=True, verbose_name="Score")
+    id = models.BigIntegerField(primary_key=True, verbose_name="Submission Id")
+    assignment_id = models.BigIntegerField(verbose_name="Assignment Id")
+    course_id = models.BigIntegerField(verbose_name="Course Id")
+    user_id = models.BigIntegerField(verbose_name="User Id")
+    score = models.FloatField(blank=True, null=True, verbose_name="Score")
     graded_date = models.DateTimeField(blank=True, null=True, verbose_name="Graded DateTime")
     avg_score = models.FloatField(blank=True, null=True, verbose_name="Average Grade")
 
@@ -265,13 +265,13 @@ class User(models.Model):
     )
 
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
-    user_id = models.CharField(null=False, blank=False, max_length=255, verbose_name="User Id")
+    user_id = models.BigIntegerField(null=False, blank=False, verbose_name="User Id")
     name = models.CharField(max_length=255, verbose_name="Name")
     sis_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="SIS Id")
     sis_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="SIS Name")
-    course_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="Course Id")
-    current_grade = models.CharField(max_length=255, blank=True, null=True, verbose_name="Current Grade")
-    final_grade = models.CharField(max_length=255, blank=True, null=True, verbose_name="Final Grade")
+    course_id = models.BigIntegerField(blank=True, null=True, verbose_name="Course Id")
+    current_grade = models.FloatField(blank=True, null=True, verbose_name="Current Grade")
+    final_grade = models.FloatField(blank=True, null=True, verbose_name="Final Grade")
     enrollment_type = models.CharField(max_length=50, choices=ENROLLMENT_TYPES, blank=True, null=True, verbose_name="Enrollment Type")
 
     def __str__(self):
@@ -283,8 +283,8 @@ class User(models.Model):
 
 class FileAccess(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
-    file_id = models.CharField(blank=True, max_length=255, null=False, verbose_name='File Id')
-    user_id = models.CharField(blank=True, max_length=255, null=False, verbose_name='User Id')
+    file_id = models.BigIntegerField(blank=True, null=False, verbose_name='File Id')
+    user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id')
     access_time = models.DateTimeField(verbose_name="Access Time")
 
     def __str__(self):
