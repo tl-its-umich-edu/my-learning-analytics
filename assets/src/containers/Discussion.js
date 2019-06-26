@@ -9,10 +9,6 @@ import DiscussionSentenceList from '../components/DiscussionSentenceList'
 import Error from './Error'
 import { isObjectEmpty } from '../util/object'
 
-const color = [
-
-]
-
 const myMockData = [
   {
     keyword: 'conceptual knowledge',

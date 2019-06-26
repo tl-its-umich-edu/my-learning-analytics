@@ -8,8 +8,6 @@ import Typography from '@material-ui/core/Typography'
 function DiscussionSentenceList (props) {
   const { usage, coherence } = props
 
-  if (usage.length === 0) return null
-
   const bull = <span>•</span>
 
   return (
