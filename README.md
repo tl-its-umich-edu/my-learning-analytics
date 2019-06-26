@@ -5,11 +5,15 @@
 My Learning Analytics based on django framework
 
 ## Environment configuration
-There is some environment configuration and addtional files needed for this app to run. You can put this in a file called .env for testing. 
+There is some environment configuration for docker-compose on local host and addtional files needed for this app to run. Most of these files are in config directory.
 
 Configuration:
 
-Copy the file `.env.sample` to `.env` and fill in with the values for local testing. You may also provide a .env file if you have one.
+- Copy the file `.env.sample` to `.env` and fill in with the values for local testing. You may also provide a .env file if you have one.
+
+- Copy the file config/env_sample.json to config/env.json. This is where most of the configuration for the application is done.
+
+- If you were using a prior version of MyLA, there is a utility "env_to_json.py" to help convert your configuration. Running `python env_to_json.py > config/env.json` should create your new config file from your .env file.
 
 On OpenShift fill these in the appropriate places to provide the environment.
 

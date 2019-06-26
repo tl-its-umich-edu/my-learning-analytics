@@ -7,7 +7,6 @@ from django.utils import timezone
 
 import numpy as np
 import pandas as pd
-from decouple import config
 from django.conf import settings
 from django.contrib import auth
 from django.db import connection as conn
@@ -24,18 +23,12 @@ from dashboard.models import AcademicTerms, UserDefaultSelection, \
 
 logger = logging.getLogger(__name__)
 
-# strings for construct file download url
-CANVAS_FILE_PREFIX = config("CANVAS_FILE_PREFIX", default="")
-CANVAS_FILE_POSTFIX = config("CANVAS_FILE_POSTFIX", default="")
-CANVAS_FILE_ID_NAME_SEPARATOR = "|"
-
 # string for no grade
 GRADE_A="90-100"
 GRADE_B="80-89"
 GRADE_C="70-79"
 GRADE_LOW="low_grade"
 NO_GRADE_STRING = "NO_GRADE"
-
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
@@ -263,7 +256,7 @@ def file_access_within_week(request, course_id=0):
     output_df.fillna(0, inplace=True) #replace null value with 0
 
     output_df['file_id_part'], output_df['file_name_part'] = output_df['file_id_name'].str.split(';', 1).str
-    output_df['file_name'] = output_df.apply(lambda row: CANVAS_FILE_PREFIX + row.file_id_part + CANVAS_FILE_POSTFIX + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
+    output_df['file_name'] = output_df.apply(lambda row: settings.CANVAS_FILE_PREFIX + row.file_id_part + settings.CANVAS_FILE_POSTFIX + settings.CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
     output_df.drop(columns=['file_id_part', 'file_name_part', 'file_id_name'], inplace=True)
     logger.debug(output_df.to_json(orient='records'))
 

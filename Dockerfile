@@ -23,6 +23,10 @@ RUN npm install --save wait-port@"~0.2.2" && \
     # This is needed to clean up the examples files as these cause collectstatic to fail (and take up extra space)
     find /usr/src/app/node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
 
+# apt-utils needs to be installed separately
+RUN apt-get update && \ 
+    apt-get install -y --no-install-recommends vim-tiny jq nodejs yarn python3-dev xmlsec1 cron && \
+    apt-get clean -y
 
 
 

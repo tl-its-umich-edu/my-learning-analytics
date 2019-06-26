@@ -1,7 +1,11 @@
-#!/bin/bash
+#!/bin/bash 
 
 # Case insenstive match
 shopt -s nocaseglob
+
+if [ -z "${ENV_FILE}" ]; then
+    ENV_FILE="/code/config/env.json"
+fi
 
 echo $DJANGO_SETTINGS_MODULE
 
@@ -23,6 +27,12 @@ else
     GUNICORN_RELOAD=""
 fi
 
+MYSQL_HOST=$(jq -r -c ".MYSQL_HOST | values" ${ENV_FILE})
+MYSQL_PORT=$(jq -r -c ".MYSQL_PORT | values" ${ENV_FILE})
+IS_CRON_POD=$(jq -r -c ".IS_CRON_POD | values" ${ENV_FILE})
+PTVSD_ENABLE=$(jq -r -c ".PTVSD_ENABLE | values" ${ENV_FILE})
+CRONTAB_SCHEDULE=$(jq -r -c ".CRONTAB_SCHEDULE | values" ${ENV_FILE})
+RUN_AT_TIMES=$(jq -r -c ".RUN_AT_TIMES | values" ${ENV_FILE})
 
 echo "Waiting for DB"
 wait-port ${MYSQL_HOST}:${MYSQL_PORT} -t 30000
@@ -32,8 +42,8 @@ python manage.py migrate
 
 # If these values aren't set or they're set to false
 # This syntax substitutes False if null or unset
-if [ "${IS_CRON_POD:-"False"}" == "False" ]; then
-    if [ "${PTVSD_ENABLE:-"False"}" == "False" ]; then
+if [ "${IS_CRON_POD:-"false",,}" == "false" ]; then
+    if [ "${PTVSD_ENABLE:-"false",,}" == "false" ]; then
         # Start Gunicorn processes
         echo Starting Gunicorn for production
 
