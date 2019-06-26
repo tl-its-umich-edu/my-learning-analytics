@@ -194,7 +194,7 @@ def file_access_within_week(request, course_id=0):
 
     # group by file_id, and file_name
     # reformat for output
-    df['file_id_name'] = df['file_id'].str.cat(df['file_name'], sep=';')
+    df['file_id_name'] = df['file_id'].astype(str).str.cat(df['file_name'], sep=';')
 
     df=df.drop(['file_id', 'file_name'], axis=1)
     df.set_index(['file_id_name'])
@@ -319,7 +319,7 @@ def update_user_default_selection_for_views(request, course_id=0):
     eventlog(request.user, EventLogTypes.EVENT_VIEW_SET_DEFAULT.value, extra=data)
     key = 'default'
     try:
-        obj, create_or_update_bool = UserDefaultSelection.objects.set_user_defaults(course_id, current_user,
+        obj, create_or_update_bool = UserDefaultSelection.objects.set_user_defaults(int(course_id), current_user,
                                                                                     default_type,
                                                                                     default_type_value)
         logger.info(
@@ -336,20 +336,20 @@ def update_user_default_selection_for_views(request, course_id=0):
     fn=objectgetter(Course, 'course_id'), raise_exception=True)
 def get_user_default_selection(request, course_id=0):
     logger.info(get_user_default_selection.__name__)
-    user_id = request.user.get_username()
+    user_sis_name = request.user.get_username()
     default_view_type = request.GET.get('default_type')
     key = 'default'
     no_user_default_response = json.dumps({key: ''})
-    logger.info(f"the default option request from user {user_id} in course {course_id} of type: {default_view_type}")
-    default_value = UserDefaultSelection.objects.get_user_defaults(course_id, user_id, default_view_type)
-    logger.info(f"""default option check returned from DB for user: {user_id} course {course_id} and type:
+    logger.info(f"the default option request from user {user_sis_name} in course {course_id} of type: {default_view_type}")
+    default_value = UserDefaultSelection.objects.get_user_defaults(int(course_id), user_sis_name, default_view_type)
+    logger.info(f"""default option check returned from DB for user: {user_sis_name} course {course_id} and type:
                     {default_view_type} is {default_value}""")
     if not default_value:
         logger.info(
-            f"user {user_id} in course {course_id} don't have any defaults values set type {default_view_type}")
+            f"user {user_sis_name} in course {course_id} don't have any defaults values set type {default_view_type}")
         return HttpResponse(no_user_default_response, content_type='application/json')
     result = json.dumps({key: default_value})
-    logger.info(f"user {user_id} in course {course_id} for type {default_view_type} defaults: {result}")
+    logger.info(f"user {user_sis_name} in course {course_id} for type {default_view_type} defaults: {result}")
     return HttpResponse(result, content_type='application/json')
 
 
