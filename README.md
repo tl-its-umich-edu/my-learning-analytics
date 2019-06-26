@@ -11,9 +11,9 @@ Configuration:
 
 - Copy the file `.env.sample` to `.env` and fill in with the values for local testing. You may also provide a .env file if you have one.
 
-- You also need to copy the file config/env_sample.json to config/env.json. This is where most of the configuration is done now. 
+- Copy the file config/env_sample.json to config/env.json. This is where most of the configuration for the application is done.
 
-- There is a utility "env_to_json.py" to help convert your configuration if you were using this prior to JSON configuration. 
+- If you were using a prior version of MyLA, there is a utility "env_to_json.py" to help convert your configuration. Running `python env_to_json.py > config/env.json` should create your new config file from your .env file.
 
 On OpenShift fill these in the appropriate places to provide the environment.
 
