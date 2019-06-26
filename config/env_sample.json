@@ -72,7 +72,7 @@
     "/*  A single default IDP to use if multiple are present in the SAML metadata (Get from Metadata)": "*/",
     "DJANGO_SAML2_DEFAULT_IDP": "",
     "/*  Earliest term date from database that we'll show and support academic terms from (default is 2016-11-15 which the first date of 'our' data)": "*/",
-    "EARLIEST_TERM_DATE": "",
+    "EARLIEST_TERM_DATE": "2016-11-15",
     "/*  CRON POD SETTINGS": "*/",
     "/* ": "*/",
     "/*  All of these settings go together and need to be enabled for cron job": "*/",

@@ -19,6 +19,8 @@ services:
       args:
         TZ: ${TZ}
     command: bash -c "./start.sh"
+    env_file:
+        - .env
     volumes:
       - .:/code
       # use the container's node_modules folder (don't override)

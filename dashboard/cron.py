@@ -249,7 +249,7 @@ class DashboardCronJob(CronJobBase):
             except Exception as e:
                 logger.exception("Error running to_sql on table file_access")
                 raise
-            return_string += str(df.shape[0]) + " rows for courses " + ",".join(data_warehouse_course_ids) + "\n"
+            return_string += str(df.shape[0]) + " rows for courses " + ",".join(map(str, data_warehouse_course_ids)) + "\n"
             logger.info(return_string)
 
         total_tbytes_billed = total_bytes_billed / 1024 / 1024 / 1024 / 1024
