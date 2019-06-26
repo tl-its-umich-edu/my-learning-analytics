@@ -224,7 +224,7 @@ function Discussion (props) {
           discussionData.map((word, i) => (
             <Grid item xs={3} key={i}>
               <SimpleCard keyword={word.keyword} coherence={word.coherence} >
-                <DiscussionSentenceList usage={word.usage} />
+                <DiscussionSentenceList usage={word.usage} coherence={word.coherence} />
               </SimpleCard>
             </Grid>
           ))
