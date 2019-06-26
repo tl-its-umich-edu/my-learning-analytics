@@ -12,7 +12,7 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
 
 # apt-utils needs to be installed separately
 RUN apt-get update && \ 
-    apt-get install -y --no-install-recommends nodejs yarn python3-dev xmlsec1 cron && \
+    apt-get install -y --no-install-recommends vim-tiny jq nodejs yarn python3-dev xmlsec1 cron && \
     apt-get clean -y
 
 # COPY startup script into known file location in container
