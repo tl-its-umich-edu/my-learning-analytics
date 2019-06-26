@@ -341,8 +341,8 @@ else:
 if ENV.get('STUDENT_DASHBOARD_LTI', False):
     INSTALLED_APPS += ('django_lti_auth',)
 
-    PYLTI_CONFIG.get = {
-        "consumers": json.loads(ENV.get("PYLTI_CONFIG_CONSUMERS", {})),
+    PYLTI_CONFIG = {
+        "consumers": ENV.get("PYLTI_CONFIG_CONSUMERS", {}),
         "method_hooks":{
             "valid_lti_request": "dashboard.lti.valid_lti_request",
             #"invalid_lti_request": "dashboard.lti.invalid_lti_request"
