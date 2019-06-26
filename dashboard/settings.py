@@ -23,8 +23,14 @@ APPLICATION_DIR = os.path.dirname(globals()['__file__'])
 PROJECT_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), ".."),
 )
-with open(os.getenv("ENV_FILE", "/code/config/env.json")) as f:
-    ENV = json.load(f)
+
+try:
+    with open(os.getenv("ENV_FILE", "/code/config/env.json")) as f:
+        ENV = json.load(f)
+except FileNotFoundError as fnfe:
+    print("Default config file or one defined in environment variable ENV_FILE not found. This is normal for the build, should define for operation")
+    # Set ENV so collectstatic will still run in the build
+    ENV = os.environ
 
 LOGOUT_URL = '/accounts/logout'
 LOGIN_URL = '/accounts/login'
