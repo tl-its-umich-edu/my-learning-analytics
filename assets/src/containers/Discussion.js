@@ -4,7 +4,7 @@ import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import Spinner from '../components/Spinner'
-import SimpleCard from '../components/SimpleCard'
+import DiscussionCard from '../components/DiscussionCard'
 import DiscussionSentenceList from '../components/DiscussionSentenceList'
 import Error from './Error'
 import { isObjectEmpty } from '../util/object'
@@ -219,9 +219,9 @@ function Discussion (props) {
         {
           discussionData.map((word, i) => (
             <Grid item xs={3} key={i}>
-              <SimpleCard keyword={word.keyword} coherence={word.coherence} >
+              <DiscussionCard keyword={word.keyword} coherence={word.coherence} >
                 <DiscussionSentenceList usage={word.usage} coherence={word.coherence} />
-              </SimpleCard>
+              </DiscussionCard>
             </Grid>
           ))
         }

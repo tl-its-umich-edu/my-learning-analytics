@@ -11,7 +11,7 @@ const styles = theme => ({
   }
 })
 
-function SimpleCard (props) {
+function DiscussionCard (props) {
   const { classes, keyword, coherence, children } = props
 
   const [anchorEl, setAnchorEl] = useState(null)
@@ -25,10 +25,12 @@ function SimpleCard (props) {
         <CardContent
           style={{
             backgroundColor: coherence > 0.7
-              ? '#3182bd'
+              ? '#2171b5'
               : coherence > 0.4
-                ? '#9ecae1'
-                : '#deebf7'
+                ? '#6baed6'
+                : coherence > 0.2
+                  ? '#bdd7e7'
+                  : '#eff3ff'
           }} >
           <Typography variant='h6' gutterBottom>
             {keyword}
@@ -54,4 +56,4 @@ function SimpleCard (props) {
   )
 }
 
-export default withStyles(styles)(SimpleCard)
+export default withStyles(styles)(DiscussionCard)
