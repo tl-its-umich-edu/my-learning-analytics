@@ -39,7 +39,7 @@ class CourseForm(forms.ModelForm):
 
     def clean(self):
         canvas_id = self.cleaned_data.get('canvas_id')
-        if not canvas_id or not canvas_id.isdigit():
+        if not canvas_id or not str(canvas_id).isdigit():
             raise forms.ValidationError(
                 f"Course ID {canvas_id} must be an integer value")
         return self.cleaned_data
