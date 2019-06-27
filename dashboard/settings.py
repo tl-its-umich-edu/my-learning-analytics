@@ -41,9 +41,6 @@ GA_ID = ENV.get('GA_ID', '')
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
 SITE_ID = 1
 
-# This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
-SITE_ID = 1
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
