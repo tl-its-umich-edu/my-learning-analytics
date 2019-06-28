@@ -85,7 +85,7 @@ INSTALLED_APPS = [
     'macros',
     'debug_toolbar',
     'pinax.eventlog',
-    'webpack_loader'
+    'webpack_loader',
     'rules.apps.AutodiscoverRulesConfig',
 ]
 
