@@ -36,6 +36,9 @@ GA_ID = config('GA_ID', default='')
 # File values from .env
 FILE_VALUES = utils.get_file_list()
 
+# This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
+SITE_ID = 1
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
@@ -71,6 +74,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
+    'django.contrib.flatpages',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'django_cron',
@@ -116,11 +121,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django_su.context_processors.is_su',
                 'django_settings_export.settings_export',
-                'dashboard.context_processors.course_name',
                 'dashboard.context_processors.current_user_course_id',
-                'dashboard.context_processors.current_user_incremented_course_id',
                 'dashboard.context_processors.current_user_courses_info',
-                'dashboard.context_processors.course_view_option',
                 'dashboard.context_processors.last_updated',
                 'dashboard.context_processors.get_build_info',
             ],
