@@ -120,14 +120,17 @@ def file_access_within_week(request, course_id=0):
     week_num_start = int(request.GET.get('week_num_start','1'))
     week_num_end = int(request.GET.get('week_num_end','0'))
     grade = request.GET.get('grade','all')
-    file_type = request.GET.get(FILE_TYPE_STRING, 'all_files')
+    file_type = request.GET.get(FILE_TYPE_STRING, ['canavs', 'leccap'])
+    file_type = file_type.split(",")
+
+    #remove after testing
+    print(file_type)
 
     # json for eventlog
     data = {
         "week_num_start": week_num_start,
         "week_num_end": week_num_end,
         "grade": grade,
-        "file_type": file_type,
         "course_id": course_id
     }
     eventlog(request.user, EventLogTypes.EVENT_VIEW_FILE_ACCESS.value, extra=data)
@@ -234,11 +237,7 @@ def file_access_within_week(request, course_id=0):
             else:
                 output_df=output_df.drop([i_grade], axis=1)
 
-    if (file_type != "all_files"):
-        # drop all other files
-        for file_dict_value in FILE_DICT.values():
-            if (file_dict_value[1] != file_type):
-                output_df = output_df[output_df.file_type == file_type]
+    output_df=output_df[output_df.file_type.isin(file_type)]
 
     # only keep rows where total_count > 0
     output_df = output_df[output_df.total_count > 0]

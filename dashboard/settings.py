@@ -35,9 +35,12 @@ GA_ID = config('GA_ID', default='')
 
 # File values from .env
 FILE_VALUES = utils.get_file_list()
+<<<<<<< HEAD
 
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
 SITE_ID = 1
+=======
+>>>>>>> very early stages of the new checkbox filtering method
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
