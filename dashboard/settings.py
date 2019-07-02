@@ -34,7 +34,7 @@ LOGIN_URL = '/accounts/login'
 GA_ID = config('GA_ID', default='')
 
 # File values from .env
-FILE_VALUES = utils.get_file_list
+FILE_VALUES = utils.get_file_list()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/

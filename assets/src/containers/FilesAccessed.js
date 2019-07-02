@@ -7,6 +7,9 @@ import Spinner from '../components/Spinner'
 import Checkbox from '@material-ui/core/Checkbox'
 import RangeSlider from '../components/RangeSlider'
 import FormControl from '@material-ui/core/FormControl'
+import FormLabel from '@material-ui/core/FormLabel'
+import FormGroup from '@material-ui/core/FormGroup'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import { useUserSettingData } from '../service/api'
@@ -41,13 +44,14 @@ const settingNotUpdated = 'Setting not updated'
 
 function FilesAccessed (props) {
   const { classes, courseInfo, courseId } = props
+  const file_values = FILE_VALUES 
   if (!courseInfo.course_view_options.fa) return (<Error>Files view is hidden for this course.</Error>)
   const [loaded, error, filesDefaultData] = useUserSettingData(courseId, 'file') // Used to update default setting
   const [minMaxWeek, setMinMaxWeek] = useState([]) // Should be updated from info
   const [curWeek, setCurWeek] = useState(0) // Should be updated from info
   const [weekRange, setWeekRange] = useState([]) // Should be depend on curWeek
   const [gradeRangeFilter, setGradeRangeFilter] = useState('') // Should be fetched from default
-  const [fileFilter, setFileFilter] = useState('');
+  const [fileFilter, setFileFilter] = useState([])
   const [fileAccessData, setFileAccessData] = useState('')
   const [dataControllerLoad, setDataControllerLoad] = useState(0)
   // initial default value that we get from backend and updated value when user save the default setting
@@ -56,8 +60,6 @@ function FilesAccessed (props) {
   // defaults setting controllers
   const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
   const [defaultLabel, setDefaultLabel] = useState(currentSetting)
-
-  const file_values = FILE_VALUES 
 
   const changeDefaultSetting = (event) => {
     const didUserChecked = event.target.checked
@@ -118,12 +120,12 @@ function FilesAccessed (props) {
     if (loaded) {
       if (filesDefaultData.default !== '') {
         setGradeRangeFilter(filesDefaultData.default)
-        setFileFilter(filesDefaultData.default)
+        setFileFilter([...fileFilter, 'canvas', 'leccap'])
         setDefaultValue(filesDefaultData.default)
       } else {
         // setting it to default
         setGradeRangeFilter('All')
-        setFileFilter('all_files')
+        setFileFilter([...fileFilter, 'canvas', 'leccap'])
         setDefaultValue('All')
       }
       setDataControllerLoad(dataControllerLoad + 1)
@@ -166,7 +168,15 @@ function FilesAccessed (props) {
 
   const onChangeFileHandler = event => {
     const value = event.target.value
-    setFileFilter(value)
+    if (event.target.checked == true) {
+      setFileFilter([...fileFilter, value])
+    } 
+    else { 
+      setFileFilter(fileFilter.filter(val => {
+        return val != value
+      }))
+    }
+    
   }
 
   const FileAccessChartBuilder = (fileData) => {
@@ -188,7 +198,7 @@ function FilesAccessed (props) {
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Typography variant='h5' gutterBottom className="title">Files Accessed</Typography>
+            <Typography variant='h5' gutterBottom className="title">Resources Accessed</Typography>
             {dataControllerLoad == 2 ? <RangeSlider
               curWeek={curWeek}
               className="slider"
@@ -199,7 +209,7 @@ function FilesAccessed (props) {
               onWeekChange={onWeekChangeHandler}
             /> : ''}
             <div className={classes.formController}>
-
+              {/*
               <FormControl className={classes.formControl}>
                 <Select
                   value={fileFilter}
@@ -214,8 +224,9 @@ function FilesAccessed (props) {
                   file_values.map((el,i) => (<MenuItem key={i} value={el.file_value}>{el.file_name}</MenuItem>))
                 }
                 </Select>
-                </FormControl>
-              <p>Files accessed from
+              </FormControl>
+              */}
+              <p>Resources accessed from
                 week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now)' : ''}</b> with
                 these grades: </p>
               <FormControl className={classes.formControl}>
@@ -239,6 +250,16 @@ function FilesAccessed (props) {
                 value="checked"
               />}
               <div style={{ padding: '15px 2px' }}>{defaultLabel}</div>
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <FormControl>
+                <FormLabel><b>Select Resources to be Viewed:</b></FormLabel>
+                <FormGroup row>
+                  {
+                    file_values.map((el) => (<FormControlLabel control={<Checkbox onChange={onChangeFileHandler} value={el.file_value}></Checkbox>} label={el.file_name}/>))
+                  }
+                </FormGroup>
+              </FormControl>
             </div>
             {fileAccessData
               ? FileAccessChartBuilder(fileAccessData)
