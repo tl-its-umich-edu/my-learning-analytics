@@ -1,6 +1,7 @@
 # Our project specific
 saml
 bq_cred.json
+env.json
 .idea/
 .DS_Store
 
