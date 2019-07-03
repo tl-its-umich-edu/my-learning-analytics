@@ -5,11 +5,15 @@
 My Learning Analytics based on django framework
 
 ## Environment configuration
-There is some environment configuration and addtional files needed for this app to run. You can put this in a file called .env for testing. 
+There is some environment configuration for docker-compose on local host and addtional files needed for this app to run. Most of these files are in config directory.
 
 Configuration:
 
-Copy the file `.env.sample` to `.env` and fill in with the values for local testing. You may also provide a .env file if you have one.
+- Copy the file `.env.sample` to `.env` and fill in with the values for local testing. You may also provide a .env file if you have one.
+
+- Copy the file config/env_sample.json to config/env.json. This is where most of the configuration for the application is done.
+
+- If you were using a prior version of MyLA, there is a utility "env_to_json.py" to help convert your configuration. Running `python env_to_json.py > config/env.json` should create your new config file from your .env file.
 
 On OpenShift fill these in the appropriate places to provide the environment.
 
@@ -84,6 +88,9 @@ Before adding adding initial terms and courses, ensure that the `CANVAS_DATA_ID_
 
     `docker exec -it student_dashboard bash ./demo_init.sh`
 
+If you have problems you can connect direct into a specific container with the command
+
+    `docker-compose run web /bin/bash
 # Create a super user to test login.
 
 On the both local dev and remote the users are stored in the local database. However on local the users have to be created via the command line, on Openshift they are created either manually in the database or when logged in via Shibboleth.
@@ -179,8 +186,6 @@ Then you can edit your files! (Probably in /code/dashboard)
 
     Set your breakpoints then run this command in the docker instance! Then connect to the cron configuration. The job will start when you attach the debugger.
     `PTVSD_WAIT_FOR_ATTACH=True PTVSD_ENABLE=TRUE PTVSD_REMOTE_PORT=3001 ./manage-ptvd.py runcrons --force`
-
-    This debug mode currently only works with django-admin commands (not gunicorn or manage.py) 
 
 ## License check
 
