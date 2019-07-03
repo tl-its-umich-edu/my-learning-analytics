@@ -219,7 +219,7 @@ class CourseViewOption(models.Model):
 
 class File(models.Model):
     file_type = models.TextField(verbose_name="File Type")
-    id = models.CharField(primary_key=True, max_length=255, verbose_name="File Id")
+    id = models.BigIntegerField(primary_key=True, verbose_name="File Id")
     name = models.TextField(verbose_name="File Name")
     course_id = models.CharField(max_length=255, verbose_name="Course Id")
 

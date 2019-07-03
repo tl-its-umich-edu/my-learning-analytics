@@ -13,7 +13,7 @@ def get_build_info():
     return f'Build_Namespace:{build_namespace} Build_Name: {build_name} Git_Source: {build_source} Git_Branch: {git_branch} Git_Commit: {git_commit}'
 
 def get_file_dict():
-    file_types = config("FILE_TYPES")
+    file_types = config("FILE_TYPES", default="")
     file_types = file_types.split()
     file_dict = {}
     for counter, item in enumerate(file_types):
@@ -23,7 +23,7 @@ def get_file_dict():
     return file_dict
 
 def get_file_list():
-    file_types = config("FILE_TYPES")
+    file_types = config("FILE_TYPES", default="")
     file_types = file_types.split()
     file_list = []
     for counter, item in enumerate(file_types):
