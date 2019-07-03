@@ -65,11 +65,10 @@
         {% if settings.GA_ID %}
             "google_analytics_id":'{{ settings.GA_ID }}',
         {% endif %}
-        
         }
-
-        var FILE_VALUES = {{ settings.FILE_VALUES|safe }}
         
+        var FILE_VALUES = {{ settings.FILE_VALUES|safe }}
+
     </script>
 </head>
 <body>
