@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import Spinner from '../components/Spinner'
 import DiscussionCard from '../components/DiscussionCard'
-import DiscussionSentenceList from '../components/DiscussionSentenceList'
+import DiscussionTab from '../components/DiscussionTab'
 import Error from './Error'
 import { isObjectEmpty } from '../util/object'
 
@@ -220,7 +220,7 @@ function Discussion (props) {
           discussionData.map((word, i) => (
             <Grid item xs={3} key={i}>
               <DiscussionCard keyword={word.keyword} coherence={word.coherence} >
-                <DiscussionSentenceList usage={word.usage} coherence={word.coherence} />
+                <DiscussionTab usage={word.usage} coherence={word.coherence} />
               </DiscussionCard>
             </Grid>
           ))
@@ -233,19 +233,10 @@ function Discussion (props) {
     <div className={classes.root}>
       <Paper className={classes.paper}>
         <Grid container spacing={40}>
-          <Grid item xs={12} lg={6}>
-            <Typography variant='h5' gutterBottom>My Discussion</Typography>
+          <Grid item xs={12} lg={12}>
             {
               myDataLoaded
                 ? discussionGrid(myDiscussionData)
-                : <Spinner />
-            }
-          </Grid>
-          <Grid item xs={12} lg={6}>
-            <Typography variant='h5' gutterBottom>Class Discussion</Typography>
-            {
-              classDataLoaded
-                ? discussionGrid(classDiscussionData)
                 : <Spinner />
             }
           </Grid>
