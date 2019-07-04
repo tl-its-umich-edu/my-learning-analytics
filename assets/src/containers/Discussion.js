@@ -2,7 +2,6 @@ import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
 import Spinner from '../components/Spinner'
 import DiscussionCard from '../components/DiscussionCard'
 import DiscussionTab from '../components/DiscussionTab'
@@ -16,8 +15,7 @@ const myMockData = [
     usage: [
       'I have conceptual knowledge about this and that',
       'we continue to problematize the entangling of type and qualityin the use of conceptual knowledge and procedural knowledge.',
-      'the most prevalent of these frameworks is one comprised of two major kinds of knowledge, conceptual knowledge and procedural knowledge',
-      'For example, Star (2005, 2007)identified two kinds of knowledge, “deep procedural knowledge” and “superficial conceptual knowledge”'
+      'the most prevalent of these frameworks is one comprised of two major kinds of knowledge, conceptual knowledge and procedural knowledge'
     ]
   }, {
     keyword: 'database',
@@ -104,16 +102,12 @@ const classMockData = [
     keyword: 'conceptual knowledge',
     coherence: 0.3,
     usage: [
-      'I have conceptual knowledge about this and that',
-      'we continue to problematize the entangling of type and qualityin the use of conceptual knowledge and procedural knowledge.',
-      'the most prevalent of these frameworks is one comprised of two major kinds of knowledge, conceptual knowledge and procedural knowledge',
       'For example, Star (2005, 2007)identified two kinds of knowledge, “deep procedural knowledge” and “superficial conceptual knowledge”'
     ]
   }, {
     keyword: 'database',
     coherence: 0.7,
     usage: [
-      'A database is an organized collection of data, generally stored and accessed electronically from a computer system.',
       'The database management system (DBMS) is the software that interacts with end users'
     ]
   },
@@ -213,14 +207,18 @@ function Discussion (props) {
     (classDataLoaded && isObjectEmpty(classDiscussionData))
   ) return (<Error>No data provided.</Error>)
 
-  const discussionGrid = discussionData => {
+  const discussionGrid = (myDiscussionData, classDiscussionData) => {
     return (
       <Grid container spacing={16}>
         {
-          discussionData.map((word, i) => (
+          myDiscussionData.map((word, i) => (
             <Grid item xs={3} key={i}>
               <DiscussionCard keyword={word.keyword} coherence={word.coherence} >
-                <DiscussionTab usage={word.usage} coherence={word.coherence} />
+                <DiscussionTab
+                  myUsage={word.usage}
+                  myCoherence={word.coherence}
+                  classUsage={classDiscussionData[i].usage}
+                  classCoherence={classDiscussionData[i].coherence} />
               </DiscussionCard>
             </Grid>
           ))
@@ -235,8 +233,8 @@ function Discussion (props) {
         <Grid container spacing={40}>
           <Grid item xs={12} lg={12}>
             {
-              myDataLoaded
-                ? discussionGrid(myDiscussionData)
+              myDataLoaded && classDataLoaded
+                ? discussionGrid(myDiscussionData, classDiscussionData)
                 : <Spinner />
             }
           </Grid>
