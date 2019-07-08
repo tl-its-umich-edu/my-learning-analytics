@@ -122,5 +122,13 @@
     "/*  database port": "*/",
     "/*  DATA_WAREHOUSE_PORT=5432": "*/",
     "/*  Enable/Disable Unizin Date Warehouse specific features/data": "*/",
-    "DATA_WAREHOUSE_IS_UNIZIN": true
+    "DATA_WAREHOUSE_IS_UNIZIN": true,
+    "RESOURCE_TYPES": {
+        "files": {"resource_label" :"Files", "resource_value":"files", "resources": ["canvas"], "disabled": "false"},
+        "videos": {"resource_label":"Videos", "resource_value":"videos", "resources": ["leccap"], "disabled": "true"}
+    },
+    "RESOURCE_URLS": {
+        "canvas": {"prefix": "https://example.instructure.com/files/", "postfix": "/download?download_frd=1"},
+        "leccap": {"prefix": "https://leccap.engin.umich.edu/leccap/viewer/r/", "postfix": ""}
+    }
 }
