@@ -7,7 +7,6 @@ import Spinner from '../components/Spinner'
 import Checkbox from '@material-ui/core/Checkbox'
 import RangeSlider from '../components/RangeSlider'
 import FormControl from '@material-ui/core/FormControl'
-import FormLabel from '@material-ui/core/FormLabel'
 import FormGroup from '@material-ui/core/FormGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Select from '@material-ui/core/Select'
@@ -44,14 +43,14 @@ const settingNotUpdated = 'Setting not updated'
 
 function FilesAccessed (props) {
   const { classes, courseInfo, courseId } = props
-  const file_values = FILE_VALUES 
+  const resource_values = RESOURCE_VALUES 
   if (!courseInfo.course_view_options.fa) return (<Error>Files view is hidden for this course.</Error>)
   const [loaded, error, filesDefaultData] = useUserSettingData(courseId, 'file') // Used to update default setting
   const [minMaxWeek, setMinMaxWeek] = useState([]) // Should be updated from info
   const [curWeek, setCurWeek] = useState(0) // Should be updated from info
   const [weekRange, setWeekRange] = useState([]) // Should be depend on curWeek
   const [gradeRangeFilter, setGradeRangeFilter] = useState('') // Should be fetched from default
-  const [fileFilter, setFileFilter] = useState([])
+  const [resourceFilter, setResourceFilter] = useState([])
   const [fileAccessData, setFileAccessData] = useState('')
   const [dataControllerLoad, setDataControllerLoad] = useState(0)
   // initial default value that we get from backend and updated value when user save the default setting
@@ -120,12 +119,24 @@ function FilesAccessed (props) {
     if (loaded) {
       if (filesDefaultData.default !== '') {
         setGradeRangeFilter(filesDefaultData.default)
-        setFileFilter([...fileFilter, 'canvas', 'leccap'])
+        let tempArray = []
+        resource_values.forEach(function(resource_item) {
+          if (resource_item.disabled === "false") {
+            tempArray.push(resource_item.resource_value)
+          }
+        })
+        setResourceFilter(resourceFilter.concat(tempArray))
         setDefaultValue(filesDefaultData.default)
       } else {
         // setting it to default
         setGradeRangeFilter('All')
-        setFileFilter([...fileFilter, 'canvas', 'leccap'])
+        let tempArray = []
+        resource_values.forEach(function(resource_item) {
+          if (resource_item.disabled === "false") {
+            tempArray.push(resource_item.resource_value)
+          }
+        })
+        setResourceFilter(resourceFilter.concat(tempArray))
         setDefaultValue('All')
       }
       setDataControllerLoad(dataControllerLoad + 1)
@@ -134,8 +145,8 @@ function FilesAccessed (props) {
 
   useEffect(() => {
     // Fetch data once all the setting data is fetched
-    if (dataControllerLoad === 2) {
-      const dataURL = `/api/v1/courses/${courseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&file_type=${fileFilter}`
+    if (dataControllerLoad === 2 && resourceFilter.length != 0) {
+      const dataURL = `/api/v1/courses/${courseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&resource_type=${resourceFilter}`
       const fetchOptions = { method: 'get', ...defaultFetchOptions }
       fetch(dataURL, fetchOptions)
         .then(handleError)
@@ -147,7 +158,7 @@ function FilesAccessed (props) {
           setFileAccessData({})
         })
     }
-  }, [dataControllerLoad, weekRange, gradeRangeFilter, fileFilter])
+  }, [dataControllerLoad, weekRange, gradeRangeFilter, resourceFilter])
 
   const onWeekChangeHandler = value => {
     // Update week range slider
@@ -170,10 +181,10 @@ function FilesAccessed (props) {
   const onChangeFileHandler = event => {
     const value = event.target.value
     if (event.target.checked == true) {
-      setFileFilter([...fileFilter, value])
+      setResourceFilter([...resourceFilter, value])
     } 
     else { 
-      setFileFilter(fileFilter.filter(val => {
+      setResourceFilter(resourceFilter.filter(val => {
         return val != value
       }))
     }
@@ -210,23 +221,6 @@ function FilesAccessed (props) {
               onWeekChange={onWeekChangeHandler}
             /> : ''}
             <div className={classes.formController}>
-              {/*
-              <FormControl className={classes.formControl}>
-                <Select
-                  value={fileFilter}
-                  onChange={onChangeFileHandler}
-                  inputProps={{
-                    name: 'file',
-                    id: 'file-type',
-                  }}
-                >
-                <MenuItem value="all_files">All</MenuItem>
-                {
-                  file_values.map((el,i) => (<MenuItem key={i} value={el.file_value}>{el.file_name}</MenuItem>))
-                }
-                </Select>
-              </FormControl>
-              */}
               <p>Resources accessed from
                 week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now)' : ''}</b> with
                 these grades: </p>
@@ -254,10 +248,13 @@ function FilesAccessed (props) {
             </div>
             <div style={{ textAlign: "center" }}>
               <FormControl>
-                <FormLabel><b>Select Resources to be Viewed:</b></FormLabel>
                 <FormGroup row>
+                  {/*
+                <FormLabel focused={true}>Select Resources to be Viewed:</FormLabel>
+                  */}
+                  <p><b>Select Resources to be Viewed:</b></p>
                   {
-                    file_values.map((el) => (<FormControlLabel control={<Checkbox onChange={onChangeFileHandler} value={el.file_value}></Checkbox>} label={el.file_name}/>))
+                    resource_values.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeFileHandler} value={el.resource_value} disabled={el.disabled === "true"}></Checkbox>} label={el.resource_label}/>))
                   }
                 </FormGroup>
               </FormControl>

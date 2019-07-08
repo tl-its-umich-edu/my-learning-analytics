@@ -219,10 +219,7 @@ class CourseViewOption(models.Model):
 
 
 class File(models.Model):
-<<<<<<< HEAD
-    file_type = models.TextField(verbose_name="File Type")
-=======
->>>>>>> react
+    resource_type = models.TextField(verbose_name="Resource Type")
     id = models.BigIntegerField(primary_key=True, verbose_name="File Id")
     name = models.TextField(verbose_name="File Name")
     course_id = models.BigIntegerField(verbose_name="Course Id")

@@ -331,8 +331,8 @@ function createFileAccessChart ({ data, width, height, domElement }) {
         legend_interval = 20,
         legend_y = -50 
 
-    let legendLabels = [ ["Files I haven't viewed", COLOR_NOT_ACCESSED_FILE],
-        ["Files I've viewed", COLOR_ACCESSED_FILE] ] 
+    let legendLabels = [ ["Resources I haven't viewed", COLOR_NOT_ACCESSED_FILE],
+        ["Resources I've viewed", COLOR_ACCESSED_FILE] ] 
 
     let legend = svg.select(".mainGroupWrapper").append("g")
         .attr("class", "legend")

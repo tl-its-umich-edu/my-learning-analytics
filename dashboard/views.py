@@ -23,16 +23,10 @@ from dashboard.models import AcademicTerms, UserDefaultSelection, \
     Course, CourseViewOption
 
 logger = logging.getLogger(__name__)
-
-<<<<<<< HEAD
 # strings for construct file download url
-CANVAS_FILE_PREFIX = config("CANVAS_FILE_PREFIX", default="")
-CANVAS_FILE_POSTFIX = config("CANVAS_FILE_POSTFIX", default="")
+RESOURCE_URLS = utils.get_resource_urls()
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
-LECCAP_FILE_PREFIX = config("LECCAP_FILE_PREFIX", default="")
 
-=======
->>>>>>> react
 # string for no grade
 GRADE_A="90-100"
 GRADE_B="80-89"
@@ -40,14 +34,10 @@ GRADE_C="70-79"
 GRADE_LOW="low_grade"
 NO_GRADE_STRING = "NO_GRADE"
 
-<<<<<<< HEAD
 # string for file type
-FILE_TYPE_STRING = "file_type"
-FILE_DICT = utils.get_file_dict()
-FILE_URLS = utils.get_file_urls()
+RESOURCE_TYPE_STRING = "resource_type"
+RESOURCE_TYPES = utils.get_resource_types()
 
-=======
->>>>>>> react
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
 
@@ -139,11 +129,19 @@ def file_access_within_week(request, course_id=0):
     week_num_start = int(request.GET.get('week_num_start','1'))
     week_num_end = int(request.GET.get('week_num_end','0'))
     grade = request.GET.get('grade','all')
-    file_type = request.GET.get(FILE_TYPE_STRING, ['canavs', 'leccap'])
-    file_type = file_type.split(",")
+    filter_values = request.GET.get(RESOURCE_TYPE_STRING, ['files', 'videos'])
+    filter_values = filter_values.split(",")
+
+    print(RESOURCE_TYPES)
+    filter_list = []
+    for filter_value in filter_values:
+        if filter_value != '':
+            print(filter_value)
+            filter_list += RESOURCE_TYPES[filter_value]['resources']
 
     #remove after testing
-    print(file_type)
+    print(filter_values)
+    print(filter_list)
 
     # json for eventlog
     data = {
@@ -177,7 +175,7 @@ def file_access_within_week(request, course_id=0):
 
     # get time range based on week number passed in via request
 
-    sqlString = f"""SELECT a.file_id as file_id, f.file_type as file_type, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id
+    sqlString = f"""SELECT a.file_id as file_id, f.resource_type as resource_type, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id
                     FROM file f, file_access a, user u, course c, academic_terms t
                     WHERE a.file_id =f.id and a.user_id = u.user_id
                     and f.course_id = c.id and c.term_id = t.id
@@ -222,14 +220,14 @@ def file_access_within_week(request, course_id=0):
     #df.reset_index(inplace=True)
 
     # zero filled dataframe with file name as row name, and grade as column name
-    output_df=pd.DataFrame(0.0, index=file_id_name, columns=[GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING, FILE_TYPE_STRING])
+    output_df=pd.DataFrame(0.0, index=file_id_name, columns=[GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING, RESOURCE_TYPE_STRING])
     output_df=output_df.rename_axis('file_id_name')
-    output_df=output_df.astype({FILE_TYPE_STRING: str})
+    output_df=output_df.astype({RESOURCE_TYPE_STRING: str})
 
     for index, row in df.iterrows():
         # set value
         output_df.at[row['file_id_name'], row['grade']] = row['percent']
-        output_df.at[row['file_id_name'], FILE_TYPE_STRING] = row[FILE_TYPE_STRING]
+        output_df.at[row['file_id_name'], RESOURCE_TYPE_STRING] = row[RESOURCE_TYPE_STRING]
     output_df.reset_index(inplace=True)
 
     # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
@@ -257,7 +255,7 @@ def file_access_within_week(request, course_id=0):
             else:
                 output_df=output_df.drop([i_grade], axis=1)
 
-    output_df=output_df[output_df.file_type.isin(file_type)]
+    output_df=output_df[output_df.resource_type.isin(filter_list)]
 
     # only keep rows where total_count > 0
     output_df = output_df[output_df.total_count > 0]
@@ -272,7 +270,7 @@ def file_access_within_week(request, course_id=0):
     output_df['file_id_part'], output_df['file_name_part'] = output_df['file_id_name'].str.split(';', 1).str
 
     # uses canvas url if file type == 0 (cavas file) and leccap url if not
-    output_df['file_name'] = output_df.apply(lambda row: FILE_URLS[row.file_type][0] + row.file_id_part + FILE_URLS[row.file_type][1] + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
+    output_df['file_name'] = output_df.apply(lambda row: RESOURCE_URLS[row.resource_type]["prefix"] + row.file_id_part + RESOURCE_URLS[row.resource_type]["postfix"] + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
     output_df.drop(columns=['file_id_part', 'file_name_part', 'file_id_name'], inplace=True)
 
     logger.debug(output_df.to_json(orient='records'))
