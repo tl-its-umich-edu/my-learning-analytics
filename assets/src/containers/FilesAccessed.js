@@ -145,7 +145,7 @@ function FilesAccessed (props) {
 
   useEffect(() => {
     // Fetch data once all the setting data is fetched
-    if (dataControllerLoad === 2 && resourceFilter.length != 0) {
+    if (dataControllerLoad === 2) {
       const dataURL = `/api/v1/courses/${courseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&resource_type=${resourceFilter}`
       const fetchOptions = { method: 'get', ...defaultFetchOptions }
       fetch(dataURL, fetchOptions)
@@ -180,10 +180,10 @@ function FilesAccessed (props) {
 
   const onChangeFileHandler = event => {
     const value = event.target.value
-    if (event.target.checked == true) {
+    if (event.target.checked == true && !resourceFilter.includes(value)) {
       setResourceFilter([...resourceFilter, value])
     } 
-    else { 
+    else if (event.target.checked == false) { 
       setResourceFilter(resourceFilter.filter(val => {
         return val != value
       }))
@@ -249,9 +249,6 @@ function FilesAccessed (props) {
             <div style={{ textAlign: "center" }}>
               <FormControl>
                 <FormGroup row>
-                  {/*
-                <FormLabel focused={true}>Select Resources to be Viewed:</FormLabel>
-                  */}
                   <p><b>Select Resources to be Viewed:</b></p>
                   {
                     resource_values.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeFileHandler} value={el.resource_value} disabled={el.disabled === "true"}></Checkbox>} label={el.resource_label}/>))

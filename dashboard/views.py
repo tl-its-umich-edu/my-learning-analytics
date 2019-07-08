@@ -132,16 +132,10 @@ def file_access_within_week(request, course_id=0):
     filter_values = request.GET.get(RESOURCE_TYPE_STRING, ['files', 'videos'])
     filter_values = filter_values.split(",")
 
-    print(RESOURCE_TYPES)
     filter_list = []
     for filter_value in filter_values:
         if filter_value != '':
-            print(filter_value)
             filter_list += RESOURCE_TYPES[filter_value]['resources']
-
-    #remove after testing
-    print(filter_values)
-    print(filter_list)
 
     # json for eventlog
     data = {
@@ -256,6 +250,9 @@ def file_access_within_week(request, course_id=0):
                 output_df=output_df.drop([i_grade], axis=1)
 
     output_df=output_df[output_df.resource_type.isin(filter_list)]
+
+    if (output_df.empty):
+        return HttpResponse("no data")
 
     # only keep rows where total_count > 0
     output_df = output_df[output_df.total_count > 0]
