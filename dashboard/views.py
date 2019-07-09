@@ -251,6 +251,7 @@ def file_access_within_week(request, course_id=0):
 
     output_df=output_df[output_df.resource_type.isin(filter_list)]
 
+    # if no checkboxes are checked send nothing
     if (output_df.empty):
         return HttpResponse("no data")
 
@@ -266,7 +267,6 @@ def file_access_within_week(request, course_id=0):
 
     output_df['file_id_part'], output_df['file_name_part'] = output_df['file_id_name'].str.split(';', 1).str
 
-    # uses canvas url if file type == 0 (cavas file) and leccap url if not
     output_df['file_name'] = output_df.apply(lambda row: RESOURCE_URLS[row.resource_type]["prefix"] + row.file_id_part + RESOURCE_URLS[row.resource_type]["postfix"] + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
     output_df.drop(columns=['file_id_part', 'file_name_part', 'file_id_name'], inplace=True)
 
