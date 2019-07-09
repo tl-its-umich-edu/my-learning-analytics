@@ -68,25 +68,25 @@ Environment variables:
 
 Start the app
 
-    `docker-compose up -d`
+    docker-compose up -d
 
 Stop the app
 
-    `docker-compose stop`
+    docker-compose stop
 
 Tear down the app completely
 
-    `docker-compose down`
+    docker-compose down
 
 If you have problems you can connect direct into a specific container with the command
 
-    `docker-compose run web /bin/bash
+    docker-compose run web /bin/bash
     
 # Populate initial demo terms and courses
 
 Before adding adding initial terms and courses, ensure that the `CANVAS_DATA_ID_INCREMENT` environment variable is set correctly
 
-    `docker exec -it student_dashboard bash ./demo_init.sh`
+    docker exec -it student_dashboard /bin/bash ./demo_init.sh
 
 If you have problems you can connect direct into a specific container with the command
 
@@ -185,7 +185,7 @@ Then you can edit your files! (Probably in /code/dashboard)
     If you want to connect to the cron job you'll have to use a different port as Django uses 3000 by default and also wait for attach.
 
     Set your breakpoints then run this command in the docker instance! Then connect to the cron configuration. The job will start when you attach the debugger.
-    `PTVSD_WAIT_FOR_ATTACH=True PTVSD_ENABLE=TRUE PTVSD_REMOTE_PORT=3001 ./manage-ptvd.py runcrons --force`
+    `docker exec -it student_dashboard /bin/bash -c "PTVSD_WAIT_FOR_ATTACH=True PTVSD_ENABLE=TRUE PTVSD_REMOTE_PORT=3001 ./manage_ptvsd.py runcrons --force"`
 
 ## License check
 
