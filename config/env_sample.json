@@ -125,7 +125,7 @@
     "DATA_WAREHOUSE_IS_UNIZIN": true,
     "RESOURCE_TYPES": {
         "files": {"resource_label" :"Files", "resource_value":"files", "resources": ["canvas"], "disabled": "false"},
-        "videos": {"resource_label":"Videos", "resource_value":"videos", "resources": ["leccap"], "disabled": "true"}
+        "videos": {"resource_label":"Videos", "resource_value":"videos", "resources": ["leccap"], "disabled": "false"}
     },
     "RESOURCE_URLS": {
         "canvas": {"prefix": "https://example.instructure.com/files/", "postfix": "/download?download_frd=1"},

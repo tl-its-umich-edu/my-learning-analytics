@@ -220,7 +220,7 @@ class CourseViewOption(models.Model):
 
 class File(models.Model):
     resource_type = models.TextField(verbose_name="Resource Type")
-    id = models.BigIntegerField(primary_key=True, verbose_name="File Id")
+    id = models.CharField(primary_key=True, max_length=255, verbose_name="File Id")
     name = models.TextField(verbose_name="File Name")
     course_id = models.BigIntegerField(verbose_name="Course Id")
 
@@ -284,7 +284,7 @@ class User(models.Model):
 
 class FileAccess(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
-    file_id = models.BigIntegerField(blank=True, null=False, verbose_name='File Id')
+    file_id = models.CharField(blank=True, max_length=255, null=False, verbose_name='File Id')
     user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id')
     access_time = models.DateTimeField(verbose_name="Access Time")
 
