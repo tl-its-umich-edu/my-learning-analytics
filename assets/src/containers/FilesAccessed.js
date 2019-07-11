@@ -60,6 +60,16 @@ function FilesAccessed (props) {
   const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
   const [defaultLabel, setDefaultLabel] = useState(currentSetting)
 
+  function setDefaultFilterState() {
+    let tempArray = []
+    resource_values.forEach(function(resource_item) {
+      if (resource_item.disabled === "false") {
+        tempArray.push(resource_item.resource_value)
+      }
+    })
+    return tempArray
+  }
+
   const changeDefaultSetting = (event) => {
     const didUserChecked = event.target.checked
 
@@ -119,24 +129,12 @@ function FilesAccessed (props) {
     if (loaded) {
       if (filesDefaultData.default !== '') {
         setGradeRangeFilter(filesDefaultData.default)
-        let tempArray = []
-        resource_values.forEach(function(resource_item) {
-          if (resource_item.disabled === "false") {
-            tempArray.push(resource_item.resource_value)
-          }
-        })
-        setResourceFilter(resourceFilter.concat(tempArray))
+        setResourceFilter(resourceFilter.concat(setDefaultFilterState()))
         setDefaultValue(filesDefaultData.default)
       } else {
         // setting it to default
         setGradeRangeFilter('All')
-        let tempArray = []
-        resource_values.forEach(function(resource_item) {
-          if (resource_item.disabled === "false") {
-            tempArray.push(resource_item.resource_value)
-          }
-        })
-        setResourceFilter(resourceFilter.concat(tempArray))
+        setResourceFilter(resourceFilter.concat(setDefaultFilterState()))
         setDefaultValue('All')
       }
       setDataControllerLoad(dataControllerLoad + 1)
@@ -145,7 +143,7 @@ function FilesAccessed (props) {
 
   useEffect(() => {
     // Fetch data once all the setting data is fetched
-    if (dataControllerLoad === 2) {
+    if (dataControllerLoad === 2 && resourceFilter != "") {
       const dataURL = `/api/v1/courses/${courseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&resource_type=${resourceFilter}`
       const fetchOptions = { method: 'get', ...defaultFetchOptions }
       fetch(dataURL, fetchOptions)
@@ -157,6 +155,9 @@ function FilesAccessed (props) {
         .catch(err => {
           setFileAccessData({})
         })
+    }
+    else {
+      setFileAccessData({})
     }
   }, [dataControllerLoad, weekRange, gradeRangeFilter, resourceFilter])
 
@@ -193,7 +194,12 @@ function FilesAccessed (props) {
 
   const FileAccessChartBuilder = (fileData) => {
     if (!fileData || Object.keys(fileData).length === 0) {
-      return (<p>No data provided</p>)
+      if (resourceFilter == "") {
+        return (<text>Please select a resource type to display data</text>)
+      } 
+      else {
+        return (<p>No data provided</p>)
+      }
     }
     return (
       <Grid item xs={12} lg={10}>
@@ -257,8 +263,7 @@ function FilesAccessed (props) {
               </FormControl>
             </div>
             {fileAccessData
-              ? FileAccessChartBuilder(fileAccessData)
-              : <Spinner/>}
+              ? FileAccessChartBuilder(fileAccessData): <Spinner/>}
           </Paper>
         </Grid>
       </Grid>
