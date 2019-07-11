@@ -15,7 +15,6 @@ from django.shortcuts import redirect, render
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
 from dashboard.common.db_util import canvas_id_to_incremented_id
-from dashboard.common import utils
 
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -24,7 +23,7 @@ from dashboard.models import AcademicTerms, UserDefaultSelection, \
 
 logger = logging.getLogger(__name__)
 # strings for construct file download url
-RESOURCE_URLS = utils.get_resource_urls()
+RESOURCE_URLS = settings.RESOURCE_URLS
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
 # string for no grade
@@ -36,7 +35,7 @@ NO_GRADE_STRING = "NO_GRADE"
 
 # string for file type
 RESOURCE_TYPE_STRING = "resource_type"
-RESOURCE_TYPES = utils.get_resource_types()
+RESOURCE_TYPES = settings.RESOURCE_TYPES
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1

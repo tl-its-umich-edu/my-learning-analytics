@@ -195,7 +195,7 @@ function FilesAccessed (props) {
   const FileAccessChartBuilder = (fileData) => {
     if (!fileData || Object.keys(fileData).length === 0) {
       if (resourceFilter == "") {
-        return (<text>Please select a resource type to display data</text>)
+        return (<div style={{textAlign: "center"}}><b>Please select a resource type to display data</b></div>)
       } 
       else {
         return (<p>No data provided</p>)

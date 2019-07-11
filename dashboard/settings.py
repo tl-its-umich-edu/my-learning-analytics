@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 import json
-from dashboard.common import utils
 
 from debug_toolbar import settings as dt_settings
 
@@ -40,7 +39,9 @@ LOGIN_URL = '/accounts/login'
 GA_ID = ENV.get('GA_ID', '')
 
 # File values from .env
-RESOURCE_VALUES = utils.get_resource_values()
+RESOURCE_TYPES = ENV.get("RESOURCE_TYPES")
+RESOURCE_URLS = ENV.get("RESOURCE_URLS")
+RESOURCE_VALUES = list(RESOURCE_TYPES.values())
 
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
 SITE_ID = 1
