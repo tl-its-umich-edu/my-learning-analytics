@@ -1,4 +1,4 @@
-import logging, os, json
+import logging, os
 logger = logging.getLogger(__name__)
 
 def get_build_info():
