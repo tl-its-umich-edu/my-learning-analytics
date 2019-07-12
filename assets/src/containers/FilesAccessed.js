@@ -144,7 +144,7 @@ function FilesAccessed (props) {
 
   useEffect(() => {
     // Fetch data once all the setting data is fetched
-    if (dataControllerLoad === 2 && resourceFilter !== "") {
+    if (dataControllerLoad === 2 && !(resourceFilter <= [])) {
       const dataURL = `/api/v1/courses/${courseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&resource_type=${resourceFilter}`
       const fetchOptions = { method: 'get', ...defaultFetchOptions }
       fetch(dataURL, fetchOptions)
