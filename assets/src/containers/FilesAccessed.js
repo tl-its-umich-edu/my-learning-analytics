@@ -16,6 +16,7 @@ import { handleError, defaultFetchOptions } from '../util/data'
 import FileAccessChart from '../components/FileAccessChart'
 import Cookie from 'js-cookie'
 import Error from './Error'
+import { type } from 'os';
 
 const styles = theme => ({
   root: {
@@ -43,7 +44,7 @@ const settingNotUpdated = 'Setting not updated'
 
 function FilesAccessed (props) {
   const { classes, courseInfo, courseId } = props
-  const resource_values = RESOURCE_VALUES 
+  const resourceValues = RESOURCE_VALUES 
   if (!courseInfo.course_view_options.fa) return (<Error>Files view is hidden for this course.</Error>)
   const [loaded, error, filesDefaultData] = useUserSettingData(courseId, 'file') // Used to update default setting
   const [minMaxWeek, setMinMaxWeek] = useState([]) // Should be updated from info
@@ -60,9 +61,9 @@ function FilesAccessed (props) {
   const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
   const [defaultLabel, setDefaultLabel] = useState(currentSetting)
 
-  function setDefaultFilterState() {
+  function getDefaultFilterState() {
     let tempArray = []
-    resource_values.forEach(function(resource_item) {
+    resourceValues.forEach(function(resource_item) {
       if (resource_item.disabled === "false") {
         tempArray.push(resource_item.resource_value)
       }
@@ -129,12 +130,12 @@ function FilesAccessed (props) {
     if (loaded) {
       if (filesDefaultData.default !== '') {
         setGradeRangeFilter(filesDefaultData.default)
-        setResourceFilter(resourceFilter.concat(setDefaultFilterState()))
+        setResourceFilter(resourceFilter.concat(getDefaultFilterState()))
         setDefaultValue(filesDefaultData.default)
       } else {
         // setting it to default
         setGradeRangeFilter('All')
-        setResourceFilter(resourceFilter.concat(setDefaultFilterState()))
+        setResourceFilter(resourceFilter.concat(getDefaultFilterState()))
         setDefaultValue('All')
       }
       setDataControllerLoad(dataControllerLoad + 1)
@@ -143,7 +144,7 @@ function FilesAccessed (props) {
 
   useEffect(() => {
     // Fetch data once all the setting data is fetched
-    if (dataControllerLoad === 2 && resourceFilter != "") {
+    if (dataControllerLoad === 2 && resourceFilter !== "") {
       const dataURL = `/api/v1/courses/${courseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&resource_type=${resourceFilter}`
       const fetchOptions = { method: 'get', ...defaultFetchOptions }
       fetch(dataURL, fetchOptions)
@@ -181,21 +182,20 @@ function FilesAccessed (props) {
 
   const onChangeFileHandler = event => {
     const value = event.target.value
-    if (event.target.checked == true && !resourceFilter.includes(value)) {
+    if (event.target.checked && !resourceFilter.includes(value)) {
       setResourceFilter([...resourceFilter, value])
     } 
-    else if (event.target.checked == false) { 
-      setResourceFilter(resourceFilter.filter(val => {
-        return val != value
-      }))
+    else if (!event.target.checked) { 
+      setResourceFilter(resourceFilter.filter(val => val !== value))
     }
-    
+    console.log(resourceFilter)
+    console.log(typeof(resourceFilter))
   }
 
   const FileAccessChartBuilder = (fileData) => {
     if (!fileData || Object.keys(fileData).length === 0) {
-      if (resourceFilter == "") {
-        return (<div style={{textAlign: "center"}}><b>Please select a resource type to display data</b></div>)
+      if (resourceFilter <= []) {
+        return (<div style={{textAlign: "center", fontWeight: "900", color:"#D8000C"}}><p>Please select a resource type to display data</p></div>)
       } 
       else {
         return (<p>No data provided</p>)
@@ -255,15 +255,16 @@ function FilesAccessed (props) {
             <div style={{ textAlign: "center" }}>
               <FormControl>
                 <FormGroup row>
-                  <p><b>Select Resources to be Viewed:</b></p>
+                  <p style={{fontWeight: "bold"}}>Select Resources to be Viewed:</p>
                   {
-                    resource_values.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeFileHandler} value={el.resource_value} disabled={el.disabled === "true"}></Checkbox>} label={el.resource_label}/>))
+                    resourceValues.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeFileHandler} value={el.resource_value} disabled={el.disabled === "true"}></Checkbox>} label={el.resource_label}/>))
                   }
                 </FormGroup>
               </FormControl>
             </div>
             {fileAccessData
-              ? FileAccessChartBuilder(fileAccessData): <Spinner/>}
+              ? FileAccessChartBuilder(fileAccessData)
+              : <Spinner/>}
           </Paper>
         </Grid>
       </Grid>
