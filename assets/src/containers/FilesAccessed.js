@@ -188,8 +188,6 @@ function FilesAccessed (props) {
     else if (!event.target.checked) { 
       setResourceFilter(resourceFilter.filter(val => val !== value))
     }
-    console.log(resourceFilter)
-    console.log(typeof(resourceFilter))
   }
 
   const FileAccessChartBuilder = (fileData) => {
