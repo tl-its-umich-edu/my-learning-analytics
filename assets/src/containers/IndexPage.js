@@ -26,8 +26,6 @@ const styles = theme => ({
 function IndexPage (props) {
   const { classes, courseInfo, courseId } = props
 
-  courseInfo.course_view_options = {}
-
   if (isObjectEmpty(courseInfo.course_view_options))
     return (<Error>No data visualizations have been added for this course.</Error>)
 
