@@ -21,8 +21,7 @@ const styles = theme => ({
     color: theme.palette.text.secondary
   },
   table: {
-    width: '300px',
-    border: 'none'
+    width: '300px'
   }
 })
 
