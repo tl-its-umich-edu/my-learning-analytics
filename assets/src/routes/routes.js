@@ -19,10 +19,10 @@ const routes = (courseId, activeViews) => {
       viewCode: 'ap'
     },
     {
-      path: `/courses/${courseId}/files`,
-      title: 'Files Accessed',
+      path: `/courses/${courseId}/resources`,
+      title: 'Resources Accessed',
       icon: Grade,
-      description: 'See what files you and your peers are reading.',
+      description: 'See what resources you and your peers are viewing.',
       image: '/static/images/file_access_trends_icon.png',
       viewCode: 'fa'
     }

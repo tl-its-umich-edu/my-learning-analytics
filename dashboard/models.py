@@ -176,15 +176,15 @@ class Course(models.Model):
 
 class CourseViewOption(models.Model):
     course = models.OneToOneField(Course, on_delete=models.CASCADE, primary_key=True, verbose_name="Course View Option Id")
-    show_files_accessed = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Files Accessed View")
+    show_resources_accessed = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Resources Accessed View")
     show_assignment_planning = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Assignment Planning View")
     show_grade_distribution = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Grade Distribution View")
 
-    VIEWS = ['show_files_accessed', 'show_assignment_planning', 'show_grade_distribution']
+    VIEWS = ['show_resources_accessed', 'show_assignment_planning', 'show_grade_distribution']
 
     def __str__(self):
         retval = ""
-        if self.show_files_accessed and 'show_files_accessed' not in settings.VIEWS_DISABLED: retval += "Files Accessed\n"
+        if self.show_resources_accessed and 'show_resources_accessed' not in settings.VIEWS_DISABLED: retval += "Resources Accessed\n"
         if self.show_assignment_planning and 'show_assignment_planning' not in settings.VIEWS_DISABLED: retval += "Assignment Planning\n"
         if self.show_grade_distribution and 'show_grade_distribution' not in settings.VIEWS_DISABLED: retval += "Grade Distribution\n"
         return retval
@@ -203,7 +203,7 @@ class CourseViewOption(models.Model):
         """
 
         try:
-            options = {'fa': int(self.show_files_accessed and 'show_files_accessed'
+            options = {'fa': int(self.show_resources_accessed and 'show_resources_accessed'
                                  not in settings.VIEWS_DISABLED),
                        'ap': int(self.show_assignment_planning and 'show_assignment_planning'
                                  not in settings.VIEWS_DISABLED),
@@ -218,17 +218,17 @@ class CourseViewOption(models.Model):
             return ""
 
 
-class File(models.Model):
-    resource_type = models.CharField(verbose_name="Resource Type")
-    id = models.CharField(primary_key=True, max_length=255, verbose_name="File Id")
-    name = models.TextField(verbose_name="File Name")
+class Resource(models.Model):
+    resource_type = models.CharField(primary_key=True, max_length=255, verbose_name="Resource Type")
+    id = models.CharField(primary_key=True, max_length=255, verbose_name="Resource Id")
+    name = models.TextField(verbose_name="Resource Name")
     course_id = models.BigIntegerField(verbose_name="Course Id")
 
     def __str__(self):
         return self.name
 
     class Meta:
-        db_table = 'file'
+        db_table = 'resource'
 
 
 class Submission(models.Model):
@@ -282,14 +282,14 @@ class User(models.Model):
         db_table = 'user'
         unique_together = (('id', 'course_id'),)
 
-class FileAccess(models.Model):
+class ResourceAccess(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
-    file_id = models.CharField(blank=True, max_length=255, null=False, verbose_name='File Id')
+    resource_id = models.CharField(blank=True, max_length=255, null=False, verbose_name='Resource Id')
     user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id')
     access_time = models.DateTimeField(verbose_name="Access Time")
 
     def __str__(self):
-        return f"File {self.file_id} accessed by {self.user_id}"
+        return f"Resource {self.resource_id} accessed by {self.user_id}"
 
     class Meta:
-        db_table = 'file_access'
+        db_table = 'resource_access'

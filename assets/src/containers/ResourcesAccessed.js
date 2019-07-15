@@ -13,7 +13,7 @@ import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import { useUserSettingData } from '../service/api'
 import { handleError, defaultFetchOptions } from '../util/data'
-import FileAccessChart from '../components/FileAccessChart'
+import ResourceAccessChart from '../components/ResourceAccessChart'
 import Cookie from 'js-cookie'
 import Error from './Error'
 import { type } from 'os';
@@ -42,17 +42,17 @@ const currentSetting = 'My current setting'
 const rememberSetting = 'Remember my setting'
 const settingNotUpdated = 'Setting not updated'
 
-function FilesAccessed (props) {
+function ResourcesAccessed (props) {
   const { classes, courseInfo, courseId } = props
   const resourceValues = RESOURCE_VALUES 
-  if (!courseInfo.course_view_options.fa) return (<Error>Files view is hidden for this course.</Error>)
-  const [loaded, error, filesDefaultData] = useUserSettingData(courseId, 'file') // Used to update default setting
+  if (!courseInfo.course_view_options.fa) return (<Error>Resources view is hidden for this course.</Error>)
+  const [loaded, error, resourcesDefaultData] = useUserSettingData(courseId, 'resource') // Used to update default setting
   const [minMaxWeek, setMinMaxWeek] = useState([]) // Should be updated from info
   const [curWeek, setCurWeek] = useState(0) // Should be updated from info
   const [weekRange, setWeekRange] = useState([]) // Should be depend on curWeek
   const [gradeRangeFilter, setGradeRangeFilter] = useState('') // Should be fetched from default
   const [resourceFilter, setResourceFilter] = useState([])
-  const [fileAccessData, setFileAccessData] = useState('')
+  const [resourceAccessData, setResourceAccessData] = useState('')
   const [dataControllerLoad, setDataControllerLoad] = useState(0)
   // initial default value that we get from backend and updated value when user save the default setting
   const [defaultValue, setDefaultValue] = useState('')
@@ -80,7 +80,7 @@ function FilesAccessed (props) {
     if (didUserChecked) {
       // Django rejects PUT/DELETE/POST calls with out CSRF token.
       const csrfToken = Cookie.get('csrftoken')
-      const body = { file: gradeRangeFilter }
+      const body = { resource: gradeRangeFilter }
       const dataURL = `/api/v1/courses/${courseId}/set_user_default_selection`
 
       defaultFetchOptions.headers['X-CSRFToken'] = csrfToken
@@ -128,10 +128,10 @@ function FilesAccessed (props) {
   useEffect(() => {
     // Fetch grade range from default setting if any
     if (loaded) {
-      if (filesDefaultData.default !== '') {
-        setGradeRangeFilter(filesDefaultData.default)
+      if (resourcesDefaultData.default !== '') {
+        setGradeRangeFilter(resourcesDefaultData.default)
         setResourceFilter(resourceFilter.concat(getDefaultFilterState()))
-        setDefaultValue(filesDefaultData.default)
+        setDefaultValue(resourcesDefaultData.default)
       } else {
         // setting it to default
         setGradeRangeFilter('All')
@@ -145,20 +145,20 @@ function FilesAccessed (props) {
   useEffect(() => {
     // Fetch data once all the setting data is fetched
     if (dataControllerLoad === 2 && !(resourceFilter.length === 0)) {
-      const dataURL = `/api/v1/courses/${courseId}/file_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&resource_type=${resourceFilter}`
+      const dataURL = `/api/v1/courses/${courseId}/resource_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&resource_type=${resourceFilter}`
       const fetchOptions = { method: 'get', ...defaultFetchOptions }
       fetch(dataURL, fetchOptions)
         .then(handleError)
         .then(res => res.json())
         .then(data => {
-          setFileAccessData(data)
+          setResourceAccessData(data)
         })
         .catch(err => {
-          setFileAccessData({})
+          setResourceAccessData({})
         })
     }
     else {
-      setFileAccessData({})
+      setResourceAccessData({})
     }
   }, [dataControllerLoad, weekRange, gradeRangeFilter, resourceFilter])
 
@@ -180,7 +180,7 @@ function FilesAccessed (props) {
     }
   }
 
-  const onChangeFileHandler = event => {
+  const onChangeResourceHandler = event => {
     const value = event.target.value
     if (event.target.checked && !resourceFilter.includes(value)) {
       setResourceFilter([...resourceFilter, value])
@@ -190,8 +190,8 @@ function FilesAccessed (props) {
     }
   }
 
-  const FileAccessChartBuilder = (fileData) => {
-    if (!fileData || Object.keys(fileData).length === 0) {
+  const ResourceAccessChartBuilder = (resourceData) => {
+    if (!resourceData || Object.keys(resourceData).length === 0) {
       if (resourceFilter.length === 0) {
         return (<div style={{textAlign: "center", fontWeight: "900", color:"#D8000C"}}><p>Please select a resource type to display data</p></div>)
       } 
@@ -201,8 +201,8 @@ function FilesAccessed (props) {
     }
     return (
       <Grid item xs={12} lg={10}>
-        <FileAccessChart
-          data={fileData}
+        <ResourceAccessChart
+          data={resourceData}
           aspectRatio={0.3}
         />
       </Grid>
@@ -255,13 +255,13 @@ function FilesAccessed (props) {
                 <FormGroup row>
                   <p style={{fontWeight: "bold"}}>Select Resources to be Viewed:</p>
                   {
-                    resourceValues.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeFileHandler} value={el.resource_value} disabled={el.disabled === "true"}></Checkbox>} label={el.resource_label}/>))
+                    resourceValues.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeResourceHandler} value={el.resource_value} disabled={el.disabled === "true"}></Checkbox>} label={el.resource_label}/>))
                   }
                 </FormGroup>
               </FormControl>
             </div>
-            {fileAccessData
-              ? FileAccessChartBuilder(fileAccessData)
+            {resourceAccessData
+              ? ResourceAccessChartBuilder(resourceAccessData)
               : <Spinner/>}
           </Paper>
         </Grid>
@@ -270,4 +270,4 @@ function FilesAccessed (props) {
   )
 }
 
-export default withStyles(styles)(FilesAccessed)
+export default withStyles(styles)(ResourcesAccessed)

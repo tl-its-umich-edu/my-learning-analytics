@@ -47,8 +47,8 @@ urlpatterns = [
     # GET access patterns
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/grade_distribution',
         login_required(views.grade_distribution), name='grade_distribution'),
-    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/file_access_within_week',
-        login_required(views.file_access_within_week), name='file_access_within_week'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/resource_access_within_week',
+        login_required(views.resource_access_within_week), name='resource_access_within_week'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignments',
         login_required(views.assignments), name='assignments'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/get_user_default_selection',

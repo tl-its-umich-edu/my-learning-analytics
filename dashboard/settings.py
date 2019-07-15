@@ -38,7 +38,7 @@ LOGIN_URL = '/accounts/login'
 # Google Analytics ID
 GA_ID = ENV.get('GA_ID', '')
 
-# File values from .env
+# Resource values from env
 RESOURCE_TYPES = ENV.get("RESOURCE_TYPES")
 RESOURCE_URLS = ENV.get("RESOURCE_URLS")
 RESOURCE_VALUES = list(RESOURCE_TYPES.values())
