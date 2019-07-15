@@ -3,12 +3,12 @@ import { Grade } from '@material-ui/icons'
 const routes = (courseId, activeViews) => {
   const allViews = [
     {
-      path: `/courses/${courseId}/grades`,
-      title: 'Grade Distribution',
+      path: `/courses/${courseId}/files`,
+      title: 'Files Accessed',
       icon: Grade,
-      description: 'See where your grade sits within the course grade distribution.',
-      image: '/static/images/grade_distribution_icon.png',
-      viewCode: 'gd'
+      description: 'See what files you and your peers are reading.',
+      image: '/static/images/file_access_trends_icon.png',
+      viewCode: 'fa'
     },
     {
       path: `/courses/${courseId}/assignments`,
@@ -19,12 +19,12 @@ const routes = (courseId, activeViews) => {
       viewCode: 'ap'
     },
     {
-      path: `/courses/${courseId}/files`,
-      title: 'Files Accessed',
+      path: `/courses/${courseId}/grades`,
+      title: 'Grade Distribution',
       icon: Grade,
-      description: 'See what files you and your peers are reading.',
-      image: '/static/images/file_access_trends_icon.png',
-      viewCode: 'fa'
+      description: 'See where your grade sits within the course grade distribution.',
+      image: '/static/images/grade_distribution_icon.png',
+      viewCode: 'gd'
     }
   ]
   return allViews.filter(view => activeViews[view.viewCode])
