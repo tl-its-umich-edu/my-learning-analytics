@@ -52,7 +52,7 @@ function CourseList (props) {
       <AppBar className={classes.root} position='static'>
         <Toolbar>
           <Typography variant='h6' color='inherit' className={classes.grow}>
-            My Learning Analytics
+            My Learning Analytics the welcome page
           </Typography>
           <div className={classes.grow} />
           <IconButton

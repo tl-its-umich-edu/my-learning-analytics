@@ -38,6 +38,11 @@ LOGIN_URL = '/accounts/login'
 # Google Analytics ID
 GA_ID = ENV.get('GA_ID', '')
 
+# Resource values from env
+RESOURCE_TYPES = ENV.get("RESOURCE_TYPES")
+RESOURCE_URLS = ENV.get("RESOURCE_URLS")
+RESOURCE_VALUES = list(RESOURCE_TYPES.values())
+
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
 SITE_ID = 1
 
@@ -406,7 +411,7 @@ BIG_QUERY_ED_APP = ENV.get('BIG_QUERY_ED_APP', "http://umich.instructure.com/")
 RUN_AT_TIMES = ENV.get('RUN_AT_TIMES', [])
 
 # Add any settings you need to be available to templates in this array
-SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID']
+SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'RESOURCE_VALUES']
 
 # Method to show the user, if they're authenticated and superuser
 def show_debug_toolbar(request):

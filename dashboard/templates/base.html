@@ -66,6 +66,8 @@
             "google_analytics_id":'{{ settings.GA_ID }}',
         {% endif %}
         }
+        
+        var RESOURCE_VALUES = {{ settings.RESOURCE_VALUES|safe }}
 
     </script>
 </head>

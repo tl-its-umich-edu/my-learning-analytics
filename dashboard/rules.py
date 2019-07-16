@@ -55,7 +55,7 @@ is_admin_or_enrolled_in_course = is_admin | is_enrolled_in_course
 
 # api
 rules.add_perm('dashboard.get_course_info', is_admin_or_enrolled_in_course)
-rules.add_perm('dashboard.file_access_within_week', is_admin_or_enrolled_in_course)
+rules.add_perm('dashboard.resource_access_within_week', is_admin_or_enrolled_in_course)
 rules.add_perm('dashboard.grade_distribution', is_admin_or_enrolled_in_course)
 rules.add_perm('dashboard.update_user_default_selection_for_views', is_admin_or_enrolled_in_course)
 rules.add_perm('dashboard.get_user_default_selection', is_admin_or_enrolled_in_course)
@@ -63,6 +63,9 @@ rules.add_perm('dashboard.assignments', is_admin_or_enrolled_in_course)
 rules.add_perm('dashboard.courses_enabled', is_admin)
 
 # templates
+rules.add_perm('dashboard.get_grades_template', is_admin_or_enrolled_in_course)
+rules.add_perm('dashboard.get_assignments_template', is_admin_or_enrolled_in_course)
+rules.add_perm('dashboard.get_resources_template', is_admin_or_enrolled_in_course)
 rules.add_perm('dashboard.get_course_template', is_admin_or_enrolled_in_course)
 
 
