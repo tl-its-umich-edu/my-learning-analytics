@@ -30,6 +30,7 @@ from django.views.decorators.cache import cache_page
 from . import views
 
 import watchman.views
+
 urlpatterns = [
     url(r'^$',
         views.get_home_template, name = 'home'),
@@ -39,8 +40,7 @@ urlpatterns = [
     url('admin', admin.site.urls),
 
     # This is the courses catch-all
-    url(r'^courses/', login_required(views.get_home_template,), name="home"),
-    url(r'^courses/(?P<course_id>[0-9]+|)', login_required(views.get_course_template,), name="home"),
+    url(r'^courses/(?P<course_id>[0-9]+|)', login_required(views.get_home_courses_template,), name="home"),
 
 
     # Thse URL's are data patterns
@@ -66,7 +66,6 @@ urlpatterns = [
     url(r'^su/', include('django_su.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
 
 if apps.is_installed('djangosaml2'):
     from djangosaml2.views import echo_attributes

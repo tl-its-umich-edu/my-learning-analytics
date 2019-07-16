@@ -15,8 +15,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Resource',
             fields=[
-                ('resource_type', models.CharField(max_length=255, primary_key=True, serialize=False, verbose_name='Resource Type')),
                 ('id', models.CharField(max_length=255, primary_key=True, verbose_name='Resource Id')),
+                ('resource_type', models.CharField(max_length=255, serialize=False, verbose_name='Resource Type')),
                 ('name', models.TextField(verbose_name='Resource Name')),
                 ('course_id', models.BigIntegerField(verbose_name='Course Id')),
             ],
