@@ -60,7 +60,7 @@ def get_home_template(request):
 
 @permission_required('dashboard.get_home_courses_template',
     fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
-def get_home_courses_template(request, course_id=0):
+def get_course_template(request, course_id=0):
     return render(request, 'frontend/index.html', {'course_id': course_id})
 
 
