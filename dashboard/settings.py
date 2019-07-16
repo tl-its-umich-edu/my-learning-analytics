@@ -39,8 +39,8 @@ LOGIN_URL = '/accounts/login'
 GA_ID = ENV.get('GA_ID', '')
 
 # Resource values from env
-RESOURCE_TYPES = ENV.get("RESOURCE_TYPES")
-RESOURCE_URLS = ENV.get("RESOURCE_URLS")
+RESOURCE_TYPES = ENV.get("RESOURCE_TYPES", {})
+RESOURCE_URLS = ENV.get("RESOURCE_URLS", {})
 RESOURCE_VALUES = list(RESOURCE_TYPES.values())
 
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
