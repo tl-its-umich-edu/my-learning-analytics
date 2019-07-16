@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 import SelectCard from '../components/SelectCard'
 import { Link } from 'react-router-dom'
-import { isObjectEmpty } from '../util/object'
+import { isObjectEmpty, getObjectValues } from '../util/object'
 import Error from './Error'
 import routes from '../routes/routes'
 
@@ -23,11 +23,16 @@ const styles = theme => ({
   }
 })
 
+const objectValuesAreAllZero = obj => getObjectValues(obj).every(x => x === 0)
+
 function IndexPage (props) {
   const { classes, courseInfo, courseId } = props
 
-  if (isObjectEmpty(courseInfo.course_view_options))
+  const views = courseInfo.course_view_options
+
+  if (isObjectEmpty(views) || objectValuesAreAllZero(views)) {
     return (<Error>No data visualizations have been added for this course.</Error>)
+  }
 
   return (
     <Grid container spacing={16} className={classes.root}>
@@ -37,7 +42,7 @@ function IndexPage (props) {
           className={classes.wrapper}
           spacing={8}
         >
-          {routes(courseId, courseInfo.course_view_options).map((props, key) =>
+          {routes(courseId, views).map((props, key) =>
             <Link style={{ textDecoration: 'none' }} to={props.path} key={key}>
               <SelectCard cardData={props} />
             </Link>
