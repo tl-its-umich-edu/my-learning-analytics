@@ -186,6 +186,9 @@ Then you can edit your files! (Probably in /code/dashboard)
 
     Set your breakpoints then run this command in the docker instance! Then connect to the cron configuration. The job will start when you attach the debugger.
     `docker exec -it student_dashboard /bin/bash -c "PTVSD_WAIT_FOR_ATTACH=True PTVSD_ENABLE=TRUE PTVSD_REMOTE_PORT=3001 ./manage_ptvsd.py runcrons --force"`
+    
+### Running front-end tests
+`docker exec -it webpack_watcher npm test` will run the test suite for the front-end React application. [Jest](https://jestjs.io/) is the testing framework used.
 
 ## License check
 
