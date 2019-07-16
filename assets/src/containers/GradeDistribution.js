@@ -37,7 +37,7 @@ function GradeDistribution (props) {
     return (
       <Grid container>
         <Grid item xs={12} lg={2}>
-          <Table className={classes.table} tableData={[
+          <Table className={classes.table} noBorder tableData={[
             ['My Grade', <strong>{gradeData[0].current_user_grade
               ? `${roundToOneDecimcal(gradeData[0].current_user_grade)}%`
               : 'There are no grades yet for you in this course'}</strong>
