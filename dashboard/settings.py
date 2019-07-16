@@ -39,8 +39,8 @@ LOGIN_URL = '/accounts/login'
 GA_ID = ENV.get('GA_ID', '')
 
 # Resource values from env
-RESOURCE_TYPES = ENV.get("RESOURCE_TYPES")
-RESOURCE_URLS = ENV.get("RESOURCE_URLS")
+RESOURCE_TYPES = ENV.get("RESOURCE_TYPES", {})
+RESOURCE_URLS = ENV.get("RESOURCE_URLS", {})
 RESOURCE_VALUES = list(RESOURCE_TYPES.values())
 
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
@@ -403,10 +403,6 @@ VIEWS_DISABLED = ENV.get('VIEWS_DISABLED', [])
 
 EARLIEST_TERM_DATE = ENV.get('EARLIEST_TERM_DATE', '2016-11-15')
 
-# This is the ed_app field that will be used to query for Canvas file events
-
-BIG_QUERY_ED_APP = ENV.get('BIG_QUERY_ED_APP', "http://umich.instructure.com/")
-
 # Time to run cron
 RUN_AT_TIMES = ENV.get('RUN_AT_TIMES', [])
 
@@ -437,7 +433,7 @@ CANVAS_FILE_POSTFIX = ENV.get("CANVAS_FILE_POSTFIX", "")
 
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
-FILES_ACCESSED_CONFIG = ENV.get("FILES_ACCESSED_CONFIG", {})
+RESOURCE_ACCESS_CONFIG = ENV.get("RESOURCE_ACCESS_CONFIG", {})
 # IMPORT LOCAL ENV
 # =====================
 try:
