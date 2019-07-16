@@ -22,6 +22,9 @@ from dashboard.models import AcademicTerms, UserDefaultSelection, \
     Course, CourseViewOption
 
 logger = logging.getLogger(__name__)
+# strings for construct resource download url
+RESOURCE_URLS = settings.RESOURCE_URLS
+CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
 # string for no grade
 GRADE_A="90-100"
@@ -29,6 +32,10 @@ GRADE_B="80-89"
 GRADE_C="70-79"
 GRADE_LOW="low_grade"
 NO_GRADE_STRING = "NO_GRADE"
+
+# string for resource type
+RESOURCE_TYPE_STRING = "resource_type"
+RESOURCE_TYPES = settings.RESOURCE_TYPES
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
@@ -53,7 +60,7 @@ def get_home_template(request):
 
 @permission_required('dashboard.get_home_courses_template',
     fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
-def get_course_template(request, course_id=0):
+def get_home_courses_template(request, course_id=0):
     return render(request, 'frontend/index.html', {'course_id': course_id})
 
 
@@ -103,10 +110,10 @@ def get_course_info(request, course_id=0):
 
     return HttpResponse(json.dumps(resp, default=str))
 
-# show percentage of users who read the file within prior n weeks
-@permission_required('dashboard.file_access_within_week',
+# show percentage of users who read the resource within prior n weeks
+@permission_required('dashboard.resource_access_within_week',
     fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
-def file_access_within_week(request, course_id=0):
+def resource_access_within_week(request, course_id=0):
 
     course_id = canvas_id_to_incremented_id(course_id)
 
@@ -121,6 +128,13 @@ def file_access_within_week(request, course_id=0):
     week_num_start = int(request.GET.get('week_num_start','1'))
     week_num_end = int(request.GET.get('week_num_end','0'))
     grade = request.GET.get('grade','all')
+    filter_values = request.GET.get(RESOURCE_TYPE_STRING, ['files', 'videos'])
+    filter_values = filter_values.split(",")
+
+    filter_list = []
+    for filter_value in filter_values:
+        if filter_value != '':
+            filter_list += RESOURCE_TYPES[filter_value]['resources']
 
     # json for eventlog
     data = {
@@ -129,7 +143,7 @@ def file_access_within_week(request, course_id=0):
         "grade": grade,
         "course_id": course_id
     }
-    eventlog(request.user, EventLogTypes.EVENT_VIEW_FILE_ACCESS.value, extra=data)
+    eventlog(request.user, EventLogTypes.EVENT_VIEW_RESOURCE_ACCESS.value, extra=data)
 
 
     # get total number of student within the course_id
@@ -154,13 +168,13 @@ def file_access_within_week(request, course_id=0):
 
     # get time range based on week number passed in via request
 
-    sqlString = f"""SELECT a.file_id as file_id, f.name as file_name, u.current_grade as current_grade, a.user_id as user_id
-                    FROM file f, file_access a, user u, course c, academic_terms t
-                    WHERE a.file_id =f.id and a.user_id = u.user_id
-                    and f.course_id = c.id and c.term_id = t.id
+    sqlString = f"""SELECT a.resource_id as resource_id, r.resource_type as resource_type, r.name as resource_name, u.current_grade as current_grade, a.user_id as user_id
+                    FROM resource r, resource_access a, user u, course c, academic_terms t
+                    WHERE a.resource_id = r.id and a.user_id = u.user_id
+                    and r.course_id = c.id and c.term_id = t.id
                     and a.access_time > %(start_time)s
                     and a.access_time < %(end_time)s
-                    and f.course_id = %(course_id)s
+                    and r.course_id = %(course_id)s
                     and u.course_id = %(course_id)s
                     and u.enrollment_type = 'StudentEnrollment' """
 
@@ -175,52 +189,54 @@ def file_access_within_week(request, course_id=0):
     if (df.empty):
         return HttpResponse("no data")
 
-    # group by file_id, and file_name
+    # group by resource_id, and resource_name
     # reformat for output
-    df['file_id_name'] = df['file_id'].astype(str).str.cat(df['file_name'], sep=';')
+    df['resource_id_name'] = df['resource_id'].astype(str).str.cat(df['resource_name'], sep=';')
 
-    df=df.drop(['file_id', 'file_name'], axis=1)
-    df.set_index(['file_id_name'])
-    # drop file records when the file has been accessed multiple times by one user
+    df=df.drop(['resource_id', 'resource_name'], axis=1)
+    df.set_index(['resource_id_name'])
+    # drop resource records when the resource has been accessed multiple times by one user
     df.drop_duplicates(inplace=True)
 
     # map point grade to letter grade
     df['grade'] = df['current_grade'].map(gpa_map)
 
     # calculate the percentage
-    df['percent'] = round(df.groupby(['file_id_name', 'grade'])['file_id_name'].transform('count')/total_number_student, 2)
+    df['percent'] = round(df.groupby(['resource_id_name', 'grade'])['resource_id_name'].transform('count')/total_number_student, 2)
 
     df=df.drop(['current_grade', 'user_id'], axis=1)
-    # now only keep the file access stats by grade level
+    # now only keep the resource access stats by grade level
     df.drop_duplicates(inplace=True)
 
-    file_id_name=df["file_id_name"].unique()
+    resource_id_name=df["resource_id_name"].unique()
 
     #df.reset_index(inplace=True)
 
-    # zero filled dataframe with file name as row name, and grade as column name
-    output_df=pd.DataFrame(0.0, index=file_id_name, columns=[GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING])
-    output_df=output_df.rename_axis('file_id_name')
+    # zero filled dataframe with resource name as row name, and grade as column name
+    output_df=pd.DataFrame(0.0, index=resource_id_name, columns=[GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING, RESOURCE_TYPE_STRING])
+    output_df=output_df.rename_axis('resource_id_name')
+    output_df=output_df.astype({RESOURCE_TYPE_STRING: str})
 
     for index, row in df.iterrows():
         # set value
-        output_df.at[row['file_id_name'], row['grade']] = row['percent']
+        output_df.at[row['resource_id_name'], row['grade']] = row['percent']
+        output_df.at[row['resource_id_name'], RESOURCE_TYPE_STRING] = row[RESOURCE_TYPE_STRING]
     output_df.reset_index(inplace=True)
 
-    # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
-    # now insert person's own viewing records: what files the user has viewed, and the last access timestamp
-    selfSqlString = "select CONCAT(f.id, ';', f.name) as file_id_name, count(*) as self_access_count, max(a.access_time) as self_access_last_time " \
-                    "from file_access a, user u, file f " \
+    # now insert person's own viewing records: what resources the user has viewed, and the last access timestamp
+    # now insert person's own viewing records: what resources the user has viewed, and the last access timestamp
+    selfSqlString = "select CONCAT(r.id, ';', r.name) as resource_id_name, count(*) as self_access_count, max(a.access_time) as self_access_last_time " \
+                    "from resource_access a, user u, resource r " \
                     "where a.user_id = u.user_id " \
-                    "and a.file_id = f.ID " \
+                    "and a.resource_id = r.ID " \
                     "and u.sis_name=%(current_user)s " \
-                    "group by CONCAT(f.id, ';', f.name)"
+                    "group by CONCAT(r.id, ';', r.name)"
     logger.debug(selfSqlString)
     logger.debug("current_user=" + current_user)
 
     selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user})
 
-    output_df = output_df.join(selfDf.set_index('file_id_name'), on='file_id_name', how='left')
+    output_df = output_df.join(selfDf.set_index('resource_id_name'), on='resource_id_name', how='left')
     output_df["total_count"] = output_df.apply(lambda row: row["90-100"]+row["80-89"]+row["70-79"] + row["low_grade"]+row.NO_GRADE, axis=1)
 
     if (grade != "all"):
@@ -232,6 +248,12 @@ def file_access_within_week(request, course_id=0):
             else:
                 output_df=output_df.drop([i_grade], axis=1)
 
+    output_df=output_df[output_df.resource_type.isin(filter_list)]
+
+    # if no checkboxes are checked send nothing
+    if (output_df.empty):
+        return HttpResponse("no data")
+
     # only keep rows where total_count > 0
     output_df = output_df[output_df.total_count > 0]
 
@@ -242,9 +264,11 @@ def file_access_within_week(request, course_id=0):
 
     output_df.fillna(0, inplace=True) #replace null value with 0
 
-    output_df['file_id_part'], output_df['file_name_part'] = output_df['file_id_name'].str.split(';', 1).str
-    output_df['file_name'] = output_df.apply(lambda row: settings.CANVAS_FILE_PREFIX + row.file_id_part + settings.CANVAS_FILE_POSTFIX + settings.CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
-    output_df.drop(columns=['file_id_part', 'file_name_part', 'file_id_name'], inplace=True)
+    output_df['resource_id_part'], output_df['resource_name_part'] = output_df['resource_id_name'].str.split(';', 1).str
+
+    output_df['resource_name'] = output_df.apply(lambda row: RESOURCE_URLS[row.resource_type]["prefix"] + row.resource_id_part + RESOURCE_URLS[row.resource_type]["postfix"] + CANVAS_FILE_ID_NAME_SEPARATOR + row.resource_name_part, axis=1)
+    output_df.drop(columns=['resource_id_part', 'resource_name_part', 'resource_id_name'], inplace=True)
+
     logger.debug(output_df.to_json(orient='records'))
 
     return HttpResponse(output_df.to_json(orient='records'),content_type='application/json')
@@ -343,6 +367,7 @@ def get_user_default_selection(request, course_id=0):
 @permission_required('dashboard.assignments',
     fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def assignments(request, course_id=0):
+    
     logger.info(assignments.__name__)
 
     course_id = canvas_id_to_incremented_id(course_id)
