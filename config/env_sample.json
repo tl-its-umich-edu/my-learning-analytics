@@ -144,7 +144,7 @@
             "app_display_name": "Engage",
             "canvas_course_id_format": "SHORT"
         },
-        "leccapengage": {
+        "leccap": {
             "query": "select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 48) AS STRING) AS resource_id, JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_user_id') AS user_id, JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_course_id') As course_id, JSON_EXTRACT_SCALAR(event, '$.object.name') as resource_name, datetime(EVENT_TIME) as access_time FROM event_store.events where JSON_EXTRACT_SCALAR(event, '$.edApp') = 'https://leccap.engin.umich.edu/#applicationName=Lecture+Capture' and type = 'MediaEvent' and JSON_EXTRACT_SCALAR(event, '$.action') = 'Started' and JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_course_id') is not null and JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_course_id') IN UNNEST(@course_ids_short)",
             "ed_app": "''",
             "app_display_name": "Leccture Capture",
