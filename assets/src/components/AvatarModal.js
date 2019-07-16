@@ -33,12 +33,12 @@ const styles = theme => ({
   }
 })
 
-function AvatarModal(props) {
+function AvatarModal (props) {
   const { classes, user } = props
 
   const url = window.location.href
   const [helpURL, setHelpURL] = useState('https://sites.google.com/umich.edu/my-learning-analytics-help/home')
-  const [logoutURL, setLogoutURL] = useState("/accounts/logout")
+  const logoutURL = '/accounts/logout'
 
   useEffect(() => {
     const helpUrlContext = url.includes('grades')
@@ -84,9 +84,8 @@ function AvatarModal(props) {
             <Divider />
             {
               user.admin
-                ?
-                <>
-                  <Link style={{ textDecoration: 'none' }} href="/admin">
+                ? <>
+                  <Link style={{ textDecoration: 'none' }} href='/admin'>
                     <ListItem button>
                       <ListItemIcon>
                         <Lock />
