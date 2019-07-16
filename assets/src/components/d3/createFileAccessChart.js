@@ -1,9 +1,9 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import d3tip from 'd3-tip'
-import './createFileAccessChart.css'
+import './createResourceAccessChart.css'
 
-function createFileAccessChart ({ data, width, height, domElement }) {
+function createResourceAccessChart ({ data, width, height, domElement }) {
     /*
             References:
                 - https://bl.ocks.org/mbostock/34f08d5e11952a80609169b7917d4172
@@ -14,11 +14,11 @@ function createFileAccessChart ({ data, width, height, domElement }) {
         
        const update = () => {
         let bar = d3.select(".mainGroup").selectAll(".bar")
-            .data(fileData, d => d.file_name)
+            .data(resourceData, d => d.resource_name)
         
         // Initialize
         bar.attr("x", 0)
-            .attr("y", d => main_yScale(d.file_name))
+            .attr("y", d => main_yScale(d.resource_name))
             .attr("width", d => main_xScale(d.total_count))
             .attr("height", main_yScale.bandwidth())
 
@@ -26,28 +26,28 @@ function createFileAccessChart ({ data, width, height, domElement }) {
             .enter()
             .append("rect")
             .attr("x", 0)
-            .attr("y", d => main_yScale(d.file_name))
+            .attr("y", d => main_yScale(d.resource_name))
             .attr("width", d => main_xScale(d.total_count))
             .attr("height", main_yScale.bandwidth())
             .attr("class", "bar")
-            .attr("fill", d => d.self_access_count > 0 ? COLOR_ACCESSED_FILE : COLOR_NOT_ACCESSED_FILE)
+            .attr("fill", d => d.self_access_count > 0 ? COLOR_ACCESSED_RESOURCE : COLOR_NOT_ACCESSED_RESOURCE)
             .on("mouseover", toolTip.show)
             .on("mouseout", toolTip.hide)
         
         // Append text to bars
         svg.selectAll(".label").remove() 
         let texts = svg.selectAll(".label")
-            .data(fileData)
+            .data(resourceData)
             .enter()
             .append("text")
             .attr("class", "label")
             .attr("x", d => main_xScale(d.total_count) + 3 + main_margin.left)
-            .attr("y", d => main_yScale(d.file_name) + main_yScale.bandwidth() / 2 + main_margin.top)
+            .attr("y", d => main_yScale(d.resource_name) + main_yScale.bandwidth() / 2 + main_margin.top)
             .attr("dx", -10 )
             .attr("dy", ".35em")
             .style("font-size", 10)
             .attr("text-anchor", "end")
-            .text(d => (((main_yScale(d.file_name) + main_yScale.bandwidth()/2) < main_height) && ((main_yScale(d.file_name) + main_yScale.bandwidth()/2) > 0))? d.total_count:"")
+            .text(d => (((main_yScale(d.resource_name) + main_yScale.bandwidth()/2) < main_height) && ((main_yScale(d.resource_name) + main_yScale.bandwidth()/2) > 0))? d.total_count:"")
         
         bar.exit().remove()
     }
@@ -65,7 +65,7 @@ function createFileAccessChart ({ data, width, height, domElement }) {
             .paddingInner(0.4)
             .paddingOuter(0)
 
-        main_yScale.domain(fileData.map( d => d.file_name))
+        main_yScale.domain(resourceData.map( d => d.resource_name))
 
         // Update the y axis
         main_yAxis = d3.axisLeft(main_yScale).tickSize(0).tickFormat(d => d.split("|")[1])
@@ -77,8 +77,8 @@ function createFileAccessChart ({ data, width, height, domElement }) {
             .filter(d => selection[0] - mini_yScale.bandwidth() <= mini_yScale(d) && mini_yScale(d) <= selection[1])
 
         d3.select(".miniGroup").selectAll(".bar")
-            .style("fill", d => d.self_access_count > 0 ? COLOR_ACCESSED_FILE : COLOR_NOT_ACCESSED_FILE)
-            .style("opacity", d => selected.includes(d.file_name) ? "1" : "0.5")
+            .style("fill", d => d.self_access_count > 0 ? COLOR_ACCESSED_RESOURCE : COLOR_NOT_ACCESSED_RESOURCE)
+            .style("opacity", d => selected.includes(d.resource_name) ? "1" : "0.5")
 
         //Update the label size
         d3.selectAll(".axis--y text")
@@ -128,12 +128,12 @@ function createFileAccessChart ({ data, width, height, domElement }) {
         gBrush.call(brush.move, [center - size / 2, center + size / 2]) 
     }
     
-    let fileData = data 
-    fileData.sort((a, b) => b.total_count - a.total_count)
+    let resourceData = data 
+    resourceData.sort((a, b) => b.total_count - a.total_count)
 
-    // colors used for different file states
-    let COLOR_ACCESSED_FILE ="steelblue",
-        COLOR_NOT_ACCESSED_FILE = "gray" 
+    // colors used for different resource states
+    let COLOR_ACCESSED_RESOURCE ="steelblue",
+        COLOR_NOT_ACCESSED_RESOURCE = "gray" 
 
     let default_selection = [0, 50]
     let main_margin = {top: 50, right: 10, bottom: 50, left: 200} 
@@ -160,11 +160,11 @@ function createFileAccessChart ({ data, width, height, domElement }) {
         .html(d => {
             let selfString
             if (d.self_access_count === 0) {
-                selfString = "<b>You haven't viewed this file. </b>" 
+                selfString = "<b>You haven't viewed this resource. </b>" 
             } else if (d.self_access_count === 1) {
-                selfString = "You have read the file once on " + new Date(d.self_access_last_time).toDateString() + "." 
+                selfString = "You have read the resource once on " + new Date(d.self_access_last_time).toDateString() + "." 
             } else {
-                selfString = "You have read the file " + d.self_access_count + " times. The last time you accessed this file was on " + new Date(d.self_access_last_time).toDateString() + "." 
+                selfString = "You have read the resource " + d.self_access_count + " times. The last time you accessed this resource was on " + new Date(d.self_access_last_time).toDateString() + "." 
             }
             return selfString 
         })
@@ -262,12 +262,12 @@ function createFileAccessChart ({ data, width, height, domElement }) {
 
     // Inject data
     // Domain
-    main_xScale.domain([0, d3.max(fileData, d => d.total_count)])
-    mini_xScale.domain([0, d3.max(fileData, d => d.total_count)])
-    main_yScale.domain(fileData.map(d => d.file_name))
+    main_xScale.domain([0, d3.max(resourceData, d => d.total_count)])
+    mini_xScale.domain([0, d3.max(resourceData, d => d.total_count)])
+    main_yScale.domain(resourceData.map(d => d.resource_name))
         .paddingInner(0.4)
         .paddingOuter(0) 
-    mini_yScale.domain(fileData.map(d => d.file_name))
+    mini_yScale.domain(resourceData.map(d => d.resource_name))
         .paddingInner(0.4)
         .paddingOuter(0)
 
@@ -294,7 +294,7 @@ function createFileAccessChart ({ data, width, height, domElement }) {
     yLabel.selectAll("text")
         .attr("fill", "steelblue")
 
-    // Add links to file name
+    // Add links to resource name
     d3.selectAll(".axis--y .tick").each(function(d) {
         // Have to use ES5 function to correctly use `this` keyword
         let link = d.split("|")[0] 
@@ -304,18 +304,27 @@ function createFileAccessChart ({ data, width, height, domElement }) {
             .attr("xlink:href", link)
         a.node().appendChild(this) 
     })
+    
+    /*
+    d3.selectAll(".axis--y .tick").append("image")
+        .attr("xlink:href", "https://github.com/favicon.ico")
+        .attr("x", -8)
+        .attr("y", -8)
+        .attr("width", 16)
+        .attr("height", 16);
+    */
 
     // Draw mini bars
     let mini_bar = miniGroup.selectAll(".bar")
-        .data(fileData, d => d.file_name)
+        .data(resourceData, d => d.resource_name)
         .enter()
         .append("rect")
         .attr("x", 0)
-        .attr("y", d => mini_yScale(d.file_name))
+        .attr("y", d => mini_yScale(d.resource_name))
         .attr("width", d => mini_xScale(d.total_count))
         .attr("height", mini_yScale.bandwidth())
         .attr("class", "bar")
-        .attr("fill", d => d.self_access_count > 0 ? COLOR_ACCESSED_FILE : COLOR_NOT_ACCESSED_FILE)
+        .attr("fill", d => d.self_access_count > 0 ? COLOR_ACCESSED_RESOURCE : COLOR_NOT_ACCESSED_RESOURCE)
 
 
     // Add brush to main chart
@@ -331,8 +340,8 @@ function createFileAccessChart ({ data, width, height, domElement }) {
         legend_interval = 20,
         legend_y = -50 
 
-    let legendLabels = [ ["Files I haven't viewed", COLOR_NOT_ACCESSED_FILE],
-        ["Files I've viewed", COLOR_ACCESSED_FILE] ] 
+    let legendLabels = [ ["Resources I haven't viewed", COLOR_NOT_ACCESSED_RESOURCE],
+        ["Resources I've viewed", COLOR_ACCESSED_RESOURCE] ] 
 
     let legend = svg.select(".mainGroupWrapper").append("g")
         .attr("class", "legend")
@@ -364,4 +373,4 @@ function createFileAccessChart ({ data, width, height, domElement }) {
     brushmove()
 }
 
-export default createFileAccessChart 
+export default createResourceAccessChart 

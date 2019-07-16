@@ -4,7 +4,7 @@ import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
 import GradeDistribution from './GradeDistribution'
 import AssignmentPlanning from './AssignmentPlanning'
-import FilesAccessed from './FilesAccessed'
+import ResourcesAccessed from './ResourcesAccessed'
 import IndexPage from './IndexPage'
 import Spinner from '../components/Spinner'
 import Error from './Error'
@@ -46,10 +46,8 @@ function Course (props) {
               render={props => <AssignmentPlanning {...props}
                 disabled={!courseInfo.course_view_options.ap}
                 courseId={courseId} />} />
-            <Route path='/courses/:courseId/files'
-              render={props => <FilesAccessed {...props}
-                disabled={!courseInfo.course_view_options.fa}
-                courseInfo={courseInfo}
+            <Route path='/courses/:courseId/resources'
+              render={props => <ResourcesAccessed {...props} disabled={!courseInfo.course_view_options.fa} courseInfo={courseInfo}
                 courseId={courseId} />} />
           </>
           : <Spinner />

@@ -30,6 +30,7 @@ from django.views.decorators.cache import cache_page
 from . import views
 
 import watchman.views
+
 urlpatterns = [
     url(r'^$',
         views.get_home_template, name = 'home'),
@@ -39,16 +40,15 @@ urlpatterns = [
     url('admin', admin.site.urls),
 
     # This is the courses catch-all
-    url(r'^courses/', login_required(views.get_home_template,), name="home"),
-    url(r'^courses/(?P<course_id>[0-9]+|)', login_required(views.get_course_template,), name="home"),
+    url(r'^courses/(?P<course_id>[0-9]+|)', login_required(views.get_home_courses_template,), name="home"),
 
 
     # Thse URL's are data patterns
     # GET access patterns
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/grade_distribution',
         login_required(views.grade_distribution), name='grade_distribution'),
-    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/file_access_within_week',
-        login_required(views.file_access_within_week), name='file_access_within_week'),
+    url(r'^api/v1/courses/(?P<course_id>[0-9]+)/resource_access_within_week',
+        login_required(views.resource_access_within_week), name='resource_access_within_week'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignments',
         login_required(views.assignments), name='assignments'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/get_user_default_selection',
@@ -66,7 +66,6 @@ urlpatterns = [
     url(r'^su/', include('django_su.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
 
 if apps.is_installed('djangosaml2'):
     from djangosaml2.views import echo_attributes
