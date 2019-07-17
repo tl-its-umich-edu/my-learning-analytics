@@ -144,22 +144,24 @@ function ResourcesAccessed (props) {
 
   useEffect(() => {
     // Fetch data once all the setting data is fetched
-    if (dataControllerLoad === 2 && !(resourceFilter.length === 0)) {
-      const dataURL = `/api/v1/courses/${courseId}/resource_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&resource_type=${resourceFilter}`
-      const fetchOptions = { method: 'get', ...defaultFetchOptions }
-      fetch(dataURL, fetchOptions)
-        .then(handleError)
-        .then(res => res.json())
-        .then(data => {
-          setResourceAccessData(data)
-        })
-        .catch(err => {
-          setResourceAccessData({})
-        })
-    }
-    else {
-      setResourceAccessData({})
-    }
+    setTimeout(function() {
+      if (dataControllerLoad === 2 && !(resourceFilter.length === 0)) {
+        const dataURL = `/api/v1/courses/${courseId}/resource_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&resource_type=${resourceFilter}`
+        const fetchOptions = { method: 'get', ...defaultFetchOptions }
+        fetch(dataURL, fetchOptions)
+          .then(handleError)
+          .then(res => res.json())
+          .then(data => {
+            setResourceAccessData(data)
+          })
+          .catch(err => {
+            setResourceAccessData({})
+          })
+      }
+      else {
+        setResourceAccessData({})
+      }
+    }, 3000)
   }, [dataControllerLoad, weekRange, gradeRangeFilter, resourceFilter])
 
   const onWeekChangeHandler = value => {
