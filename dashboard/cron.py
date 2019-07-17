@@ -11,7 +11,7 @@ import datetime
 from sqlalchemy import create_engine
 from django.conf import settings
 
-from dashboard.models import Course
+from dashboard.models import Course, Resource
 
 import pandas as pd
 
@@ -177,16 +177,20 @@ class DashboardCronJob(CronJobBase):
 
         logger.debug("in update canvas resource")
 
-        # delete all records in the table first
-        status += deleteAllRecordInTable("resource")
+        # Get all resources that have name of attachment
+        ids = tuple(Resource.objects.filter(name="attachment").values_list('id', flat=True))
 
-        #select resource record from DATA_WAREHOUSE
-        for data_warehouse_course_id in Course.objects.get_supported_courses():
-            file_sql = f"""select id, display_name as name,course_id as COURSE_ID from file_dim where file_state ='available'
-                           and course_id='{data_warehouse_course_id}'
-                        """
+        #select resource record from DATA_WAREHOUSE matching these ids
+        file_sql = f"""select id, display_name as name,course_id as COURSE_ID from file_dim where file_state ='available'
+                       and id in %(ids)s
+                    """
+        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'ids':ids})
 
-            status += util_function(data_warehouse_course_id, file_sql, 'resource')
+        # Update these back again based on the dataframe
+        for row in df_attach.itertuples(index=False):
+            Resource.objects.filter(id=row.id).update(name=row.name)
+            status += f"Row {row.id} updated to {row.name}"
+
         return status
 
     # update RESOURCE_ACCESS records from BigQuery
@@ -429,7 +433,7 @@ class DashboardCronJob(CronJobBase):
         if 'show_files_accessed' not in settings.VIEWS_DISABLED:
             try:
                 status += self.update_with_bq_access()
-#                status += self.update_canvas_resource()
+                status += self.update_canvas_resource()
             except Exception as e:
                 logger.info(e)
 
