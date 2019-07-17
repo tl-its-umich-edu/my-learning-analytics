@@ -9,6 +9,8 @@ import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import Dialog from '@material-ui/core/Dialog'
 import LogoutIcon from '@material-ui/icons/ExitToApp'
 import HelpIcon from '@material-ui/icons/HelpOutline'
 import Lock from '@material-ui/icons/Lock'
@@ -25,7 +27,7 @@ const styles = theme => ({
     marginTop: '10px',
     marginBottom: '10px',
     marginLeft: 'auto',
-    marginRight: 'auto',
+    marginRight: 'auto'
   },
   link: {
     textDecoration: 'none',
@@ -33,12 +35,15 @@ const styles = theme => ({
   }
 })
 
-function AvatarModal (props) {
+function AvatarModal(props) {
   const { classes, user } = props
 
   const url = window.location.href
-  const [helpURL, setHelpURL] = useState('https://sites.google.com/umich.edu/my-learning-analytics-help/home')
   const logoutURL = '/accounts/logout'
+
+  const [helpURL, setHelpURL] = useState('https://sites.google.com/umich.edu/my-learning-analytics-help/home')
+  const [openChangeCourseDialog, setOpenChangeCourseDialog] = useState(false)
+  const [selectedCourse, setSelectedCourse] = useState(null)
 
   useEffect(() => {
     const helpUrlContext = url.includes('grades')
@@ -93,6 +98,24 @@ function AvatarModal (props) {
                       <ListItemText inset primary='Admin' />
                     </ListItem>
                   </Link>
+                  <Divider />
+                </>
+                : null
+            }
+            {
+              user.enrolledCourses.length > 1
+                ? <>
+                  <ListItem button onClick={() => setOpenChangeCourseDialog(true)}>
+                    <ListItemIcon>
+                      <LogoutIcon />
+                    </ListItemIcon>
+                    <ListItemText inset primary='Switch Courses' style={{ marginLeft: 0 }} />
+                  </ListItem>
+                  <Dialog
+                    onClose={() => setOpenChangeCourseDialog(false)}
+                    open={openChangeCourseDialog}>
+                    <DialogTitle>Select the course you would like to switch to</DialogTitle>
+                  </Dialog>
                   <Divider />
                 </>
                 : null
