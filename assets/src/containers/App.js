@@ -25,7 +25,6 @@ const user = Object.freeze({
 function App (props) {
   const { location } = props
 
-  // replace with redirect to react login page later
   if (!user.isLoggedIn) {
     return (window.location.href = myla_globals.login)
   }
