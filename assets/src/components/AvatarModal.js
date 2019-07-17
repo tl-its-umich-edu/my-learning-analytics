@@ -65,12 +65,12 @@ function AvatarModal (props) {
         <ListItemIcon>
           <Launch />
         </ListItemIcon>
-        <ListItemText inset primary='Switch Courses' style={{ marginLeft: 0 }} />
+        <ListItemText inset primary='Switch courses' style={{ marginLeft: 0 }} />
       </ListItem>
       <Dialog
         onClose={() => setOpenChangeCourseDialog(false)}
         open={openChangeCourseDialog}>
-        <DialogTitle>Select the course you would like to switch to</DialogTitle>
+        <DialogTitle>Select a course</DialogTitle>
         <List>
           {user.enrolledCourses.map((course, i) => (
             <Link
