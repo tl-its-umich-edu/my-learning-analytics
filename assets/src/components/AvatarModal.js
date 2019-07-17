@@ -14,6 +14,7 @@ import Dialog from '@material-ui/core/Dialog'
 import LogoutIcon from '@material-ui/icons/ExitToApp'
 import HelpIcon from '@material-ui/icons/HelpOutline'
 import Lock from '@material-ui/icons/Lock'
+import Launch from '@material-ui/icons/Launch'
 
 const styles = theme => ({
   root: {
@@ -35,7 +36,7 @@ const styles = theme => ({
   }
 })
 
-function AvatarModal(props) {
+function AvatarModal (props) {
   const { classes, user } = props
 
   const url = window.location.href
@@ -43,7 +44,49 @@ function AvatarModal(props) {
 
   const [helpURL, setHelpURL] = useState('https://sites.google.com/umich.edu/my-learning-analytics-help/home')
   const [openChangeCourseDialog, setOpenChangeCourseDialog] = useState(false)
-  const [selectedCourse, setSelectedCourse] = useState(null)
+
+  const Admin = (
+    <>
+      <Link style={{ textDecoration: 'none' }} href='/admin'>
+        <ListItem button>
+          <ListItemIcon>
+            <Lock />
+          </ListItemIcon>
+          <ListItemText inset primary='Admin' />
+        </ListItem>
+      </Link>
+      <Divider />
+    </>
+  )
+
+  const SwitchCourses = (
+    <>
+      <ListItem button onClick={() => setOpenChangeCourseDialog(true)}>
+        <ListItemIcon>
+          <Launch />
+        </ListItemIcon>
+        <ListItemText inset primary='Switch Courses' style={{ marginLeft: 0 }} />
+      </ListItem>
+      <Dialog
+        onClose={() => setOpenChangeCourseDialog(false)}
+        open={openChangeCourseDialog}>
+        <DialogTitle>Select the course you would like to switch to</DialogTitle>
+        <List>
+          {user.enrolledCourses.map((course, i) => (
+            <Link
+              style={{ textDecoration: 'none' }}
+              href={`/courses/${course.course_id}`}
+              key={i}>
+              <ListItem button>
+                <ListItemText inset primary={course.course_name} style={{ marginLeft: 0 }} />
+              </ListItem>
+            </Link>
+          ))}
+        </List>
+      </Dialog>
+      <Divider />
+    </>
+  )
 
   useEffect(() => {
     const helpUrlContext = url.includes('grades')
@@ -89,35 +132,12 @@ function AvatarModal(props) {
             <Divider />
             {
               user.admin
-                ? <>
-                  <Link style={{ textDecoration: 'none' }} href='/admin'>
-                    <ListItem button>
-                      <ListItemIcon>
-                        <Lock />
-                      </ListItemIcon>
-                      <ListItemText inset primary='Admin' />
-                    </ListItem>
-                  </Link>
-                  <Divider />
-                </>
+                ? Admin
                 : null
             }
             {
               user.enrolledCourses.length > 1
-                ? <>
-                  <ListItem button onClick={() => setOpenChangeCourseDialog(true)}>
-                    <ListItemIcon>
-                      <LogoutIcon />
-                    </ListItemIcon>
-                    <ListItemText inset primary='Switch Courses' style={{ marginLeft: 0 }} />
-                  </ListItem>
-                  <Dialog
-                    onClose={() => setOpenChangeCourseDialog(false)}
-                    open={openChangeCourseDialog}>
-                    <DialogTitle>Select the course you would like to switch to</DialogTitle>
-                  </Dialog>
-                  <Divider />
-                </>
+                ? SwitchCourses
                 : null
             }
             <Link style={{ textDecoration: 'none' }} href={logoutURL}>

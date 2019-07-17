@@ -7,19 +7,18 @@ import GoogleAnalyticsTracking from '../components/GoogleAnalyticsTracking'
 import CourseList from './CourseList'
 import Course from './Course'
 
-// const enrolledCourses = (myla_globals.user_courses_info.length !== 0)
-//   ? JSON.parse(myla_globals.user_courses_info)
-//   : ''
+const enrolledCourses = (myla_globals.user_courses_info.length !== 0)
+  ? JSON.parse(myla_globals.user_courses_info)
+  : ''
 
 /*
 Frozen to prevent unintentional changes to this object. This object is strictly readonly.
 myla_globals should ONLY be accessed in App.js, and nowhere else.
 */
-
 const user = Object.freeze({
   username: myla_globals.username,
   admin: myla_globals.is_superuser,
-  enrolledCourses: [{"course_id":231768,"course_name":"EECS 808 008 FA 2057"}, {"course_id":231768,"course_name":"EECS 808 008 FA 2057"}],
+  enrolledCourses,
   isSuperuser: myla_globals.is_superuser,
   isLoggedIn: !!myla_globals.username
 })
