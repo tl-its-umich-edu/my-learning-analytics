@@ -45,7 +45,7 @@ function AvatarModal (props) {
   const [helpURL, setHelpURL] = useState('https://sites.google.com/umich.edu/my-learning-analytics-help/home')
   const [openChangeCourseDialog, setOpenChangeCourseDialog] = useState(false)
 
-  const Admin = (
+  const Admin = () => (
     <>
       <Link style={{ textDecoration: 'none' }} href='/admin'>
         <ListItem button>
@@ -59,7 +59,7 @@ function AvatarModal (props) {
     </>
   )
 
-  const SwitchCourses = (
+  const SwitchCourses = () => (
     <>
       <ListItem button onClick={() => setOpenChangeCourseDialog(true)}>
         <ListItemIcon>
@@ -132,12 +132,12 @@ function AvatarModal (props) {
             <Divider />
             {
               user.admin
-                ? Admin
+                ? Admin()
                 : null
             }
             {
               user.enrolledCourses.length > 1
-                ? SwitchCourses
+                ? SwitchCourses()
                 : null
             }
             <Link style={{ textDecoration: 'none' }} href={logoutURL}>

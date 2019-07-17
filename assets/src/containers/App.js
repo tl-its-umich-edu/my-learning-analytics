@@ -17,7 +17,11 @@ myla_globals should ONLY be accessed in App.js, and nowhere else.
 const user = Object.freeze({
   username: myla_globals.username,
   admin: myla_globals.is_superuser,
-  enrolledCourses,
+  enrolledCourses: [
+    { course_id: 231768, course_name: 'EECS 808 008 FA 2057' },
+    { course_id: 123456, course_name: 'Some Other Course' },
+    { course_id: 678901, course_name: 'Yet Another Course' }
+  ],
   isSuperuser: myla_globals.is_superuser,
   isLoggedIn: !!myla_globals.username
 })
