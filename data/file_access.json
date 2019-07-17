@@ -1,8 +1,0 @@
-[
-  {
-    "GROUP_ID": "<CANVAS_COURSE_ID>",
-    "OBJECT_ID": "<CANVAS_FILE_ID>",
-    "MEMBER_ID": "<CANVAS_USER_ID>",
-    "EVENT_TIME": "<RESOURCE_ACCESS_TIMESTAMP>"
-  }
-]
