@@ -1,9 +1,7 @@
 const roundToTwoDecimal = int => Math.round(int * 100) / 100
 const roundToOneDecimcal = int => Math.round(int * 10) / 10
 
-const average = arr => roundToOneDecimcal(
-  arr.reduce((acc, cur) => acc + cur, 0) / arr.length
-)
+const average = arr => arr.reduce((acc, cur) => acc + cur, 0) / arr.length
 
 const pearsonCorrelation = (prefs, p1, p2) => {
   let si = []
@@ -61,10 +59,20 @@ const standardDeviation = values => {
   return roundToTwoDecimal(stdDev)
 }
 
+const median = arr => {
+  const sorted = arr.sort((a, b) => a - b)
+  const middle = Math.floor(sorted.length / 2)
+  const isEven = sorted.length % 2 === 0
+  return isEven
+    ? (sorted[middle] + sorted[middle - 1]) / 2
+    : sorted[middle]
+}
+
 export {
   average,
   pearsonCorrelation,
   standardDeviation,
   roundToOneDecimcal,
-  roundToTwoDecimal
+  roundToTwoDecimal,
+  median
 }
