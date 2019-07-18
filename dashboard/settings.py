@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 import json
 
-from decouple import config, Csv
-
 from debug_toolbar import settings as dt_settings
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -26,11 +24,22 @@ PROJECT_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), ".."),
 )
 
+try:
+    with open(os.getenv("ENV_FILE", "/code/config/env.json")) as f:
+        ENV = json.load(f)
+except FileNotFoundError as fnfe:
+    print("Default config file or one defined in environment variable ENV_FILE not found. This is normal for the build, should define for operation")
+    # Set ENV so collectstatic will still run in the build
+    ENV = os.environ
+
 LOGOUT_URL = '/accounts/logout'
 LOGIN_URL = '/accounts/login'
 
 # Google Analytics ID
-GA_ID = config('GA_ID', default='')
+GA_ID = ENV.get('GA_ID', '')
+
+# This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
+SITE_ID = 1
 
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
 SITE_ID = 1
@@ -39,25 +48,25 @@ SITE_ID = 1
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('DJANGO_SECRET_KEY')
+SECRET_KEY = ENV.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
+DEBUG = ENV.get('DJANGO_DEBUG', True)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS",default="127.0.0.1,localhost", cast=Csv())
+ALLOWED_HOSTS = ENV.get("ALLOWED_HOSTS", ["127.0.0.1", "localhost"])
 
-WATCHMAN_TOKEN = config('DJANGO_WATCHMAN_TOKEN', default=None)
+WATCHMAN_TOKEN = ENV.get('DJANGO_WATCHMAN_TOKEN', None)
 
-WATCHMAN_TOKEN_NAME = config('DJANGO_WATCHMAN_TOKEN_NAME', default='token')
+WATCHMAN_TOKEN_NAME = ENV.get('DJANGO_WATCHMAN_TOKEN_NAME', 'token')
 
 # Only report on the default database
 WATCHMAN_DATABASES = ('default',)
 
 # Defaults for PTVSD
-PTVSD_ENABLE = config("PTVSD_ENABLE", default=False, cast=bool)
-PTVSD_REMOTE_ADDRESS = config("PTVSD_REMOTE_ADDRESS", default="0.0.0.0")
-PTVSD_REMOTE_PORT = config("PTVSD_REMOTE_PORT", default=3000, cast=int)
-PTVSD_WAIT_FOR_ATTACH = config("PTVSD_WAIT_FOR_ATTACH", default=False, cast=bool)
+PTVSD_ENABLE = ENV.get("PTVSD_ENABLE", False)
+PTVSD_REMOTE_ADDRESS = ENV.get("PTVSD_REMOTE_ADDRESS", "0.0.0.0")
+PTVSD_REMOTE_PORT = ENV.get("PTVSD_REMOTE_PORT", 3000)
+PTVSD_WAIT_FOR_ATTACH = ENV.get("PTVSD_WAIT_FOR_ATTACH", False)
 
 # Application definition
 
@@ -79,7 +88,8 @@ INSTALLED_APPS = [
     'macros',
     'debug_toolbar',
     'pinax.eventlog',
-    'webpack_loader'
+    'webpack_loader',
+    'rules.apps.AutodiscoverRulesConfig',
 ]
 
 # The order of this is important. It says DebugToolbar should be on top but
@@ -109,7 +119,7 @@ TEMPLATES = [
         'DIRS': [os.path.join(APPLICATION_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
-            'debug': config('DJANGO_TEMPLATE_DEBUG', default=DEBUG, cast=bool),
+            'debug': ENV.get('DJANGO_TEMPLATE_DEBUG', DEBUG),
             'context_processors': [
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.debug',
@@ -153,20 +163,20 @@ WSGI_APPLICATION = 'dashboard.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': config('MYSQL_ENGINE', default='django.db.backends.mysql'),
-        'NAME': config('MYSQL_DATABASE', default='student_dashboard'),  # your mysql database name
-        'USER': config('MYSQL_USER', default='student_dashboard_user'), # your mysql user for the database
-        'PASSWORD': config('MYSQL_PASSWORD', default='student_dashboard_password'), # password for user
-        'HOST': config('MYSQL_HOST', default='localhost'),
-        'PORT': config('MYSQL_PORT', default=3306, cast=int),
+        'ENGINE': ENV.get('MYSQL_ENGINE', 'django.db.backends.mysql'),
+        'NAME': ENV.get('MYSQL_DATABASE', 'student_dashboard'),  # your mysql database name
+        'USER': ENV.get('MYSQL_USER', 'student_dashboard_user'), # your mysql user for the database
+        'PASSWORD': ENV.get('MYSQL_PASSWORD', 'student_dashboard_password'), # password for user
+        'HOST': ENV.get('MYSQL_HOST', 'localhost'),
+        'PORT': ENV.get('MYSQL_PORT', 3306),
     },
     'DATA_WAREHOUSE': {
-        'ENGINE': config('DATA_WAREHOUSE_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': config('DATA_WAREHOUSE_DATABASE', default=''),
-        'USER': config('DATA_WAREHOUSE_USER', default=''),
-        'PASSWORD': config('DATA_WAREHOUSE_PASSWORD', default=''),
-        'HOST': config('DATA_WAREHOUSE_HOST', default=''),
-        'PORT': config('DATA_WAREHOUSE_PORT', default=5432, cast=int),
+        'ENGINE': ENV.get('DATA_WAREHOUSE_ENGINE', 'django.db.backends.postgresql'),
+        'NAME': ENV.get('DATA_WAREHOUSE_DATABASE', ''),
+        'USER': ENV.get('DATA_WAREHOUSE_USER', ''),
+        'PASSWORD': ENV.get('DATA_WAREHOUSE_PASSWORD', ''),
+        'HOST': ENV.get('DATA_WAREHOUSE_HOST', ''),
+        'PORT': ENV.get('DATA_WAREHOUSE_PORT', 5432),
     }
 }
 
@@ -175,7 +185,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = config("TIME_ZONE", default=config("TZ", "America/Detroit"))
+TIME_ZONE = ENV.get("TIME_ZONE", ENV.get("TZ", "America/Detroit"))
 
 USE_I18N = True
 
@@ -229,7 +239,12 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             'propagate': False,
-            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
+            'level': ENV.get('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'rules': {
+            'handlers': ['console'],
+            'propagate': False,
+            'level': ENV.get('RULES_LOG_LEVEL', 'INFO'),
         },
         '': {
             'level': 'WARNING',
@@ -238,24 +253,34 @@ LOGGING = {
 
     },
     'root': {
-        'level': config('ROOT_LOG_LEVEL', default='INFO'),
+        'level': ENV.get('ROOT_LOG_LEVEL', 'INFO'),
         'handlers': ['console']
     },
 }
 
 
-AUTHENTICATION_BACKENDS = ('django_su.backends.SuBackend',)
+# IMPORT LOCAL ENV
+# =====================
+try:
+    from settings_local import *
+except ImportError:
+    pass
+
+AUTHENTICATION_BACKENDS = (
+    'rules.permissions.ObjectPermissionBackend',
+    'django_su.backends.SuBackend',
+)
 
 #Shib
 
 # Give an opportunity to disable SAML
-if config('STUDENT_DASHBOARD_SAML', default='True', cast=bool):
+if ENV.get('STUDENT_DASHBOARD_SAML', True):
     import saml2
 
     SAML2_URL_PATH = '/accounts/'
     # modify to use port request comes
-    SAML2_URL_BASE = config('DJANGO_SAML2_URL_BASE', default='/accounts/')
-    SAML2_DEFAULT_IDP = config('DJANGO_SAML2_DEFAULT_IDP', default='')
+    SAML2_URL_BASE = ENV.get('DJANGO_SAML2_URL_BASE', '/accounts/')
+    SAML2_DEFAULT_IDP = ENV.get('DJANGO_SAML2_DEFAULT_IDP', '')
     # Append the query parameter for idp to the default if it's set, otherwise do nothing
     if SAML2_DEFAULT_IDP:
         SAML2_DEFAULT_IDP = '?idp=%s' % SAML2_DEFAULT_IDP
@@ -268,9 +293,9 @@ if config('STUDENT_DASHBOARD_SAML', default='True', cast=bool):
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
     BASEDIR = os.path.dirname(os.path.abspath(__file__))
-    SAML2_FILES_BASE = config('SAML2_FILES_BASE', default='/saml/')
-    SAML2_REMOTE_METADATA = config('SAML2_REMOTE_METADATA', default='')
-    SAML2_REMOTE_PEM_FILE = config('SAML2_REMOTE_PEM_FILE', default='')
+    SAML2_FILES_BASE = ENV.get('SAML2_FILES_BASE', '/saml/')
+    SAML2_REMOTE_METADATA = ENV.get('SAML2_REMOTE_METADATA', '')
+    SAML2_REMOTE_PEM_FILE = ENV.get('SAML2_REMOTE_PEM_FILE', '')
 
     SAML_CONFIG = {
         'xmlsec_binary': '/usr/bin/xmlsec1',
@@ -326,10 +351,10 @@ if config('STUDENT_DASHBOARD_SAML', default='True', cast=bool):
         'key_file': os.path.join(SAML2_FILES_BASE, 'student-dashboard-saml.key'),  'cert_file': os.path.join(SAML2_FILES_BASE, 'student-dashboard-saml.pem'),
     }
 
-    ACS_DEFAULT_REDIRECT_URL = config('DJANGO_ACS_DEFAULT_REDIRECT', default='/')
-    LOGIN_REDIRECT_URL = config('DJANGO_LOGIN_REDIRECT_URL', default='/')
+    ACS_DEFAULT_REDIRECT_URL = ENV.get('DJANGO_ACS_DEFAULT_REDIRECT', '/')
+    LOGIN_REDIRECT_URL = ENV.get('DJANGO_LOGIN_REDIRECT_URL', '/')
 
-    LOGOUT_REDIRECT_URL = config('DJANGO_LOGOUT_REDIRECT_URL',default='/')
+    LOGOUT_REDIRECT_URL = ENV.get('DJANGO_LOGOUT_REDIRECT_URL', '/')
 
     SAML_CREATE_UNKNOWN_USER = True
 
@@ -345,43 +370,47 @@ else:
     LOGOUT_REDIRECT_URL='/'
 
 # Give an opportunity to disable LTI
-if config('STUDENT_DASHBOARD_LTI', default='False', cast=bool):
+if ENV.get('STUDENT_DASHBOARD_LTI', False):
     INSTALLED_APPS += ('django_lti_auth',)
 
     PYLTI_CONFIG = {
-        "consumers": json.loads(config("PYLTI_CONFIG_CONSUMERS", default="{}", cast=str)),
+        "consumers": ENV.get("PYLTI_CONFIG_CONSUMERS", {}),
         "method_hooks":{
             "valid_lti_request": "dashboard.lti.valid_lti_request",
             #"invalid_lti_request": "dashboard.lti.invalid_lti_request"
         },
         "next_url": "home"
     }
-    LTI_PERSON_SOURCED_ID_FIELD = config('LTI_PERSON_SOURCED_ID_FIELD',
-        default="lis_person_sourcedid", cast=str)
-    LTI_EMAIL_FIELD = config('LTI_EMAIL_FIELD',
-        default="lis_person_contact_email_primary", cast=str)
-    LTI_CANVAS_COURSE_ID_FIELD = config('LTI_CANVAS_COURSE_ID_FIELD',
-        default="custom_canvas_course_id", cast=str)
+    LTI_PERSON_SOURCED_ID_FIELD = ENV.get('LTI_PERSON_SOURCED_ID_FIELD',
+        "lis_person_sourcedid")
+    LTI_EMAIL_FIELD = ENV.get('LTI_EMAIL_FIELD',
+        "lis_person_contact_email_primary")
+    LTI_CANVAS_COURSE_ID_FIELD = ENV.get('LTI_CANVAS_COURSE_ID_FIELD',
+        "custom_canvas_course_id")
 
 # controls whether Unizin specific features/data is available from the Canvas Data source
-DATA_WAREHOUSE_IS_UNIZIN = config("DATA_WAREHOUSE_IS_UNIZIN", default=True, cast=bool)
+DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)
 
 # This is used to fix ids from Canvas Data which are incremented by some large number
-CANVAS_DATA_ID_INCREMENT = config("CANVAS_DATA_ID_INCREMENT", default="17700000000000000", cast=int)
+CANVAS_DATA_ID_INCREMENT = ENV.get("CANVAS_DATA_ID_INCREMENT", 17700000000000000)
 
 # Allow enabling/disabling the View options globally
-VIEWS_DISABLED = config('VIEWS_DISABLED', default='', cast=Csv())
+VIEWS_DISABLED = ENV.get('VIEWS_DISABLED', [])
 
 # This is to set a date so that MyLA will track all terms with start date after this date.
 
-EARLIEST_TERM_DATE = config('EARLIEST_TERM_DATE', default='2016-11-15')
+EARLIEST_TERM_DATE = ENV.get('EARLIEST_TERM_DATE', '2016-11-15')
+
+# This is the ed_app field that will be used to query for Canvas file events
+
+BIG_QUERY_ED_APP = ENV.get('BIG_QUERY_ED_APP', "http://umich.instructure.com/")
 
 # This is the ed_app field that will be used to query for Canvas file events
 
 BIG_QUERY_ED_APP = config('BIG_QUERY_ED_APP', default="http://umich.instructure.com/")
 
 # Time to run cron
-RUN_AT_TIMES = config('RUN_AT_TIMES', default="", cast= Csv())
+RUN_AT_TIMES = ENV.get('RUN_AT_TIMES', [])
 
 # Add any settings you need to be available to templates in this array
 SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID']
@@ -397,13 +426,19 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 # Number of weeks max to allow by default. some begin/end dates in Canvas aren't correct
-MAX_DEFAULT_WEEKS = config("MAX_DEFAULT_WEEKS", default=16, cast=int)
+MAX_DEFAULT_WEEKS = ENV.get("MAX_DEFAULT_WEEKS", 16)
 
-CLIENT_CACHE_TIME = config("CLIENT_CACHE_TIME", default=3600, cast=int)
+CLIENT_CACHE_TIME = ENV.get("CLIENT_CACHE_TIME", 3600)
 
-CRON_BQ_IN_LIMIT = config("CRON_BQ_IN_LIMIT", default=20, cast=int)
+CRON_BQ_IN_LIMIT = ENV.get("CRON_BQ_IN_LIMIT", 20)
 
-# IMPORT LOCAL SETTINGS
+CANVAS_FILE_PREFIX = ENV.get("CANVAS_FILE_PREFIX", "")
+CANVAS_FILE_POSTFIX = ENV.get("CANVAS_FILE_POSTFIX", "")
+
+# strings for construct file download url
+
+CANVAS_FILE_ID_NAME_SEPARATOR = "|"
+# IMPORT LOCAL ENV
 # =====================
 try:
     from settings_local import *

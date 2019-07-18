@@ -5,11 +5,15 @@
 My Learning Analytics based on django framework
 
 ## Environment configuration
-There is some environment configuration and addtional files needed for this app to run. You can put this in a file called .env for testing. 
+There is some environment configuration for docker-compose on local host and addtional files needed for this app to run. Most of these files are in config directory.
 
 Configuration:
 
-Copy the file `.env.sample` to `.env` and fill in with the values for local testing. You may also provide a .env file if you have one.
+- Copy the file `.env.sample` to `.env` and fill in with the values for local testing. You may also provide a .env file if you have one.
+
+- Copy the file config/env_sample.json to config/env.json. This is where most of the configuration for the application is done.
+
+- If you were using a prior version of MyLA, there is a utility "env_to_json.py" to help convert your configuration. Running `python env_to_json.py > config/env.json` should create your new config file from your .env file.
 
 On OpenShift fill these in the appropriate places to provide the environment.
 
@@ -19,7 +23,7 @@ The bq_cred.json is service account for Big Query, it needs to be supplied and p
 
 (Openshift Only) The /secrets/saml directory needs to contain 4 files for SAML configuration. These are currently hard-coded in settings.py though the path comes from the environment SAML2_FILES_BASE.
 
-	remote-metadata.xml 
+	remote-metadata.xml
 	student-dashboard-saml.key
 	student-dashboard-saml.pem
 
@@ -64,26 +68,29 @@ Environment variables:
 
 Start the app
 
-    `docker-compose up -d`
+    docker-compose up -d
 
 Stop the app
 
-    `docker-compose stop`
+    docker-compose stop
 
 Tear down the app completely
 
-    `docker-compose down`
+    docker-compose down
 
 If you have problems you can connect direct into a specific container with the command
 
-    `docker-compose run web /bin/bash
-    
+    docker-compose run web /bin/bash
+
 # Populate initial demo terms and courses
 
 Before adding adding initial terms and courses, ensure that the `CANVAS_DATA_ID_INCREMENT` environment variable is set correctly
 
-    `docker exec -it student_dashboard bash ./demo_init.sh`
+    docker exec -it student_dashboard /bin/bash ./demo_init.sh
 
+If you have problems you can connect direct into a specific container with the command
+
+    `docker-compose run web /bin/bash
 # Create a super user to test login.
 
 On the both local dev and remote the users are stored in the local database. However on local the users have to be created via the command line, on Openshift they are created either manually in the database or when logged in via Shibboleth.
@@ -116,7 +123,7 @@ This is configured with these values
 RUN_AT_TIMES=2:00
 
 # (Unix Cron) - Run every 5 minutes
-CRONTAB_SCHEDULE=*/5 * * * * 
+CRONTAB_SCHEDULE=*/5 * * * *
 
 See the .env.sample for more information.
 =======
@@ -145,8 +152,8 @@ This will remove everything! (images, containers, volumes)
 *Docker stores MySQL data locally in the directory `.data`. If you want to fully clean you'll have to remove this folder.*
 
 ## Populating Copyright information in footer
-1. Since MyLA can be used by multiple institution, copyright information needs to be entitled to institutions needs. 
-2. Django Flatpages serves the purpose. The display of the copyright content can be controlled from the Django Admin view. 
+1. Since MyLA can be used by multiple institution, copyright information needs to be entitled to institutions needs.
+2. Django Flatpages serves the purpose. The display of the copyright content can be controlled from the Django Admin view.
 3. The url for configuring copyright info must be `/copyright/` since that is used in the `base.html` for pulling the info
 [More info](https://simpleisbetterthancomplex.com/tutorial/2016/10/04/how-to-use-django-flatpages-app.html)
 
@@ -178,9 +185,10 @@ Then you can edit your files! (Probably in /code/dashboard)
     If you want to connect to the cron job you'll have to use a different port as Django uses 3000 by default and also wait for attach.
 
     Set your breakpoints then run this command in the docker instance! Then connect to the cron configuration. The job will start when you attach the debugger.
-    `PTVSD_WAIT_FOR_ATTACH=True PTVSD_ENABLE=TRUE PTVSD_REMOTE_PORT=3001 ./manage-ptvd.py runcrons --force`
+    `docker exec -it student_dashboard /bin/bash -c "PTVSD_WAIT_FOR_ATTACH=True PTVSD_ENABLE=TRUE PTVSD_REMOTE_PORT=3001 ./manage_ptvsd.py runcrons --force"`
 
-    This debug mode currently only works with django-admin commands (not gunicorn or manage.py) 
+### Running front-end tests
+`docker exec -it webpack_watcher npm test` will run the test suite for the front-end React application. [Jest](https://jestjs.io/) is the testing framework used.
 
 ## License check
 

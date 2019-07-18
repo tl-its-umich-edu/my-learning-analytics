@@ -1,6 +1,5 @@
-from dashboard.models import Course, CourseViewOption
-
 from django.forms.models import model_to_dict
+from rules.contrib.views import permission_required, objectgetter
 
 import math, json, logging
 from datetime import datetime, timedelta
@@ -8,26 +7,21 @@ from django.utils import timezone
 
 import numpy as np
 import pandas as pd
-from decouple import config
 from django.conf import settings
 from django.contrib import auth
 from django.db import connection as conn
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
 from dashboard.common.db_util import canvas_id_to_incremented_id
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from dashboard.models import AcademicTerms, UserDefaultSelection
+from dashboard.models import AcademicTerms, UserDefaultSelection, \
+    Course, CourseViewOption
 
 logger = logging.getLogger(__name__)
-
-# strings for construct file download url
-CANVAS_FILE_PREFIX = config("CANVAS_FILE_PREFIX", default="")
-CANVAS_FILE_POSTFIX = config("CANVAS_FILE_POSTFIX", default="")
-CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
 # string for no grade
 GRADE_A="90-100"
@@ -35,7 +29,6 @@ GRADE_B="80-89"
 GRADE_C="70-79"
 GRADE_LOW="low_grade"
 NO_GRADE_STRING = "NO_GRADE"
-
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
@@ -54,6 +47,18 @@ def gpa_map(grade):
     else:
         return GRADE_LOW
 
+
+def get_home_template(request):
+    return render(request, 'frontend/index.html')
+
+@permission_required('dashboard.get_home_courses_template',
+    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
+def get_course_template(request, course_id=0):
+    return render(request, 'frontend/index.html', {'course_id': course_id})
+
+
+@permission_required('dashboard.get_course_info',
+    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
 def get_course_info(request, course_id=0):
     """Returns JSON data about a course
 
@@ -99,6 +104,8 @@ def get_course_info(request, course_id=0):
     return HttpResponse(json.dumps(resp, default=str))
 
 # show percentage of users who read the file within prior n weeks
+@permission_required('dashboard.file_access_within_week',
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def file_access_within_week(request, course_id=0):
 
     course_id = canvas_id_to_incremented_id(course_id)
@@ -126,7 +133,7 @@ def file_access_within_week(request, course_id=0):
 
 
     # get total number of student within the course_id
-    total_number_student_sql = "select count(*) from user where course_id = %(course_id)s"
+    total_number_student_sql = "select count(*) from user where course_id = %(course_id)s and enrollment_type='StudentEnrollment'"
     if (grade == GRADE_A):
         total_number_student_sql += " and current_grade >= 90"
     elif (grade == GRADE_B):
@@ -136,7 +143,7 @@ def file_access_within_week(request, course_id=0):
 
     total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": course_id})
     total_number_student = total_number_student_df.iloc[0,0]
-    logger.debug(f"course_id_string {course_id} total student {total_number_student}")
+    logger.info(f"course_id {course_id} total student={total_number_student}")
 
     term_date_start = AcademicTerms.objects.course_date_start(course_id)
 
@@ -154,7 +161,8 @@ def file_access_within_week(request, course_id=0):
                     and a.access_time > %(start_time)s
                     and a.access_time < %(end_time)s
                     and f.course_id = %(course_id)s
-                    and u.course_id = %(course_id)s """
+                    and u.course_id = %(course_id)s
+                    and u.enrollment_type = 'StudentEnrollment' """
 
     startTimeString = start.strftime('%Y%m%d') + "000000"
     endTimeString = end.strftime('%Y%m%d') + "000000"
@@ -169,7 +177,7 @@ def file_access_within_week(request, course_id=0):
 
     # group by file_id, and file_name
     # reformat for output
-    df['file_id_name'] = df['file_id'].str.cat(df['file_name'], sep=';')
+    df['file_id_name'] = df['file_id'].astype(str).str.cat(df['file_name'], sep=';')
 
     df=df.drop(['file_id', 'file_name'], axis=1)
     df.set_index(['file_id_name'])
@@ -235,13 +243,15 @@ def file_access_within_week(request, course_id=0):
     output_df.fillna(0, inplace=True) #replace null value with 0
 
     output_df['file_id_part'], output_df['file_name_part'] = output_df['file_id_name'].str.split(';', 1).str
-    output_df['file_name'] = output_df.apply(lambda row: CANVAS_FILE_PREFIX + row.file_id_part + CANVAS_FILE_POSTFIX + CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
+    output_df['file_name'] = output_df.apply(lambda row: settings.CANVAS_FILE_PREFIX + row.file_id_part + settings.CANVAS_FILE_POSTFIX + settings.CANVAS_FILE_ID_NAME_SEPARATOR + row.file_name_part, axis=1)
     output_df.drop(columns=['file_id_part', 'file_name_part', 'file_id_name'], inplace=True)
     logger.debug(output_df.to_json(orient='records'))
 
     return HttpResponse(output_df.to_json(orient='records'),content_type='application/json')
 
 
+@permission_required('dashboard.grade_distribution',
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def grade_distribution(request, course_id=0):
     logger.info(grade_distribution.__name__)
 
@@ -249,7 +259,8 @@ def grade_distribution(request, course_id=0):
 
     current_user = request.user.get_username()
     grade_score_sql = "select current_grade,(select current_grade from user where sis_name=" \
-                      "%(current_user)s and course_id=%(course_id)s) as current_user_grade from user where course_id=%(course_id)s"
+                      "%(current_user)s and course_id=%(course_id)s) as current_user_grade " \
+                      "from user where course_id=%(course_id)s and enrollment_type='StudentEnrollment';"
     df = pd.read_sql(grade_score_sql, conn, params={"current_user": current_user,'course_id': course_id})
     if df.empty or df['current_grade'].isnull().all():
         return HttpResponse(json.dumps({}), content_type='application/json')
@@ -274,6 +285,8 @@ def grade_distribution(request, course_id=0):
     return HttpResponse(df.to_json(orient='records'))
 
 
+@permission_required('dashboard.update_user_default_selection_for_views',
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def update_user_default_selection_for_views(request, course_id=0):
     logger.info(update_user_default_selection_for_views.__name__)
     course_id = canvas_id_to_incremented_id(course_id)
@@ -292,7 +305,7 @@ def update_user_default_selection_for_views(request, course_id=0):
     eventlog(request.user, EventLogTypes.EVENT_VIEW_SET_DEFAULT.value, extra=data)
     key = 'default'
     try:
-        obj, create_or_update_bool = UserDefaultSelection.objects.set_user_defaults(course_id, current_user,
+        obj, create_or_update_bool = UserDefaultSelection.objects.set_user_defaults(int(course_id), current_user,
                                                                                     default_type,
                                                                                     default_type_value)
         logger.info(
@@ -305,26 +318,30 @@ def update_user_default_selection_for_views(request, course_id=0):
     return HttpResponse(json.dumps({key: value}),content_type='application/json')
 
 
+@permission_required('dashboard.get_user_default_selection',
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def get_user_default_selection(request, course_id=0):
     logger.info(get_user_default_selection.__name__)
     course_id = canvas_id_to_incremented_id(course_id)
-    user_id = request.user.get_username()
+    user_sis_name = request.user.get_username()
     default_view_type = request.GET.get('default_type')
     key = 'default'
     no_user_default_response = json.dumps({key: ''})
-    logger.info(f"the default option request from user {user_id} in course {course_id} of type: {default_view_type}")
-    default_value = UserDefaultSelection.objects.get_user_defaults(course_id, user_id, default_view_type)
-    logger.info(f"""default option check returned from DB for user: {user_id} course {course_id} and type:
+    logger.info(f"the default option request from user {user_sis_name} in course {course_id} of type: {default_view_type}")
+    default_value = UserDefaultSelection.objects.get_user_defaults(int(course_id), user_sis_name, default_view_type)
+    logger.info(f"""default option check returned from DB for user: {user_sis_name} course {course_id} and type:
                     {default_view_type} is {default_value}""")
     if not default_value:
         logger.info(
-            f"user {user_id} in course {course_id} don't have any defaults values set type {default_view_type}")
+            f"user {user_sis_name} in course {course_id} don't have any defaults values set type {default_view_type}")
         return HttpResponse(no_user_default_response, content_type='application/json')
     result = json.dumps({key: default_value})
-    logger.info(f"user {user_id} in course {course_id} for type {default_view_type} defaults: {result}")
+    logger.info(f"user {user_sis_name} in course {course_id} for type {default_view_type} defaults: {result}")
     return HttpResponse(result, content_type='application/json')
 
 
+@permission_required('dashboard.assignments',
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def assignments(request, course_id=0):
     logger.info(assignments.__name__)
 
@@ -577,6 +594,7 @@ def logout(request):
     auth.logout(request)
     return redirect(settings.LOGOUT_REDIRECT_URL)
 
+@permission_required('dashboard.courses_enabled', raise_exception=True)
 def courses_enabled(request):
     """ Returns json for all courses we currntly support and are enabled
 
