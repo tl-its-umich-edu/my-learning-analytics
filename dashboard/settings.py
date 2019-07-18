@@ -405,10 +405,6 @@ EARLIEST_TERM_DATE = ENV.get('EARLIEST_TERM_DATE', '2016-11-15')
 
 BIG_QUERY_ED_APP = ENV.get('BIG_QUERY_ED_APP', "http://umich.instructure.com/")
 
-# This is the ed_app field that will be used to query for Canvas file events
-
-BIG_QUERY_ED_APP = config('BIG_QUERY_ED_APP', default="http://umich.instructure.com/")
-
 # Time to run cron
 RUN_AT_TIMES = ENV.get('RUN_AT_TIMES', [])
 
