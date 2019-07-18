@@ -34,6 +34,7 @@ function GradeDistribution (props) {
   if (loaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
 
   const buildGradeView = gradeData => {
+    const grades = gradeData.map(x => x.current_grade)
     return (
       <Grid container>
         <Grid item xs={12} lg={2}>
@@ -45,18 +46,18 @@ function GradeDistribution (props) {
             ],
             [
               'Average Grade',
-              <strong>{roundToOneDecimcal(average(gradeData.map(x => x.current_grade)))}%</strong>
+              <strong>{roundToOneDecimcal(average(grades))}%</strong>
             ],
             [
               'Median Grade',
-              <strong>{roundToOneDecimcal(median(gradeData.map(x => x.current_grade)))}%</strong>
+              <strong>{roundToOneDecimcal(median(grades))}%</strong>
             ],
             ['Number of Students', <strong>{gradeData.length}</strong>]
           ]} />
         </Grid>
         <Grid item xs={12} lg={10}>
           <Histogram
-            data={gradeData.map(x => x.current_grade)}
+            data={grades}
             aspectRatio={0.3}
             xAxisLabel={'Grade %'}
             yAxisLabel={'Number of Students'}
