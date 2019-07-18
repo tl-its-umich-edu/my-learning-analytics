@@ -35,7 +35,9 @@ CRONTAB_SCHEDULE=$(jq -r -c ".CRONTAB_SCHEDULE | values" ${ENV_FILE})
 RUN_AT_TIMES=$(jq -r -c ".RUN_AT_TIMES | values" ${ENV_FILE})
 
 echo "Waiting for DB"
-wait-port ${MYSQL_HOST}:${MYSQL_PORT} -t 30000
+while ! nc -z ${MYSQL_HOST} ${MYSQL_PORT}; do   
+  sleep 1 # wait 1 second before check again
+done
 
 echo Running python startups
 python manage.py migrate

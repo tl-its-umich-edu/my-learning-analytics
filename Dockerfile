@@ -18,8 +18,7 @@ RUN npm run prod && \
 # build node libraries for production mode
 FROM node-webpack AS node-prod-deps
 
-RUN npm install --save wait-port@"~0.2.2" && \
-    npm prune --production && \
+RUN npm prune --production && \
     # This is needed to clean up the examples files as these cause collectstatic to fail (and take up extra space)
     find /usr/src/app/node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
 
@@ -33,7 +32,7 @@ WORKDIR /code
 # NOTE: requirements.txt not likely to change between dev builds
 COPY requirements.txt /code/requirements.txt
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends vim-tiny jq python3-dev xmlsec1 cron && \
+    apt-get install -y --no-install-recommends netcat vim-tiny jq python3-dev xmlsec1 cron && \
     apt-get clean -y && \
     pip install -r requirements.txt
 
