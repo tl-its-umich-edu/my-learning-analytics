@@ -34,7 +34,6 @@ function GradeDistribution (props) {
   if (loaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
 
   const buildGradeView = gradeData => {
-    console.log(gradeData)
     return (
       <Grid container>
         <Grid item xs={12} lg={2}>
