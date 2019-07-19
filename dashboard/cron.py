@@ -177,19 +177,19 @@ class DashboardCronJob(CronJobBase):
 
         logger.debug("in update canvas resource")
 
-        # Get all resources that have name of attachment
-        ids = tuple(Resource.objects.filter(name="attachment").values_list('id', flat=True))
-
-        #select resource record from DATA_WAREHOUSE matching these ids
-        file_sql = f"""select id, display_name as name,course_id as COURSE_ID from file_dim where file_state ='available'
-                       and id in %(ids)s
-                    """
-        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'ids':ids})
+        # Select all the files for these courses
+        file_sql = f"select id, file_state, display_name from file_dim where course_id in %(course_ids)s"
+        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids':tuple(Course.objects.get_supported_courses())})
 
         # Update these back again based on the dataframe
+        # Remove any rows where file_state is not available!
         for row in df_attach.itertuples(index=False):
-            Resource.objects.filter(id=row.id).update(name=row.name)
-            status += f"Row {row.id} updated to {row.name}\n"
+            if row.file_state == 'available':
+                Resource.objects.filter(id=row.id).update(name=row.display_name)
+                status += f"Row {row.id} updated to {row.display_name}\n"
+            else: 
+                Resource.objects.filter(id=row.id).delete()
+                status += f"Row {row.id} removed as it is not available\n"
 
         return status
 
