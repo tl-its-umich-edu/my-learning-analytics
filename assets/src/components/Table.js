@@ -45,6 +45,7 @@ function CustomTable (props) {
                   <TableCell
                     className={classes.tableCell + ' ' + classes.tableHeadCell}
                     key={key}
+                    style={noBorder ? { borderBottom: 'none' } : null}
                   >
                     {prop}
                   </TableCell>
@@ -59,7 +60,10 @@ function CustomTable (props) {
               <TableRow key={key}>
                 {prop.map((prop, key) => {
                   return (
-                    <TableCell className={classes.tableCell} key={key}>
+                    <TableCell
+                      className={classes.tableCell}
+                      key={key}
+                      style={noBorder ? { borderBottom: 'none' } : null}>
                       {prop}
                     </TableCell>
                   )

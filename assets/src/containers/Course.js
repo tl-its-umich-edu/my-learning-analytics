@@ -12,10 +12,7 @@ import { isObjectEmpty } from '../util/object'
 import { useCourseInfo } from '../service/api'
 
 function Course (props) {
-  const {
-    courseId,
-    user
-  } = props
+  const { courseId, user } = props
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
