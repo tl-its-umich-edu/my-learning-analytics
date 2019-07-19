@@ -189,7 +189,7 @@ class DashboardCronJob(CronJobBase):
         # Update these back again based on the dataframe
         for row in df_attach.itertuples(index=False):
             Resource.objects.filter(id=row.id).update(name=row.name)
-            status += f"Row {row.id} updated to {row.name}"
+            status += f"Row {row.id} updated to {row.name}\n"
 
         return status
 
