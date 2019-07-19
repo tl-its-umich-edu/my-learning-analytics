@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
+import Checkbox from '@material-ui/core/Checkbox'
 import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
@@ -33,6 +34,8 @@ function GradeDistribution (props) {
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
   if (loaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
 
+  const [showMyGrade, setShowMyGrade] = useState(false)
+
   const buildGradeView = gradeData => {
     const grades = gradeData.map(x => x.current_grade)
     return (
@@ -40,20 +43,21 @@ function GradeDistribution (props) {
         <Grid item xs={12} lg={2}>
           <Table className={classes.table} noBorder tableData={[
             [
-              'My Grade', <strong>{gradeData[0].current_user_grade
+              'My grade', <strong>{gradeData[0].current_user_grade
                 ? `${roundToOneDecimcal(gradeData[0].current_user_grade)}%`
                 : 'There are no grades yet for you in this course'}</strong>
             ],
             [
-              'Average Grade',
+              'Average grade',
               <strong>{roundToOneDecimcal(average(grades))}%</strong>
             ],
             [
-              'Median Grade',
+              'Median grade',
               <strong>{roundToOneDecimcal(median(grades))}%</strong>
             ],
-            ['Number of Students', <strong>{gradeData.length}</strong>]
+            ['Number of students', <strong>{gradeData.length}</strong>],
           ]} />
+        {'Show my grade'} <Checkbox checked={showMyGrade} onChange={() => setShowMyGrade(!showMyGrade)}/>
         </Grid>
         <Grid item xs={12} lg={10}>
           <Histogram
@@ -61,7 +65,7 @@ function GradeDistribution (props) {
             aspectRatio={0.3}
             xAxisLabel={'Grade %'}
             yAxisLabel={'Number of Students'}
-            myGrade={gradeData[0].current_user_grade}
+            myGrade={showMyGrade ? gradeData[0].current_user_grade : null}
             maxGrade={gradeData[0].graph_upper_limit} />
         </Grid>
       </Grid>
