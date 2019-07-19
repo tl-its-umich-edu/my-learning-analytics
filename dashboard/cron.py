@@ -262,6 +262,11 @@ class DashboardCronJob(CronJobBase):
             # Drop out the columns resource_type, course_id, name from the resource_access
             resource_access_df.drop(["resource_type","name", "course_id"], axis=1, inplace=True)
 
+            # Drop the columns where there is a Na value
+            resource_access_df_drop_na = resource_access_df.dropna()
+
+            logger.info(f"{len(resource_access_df) - len(resource_access_df_drop_na)} / {len(resource_access_df)} rows were dropped because of NA")
+
             # First update the resource table
             # write to MySQL
             try:
@@ -271,11 +276,11 @@ class DashboardCronJob(CronJobBase):
                 raise
 
             try:
-                resource_access_df.to_sql(con=engine, name='resource_access', if_exists='append', index=False)
+                resource_access_df_drop_na.to_sql(con=engine, name='resource_access', if_exists='append', index=False)
             except Exception as e:
                 logger.exception("Error running to_sql on table resource_access")
                 raise
-            return_string += str(resource_access_df.shape[0]) + " rows for courses " + ",".join(map(str, data_warehouse_course_ids)) + "\n"
+            return_string += str(resource_access_df_drop_na.shape[0]) + " rows for courses " + ",".join(map(str, data_warehouse_course_ids)) + "\n"
             logger.info(return_string)
 
         total_tbytes_billed = total_bytes_billed / 1024 / 1024 / 1024 / 1024
