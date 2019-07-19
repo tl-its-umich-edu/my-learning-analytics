@@ -7,7 +7,7 @@ import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
 import Error from './Error'
-import { average, roundToOneDecimcal } from '../util/math'
+import { average, roundToOneDecimcal, median } from '../util/math'
 import { useGradeData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 
@@ -34,21 +34,30 @@ function GradeDistribution (props) {
   if (loaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
 
   const buildGradeView = gradeData => {
+    const grades = gradeData.map(x => x.current_grade)
     return (
       <Grid container>
         <Grid item xs={12} lg={2}>
-          <Table className={classes.table} tableData={[
-            ['My Grade', <strong>{gradeData[0].current_user_grade
-              ? `${roundToOneDecimcal(gradeData[0].current_user_grade)}%`
-              : 'There are no grades yet for you in this course'}</strong>
+          <Table className={classes.table} noBorder tableData={[
+            [
+              'My Grade', <strong>{gradeData[0].current_user_grade
+                ? `${roundToOneDecimcal(gradeData[0].current_user_grade)}%`
+                : 'There are no grades yet for you in this course'}</strong>
             ],
-            ['Average Grade', <strong>{average(gradeData.map(x => x.current_grade))}%</strong>],
+            [
+              'Average Grade',
+              <strong>{roundToOneDecimcal(average(grades))}%</strong>
+            ],
+            [
+              'Median Grade',
+              <strong>{roundToOneDecimcal(median(grades))}%</strong>
+            ],
             ['Number of Students', <strong>{gradeData.length}</strong>]
           ]} />
         </Grid>
         <Grid item xs={12} lg={10}>
           <Histogram
-            data={gradeData.map(x => x.current_grade)}
+            data={grades}
             aspectRatio={0.3}
             xAxisLabel={'Grade %'}
             yAxisLabel={'Number of Students'}
