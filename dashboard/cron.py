@@ -435,7 +435,7 @@ class DashboardCronJob(CronJobBase):
         status += self.weight_consideration()
 
         logger.info("** file")
-        if 'show_files_accessed' not in settings.VIEWS_DISABLED:
+        if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
             try:
                 status += self.update_with_bq_access()
                 status += self.update_canvas_resource()
