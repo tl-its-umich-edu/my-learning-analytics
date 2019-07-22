@@ -1,9 +1,8 @@
 /* global fetch */
 import { useState, useEffect } from 'react'
-import {handleError, defaultFetchOptions} from '../util/data'
+import { handleError, defaultFetchOptions } from '../util/data'
 
 const cache = new Map()
-
 
 const useFetch = (dataURL, options) => {
   const fetchOptions = options

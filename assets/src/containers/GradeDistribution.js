@@ -9,7 +9,7 @@ import Spinner from '../components/Spinner'
 import Table from '../components/Table'
 import Error from './Error'
 import { average, roundToOneDecimcal, median } from '../util/math'
-import { useGradeData } from '../service/api'
+import { useGradeData, useSaveSetting } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 
 const styles = theme => ({
@@ -36,6 +36,8 @@ function GradeDistribution (props) {
 
   const [showMyGrade, setShowMyGrade] = useState(false)
 
+  const [saved, saveError] = useSaveSetting(courseId, { grades: showMyGrade })
+
   const buildGradeView = gradeData => {
     const grades = gradeData.map(x => x.current_grade)
     return (
@@ -55,9 +57,11 @@ function GradeDistribution (props) {
               'Median grade',
               <strong>{roundToOneDecimcal(median(grades))}%</strong>
             ],
-            ['Number of students', <strong>{gradeData.length}</strong>],
+            ['Number of students', <strong>{gradeData.length}</strong>]
           ]} />
-        {'Show my grade'} <Checkbox checked={showMyGrade} onChange={() => setShowMyGrade(!showMyGrade)}/>
+          {'Show my grade'} <Checkbox
+            checked={showMyGrade}
+            onChange={() => setShowMyGrade(!showMyGrade)} />
         </Grid>
         <Grid item xs={12} lg={10}>
           <Histogram
