@@ -12,13 +12,35 @@ These instructions will get a copy of MyLA up and running on your local machine 
 1. Create a new `.env` file and copy the values from `sample.env`, which has the suggested default environment variable settings.
 1. Create a new `env.json` file under the `config` folder and copy the values from `env_sample.json`, which contains most of the suggested defaults for the application.
 
-### Installation
+### Installation & Setup
 1. Clone this repo. `git clone https://github.com/tl-its-umich-edu/my-learning-analytics.git`
 1. Then cd into the repo. `cd my-learning-analytics`
 1. Start the Docker build process (this will take some time). `docker-compose up -d --build`
+1. Load database with data. `docker exec -i student_dashboard_mysql mysql -u student_dashboard_user --password=student_dashboard_pw student_dashboard < myla_test_data_07_02_19.sql` *Can we share the mysql file?*
+1. Navigate to http://localhost:5001/ and log in as:
+    ```
+    username: root
+    password: root
+    ```
+1. As you are now logged in as `root`, there are no courses listed. Navigate to http://localhost:5001/courses/231768 or http://localhost:5001/courses/430174 to view a sample course as a superuser.
 
+#### Changing from superuser to student
+1. Click on the top-right circle, then click `Logout`.
+1. Connect to MySQL database.
+    ```
+    Host: 127.0.0.1
+    Username: student_dashboard_user
+    Password: student_dashboard_pw
+    Database: student_dashboard
+    Port: 5306
+    ```
+1. Navigate to `user` table and select a student `sis_name`, which will be used in the next step.
+1. Create an authorized user. `docker exec -it student_dashboard python manage.py createuser --superuser --username={insert sis_name} --password={create password}`
+1. Login using username and password created.
+1. The course(s) enrolled by the student with selected `sis_name` will be displayed. Click on a course to view as the student selected in step 3.
 
-## Contributing
+## Contributing to MyLA
+* [Contribution Guide](CONTRIBUTING.md)
 
 ## Users
 
