@@ -36,15 +36,20 @@ function Course (props) {
               courseId={courseId}
               courseInfo={courseInfo} />
             <Route path='/courses/:courseId/' exact
-              render={props => <IndexPage {...props} courseInfo={courseInfo} courseId={courseId} />} />
+              render={props => <IndexPage {...props}
+                courseInfo={courseInfo} courseId={courseId} />} />
             <Route path='/courses/:courseId/grades'
-              render={props => <GradeDistribution {...props} disabled={!courseInfo.course_view_options.gd}
+              render={props => <GradeDistribution {...props}
+                disabled={!courseInfo.course_view_options.gd}
                 courseId={courseId} />} />
             <Route path='/courses/:courseId/assignments'
-              render={props => <AssignmentPlanning {...props} disabled={!courseInfo.course_view_options.ap}
+              render={props => <AssignmentPlanning {...props}
+                disabled={!courseInfo.course_view_options.ap}
                 courseId={courseId} />} />
             <Route path='/courses/:courseId/files'
-              render={props => <FilesAccessed {...props} courseInfo={courseInfo}
+              render={props => <FilesAccessed {...props}
+                disabled={!courseInfo.course_view_options.fa}
+                courseInfo={courseInfo}
                 courseId={courseId} />} />
           </>
           : <Spinner />
