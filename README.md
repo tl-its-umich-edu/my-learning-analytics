@@ -1,8 +1,26 @@
-# my-learning-analytics
-
+# My Learning Analytics
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0fd487531e244c0ebbfbc25e8753c484)](https://app.codacy.com/app/ITS_Teaching_And_Learning/student-dashboard-django?utm_source=github.com&utm_medium=referral&utm_content=tl-its-umich-edu/student-dashboard-django&utm_campaign=Badge_Grade_Settings)
 
-My Learning Analytics based on django framework
+My Learning Analytics (MyLA) is a [learning analytics](https://en.wikipedia.org/wiki/Learning_analytics) platform designed for students to view their own learning data generated in the [Canvas Learning Management System](https://www.instructure.com/canvas/?newhome=canvas). It currently has 3 views ([Files Accessed](https://sites.google.com/umich.edu/my-learning-analytics-help/home/files-accessed), [Assignment Planning](https://sites.google.com/umich.edu/my-learning-analytics-help/home/assignment-planning), and [Grade Distribution](https://sites.google.com/umich.edu/my-learning-analytics-help/home/grade-distribution)), with more views planned in the future.
+
+## Getting Started
+These instructions will get a copy of MyLA up and running on your local machine with anonymized/fake student data.
+
+### Prerequisites
+1. **Install [Docker](https://www.docker.com/)**.
+1. **Install [Git](https://git-scm.com/downloads)**.
+1. Create a new `.env` file and copy the values from `sample.env`, which has the suggested default environment variable settings.
+1. Create a new `env.json` file under the `config` folder and copy the values from `env_sample.json`, which contains most of the suggested defaults for the application.
+
+### Installation
+1. Clone this repo. `git clone https://github.com/tl-its-umich-edu/my-learning-analytics.git`
+1. Then cd into the repo. `cd my-learning-analytics`
+1. Start the Docker build process (this will take some time). `docker-compose up -d --build`
+
+
+## Contributing
+
+## Users
 
 ## Environment configuration
 There is some environment configuration for docker-compose on local host and addtional files needed for this app to run. Most of these files are in config directory.
@@ -23,7 +41,7 @@ The bq_cred.json is service account for Big Query, it needs to be supplied and p
 
 (Openshift Only) The /secrets/saml directory needs to contain 4 files for SAML configuration. These are currently hard-coded in settings.py though the path comes from the environment SAML2_FILES_BASE.
 
-	remote-metadata.xml 
+	remote-metadata.xml
 	student-dashboard-saml.key
 	student-dashboard-saml.pem
 
@@ -81,7 +99,7 @@ Tear down the app completely
 If you have problems you can connect direct into a specific container with the command
 
     docker-compose run web /bin/bash
-    
+
 # Populate initial demo terms and courses
 
 Before adding adding initial terms and courses, ensure that the `CANVAS_DATA_ID_INCREMENT` environment variable is set correctly
@@ -123,7 +141,7 @@ This is configured with these values
 RUN_AT_TIMES=2:00
 
 # (Unix Cron) - Run every 5 minutes
-CRONTAB_SCHEDULE=*/5 * * * * 
+CRONTAB_SCHEDULE=*/5 * * * *
 
 See the .env.sample for more information.
 =======
@@ -152,8 +170,8 @@ This will remove everything! (images, containers, volumes)
 *Docker stores MySQL data locally in the directory `.data`. If you want to fully clean you'll have to remove this folder.*
 
 ## Populating Copyright information in footer
-1. Since MyLA can be used by multiple institution, copyright information needs to be entitled to institutions needs. 
-2. Django Flatpages serves the purpose. The display of the copyright content can be controlled from the Django Admin view. 
+1. Since MyLA can be used by multiple institution, copyright information needs to be entitled to institutions needs.
+2. Django Flatpages serves the purpose. The display of the copyright content can be controlled from the Django Admin view.
 3. The url for configuring copyright info must be `/copyright/` since that is used in the `base.html` for pulling the info
 [More info](https://simpleisbetterthancomplex.com/tutorial/2016/10/04/how-to-use-django-flatpages-app.html)
 
@@ -186,7 +204,7 @@ Then you can edit your files! (Probably in /code/dashboard)
 
     Set your breakpoints then run this command in the docker instance! Then connect to the cron configuration. The job will start when you attach the debugger.
     `docker exec -it student_dashboard /bin/bash -c "PTVSD_WAIT_FOR_ATTACH=True PTVSD_ENABLE=TRUE PTVSD_REMOTE_PORT=3001 ./manage_ptvsd.py runcrons --force"`
-    
+
 ### Running front-end tests
 `docker exec -it webpack_watcher npm test` will run the test suite for the front-end React application. [Jest](https://jestjs.io/) is the testing framework used.
 
