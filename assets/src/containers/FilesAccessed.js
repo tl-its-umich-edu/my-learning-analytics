@@ -40,8 +40,8 @@ const rememberSetting = 'Remember my setting'
 const settingNotUpdated = 'Setting not updated'
 
 function FilesAccessed (props) {
-  const { classes, courseInfo, courseId } = props
-  if (!courseInfo.course_view_options.fa) return (<Error>Files view is hidden for this course.</Error>)
+  const { classes, courseInfo, courseId, disabled } = props
+  if (disabled) return (<Error>Files view is hidden for this course.</Error>)
   const [loaded, error, filesDefaultData] = useUserSettingData(courseId, 'file') // Used to update default setting
   const [minMaxWeek, setMinMaxWeek] = useState([]) // Should be updated from info
   const [curWeek, setCurWeek] = useState(0) // Should be updated from info
