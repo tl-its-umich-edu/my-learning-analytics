@@ -43,14 +43,10 @@ These instructions will get a copy of MyLA up and running on your local machine 
 1. Login using username and password created.
 1. The course(s) enrolled by the student with selected `sis_name` will be displayed. Click on a course to view as the student selected in step 3.
 
-## Contributing to MyLA
-* [Contribution Guide](CONTRIBUTING.md)
-
 ## MyLA Configuring Settings
 - If you were using a prior version of MyLA, there is a utility "env_to_json.py" to help convert your configuration. Running `python env_to_json.py > config/env.json` should create your new config file from your .env file.
 
 ### Secrets
-
 The bq_cred.json is service account for Big Query, it needs to be supplied and put into the /secrets directory and setup in the environment.
 
 (Openshift Only) The /secrets/saml directory needs to contain 4 files for SAML configuration. These are currently hard-coded in settings.py though the path comes from the environment SAML2_FILES_BASE.
@@ -60,7 +56,6 @@ The bq_cred.json is service account for Big Query, it needs to be supplied and p
 	student-dashboard-saml.pem
 
 ### Control course view options
-
 View options can be controlled at the global and course level. If a view is disabled globally, it will be disabled for each course, even if previously enabled at the course level. If a view is not globally disabled, it can still be disabled at the course level.
 
 `VIEWS_DISABLED` comma delimited list of views to disable (default empty). The expected name of the view is the same as the view's column name in the `course_view_option` table. Example value of `show_files_accessed,show_grade_distribution` will disable both the Files Accessed and Grade Distribution views.
@@ -68,7 +63,6 @@ View options can be controlled at the global and course level. If a view is disa
 Note that by default all views are enabled when a course is added.
 
 ### LTI v1.1.1 Configuration
-
 Only basic LTI launches are supported at the moment (automatic account creation and redirection to the correct course). New courses are not added nor are course view options modified.
 
 The relative LTI launch url is `/lti/auth/` (ex: `https://example.com/lti/auth`).
@@ -88,7 +82,6 @@ Environment variables:
 `LTI_CANVAS_COURSE_ID_FIELD`: LTI launch field containing the course's canvas id (default: `custom_canvas_course_id`).
 
 ### Populate initial demo terms and courses
-
 Before adding initial terms and courses, ensure that the `CANVAS_DATA_ID_INCREMENT` environment variable is set correctly
 
     docker exec -it student_dashboard /bin/bash ./demo_init.sh
@@ -98,7 +91,6 @@ If you have problems you can connect direct into a specific container with the c
     `docker-compose run web /bin/bash
 
 ### Openshift process
-
 You should login via Shibboleth into the application. Once you do that for the first admin you'll have to go into the database auth_user table and change is_staff and is_superuser to both be true. After doing this you can change future users with any admin via the GUI.
 
 ### Load user, file, file access data into database
@@ -129,6 +121,9 @@ After about 30-60 seconds the crons should all run and you should have data! In 
 3. The url for configuring copyright info must be `/copyright/` since that is used in the `base.html` for pulling the info
 [More info](https://simpleisbetterthancomplex.com/tutorial/2016/10/04/how-to-use-django-flatpages-app.html)
 
-## License check
 
+## Contributing to MyLA
+* [Contribution Guide](CONTRIBUTING.md)
+
+## License check
 MyLA is licenced under Apache v2.0. There is a file myla_licence_compat.ini that can be used with [Python Licence Check](https://github.com/dhatim/python-license-check) to check any new dependencies and their licences.
