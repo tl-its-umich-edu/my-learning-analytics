@@ -11,7 +11,7 @@ import datetime
 from sqlalchemy import create_engine
 from django.conf import settings
 
-from dashboard.models import Course
+from dashboard.models import Course, Resource
 
 import pandas as pd
 
@@ -177,16 +177,20 @@ class DashboardCronJob(CronJobBase):
 
         logger.debug("in update canvas resource")
 
-        # delete all records in the table first
-        status += deleteAllRecordInTable("resource")
+        # Select all the files for these courses
+        file_sql = f"select id, file_state, display_name from file_dim where course_id in %(course_ids)s"
+        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids':tuple(Course.objects.get_supported_courses())})
 
-        #select resource record from DATA_WAREHOUSE
-        for data_warehouse_course_id in Course.objects.get_supported_courses():
-            file_sql = f"""select id, display_name as name,course_id as COURSE_ID from file_dim where file_state ='available'
-                           and course_id='{data_warehouse_course_id}'
-                        """
+        # Update these back again based on the dataframe
+        # Remove any rows where file_state is not available!
+        for row in df_attach.itertuples(index=False):
+            if row.file_state == 'available':
+                Resource.objects.filter(id=row.id).update(name=row.display_name)
+                status += f"Row {row.id} updated to {row.display_name}\n"
+            else: 
+                Resource.objects.filter(id=row.id).delete()
+                status += f"Row {row.id} removed as it is not available\n"
 
-            status += util_function(data_warehouse_course_id, file_sql, 'resource')
         return status
 
     # update RESOURCE_ACCESS records from BigQuery
@@ -258,6 +262,11 @@ class DashboardCronJob(CronJobBase):
             # Drop out the columns resource_type, course_id, name from the resource_access
             resource_access_df.drop(["resource_type","name", "course_id"], axis=1, inplace=True)
 
+            # Drop the columns where there is a Na value
+            resource_access_df_drop_na = resource_access_df.dropna()
+
+            logger.info(f"{len(resource_access_df) - len(resource_access_df_drop_na)} / {len(resource_access_df)} rows were dropped because of NA")
+
             # First update the resource table
             # write to MySQL
             try:
@@ -267,11 +276,11 @@ class DashboardCronJob(CronJobBase):
                 raise
 
             try:
-                resource_access_df.to_sql(con=engine, name='resource_access', if_exists='append', index=False)
+                resource_access_df_drop_na.to_sql(con=engine, name='resource_access', if_exists='append', index=False)
             except Exception as e:
                 logger.exception("Error running to_sql on table resource_access")
                 raise
-            return_string += str(resource_access_df.shape[0]) + " rows for courses " + ",".join(map(str, data_warehouse_course_ids)) + "\n"
+            return_string += str(resource_access_df_drop_na.shape[0]) + " rows for courses " + ",".join(map(str, data_warehouse_course_ids)) + "\n"
             logger.info(return_string)
 
         total_tbytes_billed = total_bytes_billed / 1024 / 1024 / 1024 / 1024
@@ -426,10 +435,10 @@ class DashboardCronJob(CronJobBase):
         status += self.weight_consideration()
 
         logger.info("** file")
-        if 'show_files_accessed' not in settings.VIEWS_DISABLED:
+        if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
             try:
                 status += self.update_with_bq_access()
-#                status += self.update_canvas_resource()
+                status += self.update_canvas_resource()
             except Exception as e:
                 logger.info(e)
 
