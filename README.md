@@ -16,7 +16,8 @@ These instructions will get a copy of MyLA up and running on your local machine 
 1. Clone this repo. `git clone https://github.com/tl-its-umich-edu/my-learning-analytics.git`
 1. Then cd into the repo. `cd my-learning-analytics`
 1. Start the Docker build process (this will take some time). `docker-compose up -d --build`
-1. Load database with data. `docker exec -i student_dashboard_mysql mysql -u student_dashboard_user --password=student_dashboard_pw student_dashboard < myla_test_data_07_02_19.sql` *Can we share the mysql file?*
+1. Download the latest SQL file from this link: https://drive.google.com/drive/u/0/folders/1Pj7roNjRPGyumKKal8-h5E6ukUiXTDI9.
+1. Load database with data. `docker exec -i student_dashboard_mysql mysql -u student_dashboard_user --password=student_dashboard_pw student_dashboard < {name of sql file}`
 
 #### Logging in as admininstrator
 1. Navigate to http://localhost:5001/ and log in as:
