@@ -46,10 +46,10 @@ These instructions will get a copy of MyLA up and running on your local machine 
 ## Contributing to MyLA
 * [Contribution Guide](CONTRIBUTING.md)
 
-### MyLA Configuring Settings
+## MyLA Configuring Settings
 - If you were using a prior version of MyLA, there is a utility "env_to_json.py" to help convert your configuration. Running `python env_to_json.py > config/env.json` should create your new config file from your .env file.
 
-#### Secrets
+### Secrets
 
 The bq_cred.json is service account for Big Query, it needs to be supplied and put into the /secrets directory and setup in the environment.
 
@@ -59,7 +59,7 @@ The bq_cred.json is service account for Big Query, it needs to be supplied and p
 	student-dashboard-saml.key
 	student-dashboard-saml.pem
 
-#### Control course view options
+### Control course view options
 
 View options can be controlled at the global and course level. If a view is disabled globally, it will be disabled for each course, even if previously enabled at the course level. If a view is not globally disabled, it can still be disabled at the course level.
 
@@ -67,7 +67,7 @@ View options can be controlled at the global and course level. If a view is disa
 
 Note that by default all views are enabled when a course is added.
 
-##### LTI v1.1.1 Configuration
+### LTI v1.1.1 Configuration
 
 Only basic LTI launches are supported at the moment (automatic account creation and redirection to the correct course). New courses are not added nor are course view options modified.
 
@@ -87,7 +87,7 @@ Environment variables:
 
 `LTI_CANVAS_COURSE_ID_FIELD`: LTI launch field containing the course's canvas id (default: `custom_canvas_course_id`).
 
-#### Populate initial demo terms and courses
+### Populate initial demo terms and courses
 
 Before adding initial terms and courses, ensure that the `CANVAS_DATA_ID_INCREMENT` environment variable is set correctly
 
@@ -97,11 +97,11 @@ If you have problems you can connect direct into a specific container with the c
 
     `docker-compose run web /bin/bash
 
-#### Openshift process
+### Openshift process
 
 You should login via Shibboleth into the application. Once you do that for the first admin you'll have to go into the database auth_user table and change is_staff and is_superuser to both be true. After doing this you can change future users with any admin via the GUI.
 
-#### Load user, file, file access data into database
+### Load user, file, file access data into database
 Users and files are loaded now with the cron job. This is run on a separate pod in Openshift when the environment variable `IS_CRON_POD=true`.
 
 Crons are configured in this project with django-cron. Django-cron is executed whenever `python manage.py runcrons` is run but it is limited via a few environment variables.
