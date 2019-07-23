@@ -40,7 +40,7 @@ const useFetch = (dataURL, options) => {
         })
         .catch(error => setError(error.message))
     }
-  }, [dataURL])
+  }, [dataURL, fetchOptions.body])
 
   return [loaded, error, data]
 }
