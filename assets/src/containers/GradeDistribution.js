@@ -59,7 +59,7 @@ function GradeDistribution (props) {
           setShowMyGrade(true)
         }
       })
-  }, [])
+  }, []) // the empty array passed as second arg to useEffect ensures this effect only runs once
 
   useEffect(() => {
     if (settingChanged) {
@@ -74,7 +74,7 @@ function GradeDistribution (props) {
         method: 'PUT'
       })
     }
-  })
+  }, [showMyGrade])
 
   const buildGradeView = gradeData => {
     const grades = gradeData.map(x => x.current_grade)
