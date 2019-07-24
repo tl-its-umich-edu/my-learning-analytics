@@ -63,9 +63,6 @@ rules.add_perm('dashboard.assignments', is_admin_or_enrolled_in_course)
 rules.add_perm('dashboard.courses_enabled', is_admin)
 
 # templates
-rules.add_perm('dashboard.get_grades_template', is_admin_or_enrolled_in_course)
-rules.add_perm('dashboard.get_assignments_template', is_admin_or_enrolled_in_course)
-rules.add_perm('dashboard.get_resources_template', is_admin_or_enrolled_in_course)
 rules.add_perm('dashboard.get_course_template', is_admin_or_enrolled_in_course)
 
 
