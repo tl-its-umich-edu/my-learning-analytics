@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
@@ -9,8 +9,10 @@ import Spinner from '../components/Spinner'
 import Table from '../components/Table'
 import Error from './Error'
 import { average, roundToOneDecimcal, median } from '../util/math'
-import { useGradeData, useSaveSetting } from '../service/api'
+import { useGradeData, useSaveSetting, useUserSettingData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
+import Cookie from 'js-cookie'
+import { handleError } from '../util/data'
 
 const styles = theme => ({
   root: {
@@ -30,13 +32,49 @@ function GradeDistribution (props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
 
-  const [loaded, error, gradeData] = useGradeData(courseId)
-  if (error) return (<Error>Something went wrong, please try again later.</Error>)
-  if (loaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
+  const [gradeLoaded, gradeError, gradeData] = useGradeData(courseId)
+  if (gradeError) return (<Error>Something went wrong, please try again later.</Error>)
+  if (gradeLoaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
 
+  const [userSettingLoaded, setUserSettingLoaded] = useState(false)
   const [showMyGrade, setShowMyGrade] = useState(false)
+  const [settingChanged, setSettingChanged] = useState(false)
 
-  const [saved, saveError] = useSaveSetting(courseId, { grades: showMyGrade })
+  useEffect(() => {
+    fetch(`/api/v1/courses/${courseId}/get_user_default_selection?default_type=grades`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': Cookie.get('csrftoken')
+      },
+      credentials: 'include'
+    }).then(handleError)
+      .then(res => res.json())
+      .then(data => {
+        setUserSettingLoaded(true)
+        if (data.default === 'False') {
+          setShowMyGrade(false)
+        } else {
+          setShowMyGrade(true)
+        }
+      })
+  }, [])
+
+  useEffect(() => {
+    if (settingChanged) {
+      fetch(`/api/v1/courses/${courseId}/set_user_default_selection`, {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': Cookie.get('csrftoken')
+        },
+        credentials: 'include',
+        body: JSON.stringify({ grades: showMyGrade }),
+        method: 'PUT'
+      })
+    }
+  })
 
   const buildGradeView = gradeData => {
     const grades = gradeData.map(x => x.current_grade)
@@ -59,9 +97,15 @@ function GradeDistribution (props) {
             ],
             ['Number of students', <strong>{gradeData.length}</strong>]
           ]} />
-          {'Show my grade'} <Checkbox
-            checked={showMyGrade}
-            onChange={() => setShowMyGrade(!showMyGrade)} />
+          {userSettingLoaded
+            ? <> {'Show my grade'} <Checkbox
+              checked={showMyGrade}
+              onChange={() => {
+                setSettingChanged(true)
+                setShowMyGrade(!showMyGrade)
+              }} />
+            </>
+            : <Spinner />}
         </Grid>
         <Grid item xs={12} lg={10}>
           <Histogram
@@ -83,7 +127,7 @@ function GradeDistribution (props) {
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom>Grade Distribution</Typography>
             {
-              loaded
+              gradeLoaded
                 ? buildGradeView(gradeData)
                 : <Spinner />
             }

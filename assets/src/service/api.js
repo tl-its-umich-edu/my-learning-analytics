@@ -8,13 +8,12 @@ export const useCourseInfo = (currentCourseId) =>
 export const useUserSettingData = (currentCourseId, type) =>
   useFetch(`/api/v1/courses/${currentCourseId}/get_user_default_selection?default_type=${type}`)
 
-export const useSaveSetting = (currentCourseId, userOptions) => {
+export const useSaveSetting = (currentCourseId, userOptions, settingChanged) => {
   const fetchOptions = {
     ...defaultFetchOptions,
     body: JSON.stringify(userOptions),
     method: 'PUT'
   }
   const dataURL = `/api/v1/courses/${currentCourseId}/set_user_default_selection`
-
   return useFetch(dataURL, fetchOptions)
 }
