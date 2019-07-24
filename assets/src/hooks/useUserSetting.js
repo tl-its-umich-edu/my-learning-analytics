@@ -18,8 +18,8 @@ const useUserSetting = (courseId, view) => {
       credentials: 'include'
     }).then(handleError)
       .then(data => {
-        setLoaded(true)
         setData(data)
+        setLoaded(true)
       })
   }, []) // the empty array passed as second arg to useEffect ensures this effect only runs once
 

@@ -13,6 +13,8 @@ import { useGradeData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 import Cookie from 'js-cookie'
 import { handleError } from '../util/data'
+import useSetUserSetting from '../hooks/useSetUserSetting'
+import useUserSetting from '../hooks/useUserSetting'
 
 const styles = theme => ({
   root: {
@@ -36,45 +38,53 @@ function GradeDistribution (props) {
   if (gradeError) return (<Error>Something went wrong, please try again later.</Error>)
   if (gradeLoaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
 
-  const [userSettingLoaded, setUserSettingLoaded] = useState(false)
-  const [showMyGrade, setShowMyGrade] = useState(false)
+  // const [userSettingLoaded, setUserSettingLoaded] = useState(false)
+  const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'grades')
   const [settingChanged, setSettingChanged] = useState(false)
 
-  useEffect(() => {
-    fetch(`/api/v1/courses/${courseId}/get_user_default_selection?default_type=grades`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': Cookie.get('csrftoken')
-      },
-      credentials: 'include'
-    }).then(handleError)
-      .then(res => res.json())
-      .then(data => {
-        setUserSettingLoaded(true)
-        if (data.default === 'False') {
-          setShowMyGrade(false)
-        } else {
-          setShowMyGrade(true)
-        }
-      })
-  }, []) // the empty array passed as second arg to useEffect ensures this effect only runs once
+  const [showGrade, setShowGrade] = useState(
+    userSettingLoaded
+      ? userSetting.default !== 'False'
+      : false
+  )
 
-  useEffect(() => {
-    if (settingChanged) {
-      fetch(`/api/v1/courses/${courseId}/set_user_default_selection`, {
-        headers: {
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRFToken': Cookie.get('csrftoken')
-        },
-        credentials: 'include',
-        body: JSON.stringify({ grades: showMyGrade }),
-        method: 'PUT'
-      })
-    }
-  }, [showMyGrade])
+  const [userSettingSaved] = useSetUserSetting(courseId, { grades: showGrade }, settingChanged)
+
+  // useEffect(() => {
+  //   fetch(`/api/v1/courses/${courseId}/get_user_default_selection?default_type=grades`, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Accept': 'application/json',
+  //       'X-Requested-With': 'XMLHttpRequest',
+  //       'X-CSRFToken': Cookie.get('csrftoken')
+  //     },
+  //     credentials: 'include'
+  //   }).then(handleError)
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       setUserSettingLoaded(true)
+  //       if (data.default === 'False') {
+  //         setShowMyGrade(false)
+  //       } else {
+  //         setShowMyGrade(true)
+  //       }
+  //     })
+  // }, []) // the empty array passed as second arg to useEffect ensures this effect only runs once
+
+  // useEffect(() => {
+  //   if (settingChanged) {
+  //     fetch(`/api/v1/courses/${courseId}/set_user_default_selection`, {
+  //       headers: {
+  //         'Accept': 'application/json',
+  //         'X-Requested-With': 'XMLHttpRequest',
+  //         'X-CSRFToken': Cookie.get('csrftoken')
+  //       },
+  //       credentials: 'include',
+  //       body: JSON.stringify({ grades: showMyGrade }),
+  //       method: 'PUT'
+  //     })
+  //   }
+  // }, [showMyGrade])
 
   const buildGradeView = gradeData => {
     const grades = gradeData.map(x => x.current_grade)
@@ -99,10 +109,10 @@ function GradeDistribution (props) {
           ]} />
           {userSettingLoaded
             ? <> {'Show my grade'} <Checkbox
-              checked={showMyGrade}
+              checked={showGrade}
               onChange={() => {
                 setSettingChanged(true)
-                setShowMyGrade(!showMyGrade)
+                setShowGrade(!showGrade)
               }} />
             </>
             : <Spinner />}
@@ -113,7 +123,7 @@ function GradeDistribution (props) {
             aspectRatio={0.3}
             xAxisLabel={'Grade %'}
             yAxisLabel={'Number of Students'}
-            myGrade={showMyGrade ? gradeData[0].current_user_grade : null}
+            myGrade={showGrade ? gradeData[0].current_user_grade : null}
             maxGrade={gradeData[0].graph_upper_limit} />
         </Grid>
       </Grid>
