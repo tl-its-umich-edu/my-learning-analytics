@@ -42,12 +42,6 @@ function GradeDistribution (props) {
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'grades')
   const [settingChanged, setSettingChanged] = useState(false)
   const [showGrade, setShowGrade] = useState(false)
-  const [userSettingSaved, userSettingResponse] = useSetUserSetting(
-    courseId,
-    { grades: showGrade },
-    settingChanged,
-    [showGrade]
-  )
 
   useEffect(() => {
     if (userSettingLoaded) {
@@ -55,6 +49,12 @@ function GradeDistribution (props) {
     }
   }, [userSettingLoaded])
 
+  const [userSettingSaved, userSettingResponse] = useSetUserSetting(
+    courseId,
+    { grades: showGrade },
+    settingChanged,
+    [showGrade]
+  )
   const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
 
