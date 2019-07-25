@@ -17,6 +17,7 @@ const useUserSetting = (courseId, view) => {
       },
       credentials: 'include'
     }).then(handleError)
+      .then(res => res.json())
       .then(data => {
         setData(data)
         setLoaded(true)

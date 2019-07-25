@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
@@ -11,10 +11,11 @@ import Error from './Error'
 import { average, roundToOneDecimcal, median } from '../util/math'
 import { useGradeData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
-import Cookie from 'js-cookie'
-import { handleError } from '../util/data'
 import useSetUserSetting from '../hooks/useSetUserSetting'
 import useUserSetting from '../hooks/useUserSetting'
+import Snackbar from '@material-ui/core/Snackbar'
+import IconButton from '@material-ui/core/IconButton'
+import CloseIcon from '@material-ui/icons/Close'
 
 const styles = theme => ({
   root: {
@@ -41,50 +42,33 @@ function GradeDistribution (props) {
   // const [userSettingLoaded, setUserSettingLoaded] = useState(false)
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'grades')
   const [settingChanged, setSettingChanged] = useState(false)
+  const [showGrade, setShowGrade] = useState(false)
+  const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState('')
 
-  const [showGrade, setShowGrade] = useState(
-    userSettingLoaded
-      ? userSetting.default !== 'False'
-      : false
+  const [userSettingSaved, userSettingResponse] = useSetUserSetting(
+    courseId,
+    { grades: showGrade },
+    settingChanged,
+    [showGrade]
   )
 
-  const [userSettingSaved] = useSetUserSetting(courseId, { grades: showGrade }, settingChanged)
+  useEffect(() => {
+    if (userSettingLoaded) {
+      setShowGrade(userSetting.default !== 'False')
+    }
+  }, [userSettingLoaded])
 
-  // useEffect(() => {
-  //   fetch(`/api/v1/courses/${courseId}/get_user_default_selection?default_type=grades`, {
-  //     method: 'GET',
-  //     headers: {
-  //       'Accept': 'application/json',
-  //       'X-Requested-With': 'XMLHttpRequest',
-  //       'X-CSRFToken': Cookie.get('csrftoken')
-  //     },
-  //     credentials: 'include'
-  //   }).then(handleError)
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       setUserSettingLoaded(true)
-  //       if (data.default === 'False') {
-  //         setShowMyGrade(false)
-  //       } else {
-  //         setShowMyGrade(true)
-  //       }
-  //     })
-  // }, []) // the empty array passed as second arg to useEffect ensures this effect only runs once
-
-  // useEffect(() => {
-  //   if (settingChanged) {
-  //     fetch(`/api/v1/courses/${courseId}/set_user_default_selection`, {
-  //       headers: {
-  //         'Accept': 'application/json',
-  //         'X-Requested-With': 'XMLHttpRequest',
-  //         'X-CSRFToken': Cookie.get('csrftoken')
-  //       },
-  //       credentials: 'include',
-  //       body: JSON.stringify({ grades: showMyGrade }),
-  //       method: 'PUT'
-  //     })
-  //   }
-  // }, [showMyGrade])
+  useEffect(() => {
+    if (userSettingSaved) {
+      if (userSettingResponse.default === 'success') {
+        setSnackbarMessage('Setting saved successfully!')
+      } else {
+        setSnackbarMessage('Setting not saved, please try again...')
+      }
+      setSavedSnackbarOpen(true)
+    }
+  }, [userSettingSaved])
 
   const buildGradeView = gradeData => {
     const grades = gradeData.map(x => x.current_grade)
@@ -116,6 +100,26 @@ function GradeDistribution (props) {
               }} />
             </>
             : <Spinner />}
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left'
+            }}
+            open={savedSnackbarOpen}
+            autoHideDuration={6000}
+            onClose={() => setSavedSnackbarOpen(false)}
+            message={<span>{snackbarMessage}</span>}
+            action={[
+              <IconButton
+                key='close'
+                aria-label='close'
+                color='inherit'
+                onClick={() => setSavedSnackbarOpen(false)}
+              >
+                <CloseIcon />
+              </IconButton>
+            ]}
+          />
         </Grid>
         <Grid item xs={12} lg={10}>
           <Histogram

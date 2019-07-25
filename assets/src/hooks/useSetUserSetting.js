@@ -3,12 +3,13 @@ import { useState, useEffect } from 'react'
 import { handleError } from '../util/data'
 import Cookie from 'js-cookie'
 
-const useSetUserSetting = (courseId, userSetting, settingChanged) => {
+const useSetUserSetting = (courseId, userSetting, settingChanged, conditionalArray) => {
   const [loaded, setLoaded] = useState(false)
   const [response, setResponse] = useState(null)
 
   useEffect(() => {
     if (settingChanged) {
+      setLoaded(false)
       fetch(`/api/v1/courses/${courseId}/set_user_default_selection`, {
         headers: {
           'Accept': 'application/json',
@@ -25,7 +26,7 @@ const useSetUserSetting = (courseId, userSetting, settingChanged) => {
           setLoaded(true)
         })
     }
-  }, [userSetting])
+  }, conditionalArray)
 
   return [loaded, response]
 }
