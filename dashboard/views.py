@@ -15,11 +15,12 @@ from django.shortcuts import redirect, render
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
 from dashboard.common.db_util import canvas_id_to_incremented_id
-
+from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
 
 from dashboard.models import AcademicTerms, UserDefaultSelection, \
-    Course, CourseViewOption
+    Course, CourseViewOption, Resource
+from dashboard.settings import RESOURCE_VALUES
 
 logger = logging.getLogger(__name__)
 # strings for construct resource download url
@@ -35,7 +36,7 @@ NO_GRADE_STRING = "NO_GRADE"
 
 # string for resource type
 RESOURCE_TYPE_STRING = "resource_type"
-RESOURCE_TYPES = settings.RESOURCE_TYPES
+RESOURCE_VALUES = settings.RESOURCE_VALUES
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
@@ -64,6 +65,7 @@ def get_course_template(request, course_id=0):
     return render(request, 'frontend/index.html', {'course_id': course_id})
 
 
+
 @permission_required('dashboard.get_course_info',
     fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
 def get_course_info(request, course_id=0):
@@ -83,6 +85,21 @@ def get_course_info(request, course_id=0):
         course = Course.objects.get(id=course_id)
     except ObjectDoesNotExist:
         return HttpResponse("{}")
+
+    course_resource_list = []
+    try:
+        resource_list = Resource.objects.get_course_resource_type(course_id)
+        if resource_list is not None:
+            logger.info(f"Course {course_id} resources data type are: {resource_list}")
+            resource_defaults = settings.RESOURCE_VALUES
+            for item in resource_list:
+                result = utils.look_up_key_for_value(resource_defaults, item)
+                if result is not None:
+                    course_resource_list.append(result.capitalize())
+            logger.info(f"Mapped generic resource types in a course {course_id}: {course_resource_list}")
+    except(ObjectDoesNotExist,Exception) as e:
+        logger.info(f"getting the course {course_id} resources types has errors due to:{e}")
+
 
     resp = model_to_dict(course)
     # Fill in the actual term
@@ -107,6 +124,7 @@ def get_course_info(request, course_id=0):
     resp['current_week_number'] = current_week_number
     resp['total_weeks'] = total_weeks
     resp['course_view_options'] = CourseViewOption.objects.get(course=course).json(include_id=False)
+    resp['resource_types'] = course_resource_list
 
     return HttpResponse(json.dumps(resp, default=str))
 
@@ -124,7 +142,7 @@ def resource_access_within_week(request, course_id=0):
     # environment settings:
     df_default_display_settings()
 
-    # read from request param
+    # read quefrom request param
     week_num_start = int(request.GET.get('week_num_start','1'))
     week_num_end = int(request.GET.get('week_num_end','0'))
     grade = request.GET.get('grade','all')
@@ -134,7 +152,7 @@ def resource_access_within_week(request, course_id=0):
     filter_list = []
     for filter_value in filter_values:
         if filter_value != '':
-            filter_list += RESOURCE_TYPES[filter_value]['resources']
+            filter_list.extend(RESOURCE_VALUES[filter_value.lower()])
 
     # json for eventlog
     data = {

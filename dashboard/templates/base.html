@@ -31,12 +31,7 @@
     <script>
         // Setup a top level js object to hold global values
         var myla_globals = {
-        {% if course_id %}
-            "course_id": '{{ current_user_course_id }}',
-        {% else %}
-            "course_id": 0,
-        {% endif %}
-            "is_superuser": {{user.is_superuser|lower}},
+          "is_superuser": {{user.is_superuser|lower}},
         {% if user.is_authenticated %}
             "username": '{{ user.get_username }}',
         {% else %}
@@ -67,7 +62,6 @@
         {% endif %}
         }
         
-        var RESOURCE_VALUES = {{ settings.RESOURCE_VALUES|safe }}
 
     </script>
 </head>
