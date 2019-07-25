@@ -39,13 +39,9 @@ function GradeDistribution (props) {
   if (gradeError) return (<Error>Something went wrong, please try again later.</Error>)
   if (gradeLoaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
 
-  // const [userSettingLoaded, setUserSettingLoaded] = useState(false)
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'grades')
   const [settingChanged, setSettingChanged] = useState(false)
   const [showGrade, setShowGrade] = useState(false)
-  const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false)
-  const [snackbarMessage, setSnackbarMessage] = useState('')
-
   const [userSettingSaved, userSettingResponse] = useSetUserSetting(
     courseId,
     { grades: showGrade },
@@ -58,6 +54,9 @@ function GradeDistribution (props) {
       setShowGrade(userSetting.default !== 'False')
     }
   }, [userSettingLoaded])
+
+  const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState('')
 
   useEffect(() => {
     if (userSettingSaved) {
