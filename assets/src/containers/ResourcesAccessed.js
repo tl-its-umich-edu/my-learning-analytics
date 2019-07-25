@@ -45,7 +45,7 @@ const settingNotUpdated = 'Setting not updated'
 function ResourcesAccessed (props) {
   const { classes, courseInfo, courseId, disabled } = props
   if (disabled) return (<Error>Files view is hidden for this course.</Error>)
-  const resourceValues = RESOURCE_VALUES
+  const resourceTypes = courseInfo.resource_types
   const [loaded, error, resourcesDefaultData] = useUserSettingData(courseId, 'resource') // Used to update default setting
   const [minMaxWeek, setMinMaxWeek] = useState([]) // Should be updated from info
   const [curWeek, setCurWeek] = useState(0) // Should be updated from info
