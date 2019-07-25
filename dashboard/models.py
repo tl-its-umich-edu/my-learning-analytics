@@ -218,11 +218,34 @@ class CourseViewOption(models.Model):
             return ""
 
 
+class ResourceQuerySet(models.QuerySet):
+    def get_course_resource_type(self, course_id):
+        """
+        Return a list of resources type data collected in the course
+        :return:
+        """
+        try:
+            return list(self.values_list('resource_type', flat=True).distinct().filter(course_id=course_id))
+        except(self.model.DoesNotExist, Exception) as e:
+            logger.error(f"Couldn't fetch Resource list in Course {course_id} due to: {e}")
+            return None
+
+
+class ResourceManager(models.Manager):
+    def get_queryset(self):
+        return ResourceQuerySet(self.model, using=self._db)
+
+    def get_course_resource_type(self, course_id):
+        return self.get_queryset().get_course_resource_type(course_id)
+
+
 class Resource(models.Model):
     resource_type = models.CharField(primary_key=True, max_length=255, verbose_name="Resource Type")
     id = models.CharField(primary_key=True, max_length=255, verbose_name="Resource Id")
     name = models.TextField(verbose_name="Resource Name")
     course_id = models.BigIntegerField(verbose_name="Course Id")
+
+    objects = ResourceManager()
 
     def __str__(self):
         return self.name

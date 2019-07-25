@@ -39,9 +39,8 @@ LOGIN_URL = '/accounts/login'
 GA_ID = ENV.get('GA_ID', '')
 
 # Resource values from env
-RESOURCE_TYPES = ENV.get("RESOURCE_TYPES", {})
+RESOURCE_VALUES = ENV.get("RESOURCE_VALUES", {})
 RESOURCE_URLS = ENV.get("RESOURCE_URLS", {})
-RESOURCE_VALUES = list(RESOURCE_TYPES.values())
 
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
 SITE_ID = 1
@@ -129,7 +128,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django_su.context_processors.is_su',
                 'django_settings_export.settings_export',
-                'dashboard.context_processors.current_user_course_id',
                 'dashboard.context_processors.current_user_courses_info',
                 'dashboard.context_processors.last_updated',
                 'dashboard.context_processors.get_build_info',
