@@ -106,7 +106,7 @@ function GradeDistribution (props) {
               horizontal: 'left'
             }}
             open={savedSnackbarOpen}
-            autoHideDuration={6000}
+            autoHideDuration={3000}
             onClose={() => setSavedSnackbarOpen(false)}
             message={<span>{snackbarMessage}</span>}
             action={[
