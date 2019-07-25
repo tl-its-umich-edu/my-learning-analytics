@@ -61,14 +61,21 @@ function ResourcesAccessed (props) {
   const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
   const [defaultLabel, setDefaultLabel] = useState(currentSetting)
 
-  function getDefaultFilterState() {
-    let tempArray = []
-    resourceValues.forEach(function(resource_item) {
-      if (resource_item.disabled === "false") {
-        tempArray.push(resource_item.resource_value)
-      }
-    })
-    return tempArray
+  function filterCheckox() {
+    if (resourceTypes.length > 1) {
+      return(
+        <div style={{ textAlign: "center" }}>
+          <FormControl>
+            <FormGroup row>
+              <p style={{fontWeight: "bold"}}>Select Resources to be Viewed:</p>
+              {
+                resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeResourceHandler} value={el}></Checkbox>} label={el}/>))
+              }
+            </FormGroup>
+          </FormControl>
+        </div>
+      )
+    }
   }
 
   const changeDefaultSetting = (event) => {
@@ -130,15 +137,16 @@ function ResourcesAccessed (props) {
     if (loaded) {
       if (resourcesDefaultData.default !== '') {
         setGradeRangeFilter(resourcesDefaultData.default)
-        setResourceFilter(resourceFilter.concat(getDefaultFilterState()))
+        setResourceFilter(resourceFilter.concat(resourceTypes))
         setDefaultValue(resourcesDefaultData.default)
       } else {
         // setting it to default
         setGradeRangeFilter('All')
-        setResourceFilter(resourceFilter.concat(getDefaultFilterState()))
+        setResourceFilter(resourceFilter.concat(resourceTypes))
         setDefaultValue('All')
       }
       setDataControllerLoad(dataControllerLoad + 1)
+      console.log(resourceTypes)
     }
   }, [loaded])
 
@@ -252,16 +260,9 @@ function ResourcesAccessed (props) {
               />}
               <div style={{ padding: '15px 2px' }}>{defaultLabel}</div>
             </div>
-            <div style={{ textAlign: "center" }}>
-              <FormControl>
-                <FormGroup row>
-                  <p style={{fontWeight: "bold"}}>Select Resources to be Viewed:</p>
-                  {
-                    resourceValues.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeResourceHandler} value={el.resource_value} disabled={el.disabled === "true"}></Checkbox>} label={el.resource_label}/>))
-                  }
-                </FormGroup>
-              </FormControl>
-            </div>
+            {
+              filterCheckox()
+            }
             {resourceAccessData
               ? ResourceAccessChartBuilder(resourceAccessData)
               : <Spinner/>}

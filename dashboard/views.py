@@ -100,6 +100,7 @@ def get_course_info(request, course_id=0):
     except(ObjectDoesNotExist,Exception) as e:
         logger.info(f"getting the course {course_id} resources types has errors due to:{e}")
 
+    course_resource_list.sort()
 
     resp = model_to_dict(course)
     # Fill in the actual term
