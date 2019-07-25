@@ -51,7 +51,7 @@ function ResourcesAccessed (props) {
   const [curWeek, setCurWeek] = useState(0) // Should be updated from info
   const [weekRange, setWeekRange] = useState([]) // Should be depend on curWeek
   const [gradeRangeFilter, setGradeRangeFilter] = useState('') // Should be fetched from default
-  const [resourceFilter, setResourceFilter] = useState([])
+  const [resourceFilter, setResourceFilter] = useState(resourceTypes)
   const [resourceAccessData, setResourceAccessData] = useState('')
   const [dataControllerLoad, setDataControllerLoad] = useState(0)
   // initial default value that we get from backend and updated value when user save the default setting
@@ -60,6 +60,8 @@ function ResourcesAccessed (props) {
   // defaults setting controllers
   const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
   const [defaultLabel, setDefaultLabel] = useState(currentSetting)
+
+  const [dataLoaded, setDataLoaded] = useState(false)
 
   function filterCheckox() {
     if (resourceTypes.length > 1) {
@@ -146,7 +148,6 @@ function ResourcesAccessed (props) {
         setDefaultValue('All')
       }
       setDataControllerLoad(dataControllerLoad + 1)
-      console.log(resourceTypes)
     }
   }, [loaded])
 
@@ -160,6 +161,7 @@ function ResourcesAccessed (props) {
         .then(res => res.json())
         .then(data => {
           setResourceAccessData(data)
+          setDataLoaded(true)
         })
         .catch(err => {
           setResourceAccessData({})
@@ -189,6 +191,7 @@ function ResourcesAccessed (props) {
   }
 
   const onChangeResourceHandler = event => {
+    setDataLoaded(false)
     const value = event.target.value
     if (event.target.checked && !resourceFilter.includes(value)) {
       setResourceFilter([...resourceFilter, value])
@@ -199,22 +202,22 @@ function ResourcesAccessed (props) {
   }
 
   const ResourceAccessChartBuilder = (resourceData) => {
-    if (!resourceData || Object.keys(resourceData).length === 0) {
       if (resourceFilter.length === 0) {
         return (<div style={{textAlign: "center", fontWeight: "900", color:"#D8000C"}}><p>Please select a resource type to display data</p></div>)
-      } 
-      else {
+      }
+      else if (!resourceData || Object.keys(resourceData).length === 0) {
         return (<p>No data provided</p>)
       }
-    }
-    return (
-      <Grid item xs={12} lg={10}>
-        <ResourceAccessChart
-          data={resourceData}
-          aspectRatio={0.3}
-        />
-      </Grid>
-    )
+      else {
+        return (
+          <Grid item xs={12} lg={10}>
+            <ResourceAccessChart
+              data={resourceData}
+              aspectRatio={0.3}
+            />
+          </Grid>
+        )
+      }
   }
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
   return (
@@ -261,7 +264,7 @@ function ResourcesAccessed (props) {
             {
               filterCheckox()
             }
-            {resourceAccessData
+            {(resourceAccessData && dataLoaded) || resourceFilter.length === 0
               ? ResourceAccessChartBuilder(resourceAccessData)
               : <Spinner/>}
           </Paper>
