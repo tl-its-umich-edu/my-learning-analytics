@@ -46,12 +46,15 @@ function ResourcesAccessed (props) {
   const { classes, courseInfo, courseId, disabled } = props
   if (disabled) return (<Error>Files view is hidden for this course.</Error>)
   const resourceTypes = courseInfo.resource_types
+  if (resourceTypes.length === 0) {
+    resourceTypes = ['Files']
+  }
   const [loaded, error, resourcesDefaultData] = useUserSettingData(courseId, 'resource') // Used to update default setting
   const [minMaxWeek, setMinMaxWeek] = useState([]) // Should be updated from info
   const [curWeek, setCurWeek] = useState(0) // Should be updated from info
   const [weekRange, setWeekRange] = useState([]) // Should be depend on curWeek
   const [gradeRangeFilter, setGradeRangeFilter] = useState('') // Should be fetched from default
-  const [resourceFilter, setResourceFilter] = useState([])
+  const [resourceFilter, setResourceFilter] = useState(resourceTypes)
   const [resourceAccessData, setResourceAccessData] = useState('')
   const [dataControllerLoad, setDataControllerLoad] = useState(0)
   // initial default value that we get from backend and updated value when user save the default setting
@@ -61,14 +64,23 @@ function ResourcesAccessed (props) {
   const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
   const [defaultLabel, setDefaultLabel] = useState(currentSetting)
 
-  function getDefaultFilterState() {
-    let tempArray = []
-    resourceValues.forEach(function(resource_item) {
-      if (resource_item.disabled === "false") {
-        tempArray.push(resource_item.resource_value)
-      }
-    })
-    return tempArray
+  const [dataLoaded, setDataLoaded] = useState(false)
+
+  function filterCheckox() {
+    if (resourceTypes.length > 1) {
+      return(
+        <div style={{ textAlign: "center" }}>
+          <FormControl>
+            <FormGroup row>
+              <p style={{fontWeight: "bold"}}>Select Resources to be Viewed:</p>
+              {
+                resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeResourceHandler} value={el}></Checkbox>} label={el}/>))
+              }
+            </FormGroup>
+          </FormControl>
+        </div>
+      )
+    }
   }
 
   const changeDefaultSetting = (event) => {
@@ -130,12 +142,10 @@ function ResourcesAccessed (props) {
     if (loaded) {
       if (resourcesDefaultData.default !== '') {
         setGradeRangeFilter(resourcesDefaultData.default)
-        setResourceFilter(resourceFilter.concat(getDefaultFilterState()))
         setDefaultValue(resourcesDefaultData.default)
       } else {
         // setting it to default
         setGradeRangeFilter('All')
-        setResourceFilter(resourceFilter.concat(getDefaultFilterState()))
         setDefaultValue('All')
       }
       setDataControllerLoad(dataControllerLoad + 1)
@@ -144,24 +154,23 @@ function ResourcesAccessed (props) {
 
   useEffect(() => {
     // Fetch data once all the setting data is fetched
-    setTimeout(function() {
-      if (dataControllerLoad === 2 && !(resourceFilter.length === 0)) {
-        const dataURL = `/api/v1/courses/${courseId}/resource_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&resource_type=${resourceFilter}`
-        const fetchOptions = { method: 'get', ...defaultFetchOptions }
-        fetch(dataURL, fetchOptions)
-          .then(handleError)
-          .then(res => res.json())
-          .then(data => {
-            setResourceAccessData(data)
-          })
-          .catch(err => {
-            setResourceAccessData({})
-          })
-      }
-      else {
-        setResourceAccessData({})
-      }
-    }, 3000)
+    if (dataControllerLoad === 2 && !(resourceFilter.length === 0)) {
+      const dataURL = `/api/v1/courses/${courseId}/resource_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&resource_type=${resourceFilter}`
+      const fetchOptions = { method: 'get', ...defaultFetchOptions }
+      fetch(dataURL, fetchOptions)
+        .then(handleError)
+        .then(res => res.json())
+        .then(data => {
+          setResourceAccessData(data)
+          setDataLoaded(true)
+        })
+        .catch(err => {
+          setResourceAccessData({})
+        })
+    }
+    else {
+      setResourceAccessData({})
+    }
   }, [dataControllerLoad, weekRange, gradeRangeFilter, resourceFilter])
 
   const onWeekChangeHandler = value => {
@@ -183,6 +192,7 @@ function ResourcesAccessed (props) {
   }
 
   const onChangeResourceHandler = event => {
+    setDataLoaded(false)
     const value = event.target.value
     if (event.target.checked && !resourceFilter.includes(value)) {
       setResourceFilter([...resourceFilter, value])
@@ -193,22 +203,22 @@ function ResourcesAccessed (props) {
   }
 
   const ResourceAccessChartBuilder = (resourceData) => {
-    if (!resourceData || Object.keys(resourceData).length === 0) {
       if (resourceFilter.length === 0) {
         return (<div style={{textAlign: "center", fontWeight: "900", color:"#D8000C"}}><p>Please select a resource type to display data</p></div>)
-      } 
-      else {
+      }
+      else if (!resourceData || Object.keys(resourceData).length === 0) {
         return (<p>No data provided</p>)
       }
-    }
-    return (
-      <Grid item xs={12} lg={10}>
-        <ResourceAccessChart
-          data={resourceData}
-          aspectRatio={0.3}
-        />
-      </Grid>
-    )
+      else {
+        return (
+          <Grid item xs={12} lg={10}>
+            <ResourceAccessChart
+              data={resourceData}
+              aspectRatio={0.3}
+            />
+          </Grid>
+        )
+      }
   }
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
   return (
@@ -252,17 +262,10 @@ function ResourcesAccessed (props) {
               />}
               <div style={{ padding: '15px 2px' }}>{defaultLabel}</div>
             </div>
-            <div style={{ textAlign: "center" }}>
-              <FormControl>
-                <FormGroup row>
-                  <p style={{fontWeight: "bold"}}>Select Resources to be Viewed:</p>
-                  {
-                    resourceValues.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeResourceHandler} value={el.resource_value} disabled={el.disabled === "true"}></Checkbox>} label={el.resource_label}/>))
-                  }
-                </FormGroup>
-              </FormControl>
-            </div>
-            {resourceAccessData
+            {
+              filterCheckox()
+            }
+            {(resourceAccessData && dataLoaded) || resourceFilter.length === 0
               ? ResourceAccessChartBuilder(resourceAccessData)
               : <Spinner/>}
           </Paper>
