@@ -31,26 +31,26 @@
     <script>
         // Setup a top level js object to hold global values
         var myla_globals = {
-          "is_superuser": {{user.is_superuser|lower}},
+            "is_superuser": {{user.is_superuser|lower}},
         {% if user.is_authenticated %}
             "username": '{{ user.get_username }}',
         {% else %}
             "username": "",
         {% endif %}
         {% if settings.GA_ID  %}
-        "GA": '{{ settings.GA_ID }}',
+            "GA": '{{ settings.GA_ID }}',
         {% else %}
-        "GA": "",
+            "GA": "",
         {% endif %}
         {% if settings.LOGIN_URL  %}
-        "login": '{{ settings.LOGIN_URL }}',
+            "login": '{{ settings.LOGIN_URL }}',
         {% else %}
-        "login": "",
+            "login": "",
         {% endif %}
         {% if settings.LOGOUT_URL  %}
-        "logout": '{{ settings.LOGOUT_URL }}',
+            "logout": '{{ settings.LOGOUT_URL }}',
         {% else %}
-        "logout": "",
+            "logout": "",
         {% endif %}
         {% if user.is_authenticated%}
             "user_courses_info":'{{current_user_courses_info|safe}}',
