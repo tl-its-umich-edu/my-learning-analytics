@@ -46,6 +46,9 @@ function ResourcesAccessed (props) {
   const { classes, courseInfo, courseId, disabled } = props
   if (disabled) return (<Error>Files view is hidden for this course.</Error>)
   const resourceTypes = courseInfo.resource_types
+  if (resourceTypes.length === 0) {
+    resourceTypes = ['Files']
+  }
   const [loaded, error, resourcesDefaultData] = useUserSettingData(courseId, 'resource') // Used to update default setting
   const [minMaxWeek, setMinMaxWeek] = useState([]) // Should be updated from info
   const [curWeek, setCurWeek] = useState(0) // Should be updated from info
@@ -139,12 +142,10 @@ function ResourcesAccessed (props) {
     if (loaded) {
       if (resourcesDefaultData.default !== '') {
         setGradeRangeFilter(resourcesDefaultData.default)
-        setResourceFilter(resourceFilter.concat(resourceTypes))
         setDefaultValue(resourcesDefaultData.default)
       } else {
         // setting it to default
         setGradeRangeFilter('All')
-        setResourceFilter(resourceFilter.concat(resourceTypes))
         setDefaultValue('All')
       }
       setDataControllerLoad(dataControllerLoad + 1)
