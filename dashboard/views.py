@@ -160,7 +160,8 @@ def resource_access_within_week(request, course_id=0):
         "week_num_start": week_num_start,
         "week_num_end": week_num_end,
         "grade": grade,
-        "course_id": course_id
+        "course_id": course_id,
+        "resource_type":filter_values
     }
     eventlog(request.user, EventLogTypes.EVENT_VIEW_RESOURCE_ACCESS.value, extra=data)
 
