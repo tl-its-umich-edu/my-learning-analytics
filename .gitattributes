@@ -80,7 +80,7 @@ NEWS              text
 readme            text
 *README*          text
 TODO              text
-*.csv             text
+*.csv             text eol=lf
 
 # Templates
 *.dot             text
