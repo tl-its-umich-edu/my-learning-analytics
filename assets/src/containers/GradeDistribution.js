@@ -36,7 +36,7 @@ function GradeDistribution (props) {
   if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
 
   const [gradeLoaded, gradeError, gradeData] = useGradeData(courseId)
-  const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'grades')
+  const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'grade')
   const [settingChanged, setSettingChanged] = useState(false)
   const [showGrade, setShowGrade] = useState(false)
 
@@ -52,7 +52,7 @@ function GradeDistribution (props) {
 
   const [userSettingSaved, userSettingResponse] = useSetUserSetting(
     courseId,
-    { grades: showGrade },
+    { grade: showGrade },
     settingChanged,
     [showGrade]
   )
