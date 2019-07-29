@@ -81,6 +81,14 @@ function ResourcesAccessed (props) {
         </div>
       )
     }
+    else if (resourceTypes.length === 1) {
+      let message = "You are viewing " + resourceTypes[0] + " data"
+      return(
+        <div style={{ textAlign: "center" }}>
+          <p style={{fontWeight: "bold"}}>{message}</p>
+        </div>
+      )
+    }
   }
 
   const changeDefaultSetting = (event) => {
