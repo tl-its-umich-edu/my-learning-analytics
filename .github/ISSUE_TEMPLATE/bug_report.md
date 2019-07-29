@@ -9,7 +9,8 @@ assignees: ''
 
 Thank you for contributing to this project!
 
-- [ ] I have searched the [issues](https://github.com/my-learning-analytics/issues) of this repository and believe that this is not a duplicate.
+- Make sure to search the [issues](https://github.com/tl-its-umich-edu/my-learning-analytics/issues) for duplicates first!
+
 ## Expected behavior (A clear and concise description of what you expected to happen) : 
 
 ## Describe the bug (Tell us what happens instead of the expected behavior) :
