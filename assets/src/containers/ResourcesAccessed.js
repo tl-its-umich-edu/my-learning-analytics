@@ -45,7 +45,7 @@ const settingNotUpdated = 'Setting not updated'
 function ResourcesAccessed (props) {
   const { classes, courseInfo, courseId, disabled } = props
   if (disabled) return (<Error>Files view is hidden for this course.</Error>)
-  const resourceTypes = courseInfo.resource_types
+  let resourceTypes = courseInfo.resource_types
   if (resourceTypes.length === 0) {
     resourceTypes = ['Files']
   }
@@ -67,19 +67,29 @@ function ResourcesAccessed (props) {
   const [dataLoaded, setDataLoaded] = useState(false)
 
   function filterCheckox() {
-    if (resourceTypes.length > 1) {
-      return(
-        <div style={{ textAlign: "center" }}>
-          <FormControl>
-            <FormGroup row>
-              <p style={{fontWeight: "bold"}}>Select Resources to be Viewed:</p>
-              {
-                resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeResourceHandler} value={el}></Checkbox>} label={el}/>))
-              }
-            </FormGroup>
-          </FormControl>
-        </div>
-      )
+    if (resourceAccessData) {
+      if (resourceTypes.length > 1) {
+        return(
+          <div style={{ textAlign: "center" }}>
+            <FormControl>
+              <FormGroup row>
+                <p style={{fontWeight: "bold"}}>Select Resources to be Viewed:</p>
+                {
+                  resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeResourceHandler} value={el}></Checkbox>} label={el}/>))
+                }
+              </FormGroup>
+            </FormControl>
+          </div>
+        )
+      }
+      else if (resourceTypes.length === 1) {
+        let message = "You are viewing " + resourceTypes[0] + " data"
+        return(
+          <div style={{ textAlign: "center" }}>
+            <p style={{fontWeight: "bold"}}>{message}</p>
+          </div>
+        )
+      }
     }
   }
 
@@ -203,22 +213,22 @@ function ResourcesAccessed (props) {
   }
 
   const ResourceAccessChartBuilder = (resourceData) => {
-      if (resourceFilter.length === 0) {
-        return (<div style={{textAlign: "center", fontWeight: "900", color:"#D8000C"}}><p>Please select a resource type to display data</p></div>)
-      }
-      else if (!resourceData || Object.keys(resourceData).length === 0) {
-        return (<p>No data provided</p>)
-      }
-      else {
-        return (
-          <Grid item xs={12} lg={10}>
-            <ResourceAccessChart
-              data={resourceData}
-              aspectRatio={0.3}
-            />
-          </Grid>
-        )
-      }
+    if (resourceFilter.length === 0) {
+      return (<div style={{textAlign: "center", fontWeight: "900", color:"#D8000C"}}><p>Please select a resource type to display data</p></div>)
+    }
+    else if (!resourceData || Object.keys(resourceData).length === 0) {
+      return (<p>No data provided</p>)
+    }
+    else {
+      return (
+        <Grid item xs={12} lg={10}>
+          <ResourceAccessChart
+            data={resourceData}
+            aspectRatio={0.3}
+          />
+        </Grid>
+      )
+    }
   }
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
   return (
