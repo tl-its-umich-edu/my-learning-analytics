@@ -36,9 +36,6 @@ function GradeDistribution (props) {
   if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
 
   const [gradeLoaded, gradeError, gradeData] = useGradeData(courseId)
-  if (gradeError) return (<Error>Something went wrong, please try again later.</Error>)
-  if (gradeLoaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
-
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'grades')
   const [settingChanged, setSettingChanged] = useState(false)
   const [showGrade, setShowGrade] = useState(false)
@@ -63,13 +60,16 @@ function GradeDistribution (props) {
       if (userSettingResponse.default === 'success') {
         setSnackbarMessage('Setting saved successfully!')
       } else {
-        setSnackbarMessage('Setting not saved, please try again...')
+        setSnackbarMessage('Setting not saved.')
       }
       setSavedSnackbarOpen(true)
     }
   }, [userSettingSaved])
 
-  const buildGradeView = gradeData => {
+  if (gradeError) return (<Error>Something went wrong, please try again later.</Error>)
+  if (gradeLoaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
+
+  const BuildGradeView = () => {
     const grades = gradeData.map(x => x.current_grade)
     return (
       <Grid container>
@@ -141,7 +141,7 @@ function GradeDistribution (props) {
             <Typography variant='h5' gutterBottom>Grade Distribution</Typography>
             {
               gradeLoaded
-                ? buildGradeView(gradeData)
+                ? <BuildGradeView />
                 : <Spinner />
             }
           </Paper>
