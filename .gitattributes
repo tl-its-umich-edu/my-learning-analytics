@@ -80,6 +80,7 @@ NEWS              text
 readme            text
 *README*          text
 TODO              text
+*.csv             text
 
 # Templates
 *.dot             text
