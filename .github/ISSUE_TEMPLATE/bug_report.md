@@ -2,37 +2,23 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: ''
+labels: bug
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+Thank you for contributing to this project!
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+- [ ] I have searched the [issues](https://github.com/my-learning-analytics/issues) of this repository and believe that this is not a duplicate.
+## Expected behavior (A clear and concise description of what you expected to happen) : 
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Describe the bug (Tell us what happens instead of the expected behavior) :
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## Steps to Reproduce :
+1. 
+2.
+3.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+## Screenshots/Video (If possible, add media to help explain your problem) :
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+## Additional context (Add any other context about the problem here) :
