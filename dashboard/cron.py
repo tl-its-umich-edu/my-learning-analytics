@@ -357,7 +357,7 @@ class DashboardCronJob(CronJobBase):
                              submission_time as (select sd.id, sd.graded_at from submission_dim sd join sub_fact suf on sd.id=suf.submission_id),
                              assign_fact as (select s.*,a.title from assignment_dim a join sub_with_enroll s on s.assignment_id=a.id where a.course_id='{data_warehouse_course_id}' and a.workflow_state='published' and muted = false),
                              assign_sub_time as (select a.*, t.graded_at from assign_fact a join submission_time t on a.submission_id = t.id),
-                             all_assign_sub as (select submission_id AS id, assignment_id AS assignment_id, course_id, global_canvas_id AS user_id, published_score AS score, graded_at AS graded_date from assign_sub_time order by assignment_id)
+                             all_assign_sub as (select submission_id AS id, assignment_id AS assignment_id, course_id, global_canvas_id AS user_id, round(published_score,1) AS score, graded_at AS graded_date from assign_sub_time order by assignment_id)
                              select f.*, f1.avg_score from all_assign_sub f join (select assignment_id, round(avg(score),1) as avg_score from all_assign_sub group by assignment_id) as f1 on f.assignment_id = f1.assignment_id
                              """
             status += util_function(data_warehouse_course_id, submission_url,'submission')
