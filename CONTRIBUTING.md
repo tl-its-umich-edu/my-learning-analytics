@@ -1,6 +1,15 @@
 # How to Contribute To My Learning Analytics
 MyLA is fully open source and being actively developed by [Information and Technology Services, University of Michigan](https://its.umich.edu/) and [Centre for Teaching, Learning and Technology, University of British Columbia](https://ctlt.ubc.ca/). The back-end is written in Python using the Django framework, and the front-end is written in JavaScript using React. We welcome any kind of contribution, from code to improvements in documentation to suggestions for future development.
 
+## Technology Overview
+### Front-end
+The front end of MyLA is written in JavaScript using [React](https://reactjs.org/), with [Material-UI](https://material-ui.com/) as the component library and [D3](https://d3js.org/) for the data visualizations. [Jest](https://jestjs.io/) is used as the testing framework - more information can be found below for running the tests.
+
+The code for the front-end is located under `/assets/src/`. MyLA uses functional components instead of class-based components and uses [React hooks](https://reactjs.org/docs/hooks-intro.html) for state and side-effects.
+
+### Back-end
+To Do
+
 ## Create an issue
 Before sending a pull request, please create an [issue](https://github.com/tl-its-umich-edu/my-learning-analytics/issues/new) describing either a problem (i.e. bug) in MyLA or a feature you would like to contribute. We'll do our best to review the issue in a timely manner to discuss before starting work to address the issue.
 
