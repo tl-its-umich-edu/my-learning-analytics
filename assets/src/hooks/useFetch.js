@@ -1,9 +1,8 @@
 /* global fetch */
 import { useState, useEffect } from 'react'
-import {handleError, defaultFetchOptions} from '../util/data'
+import { handleError, defaultFetchOptions } from '../util/data'
 
 const cache = new Map()
-
 
 const useFetch = (dataURL, options) => {
   const fetchOptions = options
@@ -41,7 +40,7 @@ const useFetch = (dataURL, options) => {
         })
         .catch(error => setError(error.message))
     }
-  }, [dataURL])
+  }, [dataURL, fetchOptions.body])
 
   return [loaded, error, data]
 }
