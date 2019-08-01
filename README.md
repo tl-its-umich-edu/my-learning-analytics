@@ -39,7 +39,7 @@ These instructions will get a copy of MyLA up and running on your local machine 
     Port: 5306
     ```
 1. Navigate to `user` table and select a student `sis_name`, which will be used in the next step.
-1. Create an authorized user. `docker exec -it student_dashboard python manage.py createuser --username={insert sis_name} --password={create password}`
+1. Create an authorized user. `docker exec -it student_dashboard python manage.py createuser --username={insert sis_name} --password={create password} --email=test@test.com`
     - Note: You can also make a user a superuser by connecting to the database, editing the record in `auth_user` and setting `is_staff=1` and `is_superuser=1`.
 1. Login using username and password created.
 1. The course(s) enrolled by the student with selected `sis_name` will be displayed. Click on a course to view as the student selected in step 3.
