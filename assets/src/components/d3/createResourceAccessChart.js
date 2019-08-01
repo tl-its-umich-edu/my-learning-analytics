@@ -43,6 +43,16 @@ function appendLegend (svg) {
     .attr('class', 'legend')
     .attr('transform', `translate(-550, 0)`)
 
+  legend.selectAll('text')
+    .data(legendLabels)
+    .enter()
+    .append('text')
+    .attr('font-family', 'sans-serif')
+    .attr('font-size', '14px')
+    .attr('y', (_, i) => legendY + i * legendInterval + legendBoxLength)
+    .attr('x', w + legendBoxTextInterval)
+    .text(d => d[0])
+
   const legendRect = legend.selectAll('rect')
     .data(legendLabels)
     .enter()
@@ -55,33 +65,20 @@ function appendLegend (svg) {
     .attr('y', (_, i) => legendY + i * legendInterval)
     .attr('x', w)
     .style('fill', d => d[1])
-
-  legend.selectAll('text')
-    .data(legendLabels)
-    .enter()
-    .append('text')
-    .attr('font-family', 'sans-serif')
-    .attr('font-size', '14px')
-    .attr('y', (_, i) => legendY + i * legendInterval + legendBoxLength)
-    .attr('x', w + legendBoxTextInterval)
-    .text(d => d[0])
 }
 
 function createResourceAccessChart ({ data, width, height, domElement }) {
   const resourceData = data.sort((a, b) => b.total_count - a.total_count)
 
-  // colors used for different resource states
-
   const defaultSelection = [0, 50]
-  const [mainWidth, mainHeight] = adjustViewport(width, height, mainMargin)
+  const [mainWidth, miniHeight] = adjustViewport(width, height, mainMargin)
 
   const miniMargin = { top: 50, right: 10, bottom: 50, left: 10 }
   const miniWidth = 100 - miniMargin.left - miniMargin.right
-  const miniHeight = mainHeight
 
   const mainXScale = d3.scaleLinear().range([0, mainWidth])
   const miniXScale = d3.scaleLinear().range([0, miniWidth])
-  let mainYScale = d3.scaleBand().range([0, mainHeight])
+  let mainYScale = d3.scaleBand().range([0, miniHeight])
   const miniYScale = d3.scaleBand().range([0, miniHeight])
   const textScale = d3.scaleLinear().range([12, 6]).domain([15, 50]).clamp(true)
 
@@ -89,7 +86,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   const svg = d3.select(domElement).append('svg')
     .attr('class', 'svgWrapper')
     .attr('width', mainWidth + mainMargin.left + mainMargin.right + miniWidth + miniMargin.left + miniMargin.right)
-    .attr('height', mainHeight + mainMargin.top + mainMargin.bottom)
+    .attr('height', miniHeight + mainMargin.top + mainMargin.bottom)
     .on('wheel.zoom', scroll)
     .on('mousedown.zoom', null) // Override the center selection
     .on('touchstart.zoom', null)
@@ -113,7 +110,10 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('width', d => mainXScale(d.total_count))
       .attr('height', mainYScale.bandwidth())
       .attr('class', 'bar')
-      .attr('fill', d => d.self_access_count > 0 ? COLOR_ACCESSED_RESOURCE : COLOR_NOT_ACCESSED_RESOURCE)
+      .attr('fill', d => d.self_access_count > 0
+        ? COLOR_ACCESSED_RESOURCE
+        : COLOR_NOT_ACCESSED_RESOURCE
+      )
       .on('mouseover', toolTip.show)
       .on('mouseout', toolTip.hide)
 
@@ -131,7 +131,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .style('font-size', 10)
       .attr('text-anchor', 'end')
       .text(d => (
-        ((mainYScale(d.resource_name) + mainYScale.bandwidth() / 2) < mainHeight) &&
+        ((mainYScale(d.resource_name) + mainYScale.bandwidth() / 2) < miniHeight) &&
         ((mainYScale(d.resource_name) + mainYScale.bandwidth() / 2) > 0))
         ? d.total_count
         : ''
@@ -186,8 +186,14 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .filter(d => selection[0] - miniYScale.bandwidth() <= miniYScale(d) && miniYScale(d) <= selection[1])
 
     d3.select('.miniGroup').selectAll('.bar')
-      .style('fill', d => d.self_access_count > 0 ? COLOR_ACCESSED_RESOURCE : COLOR_NOT_ACCESSED_RESOURCE)
-      .style('opacity', d => selected.includes(d.resource_name) ? '1' : '0.5')
+      .style('fill', d => d.self_access_count > 0
+        ? COLOR_ACCESSED_RESOURCE
+        : COLOR_NOT_ACCESSED_RESOURCE
+      )
+      .style('opacity', d => selected.includes(d.resource_name)
+        ? 1
+        : 0.5
+      )
 
     // Update the label size
     d3.selectAll('.axis--y text')
@@ -212,7 +218,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   // Main chart group
   const mainGroup = svg.append('g')
     .attr('class', 'mainGroupWrapper')
-    .attr('transform', 'translate(' + mainMargin.left + ',' + mainMargin.top + ')')
+    .attr('transform', `translate(${mainMargin.left}, ${mainMargin.top})`)
     .append('g')
     .attr('clip-path', 'url(#clip)')
     .style('clip-path', 'url(#clip)')
@@ -221,16 +227,15 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   // Mini chart group
   const miniGroup = svg.append('g')
     .attr('class', 'miniGroup')
-    .attr('transform', 'translate(' + (mainMargin.left + mainWidth + mainMargin.right + miniMargin.left) + ',' + miniMargin.top + ')')
+    .attr('transform', `translate(${(mainMargin.left + mainWidth + mainMargin.right + miniMargin.left)}, ${miniMargin.top})`)
 
   const brushGroup = svg.append('g')
     .attr('class', 'brushGroup')
-    .attr('transform', 'translate(' + (mainMargin.left + mainWidth + mainMargin.right + miniMargin.left) + ',' + miniMargin.top + ')')
+    .attr('transform', `translate(${(mainMargin.left + mainWidth + mainMargin.right + miniMargin.left)}, ${miniMargin.top})`)
 
   // Scales
-
-  const mainYZoom = d3.scaleLinear().range([0, mainHeight])
-    .domain([0, mainHeight])
+  const mainYZoom = d3.scaleLinear().range([0, miniHeight])
+    .domain([0, miniHeight])
 
   // Axis
   const mainXAxis = d3.axisBottom(mainXScale)
@@ -273,7 +278,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .append('rect')
     .attr('x', -mainMargin.left)
     .attr('width', mainWidth + mainMargin.left)
-    .attr('height', mainHeight)
+    .attr('height', miniHeight)
 
   // Inject data
   // Domain
@@ -290,13 +295,13 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   const xLabel = d3.select('.mainGroupWrapper')
     .append('g')
     .attr('class', 'axis axis--x')
-    .attr('transform', 'translate(' + 0 + ',' + (mainHeight + 5) + ')')
+    .attr('transform', 'translate(' + 0 + ',' + (miniHeight + 5) + ')')
     .call(mainXAxis.tickFormat(d => d + '%'))
 
   xLabel.append('text')
     .attr('fill', 'black')
     .attr('text-anchor', 'middle')
-    .attr('transform', 'translate(' + mainWidth / 2 + ', ' + 40 + ')')
+    .attr('transform', `translate(${mainWidth / 2}, 40)`)
     .text('Percentage of All Students in the Selected Grade Range')
     .style('font-size', '14px')
 
