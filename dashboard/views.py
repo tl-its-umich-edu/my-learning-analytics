@@ -480,7 +480,7 @@ def assignments(request, course_id=0):
 def get_course_assignments(course_id):
 
     sql=f"""select assign.*,sub.avg_score from
-            (select assignment_id,name,assign_grp_name,grp_id,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from
+            (select ifnull(assignment_id, 0) as assignment_id ,name,assign_grp_name,grp_id,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from
             (select a.id as assignment_id,a.assignment_group_id, a.local_date as due_date,a.name,a.points_possible from assignment as a  where a.course_id =%(course_id)s) as app right join
             (select id, name as assign_grp_name, id as grp_id, group_points, weight,drop_lowest,drop_highest from assignment_groups where course_id=%(course_id)s) as ag on ag.id=app.assignment_group_id) as assign left join
             (select distinct assignment_id,avg_score from submission where course_id=%(course_id)s) as sub on sub.assignment_id = assign.assignment_id
