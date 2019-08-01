@@ -9,9 +9,12 @@ import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import Dialog from '@material-ui/core/Dialog'
 import LogoutIcon from '@material-ui/icons/ExitToApp'
 import HelpIcon from '@material-ui/icons/HelpOutline'
 import Lock from '@material-ui/icons/Lock'
+import Launch from '@material-ui/icons/Launch'
 
 const styles = theme => ({
   root: {
@@ -25,7 +28,7 @@ const styles = theme => ({
     marginTop: '10px',
     marginBottom: '10px',
     marginLeft: 'auto',
-    marginRight: 'auto',
+    marginRight: 'auto'
   },
   link: {
     textDecoration: 'none',
@@ -37,8 +40,53 @@ function AvatarModal (props) {
   const { classes, user } = props
 
   const url = window.location.href
-  const [helpURL, setHelpURL] = useState('https://sites.google.com/umich.edu/my-learning-analytics-help/home')
   const logoutURL = '/accounts/logout'
+
+  const [helpURL, setHelpURL] = useState('https://sites.google.com/umich.edu/my-learning-analytics-help/home')
+  const [openChangeCourseDialog, setOpenChangeCourseDialog] = useState(false)
+
+  const Admin = () => (
+    <>
+      <Link style={{ textDecoration: 'none' }} href='/admin'>
+        <ListItem button>
+          <ListItemIcon>
+            <Lock />
+          </ListItemIcon>
+          <ListItemText inset primary='Admin' />
+        </ListItem>
+      </Link>
+      <Divider />
+    </>
+  )
+
+  const SwitchCourses = () => (
+    <>
+      <ListItem button onClick={() => setOpenChangeCourseDialog(true)}>
+        <ListItemIcon>
+          <Launch />
+        </ListItemIcon>
+        <ListItemText inset primary='Switch courses' style={{ marginLeft: 0 }} />
+      </ListItem>
+      <Dialog
+        onClose={() => setOpenChangeCourseDialog(false)}
+        open={openChangeCourseDialog}>
+        <DialogTitle>Select a course</DialogTitle>
+        <List>
+          {user.enrolledCourses.map((course, i) => (
+            <Link
+              style={{ textDecoration: 'none' }}
+              href={`/courses/${course.course_id}`}
+              key={i}>
+              <ListItem button>
+                <ListItemText inset primary={course.course_name} style={{ marginLeft: 0 }} />
+              </ListItem>
+            </Link>
+          ))}
+        </List>
+      </Dialog>
+      <Divider />
+    </>
+  )
 
   useEffect(() => {
     const helpUrlContext = url.includes('grades')
@@ -84,17 +132,12 @@ function AvatarModal (props) {
             <Divider />
             {
               user.admin
-                ? <>
-                  <Link style={{ textDecoration: 'none' }} href='/admin'>
-                    <ListItem button>
-                      <ListItemIcon>
-                        <Lock />
-                      </ListItemIcon>
-                      <ListItemText inset primary='Admin' />
-                    </ListItem>
-                  </Link>
-                  <Divider />
-                </>
+                ? Admin()
+                : null
+            }
+            {
+              user.enrolledCourses.length > 1
+                ? SwitchCourses()
                 : null
             }
             <Link style={{ textDecoration: 'none' }} href={logoutURL}>

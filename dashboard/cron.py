@@ -3,13 +3,15 @@ from __future__ import print_function #python 3 support
 
 from django.db import connections as conns
 
+from dashboard.common import db_util
+
 import logging
 import datetime
 
 from sqlalchemy import create_engine
 from django.conf import settings
 
-from dashboard.models import Course
+from dashboard.models import Course, Resource
 
 import pandas as pd
 
@@ -168,33 +170,38 @@ class DashboardCronJob(CronJobBase):
 
 
 
-    # update file records from DATA_WAREHOUSE
-    def update_file(self):
+    # update file records from Canvas that don't have names provided
+    def update_canvas_resource(self):
         # cron status
         status = ""
 
-        logger.debug("in update with data warehouse file")
+        logger.debug("in update canvas resource")
 
-        # delete all records in the table first
-        status += deleteAllRecordInTable("file")
+        # Select all the files for these courses
+        file_sql = f"select id, file_state, display_name from file_dim where course_id in %(course_ids)s"
+        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids':tuple(Course.objects.get_supported_courses())})
 
-        #select file record from DATA_WAREHOUSE
-        for data_warehouse_course_id in Course.objects.get_supported_courses():
-            file_sql = f"""select id, display_name as name,course_id as COURSE_ID from file_dim where file_state ='available'
-                           and course_id='{data_warehouse_course_id}'
-                        """
+        # Update these back again based on the dataframe
+        # Remove any rows where file_state is not available!
+        for row in df_attach.itertuples(index=False):
+            if row.file_state == 'available':
+                Resource.objects.filter(id=row.id).update(name=row.display_name)
+                status += f"Row {row.id} updated to {row.display_name}\n"
+            else: 
+                Resource.objects.filter(id=row.id).delete()
+                status += f"Row {row.id} removed as it is not available\n"
 
-            status += util_function(data_warehouse_course_id, file_sql, 'file')
         return status
 
-    # update FILE_ACCESS records from BigQuery
+    # update RESOURCE_ACCESS records from BigQuery
     def update_with_bq_access(self):
 
         # cron status
         status = ""
 
-        # delete all records in file_access table
-        status += deleteAllRecordInTable("file_access")
+        # delete all records in resource and resource_access table
+        status += deleteAllRecordInTable("resource")
+        status += deleteAllRecordInTable("resource_access")
 
         # return string with concatenated SQL insert result
         return_string = ""
@@ -210,46 +217,70 @@ class DashboardCronJob(CronJobBase):
         for data_warehouse_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
             # query to retrieve all file access events for one course
             # There is no catch if this query fails, event_store.events needs to exist
-            query = """select CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS file_id,
-                    SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS user_id,
-                    datetime(EVENT_TIME) as access_time
-                    FROM event_store.events
-                    where JSON_EXTRACT_SCALAR(event, '$.edApp.id') = @edApp
-                    and type = 'NavigationEvent'
-                    and JSON_EXTRACT_SCALAR(event, '$.object.name') = 'attachment'
-                    and JSON_EXTRACT_SCALAR(event, '$.action') = 'NavigatedTo'
-                    and JSON_EXTRACT_SCALAR(event, '$.membership.member.id') is not null
-                    and SUBSTR(JSON_EXTRACT_SCALAR(event, "$.group.id"),31) IN UNNEST(@course_ids)
-                    """
-            logger.debug(query)
+
+            final_bq_query = []
+            for k, query_obj in settings.RESOURCE_ACCESS_CONFIG.items():
+                final_bq_query.append(query_obj['query'])
+            final_bq_query = "  UNION ALL   ".join(final_bq_query)
+
+            data_warehouse_course_ids_short = [db_util.incremented_id_to_canvas_id(id) for id in data_warehouse_course_ids]
+
+            logger.debug(final_bq_query)
             logger.debug(data_warehouse_course_ids)
             query_params = [
                 bigquery.ArrayQueryParameter('course_ids', 'STRING', data_warehouse_course_ids),
-                bigquery.ScalarQueryParameter('edApp', 'STRING', settings.BIG_QUERY_ED_APP)
+                bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
+                bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT)
             ]
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
 
             # Location must match that of the dataset(s) referenced in the query.
-            bq_query = bigquery_client.query(query, location='US', job_config=job_config)
+            bq_query = bigquery_client.query(final_bq_query, location='US', job_config=job_config)
             #bq_query.result()
-            df = bq_query.to_dataframe()
+            resource_access_df = bq_query.to_dataframe()
             total_bytes_billed += bq_query.total_bytes_billed
 
-            logger.debug("df row number=" + str(df.shape[0]))
+            logger.debug("df row number=" + str(resource_access_df.shape[0]))
             # drop duplicates
-            df.drop_duplicates(["file_id", "user_id", "access_time"], keep='first', inplace=True)
+            resource_access_df.drop_duplicates(["resource_id", "user_id", "access_time"], keep='first', inplace=True)
 
-            logger.debug("after drop duplicates, df row number=" + str(df.shape[0]))
+            logger.debug("after drop duplicates, df row number=" + str(resource_access_df.shape[0]))
 
-            logger.debug(df)
+            logger.debug(resource_access_df)
+
+            # Because we're pulling all the data down into one query we need to manipulate it a little bit
+            # Make a copy of the access dataframe
+            resource_df = resource_access_df.copy(deep=True)
+            # Drop out the columns user and access time from resource data frame
+            resource_df.drop(["user_id", "access_time"], axis=1, inplace=True)
+            # Drop out the duplicates
+            resource_df.drop_duplicates(["resource_id", "course_id"], inplace=True)
+            # Rename the column resource_id to id
+            resource_df.rename(columns={"resource_id": "id"}, inplace=True)
+
+            # Drop out the columns resource_type, course_id, name from the resource_access
+            resource_access_df.drop(["resource_type","name", "course_id"], axis=1, inplace=True)
+
+            # Drop the columns where there is a Na value
+            resource_access_df_drop_na = resource_access_df.dropna()
+
+            logger.info(f"{len(resource_access_df) - len(resource_access_df_drop_na)} / {len(resource_access_df)} rows were dropped because of NA")
+
+            # First update the resource table
             # write to MySQL
             try:
-                df.to_sql(con=engine, name='file_access', if_exists='append', index=False)
+                resource_df.to_sql(con=engine, name='resource', if_exists='append', index=False)
             except Exception as e:
-                logger.exception("Error running to_sql on table file_access")
+                logger.exception("Error running to_sql on table resource")
                 raise
-            return_string += str(df.shape[0]) + " rows for courses " + ",".join(map(str, data_warehouse_course_ids)) + "\n"
+
+            try:
+                resource_access_df_drop_na.to_sql(con=engine, name='resource_access', if_exists='append', index=False)
+            except Exception as e:
+                logger.exception("Error running to_sql on table resource_access")
+                raise
+            return_string += str(resource_access_df_drop_na.shape[0]) + " rows for courses " + ",".join(map(str, data_warehouse_course_ids)) + "\n"
             logger.info(return_string)
 
         total_tbytes_billed = total_bytes_billed / 1024 / 1024 / 1024 / 1024
@@ -315,7 +346,7 @@ class DashboardCronJob(CronJobBase):
 
         logger.info("update_submission(): ")
 
-        # delete all records in file_access table
+        # delete all records in resource_access table
         status += deleteAllRecordInTable("submission")
 
         # loop through multiple course ids
@@ -404,9 +435,12 @@ class DashboardCronJob(CronJobBase):
         status += self.weight_consideration()
 
         logger.info("** file")
-        if 'show_files_accessed' not in settings.VIEWS_DISABLED:
-            status += self.update_file()
-            status += self.update_with_bq_access()
+        if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
+            try:
+                status += self.update_with_bq_access()
+                status += self.update_canvas_resource()
+            except Exception as e:
+                logger.info(e)
 
         if settings.DATA_WAREHOUSE_IS_UNIZIN:
             logger.info("** informational")
@@ -417,5 +451,3 @@ class DashboardCronJob(CronJobBase):
         logger.info("************ total status=" + status + "\n")
 
         return status
-
-

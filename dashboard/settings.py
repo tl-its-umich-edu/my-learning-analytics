@@ -38,6 +38,10 @@ LOGIN_URL = '/accounts/login'
 # Google Analytics ID
 GA_ID = ENV.get('GA_ID', '')
 
+# Resource values from env
+RESOURCE_VALUES = ENV.get("RESOURCE_VALUES", {})
+RESOURCE_URLS = ENV.get("RESOURCE_URLS", {})
+
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
 SITE_ID = 1
 
@@ -127,7 +131,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django_su.context_processors.is_su',
                 'django_settings_export.settings_export',
-                'dashboard.context_processors.current_user_course_id',
                 'dashboard.context_processors.current_user_courses_info',
                 'dashboard.context_processors.last_updated',
                 'dashboard.context_processors.get_build_info',
@@ -401,15 +404,11 @@ VIEWS_DISABLED = ENV.get('VIEWS_DISABLED', [])
 
 EARLIEST_TERM_DATE = ENV.get('EARLIEST_TERM_DATE', '2016-11-15')
 
-# This is the ed_app field that will be used to query for Canvas file events
-
-BIG_QUERY_ED_APP = ENV.get('BIG_QUERY_ED_APP', "http://umich.instructure.com/")
-
 # Time to run cron
 RUN_AT_TIMES = ENV.get('RUN_AT_TIMES', [])
 
 # Add any settings you need to be available to templates in this array
-SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID']
+SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'RESOURCE_VALUES']
 
 # Method to show the user, if they're authenticated and superuser
 def show_debug_toolbar(request):
@@ -434,6 +433,8 @@ CANVAS_FILE_POSTFIX = ENV.get("CANVAS_FILE_POSTFIX", "")
 # strings for construct file download url
 
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
+
+RESOURCE_ACCESS_CONFIG = ENV.get("RESOURCE_ACCESS_CONFIG", {})
 # IMPORT LOCAL ENV
 # =====================
 try:

@@ -3,12 +3,12 @@ import { Grade } from '@material-ui/icons'
 const routes = (courseId, activeViews) => {
   const allViews = [
     {
-      path: `/courses/${courseId}/files`,
-      title: 'Files Accessed',
+      path: `/courses/${courseId}/grades`,
+      title: 'Grade Distribution',
       icon: Grade,
-      description: 'See what files you and your peers are reading.',
-      image: '/static/images/file_access_trends_icon.png',
-      viewCode: 'fa'
+      description: 'See where your grade sits within the course grade distribution.',
+      image: '/static/images/grade_distribution_icon.png',
+      viewCode: 'gd'
     },
     {
       path: `/courses/${courseId}/assignments`,
@@ -19,18 +19,10 @@ const routes = (courseId, activeViews) => {
       viewCode: 'ap'
     },
     {
-      path: `/courses/${courseId}/grades`,
-      title: 'Grade Distribution',
+      path: `/courses/${courseId}/resources`,
+      title: 'Resources Accessed',
       icon: Grade,
-      description: 'See where your grade sits within the course grade distribution.',
-      image: '/static/images/grade_distribution_icon.png',
-      viewCode: 'gd'
-    },
-    {
-      path: `/courses/${courseId}/discussion`,
-      title: 'Discussion',
-      icon: Grade,
-      description: 'See analytics about discussion.',
+      description: 'See what resources you and your peers are viewing.',
       image: '/static/images/file_access_trends_icon.png',
       viewCode: 'fa'
     }

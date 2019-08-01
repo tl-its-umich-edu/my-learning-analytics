@@ -1,6 +1,7 @@
 import logging, os
 logger = logging.getLogger(__name__)
 
+
 def get_build_info():
     logger.debug(get_build_info.__name__)
     git_commit=os.getenv("OPENSHIFT_BUILD_COMMIT", "")
@@ -10,3 +11,10 @@ def get_build_info():
     build_name=os.getenv("OPENSHIFT_BUILD_NAME", "")
     return f'Build_Namespace:{build_namespace} Build_Name: {build_name} Git_Source: {build_source} Git_Branch: {git_branch} Git_Commit: {git_commit}'
 
+
+def look_up_key_for_value(myDict, searchFor):
+    for key, value in myDict.items():
+        for v in value:
+            if searchFor in v:
+                return key
+    return None

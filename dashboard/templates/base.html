@@ -31,11 +31,6 @@
     <script>
         // Setup a top level js object to hold global values
         var myla_globals = {
-        {% if course_id %}
-            "course_id": '{{ current_user_course_id }}',
-        {% else %}
-            "course_id": 0,
-        {% endif %}
             "is_superuser": {{user.is_superuser|lower}},
         {% if user.is_authenticated %}
             "username": '{{ user.get_username }}',
@@ -43,19 +38,19 @@
             "username": "",
         {% endif %}
         {% if settings.GA_ID  %}
-        "GA": '{{ settings.GA_ID }}',
+            "GA": '{{ settings.GA_ID }}',
         {% else %}
-        "GA": "",
+            "GA": "",
         {% endif %}
         {% if settings.LOGIN_URL  %}
-        "login": '{{ settings.LOGIN_URL }}',
+            "login": '{{ settings.LOGIN_URL }}',
         {% else %}
-        "login": "",
+            "login": "",
         {% endif %}
         {% if settings.LOGOUT_URL  %}
-        "logout": '{{ settings.LOGOUT_URL }}',
+            "logout": '{{ settings.LOGOUT_URL }}',
         {% else %}
-        "logout": "",
+            "logout": "",
         {% endif %}
         {% if user.is_authenticated%}
             "user_courses_info":'{{current_user_courses_info|safe}}',
@@ -66,6 +61,7 @@
             "google_analytics_id":'{{ settings.GA_ID }}',
         {% endif %}
         }
+        
 
     </script>
 </head>

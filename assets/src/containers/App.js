@@ -1,32 +1,43 @@
-import React, { useState } from 'react'
+/* global myla_globals */
+import React from 'react'
 import { Route, withRouter } from 'react-router-dom'
-import { matchPath } from 'react-router';
+import { matchPath } from 'react-router'
 import GoogleAnalyticsTracking from '../components/GoogleAnalyticsTracking'
 import CourseList from './CourseList'
 import Course from './Course'
 
+const enrolledCourses = (myla_globals.user_courses_info.length !== 0)
+  ? JSON.parse(myla_globals.user_courses_info)
+  : ''
+
+/*
+Frozen to prevent unintentional changes to this object. This object is strictly readonly.
+myla_globals should ONLY be accessed in App.js, and nowhere else.
+*/
+const user = Object.freeze({
+  username: myla_globals.username,
+  admin: myla_globals.is_superuser,
+  enrolledCourses,
+  isSuperuser: myla_globals.is_superuser,
+  isLoggedIn: !!myla_globals.username
+})
+
 function App (props) {
-  const {
-    location
-  } = props
-  const isLoggedIn = !!myla_globals.username
-  // replace with redirect to react login page later
-  if (!isLoggedIn) {
+  const { location } = props
+
+  if (!user.isLoggedIn) {
     return (window.location.href = myla_globals.login)
   }
 
   const coursePageMatch = matchPath(location.pathname, '/courses/:courseId/')
   const courseId = coursePageMatch ? coursePageMatch.params.courseId : null
-  const user = {
-    username: myla_globals.username,
-    admin: myla_globals.is_superuser
-  }
+
   return (
     <>
       <GoogleAnalyticsTracking gaId={myla_globals.google_analytics_id} />
       <Route path='/' exact render={props => <CourseList {...props} user={user} />} />
       <Route path='/courses' exact render={props => <CourseList {...props} user={user} />} />
-      { courseId ? <Course user={user} courseId={courseId} {...props} /> : null }
+      {courseId ? <Course user={user} courseId={courseId} {...props} /> : null}
     </>
   )
 }

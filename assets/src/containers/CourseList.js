@@ -38,17 +38,11 @@ const styles = theme => ({
 })
 
 function CourseList (props) {
-  const {
-    classes,
-    user
-  } = props
+  const { classes, user } = props
 
-  const userCourseInfo = (myla_globals.user_courses_info.length !== 0)
-    ? JSON.parse(myla_globals.user_courses_info)
-    : ''
-
-  const isSuperuser = myla_globals.is_superuser
-  if (!userCourseInfo && !isSuperuser) return (<Error>You are not enrolled in any courses with MyLA enabled.</Error>)
+  if (!user.enrolledCourses && !user.isSuperuser) {
+    return (<Error>You are not enrolled in any courses with MyLA enabled.</Error>)
+  }
 
   const [avatarEl, setAvatarEl] = useState(null)
   const avatarOpen = Boolean(avatarEl)
@@ -58,9 +52,9 @@ function CourseList (props) {
       <AppBar className={classes.root} position='static'>
         <Toolbar>
           <Typography variant='h6' color='inherit' className={classes.grow}>
-            My Learning Analytics
+            My Learning Analytics the welcome page
           </Typography>
-          <div className={classes.grow}/>
+          <div className={classes.grow} />
           <IconButton
             aria-owns={avatarOpen ? 'simple-popper' : undefined}
             onClick={event => setAvatarEl(event.currentTarget)}
@@ -82,29 +76,29 @@ function CourseList (props) {
               horizontal: 'center'
             }}
           >
-            <AvatarModal user={user}/>
+            <AvatarModal user={user} />
           </Popover>
         </Toolbar>
       </AppBar>
       <div className={classes.root}>
-        {isSuperuser ?
-          <Grid container spacing={16}>
-            <Grid item xs={12}>
-              <Paper className={classes.paper}>
-                <Typography variant='h5' gutterBottom>Select a course of your choice</Typography>
-              </Paper>
+        {
+          user.isSuperuser
+            ? <Grid container spacing={16}>
+              <Grid item xs={12}>
+                <Paper className={classes.paper}>
+                  <Typography variant='h5' gutterBottom>Select a course of your choice</Typography>
+                </Paper>
+              </Grid>
             </Grid>
-          </Grid>
-          :
-          <Grid container spacing={16}>
-            <Grid item xs={12} className={classes.container}>
-              {userCourseInfo.map((course, key) =>
-                <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
-                  <SelectCard cardData={{ title: course.course_name }}/>
-                </Link>
-              )}
+            : <Grid container spacing={16}>
+              <Grid item xs={12} className={classes.container}>
+                {user.enrolledCourses.map((course, key) =>
+                  <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
+                    <SelectCard cardData={{ title: course.course_name }} />
+                  </Link>
+                )}
+              </Grid>
             </Grid>
-          </Grid>
         }
       </div>
     </>

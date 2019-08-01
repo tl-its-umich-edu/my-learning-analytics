@@ -4,8 +4,7 @@ import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
 import GradeDistribution from './GradeDistribution'
 import AssignmentPlanning from './AssignmentPlanning'
-import FilesAccessed from './FilesAccessed'
-import Discussion from './Discussion'
+import ResourcesAccessed from './ResourcesAccessed'
 import IndexPage from './IndexPage'
 import Spinner from '../components/Spinner'
 import Error from './Error'
@@ -13,10 +12,7 @@ import { isObjectEmpty } from '../util/object'
 import { useCourseInfo } from '../service/api'
 
 function Course (props) {
-  const {
-    courseId,
-    user
-  } = props
+  const { courseId, user } = props
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
@@ -40,15 +36,18 @@ function Course (props) {
               courseId={courseId}
               courseInfo={courseInfo} />
             <Route path='/courses/:courseId/' exact
-              render={props => <IndexPage {...props} courseInfo={courseInfo} courseId={courseId} />} />
+              render={props => <IndexPage {...props}
+                courseInfo={courseInfo} courseId={courseId} />} />
             <Route path='/courses/:courseId/grades'
-              render={props => <GradeDistribution {...props} disabled={!courseInfo.course_view_options.gd}
+              render={props => <GradeDistribution {...props}
+                disabled={!courseInfo.course_view_options.gd}
                 courseId={courseId} />} />
             <Route path='/courses/:courseId/assignments'
-              render={props => <AssignmentPlanning {...props} disabled={!courseInfo.course_view_options.ap}
+              render={props => <AssignmentPlanning {...props}
+                disabled={!courseInfo.course_view_options.ap}
                 courseId={courseId} />} />
-            <Route path='/courses/:courseId/files'
-              render={props => <FilesAccessed {...props} courseInfo={courseInfo}
+            <Route path='/courses/:courseId/resources'
+              render={props => <ResourcesAccessed {...props} disabled={!courseInfo.course_view_options.fa} courseInfo={courseInfo}
                 courseId={courseId} />} />
             <Route path='/courses/:courseId/discussion'
               render={props => <Discussion {...props} courseInfo={courseInfo}
