@@ -49,18 +49,7 @@ class AcademicTerms(models.Model):
         verbose_name = "Academic Terms"
         verbose_name_plural = "Academic Terms"
 
-
 class UserDefaultQuerySet(models.QuerySet):
-    def get_user_defaults(self, course_id, sis_user_name, default_view_type):
-        try:
-            return self.get(course_id=course_id,
-                            user_sis_name=str(sis_user_name),
-                            default_view_type=str(default_view_type)).default_view_value
-        except (self.model.DoesNotExist, Exception) as e:
-            logger.error(f"""Couldn't get the default value for in course: {course_id} for user: {sis_user_name}
-                         with default_view_type: {default_view_type} due to {e} """)
-            return None
-
     def set_user_default(self, course_id, sis_user_name, default_view_type, default_view_value):
         try:
             return self.update_or_create(course_id=course_id, user_sis_name=sis_user_name, default_view_type=default_view_type,
@@ -70,18 +59,6 @@ class UserDefaultQuerySet(models.QuerySet):
                              with default_view_type: {default_view_type} and value: {default_view_value} due to {e} """)
             raise e
 
-
-class UserDefaultManager(models.Manager):
-    def get_queryset(self):
-        return UserDefaultQuerySet(self.model, using=self._db)
-
-    def get_user_defaults(self, course_id, sis_user_name, default_view_type):
-        return self.get_queryset().get_user_defaults(course_id, sis_user_name, default_view_type)
-
-    def set_user_defaults(self, course_id, sis_user_name, default_view_type, default_view_value):
-        return self.get_queryset().set_user_default(course_id, sis_user_name, default_view_type, default_view_value)
-
-
 class UserDefaultSelection(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
     course_id = models.BigIntegerField(blank=True, null=True, verbose_name="Course Id")
@@ -89,12 +66,11 @@ class UserDefaultSelection(models.Model):
     default_view_type = models.CharField(max_length=255, blank=True, null=True, verbose_name="Default Type")
     default_view_value = models.CharField(max_length=255, blank=True, null=True, verbose_name="Default Value")
 
-    objects = UserDefaultManager()
+    objects = UserDefaultQuerySet.as_manager()
 
     class Meta:
         db_table = 'user_default_selection'
         unique_together = (('user_sis_name', 'course_id', 'default_view_type'),)
-
 
 class Assignment(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Assignment Id")

@@ -6,6 +6,8 @@ from datetime import datetime
 from dateutil.parser import parse
 
 from django_cron.models import CronJobLog
+from dashboard.models import UserDefaultSelection
+
 import pandas as pd
 from django.conf import settings
 
@@ -128,3 +130,28 @@ def get_canvas_data_date():
     except Exception:
         logger.info("Value could not be found from metadata", exc_info = True)
     return datetime.min
+
+def get_user_defaults(user_sis_name: str, course_id: int = 0, default_view_type: str = None) -> dict:
+    """ Get user defaults from the database
+    
+    :param user_sis_name: User SIS name
+    :type user_sis_name: str
+    :param course_id: Course ID 0 will return defaults, defaults to 0
+    :type course_id: int, optional
+    :param default_view_type: A specific view or None for all for user, defaults to None
+    :type default_view_type: str, optional
+    :return: A dict with the users values or an empty dict if none found
+    :rtype: dict
+    """
+    args = {'course_id': int(course_id), 'user_sis_name': user_sis_name}
+    if default_view_type:
+        args.update(default_view_type = default_view_type)
+    defaults = UserDefaultSelection.objects.filter(**args)
+
+    default_values = {default.default_view_type:default.default_view_value for default in defaults}
+    
+    logger.info(f"""default option check returned from DB for user: {user_sis_name} course {course_id} and type: {default_view_type} is {default_values}""")
+    if (default_values):
+        return default_values
+    else:
+        return {}

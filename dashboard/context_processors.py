@@ -2,6 +2,7 @@ from dashboard.common import db_util
 from dashboard.common import utils
 
 import logging
+import json
 logger = logging.getLogger(__name__)
 
 
@@ -17,3 +18,8 @@ def last_updated(request):
 
 def get_build_info(request):
     return {'build': utils.get_build_info()}
+
+def get_user_defaults(request):
+    user_sis_name = request.user.get_username()
+    defaults = db_util.get_user_defaults(user_sis_name, 0)
+    return {'get_user_defaults': json.dumps(defaults)}

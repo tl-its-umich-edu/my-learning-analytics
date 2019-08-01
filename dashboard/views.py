@@ -14,7 +14,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
-from dashboard.common.db_util import canvas_id_to_incremented_id
+from dashboard.common import db_util
 from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -40,6 +40,10 @@ RESOURCE_VALUES = settings.RESOURCE_VALUES
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
+
+# Either the user is in the course or the course is 0 (special case)
+def is_in_course(request, course_id=0):
+    return course_id == 0 or objectgetter(Course, 'course_id', 'canvas_id')
 
 def gpa_map(grade):
     if grade is None:
@@ -78,7 +82,7 @@ def get_course_info(request, course_id=0):
     :return: JSON to be used
     :rtype: str
     """
-    course_id = canvas_id_to_incremented_id(course_id)
+    course_id = db_util.canvas_id_to_incremented_id(course_id)
     today = timezone.now()
 
     try:
@@ -134,7 +138,7 @@ def get_course_info(request, course_id=0):
     fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def resource_access_within_week(request, course_id=0):
 
-    course_id = canvas_id_to_incremented_id(course_id)
+    course_id = db_util.canvas_id_to_incremented_id(course_id)
 
     current_user=request.user.get_username()
 
@@ -299,7 +303,7 @@ def resource_access_within_week(request, course_id=0):
 def grade_distribution(request, course_id=0):
     logger.info(grade_distribution.__name__)
 
-    course_id = canvas_id_to_incremented_id(course_id)
+    course_id = db_util.canvas_id_to_incremented_id(course_id)
 
     current_user = request.user.get_username()
     grade_score_sql = "select current_grade,(select current_grade from user where sis_name=" \
@@ -330,10 +334,12 @@ def grade_distribution(request, course_id=0):
 
 
 @permission_required('dashboard.update_user_default_selection_for_views',
-    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
+    fn=is_in_course, raise_exception=True)
 def update_user_default_selection_for_views(request, course_id=0):
     logger.info(update_user_default_selection_for_views.__name__)
-    course_id = canvas_id_to_incremented_id(course_id)
+    # Don't do anything for course id 0
+    if (course_id != 0):
+        course_id = db_util.canvas_id_to_incremented_id(course_id)
     current_user = request.user.get_username()
     default_selection = json.loads(request.body.decode("utf-8"))
     logger.info(default_selection)
@@ -349,7 +355,7 @@ def update_user_default_selection_for_views(request, course_id=0):
     eventlog(request.user, EventLogTypes.EVENT_VIEW_SET_DEFAULT.value, extra=data)
     key = 'default'
     try:
-        obj, create_or_update_bool = UserDefaultSelection.objects.set_user_defaults(int(course_id), current_user,
+        obj, create_or_update_bool = UserDefaultSelection.objects.set_user_default(int(course_id), current_user,
                                                                                     default_type,
                                                                                     default_type_value)
         logger.info(
@@ -363,26 +369,23 @@ def update_user_default_selection_for_views(request, course_id=0):
 
 
 @permission_required('dashboard.get_user_default_selection',
-    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
+    fn=is_in_course, raise_exception=True)
 def get_user_default_selection(request, course_id=0):
     logger.info(get_user_default_selection.__name__)
-    course_id = canvas_id_to_incremented_id(course_id)
-    user_sis_name = request.user.get_username()
+    # Don't do anything for course id 0
+    if (course_id != 0):
+        course_id = db_util.canvas_id_to_incremented_id(course_id)
     default_view_type = request.GET.get('default_type')
-    key = 'default'
-    no_user_default_response = json.dumps({key: ''})
-    logger.info(f"the default option request from user {user_sis_name} in course {course_id} of type: {default_view_type}")
-    default_value = UserDefaultSelection.objects.get_user_defaults(int(course_id), user_sis_name, default_view_type)
-    logger.info(f"""default option check returned from DB for user: {user_sis_name} course {course_id} and type:
-                    {default_view_type} is {default_value}""")
+    no_user_default_response = json.dumps({})
+    user_sis_name = request.user.get_username()
+    default_value = db_util.get_user_defaults(user_sis_name, int(course_id), default_view_type)
     if not default_value:
         logger.info(
             f"user {user_sis_name} in course {course_id} don't have any defaults values set type {default_view_type}")
         return HttpResponse(no_user_default_response, content_type='application/json')
-    result = json.dumps({key: default_value})
+    result = json.dumps(default_value)
     logger.info(f"user {user_sis_name} in course {course_id} for type {default_view_type} defaults: {result}")
     return HttpResponse(result, content_type='application/json')
-
 
 @permission_required('dashboard.assignments',
     fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
@@ -390,7 +393,7 @@ def assignments(request, course_id=0):
     
     logger.info(assignments.__name__)
 
-    course_id = canvas_id_to_incremented_id(course_id)
+    course_id = db_util.canvas_id_to_incremented_id(course_id)
 
     current_user = request.user.get_username()
     df_default_display_settings()

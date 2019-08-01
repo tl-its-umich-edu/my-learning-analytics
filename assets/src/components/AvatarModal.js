@@ -15,6 +15,9 @@ import LogoutIcon from '@material-ui/icons/ExitToApp'
 import HelpIcon from '@material-ui/icons/HelpOutline'
 import Lock from '@material-ui/icons/Lock'
 import Launch from '@material-ui/icons/Launch'
+import Checkbox from '@material-ui/core/Checkbox'
+import useSetUserSetting from '../hooks/useSetUserSetting'
+import useUserSetting from '../hooks/useUserSetting'
 
 const styles = theme => ({
   root: {
@@ -44,6 +47,16 @@ function AvatarModal (props) {
 
   const [helpURL, setHelpURL] = useState('https://sites.google.com/umich.edu/my-learning-analytics-help/home')
   const [openChangeCourseDialog, setOpenChangeCourseDialog] = useState(false)
+  
+  const [settingChanged, setSettingChanged] = useState(false)
+  const [demoMode, setDemoMode] = useState(false)
+
+  const [userSettingSaved, userSettingResponse] = useSetUserSetting(
+    null,
+    { demomode: demoMode },
+    settingChanged,
+    [demoMode]
+  )
 
   const Admin = () => (
     <>
@@ -56,6 +69,20 @@ function AvatarModal (props) {
         </ListItem>
       </Link>
       <Divider />
+        <ListItem>
+          <ListItemIcon>
+            <Lock />
+          </ListItemIcon>
+          <ListItemText inset primary='Demo Mode' />
+          <Checkbox checked={demoMode} 
+            onChange={() => {
+              setSettingChanged(true)
+              setDemoMode(!demoMode)
+            }
+          } />
+      </ListItem>
+      <Divider />
+
     </>
   )
 

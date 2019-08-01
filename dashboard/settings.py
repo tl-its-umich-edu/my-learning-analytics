@@ -131,6 +131,7 @@ TEMPLATES = [
                 'dashboard.context_processors.current_user_courses_info',
                 'dashboard.context_processors.last_updated',
                 'dashboard.context_processors.get_build_info',
+                'dashboard.context_processors.get_user_defaults',
             ],
         },
     },
