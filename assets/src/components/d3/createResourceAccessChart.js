@@ -3,17 +3,101 @@ import { adjustViewport } from '../../util/chart'
 import d3tip from 'd3-tip'
 import './createResourceAccessChart.css'
 
-function createResourceAccessChart ({ data, width, height, domElement }) {
-  /*
-          References:
-              - https://bl.ocks.org/mbostock/34f08d5e11952a80609169b7917d4172
-              - http://bl.ocks.org/nbremer/326fb6de768e85261bfd47aa1f497863
-              - D3 Brush: https://github.com/d3/d3-brush/blob/master/README.md#brushSelection
-              - D3 V4 Changes: https://github.com/d3/d3/blob/master/CHANGES.md
-      */
+/*
+  References:
+    - https://bl.ocks.org/mbostock/34f08d5e11952a80609169b7917d4172
+    - http://bl.ocks.org/nbremer/326fb6de768e85261bfd47aa1f497863
+    - D3 Brush: https://github.com/d3/d3-brush/blob/master/README.md#brushSelection
+    - D3 V4 Changes: https://github.com/d3/d3/blob/master/CHANGES.md
+*/
 
-  const update = () => {
-    let bar = d3.select('.mainGroup').selectAll('.bar')
+const COLOR_ACCESSED_RESOURCE = 'steelblue'
+const COLOR_NOT_ACCESSED_RESOURCE = 'gray'
+const mainMargin = { top: 50, right: 10, bottom: 50, left: 200 }
+
+const toolTip = d3tip().attr('class', 'd3-tip')
+  .direction('n').offset([-5, 5])
+  .html(d => {
+    if (d.self_access_count === 0) {
+      return `<b>You haven't viewed this resource. </b > `
+    } else if (d.self_access_count === 1) {
+      return `You have read the resource once on ${new Date(d.self_access_last_time).toDateString()}.`
+    } else {
+      return `You have read the resource ${d.self_access_count} times. The last time you accessed this resource was on ${new Date(d.self_access_last_time).toDateString()}.`
+    }
+  })
+
+function appendLegend (svg) {
+  const w = 800 - mainMargin.left - mainMargin.right
+  const legendBoxLength = 10
+  const legendBoxTextInterval = 15
+  const legendInterval = 20
+  const legendY = -50
+
+  const legendLabels = [
+    [`Resources I haven't viewed`, COLOR_NOT_ACCESSED_RESOURCE],
+    [`Resources I've viewed`, COLOR_ACCESSED_RESOURCE]
+  ]
+
+  const legend = svg.select('.mainGroupWrapper').append('g')
+    .attr('class', 'legend')
+    .attr('transform', `translate(-550, 0)`)
+
+  const legendRect = legend.selectAll('rect')
+    .data(legendLabels)
+    .enter()
+    .append('rect')
+    .attr('y', legendY)
+    .attr('width', legendBoxLength)
+    .attr('height', legendBoxLength)
+
+  legendRect
+    .attr('y', (_, i) => legendY + i * legendInterval)
+    .attr('x', w)
+    .style('fill', d => d[1])
+
+  legend.selectAll('text')
+    .data(legendLabels)
+    .enter()
+    .append('text')
+    .attr('font-family', 'sans-serif')
+    .attr('font-size', '14px')
+    .attr('y', (_, i) => legendY + i * legendInterval + legendBoxLength)
+    .attr('x', w + legendBoxTextInterval)
+    .text(d => d[0])
+}
+
+function createResourceAccessChart ({ data, width, height, domElement }) {
+  const resourceData = data.sort((a, b) => b.total_count - a.total_count)
+
+  // colors used for different resource states
+
+  const defaultSelection = [0, 50]
+  const [mainWidth, mainHeight] = adjustViewport(width, height, mainMargin)
+
+  const miniMargin = { top: 50, right: 10, bottom: 50, left: 10 }
+  const miniWidth = 100 - miniMargin.left - miniMargin.right
+  const miniHeight = mainHeight
+
+  const mainXScale = d3.scaleLinear().range([0, mainWidth])
+  const miniXScale = d3.scaleLinear().range([0, miniWidth])
+  let mainYScale = d3.scaleBand().range([0, mainHeight])
+  const miniYScale = d3.scaleBand().range([0, miniHeight])
+  const textScale = d3.scaleLinear().range([12, 6]).domain([15, 50]).clamp(true)
+
+  // Build the chart
+  const svg = d3.select(domElement).append('svg')
+    .attr('class', 'svgWrapper')
+    .attr('width', mainWidth + mainMargin.left + mainMargin.right + miniWidth + miniMargin.left + miniMargin.right)
+    .attr('height', mainHeight + mainMargin.top + mainMargin.bottom)
+    .on('wheel.zoom', scroll)
+    .on('mousedown.zoom', null) // Override the center selection
+    .on('touchstart.zoom', null)
+    .on('touchmove.zoom', null)
+    .on('touchend.zoom', null)
+
+  function update () {
+    const bar = d3.select('.mainGroup').selectAll('.bar')
       .data(resourceData, d => d.resource_name)
 
     // Initialize
@@ -22,8 +106,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('width', d => mainXScale(d.total_count))
       .attr('height', mainYScale.bandwidth())
 
-    bar
-      .enter()
+    bar.enter()
       .append('rect')
       .attr('x', 0)
       .attr('y', d => mainYScale(d.resource_name))
@@ -57,9 +140,30 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     bar.exit().remove()
   }
 
-  const brushmove = () => {
-    let fullRange = mainYZoom.range()
-    let selection = d3.event ? d3.event.selection : defaultSelection
+  function scroll () {
+    // Mouse scroll on the chart
+    const selection = d3.brushSelection(gBrush.node())
+    const size = selection[1] - selection[0]
+    const range = miniYScale.range()
+    const y0 = d3.min(range)
+    const y1 = d3.max(range) + miniYScale.bandwidth()
+    const dy = d3.event.deltaY
+    const topSection = selection[0] - dy < y0
+      ? y0
+      : selection[1] - dy > y1
+        ? y1 - size
+        : selection[0] - dy
+
+    // Make sure the page doesnt scroll
+    d3.event.stopPropagation()
+    d3.event.preventDefault()
+    // Move the brush
+    gBrush.call(brush.move, [topSection, topSection + size])
+  }
+
+  function brushmove () {
+    const fullRange = mainYZoom.range()
+    const selection = d3.event ? d3.event.selection : defaultSelection
 
     // Update the axes
     // Map selection area to full range
@@ -73,12 +177,12 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     mainYScale.domain(resourceData.map(d => d.resource_name))
 
     // Update the y axis
-    let mainYAxis = d3.axisLeft(mainYScale).tickSize(0).tickFormat(d => d.split('|')[1])
+    const mainYAxis = d3.axisLeft(mainYScale).tickSize(0).tickFormat(d => d.split('|')[1])
 
     mainGroup.select('.axis--y').call(mainYAxis)
 
     // Updated style of selected bars
-    let selected = miniYScale.domain()
+    const selected = miniYScale.domain()
       .filter(d => selection[0] - miniYScale.bandwidth() <= miniYScale(d) && miniYScale(d) <= selection[1])
 
     d3.select('.miniGroup').selectAll('.bar')
@@ -92,86 +196,21 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     update()
   }
 
-  const scroll = () => {
-    // Mouse scroll on the chart
-    let selection = d3.brushSelection(gBrush.node())
-    let size = selection[1] - selection[0]
-    let range = miniYScale.range()
-    let y0 = d3.min(range)
-    let y1 = d3.max(range) + miniYScale.bandwidth()
-    let dy = d3.event.deltaY
-    let topSection
-
-    if (selection[0] - dy < y0) topSection = y0
-    else if (selection[1] - dy > y1) topSection = y1 - size
-    else topSection = selection[0] - dy
-
-    // Make sure the page doesnt scroll
-    d3.event.stopPropagation()
-    d3.event.preventDefault()
-    // Move the brush
-    gBrush.call(brush.move, [topSection, topSection + size])
-  }
-
-  const brushcenter = () => {
-    let target = d3.event.targe
-    let selection = d3.brushSelection(gBrush.node())
-    let size = selection[1] - selection[0]
-    let range = miniYScale.range()
-    let y0 = d3.min(range) + size / 2
-    let y1 = d3.max(range) + miniYScale.bandwidth() - size / 2
-    let center = Math.max(y0, Math.min(y1, d3.mouse(target)[1]))
+  function brushcenter () {
+    const target = d3.event.targe
+    const selection = d3.brushSelection(gBrush.node())
+    const size = selection[1] - selection[0]
+    const range = miniYScale.range()
+    const y0 = d3.min(range) + size / 2
+    const y1 = d3.max(range) + miniYScale.bandwidth() - size / 2
+    const center = Math.max(y0, Math.min(y1, d3.mouse(target)[1]))
 
     d3.event.stopPropagation()
     gBrush.call(brush.move, [center - size / 2, center + size / 2])
   }
 
-  let resourceData = data
-  resourceData.sort((a, b) => b.total_count - a.total_count)
-
-  // colors used for different resource states
-  let COLOR_ACCESSED_RESOURCE = 'steelblue'
-  let COLOR_NOT_ACCESSED_RESOURCE = 'gray'
-
-  let defaultSelection = [0, 50]
-  let mainMargin = { top: 50, right: 10, bottom: 50, left: 200 }
-  let [mainWidth, mainHeight] = adjustViewport(width, height, mainMargin)
-
-  let miniMargin = { top: 50, right: 10, bottom: 50, left: 10 }
-  let miniWidth = 100 - miniMargin.left - miniMargin.right
-  let miniHeight = mainHeight
-
-  // Build the chart
-  let svg = d3.select(domElement).append('svg')
-    .attr('class', 'svgWrapper')
-    .attr('width', mainWidth + mainMargin.left + mainMargin.right + miniWidth + miniMargin.left + miniMargin.right)
-    .attr('height', mainHeight + mainMargin.top + mainMargin.bottom)
-    .on('wheel.zoom', scroll)
-    .on('mousedown.zoom', null) // Override the center selection
-    .on('touchstart.zoom', null)
-    .on('touchmove.zoom', null)
-    .on('touchend.zoom', null)
-
-  // Tooltip
-  let toolTip = d3tip().attr('class', 'd3-tip')
-    .direction('n').offset([-5, 5])
-    .html(d => {
-      let selfString
-      if (d.self_access_count === 0) {
-        selfString = `<b>You haven't viewed this resource. </b > `
-      } else if (d.self_access_count === 1) {
-        selfString = 'You have read the resource once on ' + new Date(d.self_access_last_time).toDateString() + '.'
-      } else {
-        selfString = 'You have read the resource ' + d.self_access_count + ' times. The last time you accessed this resource was on ' + new Date(d.self_access_last_time).toDateString() + '.'
-      }
-      return selfString
-    })
-
-  // Style tooltip
-  svg.call(toolTip)
-
   // Main chart group
-  let mainGroup = svg.append('g')
+  const mainGroup = svg.append('g')
     .attr('class', 'mainGroupWrapper')
     .attr('transform', 'translate(' + mainMargin.left + ',' + mainMargin.top + ')')
     .append('g')
@@ -180,40 +219,35 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('class', 'mainGroup')
 
   // Mini chart group
-  let miniGroup = svg.append('g')
+  const miniGroup = svg.append('g')
     .attr('class', 'miniGroup')
     .attr('transform', 'translate(' + (mainMargin.left + mainWidth + mainMargin.right + miniMargin.left) + ',' + miniMargin.top + ')')
 
-  let brushGroup = svg.append('g')
+  const brushGroup = svg.append('g')
     .attr('class', 'brushGroup')
     .attr('transform', 'translate(' + (mainMargin.left + mainWidth + mainMargin.right + miniMargin.left) + ',' + miniMargin.top + ')')
 
   // Scales
-  let mainXScale = d3.scaleLinear().range([0, mainWidth])
-  let miniXScale = d3.scaleLinear().range([0, miniWidth])
-  let mainYScale = d3.scaleBand().range([0, mainHeight])
-  let miniYScale = d3.scaleBand().range([0, miniHeight])
-  let textScale = d3.scaleLinear().range([12, 6]).domain([15, 50]).clamp(true)
 
-  let mainYZoom = d3.scaleLinear().range([0, mainHeight])
+  const mainYZoom = d3.scaleLinear().range([0, mainHeight])
     .domain([0, mainHeight])
 
   // Axis
-  let mainXAxis = d3.axisBottom(mainXScale)
+  const mainXAxis = d3.axisBottom(mainXScale)
     .ticks(6)
     .tickSizeOuter(10)
 
-  let mainYAxis = d3.axisLeft(mainYScale)
+  const mainYAxis = d3.axisLeft(mainYScale)
     .tickSize(0)
     .tickFormat(d => d.split('|')[1])
 
   // Brush
-  let brush = d3.brushY()
+  const brush = d3.brushY()
     .extent([[0, 0], [miniWidth, miniHeight]])
     .on('brush', brushmove)
     .handleSize(20)
 
-  let gBrush = brushGroup.append('g')
+  const gBrush = brushGroup.append('g')
     .attr('class', 'brush')
     .call(brush)
     .call(brush.move, defaultSelection)
@@ -253,7 +287,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .paddingOuter(0)
 
   // Append axis to main chart
-  let xLabel = d3.select('.mainGroupWrapper')
+  const xLabel = d3.select('.mainGroupWrapper')
     .append('g')
     .attr('class', 'axis axis--x')
     .attr('transform', 'translate(' + 0 + ',' + (mainHeight + 5) + ')')
@@ -266,7 +300,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .text('Percentage of All Students in the Selected Grade Range')
     .style('font-size', '14px')
 
-  let yLabel = mainGroup.append('g')
+  const yLabel = mainGroup.append('g')
     .attr('class', 'axis axis--y')
     .attr('transform', 'translate(-5,0)')
     .call(mainYAxis)
@@ -277,7 +311,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   // Add links to resource name
   d3.selectAll('.axis--y .tick').each(function (d) {
     // Have to use ES5 function to correctly use `this` keyword
-    let link = d.split('|')[0]
+    const link = d.split('|')[0]
     const a = d3.select(this.parentNode).append('a')
       .attr('xlink:target', '_blank')
       .attr('xlink:href', link)
@@ -294,7 +328,10 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('width', d => miniXScale(d.total_count))
     .attr('height', miniYScale.bandwidth())
     .attr('class', 'bar')
-    .attr('fill', d => d.self_access_count > 0 ? COLOR_ACCESSED_RESOURCE : COLOR_NOT_ACCESSED_RESOURCE)
+    .attr('fill', d => d.self_access_count > 0
+      ? COLOR_ACCESSED_RESOURCE
+      : COLOR_NOT_ACCESSED_RESOURCE
+    )
 
   // Add brush to main chart
   miniGroup.append('g')
@@ -302,42 +339,9 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .call(brush)
 
   // Legend
-  let w = 800 - mainMargin.left - mainMargin.right
-  let legendBoxLength = 10
-  let legendBoxTextInterval = 15
-  let legendInterval = 20
-  let legendY = -50
+  appendLegend(svg)
 
-  let legendLabels = [[`Resources I haven't viewed`, COLOR_NOT_ACCESSED_RESOURCE],
-    [`Resources I've viewed`, COLOR_ACCESSED_RESOURCE]]
-
-  let legend = svg.select('.mainGroupWrapper').append('g')
-    .attr('class', 'legend')
-    .attr('transform', `translate(-550, 0)`)
-
-  let legendRect = legend.selectAll('rect')
-    .data(legendLabels)
-    .enter()
-    .append('rect')
-    .attr('y', legendY)
-    .attr('width', legendBoxLength)
-    .attr('height', legendBoxLength)
-
-  legendRect
-    .attr('y', (d, i) => legendY + i * legendInterval)
-    .attr('x', w)
-    .style('fill', d => d[1])
-
-  legend.selectAll('text')
-    .data(legendLabels)
-    .enter()
-    .append('text')
-    .attr('font-family', 'sans-serif')
-    .attr('font-size', '14px')
-    .attr('y', (d, i) => legendY + i * legendInterval + legendBoxLength)
-    .attr('x', w + legendBoxTextInterval)
-    .text(d => d[0])
-
+  svg.call(toolTip)
   brushmove()
 }
 
