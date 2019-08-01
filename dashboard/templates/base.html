@@ -54,8 +54,10 @@
         {% endif %}
         {% if user.is_authenticated%}
             "user_courses_info":'{{current_user_courses_info|safe}}',
+            "user_defaults": {{get_user_defaults|safe}},
         {% else %}
             "user_courses_info":"",
+            "demo_mode":"",
         {% endif %}
         {% if settings.GA_ID %}
             "google_analytics_id":'{{ settings.GA_ID }}',

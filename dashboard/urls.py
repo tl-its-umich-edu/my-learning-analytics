@@ -52,7 +52,11 @@ urlpatterns = [
         login_required(views.resource_access_within_week), name='resource_access_within_week'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/assignments',
         login_required(views.assignments), name='assignments'),
+    # Course specific default
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/get_user_default_selection',
+        login_required(views.get_user_default_selection), name='get_user_default_selection'),
+    # General default
+    url(r'^api/v1/get_user_default_selection',
         login_required(views.get_user_default_selection), name='get_user_default_selection'),
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/info',
         login_required(views.get_course_info), name='get_course_info'),
@@ -61,7 +65,11 @@ urlpatterns = [
         cache_page(settings.CLIENT_CACHE_TIME)(views.courses_enabled), name='courses_enabled'),
 
     # PUT/POST access patterns
+    # Course specific default
     url(r'^api/v1/courses/(?P<course_id>[0-9]+)/set_user_default_selection',
+        login_required(views.update_user_default_selection_for_views), name='update_user_default_selection_for_views'),
+    # General default
+    url(r'^api/v1/set_user_default_selection',
         login_required(views.update_user_default_selection_for_views), name='update_user_default_selection_for_views'),
 
     url(r'^su/', include('django_su.urls')),

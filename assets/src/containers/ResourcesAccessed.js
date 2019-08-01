@@ -150,9 +150,9 @@ function ResourcesAccessed (props) {
   useEffect(() => {
     // Fetch grade range from default setting if any
     if (loaded) {
-      if (resourcesDefaultData.default !== '') {
-        setGradeRangeFilter(resourcesDefaultData.default)
-        setDefaultValue(resourcesDefaultData.default)
+      if (resourcesDefaultData.resource !== '') {
+        setGradeRangeFilter(resourcesDefaultData.resource)
+        setDefaultValue(resourcesDefaultData.resource)
       } else {
         // setting it to default
         setGradeRangeFilter('All')

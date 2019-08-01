@@ -22,6 +22,12 @@ const user = Object.freeze({
   isLoggedIn: !!myla_globals.username
 })
 
+/* This one might be modified by the UI
+ */
+const user_pref = Object({
+    demo_mode: myla_globals.demo_mode
+})
+
 function App (props) {
   const { location } = props
 
