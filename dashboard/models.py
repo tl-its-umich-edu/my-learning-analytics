@@ -52,6 +52,8 @@ class AcademicTerms(models.Model):
 class UserDefaultQuerySet(models.QuerySet):
     def set_user_default(self, course_id, sis_user_name, default_view_type, default_view_value):
         try:
+            if (default_view_type not in settings.VALID_DEFAULT_SELECTION_TYPES):
+                raise Exception("View Type is in list of valid view types")
             return self.update_or_create(course_id=course_id, user_sis_name=sis_user_name, default_view_type=default_view_type,
                                          defaults={'default_view_value': default_view_value})
         except (self.model.DoesNotExist, Exception) as e:

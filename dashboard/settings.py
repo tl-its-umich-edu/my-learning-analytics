@@ -433,6 +433,13 @@ CANVAS_FILE_POSTFIX = ENV.get("CANVAS_FILE_POSTFIX", "")
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
 RESOURCE_ACCESS_CONFIG = ENV.get("RESOURCE_ACCESS_CONFIG", {})
+
+""" This is a list of valid option for user_default_selection
+    These have to be updated if you add additional settings
+    Added as a security check to prevent unwanted types being added
+"""
+VALID_DEFAULT_SELECTION_TYPES=['grade','resource','demomode']
+
 # IMPORT LOCAL ENV
 # =====================
 try:
