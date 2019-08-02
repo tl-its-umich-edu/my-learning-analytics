@@ -42,7 +42,7 @@ function GradeDistribution (props) {
 
   useEffect(() => {
     if (userSettingLoaded) {
-      if (isObjectEmpty(userSetting.grade)) {
+      if (isObjectEmpty(userSetting) || isObjectEmpty(userSetting.grade)) {
         setShowGrade(false)
       } else {
         setShowGrade(userSetting.grade !== 'False')

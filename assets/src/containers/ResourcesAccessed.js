@@ -13,6 +13,7 @@ import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import { useUserSettingData } from '../service/api'
 import { handleError, defaultFetchOptions } from '../util/data'
+import { isObjectEmpty } from '../util/object'
 import ResourceAccessChart from '../components/ResourceAccessChart'
 import Cookie from 'js-cookie'
 import Error from './Error'
@@ -150,13 +151,13 @@ function ResourcesAccessed (props) {
   useEffect(() => {
     // Fetch grade range from default setting if any
     if (loaded) {
-      if (resourcesDefaultData.resource !== '') {
-        setGradeRangeFilter(resourcesDefaultData.resource)
-        setDefaultValue(resourcesDefaultData.resource)
-      } else {
+      if (isObjectEmpty(resourcesDefaultData) || isObjectEmpty(resourcesDefaultData.resource)) {
         // setting it to default
         setGradeRangeFilter('All')
         setDefaultValue('All')
+      } else {
+        setGradeRangeFilter(resourcesDefaultData.resource)
+        setDefaultValue(resourcesDefaultData.resource)
       }
       setDataControllerLoad(dataControllerLoad + 1)
     }
