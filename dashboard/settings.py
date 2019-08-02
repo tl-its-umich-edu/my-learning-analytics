@@ -453,6 +453,12 @@ if CSRF_COOKIE_SECURE:
     SESSION_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+""" This is a list of valid option for user_default_selection
+    These have to be updated if you add additional settings
+    Added as a security check to prevent unwanted types being added
+"""
+VALID_DEFAULT_SELECTION_TYPES=['grade','resource','demomode']
+
 # IMPORT LOCAL ENV
 # =====================
 try:
