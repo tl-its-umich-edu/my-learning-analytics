@@ -32,7 +32,7 @@ const styles = theme => ({
 })
 
 function GradeDistribution (props) {
-  const { classes, disabled, courseId } = props
+  const { classes, disabled, courseId, user } = props
   if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
 
   const [gradeLoaded, gradeError, gradeData] = useGradeData(courseId)
@@ -76,53 +76,38 @@ function GradeDistribution (props) {
   const BuildGradeView = () => {
     const grades = gradeData.map(x => x.current_grade)
     return (
-      <Grid container>
-        <Grid item xs={12} lg={2}>
-          <Table className={classes.table} noBorder tableData={[
-            [
-              'My grade', <strong>{gradeData[0].current_user_grade
-                ? `${roundToOneDecimcal(gradeData[0].current_user_grade)}%`
-                : 'There are no grades yet for you in this course'}</strong>
-            ],
-            [
-              'Average grade',
-              <strong>{roundToOneDecimcal(average(grades))}%</strong>
-            ],
-            [
-              'Median grade',
-              <strong>{roundToOneDecimcal(median(grades))}%</strong>
-            ],
-            ['Number of students', <strong>{gradeData.length}</strong>]
-          ]} />
-          {userSettingLoaded
-            ? <> {'Show my grade'} <Checkbox
-              checked={showGrade}
-              onChange={() => {
-                setSettingChanged(true)
-                setShowGrade(!showGrade)
-              }} />
-            </>
-            : <Spinner />}
-          <Snackbar
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left'
-            }}
-            open={savedSnackbarOpen}
-            autoHideDuration={3000}
-            onClose={() => setSavedSnackbarOpen(false)}
-            message={<span>{snackbarMessage}</span>}
-            action={[
-              <IconButton
-                key='close'
-                aria-label='close'
-                color='inherit'
-                onClick={() => setSavedSnackbarOpen(false)}
-              >
-                <CloseIcon />
-              </IconButton>
-            ]}
-          />
+      <div>
+        <Grid container>
+          <Grid item xs={12} lg={2}>
+            <div className={user.user_defaults.demomode === "True" ? 'sensitive' : ''}>
+              <Table className={classes.table} noBorder tableData={[
+                [
+                  'My grade', <strong>{gradeData[0].current_user_grade
+                    ? `${roundToOneDecimcal(gradeData[0].current_user_grade)}%`
+                    : 'There are no grades yet for you in this course'}</strong>
+                ],
+                [
+                  'Average grade',
+                  <strong>{roundToOneDecimcal(average(grades))}%</strong>
+                ],
+                [
+                  'Median grade',
+                  <strong>{roundToOneDecimcal(median(grades))}%</strong>
+                ],
+                ['Number of students', <strong>{gradeData.length}</strong>]
+              ]} />
+            </div>
+            <div>
+              {userSettingLoaded
+                ? <> {'Show my grade'} <Checkbox
+                  checked={showGrade}
+                  onChange={() => {
+                    setSettingChanged(true)
+                    setShowGrade(!showGrade)
+                  }} />
+                </>
+                : <Spinner />}
+            </div>
         </Grid>
         <Grid item xs={12} lg={10}>
           <Histogram
@@ -134,6 +119,26 @@ function GradeDistribution (props) {
             maxGrade={gradeData[0].graph_upper_limit} />
         </Grid>
       </Grid>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left'
+        }}
+        open={savedSnackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSavedSnackbarOpen(false)}
+        message={<span>{snackbarMessage}</span>}
+        action={[
+          <IconButton
+            key='close'
+            aria-label='close'
+            color='inherit'
+            onClick={() => setSavedSnackbarOpen(false)}
+          >
+            <CloseIcon />
+          </IconButton>
+        ]}
+      /></div>
     )
   }
 

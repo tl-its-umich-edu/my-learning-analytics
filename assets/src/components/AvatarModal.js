@@ -49,7 +49,7 @@ function AvatarModal (props) {
   const [openChangeCourseDialog, setOpenChangeCourseDialog] = useState(false)
   
   const [settingChanged, setSettingChanged] = useState(false)
-  const [demoMode, setDemoMode] = useState(false)
+  const [demoMode, setDemoMode] = useState(user.user_defaults.demomode === "True")
 
   const [userSettingSaved, userSettingResponse] = useSetUserSetting(
     null,
@@ -78,6 +78,8 @@ function AvatarModal (props) {
             onChange={() => {
               setSettingChanged(true)
               setDemoMode(!demoMode)
+              // This should be more dynamic but I don't know how
+              window.location.reload()
             }
           } />
       </ListItem>
