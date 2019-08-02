@@ -46,3 +46,5 @@ code {
     opacity: 0;
   }
 }
+
+.sensitive {filter: blur(4px);}

@@ -19,13 +19,8 @@ const user = Object.freeze({
   admin: myla_globals.is_superuser,
   enrolledCourses,
   isSuperuser: myla_globals.is_superuser,
-  isLoggedIn: !!myla_globals.username
-})
-
-/* This one might be modified by the UI
- */
-const user_pref = Object({
-    demo_mode: myla_globals.demo_mode
+  isLoggedIn: !!myla_globals.username,
+  user_defaults: myla_globals.user_defaults
 })
 
 function App (props) {

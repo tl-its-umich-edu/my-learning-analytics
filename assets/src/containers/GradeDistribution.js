@@ -14,6 +14,8 @@ import { useGradeData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 import useSetUserSetting from '../hooks/useSetUserSetting'
 import useUserSetting from '../hooks/useUserSetting'
+import { SSL_OP_CRYPTOPRO_TLSEXT_BUG } from 'constants';
+import clsx from 'clsx';
 
 const styles = theme => ({
   root: {
@@ -93,22 +95,16 @@ function GradeDistribution (props) {
     return (
       <Grid container>
         <Grid item xs={12} lg={2}>
-          <Table className={classes.table} noBorder tableData={tableRows} />
+          <Table className={clsx(user.user_defaults.demomode === "True" ? 'sensitive' : '', classes.table)} noBorder tableData={tableRows} />
           {gradeCheckbox}
           <UserSettingSnackbar
             saved={userSettingSaved}
             response={userSettingResponse} />
         </Grid>
-        <Grid item xs={12} lg={10}>
-          <Histogram
-            data={grades}
-            aspectRatio={0.3}
-            xAxisLabel={'Grade %'}
-            yAxisLabel={'Number of Students'}
-            myGrade={showGrade ? gradeData[0].current_user_grade : null}
-            maxGrade={gradeData[0].graph_upper_limit} />
-        </Grid>
-      </Grid>
+        <UserSettingSnackbar
+          saved={userSettingSaved}
+          response={userSettingResponse} />
+      </div>
     )
   }
 

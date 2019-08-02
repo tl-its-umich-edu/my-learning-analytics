@@ -10,6 +10,7 @@ import MenuIcon from '@material-ui/icons/Menu'
 import Avatar from '@material-ui/core/Avatar'
 import Popover from '@material-ui/core/Popover'
 import AvatarModal from '../components/AvatarModal'
+import clsx from 'clsx';
 
 const styles = theme => ({
   root: {
@@ -71,7 +72,7 @@ function DashboardAppBar (props) {
               </Link>
               <Link
                 to={{ pathname: `/courses/${courseId}` }}
-                className={classes.homeButton}>
+                className={clsx(classes.homeButton, user.user_defaults.demomode === "True" ? 'sensitive' : '')}>
                 {courseName}
               </Link>
             </Typography>
