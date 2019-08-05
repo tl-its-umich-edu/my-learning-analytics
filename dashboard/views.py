@@ -579,7 +579,7 @@ def find_min_week(course_id):
 
 def find_current_week(row):
     # this needs to be local timezone
-    current_date = datetime.now()
+    current_date = timezone.localtime(timezone.now())
     year,week,dow = current_date.isocalendar() #dow = day of week
     if row == week:
         return True
