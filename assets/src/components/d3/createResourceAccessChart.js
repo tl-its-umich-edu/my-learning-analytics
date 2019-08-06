@@ -169,7 +169,11 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   function brushmove () {
     const fullRange = mainYZoom.range()
-    const selection = d3.event ? d3.event.selection : defaultSelection
+    const selection = d3.event
+      ? d3.event.selection[1] === 0 // prevents [0, 0] from being returned, which causes bug
+        ? [0, 0.1]
+        : d3.event.selection
+      : defaultSelection
 
     // Update the axes
     // Map selection area to full range
