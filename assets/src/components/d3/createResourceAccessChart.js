@@ -19,7 +19,7 @@ const toolTip = d3tip().attr('class', 'd3-tip')
   .direction('n').offset([-5, 5])
   .html(d => {
     if (d.self_access_count === 0) {
-      return `<b>You haven't viewed this resource. </b > `
+      return `<b>You haven't viewed this resource. </b>`
     } else if (d.self_access_count === 1) {
       return `You have read the resource once on ${new Date(d.self_access_last_time).toDateString()}.`
     } else {
@@ -207,6 +207,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     const selection = d3.brushSelection(gBrush.node())
     const size = selection[1] - selection[0]
     const range = miniYScale.range()
+    console.log(range)
     const y0 = d3.min(range) + size / 2
     const y1 = d3.max(range) + miniYScale.bandwidth() - size / 2
     const center = Math.max(y0, Math.min(y1, d3.mouse(target)[1]))
@@ -314,8 +315,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('fill', 'steelblue')
 
   // Add links to resource name
+  // Have to use ES5 function to correctly use `this` keyword
   d3.selectAll('.axis--y .tick').each(function (d) {
-    // Have to use ES5 function to correctly use `this` keyword
     const link = d.split('|')[0]
     const a = d3.select(this.parentNode).append('a')
       .attr('xlink:target', '_blank')
