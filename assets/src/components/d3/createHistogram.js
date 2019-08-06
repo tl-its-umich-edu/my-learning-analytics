@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
-import { roundToOneDecimcal } from '../../util/math'
+import { roundToOneDecimal } from '../../util/math'
 
 function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100 }) {
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
@@ -92,7 +92,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     svg.append('text')
       .attr('x', x(myGrade) - 110)
       .attr('y', margin.top-5)
-      .text(`My Grade: ${roundToOneDecimcal(myGrade)}%`)
+      .text(`My Grade: ${roundToOneDecimal(myGrade)}%`)
       .attr('font-size', '0.875rem')
       .attr('font-weight', 'bold')
       .attr('line-height', '1.46429em')

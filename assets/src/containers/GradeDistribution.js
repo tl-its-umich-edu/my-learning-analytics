@@ -9,7 +9,7 @@ import Spinner from '../components/Spinner'
 import Table from '../components/Table'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
 import Error from './Error'
-import { average, roundToOneDecimcal, median } from '../util/math'
+import { average, roundToOneDecimal, median } from '../util/math'
 import { useGradeData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 import useSetUserSetting from '../hooks/useSetUserSetting'
@@ -66,16 +66,16 @@ function GradeDistribution (props) {
           <Table className={classes.table} noBorder tableData={[
             [
               'My grade', <strong>{gradeData[0].current_user_grade
-                ? `${roundToOneDecimcal(gradeData[0].current_user_grade)}%`
+                ? `${roundToOneDecimal(gradeData[0].current_user_grade)}%`
                 : 'There are no grades yet for you in this course'}</strong>
             ],
             [
               'Average grade',
-              <strong>{roundToOneDecimcal(average(grades))}%</strong>
+              <strong>{roundToOneDecimal(average(grades))}%</strong>
             ],
             [
               'Median grade',
-              <strong>{roundToOneDecimcal(median(grades))}%</strong>
+              <strong>{roundToOneDecimal(median(grades))}%</strong>
             ],
             ['Number of students', <strong>{gradeData.length}</strong>]
           ]} />
