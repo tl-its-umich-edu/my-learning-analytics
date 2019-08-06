@@ -40,7 +40,7 @@ GA_ID = ENV.get('GA_ID', '')
 
 # Resource values from env
 RESOURCE_VALUES = ENV.get("RESOURCE_VALUES", {"files": ["canvas"]})
-RESOURCE_URLS = ENV.get("RESOURCE_URLS", {"canvas": {"prefix": "https://somthing.instructure.com/files/", "postfix": "/download?download_frd=1"}})
+RESOURCE_URLS = ENV.get("RESOURCE_URLS", {"canvas": {"prefix": "https://demo.instructure.com/files/", "postfix": "/download?download_frd=1"}})
 
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
 SITE_ID = 1
