@@ -11,8 +11,8 @@ import './createResourceAccessChart.css'
     - D3 V4 Changes: https://github.com/d3/d3/blob/master/CHANGES.md
 */
 
-const COLOR_ACCESSED_RESOURCE = 'steelblue'
-const COLOR_NOT_ACCESSED_RESOURCE = 'gray'
+const accessedResourceColor = 'steelblue'
+const notAccessedResourceColor = 'gray'
 const mainMargin = { top: 50, right: 10, bottom: 50, left: 200 }
 
 const toolTip = d3tip().attr('class', 'd3-tip')
@@ -35,8 +35,8 @@ function appendLegend (svg) {
   const legendY = -50
 
   const legendLabels = [
-    [`Resources I haven't viewed`, COLOR_NOT_ACCESSED_RESOURCE],
-    [`Resources I've viewed`, COLOR_ACCESSED_RESOURCE]
+    [`Resources I haven't viewed`, notAccessedResourceColor],
+    [`Resources I've viewed`, accessedResourceColor]
   ]
 
   const legend = svg.select('.mainGroupWrapper').append('g')
@@ -70,8 +70,14 @@ function appendLegend (svg) {
 function createResourceAccessChart ({ data, width, height, domElement }) {
   const resourceData = data.sort((a, b) => b.total_count - a.total_count)
 
-  const defaultSelection = [0, 50]
   const [mainWidth, miniHeight] = adjustViewport(width, height, mainMargin)
+
+  const defaultNumberOfResources = 7
+  const selectionWindowHeight = resourceData.length < defaultNumberOfResources
+    ? miniHeight
+    : miniHeight / resourceData.length * defaultNumberOfResources
+
+  const defaultSelection = [0, selectionWindowHeight]
 
   const miniMargin = { top: 50, right: 10, bottom: 50, left: 10 }
   const miniWidth = 100 - miniMargin.left - miniMargin.right
@@ -111,8 +117,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('height', mainYScale.bandwidth())
       .attr('class', 'bar')
       .attr('fill', d => d.self_access_count > 0
-        ? COLOR_ACCESSED_RESOURCE
-        : COLOR_NOT_ACCESSED_RESOURCE
+        ? accessedResourceColor
+        : notAccessedResourceColor
       )
       .on('mouseover', toolTip.show)
       .on('mouseout', toolTip.hide)
@@ -187,8 +193,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
     d3.select('.miniGroup').selectAll('.bar')
       .style('fill', d => d.self_access_count > 0
-        ? COLOR_ACCESSED_RESOURCE
-        : COLOR_NOT_ACCESSED_RESOURCE
+        ? accessedResourceColor
+        : notAccessedResourceColor
       )
       .style('opacity', d => selected.includes(d.resource_name)
         ? 1
@@ -207,7 +213,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     const selection = d3.brushSelection(gBrush.node())
     const size = selection[1] - selection[0]
     const range = miniYScale.range()
-    console.log(range)
     const y0 = d3.min(range) + size / 2
     const y1 = d3.max(range) + miniYScale.bandwidth() - size / 2
     const center = Math.max(y0, Math.min(y1, d3.mouse(target)[1]))
@@ -335,8 +340,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('height', miniYScale.bandwidth())
     .attr('class', 'bar')
     .attr('fill', d => d.self_access_count > 0
-      ? COLOR_ACCESSED_RESOURCE
-      : COLOR_NOT_ACCESSED_RESOURCE
+      ? accessedResourceColor
+      : notAccessedResourceColor
     )
 
   // Add brush to main chart
