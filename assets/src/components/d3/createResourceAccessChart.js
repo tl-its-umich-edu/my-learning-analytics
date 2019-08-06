@@ -203,7 +203,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   }
 
   function brushcenter () {
-    const target = d3.event.targe
+    const target = d3.event.target
     const selection = d3.brushSelection(gBrush.node())
     const size = selection[1] - selection[0]
     const range = miniYScale.range()
