@@ -240,7 +240,7 @@ class ResourceManager(models.Manager):
 
 
 class Resource(models.Model):
-    resource_type = models.CharField(primary_key=True, max_length=255, verbose_name="Resource Type")
+    resource_type = models.CharField(max_length=255, verbose_name="Resource Type")
     id = models.CharField(primary_key=True, max_length=255, verbose_name="Resource Id")
     name = models.TextField(verbose_name="Resource Name")
     course_id = models.BigIntegerField(verbose_name="Course Id")
