@@ -207,7 +207,7 @@ def resource_access_within_week(request, course_id=0):
 
     # return if there is no data during this interval
     if (df.empty):
-        return HttpResponse("no data")
+        return HttpResponse("{}")
 
     # group by resource_id, and resource_name
     # reformat for output
@@ -272,7 +272,7 @@ def resource_access_within_week(request, course_id=0):
 
     # if no checkboxes are checked send nothing
     if (output_df.empty):
-        return HttpResponse("no data")
+        return HttpResponse("{}")
 
     # only keep rows where total_count > 0
     output_df = output_df[output_df.total_count > 0]
@@ -578,7 +578,8 @@ def find_min_week(course_id):
 
 
 def find_current_week(row):
-    current_date = timezone.now()
+    # this needs to be local timezone
+    current_date = timezone.localtime(timezone.now())
     year,week,dow = current_date.isocalendar() #dow = day of week
     if row == week:
         return True

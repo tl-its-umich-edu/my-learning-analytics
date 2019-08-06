@@ -7,15 +7,13 @@ import Checkbox from '@material-ui/core/Checkbox'
 import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
+import UserSettingSnackbar from '../components/UserSettingSnackbar'
 import Error from './Error'
 import { average, roundToOneDecimcal, median } from '../util/math'
 import { useGradeData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 import useSetUserSetting from '../hooks/useSetUserSetting'
 import useUserSetting from '../hooks/useUserSetting'
-import Snackbar from '@material-ui/core/Snackbar'
-import IconButton from '@material-ui/core/IconButton'
-import CloseIcon from '@material-ui/icons/Close'
 
 const styles = theme => ({
   root: {
@@ -56,19 +54,6 @@ function GradeDistribution (props) {
     settingChanged,
     [showGrade]
   )
-  const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false)
-  const [snackbarMessage, setSnackbarMessage] = useState('')
-
-  useEffect(() => {
-    if (userSettingSaved) {
-      if (userSettingResponse.default === 'success') {
-        setSnackbarMessage('Setting saved successfully!')
-      } else {
-        setSnackbarMessage('Setting not saved.')
-      }
-      setSavedSnackbarOpen(true)
-    }
-  }, [userSettingSaved])
 
   if (gradeError) return (<Error>Something went wrong, please try again later.</Error>)
   if (gradeLoaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
@@ -103,26 +88,9 @@ function GradeDistribution (props) {
               }} />
             </>
             : <Spinner />}
-          <Snackbar
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left'
-            }}
-            open={savedSnackbarOpen}
-            autoHideDuration={3000}
-            onClose={() => setSavedSnackbarOpen(false)}
-            message={<span>{snackbarMessage}</span>}
-            action={[
-              <IconButton
-                key='close'
-                aria-label='close'
-                color='inherit'
-                onClick={() => setSavedSnackbarOpen(false)}
-              >
-                <CloseIcon />
-              </IconButton>
-            ]}
-          />
+          <UserSettingSnackbar
+            saved={userSettingSaved}
+            response={userSettingResponse} />
         </Grid>
         <Grid item xs={12} lg={10}>
           <Histogram

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { renderToString } from 'react-dom/server'
 import Paper from '@material-ui/core/Paper'
@@ -40,13 +40,15 @@ const styles = theme => ({
   }
 })
 
-const getCurrentWeek = assignmentData => {
-  assignmentData.forEach(item => {
+export const getCurrentWeek = assignmentData => {
+  let currentWeek = null
+  assignmentData.some((item) => {
     let weekStatus = item.due_date_items[0].assignment_items[0].current_week
     if (weekStatus) {
-      return item.week
+      return currentWeek = item.week
     }
   })
+  return currentWeek
 }
 
 const assignmentTable = assignmentData => {
