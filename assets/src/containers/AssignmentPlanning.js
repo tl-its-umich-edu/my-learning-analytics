@@ -14,8 +14,10 @@ import TableAssignment from '../components/TableAssignment'
 import Checkbox from '@material-ui/core/Checkbox'
 import Cookie from 'js-cookie'
 import Error from './Error'
-import { handleError, defaultFetchOptions } from '../util/data'
+import { handleError, defaultFetchOptions, getCurrentWeek } from '../util/data'
 import { useUserSettingData } from '../service/api'
+import { isObjectEmpty } from '../util/object'
+import useUserSetting from '../hooks/useUserSetting'
 
 const styles = theme => ({
   root: {
@@ -40,17 +42,6 @@ const styles = theme => ({
   }
 })
 
-export const getCurrentWeek = assignmentData => {
-  let currentWeek = null
-  assignmentData.some((item) => {
-    let weekStatus = item.due_date_items[0].assignment_items[0].current_week
-    if (weekStatus) {
-      return currentWeek = item.week
-    }
-  })
-  return currentWeek
-}
-
 const assignmentTable = assignmentData => {
   if (!assignmentData || Object.keys(assignmentData).length === 0) {
     return (<Typography>No data provided</Typography>)
@@ -67,6 +58,20 @@ function AssignmentPlanning (props) {
   if (disabled) return (<Error>Assignment view is hidden for this course.</Error>)
   const [loaded, error, assignmentDefaultData] = useUserSettingData(courseId, 'assignment')
 
+  const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'assignment')
+  const [settingChanged, setSettingChanged] = useState(false)
+  const [assignmentGradeFilter, setAssignmentGradeFilter] = useState(0)
+
+  useEffect(() => {
+    if (userSettingLoaded) {
+      if (isObjectEmpty(userSetting.default)) {
+        setAssignmentGradeFilter(0)
+      } else {
+        setAssignmentGradeFilter()
+      }
+    }
+  })
+
   const currentSetting = 'My current setting'
   const rememberSetting = 'Remember my setting'
   const settingNotUpdated = 'Setting not updated'
@@ -74,8 +79,10 @@ function AssignmentPlanning (props) {
   // initial default value that we get from backend and updated value when user save the default setting
   const [defaultValue, setDefaultValue] = useState('')
   // assignment data and weight controller
-  const [assignmentFilter, setAssignmentFilter] = useState('')
+
   const [assignmentData, setAssignmentData] = useState('')
+
+  console.log(assignmentData)
   // defaults setting controllers
   const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
 
@@ -85,7 +92,6 @@ function AssignmentPlanning (props) {
       if (assignmentDefaultData.default === '') {
         setAssignmentFilter(0)
         setDefaultValue(0)
-
       } else {
         setAssignmentFilter(assignmentDefaultData.default)
         setDefaultValue(parseInt(assignmentDefaultData.default))
@@ -120,9 +126,9 @@ function AssignmentPlanning (props) {
             return
           }
           setDefaultLabel(settingNotUpdated)
-        }).catch(err => {
-        setDefaultLabel(settingNotUpdated)
-      })
+        }).catch(_ => {
+          setDefaultLabel(settingNotUpdated)
+        })
     }
   }
 
@@ -136,26 +142,24 @@ function AssignmentPlanning (props) {
       setDefaultCheckedState(false)
       setDefaultLabel(rememberSetting)
     }
-
   }
 
   useEffect(() => {
-      if (!loaded) {
-        return
-      }
-      const fetchOptions = { method: 'get', ...defaultFetchOptions }
-      const dataURL = `/api/v1/courses/${courseId}/assignments?percent=${assignmentFilter}`
-      fetch(dataURL, fetchOptions)
-        .then(handleError)
-        .then(res => res.json())
-        .then(data => {
-          setAssignmentData(data)
-        })
-        .catch(err => {
-            setAssignmentData({})
-          }
-        )
-    }, [assignmentFilter]
+    if (!loaded) {
+      return
+    }
+    const fetchOptions = { method: 'get', ...defaultFetchOptions }
+    const dataURL = `/api/v1/courses/${courseId}/assignments?percent=${assignmentFilter}`
+    fetch(dataURL, fetchOptions)
+      .then(handleError)
+      .then(res => res.json())
+      .then(data => {
+        setAssignmentData(data)
+      })
+      .catch(_ => {
+        setAssignmentData({})
+      })
+  }, [assignmentFilter]
   )
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
   return (
@@ -171,24 +175,29 @@ function AssignmentPlanning (props) {
                 tip={createToolTip(d => renderToString(
                   <Paper className={classes.paper}>
                     <Typography>
-                      Assignment: <strong>{d.name}</strong><br/>
-                      Due at: <strong>{d.due_dates}</strong><br/>
-                      Your grade: <strong>{d.score ? `${d.score}` : 'Not available'}</strong><br/>
-                      Total points possible: <strong>{d.points_possible}</strong><br/>
-                      Avg assignment grade: <strong>{d.avg_score}</strong><br/>
-                      Percentage worth in final grade: <strong>{d.towards_final_grade}%</strong><br/>
+                      Assignment: <strong>{d.name}</strong><br />
+                      Due at: <strong>{d.due_dates}</strong><br />
+                      Your grade: <strong>{d.score ? `${d.score}` : 'Not available'}</strong><br />
+                      Total points possible: <strong>{d.points_possible}</strong><br />
+                      Avg assignment grade: <strong>{d.avg_score}</strong><br />
+                      Percentage worth in final grade: <strong>{d.towards_final_grade}%</strong><br />
                     </Typography>
-                    {parseInt(d.drop_lowest) !== 0 ?
-                      <Typography component="p">
-                        The lowest <strong>{d.drop_lowest}</strong> scores will dropped from this assigment group
-                      </Typography> : ''
+                    {
+                      parseInt(d.drop_lowest) !== 0
+                        ? <Typography component='p'>
+                          The lowest <strong>{d.drop_lowest}</strong> scores will dropped from this assigment group
+                        </Typography>
+                        : ''
                     }
-                    {parseInt(d.drop_highest) !== 0 ?
-                      <Typography component="p">
-                        The highest <strong>{d.drop_highest}</strong> scores will dropped from this assigment group
-                      </Typography> : ''}
+                    {
+                      parseInt(d.drop_highest) !== 0
+                        ? <Typography component='p'>
+                          The highest <strong>{d.drop_highest}</strong> scores will dropped from this assigment group
+                        </Typography>
+                        : ''
+                    }
                   </Paper>
-                ))}/> : <Spinner/>}
+                ))} /> : <Spinner />}
             </ >
           </Paper>
         </Grid>
@@ -200,12 +209,12 @@ function AssignmentPlanning (props) {
               </Grid>
               <Grid item xs={12} md={2}>
                 <Typography variant='h6'>Assignment Status</Typography>
-                <div className={classes.graded}/>
+                <div className={classes.graded} />
                 <Typography style={{ display: 'inline' }}> Graded</Typography>
-                <br/>
-                <div className={classes.ungraded}/>
+                <br />
+                <div className={classes.ungraded} />
                 <Typography style={{ display: 'inline' }}> Not Yet Graded</Typography>
-                <br/>
+                <br />
               </Grid>
             </Grid>
             <FormControl>
@@ -222,16 +231,20 @@ function AssignmentPlanning (props) {
                   <MenuItem value={50}>50%</MenuItem>
                   <MenuItem value={75}>75%</MenuItem>
                 </Select>
-                {defaultCheckboxState ? <div style={{ padding: '10px' }}></div> : <Checkbox
-                  checked={defaultCheckboxState}
-                  onChange={changeDefaultSetting}
-                  value="checked"
-                />}
+                {
+                  defaultCheckboxState
+                    ? <div style={{ padding: '10px' }} />
+                    : <Checkbox
+                      checked={defaultCheckboxState}
+                      onChange={changeDefaultSetting}
+                      value='checked'
+                    />
+                }
                 <div style={{ padding: '15px 2px' }}>{defaultLabel}</div>
               </div>
             </FormControl>
-            {/*in case of no data empty list is sent*/}
-            {assignmentData ? assignmentTable(assignmentData.plan) : <Spinner/>}
+            { /* in case of no data empty list is sent */}
+            {assignmentData ? assignmentTable(assignmentData.plan) : <Spinner />}
           </Paper>
         </Grid>
       </Grid>
