@@ -14,32 +14,15 @@ from django.core.exceptions import ObjectDoesNotExist
 import logging
 logger = logging.getLogger(__name__)
 
-from datetime import datetime
 from model_utils import Choices
 
-class AcademicTermsQuerySet(models.QuerySet):
-    def course_date_start(self, course_id):
-        try:
-            return self.get(course__id=str(course_id)).date_start
-        except self.model.DoesNotExist:
-            logger.debug(f"Could not find term for course {course_id}")
-            return datetime.min
-
-class AcademicTermsManager(models.Manager):
-    def get_queryset(self):
-        return AcademicTermsQuerySet(self.model, using=self._db)
-
-    def course_date_start(self, course_id):
-        return self.get_queryset().course_date_start(course_id)
 
 class AcademicTerms(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Term Id")
     canvas_id = models.BigIntegerField(verbose_name="Canvas Id")
     name = models.CharField(max_length=255, verbose_name="Name")
-    date_start = models.DateTimeField(verbose_name="Start Date", blank=True, null=True)
-    date_end = models.DateTimeField(verbose_name="End Date", blank=True, null=True)
-
-    objects = AcademicTermsManager()
+    date_start = models.DateTimeField(verbose_name="Term Start Date and Time", blank=True, null=True)
+    date_end = models.DateTimeField(verbose_name="Term End Date and Time", blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -137,6 +120,7 @@ class AssignmentWeightConsideration(models.Model):
     class Meta:
         db_table = 'assignment_weight_consideration'
 
+
 class CourseQuerySet(models.QuerySet):
     def get_supported_courses(self):
         """Returns the list of supported courses from the database
@@ -150,6 +134,7 @@ class CourseQuerySet(models.QuerySet):
             logger.info("Courses did not exist", exc_info = True)
         return []
 
+
 class CourseManager(models.Manager):
     def get_queryset(self):
         return CourseQuerySet(self.model, using=self._db)
@@ -159,18 +144,31 @@ class CourseManager(models.Manager):
 
 
 class Course(models.Model):
-    id = models.BigIntegerField(primary_key=True, verbose_name="Unizin Course Id", db_column='id', editable=False)
+    id = models.BigIntegerField(primary_key=True, verbose_name="Unizin Course Id", db_column='id')
     canvas_id = models.BigIntegerField(verbose_name="Canvas Course Id", db_column='canvas_id')
-    term_id = models.ForeignKey(AcademicTerms, verbose_name="Term Id", on_delete=models.SET_NULL, db_column='term_id', null=True, db_constraint=False)
+    term = models.ForeignKey(AcademicTerms, verbose_name="Term Id", on_delete=models.SET_NULL, null=True, db_column="term_id")
     name = models.CharField(max_length=255, verbose_name="Name")
+    date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
+    date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)
 
     objects = CourseManager()
 
     def __str__(self):
         return self.name
 
+    def get_course_date_range(self):
+        if self.date_start is not None:
+            start = self.date_start
+        else:
+            start = self.term.date_start
+        if self.date_end is not None:
+            end = self.date_end
+        else:
+            end = self.term.date_end
+        return (start, end)
+
     class Meta:
-        db_table = 'course'
+        db_table = "course"
         verbose_name = "Course"
 
 
