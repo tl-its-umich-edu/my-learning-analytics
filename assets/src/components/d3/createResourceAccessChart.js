@@ -187,7 +187,10 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     mainYScale.domain(resourceData.map(d => d.resource_name))
 
     // Update the y axis
-    const mainYAxis = d3.axisLeft(mainYScale).tickSize(0).tickFormat(d => d.split('|')[1])
+    const mainYAxis = d3
+      .axisLeft(mainYScale)
+      .tickSize(0)
+      .tickFormat(d => d.split('|')[1])
 
     mainGroup.select('.axis--y').call(mainYAxis)
 
@@ -208,6 +211,14 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     // Update the label size
     d3.selectAll('.axis--y text')
       .style('font-size', textScale(selected.length))
+      .each(function (d) {
+        // add link to y axis legend
+        const link = d.split('|')[0]
+        const a = d3.select(this.parentNode).append('a')
+          .attr('xlink:target', '_blank')
+          .attr('xlink:href', link)
+        a.node().appendChild(this)
+      })
 
     update()
   }
@@ -323,16 +334,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   yLabel.selectAll('text')
     .attr('fill', 'steelblue')
 
-  // Add links to resource name
-  // Have to use ES5 function to correctly use `this` keyword
-  d3.selectAll('.axis--y .tick').each(function (d) {
-    const link = d.split('|')[0]
-    const a = d3.select(this.parentNode).append('a')
-      .attr('xlink:target', '_blank')
-      .attr('xlink:href', link)
-    a.node().appendChild(this)
-  })
-
   // Draw mini bars
   miniGroup.selectAll('.bar')
     .data(resourceData, d => d.resource_name)
@@ -357,6 +358,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   appendLegend(svg)
 
   svg.call(toolTip)
+
   brushmove()
 }
 
