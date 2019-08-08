@@ -27,7 +27,7 @@ const toolTip = d3tip().attr('class', 'd3-tip')
     }
   })
 
-function appendLegend(svg) {
+function appendLegend (svg) {
   const w = 800 - mainMargin.left - mainMargin.right
   const legendBoxLength = 10
   const legendBoxTextInterval = 15
@@ -264,7 +264,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .append('g')
     .attr('class', 'axis axis--x')
     .attr('transform', 'translate(' + 0 + ',' + (miniHeight + 5) + ')')
-    .call(mainXAxis.tickFormat(d => d + '%'))
+    .call(mainXAxis.tickFormat(d => `${d * 100}%`))
 
   xLabel.append('text')
     .attr('fill', 'black')
