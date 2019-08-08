@@ -101,10 +101,16 @@ function GradeDistribution (props) {
             saved={userSettingSaved}
             response={userSettingResponse} />
         </Grid>
-        <UserSettingSnackbar
-          saved={userSettingSaved}
-          response={userSettingResponse} />
-      </div>
+        <Grid item xs={12} lg={10}>
+          <Histogram
+            data={grades}
+            aspectRatio={0.3}
+            xAxisLabel={'Grade %'}
+            yAxisLabel={'Number of Students'}
+            myGrade={showGrade ? gradeData[0].current_user_grade : null}
+            maxGrade={gradeData[0].graph_upper_limit} />
+        </Grid>
+      </Grid>
     )
   }
 

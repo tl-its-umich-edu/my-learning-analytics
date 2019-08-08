@@ -7,6 +7,7 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
+import clsx from 'clsx';
 
 const tableStyle = theme => ({
   table: {
@@ -33,10 +34,10 @@ const tableStyle = theme => ({
 })
 
 function CustomTable (props) {
-  const { classes, tableHead, tableData, noBorder } = props
+  const { classes, tableHead, tableData, noBorder, className } = props
   return (
     <div className={classes.tableResponsive}>
-      <Table className={classes.table}>
+      <Table className={clsx(classes.table, className)}>
         {tableHead !== undefined ? (
           <TableHead>
             <TableRow>
