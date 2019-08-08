@@ -27,7 +27,7 @@ const toolTip = d3tip().attr('class', 'd3-tip')
     }
   })
 
-function appendLegend (svg) {
+function appendLegend(svg) {
   const w = 800 - mainMargin.left - mainMargin.right
   const legendBoxLength = 10
   const legendBoxTextInterval = 15
@@ -208,39 +208,9 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
         : 0.5
       )
 
-    // Append axis to main chart
-    const xLabel = d3.select('.mainGroupWrapper')
-      .append('g')
-      .attr('class', 'axis axis--x')
-      .attr('transform', 'translate(' + 0 + ',' + (miniHeight + 5) + ')')
-      .call(mainXAxis.tickFormat(d => d + '%'))
-
-    xLabel.append('text')
-      .attr('fill', 'black')
-      .attr('text-anchor', 'middle')
-      .attr('transform', `translate(${mainWidth / 2}, 40)`)
-      .text('Percentage of All Students in the Selected Grade Range')
-      .style('font-size', '14px')
-
-    const yLabel = mainGroup.append('g')
-      .attr('class', 'axis axis--y')
-      .attr('transform', 'translate(-5,0)')
-      .call(mainYAxis)
-
-    yLabel.selectAll('text')
-      .attr('fill', accessedResourceColor)
-
     // Update the label size
     d3.selectAll('.axis--y text')
       .style('font-size', textScale(selected.length))
-      .each(function (d) {
-        // add link to y axis legend
-        const link = d.split('|')[0]
-        const a = d3.select(this.parentNode).append('a')
-          .attr('xlink:target', '_blank')
-          .attr('xlink:href', link)
-        a.node().appendChild(this)
-      })
 
     update()
   }
@@ -285,9 +255,28 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .ticks(6)
     .tickSizeOuter(10)
 
-  d3.axisLeft(mainYScale)
+  const mainYAxis = d3.axisLeft(mainYScale)
     .tickSize(0)
     .tickFormat(d => d.split('|')[1])
+
+  // Append axis to main chart
+  const xLabel = d3.select('.mainGroupWrapper')
+    .append('g')
+    .attr('class', 'axis axis--x')
+    .attr('transform', 'translate(' + 0 + ',' + (miniHeight + 5) + ')')
+    .call(mainXAxis.tickFormat(d => d + '%'))
+
+  xLabel.append('text')
+    .attr('fill', 'black')
+    .attr('text-anchor', 'middle')
+    .attr('transform', `translate(${mainWidth / 2}, 40)`)
+    .text('Percentage of All Students in the Selected Grade Range')
+    .style('font-size', '14px')
+
+  const yLabel = mainGroup.append('g')
+    .attr('class', 'axis axis--y')
+    .attr('transform', 'translate(-5,0)')
+    .call(mainYAxis)
 
   // Brush
   const brush = d3.brushY()
@@ -360,6 +349,18 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   svg.call(toolTip)
 
   brushmove()
+
+  d3.selectAll('.axis--y .tick').each(function (d) {
+    // Have to use ES5 function to correctly use `this` keyword
+    let link = d.split('|')[0]
+    const a = d3.select(this.parentNode).append('a')
+      .attr('xlink:target', '_blank')
+      .attr('xlink:href', link)
+    a.node().appendChild(this)
+  })
+
+  yLabel.selectAll('text')
+    .attr('fill', accessedResourceColor)
 }
 
 export default createResourceAccessChart
