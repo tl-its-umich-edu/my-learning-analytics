@@ -27,6 +27,15 @@ class AcademicTerms(models.Model):
     def __str__(self):
         return self.name
 
+    # # Replace the year in the end date with start date (Hack to get around far out years)
+    # # This should be replaced in the future via an API call so the terms have correct end years, or Canvas data adjusted
+    def get_correct_date_end(self):
+        if (self.date_end.year - self.date_start.year) > 1:
+            logger.debug(f'{self.date_end.year} - {self.date_start.year} greater than 1 so setting end year to match start year.')
+            return self.date_end.replace(year=self.date_start.year)
+        else:
+            return self.date_end
+
     class Meta:
         db_table = 'academic_terms'
         verbose_name = "Academic Terms"
@@ -146,7 +155,7 @@ class CourseManager(models.Manager):
 class Course(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Unizin Course Id", db_column='id')
     canvas_id = models.BigIntegerField(verbose_name="Canvas Course Id", db_column='canvas_id')
-    term = models.ForeignKey(AcademicTerms, verbose_name="Term Id", on_delete=models.SET_NULL, null=True, db_column="term_id")
+    term = models.ForeignKey(AcademicTerms, verbose_name="Term Id", on_delete=models.SET_NULL, db_column="term_id", null=True, db_constraint=False)
     name = models.CharField(max_length=255, verbose_name="Name")
     date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
     date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)
@@ -164,8 +173,8 @@ class Course(models.Model):
         if self.date_end is not None:
             end = self.date_end
         else:
-            end = self.term.date_end
-        return (start, end)
+            end = self.term.get_correct_date_end()
+        return start, end
 
     class Meta:
         db_table = "course"

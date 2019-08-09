@@ -18,8 +18,7 @@ from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
 
-from dashboard.models import AcademicTerms, UserDefaultSelection, \
-    Course, CourseViewOption, Resource
+from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
 from dashboard.settings import RESOURCE_VALUES
 
 logger = logging.getLogger(__name__)
@@ -103,12 +102,6 @@ def get_course_info(request, course_id=0):
     course_resource_list.sort()
 
     resp = model_to_dict(course)
-
-    # # Replace the year in the end date with start date (Hack to get around far out years)
-    # # This should be replaced in the future via an API call so the terms have correct end years, or Canvas data adjusted
-    # if (term.date_end.year - term.date_start.year) > 1:
-    #     logger.debug(f'{term.date_end.year} - {term.date_start.year} greater than 1 so setting end year to match start year.')
-    #     term.date_end = term.date_end.replace(year=term.date_start.year)
 
     course_start, course_end = course.get_course_date_range()
 
