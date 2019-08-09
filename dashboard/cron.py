@@ -400,8 +400,8 @@ class DashboardCronJob(CronJobBase):
                 with grp_info as (select gf.group_id
                                   from group_fact gf join group_dim gd on gf.group_id = gd.id
                                   where gf.parent_course_id = '{data_warehouse_course_id}' and gd.workflow_state = 'available'),
-                grp_member_info as (select gmf.group_id, gmf.user_id, gmf.group_membership_id
-                                    from group_membership_fact gmf join grp_info gi on gmf.group_id = gi.group_id)
+                grp_member_info as (select gmf.group_id, ud.global_canvas_id as user_id, gmf.group_membership_id
+                                    from group_membership_fact gmf join grp_info gi on gmf.group_id = gi.group_id join user_dim ud on gmf.user_id = ud.id)
                 select gmi.group_id, gmi.user_id
                 from group_membership_dim gmd join grp_member_info gmi on gmd.id = gmi.group_membership_id
                 where workflow_state = 'accepted'
@@ -426,16 +426,16 @@ class DashboardCronJob(CronJobBase):
                 with grp_info as (select gf.group_id, gf.parent_course_id, gd.is_public
                                   from group_fact gf join group_dim gd on gf.group_id = gd.id
                                   where gf.parent_course_id = '{data_warehouse_course_id}' and gd.workflow_state = 'available'),
-                topic_info as (select dtf.discussion_topic_id, dtf.assignment_id, dtf.group_id, dtf.user_id, gi.is_public as group_is_public
-                               from discussion_topic_fact dtf left join grp_info gi on dtf.group_id = gi.group_id
+                topic_info as (select dtf.discussion_topic_id, dtf.assignment_id, dtf.group_id, ud.global_canvas_id as user_id, gi.is_public as group_is_public
+                               from discussion_topic_fact dtf left join grp_info gi on dtf.group_id = gi.group_id left join user_dim ud on dtf.user_id = ud.id
                                where dtf.course_id = '{data_warehouse_course_id}' or gi.parent_course_id = '{data_warehouse_course_id}'),
                 topic_more as (select ti.discussion_topic_id as topic_id, null as entry_id, '{data_warehouse_course_id}' as course_id,
                                CAST(ti.assignment_id as VARCHAR), CAST(ti.group_id as VARCHAR), CAST(ti.user_id as VARCHAR), ti.group_is_public,
                                dtd.title, dtd.message, dtd.updated_at
                                from discussion_topic_dim dtd join topic_info ti on dtd.id = ti.discussion_topic_id
                                where dtd.type is null and dtd.workflow_state = 'active'),
-                entry_info as (select tm.topic_id, def.discussion_entry_id, tm.assignment_id, tm.group_id, def.user_id, tm.group_is_public
-                               from discussion_entry_fact def join topic_more tm on def.topic_id = tm.topic_id)
+                entry_info as (select tm.topic_id, def.discussion_entry_id, tm.assignment_id, tm.group_id, ud.global_canvas_id as user_id, tm.group_is_public
+                               from discussion_entry_fact def join topic_more tm on def.topic_id = tm.topic_id left join user_dim ud on def.user_id = ud.id)
                 select * from topic_more
                 UNION
                 select ei.topic_id, CAST(ei.discussion_entry_id as VARCHAR) as entry_id, '{data_warehouse_course_id}' as course_id,
