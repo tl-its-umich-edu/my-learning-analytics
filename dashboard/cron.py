@@ -187,7 +187,7 @@ class DashboardCronJob(CronJobBase):
             if row.file_state == 'available':
                 Resource.objects.filter(id=row.id).update(name=row.display_name)
                 status += f"Row {row.id} updated to {row.display_name}\n"
-            else: 
+            else:
                 Resource.objects.filter(id=row.id).delete()
                 status += f"Row {row.id} removed as it is not available\n"
 
@@ -289,7 +289,7 @@ class DashboardCronJob(CronJobBase):
         status +=(f"TBytes billed for BQ: {total_tbytes_billed} = ${total_tbytes_price}\n")
         return status
 
-    def update_groups(self):
+    def update_assignment_groups(self):
         # cron status
         status =""
 
@@ -387,6 +387,69 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
+    def update_group_membership(self):
+        #load group membership
+        status =""
+
+        # delete all records in group_membership table
+        status += deleteAllRecordInTable("group_membership")
+
+        # loop through multiple course ids
+        for data_warehouse_course_id in Course.objects.get_supported_courses():
+            group_membership_url = f"""
+                with grp_info as (select gf.group_id
+                                  from group_fact gf join group_dim gd on gf.group_id = gd.id
+                                  where gf.parent_course_id = '{data_warehouse_course_id}' and gd.workflow_state = 'available'),
+                grp_member_info as (select gmf.group_id, ud.global_canvas_id as user_id, gmf.group_membership_id
+                                    from group_membership_fact gmf join grp_info gi on gmf.group_id = gi.group_id join user_dim ud on gmf.user_id = ud.id)
+                select gmi.group_id, gmi.user_id
+                from group_membership_dim gmd join grp_member_info gmi on gmd.id = gmi.group_membership_id
+                where workflow_state = 'accepted'
+            """
+            status += util_function(data_warehouse_course_id, group_membership_url, 'group_membership')
+            logger.debug(status+"\n\n")
+
+        return status
+
+    def update_discussion(self):
+        #load the discussion topic and entry information within a course into a flat table.
+        status =""
+
+        # delete all records in discussion_flattened table
+        status += deleteAllRecordInTable("discussion_flattened")
+
+        # loop through multiple course ids
+        for data_warehouse_course_id in Course.objects.get_supported_courses():
+            # NOTE: Pandas has trouble with int columns with null values mixed in (converts to float causing perscision issues)
+            # as a way around this, some fields (entry_id, assignment_id, group_id, and user_id) are cast as varchar in the query
+            discussion_url = f"""
+                with grp_info as (select gf.group_id, gf.parent_course_id, gd.is_public
+                                  from group_fact gf join group_dim gd on gf.group_id = gd.id
+                                  where gf.parent_course_id = '{data_warehouse_course_id}' and gd.workflow_state = 'available'),
+                topic_info as (select dtf.discussion_topic_id, dtf.assignment_id, dtf.group_id, ud.global_canvas_id as user_id, gi.is_public as group_is_public
+                               from discussion_topic_fact dtf left join grp_info gi on dtf.group_id = gi.group_id left join user_dim ud on dtf.user_id = ud.id
+                               where dtf.course_id = '{data_warehouse_course_id}' or gi.parent_course_id = '{data_warehouse_course_id}'),
+                topic_more as (select ti.discussion_topic_id as topic_id, null as entry_id, '{data_warehouse_course_id}' as course_id,
+                               CAST(ti.assignment_id as VARCHAR), CAST(ti.group_id as VARCHAR), CAST(ti.user_id as VARCHAR), ti.group_is_public,
+                               dtd.title, dtd.message, dtd.updated_at
+                               from discussion_topic_dim dtd join topic_info ti on dtd.id = ti.discussion_topic_id
+                               where dtd.type is null and dtd.workflow_state = 'active'),
+                entry_info as (select tm.topic_id, def.discussion_entry_id, tm.assignment_id, tm.group_id, ud.global_canvas_id as user_id, tm.group_is_public
+                               from discussion_entry_fact def join topic_more tm on def.topic_id = tm.topic_id left join user_dim ud on def.user_id = ud.id)
+                select * from topic_more
+                UNION
+                select ei.topic_id, CAST(ei.discussion_entry_id as VARCHAR) as entry_id, '{data_warehouse_course_id}' as course_id,
+                CAST(ei.assignment_id as VARCHAR), CAST(ei.group_id as VARCHAR), CAST(ei.user_id as VARCHAR), ei.group_is_public,
+                null as title, ded.message, ded.updated_at
+                from discussion_entry_dim ded join entry_info ei on ded.id = ei.discussion_entry_id
+                where ded.workflow_state = 'active'
+                order by topic_id, entry_id nulls first
+            """
+            status += util_function(data_warehouse_course_id, discussion_url, 'discussion_flattened')
+            logger.debug(status+"\n\n")
+
+        return status
+
     def update_term(self):
         # cron status
         status = ""
@@ -428,7 +491,7 @@ class DashboardCronJob(CronJobBase):
         status += self.update_user()
 
         logger.info("** assignment")
-        status += self.update_groups()
+        status += self.update_assignment_groups()
         status += self.update_assignment()
 
         status += self.submission()
@@ -441,6 +504,13 @@ class DashboardCronJob(CronJobBase):
                 status += self.update_canvas_resource()
             except Exception as e:
                 logger.info(e)
+
+        logger.info("** group")
+        status += self.update_group_membership()
+
+        logger.info("** discussion")
+        # TODO: add a if condition around this if in VIEWS_DISABLED
+        status += self.update_discussion()
 
         if settings.DATA_WAREHOUSE_IS_UNIZIN:
             logger.info("** informational")

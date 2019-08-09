@@ -101,7 +101,7 @@
     "/*  Whether or not to wait for ptvsd to attach before continuing (Default False)": "*/",
     "PTVSD_WAIT_FOR_ATTACH": false,
     "/*  Control course view options globally": "*/",
-    "/*  Current possible values are a CSV list of any/none/all of show_files_accessed, show_assignment_planning, show_grade_distribution": "*/",
+    "/*  Current possible values are a CSV list of any/none/all of show_resources_accessed, show_assignment_planning, show_grade_distribution": "*/",
     "/*  By default this is empty and no views are disabled": "*/",
     "VIEWS_DISABLED": "",
     "/*  Data Warehouse configuration": "*/",

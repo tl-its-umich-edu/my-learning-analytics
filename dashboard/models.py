@@ -137,6 +137,36 @@ class AssignmentWeightConsideration(models.Model):
     class Meta:
         db_table = 'assignment_weight_consideration'
 
+class GroupMembership(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name="Table Id")
+    group_id = models.BigIntegerField(verbose_name="Group Id")
+    user_id = models.BigIntegerField(verbose_name="User Id")
+
+    class Meta:
+        db_table = 'group_membership'
+        unique_together = (('group_id', 'user_id'),)
+
+class DiscussionFlattened(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name="Table Id")
+    # topic_id + null entry_id = discussion topic record
+    # topic_id + entry_id = discussion entry record
+    topic_id = models.BigIntegerField(verbose_name="Discussion Topic Id")
+    entry_id = models.BigIntegerField(blank=True, null=True, verbose_name="Discussion Entry Id")
+    course_id = models.BigIntegerField(verbose_name="Course Id") # stores course_id or group_parent_course_id
+    assignment_id = models.BigIntegerField(blank=True, null=True, verbose_name="Assignment Id")
+    group_id = models.BigIntegerField(blank=True, null=True, verbose_name="Group Id")
+    user_id = models.BigIntegerField(blank=True, null=True, verbose_name="User Id")
+    # determines who has access to the discussion
+    group_is_public = models.NullBooleanField(blank=True, default=False, verbose_name="Group Is Public")
+    # title only for discussion topic record
+    title = models.CharField(blank=True, null=True, max_length=255, verbose_name="Title", default='')
+    message = models.TextField(verbose_name="Message")
+    updated_at = models.DateTimeField(verbose_name="Updated At", blank=True, null=True)
+
+    class Meta:
+        db_table = 'discussion_flattened'
+        unique_together = (('topic_id', 'entry_id'),)
+
 class CourseQuerySet(models.QuerySet):
     def get_supported_courses(self):
         """Returns the list of supported courses from the database

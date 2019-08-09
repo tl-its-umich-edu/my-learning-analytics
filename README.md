@@ -31,7 +31,7 @@ The bq_cred.json is service account for Big Query, it needs to be supplied and p
 
 View options can be controlled at the global and course level. If a view is disabled globally, it will be disabled for each course, even if previously enabled at the course level. If a view is not globally disabled, it can still be disabled at the course level.
 
-`VIEWS_DISABLED` comma delimited list of views to disable (default empty). The expected name of the view is the same as the view's column name in the `course_view_option` table. Example value of `show_files_accessed,show_grade_distribution` will disable both the Files Accessed and Grade Distribution views.
+`VIEWS_DISABLED` comma delimited list of views to disable (default empty). The expected name of the view is the same as the view's column name in the `course_view_option` table. Example value of `show_resources_accessed,show_grade_distribution` will disable both the Resources Accessed and Grade Distribution views.
 
 Note that by default all views are enabled when a course is added.
 
