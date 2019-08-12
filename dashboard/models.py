@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from collections import namedtuple
 
 import logging
 logger = logging.getLogger(__name__)
@@ -174,7 +175,8 @@ class Course(models.Model):
             end = self.date_end
         else:
             end = self.term.get_correct_date_end()
-        return start, end
+        DateRange = namedtuple("DateRange", ["start", "end"])
+        return DateRange(start, end)
 
     class Meta:
         db_table = "course"

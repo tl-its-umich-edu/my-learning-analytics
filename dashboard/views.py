@@ -589,7 +589,7 @@ def is_weight_considered(course_id):
 
 def get_course_date_start(course_id):
     logger.info(get_course_date_start.__name__)
-    course_date_start = Course.objects.get(id=course_id).get_course_date_range()[0]
+    course_date_start = Course.objects.get(id=course_id).get_course_date_range().start
     return course_date_start
 
 
