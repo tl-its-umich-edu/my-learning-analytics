@@ -432,6 +432,13 @@ CANVAS_FILE_POSTFIX = ENV.get("CANVAS_FILE_POSTFIX", "")
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
 RESOURCE_ACCESS_CONFIG = ENV.get("RESOURCE_ACCESS_CONFIG", {})
+
+# Django CSP Settings, load up from file if set
+if "CSP" in ENV:
+    MIDDLEWARE_CLASSES += ['csp.middleware.CSPMiddleware',]
+    for csp_key, csp_val in ENV.get("CSP").items():
+        globals()["CSP_"+csp_key] = csp_val
+
 # IMPORT LOCAL ENV
 # =====================
 try:
