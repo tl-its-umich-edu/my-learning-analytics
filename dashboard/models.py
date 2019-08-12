@@ -21,8 +21,8 @@ class AcademicTerms(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Term Id")
     canvas_id = models.BigIntegerField(verbose_name="Canvas Id")
     name = models.CharField(max_length=255, verbose_name="Name")
-    date_start = models.DateTimeField(verbose_name="Term Start Date and Time", blank=True, null=True)
-    date_end = models.DateTimeField(verbose_name="Term End Date and Time", blank=True, null=True)
+    date_start = models.DateTimeField(verbose_name="Start Date and Time", blank=True, null=True)
+    date_end = models.DateTimeField(verbose_name="End Date and Time", blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -31,7 +31,7 @@ class AcademicTerms(models.Model):
     # # This should be replaced in the future via an API call so the terms have correct end years, or Canvas data adjusted
     def get_correct_date_end(self):
         if (self.date_end.year - self.date_start.year) > 1:
-            logger.debug(f'{self.date_end.year} - {self.date_start.year} greater than 1 so setting end year to match start year.')
+            logger.info(f'{self.date_end.year} - {self.date_start.year} greater than 1 so setting end year to match start year.')
             return self.date_end.replace(year=self.date_start.year)
         else:
             return self.date_end
@@ -153,9 +153,9 @@ class CourseManager(models.Manager):
 
 
 class Course(models.Model):
-    id = models.BigIntegerField(primary_key=True, verbose_name="Unizin Course Id", db_column='id')
+    id = models.BigIntegerField(primary_key=True, verbose_name="Course Id", db_column='id')
     canvas_id = models.BigIntegerField(verbose_name="Canvas Course Id", db_column='canvas_id')
-    term = models.ForeignKey(AcademicTerms, verbose_name="Term Id", on_delete=models.SET_NULL, db_column="term_id", null=True, db_constraint=False)
+    term = models.ForeignKey(AcademicTerms, verbose_name="Term", on_delete=models.SET_NULL, db_column="term_id", null=True, db_constraint=False)
     name = models.CharField(max_length=255, verbose_name="Name")
     date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
     date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)

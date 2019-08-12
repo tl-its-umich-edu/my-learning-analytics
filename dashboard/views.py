@@ -173,7 +173,7 @@ def resource_access_within_week(request, course_id=0):
     total_number_student = total_number_student_df.iloc[0,0]
     logger.info(f"course_id {course_id} total student={total_number_student}")
 
-    course_date_start = get_course_start_date(course_id)
+    course_date_start = get_course_date_start(course_id)
 
     start = course_date_start + timedelta(days=(week_num_start * 7))
     end = course_date_start + timedelta(days=(week_num_end * 7))
@@ -566,7 +566,7 @@ def percent_calculation(consider_weight,total_points,hidden_assignments,row):
 
 
 def find_min_week(course_id):
-    date = get_course_start_date(course_id)
+    date = get_course_date_start(course_id)
     year,week,dow=date.isocalendar()
     return week
 
@@ -587,9 +587,9 @@ def is_weight_considered(course_id):
     return value
 
 
-def get_course_start_date(course_id):
-    logger.info(get_course_start_date.__name__)
-    course_date_start = Course.objects.all().get(id=course_id).get_course_date_range()[0]
+def get_course_date_start(course_id):
+    logger.info(get_course_date_start.__name__)
+    course_date_start = Course.objects.get(id=course_id).get_course_date_range()[0]
     return course_date_start
 
 
