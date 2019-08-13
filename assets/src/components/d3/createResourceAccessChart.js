@@ -259,24 +259,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .tickSize(0)
     .tickFormat(d => d.split('|')[1])
 
-  // Append axis to main chart
-  const xLabel = d3.select('.mainGroupWrapper')
-    .append('g')
-    .attr('class', 'axis axis--x')
-    .attr('transform', 'translate(' + 0 + ',' + (miniHeight + 5) + ')')
-    .call(mainXAxis.tickFormat(d => `${d * 100}%`))
-
-  xLabel.append('text')
-    .attr('fill', 'black')
-    .attr('text-anchor', 'middle')
-    .attr('transform', `translate(${mainWidth / 2}, 40)`)
-    .text('Percentage of All Students in the Selected Grade Range')
-    .style('font-size', '14px')
-
-  const yLabel = mainGroup.append('g')
-    .attr('class', 'axis axis--y')
-    .attr('transform', 'translate(-5,0)')
-    .call(mainYAxis)
+  
 
   // Brush
   const brush = d3.brushY()
@@ -322,6 +305,28 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   miniYScale.domain(resourceData.map(d => d.resource_name))
     .paddingInner(0.4)
     .paddingOuter(0)
+
+  // Append axis to main chart
+  const xLabel = d3.select('.mainGroupWrapper')
+    .append('g')
+    .attr('class', 'axis axis--x')
+    .attr('transform', 'translate(' + 0 + ',' + (miniHeight + 5) + ')')
+    .call(mainXAxis.tickFormat(d => d + '%'))
+
+  xLabel.append('text')
+    .attr('fill', 'black')
+    .attr('text-anchor', 'middle')
+    .attr('transform', `translate(${mainWidth / 2}, 40)`)
+    .text('Percentage of All Students in the Selected Grade Range')
+    .style('font-size', '14px')
+
+  const yLabel = mainGroup.append('g')
+    .attr('class', 'axis axis--y')
+    .attr('transform', 'translate(-5,0)')
+    .call(mainYAxis)
+
+  yLabel.selectAll('text')
+    .attr('fill', 'steelblue')
 
   // Draw mini bars
   miniGroup.selectAll('.bar')
