@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import rules, logging
 from dashboard.models import User
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,7 @@ def is_admin(user):
 def is_enrolled_in_course(user, course):
     try:
         User.objects.get(
-            sis_name=user.get_username(),
+            Q(sis_name=user.get_username()) | Q(sis_id=user.get_username()),
             course_id=course.id,
         )
         return True
@@ -25,7 +26,7 @@ def is_enrolled_in_course(user, course):
 def is_instructor_in_course(user, course):
     try:
         User.objects.get(
-            sis_name=user.get_username(),
+            Q(sis_name=user.get_username()) | Q(sis_id=user.get_username()),
             course_id=course.id,
             enrollment_type=User.ENROLLMENT_TYPES.TeacherEnrollment,
         )
@@ -38,7 +39,7 @@ def is_instructor_in_course(user, course):
 def is_above_student_in_course(user, course):
     try:
         enrolled = User.objects.get(
-            sis_name=user.get_username(),
+            sis_name=Q(user.get_username()) | Q(sis_id=user.get_username()),
             course_id=course.id,
             enrollment_type__in=[
                 User.ENROLLMENT_TYPES.TeacherEnrollment,

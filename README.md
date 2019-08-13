@@ -69,13 +69,19 @@ Note that by default all views are enabled when a course is added.
 ### LTI v1.1.1 Configuration
 Only basic LTI launches are supported at the moment (automatic account creation and redirection to the correct course). New courses are not added nor are course view options modified.
 
-The relative LTI launch url is `/lti/auth/` (ex: `https://example.com/lti/auth`).
+The relative LTI launch url is `/lti/auth/` (ex: `https://example.com/lti/auth/`). *NOTE* The trailing slash after /auth/ is required! You'll get an error about CSRF if you have the wrong URL! :) 
+
+*Canvas Note* When you configure the tool in Canvas the "Privacy" option must be changed from Anonymous to Public to pass along the user information required.
+
+`Public: Various identifying information (name, email, Canvas ID, SIS ID of the course, SIS ID of the user, etc.) is sent to the vendor.`
+
+You also need to configure CSP value in the environment, specifically the FRAME_SRC. (See next section) In addtiion you make sure you are using https and CSRF_COOKIE_SECURE is true with your domain (or instructure.com) in trusted origins.
 
 Environment variables:
 
 `STUDENT_DASHBOARD_LTI`: Set to True to enable LTI (default false).
 
-`PYLTI_CONFIG_CONSUMERS`: JSON string of supported LTI Consumers (default none). Formated `{ "LTI_CONSUMER_KEY_1": { "secret": "LTI_CONSUMER_SECRET_1" } }`.
+`PYLTI_CONFIG_CONSUMERS`: JSON string of supported LTI Consumers (default none). Formated `{ "LTI_CONSUMER_KEY_1": { "secret": "LTI_CONSUMER_SECRET_1" } }`. These are the actual key and secret you put into your launch (like in Canvas).
 
 `LTI_PERSON_SOURCED_ID_FIELD`: LTI launch field containing the user's SIS ID (default: `lis_person_sourcedid`). Useful for retrieving SIS ID from custom LTI launch fields if `lis_person_sourcedid` is not available.
 
@@ -87,7 +93,7 @@ Environment variables:
 
 ### Content Security Policy
 
-All of the Content Security Policy headers can be configured. In the env_sample.json there is a sample security policy that should work to bring it up, and since it's set to false by default it won't actually do anything. If you're using LTI to embed this tool or you want to configure the policy you need to adjust these values.
+All of the Content Security Policy headers can be configured. In the env_sample.json there is a sample security policy that should work to bring it up. It has REPORT_ONLY set to true by default it won't actually do anything. If you're using LTI to embed this tool or you want to configure the policy you need to adjust these values and set REPORT_ONLY to false.
 
 ### Populate initial demo terms and courses
 Before adding initial terms and courses, ensure that the `CANVAS_DATA_ID_INCREMENT` environment variable is set correctly

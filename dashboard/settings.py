@@ -378,7 +378,7 @@ if ENV.get('STUDENT_DASHBOARD_LTI', False):
         "consumers": ENV.get("PYLTI_CONFIG_CONSUMERS", {}),
         "method_hooks":{
             "valid_lti_request": "dashboard.lti.valid_lti_request",
-            #"invalid_lti_request": "dashboard.lti.invalid_lti_request"
+            "invalid_lti_request": "dashboard.lti.invalid_lti_request"
         },
         "next_url": "home"
     }
@@ -388,7 +388,7 @@ if ENV.get('STUDENT_DASHBOARD_LTI', False):
         "lis_person_contact_email_primary")
     LTI_CANVAS_COURSE_ID_FIELD = ENV.get('LTI_CANVAS_COURSE_ID_FIELD',
         "custom_canvas_course_id")
-
+    
 # controls whether Unizin specific features/data is available from the Canvas Data source
 DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)
 
@@ -410,7 +410,11 @@ SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'RESOURCE_VALUES']
 
 # Method to show the user, if they're authenticated and superuser
 def show_debug_toolbar(request):
-    return DEBUG and request.user and request.user.is_authenticated and request.user.is_superuser
+    try:
+        return DEBUG and request.user and request.user.is_authenticated and request.user.is_superuser
+    except:
+        # If there's an exception here just don't show it
+        return False
 
 DEBUG_TOOLBAR_PANELS = dt_settings.PANELS_DEFAULTS
 
@@ -438,10 +442,19 @@ RESOURCE_ACCESS_CONFIG = ENV.get("RESOURCE_ACCESS_CONFIG", {})
 if "CSP" in ENV:
     MIDDLEWARE_CLASSES += ['csp.middleware.CSPMiddleware',]
     for csp_key, csp_val in ENV.get("CSP").items():
-        globals()["CSP_"+csp_key] = csp_val
+        # If there's a value set for this CSP config, set it as a global
+        if (csp_val):
+            globals()["CSP_"+csp_key] = csp_val
 # If CSP not set, add in XFrameOptionsMiddleware
 else:
     MIDDLEWARE_CLASSES += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
+
+# These are mostly needed by Canvas but it should also be in on general 
+CSRF_COOKIE_SECURE = ENV.get("CSRF_COOKIE_SECURE", True)
+if CSRF_COOKIE_SECURE:
+    CSRF_TRUSTED_ORIGINS = ENV.get("CSRF_TRUSTED_ORIGINS", [])
+    SESSION_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # IMPORT LOCAL ENV
 # =====================
