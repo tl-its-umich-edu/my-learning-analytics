@@ -25,7 +25,7 @@ PROJECT_ROOT = os.path.abspath(
 )
 
 try:
-    with open(os.getenv("ENV_FILE", "/code/config/env.json")) as f:
+    with open(os.getenv("ENV_FILE", "/secrets/env.json")) as f:
         ENV = json.load(f)
 except FileNotFoundError as fnfe:
     print("Default config file or one defined in environment variable ENV_FILE not found. This is normal for the build, should define for operation")
