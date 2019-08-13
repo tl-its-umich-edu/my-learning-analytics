@@ -26,7 +26,7 @@
         "CONNECT_SRC": [],
         "STYLE_SRC": ["'self'", "'unsafe-inline'"],
         "BASE_URI": [],
-        "FRAME_ANCESTORS": [],
+        "FRAME_ANCESTORS": ["'self'"],
         "FORM_ACTION": [],
         "SANDBOX": [],
         "REPORT_URI": [],

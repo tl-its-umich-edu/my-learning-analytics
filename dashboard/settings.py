@@ -103,7 +103,6 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
@@ -438,6 +437,9 @@ if "CSP" in ENV:
     MIDDLEWARE_CLASSES += ['csp.middleware.CSPMiddleware',]
     for csp_key, csp_val in ENV.get("CSP").items():
         globals()["CSP_"+csp_key] = csp_val
+# If CSP not set, add in XFrameOptionsMiddleware
+else:
+    MIDDLEWARE_CLASSES += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
 
 # IMPORT LOCAL ENV
 # =====================
