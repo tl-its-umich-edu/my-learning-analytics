@@ -372,6 +372,8 @@ else:
 # Give an opportunity to disable LTI
 if ENV.get('STUDENT_DASHBOARD_LTI', False):
     INSTALLED_APPS += ('django_lti_auth',)
+    if not 'django.contrib.auth.backends.ModelBackend' in AUTHENTICATION_BACKENDS:
+        AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
 
     PYLTI_CONFIG = {
         "consumers": ENV.get("PYLTI_CONFIG_CONSUMERS", {}),
