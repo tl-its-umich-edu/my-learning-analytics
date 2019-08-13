@@ -9,12 +9,15 @@ These instructions will get a copy of MyLA up and running on your local machine 
 ### Prerequisites
 1. **Install [Docker](https://www.docker.com/)**.
 1. **Install [Git](https://git-scm.com/downloads)**.
-1. Create a new `.env` file and copy the values from `sample.env`, which has the suggested default environment variable settings.
-1. Create a new `env.json` file under the `config` folder and copy the values from `env_sample.json`, which contains most of the suggested defaults for the application.
 
 ### Installation & Setup
 1. Clone this repo. `git clone https://github.com/tl-its-umich-edu/my-learning-analytics.git`
 1. Then cd into the repo. `cd my-learning-analytics`
+1. Create a directory in your home directory called "mylasecrets". `mkdir ~/mylasecrets`. This directory is mapped by docker-compose.yml into the container as /secrets/ 
+1. Copy the config/env_sample.json into mylasecrets as env.json. `cp config/env_sample.json ~/mylasecrets/env.json`
+1. Examine this `env.json` file, you may need to change some of the configuration in it now or later. There are comments to help the configuration.
+1. Create a new `.env` file and copy the values from `.env.sample`, which has the suggested default environment variable settings.
+1. Examine this `.env` file. It mostly just has the MySQL information as well as locations of the environment files.
 1. Start the Docker build process (this will take some time). `docker-compose up -d --build`
 1. Download the latest SQL file from this link: https://drive.google.com/drive/u/0/folders/1Pj7roNjRPGyumKKal8-h5E6ukUiXTDI9.
 1. Load database with data. `docker exec -i student_dashboard_mysql mysql -u student_dashboard_user --password=student_dashboard_pw student_dashboard < {name of sql file}`
@@ -47,8 +50,8 @@ These instructions will get a copy of MyLA up and running on your local machine 
 ## MyLA Configuring Settings
 - If you were using a prior version of MyLA, there is a utility "env_to_json.py" to help convert your configuration. Running `python env_to_json.py > config/env.json` should create your new config file from your .env file.
 
-### Secrets
-The bq_cred.json is service account for Big Query, it needs to be supplied and put into the /secrets directory and setup in the environment.
+### Secrets (Optional)
+The bq_cred.json defined in the .env file is service account for Big Query, it needs to be supplied and put into the directory defined in the .env file and setup in the environment.
 
 (Openshift Only) The /secrets/saml directory needs to contain 4 files for SAML configuration. These are currently hard-coded in settings.py though the path comes from the environment SAML2_FILES_BASE.
 
