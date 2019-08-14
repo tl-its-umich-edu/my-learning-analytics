@@ -4,7 +4,7 @@
 shopt -s nocaseglob
 
 if [ -z "${ENV_FILE}" ]; then
-    ENV_FILE="/code/config/env.json"
+    ENV_FILE="/secrets/env.json"
 fi
 
 echo $DJANGO_SETTINGS_MODULE
