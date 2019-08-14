@@ -172,6 +172,9 @@ def resource_access_within_week(request, course_id=0):
     total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": course_id})
     total_number_student = total_number_student_df.iloc[0,0]
     logger.info(f"course_id {course_id} total student={total_number_student}")
+    if total_number_student == 0:
+        logger.info(f"There are no students in the percent grade range {grade} for course {course_id}")
+        return HttpResponse("{}")
 
     course_date_start = get_course_date_start(course_id)
 
