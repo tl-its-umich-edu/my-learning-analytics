@@ -82,6 +82,10 @@ Environment variables:
 
 `LTI_CANVAS_COURSE_ID_FIELD`: LTI launch field containing the course's canvas id (default: `custom_canvas_course_id`).
 
+### Content Security Policy
+
+All of the Content Security Policy headers can be configured. In the env_sample.json there is a sample security policy that should work to bring it up, and since it's set to false by default it won't actually do anything. If you're using LTI to embed this tool or you want to configure the policy you need to adjust these values.
+
 ### Populate initial demo terms and courses
 Before adding initial terms and courses, ensure that the `CANVAS_DATA_ID_INCREMENT` environment variable is set correctly
 
