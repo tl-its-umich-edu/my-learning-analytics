@@ -25,7 +25,7 @@ PROJECT_ROOT = os.path.abspath(
 )
 
 try:
-    with open(os.getenv("ENV_FILE", "/code/config/env.json")) as f:
+    with open(os.getenv("ENV_FILE", "/secrets/env.json")) as f:
         ENV = json.load(f)
 except FileNotFoundError as fnfe:
     print("Default config file or one defined in environment variable ENV_FILE not found. This is normal for the build, should define for operation")
@@ -39,8 +39,8 @@ LOGIN_URL = '/accounts/login'
 GA_ID = ENV.get('GA_ID', '')
 
 # Resource values from env
-RESOURCE_VALUES = ENV.get("RESOURCE_VALUES", {})
-RESOURCE_URLS = ENV.get("RESOURCE_URLS", {})
+RESOURCE_VALUES = ENV.get("RESOURCE_VALUES", {"files": ["canvas"]})
+RESOURCE_URLS = ENV.get("RESOURCE_URLS", {"canvas": {"prefix": "https://demo.instructure.com/files/", "postfix": "/download?download_frd=1"}})
 
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
 SITE_ID = 1
@@ -106,7 +106,6 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
@@ -375,6 +374,8 @@ else:
 # Give an opportunity to disable LTI
 if ENV.get('STUDENT_DASHBOARD_LTI', False):
     INSTALLED_APPS += ('django_lti_auth',)
+    if not 'django.contrib.auth.backends.ModelBackend' in AUTHENTICATION_BACKENDS:
+        AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
 
     PYLTI_CONFIG = {
         "consumers": ENV.get("PYLTI_CONFIG_CONSUMERS", {}),
@@ -435,6 +436,16 @@ CANVAS_FILE_POSTFIX = ENV.get("CANVAS_FILE_POSTFIX", "")
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
 RESOURCE_ACCESS_CONFIG = ENV.get("RESOURCE_ACCESS_CONFIG", {})
+
+# Django CSP Settings, load up from file if set
+if "CSP" in ENV:
+    MIDDLEWARE_CLASSES += ['csp.middleware.CSPMiddleware',]
+    for csp_key, csp_val in ENV.get("CSP").items():
+        globals()["CSP_"+csp_key] = csp_val
+# If CSP not set, add in XFrameOptionsMiddleware
+else:
+    MIDDLEWARE_CLASSES += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
+
 # IMPORT LOCAL ENV
 # =====================
 try:

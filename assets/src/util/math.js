@@ -1,5 +1,5 @@
 const roundToTwoDecimal = int => Math.round(int * 100) / 100
-const roundToOneDecimcal = int => Math.round(int * 10) / 10
+const roundToOneDecimal = int => Math.round(int * 10) / 10
 
 const average = arr => arr.reduce((acc, cur) => acc + cur, 0) / arr.length
 
@@ -72,7 +72,7 @@ export {
   average,
   pearsonCorrelation,
   standardDeviation,
-  roundToOneDecimcal,
+  roundToOneDecimal,
   roundToTwoDecimal,
   median
 }
