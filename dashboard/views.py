@@ -179,7 +179,7 @@ def resource_access_within_week(request, course_id=0):
     total_number_student = total_number_student_df.iloc[0,0]
     logger.info(f"course_id {course_id} total student={total_number_student}")
     if total_number_student == 0:
-        logger.info(f"For grade {grade} request there are no students in the percent grade range for course {course_id}")
+        logger.info(f"There are no students in the percent grade range {grade} for course {course_id}")
         return HttpResponse("{}")
 
     term_date_start = AcademicTerms.objects.course_date_start(course_id)
