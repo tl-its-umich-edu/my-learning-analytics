@@ -41,7 +41,8 @@ function Course (props) {
             <Route path='/courses/:courseId/grades'
               render={props => <GradeDistribution {...props}
                 disabled={!courseInfo.course_view_options.gd}
-                courseId={courseId} />} />
+                courseId={courseId}
+                user={user} />} />
             <Route path='/courses/:courseId/assignments'
               render={props => <AssignmentPlanning {...props}
                 disabled={!courseInfo.course_view_options.ap}

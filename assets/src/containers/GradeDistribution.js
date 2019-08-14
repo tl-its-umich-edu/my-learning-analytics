@@ -30,7 +30,7 @@ const styles = theme => ({
 })
 
 function GradeDistribution (props) {
-  const { classes, disabled, courseId } = props
+  const { classes, disabled, courseId, user } = props
   if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
 
   const [gradeLoaded, gradeError, gradeData] = useGradeData(courseId)
@@ -60,34 +60,41 @@ function GradeDistribution (props) {
 
   const BuildGradeView = () => {
     const grades = gradeData.map(x => x.current_grade)
+
+    const tableRows = [
+      ['Average grade', <strong>{roundToOneDecimal(average(grades))}%</strong>],
+      ['Median grade', <strong>{roundToOneDecimal(median(grades))}%</strong>],
+      ['Number of students', <strong>{gradeData.length}</strong>],
+      showGrade ?
+        [
+          'My grade',
+          <strong>{
+            gradeData[0].current_user_grade ?
+              `${roundToOneDecimal(gradeData[0].current_user_grade)}%` :
+              'There are no grades yet for you in this course'
+          }</strong>
+        ] : []
+    ]
+
+    const gradeCheckbox = !user.admin ?
+      <> {userSettingLoaded ?
+        <> {'Show my grade'}
+          <Checkbox
+            color='primary'
+            checked={showGrade}
+            onChange={() => {
+              setSettingChanged(true)
+              setShowGrade(!showGrade)
+            }}
+          />
+        </> : <Spinner />}
+      </> : null
+
     return (
       <Grid container>
         <Grid item xs={12} lg={2}>
-          <Table className={classes.table} noBorder tableData={[
-            [
-              'My grade', <strong>{gradeData[0].current_user_grade
-                ? `${roundToOneDecimal(gradeData[0].current_user_grade)}%`
-                : 'There are no grades yet for you in this course'}</strong>
-            ],
-            [
-              'Average grade',
-              <strong>{roundToOneDecimal(average(grades))}%</strong>
-            ],
-            [
-              'Median grade',
-              <strong>{roundToOneDecimal(median(grades))}%</strong>
-            ],
-            ['Number of students', <strong>{gradeData.length}</strong>]
-          ]} />
-          {userSettingLoaded
-            ? <> {'Show my grade'} <Checkbox
-              checked={showGrade}
-              onChange={() => {
-                setSettingChanged(true)
-                setShowGrade(!showGrade)
-              }} />
-            </>
-            : <Spinner />}
+          <Table className={classes.table} noBorder tableData={tableRows} />
+          {gradeCheckbox}
           <UserSettingSnackbar
             saved={userSettingSaved}
             response={userSettingResponse} />
