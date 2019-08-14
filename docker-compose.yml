@@ -24,6 +24,7 @@ services:
       # use the container's node_modules folder (don't override)
       - /code/node_modules/
       - /code/static/
+      - ${HOME}/mylasecrets:/secrets
     ports:
       - "5001:5000"
       - "3000:3000"

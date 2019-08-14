@@ -18,8 +18,7 @@ from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
 
-from dashboard.models import AcademicTerms, UserDefaultSelection, \
-    Course, CourseViewOption, Resource
+from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
 from dashboard.settings import RESOURCE_VALUES
 
 logger = logging.getLogger(__name__)
@@ -59,11 +58,11 @@ def gpa_map(grade):
 def get_home_template(request):
     return render(request, 'frontend/index.html')
 
+
 @permission_required('dashboard.get_course_template',
     fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
 def get_course_template(request, course_id=0):
     return render(request, 'frontend/index.html', {'course_id': course_id})
-
 
 
 @permission_required('dashboard.get_course_info',
@@ -103,19 +102,13 @@ def get_course_info(request, course_id=0):
     course_resource_list.sort()
 
     resp = model_to_dict(course)
-    # Fill in the actual term
-    term = course.term_id
 
-    # Replace the year in the end date with start date (Hack to get around far out years)
-    # This should be replaced in the future via an API call so the terms have correct end years, or Canvas data adjusted
-    if (term.date_end.year - term.date_start.year) > 1:
-        logger.debug(f'{term.date_end.year} - {term.date_start.year} greater than 1 so setting end year to match start year.')
-        term.date_end = term.date_end.replace(year=term.date_start.year)
+    course_start, course_end = course.get_course_date_range()
 
-    current_week_number = math.ceil((today - term.date_start).days/7)
-    total_weeks = math.ceil((term.date_end - term.date_start).days/7)
+    current_week_number = math.ceil((today - course_start).days/7)
+    total_weeks = math.ceil((course_end - course_start).days/7)
 
-    resp['term'] = model_to_dict(term)
+    resp['term'] = model_to_dict(course.term)
 
     # Have a fixed maximum number of weeks
     if total_weeks > settings.MAX_DEFAULT_WEEKS:
@@ -129,6 +122,7 @@ def get_course_info(request, course_id=0):
 
     return HttpResponse(json.dumps(resp, default=str))
 
+
 # show percentage of users who read the resource within prior n weeks
 @permission_required('dashboard.resource_access_within_week',
     fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
@@ -136,7 +130,7 @@ def resource_access_within_week(request, course_id=0):
 
     course_id = canvas_id_to_incremented_id(course_id)
 
-    current_user=request.user.get_username()
+    current_user = request.user.get_username()
 
     logger.debug("current_user=" + current_user)
 
@@ -178,13 +172,15 @@ def resource_access_within_week(request, course_id=0):
     total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": course_id})
     total_number_student = total_number_student_df.iloc[0,0]
     logger.info(f"course_id {course_id} total student={total_number_student}")
+    if total_number_student == 0:
+        logger.info(f"There are no students in the percent grade range {grade} for course {course_id}")
+        return HttpResponse("{}")
 
-    term_date_start = AcademicTerms.objects.course_date_start(course_id)
+    course_date_start = get_course_date_start(course_id)
 
-    start = term_date_start + timedelta(days=(week_num_start * 7))
-    end = term_date_start + timedelta(days=(week_num_end * 7))
-    logger.debug("term_start=" + str(term_date_start) + " start=" + str(start) + " end=" + str(end))
-
+    start = course_date_start + timedelta(days=(week_num_start * 7))
+    end = course_date_start + timedelta(days=(week_num_end * 7))
+    logger.debug("course_start=" + str(course_date_start) + " start=" + str(start) + " end=" + str(end))
 
     # get time range based on week number passed in via request
 
@@ -207,7 +203,7 @@ def resource_access_within_week(request, course_id=0):
 
     # return if there is no data during this interval
     if (df.empty):
-        return HttpResponse("no data")
+        return HttpResponse("{}")
 
     # group by resource_id, and resource_name
     # reformat for output
@@ -272,7 +268,7 @@ def resource_access_within_week(request, course_id=0):
 
     # if no checkboxes are checked send nothing
     if (output_df.empty):
-        return HttpResponse("no data")
+        return HttpResponse("{}")
 
     # only keep rows where total_count > 0
     output_df = output_df[output_df.total_count > 0]
@@ -533,6 +529,7 @@ def get_user_assignment_submission(current_user,assignments_in_course_df, course
         assignment_submissions.drop(columns=['graded_date'], inplace=True)
     return assignment_submissions
 
+
 # don't show the avg scores for student when individual assignment is not graded as canvas currently don't show it
 def no_show_avg_score_for_ungraded_assignments(row):
     if row['score'] is None:
@@ -572,13 +569,14 @@ def percent_calculation(consider_weight,total_points,hidden_assignments,row):
 
 
 def find_min_week(course_id):
-    date = get_term_dates_for_course(course_id)
+    date = get_course_date_start(course_id)
     year,week,dow=date.isocalendar()
     return week
 
 
 def find_current_week(row):
-    current_date = timezone.now()
+    # this needs to be local timezone
+    current_date = timezone.localtime(timezone.now())
     year,week,dow = current_date.isocalendar() #dow = day of week
     if row == week:
         return True
@@ -592,11 +590,10 @@ def is_weight_considered(course_id):
     return value
 
 
-def get_term_dates_for_course(course_id):
-    logger.info(get_term_dates_for_course.__name__)
-    sql = "select a.date_start from course c, academic_terms a where c.id = %(course_id)s and c.term_id=a.id"
-    df = pd.read_sql(sql, conn, params={"course_id": course_id}, parse_dates={'date_start': '%Y-%m-%d'})
-    return df['date_start'].iloc[0]
+def get_course_date_start(course_id):
+    logger.info(get_course_date_start.__name__)
+    course_date_start = Course.objects.get(id=course_id).get_course_date_range().start
+    return course_date_start
 
 
 def are_weighted_assignments_hidden(course_id, df):
@@ -625,7 +622,6 @@ def are_weighted_assignments_hidden(course_id, df):
             return True
 
 
-
 def df_default_display_settings():
     pd.set_option('display.max_column', None)
     pd.set_option('display.max_rows', None)
@@ -638,6 +634,7 @@ def logout(request):
     logger.info('User %s logging out.' % request.user.username)
     auth.logout(request)
     return redirect(settings.LOGOUT_REDIRECT_URL)
+
 
 @permission_required('dashboard.courses_enabled', raise_exception=True)
 def courses_enabled(request):

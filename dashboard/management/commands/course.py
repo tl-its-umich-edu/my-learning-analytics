@@ -40,7 +40,7 @@ class Command(BaseCommand):
             self.stdout.write ("Creating course view options")
             course_view_obj = CourseViewOption(
                 course_id=prefixed_course_id,
-                show_files_accessed=True,
+                show_resources_accessed=True,
                 show_assignment_planning=True,
                 show_grade_distribution=True
             )

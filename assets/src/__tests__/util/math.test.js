@@ -2,7 +2,7 @@
 
 import {
   average,
-  roundToOneDecimcal,
+  roundToOneDecimal,
   roundToTwoDecimal,
   median,
   pearsonCorrelation
@@ -37,11 +37,11 @@ describe('median', () => {
 
 describe('roundToOneDecimal', () => {
   it('takes a rational number and returns that number rounded to one decimal place', () => {
-    expect(roundToOneDecimcal(1)).toBe(1)
-    expect(roundToOneDecimcal(1.5)).toBe(1.5)
-    expect(roundToOneDecimcal(1.55)).toBe(1.6)
-    expect(roundToOneDecimcal(1.555)).toBe(1.6)
-    expect(roundToOneDecimcal(1.32)).toBe(1.3)
+    expect(roundToOneDecimal(1)).toBe(1)
+    expect(roundToOneDecimal(1.5)).toBe(1.5)
+    expect(roundToOneDecimal(1.55)).toBe(1.6)
+    expect(roundToOneDecimal(1.555)).toBe(1.6)
+    expect(roundToOneDecimal(1.32)).toBe(1.3)
   })
 })
 

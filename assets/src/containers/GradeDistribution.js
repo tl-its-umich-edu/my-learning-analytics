@@ -7,15 +7,13 @@ import Checkbox from '@material-ui/core/Checkbox'
 import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
+import UserSettingSnackbar from '../components/UserSettingSnackbar'
 import Error from './Error'
-import { average, roundToOneDecimcal, median } from '../util/math'
+import { average, roundToOneDecimal, median } from '../util/math'
 import { useGradeData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 import useSetUserSetting from '../hooks/useSetUserSetting'
 import useUserSetting from '../hooks/useUserSetting'
-import Snackbar from '@material-ui/core/Snackbar'
-import IconButton from '@material-ui/core/IconButton'
-import CloseIcon from '@material-ui/icons/Close'
 
 const styles = theme => ({
   root: {
@@ -32,7 +30,7 @@ const styles = theme => ({
 })
 
 function GradeDistribution (props) {
-  const { classes, disabled, courseId } = props
+  const { classes, disabled, courseId, user } = props
   if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
 
   const [gradeLoaded, gradeError, gradeData] = useGradeData(courseId)
@@ -56,73 +54,50 @@ function GradeDistribution (props) {
     settingChanged,
     [showGrade]
   )
-  const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false)
-  const [snackbarMessage, setSnackbarMessage] = useState('')
-
-  useEffect(() => {
-    if (userSettingSaved) {
-      if (userSettingResponse.default === 'success') {
-        setSnackbarMessage('Setting saved successfully!')
-      } else {
-        setSnackbarMessage('Setting not saved.')
-      }
-      setSavedSnackbarOpen(true)
-    }
-  }, [userSettingSaved])
 
   if (gradeError) return (<Error>Something went wrong, please try again later.</Error>)
   if (gradeLoaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
 
   const BuildGradeView = () => {
     const grades = gradeData.map(x => x.current_grade)
+
+    const tableRows = [
+      ['Average grade', <strong>{roundToOneDecimal(average(grades))}%</strong>],
+      ['Median grade', <strong>{roundToOneDecimal(median(grades))}%</strong>],
+      ['Number of students', <strong>{gradeData.length}</strong>],
+      showGrade ?
+        [
+          'My grade',
+          <strong>{
+            gradeData[0].current_user_grade ?
+              `${roundToOneDecimal(gradeData[0].current_user_grade)}%` :
+              'There are no grades yet for you in this course'
+          }</strong>
+        ] : []
+    ]
+
+    const gradeCheckbox = !user.admin ?
+      <> {userSettingLoaded ?
+        <> {'Show my grade'}
+          <Checkbox
+            color='primary'
+            checked={showGrade}
+            onChange={() => {
+              setSettingChanged(true)
+              setShowGrade(!showGrade)
+            }}
+          />
+        </> : <Spinner />}
+      </> : null
+
     return (
       <Grid container>
         <Grid item xs={12} lg={2}>
-          <Table className={classes.table} noBorder tableData={[
-            [
-              'My grade', <strong>{gradeData[0].current_user_grade
-                ? `${roundToOneDecimcal(gradeData[0].current_user_grade)}%`
-                : 'There are no grades yet for you in this course'}</strong>
-            ],
-            [
-              'Average grade',
-              <strong>{roundToOneDecimcal(average(grades))}%</strong>
-            ],
-            [
-              'Median grade',
-              <strong>{roundToOneDecimcal(median(grades))}%</strong>
-            ],
-            ['Number of students', <strong>{gradeData.length}</strong>]
-          ]} />
-          {userSettingLoaded
-            ? <> {'Show my grade'} <Checkbox
-              checked={showGrade}
-              onChange={() => {
-                setSettingChanged(true)
-                setShowGrade(!showGrade)
-              }} />
-            </>
-            : <Spinner />}
-          <Snackbar
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left'
-            }}
-            open={savedSnackbarOpen}
-            autoHideDuration={3000}
-            onClose={() => setSavedSnackbarOpen(false)}
-            message={<span>{snackbarMessage}</span>}
-            action={[
-              <IconButton
-                key='close'
-                aria-label='close'
-                color='inherit'
-                onClick={() => setSavedSnackbarOpen(false)}
-              >
-                <CloseIcon />
-              </IconButton>
-            ]}
-          />
+          <Table className={classes.table} noBorder tableData={tableRows} />
+          {gradeCheckbox}
+          <UserSettingSnackbar
+            saved={userSettingSaved}
+            response={userSettingResponse} />
         </Grid>
         <Grid item xs={12} lg={10}>
           <Histogram
