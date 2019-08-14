@@ -23,8 +23,8 @@ def valid_lti_request(user_payload, request):
         except User.DoesNotExist:
             password = ''.join(random.sample(string.ascii_letters, RANDOM_PASSWORD_DEFAULT_LENGTH))
             user_obj = User.objects.create_user(username=username, email=email, password=password)
-        # TODO: might have to create an LTI backend since this seems hacky
-        login(request, user_obj, backend=settings.AUTHENTICATION_BACKENDS[0])
+        user_obj.backend = 'django.contrib.auth.backends.ModelBackend'
+        login(request, user_obj)
     else:
         #handle no username from LTI launch
         return HttpResponseRedirect(reverse('django_lti_auth:denied'))
