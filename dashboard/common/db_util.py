@@ -36,11 +36,11 @@ def get_course_name_from_id(course_id):
     :rtype: [str]
     """
     logger.debug(get_course_name_from_id.__name__)
-    course_id = canvas_id_to_incremented_id(course_id)
+    warehouse_id = canvas_id_to_incremented_id(course_id)
     course_name = ""
     if (course_id):
         with django.db.connection.cursor() as cursor:
-            cursor.execute("SELECT name FROM course WHERE id = %s", [course_id])
+            cursor.execute("SELECT name FROM course WHERE warehouse_id = %s", [warehouse_id])
             row = cursor.fetchone()
             if (row != None):
                 course_name = row[0]
@@ -50,12 +50,18 @@ def get_course_name_from_id(course_id):
 def get_course_view_options (course_id):
 
     logger.info(get_course_view_options.__name__)
-    course_id = canvas_id_to_incremented_id(course_id)
-    logger.debug("course_id=" + str(course_id))
+    warehouse_id = canvas_id_to_incremented_id(course_id)
+    logger.debug("warehouse_id=" + str(warehouse_id))
     course_view_option = ""
-    if (course_id):
+    if (warehouse_id):
         with django.db.connection.cursor() as cursor:
-            cursor.execute("SELECT show_resources_accessed, show_assignment_planning, show_grade_distribution FROM course_view_option WHERE course_id = %s", [course_id])
+            cursor.execute("""
+                SELECT show_resources_accessed, show_assignment_planning, show_grade_distribution 
+                FROM course_view_option 
+                INNER JOIN course
+                    ON course.id = course_view_option.course_id
+                WHERE course.warehouse = %s
+            """, [warehouse_id])
             row = cursor.fetchone()
             if (row != None):
                 course_view_option = {}
