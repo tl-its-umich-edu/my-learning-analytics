@@ -156,7 +156,7 @@ class CourseManager(models.Manager):
 class Course(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Course Id", db_column="id")
     canvas_id = models.BigIntegerField(verbose_name="Canvas Course Id", db_column='canvas_id')
-    warehouse_id = models.BigIntegerField(verbose_name="Warehouse Course Id", db_column='warehouse_id', editable=False)
+    warehouse_id = models.BigIntegerField(verbose_name="Warehouse Course Id", db_column='warehouse_id')
     term = models.ForeignKey(AcademicTerms, verbose_name="Term", on_delete=models.SET_NULL, db_column="term_id", null=True, db_constraint=False)
     name = models.CharField(max_length=255, verbose_name="Name")
     date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
