@@ -60,7 +60,7 @@ def get_course_view_options (course_id):
                 FROM course_view_option 
                 INNER JOIN course
                     ON course.id = course_view_option.course_id
-                WHERE course.warehouse = %s
+                WHERE course.warehouse_id = %s
             """, [warehouse_id])
             row = cursor.fetchone()
             if (row != None):
