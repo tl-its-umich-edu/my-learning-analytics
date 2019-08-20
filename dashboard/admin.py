@@ -5,7 +5,7 @@ from django.utils.safestring import mark_safe
 from django.template.defaultfilters import linebreaksbr
 
 from dashboard.common.db_util import canvas_id_to_incremented_id
-from .models import CourseViewOptionTemp, CourseTemp
+from .models import CourseViewOption, Course
 
 from django.forms.models import ModelForm
 
@@ -20,21 +20,21 @@ class AlwaysChangedModelForm(ModelForm):
         return super(AlwaysChangedModelForm, self).has_changed()
 
 
-class CourseViewOptionTempInline(admin.StackedInline):
-    model = CourseViewOptionTemp
+class CourseViewOptionInline(admin.StackedInline):
+    model = CourseViewOption
     form = AlwaysChangedModelForm
 
     exclude = ()
 
     # exclude disabled views
-    for view in CourseViewOptionTemp.VIEWS:
+    for view in CourseViewOption.VIEWS:
         if view in settings.VIEWS_DISABLED:
             exclude += (view,)
 
 
-class CourseTempForm(forms.ModelForm):
+class CourseForm(forms.ModelForm):
     class Meta:
-        model = CourseTemp
+        model = Course
         exclude = ()
 
     def clean(self):
@@ -45,21 +45,21 @@ class CourseTempForm(forms.ModelForm):
         return self.cleaned_data
 
 
-class CourseTempAdmin(admin.ModelAdmin):
-    inlines = [CourseViewOptionTempInline, ]
-    form = CourseTempForm
-    list_display = ('canvas_id', 'warehouse_id', 'name', 'term', '_courseviewoptiontemp')
+class CourseAdmin(admin.ModelAdmin):
+    inlines = [CourseViewOptionInline, ]
+    form = CourseForm
+    list_display = ('canvas_id', 'warehouse_id', 'name', 'term', '_courseviewoption')
     list_select_related = True
 
     # Need this method to correctly display the line breaks
-    def _courseviewoptiontemp(self, obj):
-        return mark_safe(linebreaksbr(obj.courseviewoptiontemp))
-    _courseviewoptiontemp.short_description = "Course View Option(s)"
+    def _courseviewoption(self, obj):
+        return mark_safe(linebreaksbr(obj.courseviewoption))
+    _courseviewoption.short_description = "Course View Option(s)"
 
     # When saving the course, update the id based on canvas id
     def save_model(self, request, obj, form, change):
         obj.warehouse_id = canvas_id_to_incremented_id(obj.canvas_id)
-        return super(CourseTempAdmin, self).save_model(request, obj, form, change)
+        return super(CourseAdmin, self).save_model(request, obj, form, change)
 
 
-admin.site.register(CourseTemp, CourseTempAdmin)
+admin.site.register(Course, CourseAdmin)

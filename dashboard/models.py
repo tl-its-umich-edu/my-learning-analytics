@@ -131,7 +131,7 @@ class AssignmentWeightConsideration(models.Model):
         db_table = 'assignment_weight_consideration'
 
 
-class CourseTempQuerySet(models.QuerySet):
+class CourseQuerySet(models.QuerySet):
     def get_supported_courses(self):
         """Returns the list of supported courses from the database
 
@@ -145,23 +145,24 @@ class CourseTempQuerySet(models.QuerySet):
         return []
 
 
-class CourseTempManager(models.Manager):
+class CourseManager(models.Manager):
     def get_queryset(self):
-        return CourseTempQuerySet(self.model, using=self._db)
+        return CourseQuerySet(self.model, using=self._db)
 
     def get_supported_courses(self):
         return self.get_queryset().get_supported_courses()
 
 
 class Course(models.Model):
-    id = models.BigIntegerField(primary_key=True, verbose_name="Course Id", db_column='id')
+    id = models.AutoField(primary_key=True, verbose_name="Course Id", db_column="id")
     canvas_id = models.BigIntegerField(verbose_name="Canvas Course Id", db_column='canvas_id')
+    warehouse_id = models.BigIntegerField(verbose_name="Warehouse Course Id", db_column='warehouse_id', editable=False)
     term = models.ForeignKey(AcademicTerms, verbose_name="Term", on_delete=models.SET_NULL, db_column="term_id", null=True, db_constraint=False)
     name = models.CharField(max_length=255, verbose_name="Name")
     date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
     date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)
 
-    # objects = CourseManager()
+    objects = CourseManager()
 
     def __str__(self):
         return self.name
@@ -183,39 +184,9 @@ class Course(models.Model):
         verbose_name = "Course"
 
 
-class CourseTemp(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name="Course Id", db_column="id")
-    canvas_id = models.BigIntegerField(verbose_name="Canvas Course Id", db_column='canvas_id')
-    warehouse_id = models.BigIntegerField(verbose_name="Warehouse Course Id", db_column='warehouse_id', editable=False)
-    term = models.ForeignKey(AcademicTerms, verbose_name="Term", on_delete=models.SET_NULL, db_column="term_id", null=True, db_constraint=False)
-    name = models.CharField(max_length=255, verbose_name="Name")
-    date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
-    date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)
-
-    objects = CourseTempManager()
-
-    def __str__(self):
-        return self.name
-
-    def get_course_date_range(self):
-        if self.date_start is not None:
-            start = self.date_start
-        else:
-            start = self.term.date_start
-        if self.date_end is not None:
-            end = self.date_end
-        else:
-            end = self.term.get_correct_date_end()
-        DateRange = namedtuple("DateRange", ["start", "end"])
-        return DateRange(start, end)
-
-    class Meta:
-        db_table = "course_temp"
-        verbose_name = "CourseTemp"
-
-
 class CourseViewOption(models.Model):
-    course = models.OneToOneField(Course, on_delete=models.CASCADE, primary_key=True, verbose_name="Course View Option Id")
+    id = models.AutoField(primary_key=True, verbose_name="Course View Option Id")
+    course = models.OneToOneField(Course, on_delete=models.CASCADE, verbose_name="Course Id")
     show_resources_accessed = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Resources Accessed View")
     show_assignment_planning = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Assignment Planning View")
     show_grade_distribution = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Grade Distribution View")
@@ -232,51 +203,6 @@ class CourseViewOption(models.Model):
     class Meta:
         db_table = 'course_view_option'
         verbose_name = "Course View Option"
-
-    def json(self, include_id=True):
-        """Format the json output that we want for this record
-
-        :param include_id: Whether or not to include the id in the return
-        This should be of the format canvas_id : {options}
-        :return: JSON formatted CourseViewOption
-        :rtype: Dict
-        """
-
-        try:
-            options = {'fa': int(self.show_resources_accessed and 'show_resources_accessed'
-                                 not in settings.VIEWS_DISABLED),
-                       'ap': int(self.show_assignment_planning and 'show_assignment_planning'
-                                 not in settings.VIEWS_DISABLED),
-                       'gd': int(self.show_grade_distribution and 'show_grade_distribution'
-                                 not in settings.VIEWS_DISABLED),}
-            if include_id:
-                return {self.course.canvas_id: options}
-            else:
-                return options
-        except ObjectDoesNotExist:
-            logger.warning(f"CourseViewOption does not exist in Course table, skipping")
-            return ""
-
-
-class CourseViewOptionTemp(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name="Course View Option Id")
-    course = models.OneToOneField(CourseTemp, on_delete=models.CASCADE, verbose_name="Course Id")
-    show_resources_accessed = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Resources Accessed View")
-    show_assignment_planning = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Assignment Planning View")
-    show_grade_distribution = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Grade Distribution View")
-
-    VIEWS = ['show_resources_accessed', 'show_assignment_planning', 'show_grade_distribution']
-
-    def __str__(self):
-        retval = ""
-        if self.show_resources_accessed and 'show_resources_accessed' not in settings.VIEWS_DISABLED: retval += "Resources Accessed\n"
-        if self.show_assignment_planning and 'show_assignment_planning' not in settings.VIEWS_DISABLED: retval += "Assignment Planning\n"
-        if self.show_grade_distribution and 'show_grade_distribution' not in settings.VIEWS_DISABLED: retval += "Grade Distribution\n"
-        return retval
-
-    class Meta:
-        db_table = 'course_view_option_temp'
-        verbose_name = "Course View Option Temp"
 
     def json(self, include_id=True):
         """Format the json output that we want for this record
@@ -389,6 +315,7 @@ class User(models.Model):
     class Meta:
         db_table = 'user'
         unique_together = (('id', 'course_id'),)
+
 
 class ResourceAccess(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")

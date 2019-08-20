@@ -18,7 +18,7 @@ from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
 
-from dashboard.models import CourseTemp, CourseViewOptionTemp, Resource, UserDefaultSelection
+from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
 from dashboard.settings import RESOURCE_VALUES
 
 logger = logging.getLogger(__name__)
@@ -60,13 +60,13 @@ def get_home_template(request):
 
 
 @permission_required('dashboard.get_course_template',
-    fn=objectgetter(CourseTemp, 'course_id', 'canvas_id'), raise_exception=True)
+    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
 def get_course_template(request, course_id=0):
     return render(request, 'frontend/index.html', {'course_id': course_id})
 
 
 @permission_required('dashboard.get_course_info',
-    fn=objectgetter(CourseTemp, 'course_id', 'canvas_id'), raise_exception=True)
+    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
 def get_course_info(request, course_id=0):
     """Returns JSON data about a course
 
@@ -81,7 +81,7 @@ def get_course_info(request, course_id=0):
     today = timezone.now()
 
     try:
-        course = CourseTemp.objects.get(warehouse_id=course_id)
+        course = Course.objects.get(warehouse_id=course_id)
     except ObjectDoesNotExist:
         return HttpResponse("{}")
 
@@ -117,7 +117,7 @@ def get_course_info(request, course_id=0):
 
     resp['current_week_number'] = current_week_number
     resp['total_weeks'] = total_weeks
-    resp['course_view_options'] = CourseViewOptionTemp.objects.get(course=course).json(include_id=False)
+    resp['course_view_options'] = CourseViewOption.objects.get(course=course).json(include_id=False)
     resp['resource_types'] = course_resource_list
 
     return HttpResponse(json.dumps(resp, default=str))
@@ -125,7 +125,7 @@ def get_course_info(request, course_id=0):
 
 # show percentage of users who read the resource within prior n weeks
 @permission_required('dashboard.resource_access_within_week',
-    fn=objectgetter(CourseTemp, 'course_id','canvas_id'), raise_exception=True)
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def resource_access_within_week(request, course_id=0):
 
     course_id = canvas_id_to_incremented_id(course_id)
@@ -291,7 +291,7 @@ def resource_access_within_week(request, course_id=0):
 
 
 @permission_required('dashboard.grade_distribution',
-    fn=objectgetter(CourseTemp, 'course_id','canvas_id'), raise_exception=True)
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def grade_distribution(request, course_id=0):
     logger.info(grade_distribution.__name__)
 
@@ -326,7 +326,7 @@ def grade_distribution(request, course_id=0):
 
 
 @permission_required('dashboard.update_user_default_selection_for_views',
-    fn=objectgetter(CourseTemp, 'course_id','canvas_id'), raise_exception=True)
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def update_user_default_selection_for_views(request, course_id=0):
     logger.info(update_user_default_selection_for_views.__name__)
     course_id = canvas_id_to_incremented_id(course_id)
@@ -359,7 +359,7 @@ def update_user_default_selection_for_views(request, course_id=0):
 
 
 @permission_required('dashboard.get_user_default_selection',
-    fn=objectgetter(CourseTemp, 'course_id','canvas_id'), raise_exception=True)
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def get_user_default_selection(request, course_id=0):
     logger.info(get_user_default_selection.__name__)
     course_id = canvas_id_to_incremented_id(course_id)
@@ -381,7 +381,7 @@ def get_user_default_selection(request, course_id=0):
 
 
 @permission_required('dashboard.assignments',
-    fn=objectgetter(CourseTemp, 'course_id','canvas_id'), raise_exception=True)
+    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def assignments(request, course_id=0):
     
     logger.info(assignments.__name__)
@@ -592,7 +592,7 @@ def is_weight_considered(course_id):
 
 def get_course_date_start(course_id):
     logger.info(get_course_date_start.__name__)
-    course_date_start = CourseTemp.objects.get(warehouse_id=course_id).get_course_date_range().start
+    course_date_start = Course.objects.get(warehouse_id=course_id).get_course_date_range().start
     return course_date_start
 
 
@@ -642,7 +642,7 @@ def courses_enabled(request):
 
     """
     data = {}
-    for cvo in CourseViewOptionTemp.objects.all():
+    for cvo in CourseViewOption.objects.all():
         data.update(cvo.json())
 
     callback = request.GET.get('callback')

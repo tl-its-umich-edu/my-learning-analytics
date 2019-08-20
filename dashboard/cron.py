@@ -11,7 +11,7 @@ import datetime
 from sqlalchemy import create_engine
 from django.conf import settings
 
-from dashboard.models import CourseTemp, Resource
+from dashboard.models import Course, Resource
 
 import pandas as pd
 
@@ -94,7 +94,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in checking course")
 
         # loop through multiple course ids
-        for course_id in CourseTemp.objects.get_supported_courses():
+        for course_id in Course.objects.get_supported_courses():
             # select course based on course id
             course_sql = f"""select *
                         from course_dim c
@@ -123,7 +123,7 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("user")
 
         # loop through multiple course ids
-        for data_warehouse_course_id in CourseTemp.objects.get_supported_courses():
+        for data_warehouse_course_id in Course.objects.get_supported_courses():
 
 
             # select all student registered for the course
@@ -179,7 +179,7 @@ class DashboardCronJob(CronJobBase):
 
         # Select all the files for these courses
         file_sql = f"select id, file_state, display_name from file_dim where course_id in %(course_ids)s"
-        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids':tuple(CourseTemp.objects.get_supported_courses())})
+        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids':tuple(Course.objects.get_supported_courses())})
 
         # Update these back again based on the dataframe
         # Remove any rows where file_state is not available!
@@ -214,7 +214,7 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
-        for data_warehouse_course_ids in split_list(CourseTemp.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
+        for data_warehouse_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
             # query to retrieve all file access events for one course
             # There is no catch if this query fails, event_store.events needs to exist
 
@@ -301,7 +301,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug("update_assignment_groups(): ")
 
         # loop through multiple course ids
-        for data_warehouse_course_id in CourseTemp.objects.get_supported_courses():
+        for data_warehouse_course_id in Course.objects.get_supported_courses():
             assignment_groups_sql= f"""with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{data_warehouse_course_id}' and ad.visibility = 'everyone' and ad.workflow_state='published'),
             assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf on agd.id = agf.assignment_group_id  where agd.course_id='{data_warehouse_course_id}' and workflow_state='available'),
             assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join (select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id ),
@@ -325,7 +325,7 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("assignment")
 
         # loop through multiple course ids
-        for data_warehouse_course_id in CourseTemp.objects.get_supported_courses():
+        for data_warehouse_course_id in Course.objects.get_supported_courses():
             assignment_sql = f"""with assignment_info as
                             (select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone '{settings.TIME_ZONE}' as local_date,
                             ad.title AS name,af.course_id AS course_id,af.assignment_id AS id,
@@ -350,7 +350,7 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("submission")
 
         # loop through multiple course ids
-        for data_warehouse_course_id in CourseTemp.objects.get_supported_courses():
+        for data_warehouse_course_id in Course.objects.get_supported_courses():
             submission_url = f"""with sub_fact as (select submission_id, assignment_id, course_id, user_id, global_canvas_id, published_score from submission_fact sf join user_dim u on sf.user_id = u.id where course_id = '{data_warehouse_course_id}'),
                              enrollment as (select  distinct(user_id) from enrollment_dim where course_id = '{data_warehouse_course_id}' and workflow_state='active' and type = 'StudentEnrollment'),
                              sub_with_enroll as (select sf.* from sub_fact sf join enrollment e on e.user_id = sf.user_id),
@@ -376,7 +376,7 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("assignment_weight_consideration")
 
         # loop through multiple course ids
-        for data_warehouse_course_id in CourseTemp.objects.get_supported_courses():
+        for data_warehouse_course_id in Course.objects.get_supported_courses():
             is_weight_considered_url = f"""with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact
                                         where course_id = '{data_warehouse_course_id}' group by course_id having sum(group_weight)>1)
                                         (select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)
