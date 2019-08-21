@@ -117,7 +117,12 @@ class DashboardCronJob(CronJobBase):
             else:
                 course_dfs.append(course_df)
 
-        courses_data = pd.concat(course_dfs).reset_index()
+        if len(course_dfs) > 0:
+            courses_data = pd.concat(course_dfs).reset_index()
+        else:
+            logger.info("No course records were found in the database.")
+            courses_data = pd.DataFrame()
+
         CourseVerification = namedtuple("CourseVerification", ["invalid_course_ids", "course_data"])
         return CourseVerification(invalid_course_id_list, courses_data)
 
@@ -188,20 +193,21 @@ class DashboardCronJob(CronJobBase):
 
         logger.debug("in update canvas resource")
 
-        # Select all the files for these courses
-        file_sql = f"select id, file_state, display_name from file_dim where course_id in %(course_ids)s"
-        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids':tuple(Course.objects.get_supported_courses())})
+        course_ids = Course.objects.get_supported_courses()
+        if len(course_ids) > 0:
+            # Select all the files for these courses
+            file_sql = f"select id, file_state, display_name from file_dim where course_id in %(course_ids)s"
+            df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids':tuple(course_ids)})
 
-        # Update these back again based on the dataframe
-        # Remove any rows where file_state is not available!
-        for row in df_attach.itertuples(index=False):
-            if row.file_state == 'available':
-                Resource.objects.filter(id=row.id).update(name=row.display_name)
-                status += f"Row {row.id} updated to {row.display_name}\n"
-            else: 
-                Resource.objects.filter(id=row.id).delete()
-                status += f"Row {row.id} removed as it is not available\n"
-
+            # Update these back again based on the dataframe
+            # Remove any rows where file_state is not available!
+            for row in df_attach.itertuples(index=False):
+                if row.file_state == 'available':
+                    Resource.objects.filter(id=row.id).update(name=row.display_name)
+                    status += f"Row {row.id} updated to {row.display_name}\n"
+                else:
+                    Resource.objects.filter(id=row.id).delete()
+                    status += f"Row {row.id} removed as it is not available\n"
         return status
 
 
@@ -427,7 +433,10 @@ class DashboardCronJob(CronJobBase):
 
         logger.info(warehouse_courses_data.to_json())
         courses = Course.objects.all()
-        courses_string = ", ".join([str(x) for x in Course.objects.get_supported_courses()])
+        if len(courses) > 0:
+            courses_string = ", ".join([str(x) for x in Course.objects.get_supported_courses()])
+        else:
+            courses_string = "N/A"
         status += f"{str(len(courses))} course(s): {courses_string}\n"
 
         for course in courses:
