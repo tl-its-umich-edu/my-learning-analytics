@@ -16,7 +16,7 @@
     "CSP": {
         "REPORT_ONLY": true,
         "/* You should set your domain as the DEFAULT_SRC": "*/",
-        "DEFAULT_SRC": ["'self'", "ngrok.io"],
+        "DEFAULT_SRC": ["'self'","example.edu"],
         "SCRIPT_SRC": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "www.google-analytics.com"],
         "IMG_SRC": ["'self'", "data:", "www.google-analytics.com"],
         "OBJECT_SRC": [],
