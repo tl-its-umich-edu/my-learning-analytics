@@ -5,7 +5,7 @@ from django.utils.safestring import mark_safe
 from django.template.defaultfilters import linebreaksbr
 
 from dashboard.common.db_util import canvas_id_to_incremented_id
-from .models import CourseViewOption, Course
+from .models import CourseViewOption, Course, CourseDateRange
 
 from django.forms.models import ModelForm
 
@@ -32,6 +32,12 @@ class CourseViewOptionInline(admin.StackedInline):
             exclude += (view,)
 
 
+class CourseDateRangeInline(admin.StackedInline):
+    model = CourseDateRange
+    form = AlwaysChangedModelForm
+    exclude = ()
+
+
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
@@ -46,11 +52,11 @@ class CourseForm(forms.ModelForm):
 
 
 class CourseAdmin(admin.ModelAdmin):
-    inlines = [CourseViewOptionInline, ]
+    inlines = [CourseDateRangeInline, CourseViewOptionInline, ]
     form = CourseForm
     list_display = ('id', 'canvas_id', 'name', 'term', '_courseviewoption')
     list_select_related = True
-    readonly_fields = ('term',)
+    readonly_fields = ('id', 'term',)
 
     # Need this method to correctly display the line breaks
     def _courseviewoption(self, obj):

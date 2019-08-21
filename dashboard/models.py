@@ -158,8 +158,6 @@ class Course(models.Model):
     canvas_id = models.BigIntegerField(verbose_name="Canvas Course Id", db_column='canvas_id')
     term = models.ForeignKey(AcademicTerms, verbose_name="Term", on_delete=models.SET_NULL, db_column="term_id", null=True, db_constraint=False)
     name = models.CharField(max_length=255, verbose_name="Name")
-    date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
-    date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)
 
     objects = CourseManager()
 
@@ -167,12 +165,13 @@ class Course(models.Model):
         return self.name
 
     def get_course_date_range(self):
-        if self.date_start is not None:
-            start = self.date_start
+        date_range = self.date_range
+        if date_range.date_start is not None:
+            start = date_range.date_start
         else:
             start = self.term.date_start
-        if self.date_end is not None:
-            end = self.date_end
+        if date_range.date_end is not None:
+            end = date_range.date_end
         else:
             end = self.term.get_correct_date_end()
         DateRange = namedtuple("DateRange", ["start", "end"])
@@ -225,6 +224,17 @@ class CourseViewOption(models.Model):
         except ObjectDoesNotExist:
             logger.warning(f"CourseViewOption does not exist in Course table, skipping")
             return ""
+
+
+class CourseDateRange(models.Model):
+    course = models.OneToOneField(Course, primary_key=True, on_delete=models.CASCADE, related_name='date_range')
+    date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
+    date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)
+    managedByAdmin = models.BooleanField(verbose_name="Range Managed by Administrator", blank=False, null=False, default=False)
+
+    class Meta:
+        db_table = "course_date_range"
+        verbose_name = "Course Date Range"
 
 
 class ResourceQuerySet(models.QuerySet):
