@@ -85,6 +85,20 @@ def deleteAllRecordInTable(tableName):
     return f"delete : {tableName}\n"
 
 
+# use Django ORM to compare warehouse and existing data and, if necessary, update DateTime field of model instance
+def update_datetime_field(course_obj, course_field_name, warehouse_dataframe, warehouse_field_name):
+    warehouse_field_value = warehouse_dataframe[warehouse_field_name].iloc[0]
+    if warehouse_field_value is not None:
+        warehouse_field_value = warehouse_field_value.replace(tzinfo=pytz.UTC)
+    course_field_value = getattr(course_obj, course_field_name)
+    if course_field_value != warehouse_field_value:
+        logger.info("{} (course) is not {} (warehouse).".format(str(course_field_value), str(warehouse_field_value)))
+        setattr(course_obj, course_field_name, warehouse_field_value)
+        logger.info(f"{course_field_name} for {course_obj.id} has been updated.")
+        return [course_field_name]
+    return []
+
+
 # cron job to populate course and user tables
 class DashboardCronJob(CronJobBase):
 
@@ -431,7 +445,7 @@ class DashboardCronJob(CronJobBase):
         status = ""
         logger.debug("while using verify_course_ids data to update course table")
 
-        logger.info(warehouse_courses_data.to_json())
+        logger.debug(warehouse_courses_data.to_json())
         courses = Course.objects.all()
         if len(courses) > 0:
             courses_string = ", ".join([str(x) for x in Course.objects.get_supported_courses()])
@@ -455,23 +469,8 @@ class DashboardCronJob(CronJobBase):
             logger.info(f"Term for {course.id} has been updated.")
             updated_fields.append("term")
 
-            warehouse_course_start = warehouse_course_df["start_at"].iloc[0]
-            if warehouse_course_start is not None:
-                warehouse_course_start = warehouse_course_start.replace(tzinfo=pytz.UTC)
-            if course.date_start != warehouse_course_start:
-                logger.info("{} (course) is not {} (warehouse).".format(str(course.date_start), str(warehouse_course_start)))
-                course.date_start = warehouse_course_start
-                logger.info(f"Date Start for {course.id} has been updated.")
-                updated_fields.append("date_start")
-
-            warehouse_course_end = warehouse_course_df["conclude_at"].iloc[0]
-            if warehouse_course_end is not None:
-                warehouse_course_end = warehouse_course_end.replace(tzinfo=pytz.UTC)
-            if course.date_end != warehouse_course_end:
-                logger.info("{} (course) is not {} (warehouse).".format(str(course.date_end), str(warehouse_course_end)))
-                course.date_end = warehouse_course_end
-                logger.info(f"Date End for {course.id} has been updated.")
-                updated_fields.append("date_end")
+            updated_fields += update_datetime_field(course, "date_start", warehouse_course_df, "start_at")
+            updated_fields += update_datetime_field(course, "date_end", warehouse_course_df, "conclude_at")
 
             course.save()
             status += ", ".join(updated_fields) + "\n"
