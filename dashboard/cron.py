@@ -87,17 +87,19 @@ def deleteAllRecordInTable(tableName):
 
 # use Django ORM to compare warehouse and existing data and, if necessary, update DateTime field of model instance
 def update_datetime_field(course_obj, course_field_name, warehouse_dataframe, warehouse_field_name):
-    date_range = course_obj.date_range
-    warehouse_field_value = warehouse_dataframe[warehouse_field_name].iloc[0]
-    if warehouse_field_value is not None:
-        warehouse_field_value = warehouse_field_value.replace(tzinfo=pytz.UTC)
-    course_field_value = getattr(date_range, course_field_name)
-    if course_field_value != warehouse_field_value:
-        logger.info("{} (course) is not {} (warehouse).".format(str(course_field_value), str(warehouse_field_value)))
-        setattr(date_range, course_field_name, warehouse_field_value)
-        date_range.save()
-        logger.info(f"{course_field_name} for {course_obj.id} has been updated.")
-        return [course_field_name]
+    course_field_value = getattr(course_obj, course_field_name)
+    # Skipping update if the field already has a value, provided by a previous cron run or administrator
+    if course_field_value is not None:
+        logger.info(f"Update of {course_field_name} skipped; existing value was found.")
+    else:
+        warehouse_field_value = warehouse_dataframe[warehouse_field_name].iloc[0]
+        if warehouse_field_value is not None:
+            warehouse_field_value = warehouse_field_value.replace(tzinfo=pytz.UTC)
+        if course_field_value != warehouse_field_value:
+            logger.info("{} (course) is not {} (warehouse).".format(str(course_field_value), str(warehouse_field_value)))
+            setattr(course_obj, course_field_name, warehouse_field_value)
+            logger.info(f"{course_field_name} for {course_obj.id} has been updated.")
+            return [course_field_name]
     return []
 
 
@@ -467,11 +469,8 @@ class DashboardCronJob(CronJobBase):
             logger.info(f"Term for {course.id} has been updated.")
             updated_fields.append("term")
 
-            if not course.date_range.managedByAdmin:
-                updated_fields += update_datetime_field(course, "date_start", warehouse_course_df, "start_at")
-                updated_fields += update_datetime_field(course, "date_end", warehouse_course_df, "conclude_at")
-            else:
-                logger.info("Course date start and end fields are managed by the administrator.")
+            updated_fields += update_datetime_field(course, "date_start", warehouse_course_df, "start_at")
+            updated_fields += update_datetime_field(course, "date_end", warehouse_course_df, "conclude_at")
 
             course.save()
             status += ", ".join(updated_fields) + "\n"
@@ -501,7 +500,8 @@ class DashboardCronJob(CronJobBase):
         status += self.update_term()
 
         if len(Course.objects.get_supported_courses()) == 0:
-            logger.info("Skipping other table updates...")
+            logger.info("Skipping course-related table updates...")
+            status += "Skipped course-related table updates.\n"
         else:
             logger.info("** course")
             status += self.update_course(course_verification.course_data)
