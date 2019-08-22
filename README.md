@@ -71,11 +71,12 @@ Only basic LTI launches are supported at the moment (automatic account creation 
 
 The relative LTI launch url is `/lti/auth/` (ex: `https://example.com/lti/auth/`). *NOTE* The trailing slash after /auth/ is required! You'll get an error about CSRF if you have the wrong URL! :) 
 
-*Canvas Note* When you configure the tool in Canvas the "Privacy" option must be changed from Anonymous to Public to pass along the user information required.
+#### Canvas Notes
+* When you configure the tool in Canvas the "Privacy" option must be changed from Anonymous to Public to pass along the user information required.
 
-`Public: Various identifying information (name, email, Canvas ID, SIS ID of the course, SIS ID of the user, etc.) is sent to the vendor.`
+* You should use the [XML builder](https://www.edu-apps.org/build_xml.html) to generate an XML and past the XML that rather than manually adding it. This will allow options like "Course Navigation" extension.
 
-You also need to configure CSP value in the environment, specifically the FRAME_SRC. (See next section) In addtiion you make sure you are using https and CSRF_COOKIE_SECURE is true with your domain (or instructure.com) in trusted origins.
+* You also need to configure CSP value in the environment, specifically the FRAME_SRC. (See next section) In addtiion you make sure you are using https and CSRF_COOKIE_SECURE is true with your domain (or instructure.com) in trusted origins.
 
 Environment variables:
 
@@ -86,8 +87,6 @@ Environment variables:
 `LTI_PERSON_SOURCED_ID_FIELD`: LTI launch field containing the user's SIS ID (default: `lis_person_sourcedid`). Useful for retrieving SIS ID from custom LTI launch fields if `lis_person_sourcedid` is not available.
 
 `LTI_EMAIL_FIELD`: LTI launch field containing the user's email address (default: `lis_person_contact_email_primary`). Useful for retrieving email from custom LTI launch fields if `lis_person_contact_email_primary` is not available.
-
-`LTI_EMAIL_FIELD`: LTI launch field containing the user's email address (default: `lis_person_contact_email_primary`).
 
 `LTI_CANVAS_COURSE_ID_FIELD`: LTI launch field containing the course's canvas id (default: `custom_canvas_course_id`).
 
