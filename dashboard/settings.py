@@ -410,11 +410,7 @@ SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'RESOURCE_VALUES']
 
 # Method to show the user, if they're authenticated and superuser
 def show_debug_toolbar(request):
-    try:
-        return DEBUG and request.user and request.user.is_authenticated and request.user.is_superuser
-    except:
-        # If there's an exception here just don't show it
-        return False
+    return DEBUG and request.user and request.user.is_authenticated and request.user.is_superuser
 
 DEBUG_TOOLBAR_PANELS = dt_settings.PANELS_DEFAULTS
 

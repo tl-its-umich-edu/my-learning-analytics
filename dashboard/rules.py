@@ -2,7 +2,6 @@ from __future__ import absolute_import
 
 import rules, logging
 from dashboard.models import User
-from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
@@ -13,11 +12,7 @@ def is_admin(user):
 @rules.predicate
 def is_enrolled_in_course(user, course):
     try:
-        User.objects.get(
-            Q(sis_name=user.get_username()) | Q(sis_id=user.get_username()),
-            course_id=course.id,
-        )
-        return True
+        return User.objects.get_user_in_course(user, course).count()
     except User.DoesNotExist:
         logger.error(f'Permissions is_enrolled_in_course: user {user.id} is not enrolled in course {course.id}')
         return False
@@ -25,32 +20,11 @@ def is_enrolled_in_course(user, course):
 @rules.predicate
 def is_instructor_in_course(user, course):
     try:
-        User.objects.get(
-            Q(sis_name=user.get_username()) | Q(sis_id=user.get_username()),
-            course_id=course.id,
-            enrollment_type=User.ENROLLMENT_TYPES.TeacherEnrollment,
-        )
-        return True
+        return User.objects.get_user_in_course(user, course).filter(
+            enrollment_type=User.ENROLLMENT_TYPES.TeacherEnrollment).count()
     except User.DoesNotExist:
         logger.error(f'Permission is_instructor_in_course: user {user.id} is not an instructor in course {course.id}')
         return False
-
-@rules.predicate
-def is_above_student_in_course(user, course):
-    try:
-        enrolled = User.objects.get(
-            sis_name=Q(user.get_username()) | Q(sis_id=user.get_username()),
-            course_id=course.id,
-            enrollment_type__in=[
-                User.ENROLLMENT_TYPES.TeacherEnrollment,
-                User.ENROLLMENT_TYPES.TaEnrollment,
-            ],
-        )
-        return True
-    except User.DoesNotExist:
-        logger.error(f'Permission is_above_student_in_course: user {user.id} is not an instructor or teaching assistant in course {course.id}')
-        return False
-
 
 is_admin_or_enrolled_in_course = is_admin | is_enrolled_in_course
 
