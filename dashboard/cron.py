@@ -210,20 +210,19 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in update canvas resource")
 
         course_ids = Course.objects.get_supported_courses()
-        if len(course_ids) > 0:
-            # Select all the files for these courses
-            file_sql = f"select id, file_state, display_name from file_dim where course_id in %(course_ids)s"
-            df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids':tuple(course_ids)})
+        # Select all the files for these courses
+        file_sql = f"select id, file_state, display_name from file_dim where course_id in %(course_ids)s"
+        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids':tuple(course_ids)})
 
-            # Update these back again based on the dataframe
-            # Remove any rows where file_state is not available!
-            for row in df_attach.itertuples(index=False):
-                if row.file_state == 'available':
-                    Resource.objects.filter(id=row.id).update(name=row.display_name)
-                    status += f"Row {row.id} updated to {row.display_name}\n"
-                else:
-                    Resource.objects.filter(id=row.id).delete()
-                    status += f"Row {row.id} removed as it is not available\n"
+        # Update these back again based on the dataframe
+        # Remove any rows where file_state is not available!
+        for row in df_attach.itertuples(index=False):
+            if row.file_state == 'available':
+                Resource.objects.filter(id=row.id).update(name=row.display_name)
+                status += f"Row {row.id} updated to {row.display_name}\n"
+            else:
+                Resource.objects.filter(id=row.id).delete()
+                status += f"Row {row.id} removed as it is not available\n"
         return status
 
 
@@ -449,10 +448,7 @@ class DashboardCronJob(CronJobBase):
 
         logger.debug(warehouse_courses_data.to_json())
         courses = Course.objects.all()
-        if len(courses) > 0:
-            courses_string = ", ".join([str(x) for x in Course.objects.get_supported_courses()])
-        else:
-            courses_string = "N/A"
+        courses_string = ", ".join([str(x) for x in Course.objects.get_supported_courses()])
         status += f"{str(len(courses))} course(s): {courses_string}\n"
 
         for course in courses:
@@ -504,26 +500,29 @@ class DashboardCronJob(CronJobBase):
         logger.info("** term")
         status += self.update_term()
 
-        logger.info("** course")
-        status += self.update_course(course_verification.course_data)
+        if len(Course.objects.get_supported_courses()) == 0:
+            logger.info("Skipping other table updates...")
+        else:
+            logger.info("** course")
+            status += self.update_course(course_verification.course_data)
 
-        logger.info("** user")
-        status += self.update_user()
+            logger.info("** user")
+            status += self.update_user()
 
-        logger.info("** assignment")
-        status += self.update_groups()
-        status += self.update_assignment()
+            logger.info("** assignment")
+            status += self.update_groups()
+            status += self.update_assignment()
 
-        status += self.submission()
-        status += self.weight_consideration()
+            status += self.submission()
+            status += self.weight_consideration()
 
-        logger.info("** file")
-        if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
-            try:
-                status += self.update_with_bq_access()
-                status += self.update_canvas_resource()
-            except Exception as e:
-                logger.info(e)
+            logger.info("** file")
+            if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
+                try:
+                    status += self.update_with_bq_access()
+                    status += self.update_canvas_resource()
+                except Exception as e:
+                    logger.info(e)
 
         if settings.DATA_WAREHOUSE_IS_UNIZIN:
             logger.info("** informational")
