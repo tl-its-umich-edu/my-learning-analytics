@@ -15,7 +15,7 @@ import Checkbox from '@material-ui/core/Checkbox'
 import Cookie from 'js-cookie'
 import Error from './Error'
 import { handleError, defaultFetchOptions, getCurrentWeek } from '../util/data'
-import { useUserSettingData } from '../service/api'
+import { useUserSettingData, useAssignmentData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 import useUserSetting from '../hooks/useUserSetting'
 
@@ -56,11 +56,14 @@ const assignmentTable = assignmentData => {
 function AssignmentPlanning (props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<Error>Assignment view is hidden for this course.</Error>)
-  const [loaded, error, assignmentDefaultData] = useUserSettingData(courseId, 'assignment')
+  // const [loaded, error, assignmentDefaultData] = useUserSettingData(courseId, 'assignment')
 
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'assignment')
   const [settingChanged, setSettingChanged] = useState(false)
   const [assignmentGradeFilter, setAssignmentGradeFilter] = useState(0)
+  const [assignmentLoaded, assignmentError, assignmentData] = useAssignmentData(courseId, assignmentGradeFilter)
+
+  console.log(userSettingLoaded, userSetting, assignmentData)
 
   useEffect(() => {
     if (userSettingLoaded) {
@@ -80,24 +83,24 @@ function AssignmentPlanning (props) {
   const [defaultValue, setDefaultValue] = useState('')
   // assignment data and weight controller
 
-  const [assignmentData, setAssignmentData] = useState('')
+  // const [assignmentData, setAssignmentData] = useState('')
 
-  console.log(assignmentData)
+  // console.log(assignmentData)
   // defaults setting controllers
   const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
 
   const [defaultLabel, setDefaultLabel] = useState(currentSetting)
-  useEffect(() => {
-    if (loaded) {
-      if (assignmentDefaultData.default === '') {
-        setAssignmentFilter(0)
-        setDefaultValue(0)
-      } else {
-        setAssignmentFilter(assignmentDefaultData.default)
-        setDefaultValue(parseInt(assignmentDefaultData.default))
-      }
-    }
-  }, [loaded])
+  // useEffect(() => {
+  //   if (loaded) {
+  //     if (assignmentDefaultData.default === '') {
+  //       setAssignmentFilter(0)
+  //       setDefaultValue(0)
+  //     } else {
+  //       setAssignmentFilter(assignmentDefaultData.default)
+  //       setDefaultValue(parseInt(assignmentDefaultData.default))
+  //     }
+  //   }
+  // }, [loaded])
 
   const changeDefaultSetting = (event) => {
     const didUserChecked = event.target.checked
@@ -105,63 +108,63 @@ function AssignmentPlanning (props) {
     setDefaultCheckedState(didUserChecked)
     setDefaultLabel(didUserChecked ? currentSetting : rememberSetting)
 
-    if (didUserChecked) {
-      // Django rejects PUT/DELETE/POST calls with out CSRF token.
-      const csrfToken = Cookie.get('csrftoken')
-      const body = { assignment: assignmentFilter }
-      const dataURL = `/api/v1/courses/${courseId}/set_user_default_selection`
+    // if (didUserChecked) {
+    //   // Django rejects PUT/DELETE/POST calls with out CSRF token.
+    //   const csrfToken = Cookie.get('csrftoken')
+    //   const body = { assignment: assignmentFilter }
+    //   const dataURL = `/api/v1/courses/${courseId}/set_user_default_selection`
 
-      defaultFetchOptions.headers['X-CSRFToken'] = csrfToken
-      defaultFetchOptions['method'] = 'PUT'
-      defaultFetchOptions['body'] = JSON.stringify(body)
+    //   defaultFetchOptions.headers['X-CSRFToken'] = csrfToken
+    //   defaultFetchOptions['method'] = 'PUT'
+    //   defaultFetchOptions['body'] = JSON.stringify(body)
 
-      fetch(dataURL, defaultFetchOptions)
-        .then(handleError)
-        .then(res => res.json())
-        .then(data => {
-          const res = data.default
-          if (res === 'success') {
-            setDefaultValue(assignmentFilter)
-            setDefaultCheckedState(true)
-            return
-          }
-          setDefaultLabel(settingNotUpdated)
-        }).catch(_ => {
-          setDefaultLabel(settingNotUpdated)
-        })
-    }
+    //   fetch(dataURL, defaultFetchOptions)
+    //     .then(handleError)
+    //     .then(res => res.json())
+    //     .then(data => {
+    //       const res = data.default
+    //       if (res === 'success') {
+    //         setDefaultValue(assignmentFilter)
+    //         setDefaultCheckedState(true)
+    //         return
+    //       }
+    //       setDefaultLabel(settingNotUpdated)
+    //     }).catch(_ => {
+    //       setDefaultLabel(settingNotUpdated)
+    //     })
+    // }
   }
 
-  const onChangeAssignmentList = event => {
-    const value = event.target.value
-    setAssignmentFilter(value)
-    if (defaultValue === value) {
-      setDefaultCheckedState(true)
-      setDefaultLabel(currentSetting)
-    } else {
-      setDefaultCheckedState(false)
-      setDefaultLabel(rememberSetting)
-    }
-  }
+  // const onChangeAssignmentList = event => {
+  //   const value = event.target.value
+  //   setAssignmentFilter(value)
+  //   if (defaultValue === value) {
+  //     setDefaultCheckedState(true)
+  //     setDefaultLabel(currentSetting)
+  //   } else {
+  //     setDefaultCheckedState(false)
+  //     setDefaultLabel(rememberSetting)
+  //   }
+  // }
 
-  useEffect(() => {
-    if (!loaded) {
-      return
-    }
-    const fetchOptions = { method: 'get', ...defaultFetchOptions }
-    const dataURL = `/api/v1/courses/${courseId}/assignments?percent=${assignmentFilter}`
-    fetch(dataURL, fetchOptions)
-      .then(handleError)
-      .then(res => res.json())
-      .then(data => {
-        setAssignmentData(data)
-      })
-      .catch(_ => {
-        setAssignmentData({})
-      })
-  }, [assignmentFilter]
-  )
-  if (error) return (<Error>Something went wrong, please try again later.</Error>)
+  // useEffect(() => {
+  //   if (!loaded) {
+  //     return
+  //   }
+  //   const fetchOptions = { method: 'get', ...defaultFetchOptions }
+  //   const dataURL = `/api/v1/courses/${courseId}/assignments?percent=${assignmentFilter}`
+  //   fetch(dataURL, fetchOptions)
+  //     .then(handleError)
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       setAssignmentData(data)
+  //     })
+  //     .catch(_ => {
+  //       setAssignmentData({})
+  //     })
+  // }, [assignmentFilter]
+  // )
+  // if (error) return (<Error>Something went wrong, please try again later.</Error>)
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
@@ -221,8 +224,9 @@ function AssignmentPlanning (props) {
               <Typography>Show assignments that weigh at least</Typography>
               <div style={{ display: 'flex' }}>
                 <Select
-                  value={assignmentFilter}
-                  onChange={onChangeAssignmentList}>
+                  value={0}
+                  // onChange={onChangeAssignmentList}
+                  >
                   <MenuItem value={0}>0% (all)</MenuItem>
                   <MenuItem value={2}>2%</MenuItem>
                   <MenuItem value={5}>5%</MenuItem>
