@@ -14,6 +14,9 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from collections import namedtuple
 
+from datetime import datetime, timedelta
+import pytz
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -171,12 +174,16 @@ class Course(models.Model):
     def get_course_date_range(self):
         if self.date_start is not None:
             start = self.date_start
-        else:
+        elif self.term is not None:
             start = self.term.date_start
+        else:
+            start = datetime.now(pytz.UTC)
         if self.date_end is not None:
             end = self.date_end
-        else:
+        elif self.term is not None:
             end = self.term.get_correct_date_end()
+        else:
+            end = start + timedelta(weeks=2)
         DateRange = namedtuple("DateRange", ["start", "end"])
         return DateRange(start, end)
 
