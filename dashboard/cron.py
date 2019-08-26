@@ -95,8 +95,6 @@ def update_datetime_field(course_obj, course_field_name, warehouse_dataframe, wa
         warehouse_field_value = warehouse_dataframe[warehouse_field_name].iloc[0]
         if warehouse_field_value is not None:
             warehouse_field_value = warehouse_field_value.replace(tzinfo=pytz.UTC)
-        if course_field_value != warehouse_field_value:
-            logger.info("{} (course) is not {} (warehouse).".format(str(course_field_value), str(warehouse_field_value)))
             setattr(course_obj, course_field_name, warehouse_field_value)
             logger.info(f"{course_field_name} for {course_obj.id} has been updated.")
             return [course_field_name]
@@ -128,7 +126,7 @@ class DashboardCronJob(CronJobBase):
             logger.debug(course_sql)
             course_df = pd.read_sql(course_sql, conns['DATA_WAREHOUSE'])
 
-            # error out when course id is invalid, otherwise accumulate dataframes
+            # error out when course id is invalid, otherwise add DataFrame to list
             if course_df.empty:
                 logger.error(f"""Course {course_id} don't have the entry in data warehouse yet. """)
                 invalid_course_id_list.append(course_id)
@@ -211,8 +209,8 @@ class DashboardCronJob(CronJobBase):
 
         logger.debug("in update canvas resource")
 
-        course_ids = Course.objects.get_supported_courses()
         # Select all the files for these courses
+        course_ids = Course.objects.get_supported_courses()
         file_sql = f"select id, file_state, display_name from file_dim where course_id in %(course_ids)s"
         df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids':tuple(course_ids)})
 
