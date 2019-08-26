@@ -2,13 +2,18 @@ from __future__ import print_function #python 3 support
 
 import random
 import string
+import logging
 
 from django.contrib.auth import login
 from django.urls import reverse
 from django.conf import settings
 from django.http import HttpResponseRedirect
 
+from pylti.common import LTIException
+
 from django.contrib.auth.models import User
+
+logger = logging.getLogger(__name__)
 
 RANDOM_PASSWORD_DEFAULT_LENGTH = 32
 
@@ -27,7 +32,7 @@ def valid_lti_request(user_payload, request):
         login(request, user_obj)
     else:
         #handle no username from LTI launch
-        return HttpResponseRedirect(reverse('django_lti_auth:denied'))
+        raise LTIException("No username supplied in the launch, you should check your provider and/or settings.")
 
     url = reverse('home')
     if canvas_course_id:
@@ -35,5 +40,5 @@ def valid_lti_request(user_payload, request):
 
     return url
 
-# def invalid_lti_request(user_payload):
-#     pass
+def invalid_lti_request(user_payload):
+    logger.info(f"Invalid LTI request for {user_payload}")
