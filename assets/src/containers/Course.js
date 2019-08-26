@@ -7,17 +7,18 @@ import AssignmentPlanning from './AssignmentPlanning'
 import ResourcesAccessed from './ResourcesAccessed'
 import IndexPage from './IndexPage'
 import Spinner from '../components/Spinner'
-import Error from './Error'
 import { isObjectEmpty } from '../util/object'
 import { useCourseInfo } from '../service/api'
+import AlertBanner from "../components/AlertBanner";
+import ErrorBanner from "../components/ErrorBanner";
 
 function Course (props) {
   const { courseId, user } = props
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
-  if (error) return (<Error>Something went wrong, please try again later.</Error>)
-  if (loaded && isObjectEmpty(courseInfo)) return (<Error>Tool is not enabled for this course.</Error>)
+  if (error) return (<ErrorBanner/>)
+  if (loaded && isObjectEmpty(courseInfo)) return (<AlertBanner>Tool is not enabled for this course.</AlertBanner>)
 
   return (
     <>

@@ -13,7 +13,8 @@ import createToolTip from '../util/createToolTip'
 import TableAssignment from '../components/TableAssignment'
 import Checkbox from '@material-ui/core/Checkbox'
 import Cookie from 'js-cookie'
-import Error from './Error'
+import AlertBanner from '../components/AlertBanner'
+import ErrorBanner from '../components/ErrorBanner'
 import { handleError, defaultFetchOptions } from '../util/data'
 import { useUserSettingData } from '../service/api'
 
@@ -53,7 +54,7 @@ export const getCurrentWeek = assignmentData => {
 
 const assignmentTable = assignmentData => {
   if (!assignmentData || Object.keys(assignmentData).length === 0) {
-    return (<Typography>No data provided</Typography>)
+    return (<AlertBanner>No assignment data is available for this course.</AlertBanner>)
   }
   return <TableAssignment
     tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
@@ -64,7 +65,7 @@ const assignmentTable = assignmentData => {
 
 function AssignmentPlanning (props) {
   const { classes, disabled, courseId } = props
-  if (disabled) return (<Error>Assignment view is hidden for this course.</Error>)
+  if (disabled) return (<AlertBanner>The Assignment Planning view is hidden for this course.</AlertBanner>)
   const [loaded, error, assignmentDefaultData] = useUserSettingData(courseId, 'assignment')
 
   const currentSetting = 'My current setting'
@@ -157,7 +158,7 @@ function AssignmentPlanning (props) {
         )
     }, [assignmentFilter]
   )
-  if (error) return (<Error>Something went wrong, please try again later.</Error>)
+  if (error) return (<ErrorBanner/>)
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>

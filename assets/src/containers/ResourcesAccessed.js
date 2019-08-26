@@ -15,7 +15,8 @@ import { useUserSettingData } from '../service/api'
 import { handleError, defaultFetchOptions } from '../util/data'
 import ResourceAccessChart from '../components/ResourceAccessChart'
 import Cookie from 'js-cookie'
-import Error from './Error'
+import AlertBanner from '../components/AlertBanner'
+import ErrorBanner from '../components/ErrorBanner'
 import { type } from 'os';
 
 const styles = theme => ({
@@ -44,7 +45,7 @@ const settingNotUpdated = 'Setting not updated'
 
 function ResourcesAccessed (props) {
   const { classes, courseInfo, courseId, disabled } = props
-  if (disabled) return (<Error>Files view is hidden for this course.</Error>)
+  if (disabled) return (<AlertBanner>The Resources Accessed view is hidden for this course.</AlertBanner>)
   let resourceTypes = courseInfo.resource_types
   if (resourceTypes.length === 0) {
     resourceTypes = ['Files']
@@ -217,7 +218,7 @@ function ResourcesAccessed (props) {
       return (<div style={{textAlign: "center", fontWeight: "900", color:"#D8000C"}}><p>Please select a resource type to display data</p></div>)
     }
     else if (!resourceData || Object.keys(resourceData).length === 0) {
-      return (<p>No data provided</p>)
+      return (<AlertBanner>No resource data is available for the selected week(s).</AlertBanner>)
     }
     else {
       return (
@@ -230,7 +231,7 @@ function ResourcesAccessed (props) {
       )
     }
   }
-  if (error) return (<Error>Something went wrong, please try again later.</Error>)
+  if (error) return (<ErrorBanner/>)
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>

@@ -8,7 +8,8 @@ import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
-import Error from './Error'
+import ErrorBanner from '../components/ErrorBanner'
+import AlertBanner from '../components/AlertBanner'
 import { average, roundToOneDecimal, median } from '../util/math'
 import { useGradeData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
@@ -31,7 +32,7 @@ const styles = theme => ({
 
 function GradeDistribution (props) {
   const { classes, disabled, courseId, user } = props
-  if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
+  if (disabled) return (<AlertBanner>The Grade Distribution view is hidden for this course.</AlertBanner>)
 
   const [gradeLoaded, gradeError, gradeData] = useGradeData(courseId)
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'grade')
@@ -55,8 +56,7 @@ function GradeDistribution (props) {
     [showGrade]
   )
 
-  if (gradeError) return (<Error>Something went wrong, please try again later.</Error>)
-  if (gradeLoaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
+  if (gradeError) return (<ErrorBanner/>)
 
   const BuildGradeView = () => {
     const grades = gradeData.map(x => x.current_grade)
@@ -110,7 +110,11 @@ function GradeDistribution (props) {
         </Grid>
       </Grid>
     )
-  }
+  };
+
+  const content = (gradeLoaded && isObjectEmpty(gradeData)) ?
+      (<AlertBanner>No grade data is available for this course.</AlertBanner>) :
+      (gradeLoaded ? <BuildGradeView /> : <Spinner />);
 
   return (
     <div className={classes.root}>
@@ -118,11 +122,7 @@ function GradeDistribution (props) {
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom>Grade Distribution</Typography>
-            {
-              gradeLoaded
-                ? <BuildGradeView />
-                : <Spinner />
-            }
+            {content}
           </Paper>
         </Grid>
       </Grid>
