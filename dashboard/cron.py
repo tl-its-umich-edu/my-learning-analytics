@@ -1,6 +1,4 @@
 
-from __future__ import print_function  # python 3 support
-
 from django.db import connections as conns
 
 from dashboard.common import db_util
