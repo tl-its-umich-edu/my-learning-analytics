@@ -325,6 +325,7 @@ class User(models.Model):
         db_table = 'user'
         unique_together = (('id', 'course_id'),)
 
+
 class ResourceAccess(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
     resource_id = models.CharField(blank=True, max_length=255, null=False, verbose_name='Resource Id')

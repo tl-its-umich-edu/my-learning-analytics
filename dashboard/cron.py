@@ -1,17 +1,17 @@
 
-from __future__ import print_function #python 3 support
-
 from django.db import connections as conns
 
 from dashboard.common import db_util
 
 import logging
 import datetime
+import pytz
 
 from sqlalchemy import create_engine
 from django.conf import settings
+from collections import namedtuple
 
-from dashboard.models import Course, Resource
+from dashboard.models import Course, Resource, AcademicTerms
 
 import pandas as pd
 
@@ -33,7 +33,7 @@ logger.debug("db-user:" + db_user)
 
 engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}?charset=utf8mb4"
                        .format(db = db_name,  # your mysql database name
-                               user = db_user, # your mysql user for the database
+                               user = db_user,  # your mysql user for the database
                                password = db_password, # password for user
                                host = db_host,
                                port = db_port))
@@ -67,11 +67,13 @@ def util_function(data_warehouse_course_id, sql_string, mysql_table, table_ident
     # returns the row size of dataframe
     return f"{str(df.shape[0])} {mysql_table} : {data_warehouse_course_id}\n"
 
+
 # execute database query
 def executeDbQuery(query):
     with engine.connect() as connection:
         connection.detach()
         connection.execute(query)
+
 
 # remove all records inside the specified table
 def deleteAllRecordInTable(tableName):
@@ -80,16 +82,35 @@ def deleteAllRecordInTable(tableName):
 
     return f"delete : {tableName}\n"
 
+
+# use Django ORM to compare warehouse and existing data and, if necessary, update DateTime field of model instance
+def update_datetime_field(course_obj, course_field_name, warehouse_dataframe, warehouse_field_name):
+    course_field_value = getattr(course_obj, course_field_name)
+    # Skipping update if the field already has a value, provided by a previous cron run or administrator
+    if course_field_value is not None:
+        logger.info(f"Update of {course_field_name} skipped; existing value was found.")
+    else:
+        warehouse_field_value = warehouse_dataframe[warehouse_field_name].iloc[0]
+        if warehouse_field_value is not None:
+            warehouse_field_value = warehouse_field_value.replace(tzinfo=pytz.UTC)
+            setattr(course_obj, course_field_name, warehouse_field_value)
+            logger.info(f"{course_field_name} for {course_obj.id} has been updated.")
+            return [course_field_name]
+    return []
+
+
 # cron job to populate course and user tables
 class DashboardCronJob(CronJobBase):
 
     schedule = Schedule(run_at_times=settings.RUN_AT_TIMES)
     code = 'dashboard.DashboardCronJob'    # a unique code
 
+
     # verify whether course ids are valid
     def verify_course_ids(self):
         # whether all course ids are valid ids
         invalid_course_id_list = []
+        course_dfs = []
 
         logger.debug("in checking course")
 
@@ -103,13 +124,22 @@ class DashboardCronJob(CronJobBase):
             logger.debug(course_sql)
             course_df = pd.read_sql(course_sql, conns['DATA_WAREHOUSE'])
 
-            # error out when course id is invalid
+            # error out when course id is invalid, otherwise add DataFrame to list
             if course_df.empty:
                 logger.error(f"""Course {course_id} don't have the entry in data warehouse yet. """)
                 invalid_course_id_list.append(course_id)
+            else:
+                course_dfs.append(course_df)
 
+        if len(course_dfs) > 0:
+            courses_data = pd.concat(course_dfs).reset_index()
+        else:
+            logger.info("No course records were found in the database.")
+            courses_data = pd.DataFrame()
 
-        return invalid_course_id_list
+        CourseVerification = namedtuple("CourseVerification", ["invalid_course_ids", "course_data"])
+        return CourseVerification(invalid_course_id_list, courses_data)
+
 
     # update USER records from DATA_WAREHOUSE
     def update_user(self):
@@ -148,6 +178,7 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
+
     # update unizin metadata from DATA_WAREHOUSE
     def update_unizin_metadata(self):
 
@@ -169,7 +200,6 @@ class DashboardCronJob(CronJobBase):
         return status
 
 
-
     # update file records from Canvas that don't have names provided
     def update_canvas_resource(self):
         # cron status
@@ -178,8 +208,9 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in update canvas resource")
 
         # Select all the files for these courses
+        course_ids = Course.objects.get_supported_courses()
         file_sql = f"select id, file_state, display_name from file_dim where course_id in %(course_ids)s"
-        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids':tuple(Course.objects.get_supported_courses())})
+        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids':tuple(course_ids)})
 
         # Update these back again based on the dataframe
         # Remove any rows where file_state is not available!
@@ -187,11 +218,11 @@ class DashboardCronJob(CronJobBase):
             if row.file_state == 'available':
                 Resource.objects.filter(id=row.id).update(name=row.display_name)
                 status += f"Row {row.id} updated to {row.display_name}\n"
-            else: 
+            else:
                 Resource.objects.filter(id=row.id).delete()
                 status += f"Row {row.id} removed as it is not available\n"
-
         return status
+
 
     # update RESOURCE_ACCESS records from BigQuery
     def update_with_bq_access(self):
@@ -289,6 +320,7 @@ class DashboardCronJob(CronJobBase):
         status +=(f"TBytes billed for BQ: {total_tbytes_billed} = ${total_tbytes_price}\n")
         return status
 
+
     def update_groups(self):
         # cron status
         status =""
@@ -314,6 +346,7 @@ class DashboardCronJob(CronJobBase):
             status += util_function(data_warehouse_course_id, assignment_groups_sql, 'assignment_groups')
 
         return status
+
 
     def update_assignment(self):
         #Load the assignment info w.r.t to a course such as due_date, points etc
@@ -342,7 +375,7 @@ class DashboardCronJob(CronJobBase):
     def submission(self):
         #student submission information for assignments
         # cron status
-        status =""
+        status = ""
 
         logger.info("update_submission(): ")
 
@@ -387,6 +420,7 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
+
     def update_term(self):
         # cron status
         status = ""
@@ -403,6 +437,42 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
+
+    # update course records with data returned from verify_course_ids, only making changes when necessary
+    def update_course(self, warehouse_courses_data):
+        # cron status
+        status = ""
+        logger.debug("while using verify_course_ids data to update course table")
+
+        logger.debug(warehouse_courses_data.to_json())
+        courses = Course.objects.all()
+        courses_string = ", ".join([str(x) for x in Course.objects.get_supported_courses()])
+        status += f"{str(len(courses))} course(s): {courses_string}\n"
+
+        for course in courses:
+            updated_fields = []
+            status += f"course {course.id}: updated "
+            warehouse_course_df = warehouse_courses_data.loc[warehouse_courses_data["id"] == course.id]
+
+            warehouse_course_name = warehouse_course_df["name"].iloc[0]
+            if course.name != warehouse_course_name:
+                course.name = warehouse_course_name
+                logger.info(f"Name for {course.id} has been updated.")
+                updated_fields.append("name")
+
+            # term is always updated because the term records are deleted by the update_term method
+            course.term = AcademicTerms.objects.get(id=warehouse_course_df["enrollment_term_id"])
+            logger.info(f"Term for {course.id} has been updated.")
+            updated_fields.append("term")
+
+            updated_fields += update_datetime_field(course, "date_start", warehouse_course_df, "start_at")
+            updated_fields += update_datetime_field(course, "date_end", warehouse_course_df, "conclude_at")
+
+            course.save()
+            status += ", ".join(updated_fields) + "\n"
+        return status
+
+
     def do(self):
         logger.info("** dashboard cron tab")
 
@@ -410,7 +480,8 @@ class DashboardCronJob(CronJobBase):
 
         status += "Start cron: " +  str(datetime.datetime.now()) + "\n"
 
-        invalid_course_id_list = self.verify_course_ids()
+        course_verification = self.verify_course_ids()
+        invalid_course_id_list = course_verification.invalid_course_ids
         logger.debug(f"invalid id {invalid_course_id_list}")
         if len(invalid_course_id_list) > 0:
             # error out and stop cron job
@@ -424,23 +495,30 @@ class DashboardCronJob(CronJobBase):
         logger.info("** term")
         status += self.update_term()
 
-        logger.info("** user")
-        status += self.update_user()
+        if len(Course.objects.get_supported_courses()) == 0:
+            logger.info("Skipping course-related table updates...")
+            status += "Skipped course-related table updates.\n"
+        else:
+            logger.info("** course")
+            status += self.update_course(course_verification.course_data)
 
-        logger.info("** assignment")
-        status += self.update_groups()
-        status += self.update_assignment()
+            logger.info("** user")
+            status += self.update_user()
 
-        status += self.submission()
-        status += self.weight_consideration()
+            logger.info("** assignment")
+            status += self.update_groups()
+            status += self.update_assignment()
 
-        logger.info("** file")
-        if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
-            try:
-                status += self.update_with_bq_access()
-                status += self.update_canvas_resource()
-            except Exception as e:
-                logger.info(e)
+            status += self.submission()
+            status += self.weight_consideration()
+
+            logger.info("** file")
+            if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
+                try:
+                    status += self.update_with_bq_access()
+                    status += self.update_canvas_resource()
+                except Exception as e:
+                    logger.info(e)
 
         if settings.DATA_WAREHOUSE_IS_UNIZIN:
             logger.info("** informational")
