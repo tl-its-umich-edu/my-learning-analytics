@@ -57,14 +57,11 @@ const assignmentTable = assignmentData => {
 function AssignmentPlanning (props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<Error>Assignment view is hidden for this course.</Error>)
-  // const [loaded, error, assignmentDefaultData] = useUserSettingData(courseId, 'assignment')
 
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'assignment')
-  const [settingChanged, setSettingChanged] = useState(false)
+  const [saveSettingCheckbox, setSaveSettingCheckbox] = useState(false)
   const [assignmentGradeFilter, setAssignmentGradeFilter] = useState(0)
   const [assignmentLoaded, assignmentError, assignmentData] = useAssignmentData(courseId, assignmentGradeFilter)
-
-  console.log(userSettingLoaded, userSetting, assignmentData)
 
   useEffect(() => {
     if (userSettingLoaded) {
@@ -76,11 +73,12 @@ function AssignmentPlanning (props) {
     }
   }, [userSettingLoaded])
 
+  // console.log(saveSettingCheckbox)
+
   const [userSettingSaved, userSettingResponse] = useSetUserSetting(
     courseId,
     { assignment: assignmentGradeFilter },
-    settingChanged,
-    [assignmentGradeFilter]
+    saveSettingCheckbox
   )
 
   const currentSetting = 'My current setting'
@@ -110,43 +108,42 @@ function AssignmentPlanning (props) {
   //   }
   // }, [loaded])
 
-  const changeDefaultSetting = (event) => {
-    const didUserChecked = event.target.checked
+  // const changeDefaultSetting = (event) => {
+  //   const didUserChecked = event.target.checked
 
-    setDefaultCheckedState(didUserChecked)
-    setDefaultLabel(didUserChecked ? currentSetting : rememberSetting)
+  //   setDefaultCheckedState(didUserChecked)
+  //   setDefaultLabel(didUserChecked ? currentSetting : rememberSetting)
 
-    // if (didUserChecked) {
-    //   // Django rejects PUT/DELETE/POST calls with out CSRF token.
-    //   const csrfToken = Cookie.get('csrftoken')
-    //   const body = { assignment: assignmentFilter }
-    //   const dataURL = `/api/v1/courses/${courseId}/set_user_default_selection`
+  //   // if (didUserChecked) {
+  //   //   // Django rejects PUT/DELETE/POST calls with out CSRF token.
+  //   //   const csrfToken = Cookie.get('csrftoken')
+  //   //   const body = { assignment: assignmentFilter }
+  //   //   const dataURL = `/api/v1/courses/${courseId}/set_user_default_selection`
 
-    //   defaultFetchOptions.headers['X-CSRFToken'] = csrfToken
-    //   defaultFetchOptions['method'] = 'PUT'
-    //   defaultFetchOptions['body'] = JSON.stringify(body)
+  //   //   defaultFetchOptions.headers['X-CSRFToken'] = csrfToken
+  //   //   defaultFetchOptions['method'] = 'PUT'
+  //   //   defaultFetchOptions['body'] = JSON.stringify(body)
 
-    //   fetch(dataURL, defaultFetchOptions)
-    //     .then(handleError)
-    //     .then(res => res.json())
-    //     .then(data => {
-    //       const res = data.default
-    //       if (res === 'success') {
-    //         setDefaultValue(assignmentFilter)
-    //         setDefaultCheckedState(true)
-    //         return
-    //       }
-    //       setDefaultLabel(settingNotUpdated)
-    //     }).catch(_ => {
-    //       setDefaultLabel(settingNotUpdated)
-    //     })
-    // }
-  }
+  //   //   fetch(dataURL, defaultFetchOptions)
+  //   //     .then(handleError)
+  //   //     .then(res => res.json())
+  //   //     .then(data => {
+  //   //       const res = data.default
+  //   //       if (res === 'success') {
+  //   //         setDefaultValue(assignmentFilter)
+  //   //         setDefaultCheckedState(true)
+  //   //         return
+  //   //       }
+  //   //       setDefaultLabel(settingNotUpdated)
+  //   //     }).catch(_ => {
+  //   //       setDefaultLabel(settingNotUpdated)
+  //   //     })
+  //   // }
+  // }
 
-  const onChangeAssignmentList = event => {
+  const handleAssignmentFilter = event => {
     const value = event.target.value
     if (assignmentGradeFilter !== value) {
-      setSettingChanged(true)
       setAssignmentGradeFilter(value)
     }
     // if (defaultValue === value) {
@@ -236,7 +233,7 @@ function AssignmentPlanning (props) {
               <div style={{ display: 'flex' }}>
                 <Select
                   value={assignmentGradeFilter}
-                  onChange={onChangeAssignmentList}
+                  onChange={handleAssignmentFilter}
                 >
                   <MenuItem value={0}>0% (all)</MenuItem>
                   <MenuItem value={2}>2%</MenuItem>
@@ -246,15 +243,11 @@ function AssignmentPlanning (props) {
                   <MenuItem value={50}>50%</MenuItem>
                   <MenuItem value={75}>75%</MenuItem>
                 </Select>
-                {
-                  defaultCheckboxState
-                    ? <div style={{ padding: '10px' }} />
-                    : <Checkbox
-                      checked={defaultCheckboxState}
-                      onChange={changeDefaultSetting}
-                      value='checked'
-                    />
-                }
+                <Checkbox
+                  checked={saveSettingCheckbox}
+                  onChange={() => setSaveSettingCheckbox(!saveSettingCheckbox)}
+                  value='checked'
+                />
                 <div style={{ padding: '15px 2px' }}>{defaultLabel}</div>
               </div>
             </FormControl>
