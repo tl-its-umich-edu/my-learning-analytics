@@ -18,6 +18,7 @@ import { handleError, defaultFetchOptions, getCurrentWeek } from '../util/data'
 import { useUserSettingData, useAssignmentData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 import useUserSetting from '../hooks/useUserSetting'
+import useSetUserSetting from '../hooks/useSetUserSetting'
 
 const styles = theme => ({
   root: {
@@ -70,17 +71,24 @@ function AssignmentPlanning (props) {
       if (isObjectEmpty(userSetting.default)) {
         setAssignmentGradeFilter(0)
       } else {
-        setAssignmentGradeFilter()
+        setAssignmentGradeFilter(userSetting.default)
       }
     }
-  })
+  }, [userSettingLoaded])
+
+  const [userSettingSaved, userSettingResponse] = useSetUserSetting(
+    courseId,
+    { assignment: assignmentGradeFilter },
+    settingChanged,
+    [assignmentGradeFilter]
+  )
 
   const currentSetting = 'My current setting'
   const rememberSetting = 'Remember my setting'
   const settingNotUpdated = 'Setting not updated'
 
   // initial default value that we get from backend and updated value when user save the default setting
-  const [defaultValue, setDefaultValue] = useState('')
+  // const [defaultValue, setDefaultValue] = useState('')
   // assignment data and weight controller
 
   // const [assignmentData, setAssignmentData] = useState('')
@@ -135,17 +143,20 @@ function AssignmentPlanning (props) {
     // }
   }
 
-  // const onChangeAssignmentList = event => {
-  //   const value = event.target.value
-  //   setAssignmentFilter(value)
-  //   if (defaultValue === value) {
-  //     setDefaultCheckedState(true)
-  //     setDefaultLabel(currentSetting)
-  //   } else {
-  //     setDefaultCheckedState(false)
-  //     setDefaultLabel(rememberSetting)
-  //   }
-  // }
+  const onChangeAssignmentList = event => {
+    const value = event.target.value
+    if (assignmentGradeFilter !== value) {
+      setSettingChanged(true)
+      setAssignmentGradeFilter(value)
+    }
+    // if (defaultValue === value) {
+    //   setDefaultCheckedState(true)
+    //   setDefaultLabel(currentSetting)
+    // } else {
+    //   setDefaultCheckedState(false)
+    //   setDefaultLabel(rememberSetting)
+    // }
+  }
 
   // useEffect(() => {
   //   if (!loaded) {
@@ -224,9 +235,9 @@ function AssignmentPlanning (props) {
               <Typography>Show assignments that weigh at least</Typography>
               <div style={{ display: 'flex' }}>
                 <Select
-                  value={0}
-                  // onChange={onChangeAssignmentList}
-                  >
+                  value={assignmentGradeFilter}
+                  onChange={onChangeAssignmentList}
+                >
                   <MenuItem value={0}>0% (all)</MenuItem>
                   <MenuItem value={2}>2%</MenuItem>
                   <MenuItem value={5}>5%</MenuItem>
