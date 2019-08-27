@@ -57,10 +57,13 @@ function AssignmentPlanning (props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<Error>Assignment view is hidden for this course.</Error>)
 
-  const [showSaveSettingCheckbox, setShowSaveSettingCheckbox] = useState(false)
-  const [saveSettingCheckbox, setSaveSettingCheckbox] = useState(false)
-  const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'assignment', [saveSettingCheckbox])
+  // const [showSaveSettingCheckbox, setShowSaveSettingCheckbox] = useState(false)
+  // const [saveSettingCheckbox, setSaveSettingCheckbox] = useState(false)
+  // const [checkboxLabel, setCheckboxLabel] = useState('Save setting')
+
   const [assignmentGradeFilter, setAssignmentGradeFilter] = useState(0)
+  const [assignmentFilterChanged, setAssignmentFilterChanged] = useState(false)
+  const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'assignment', [setAssignmentGradeFilter])
   const [assignmentLoaded, assignmentError, assignmentData] = useAssignmentData(courseId, assignmentGradeFilter)
 
   useEffect(() => {
@@ -76,16 +79,18 @@ function AssignmentPlanning (props) {
   const [userSettingSaved, userSettingResponse] = useSetUserSetting(
     courseId,
     { assignment: assignmentGradeFilter },
-    saveSettingCheckbox,
-    [saveSettingCheckbox]
+    assignmentFilterChanged,
+    [assignmentGradeFilter]
   )
 
   const handleAssignmentFilter = event => {
     const value = event.target.value
     if (assignmentGradeFilter !== value) {
       setAssignmentGradeFilter(value)
-      setSaveSettingCheckbox(false)
-      setShowSaveSettingCheckbox(true)
+      setAssignmentFilterChanged(true)
+      // setSaveSettingCheckbox(false)
+      // setCheckboxLabel('Save setting')
+      // setShowSaveSettingCheckbox(true)
     }
   }
 
@@ -138,16 +143,16 @@ function AssignmentPlanning (props) {
                   <MenuItem value={50}>50%</MenuItem>
                   <MenuItem value={75}>75%</MenuItem>
                 </Select>
-                {showSaveSettingCheckbox
+                {/* {showSaveSettingCheckbox
                   ? <>
                     <Checkbox
                       checked={saveSettingCheckbox}
                       onChange={() => setSaveSettingCheckbox(!saveSettingCheckbox)}
                       value='checked'
                     />
-                    <div style={{ padding: '15px 2px' }}>Save Setting</div>
+                    <div style={{ padding: '15px 2px' }}>{userSettingSaved ? 'Setting saved!' : 'Save setting'}</div>
                   </>
-                  : null}
+                  : null} */}
               </div>
             </FormControl>
             <UserSettingSnackbar
