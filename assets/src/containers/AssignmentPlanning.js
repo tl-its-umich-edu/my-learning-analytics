@@ -12,10 +12,10 @@ import ProgressBar from '../components/ProgressBar'
 import createToolTip from '../util/createToolTip'
 import TableAssignment from '../components/TableAssignment'
 import Checkbox from '@material-ui/core/Checkbox'
-import Cookie from 'js-cookie'
+import UserSettingSnackbar from '../components/UserSettingSnackbar'
 import Error from './Error'
-import { handleError, defaultFetchOptions, getCurrentWeek } from '../util/data'
-import { useUserSettingData, useAssignmentData } from '../service/api'
+import { getCurrentWeek } from '../util/data'
+import { useAssignmentData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 import useUserSetting from '../hooks/useUserSetting'
 import useSetUserSetting from '../hooks/useSetUserSetting'
@@ -54,12 +54,13 @@ const assignmentTable = assignmentData => {
   />
 }
 
-function AssignmentPlanning (props) {
+function AssignmentPlanning(props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<Error>Assignment view is hidden for this course.</Error>)
 
-  const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'assignment')
+  const [showSaveSettingCheckbox, setShowSaveSettingCheckbox] = useState(false)
   const [saveSettingCheckbox, setSaveSettingCheckbox] = useState(false)
+  const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'assignment', [saveSettingCheckbox])
   const [assignmentGradeFilter, setAssignmentGradeFilter] = useState(0)
   const [assignmentLoaded, assignmentError, assignmentData] = useAssignmentData(courseId, assignmentGradeFilter)
 
@@ -78,100 +79,18 @@ function AssignmentPlanning (props) {
   const [userSettingSaved, userSettingResponse] = useSetUserSetting(
     courseId,
     { assignment: assignmentGradeFilter },
-    saveSettingCheckbox
+    saveSettingCheckbox,
+    [saveSettingCheckbox]
   )
-
-  const currentSetting = 'My current setting'
-  const rememberSetting = 'Remember my setting'
-  const settingNotUpdated = 'Setting not updated'
-
-  // initial default value that we get from backend and updated value when user save the default setting
-  // const [defaultValue, setDefaultValue] = useState('')
-  // assignment data and weight controller
-
-  // const [assignmentData, setAssignmentData] = useState('')
-
-  // console.log(assignmentData)
-  // defaults setting controllers
-  const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
-
-  const [defaultLabel, setDefaultLabel] = useState(currentSetting)
-  // useEffect(() => {
-  //   if (loaded) {
-  //     if (assignmentDefaultData.default === '') {
-  //       setAssignmentFilter(0)
-  //       setDefaultValue(0)
-  //     } else {
-  //       setAssignmentFilter(assignmentDefaultData.default)
-  //       setDefaultValue(parseInt(assignmentDefaultData.default))
-  //     }
-  //   }
-  // }, [loaded])
-
-  // const changeDefaultSetting = (event) => {
-  //   const didUserChecked = event.target.checked
-
-  //   setDefaultCheckedState(didUserChecked)
-  //   setDefaultLabel(didUserChecked ? currentSetting : rememberSetting)
-
-  //   // if (didUserChecked) {
-  //   //   // Django rejects PUT/DELETE/POST calls with out CSRF token.
-  //   //   const csrfToken = Cookie.get('csrftoken')
-  //   //   const body = { assignment: assignmentFilter }
-  //   //   const dataURL = `/api/v1/courses/${courseId}/set_user_default_selection`
-
-  //   //   defaultFetchOptions.headers['X-CSRFToken'] = csrfToken
-  //   //   defaultFetchOptions['method'] = 'PUT'
-  //   //   defaultFetchOptions['body'] = JSON.stringify(body)
-
-  //   //   fetch(dataURL, defaultFetchOptions)
-  //   //     .then(handleError)
-  //   //     .then(res => res.json())
-  //   //     .then(data => {
-  //   //       const res = data.default
-  //   //       if (res === 'success') {
-  //   //         setDefaultValue(assignmentFilter)
-  //   //         setDefaultCheckedState(true)
-  //   //         return
-  //   //       }
-  //   //       setDefaultLabel(settingNotUpdated)
-  //   //     }).catch(_ => {
-  //   //       setDefaultLabel(settingNotUpdated)
-  //   //     })
-  //   // }
-  // }
 
   const handleAssignmentFilter = event => {
     const value = event.target.value
     if (assignmentGradeFilter !== value) {
       setAssignmentGradeFilter(value)
+      setShowSaveSettingCheckbox(true)
     }
-    // if (defaultValue === value) {
-    //   setDefaultCheckedState(true)
-    //   setDefaultLabel(currentSetting)
-    // } else {
-    //   setDefaultCheckedState(false)
-    //   setDefaultLabel(rememberSetting)
-    // }
   }
 
-  // useEffect(() => {
-  //   if (!loaded) {
-  //     return
-  //   }
-  //   const fetchOptions = { method: 'get', ...defaultFetchOptions }
-  //   const dataURL = `/api/v1/courses/${courseId}/assignments?percent=${assignmentFilter}`
-  //   fetch(dataURL, fetchOptions)
-  //     .then(handleError)
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       setAssignmentData(data)
-  //     })
-  //     .catch(_ => {
-  //       setAssignmentData({})
-  //     })
-  // }, [assignmentFilter]
-  // )
   // if (error) return (<Error>Something went wrong, please try again later.</Error>)
   return (
     <div className={classes.root}>
@@ -243,14 +162,21 @@ function AssignmentPlanning (props) {
                   <MenuItem value={50}>50%</MenuItem>
                   <MenuItem value={75}>75%</MenuItem>
                 </Select>
-                <Checkbox
-                  checked={saveSettingCheckbox}
-                  onChange={() => setSaveSettingCheckbox(!saveSettingCheckbox)}
-                  value='checked'
-                />
-                <div style={{ padding: '15px 2px' }}>{defaultLabel}</div>
+                {showSaveSettingCheckbox
+                  ? <>
+                    <Checkbox
+                      checked={saveSettingCheckbox}
+                      onChange={() => setSaveSettingCheckbox(!saveSettingCheckbox)}
+                      value='checked'
+                    />
+                    <div style={{ padding: '15px 2px' }}>Save Setting</div>
+                  </>
+                  : null}
               </div>
             </FormControl>
+            <UserSettingSnackbar
+              saved={userSettingSaved}
+              response={userSettingResponse} />
             { /* in case of no data empty list is sent */}
             {assignmentData ? assignmentTable(assignmentData.plan) : <Spinner />}
           </Paper>
