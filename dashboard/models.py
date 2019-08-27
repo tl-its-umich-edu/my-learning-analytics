@@ -8,6 +8,8 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.db.models import Q
+
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from collections import namedtuple
@@ -316,6 +318,13 @@ class UnizinMetadata(models.Model):
         db_table = 'unizin_metadata'
 
 
+class UserQuerySet(models.query.QuerySet):
+    def get_user_in_course(self, user, course):
+        return self.filter(
+            Q(sis_name=user.get_username()) | Q(sis_id=user.get_username()),
+            course_id=course.id
+        )
+
 class User(models.Model):
     ENROLLMENT_TYPES = Choices(
         ('StudentEnrollment', 'Student'),
@@ -336,12 +345,15 @@ class User(models.Model):
     final_grade = models.FloatField(blank=True, null=True, verbose_name="Final Grade")
     enrollment_type = models.CharField(max_length=50, choices=ENROLLMENT_TYPES, blank=True, null=True, verbose_name="Enrollment Type")
 
+    objects = UserQuerySet.as_manager()
+
     def __str__(self):
         return self.name
 
     class Meta:
         db_table = 'user'
         unique_together = (('id', 'course_id'),)
+
 
 class ResourceAccess(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")

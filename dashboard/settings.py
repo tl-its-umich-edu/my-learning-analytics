@@ -173,6 +173,7 @@ DATABASES = {
         'PASSWORD': ENV.get('MYSQL_PASSWORD', 'student_dashboard_password'), # password for user
         'HOST': ENV.get('MYSQL_HOST', 'localhost'),
         'PORT': ENV.get('MYSQL_PORT', 3306),
+        'OPTIONS': {'charset': 'utf8mb4'},
     },
     'DATA_WAREHOUSE': {
         'ENGINE': ENV.get('DATA_WAREHOUSE_ENGINE', 'django.db.backends.postgresql'),
@@ -383,7 +384,7 @@ if ENV.get('STUDENT_DASHBOARD_LTI', False):
         "consumers": ENV.get("PYLTI_CONFIG_CONSUMERS", {}),
         "method_hooks":{
             "valid_lti_request": "dashboard.lti.valid_lti_request",
-            #"invalid_lti_request": "dashboard.lti.invalid_lti_request"
+            "invalid_lti_request": "dashboard.lti.invalid_lti_request"
         },
         "next_url": "home"
     }
@@ -443,10 +444,19 @@ RESOURCE_ACCESS_CONFIG = ENV.get("RESOURCE_ACCESS_CONFIG", {})
 if "CSP" in ENV:
     MIDDLEWARE_CLASSES += ['csp.middleware.CSPMiddleware',]
     for csp_key, csp_val in ENV.get("CSP").items():
-        globals()["CSP_"+csp_key] = csp_val
+        # If there's a value set for this CSP config, set it as a global
+        if (csp_val):
+            globals()["CSP_"+csp_key] = csp_val
 # If CSP not set, add in XFrameOptionsMiddleware
 else:
     MIDDLEWARE_CLASSES += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
+
+# These are mostly needed by Canvas but it should also be in on general
+CSRF_COOKIE_SECURE = ENV.get("CSRF_COOKIE_SECURE", True)
+if CSRF_COOKIE_SECURE:
+    CSRF_TRUSTED_ORIGINS = ENV.get("CSRF_TRUSTED_ORIGINS", [])
+    SESSION_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # IMPORT LOCAL ENV
 # =====================
