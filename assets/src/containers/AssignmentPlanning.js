@@ -53,7 +53,7 @@ const assignmentTable = assignmentData => {
   />
 }
 
-function AssignmentPlanning(props) {
+function AssignmentPlanning (props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<Error>Assignment view is hidden for this course.</Error>)
 
@@ -73,8 +73,6 @@ function AssignmentPlanning(props) {
     }
   }, [userSettingLoaded])
 
-  // console.log(saveSettingCheckbox)
-
   const [userSettingSaved, userSettingResponse] = useSetUserSetting(
     courseId,
     { assignment: assignmentGradeFilter },
@@ -90,7 +88,8 @@ function AssignmentPlanning(props) {
     }
   }
 
-  // if (error) return (<Error>Something went wrong, please try again later.</Error>)
+  if (assignmentError) return (<Error>Something went wrong, please try again later.</Error>)
+
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
@@ -154,7 +153,7 @@ function AssignmentPlanning(props) {
               saved={userSettingSaved}
               response={userSettingResponse} />
             { /* in case of no data empty list is sent */}
-            {assignmentData ? assignmentTable(assignmentData.plan) : <Spinner />}
+            {assignmentLoaded ? assignmentTable(assignmentData.plan) : <Spinner />}
           </Paper>
         </Grid>
       </Grid>
