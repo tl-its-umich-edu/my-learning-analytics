@@ -84,6 +84,7 @@ function AssignmentPlanning (props) {
     const value = event.target.value
     if (assignmentGradeFilter !== value) {
       setAssignmentGradeFilter(value)
+      setSaveSettingCheckbox(false)
       setShowSaveSettingCheckbox(true)
     }
   }
@@ -151,7 +152,8 @@ function AssignmentPlanning (props) {
             </FormControl>
             <UserSettingSnackbar
               saved={userSettingSaved}
-              response={userSettingResponse} />
+              response={userSettingResponse}
+              successMessage={'Assignment filter setting saved!'} />
             { /* in case of no data empty list is sent */}
             {assignmentLoaded ? assignmentTable(assignmentData.plan) : <Spinner />}
           </Paper>
