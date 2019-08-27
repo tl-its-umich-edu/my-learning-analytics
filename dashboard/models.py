@@ -8,41 +8,36 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.db.models import Q
+
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from collections import namedtuple
 
 import logging
 logger = logging.getLogger(__name__)
 
-from datetime import datetime
 from model_utils import Choices
 
-class AcademicTermsQuerySet(models.QuerySet):
-    def course_date_start(self, course_id):
-        try:
-            return self.get(course__id=str(course_id)).date_start
-        except self.model.DoesNotExist:
-            logger.debug(f"Could not find term for course {course_id}")
-            return datetime.min
-
-class AcademicTermsManager(models.Manager):
-    def get_queryset(self):
-        return AcademicTermsQuerySet(self.model, using=self._db)
-
-    def course_date_start(self, course_id):
-        return self.get_queryset().course_date_start(course_id)
 
 class AcademicTerms(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Term Id")
     canvas_id = models.BigIntegerField(verbose_name="Canvas Id")
     name = models.CharField(max_length=255, verbose_name="Name")
-    date_start = models.DateTimeField(verbose_name="Start Date", blank=True, null=True)
-    date_end = models.DateTimeField(verbose_name="End Date", blank=True, null=True)
-
-    objects = AcademicTermsManager()
+    date_start = models.DateTimeField(verbose_name="Start Date and Time", blank=True, null=True)
+    date_end = models.DateTimeField(verbose_name="End Date and Time", blank=True, null=True)
 
     def __str__(self):
         return self.name
+
+    # # Replace the year in the end date with start date (Hack to get around far out years)
+    # # This should be replaced in the future via an API call so the terms have correct end years, or Canvas data adjusted
+    def get_correct_date_end(self):
+        if (self.date_end.year - self.date_start.year) > 1:
+            logger.info(f'{self.date_end.year} - {self.date_start.year} greater than 1 so setting end year to match start year.')
+            return self.date_end.replace(year=self.date_start.year)
+        else:
+            return self.date_end
 
     class Meta:
         db_table = 'academic_terms'
@@ -137,6 +132,7 @@ class AssignmentWeightConsideration(models.Model):
     class Meta:
         db_table = 'assignment_weight_consideration'
 
+
 class CourseQuerySet(models.QuerySet):
     def get_supported_courses(self):
         """Returns the list of supported courses from the database
@@ -150,6 +146,7 @@ class CourseQuerySet(models.QuerySet):
             logger.info("Courses did not exist", exc_info = True)
         return []
 
+
 class CourseManager(models.Manager):
     def get_queryset(self):
         return CourseQuerySet(self.model, using=self._db)
@@ -159,18 +156,32 @@ class CourseManager(models.Manager):
 
 
 class Course(models.Model):
-    id = models.BigIntegerField(primary_key=True, verbose_name="Unizin Course Id", db_column='id', editable=False)
+    id = models.BigIntegerField(primary_key=True, verbose_name="Course Id", db_column='id')
     canvas_id = models.BigIntegerField(verbose_name="Canvas Course Id", db_column='canvas_id')
-    term_id = models.ForeignKey(AcademicTerms, verbose_name="Term Id", on_delete=models.SET_NULL, db_column='term_id', null=True, db_constraint=False)
+    term = models.ForeignKey(AcademicTerms, verbose_name="Term", on_delete=models.SET_NULL, db_column="term_id", null=True, db_constraint=False)
     name = models.CharField(max_length=255, verbose_name="Name")
+    date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
+    date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)
 
     objects = CourseManager()
 
     def __str__(self):
         return self.name
 
+    def get_course_date_range(self):
+        if self.date_start is not None:
+            start = self.date_start
+        else:
+            start = self.term.date_start
+        if self.date_end is not None:
+            end = self.date_end
+        else:
+            end = self.term.get_correct_date_end()
+        DateRange = namedtuple("DateRange", ["start", "end"])
+        return DateRange(start, end)
+
     class Meta:
-        db_table = 'course'
+        db_table = "course"
         verbose_name = "Course"
 
 
@@ -278,6 +289,13 @@ class UnizinMetadata(models.Model):
         db_table = 'unizin_metadata'
 
 
+class UserQuerySet(models.query.QuerySet):
+    def get_user_in_course(self, user, course):
+        return self.filter(
+            Q(sis_name=user.get_username()) | Q(sis_id=user.get_username()),
+            course_id=course.id
+        )
+
 class User(models.Model):
     ENROLLMENT_TYPES = Choices(
         ('StudentEnrollment', 'Student'),
@@ -298,12 +316,15 @@ class User(models.Model):
     final_grade = models.FloatField(blank=True, null=True, verbose_name="Final Grade")
     enrollment_type = models.CharField(max_length=50, choices=ENROLLMENT_TYPES, blank=True, null=True, verbose_name="Enrollment Type")
 
+    objects = UserQuerySet.as_manager()
+
     def __str__(self):
         return self.name
 
     class Meta:
         db_table = 'user'
         unique_together = (('id', 'course_id'),)
+
 
 class ResourceAccess(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")

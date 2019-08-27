@@ -25,7 +25,7 @@ PROJECT_ROOT = os.path.abspath(
 )
 
 try:
-    with open(os.getenv("ENV_FILE", "/code/config/env.json")) as f:
+    with open(os.getenv("ENV_FILE", "/secrets/env.json")) as f:
         ENV = json.load(f)
 except FileNotFoundError as fnfe:
     print("Default config file or one defined in environment variable ENV_FILE not found. This is normal for the build, should define for operation")
@@ -103,7 +103,6 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
@@ -372,12 +371,14 @@ else:
 # Give an opportunity to disable LTI
 if ENV.get('STUDENT_DASHBOARD_LTI', False):
     INSTALLED_APPS += ('django_lti_auth',)
+    if not 'django.contrib.auth.backends.ModelBackend' in AUTHENTICATION_BACKENDS:
+        AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
 
     PYLTI_CONFIG = {
         "consumers": ENV.get("PYLTI_CONFIG_CONSUMERS", {}),
         "method_hooks":{
             "valid_lti_request": "dashboard.lti.valid_lti_request",
-            #"invalid_lti_request": "dashboard.lti.invalid_lti_request"
+            "invalid_lti_request": "dashboard.lti.invalid_lti_request"
         },
         "next_url": "home"
     }
@@ -387,7 +388,7 @@ if ENV.get('STUDENT_DASHBOARD_LTI', False):
         "lis_person_contact_email_primary")
     LTI_CANVAS_COURSE_ID_FIELD = ENV.get('LTI_CANVAS_COURSE_ID_FIELD',
         "custom_canvas_course_id")
-
+    
 # controls whether Unizin specific features/data is available from the Canvas Data source
 DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)
 
@@ -432,6 +433,25 @@ CANVAS_FILE_POSTFIX = ENV.get("CANVAS_FILE_POSTFIX", "")
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
 RESOURCE_ACCESS_CONFIG = ENV.get("RESOURCE_ACCESS_CONFIG", {})
+
+# Django CSP Settings, load up from file if set
+if "CSP" in ENV:
+    MIDDLEWARE_CLASSES += ['csp.middleware.CSPMiddleware',]
+    for csp_key, csp_val in ENV.get("CSP").items():
+        # If there's a value set for this CSP config, set it as a global
+        if (csp_val):
+            globals()["CSP_"+csp_key] = csp_val
+# If CSP not set, add in XFrameOptionsMiddleware
+else:
+    MIDDLEWARE_CLASSES += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
+
+# These are mostly needed by Canvas but it should also be in on general 
+CSRF_COOKIE_SECURE = ENV.get("CSRF_COOKIE_SECURE", True)
+if CSRF_COOKIE_SECURE:
+    CSRF_TRUSTED_ORIGINS = ENV.get("CSRF_TRUSTED_ORIGINS", [])
+    SESSION_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # IMPORT LOCAL ENV
 # =====================
 try:
