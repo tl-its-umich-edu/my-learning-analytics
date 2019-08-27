@@ -19,18 +19,20 @@ const styles = theme => ({
 })
 
 function Banner (props) {
-    const { classes, backgroundColor, textColor, children } = props;
+    const { classes, settings, children } = props;
 
     const paperStyle = {
-        'background': backgroundColor,
+        'background': settings.backgroundColor,
+        'width': settings.width,
+        'maxWidth': settings.maxWidth,
     };
 
     return (
         <div className={classes.root}>
-            <Grid container spacing={16}>
+            <Grid container spacing={16} align="center">
                 <Grid item xs={12}>
                     <Paper className={classes.paper} style={paperStyle}>
-                        <Typography variant="body1" align="center" style={{'color': textColor}} gutterBottom>
+                        <Typography variant="body1" align="center" style={{'color': settings.textColor}} gutterBottom>
                             {children}
                         </Typography>
                     </Paper>

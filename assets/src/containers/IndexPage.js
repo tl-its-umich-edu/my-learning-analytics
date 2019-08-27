@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid'
 import SelectCard from '../components/SelectCard'
 import { Link } from 'react-router-dom'
 import { isObjectEmpty, getObjectValues } from '../util/object'
-import Error from './Error'
+import ErrorBanner from '../components/ErrorBanner'
 import routes from '../routes/routes'
 
 const styles = theme => ({
@@ -31,7 +31,7 @@ function IndexPage (props) {
   const views = courseInfo.course_view_options
 
   if (isObjectEmpty(views) || objectValuesAreAllZero(views)) {
-    return (<Error>No data visualizations have been added for this course.</Error>)
+    return (<ErrorBanner>No data visualizations have been added for this course.</ErrorBanner>)
   }
 
   return (

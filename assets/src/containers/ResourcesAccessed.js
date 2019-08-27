@@ -3,9 +3,7 @@ import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
-import Spinner from '../components/Spinner'
 import Checkbox from '@material-ui/core/Checkbox'
-import RangeSlider from '../components/RangeSlider'
 import FormControl from '@material-ui/core/FormControl'
 import FormGroup from '@material-ui/core/FormGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
@@ -13,10 +11,14 @@ import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import { useUserSettingData } from '../service/api'
 import { handleError, defaultFetchOptions } from '../util/data'
-import ResourceAccessChart from '../components/ResourceAccessChart'
 import Cookie from 'js-cookie'
 import AlertBanner from '../components/AlertBanner'
 import ErrorBanner from '../components/ErrorBanner'
+import RangeSlider from '../components/RangeSlider'
+import ResourceAccessChart from '../components/ResourceAccessChart'
+import Spinner from '../components/Spinner'
+import TipBanner from '../components/TipBanner'
+
 import { type } from 'os';
 
 const styles = theme => ({
@@ -67,7 +69,7 @@ function ResourcesAccessed (props) {
 
   const [dataLoaded, setDataLoaded] = useState(false)
 
-  function filterCheckox() {
+  function filterCheckbox() {
     if (resourceAccessData) {
       if (resourceTypes.length > 1) {
         return(
@@ -215,7 +217,7 @@ function ResourcesAccessed (props) {
 
   const ResourceAccessChartBuilder = (resourceData) => {
     if (resourceFilter.length === 0) {
-      return (<div style={{textAlign: "center", fontWeight: "900", color:"#D8000C"}}><p>Please select a resource type to display data</p></div>)
+      return (<TipBanner>Please select a resource type to display data</TipBanner>)
     }
     else if (!resourceData || Object.keys(resourceData).length === 0) {
       return (<AlertBanner>No resource data is available for the selected week(s).</AlertBanner>)
@@ -274,7 +276,7 @@ function ResourcesAccessed (props) {
               <div style={{ padding: '15px 2px' }}>{defaultLabel}</div>
             </div>
             {
-              filterCheckox()
+              filterCheckbox()
             }
             {(resourceAccessData && dataLoaded) || resourceFilter.length === 0
               ? ResourceAccessChartBuilder(resourceAccessData)

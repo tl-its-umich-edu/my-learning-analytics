@@ -1,14 +1,14 @@
 import React from 'react';
 import Banner from './Banner';
 
-function AlertBanner (props) {
+function TipBanner (props) {
     const { children } = props;
 
     const bannerSettings = {
-        backgroundColor: "#CCE5FF",
-        textColor: "#004085",
-        maxWidth: undefined,
-        width: "100%",
+       backgroundColor: "#FFF",
+       textColor: undefined,
+       maxWidth: "300px",
+       width: undefined,
     }
 
     return (
@@ -18,4 +18,4 @@ function AlertBanner (props) {
     );
 }
 
-export default AlertBanner;
+export default TipBanner;

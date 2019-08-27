@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react'
-import { withStyles } from '@material-ui/core/styles'
 import { renderToString } from 'react-dom/server'
+import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
-import Spinner from '../components/Spinner'
 import Typography from '@material-ui/core/Typography'
 import Select from '@material-ui/core/Select'
 import FormControl from '@material-ui/core/FormControl'
 import MenuItem from '@material-ui/core/MenuItem'
-import ProgressBar from '../components/ProgressBar'
-import createToolTip from '../util/createToolTip'
-import TableAssignment from '../components/TableAssignment'
 import Checkbox from '@material-ui/core/Checkbox'
 import Cookie from 'js-cookie'
 import AlertBanner from '../components/AlertBanner'
 import ErrorBanner from '../components/ErrorBanner'
+import ProgressBar from '../components/ProgressBar'
+import Spinner from '../components/Spinner'
+import TableAssignment from '../components/TableAssignment'
 import { handleError, defaultFetchOptions } from '../util/data'
+import createToolTip from '../util/createToolTip'
 import { useUserSettingData } from '../service/api'
 
 const styles = theme => ({
@@ -54,7 +54,7 @@ export const getCurrentWeek = assignmentData => {
 
 const assignmentTable = assignmentData => {
   if (!assignmentData || Object.keys(assignmentData).length === 0) {
-    return (<AlertBanner>No assignment data is available for this course.</AlertBanner>)
+    return (<AlertBanner>No assignment data at that weight is available for this course.</AlertBanner>)
   }
   return <TableAssignment
     tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
