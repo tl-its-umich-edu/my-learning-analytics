@@ -95,6 +95,7 @@ function AssignmentPlanning (props) {
   }
 
   if (assignmentError) return (<Error>Something went wrong, please try again later.</Error>)
+  if (assignmentLoaded && isObjectEmpty(assignmentData)) return (<Error>No data provided.</Error>)
 
   return (
     <div className={classes.root}>
