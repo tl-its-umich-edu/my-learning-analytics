@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { renderToString } from 'react-dom/server'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Spinner from '../components/Spinner'
@@ -9,7 +8,6 @@ import Select from '@material-ui/core/Select'
 import FormControl from '@material-ui/core/FormControl'
 import MenuItem from '@material-ui/core/MenuItem'
 import ProgressBar from '../components/ProgressBar'
-import createToolTip from '../util/createToolTip'
 import TableAssignment from '../components/TableAssignment'
 import Checkbox from '@material-ui/core/Checkbox'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
@@ -19,6 +17,7 @@ import { useAssignmentData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 import useUserSetting from '../hooks/useUserSetting'
 import useSetUserSetting from '../hooks/useSetUserSetting'
+import { AssignmentPlanningTooltip } from '../components/Tooltip'
 
 const styles = theme => ({
   root: {
@@ -99,35 +98,12 @@ function AssignmentPlanning(props) {
           <Paper className={classes.paper}>
             <>
               <Typography variant='h5' gutterBottom>Progress toward Final Grade</Typography>
-              {assignmentData ? <ProgressBar
-                data={assignmentData.progress}
-                aspectRatio={0.12}
-                tip={createToolTip(d => renderToString(
-                  <Paper className={classes.paper}>
-                    <Typography>
-                      Assignment: <strong>{d.name}</strong><br />
-                      Due at: <strong>{d.due_dates}</strong><br />
-                      Your grade: <strong>{d.score ? `${d.score}` : 'Not available'}</strong><br />
-                      Total points possible: <strong>{d.points_possible}</strong><br />
-                      Avg assignment grade: <strong>{d.avg_score}</strong><br />
-                      Percentage worth in final grade: <strong>{d.towards_final_grade}%</strong><br />
-                    </Typography>
-                    {
-                      parseInt(d.drop_lowest) !== 0
-                        ? <Typography component='p'>
-                          The lowest <strong>{d.drop_lowest}</strong> scores will dropped from this assigment group
-                        </Typography>
-                        : ''
-                    }
-                    {
-                      parseInt(d.drop_highest) !== 0
-                        ? <Typography component='p'>
-                          The highest <strong>{d.drop_highest}</strong> scores will dropped from this assigment group
-                        </Typography>
-                        : ''
-                    }
-                  </Paper>
-                ))} /> : <Spinner />}
+              {assignmentData
+                ? <ProgressBar
+                  data={assignmentData.progress}
+                  aspectRatio={0.12}
+                  tip={AssignmentPlanningTooltip(classes)} />
+                : <Spinner />}
             </ >
           </Paper>
         </Grid>
