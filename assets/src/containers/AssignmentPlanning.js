@@ -57,9 +57,8 @@ function AssignmentPlanning (props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<Error>Assignment view is hidden for this course.</Error>)
 
-  // const [showSaveSettingCheckbox, setShowSaveSettingCheckbox] = useState(false)
-  // const [saveSettingCheckbox, setSaveSettingCheckbox] = useState(false)
-  // const [checkboxLabel, setCheckboxLabel] = useState('Save setting')
+  const [showSaveSettingCheckbox, setShowSaveSettingCheckbox] = useState(false)
+  const [saveSettingCheckbox, setSaveSettingCheckbox] = useState(false)
 
   const [assignmentGradeFilter, setAssignmentGradeFilter] = useState(0)
   const [assignmentFilterChanged, setAssignmentFilterChanged] = useState(false)
@@ -79,8 +78,8 @@ function AssignmentPlanning (props) {
   const [userSettingSaved, userSettingResponse] = useSetUserSetting(
     courseId,
     { assignment: assignmentGradeFilter },
-    assignmentFilterChanged,
-    [assignmentGradeFilter]
+    assignmentFilterChanged && saveSettingCheckbox,
+    [saveSettingCheckbox]
   )
 
   const handleAssignmentFilter = event => {
@@ -88,9 +87,9 @@ function AssignmentPlanning (props) {
     if (assignmentGradeFilter !== value) {
       setAssignmentGradeFilter(value)
       setAssignmentFilterChanged(true)
-      // setSaveSettingCheckbox(false)
-      // setCheckboxLabel('Save setting')
-      // setShowSaveSettingCheckbox(true)
+
+      setSaveSettingCheckbox(false)
+      setShowSaveSettingCheckbox(true)
     }
   }
 
@@ -144,16 +143,21 @@ function AssignmentPlanning (props) {
                   <MenuItem value={50}>50%</MenuItem>
                   <MenuItem value={75}>75%</MenuItem>
                 </Select>
-                {/* {showSaveSettingCheckbox
+                {showSaveSettingCheckbox
                   ? <>
                     <Checkbox
                       checked={saveSettingCheckbox}
                       onChange={() => setSaveSettingCheckbox(!saveSettingCheckbox)}
                       value='checked'
                     />
-                    <div style={{ padding: '15px 2px' }}>{userSettingSaved ? 'Setting saved!' : 'Save setting'}</div>
+                    <div style={{ padding: '15px 2px' }}>{
+                      userSettingSaved && saveSettingCheckbox
+                        ? 'Setting saved!'
+                        : 'Save setting'
+                    }
+                    </div>
                   </>
-                  : null} */}
+                  : null}
               </div>
             </FormControl>
             <UserSettingSnackbar
