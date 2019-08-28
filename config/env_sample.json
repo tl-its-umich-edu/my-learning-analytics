@@ -40,7 +40,7 @@
         "INCLUDE_NONCE_IN": []
     },
     "/*  Enable secure cookies, also set your trusted origin (example of instructure.com)": "*/",
-    "CSRF_COOKIE_SECURE": true,
+    "CSRF_COOKIE_SECURE": false,
     "CSRF_TRUSTED_ORIGINS": ["instructure.com"],
     "/*  ID for your Google Analytics, defaults to nothing/disabled": "*/",
     "GA_ID": "",
