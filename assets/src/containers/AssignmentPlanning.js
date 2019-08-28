@@ -62,7 +62,7 @@ function AssignmentPlanning (props) {
 
   const [assignmentGradeFilter, setAssignmentGradeFilter] = useState(0)
   const [assignmentFilterChanged, setAssignmentFilterChanged] = useState(false)
-  const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'assignment', [setAssignmentGradeFilter])
+  const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'assignment')
   const [assignmentLoaded, assignmentError, assignmentData] = useAssignmentData(courseId, assignmentGradeFilter)
 
   useEffect(() => {
