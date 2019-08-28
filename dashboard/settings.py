@@ -446,7 +446,7 @@ else:
     MIDDLEWARE_CLASSES += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
 
 # These are mostly needed by Canvas but it should also be in on general 
-CSRF_COOKIE_SECURE = ENV.get("CSRF_COOKIE_SECURE", True)
+CSRF_COOKIE_SECURE = ENV.get("CSRF_COOKIE_SECURE", False)
 if CSRF_COOKIE_SECURE:
     CSRF_TRUSTED_ORIGINS = ENV.get("CSRF_TRUSTED_ORIGINS", [])
     SESSION_COOKIE_SECURE = True
