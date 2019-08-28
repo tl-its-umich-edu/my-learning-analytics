@@ -149,6 +149,7 @@ function AssignmentPlanning (props) {
                       checked={saveSettingCheckbox}
                       onChange={() => setSaveSettingCheckbox(!saveSettingCheckbox)}
                       value='checked'
+                      color='primary'
                     />
                     <div style={{ padding: '15px 2px' }}>{
                       userSettingSaved && saveSettingCheckbox
