@@ -62,9 +62,10 @@ function GradeDistribution (props) {
     const grades = gradeData.map(x => x.current_grade)
 
     const tableRows = [
-      ['Average grade', <strong>{roundToOneDecimal(average(grades))}%</strong>],
-      ['Median grade', <strong>{roundToOneDecimal(median(grades))}%</strong>],
-      ['Number of students', <strong>{gradeData.length}</strong>],
+      ['Average grade', <strong>{gradeData[0].grade_avg}%</strong>],
+      ['Median grade', <strong>{gradeData[0].median_grade}%</strong>],
+      ['Number of students', <strong>{gradeData[0].tot_students}</strong>],
+      ['Outlier_Found', <strong>{gradeData[0].is_outliers_found.toString()}</strong>],
       showGrade ?
         [
           'My grade',
@@ -73,7 +74,7 @@ function GradeDistribution (props) {
               `${roundToOneDecimal(gradeData[0].current_user_grade)}%` :
               'There are no grades yet for you in this course'
           }</strong>
-        ] : []
+        ] : [],
     ]
 
     const gradeCheckbox = !user.admin ?
@@ -106,7 +107,8 @@ function GradeDistribution (props) {
             xAxisLabel={'Grade %'}
             yAxisLabel={'Number of Students'}
             myGrade={showGrade ? gradeData[0].current_user_grade : null}
-            maxGrade={gradeData[0].graph_upper_limit} />
+            maxGrade={gradeData[0].graph_upper_limit}
+            isABTestingCourse={gradeData[0].ab_test_course}/>
         </Grid>
       </Grid>
     )

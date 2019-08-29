@@ -2,17 +2,21 @@ import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import { roundToOneDecimal } from '../../util/math'
 
-function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100 }) {
+function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100,
+                            isABTestingCourse}) {
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
+  const minGrade = Math.min(...data)
 
   const x = d3.scaleLinear()
     .domain([0, maxGrade]).nice()
     .range([margin.left, aWidth - margin.right])
 
+
   const bins = d3.histogram()
     .domain(x.domain())
     .thresholds(x.ticks(40))(data)
+
 
   const y = d3.scaleLinear()
     .domain([0, d3.max(bins, d => d.length)]).nice()
@@ -38,7 +42,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     .attr('y', d => y(d.length) + margin.top-5)
     .attr('text-anchor', 'middle')
     .attr('fill', 'white')
-    .text(d => d.length === 0 ? '' : d.length)
+    .text(d => isABTestingCourse?'':(d.length === 0 ? '' : d.length))
 
   const xAxis = g => g
     .attr(`transform`, `translate(0, ${aHeight - margin.bottom})`)
@@ -57,12 +61,22 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
       .attr('line-height', '1.46429em')
       .text(xAxisLabel).attr('dy', -4)
     )
+    .call(g=>g.selectAll('.tick').filter(d => d< minGrade).remove())
+    .call(g => g.select('.tick:nth-of-type(1) text').clone()
+      .attr('x', 4)
+      .text(!data.includes(0)?'<':'')
+         .attr('dx', -26)
+         .attr('dy', 7)
+    )
+
 
   const yAxis = g => g
     .attr('transform', `translate(${margin.left},0)`)
     .attr('class', 'axis')
     .call(d3.axisLeft(y).tickSizeInner(-aWidth).ticks(5))
     .call(g => g.select('.domain').remove())
+    .call(g => isABTestingCourse?g.selectAll('.tick text').filter((d,i,arr) => i>0 && i<(arr.length-1)).remove():g)
+    .call(g => isABTestingCourse?g.select('.tick:last-of-type text').attr('opacity',0): g)
     .call(g => g.select('.tick:last-of-type text').clone()
       .attr('x', 4)
       .attr('fill', 'rgba(0, 0, 0, 0.87)')
@@ -70,9 +84,9 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
       .attr('font-size', '0.875rem')
       .attr('font-weight', '400')
       .attr('line-height', '1.46429em')
+      .attr('opacity',1)
       .attr('text-anchor', 'start')
-      .text(yAxisLabel).attr('dy', -4)
-    )
+      .text(yAxisLabel).attr('dy', -4))
 
   svg.append('g')
     .call(xAxis)
@@ -83,14 +97,15 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   if (myGrade) {
     svg.append('line')
       .attr(`transform`, `translate(0, ${aHeight - margin.bottom})`)
-      .attr('x1', x(myGrade))
+      // we are binning the lowest 5 grades in the course so to safeguard showing low performer on the axis
+      .attr('x1', myGrade> minGrade? x(myGrade):x(minGrade))
       .attr('y1', -aHeight)
-      .attr('x2', x(myGrade))
+      .attr('x2', myGrade>minGrade?x(myGrade):x(minGrade))
       .attr('y2', 0)
       .attr('stroke', 'darkorange')
       .attr('stroke-width', '2')
     svg.append('text')
-      .attr('x', x(myGrade) - 110)
+      .attr('x', myGrade> minGrade? x(myGrade):x(minGrade) - 110)
       .attr('y', margin.top-5)
       .text(`My Grade: ${roundToOneDecimal(myGrade)}%`)
       .attr('font-size', '0.875rem')

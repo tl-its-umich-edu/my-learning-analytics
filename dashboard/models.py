@@ -162,6 +162,8 @@ class Course(models.Model):
     name = models.CharField(max_length=255, verbose_name="Name")
     date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
     date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)
+    ab_test_course = models.BooleanField(blank=False, null=False, default=False, verbose_name=
+                                         "AB test course")
 
     objects = CourseManager()
 

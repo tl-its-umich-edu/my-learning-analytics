@@ -62,6 +62,8 @@ WATCHMAN_TOKEN_NAME = ENV.get('DJANGO_WATCHMAN_TOKEN_NAME', 'token')
 
 # Only report on the default database
 WATCHMAN_DATABASES = ('default',)
+# this option enables users to show slighly different visuals for different courses
+AB_TESTING_COURSES = ENV.get('AB_TESTING_COURSES', [])
 
 # Defaults for PTVSD
 PTVSD_ENABLE = ENV.get("PTVSD_ENABLE", False)
