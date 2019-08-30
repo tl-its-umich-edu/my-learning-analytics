@@ -97,15 +97,14 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   if (myGrade) {
     svg.append('line')
       .attr(`transform`, `translate(0, ${aHeight - margin.bottom})`)
-      // we are binning the lowest 5 grades in the course so to safeguard showing low performer on the axis
-      .attr('x1', myGrade> minGrade? x(myGrade):x(minGrade))
+      .attr('x1', x(myGrade))
       .attr('y1', -aHeight)
-      .attr('x2', myGrade>minGrade?x(myGrade):x(minGrade))
+      .attr('x2', x(myGrade))
       .attr('y2', 0)
       .attr('stroke', 'darkorange')
       .attr('stroke-width', '2')
     svg.append('text')
-      .attr('x', myGrade> minGrade? x(myGrade):x(minGrade) - 110)
+      .attr('x', x(myGrade) - 110)
       .attr('y', margin.top-5)
       .text(`My Grade: ${roundToOneDecimal(myGrade)}%`)
       .attr('font-size', '0.875rem')
