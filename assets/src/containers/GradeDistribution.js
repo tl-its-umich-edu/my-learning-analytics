@@ -48,7 +48,7 @@ function GradeDistribution (props) {
     }
   }, [userSettingLoaded])
 
-  const [userSettingSaved, userSettingResponse] = useSetUserSetting(
+  const [userSettingSaved, _, userSettingResponse] = useSetUserSetting(
     courseId,
     { grade: showGrade },
     settingChanged,

@@ -70,6 +70,13 @@ function AssignmentPlanning (props) {
   const [assignmentLoaded, assignmentError, assignmentData] = useAssignmentData(courseId, assignmentGradeFilter)
   const [saveLabel, setSaveLabel] = useState(currentSetting)
 
+  const [userSettingSaved, savingError, userSettingResponse] = useSetUserSetting(
+    courseId,
+    { assignment: assignmentGradeFilter },
+    userSavedFilterSetting !== assignmentGradeFilter && saveSettingClicked,
+    [saveSettingClicked]
+  )
+
   useEffect(() => {
     if (userSettingLoaded) {
       if (isObjectEmpty(userSetting.default)) {
@@ -81,16 +88,11 @@ function AssignmentPlanning (props) {
     }
   }, [userSettingLoaded])
 
-  const [userSettingSaved, userSettingResponse] = useSetUserSetting(
-    courseId,
-    { assignment: assignmentGradeFilter },
-    userSavedFilterSetting !== assignmentGradeFilter && saveSettingClicked,
-    [saveSettingClicked]
-  )
-
   useEffect(() => {
     if (userSavedFilterSetting !== assignmentGradeFilter) {
       setSaveLabel(rememberSetting)
+    } else if (savingError) {
+      setSaveLabel(settingNotUpdated)
     } else {
       setSaveLabel(currentSetting)
     }
