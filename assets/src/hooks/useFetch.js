@@ -4,7 +4,7 @@ import { handleError, defaultFetchOptions } from '../util/data'
 
 const cache = new Map()
 
-const useFetch = (dataURL, options) => {
+const useFetch = (dataURL, options, fetchAfter = false) => {
   const fetchOptions = options
     ? { ...options, ...defaultFetchOptions }
     : { method: 'get', ...defaultFetchOptions }
@@ -14,6 +14,7 @@ const useFetch = (dataURL, options) => {
   const [error, setError] = useState(false)
 
   useEffect(() => {
+    if (fetchAfter) return
     if (fetchOptions.method === 'get') {
       // only cache 'get' calls
       if (cache.has(dataURL)) {

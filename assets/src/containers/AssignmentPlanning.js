@@ -67,7 +67,7 @@ function AssignmentPlanning (props) {
   const [assignmentGradeFilter, setAssignmentGradeFilter] = useState(0)
   const [userSavedFilterSetting, setUserSavedFilterSetting] = useState(assignmentGradeFilter)
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'assignment')
-  const [assignmentLoaded, assignmentError, assignmentData] = useAssignmentData(courseId, assignmentGradeFilter)
+  const [assignmentLoaded, assignmentError, assignmentData] = useAssignmentData(courseId, assignmentGradeFilter, !userSettingLoaded)
   const [saveLabel, setSaveLabel] = useState(currentSetting)
 
   const [userSettingSaved, savingError, userSettingResponse] = useSetUserSetting(
@@ -89,6 +89,7 @@ function AssignmentPlanning (props) {
   }, [userSettingLoaded])
 
   useEffect(() => {
+    // if user setting is different from current grade filter, show label for remembering setting
     if (userSavedFilterSetting !== assignmentGradeFilter) {
       setSaveLabel(rememberSetting)
     } else if (savingError) {
@@ -98,6 +99,7 @@ function AssignmentPlanning (props) {
     }
   })
 
+  // if user setting is saved, don't show checkbox and sync userSavedFilterSetting with assignmentGradeFilter
   useEffect(() => {
     if (userSettingSaved) {
       setShowSaveSetting(false)
