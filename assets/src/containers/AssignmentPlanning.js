@@ -42,6 +42,10 @@ const styles = theme => ({
   }
 })
 
+const currentSetting = 'My current setting'
+const rememberSetting = 'Remember my setting'
+const settingNotUpdated = 'Setting not updated'
+
 const assignmentTable = assignmentData => {
   if (!assignmentData || Object.keys(assignmentData).length === 0) {
     return (<Typography>No data provided</Typography>)
@@ -57,10 +61,11 @@ function AssignmentPlanning (props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<Error>Assignment view is hidden for this course.</Error>)
 
-  const [showSaveSettingCheckbox, setShowSaveSettingCheckbox] = useState(false)
-  const [saveSettingCheckbox, setSaveSettingCheckbox] = useState(false)
+  const [showSaveSetting, setShowSaveSetting] = useState(false)
+  const [saveSettingClicked, setSaveSettingClicked] = useState(false)
 
   const [assignmentGradeFilter, setAssignmentGradeFilter] = useState(0)
+  const [userSavedFilterSetting, setUserSavedFilterSetting] = useState(assignmentGradeFilter)
   const [assignmentFilterChanged, setAssignmentFilterChanged] = useState(false)
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'assignment')
   const [assignmentLoaded, assignmentError, assignmentData] = useAssignmentData(courseId, assignmentGradeFilter)
@@ -71,6 +76,7 @@ function AssignmentPlanning (props) {
         setAssignmentGradeFilter(0)
       } else {
         setAssignmentGradeFilter(userSetting.default)
+        setUserSavedFilterSetting(userSetting.default)
       }
     }
   }, [userSettingLoaded])
@@ -78,8 +84,8 @@ function AssignmentPlanning (props) {
   const [userSettingSaved, userSettingResponse] = useSetUserSetting(
     courseId,
     { assignment: assignmentGradeFilter },
-    assignmentFilterChanged && saveSettingCheckbox,
-    [saveSettingCheckbox]
+    assignmentFilterChanged && saveSettingClicked,
+    [saveSettingClicked]
   )
 
   const handleAssignmentFilter = event => {
@@ -88,8 +94,12 @@ function AssignmentPlanning (props) {
       setAssignmentGradeFilter(value)
       setAssignmentFilterChanged(true)
 
-      setSaveSettingCheckbox(false)
-      setShowSaveSettingCheckbox(true)
+      setSaveSettingClicked(false)
+      if (userSavedFilterSetting === value) {
+        setShowSaveSetting(false)
+      } else {
+        setShowSaveSetting(true)
+      }
     }
   }
 
@@ -143,16 +153,16 @@ function AssignmentPlanning (props) {
                   <MenuItem value={50}>50%</MenuItem>
                   <MenuItem value={75}>75%</MenuItem>
                 </Select>
-                {showSaveSettingCheckbox
+                {showSaveSetting
                   ? <>
                     <Checkbox
-                      checked={saveSettingCheckbox}
-                      onChange={() => setSaveSettingCheckbox(!saveSettingCheckbox)}
+                      checked={saveSettingClicked}
+                      onChange={() => setSaveSettingClicked(!saveSettingClicked)}
                       value='checked'
                       color='primary'
                     />
                     <div style={{ padding: '15px 2px' }}>{
-                      userSettingSaved && saveSettingCheckbox
+                      userSettingSaved && saveSettingClicked
                         ? 'Setting saved!'
                         : 'Save setting'
                     }
