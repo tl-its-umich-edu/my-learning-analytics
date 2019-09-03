@@ -20,6 +20,7 @@ const useFetch = (dataURL, options) => {
         setData(cache.get(dataURL))
         setLoaded(true)
       } else {
+        setLoaded(false)
         fetch(dataURL, fetchOptions)
           .then(handleError)
           .then(res => res.json())
@@ -31,6 +32,7 @@ const useFetch = (dataURL, options) => {
           .catch(error => setError(error))
       }
     } else {
+      setLoaded(false)
       fetch(dataURL, fetchOptions)
         .then(handleError)
         .then(res => res.json())
