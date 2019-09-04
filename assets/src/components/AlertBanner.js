@@ -6,10 +6,9 @@ function AlertBanner (props) {
 
     const bannerSettings = {
         backgroundColor: "#CCE5FF",
-        textColor: "#004085",
-        maxWidth: undefined,
-        width: "100%",
-    }
+        borderColor: "#b8daff",
+        textColor: "#004085"
+    };
 
     return (
         <Banner settings={bannerSettings}>

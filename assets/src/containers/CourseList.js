@@ -11,11 +11,11 @@ import IconButton from '@material-ui/core/IconButton'
 import Avatar from '@material-ui/core/Avatar'
 import Popover from '@material-ui/core/Popover'
 import AvatarModal from '../components/AvatarModal'
-import ErrorBanner from '../components/ErrorBanner'
+import WarningBanner from '../components/WarningBanner'
 
 const styles = theme => ({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   container: {
     display: 'flex',
@@ -40,8 +40,10 @@ const styles = theme => ({
 function CourseList (props) {
   const { classes, user } = props
 
+  console.log(classes);
+
   if (!user.enrolledCourses && !user.isSuperuser) {
-    return (<ErrorBanner>You are not enrolled in any courses with MyLA enabled.</ErrorBanner>)
+    return (<WarningBanner>You are not enrolled in any courses with MyLA enabled.</WarningBanner>)
   }
 
   const [avatarEl, setAvatarEl] = useState(null)
@@ -83,14 +85,14 @@ function CourseList (props) {
       <div className={classes.root}>
         {
           user.isSuperuser
-            ? <Grid container spacing={16}>
+            ? <Grid container xs={16}>
               <Grid item xs={12}>
                 <Paper className={classes.paper}>
                   <Typography variant='h5' gutterBottom>Select a course of your choice</Typography>
                 </Paper>
               </Grid>
             </Grid>
-            : <Grid container spacing={16}>
+            : <Grid container xs={16}>
               <Grid item xs={12} className={classes.container}>
                 {user.enrolledCourses.map((course, key) =>
                   <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>

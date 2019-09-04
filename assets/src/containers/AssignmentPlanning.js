@@ -10,7 +10,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import Checkbox from '@material-ui/core/Checkbox'
 import Cookie from 'js-cookie'
 import AlertBanner from '../components/AlertBanner'
-import ErrorBanner from '../components/ErrorBanner'
+import WarningBanner from '../components/WarningBanner'
 import ProgressBar from '../components/ProgressBar'
 import Spinner from '../components/Spinner'
 import TableAssignment from '../components/TableAssignment'
@@ -54,7 +54,7 @@ export const getCurrentWeek = assignmentData => {
 
 const assignmentTable = assignmentData => {
   if (!assignmentData || Object.keys(assignmentData).length === 0) {
-    return (<AlertBanner>No assignment data at that weight is available for this course.</AlertBanner>)
+    return (<AlertBanner>Assignment data for this course at or above the selected weight is not available.</AlertBanner>)
   }
   return <TableAssignment
     tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
@@ -158,7 +158,7 @@ function AssignmentPlanning (props) {
         )
     }, [assignmentFilter]
   )
-  if (error) return (<ErrorBanner/>)
+  if (error) return (<WarningBanner/>)
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>

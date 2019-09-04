@@ -13,11 +13,10 @@ import { useUserSettingData } from '../service/api'
 import { handleError, defaultFetchOptions } from '../util/data'
 import Cookie from 'js-cookie'
 import AlertBanner from '../components/AlertBanner'
-import ErrorBanner from '../components/ErrorBanner'
+import WarningBanner from '../components/WarningBanner'
 import RangeSlider from '../components/RangeSlider'
 import ResourceAccessChart from '../components/ResourceAccessChart'
 import Spinner from '../components/Spinner'
-import TipBanner from '../components/TipBanner'
 
 import { type } from 'os';
 
@@ -217,10 +216,10 @@ function ResourcesAccessed (props) {
 
   const ResourceAccessChartBuilder = (resourceData) => {
     if (resourceFilter.length === 0) {
-      return (<TipBanner>Please select a resource type to display data</TipBanner>)
+      return (<AlertBanner>Please select a resource type to display data</AlertBanner>)
     }
     else if (!resourceData || Object.keys(resourceData).length === 0) {
-      return (<AlertBanner>No resource data is available for the selected week(s).</AlertBanner>)
+      return (<AlertBanner>Resource data for this course from the selected week(s) is not available.</AlertBanner>)
     }
     else {
       return (
@@ -233,7 +232,7 @@ function ResourcesAccessed (props) {
       )
     }
   }
-  if (error) return (<ErrorBanner/>)
+  if (error) return (<WarningBanner/>)
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>

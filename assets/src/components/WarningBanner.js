@@ -1,16 +1,15 @@
 import React from 'react';
 import Banner from './Banner';
 
-function ErrorBanner (props) {
+function WarningBanner (props) {
     const { children } = props;
     const defaultMessage = "Something went wrong; please try again later.";
 
     const bannerSettings = {
-        backgroundColor: "#F08080",
-        textColor: "#8B0000",
-        maxWidth: undefined,
-        width: "100%",
-    }
+        backgroundColor: "#fff3cd",
+        borderColor: "#ffeeba",
+        textColor: "#856404"
+    };
 
     return (
         <Banner settings={bannerSettings}>
@@ -19,4 +18,4 @@ function ErrorBanner (props) {
     );
 }
 
-export default ErrorBanner;
+export default WarningBanner;

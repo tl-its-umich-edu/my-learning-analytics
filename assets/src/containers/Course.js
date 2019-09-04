@@ -10,14 +10,14 @@ import Spinner from '../components/Spinner'
 import { isObjectEmpty } from '../util/object'
 import { useCourseInfo } from '../service/api'
 import AlertBanner from "../components/AlertBanner";
-import ErrorBanner from "../components/ErrorBanner";
+import WarningBanner from "../components/WarningBanner";
 
 function Course (props) {
   const { courseId, user } = props
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
-  if (error) return (<ErrorBanner/>)
+  if (error) return (<WarningBanner/>)
   if (loaded && isObjectEmpty(courseInfo)) return (<AlertBanner>Tool is not enabled for this course.</AlertBanner>)
 
   return (

@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import Checkbox from '@material-ui/core/Checkbox'
 import AlertBanner from '../components/AlertBanner'
-import ErrorBanner from '../components/ErrorBanner'
+import WarningBanner from '../components/WarningBanner'
 import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
@@ -56,7 +56,7 @@ function GradeDistribution (props) {
     [showGrade]
   )
 
-  if (gradeError) return (<ErrorBanner/>)
+  if (gradeError) return (<WarningBanner/>)
 
   const BuildGradeView = () => {
     const grades = gradeData.map(x => x.current_grade)
@@ -113,7 +113,7 @@ function GradeDistribution (props) {
   };
 
   const content = (gradeLoaded && isObjectEmpty(gradeData)) ?
-      (<AlertBanner>No grade data is available for this course.</AlertBanner>) :
+      (<AlertBanner>Grade data for this course is not available.</AlertBanner>) :
       (gradeLoaded ? <BuildGradeView /> : <Spinner />);
 
   return (
