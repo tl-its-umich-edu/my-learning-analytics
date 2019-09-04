@@ -110,10 +110,10 @@ function GradeDistribution (props) {
         </Grid>
       </Grid>
     )
-  };
+  }
 
   const content = (gradeLoaded && isObjectEmpty(gradeData)) ?
-      (<AlertBanner>Grade data for this course is not available.</AlertBanner>) :
+      (<AlertBanner>Grade data is not available.</AlertBanner>) :
       (gradeLoaded ? <BuildGradeView /> : <Spinner />);
 
   return (

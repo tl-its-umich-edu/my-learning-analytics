@@ -75,7 +75,7 @@ function ResourcesAccessed (props) {
           <div style={{ textAlign: "center" }}>
             <FormControl>
               <FormGroup row>
-                <p style={{fontWeight: "bold"}}>Select Resources to be Viewed:</p>
+                <p style={{fontWeight: "bold"}}>Select resource types to be viewed:&nbsp;&nbsp;</p>
                 {
                   resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeResourceHandler} value={el}></Checkbox>} label={el}/>))
                 }
@@ -216,10 +216,10 @@ function ResourcesAccessed (props) {
 
   const ResourceAccessChartBuilder = (resourceData) => {
     if (resourceFilter.length === 0) {
-      return (<AlertBanner>Please select a resource type to display data</AlertBanner>)
+      return (<AlertBanner>Please select a resource type to display data.</AlertBanner>)
     }
     else if (!resourceData || Object.keys(resourceData).length === 0) {
-      return (<AlertBanner>Resource data for this course from the selected week(s) is not available.</AlertBanner>)
+      return (<AlertBanner>Resource data for your selections is not available.</AlertBanner>)
     }
     else {
       return (
@@ -249,10 +249,8 @@ function ResourcesAccessed (props) {
               onWeekChange={onWeekChangeHandler}
             /> : ''}
             <div className={classes.formController}>
-              <p>Resources accessed from
-                week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now)' : ''}</b> with
-                these grades: </p>
-              <FormControl className={classes.formControl}>
+              <p>Resources accessed from week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now) ' : ''}</b> by students with these grades:&nbsp;&nbsp;</p>
+              <FormControl>
                 <Select
                   value={gradeRangeFilter}
                   onChange={onChangeGradeRangeHandler}

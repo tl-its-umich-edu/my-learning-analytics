@@ -54,7 +54,7 @@ export const getCurrentWeek = assignmentData => {
 
 const assignmentTable = assignmentData => {
   if (!assignmentData || Object.keys(assignmentData).length === 0) {
-    return (<AlertBanner>Assignment data for this course at or above the selected weight is not available.</AlertBanner>)
+    return (<AlertBanner>Assignment data at or above the selected weight is not available.</AlertBanner>)
   }
   return <TableAssignment
     tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
@@ -176,7 +176,7 @@ function AssignmentPlanning (props) {
                       Due at: <strong>{d.due_dates}</strong><br/>
                       Your grade: <strong>{d.score ? `${d.score}` : 'Not available'}</strong><br/>
                       Total points possible: <strong>{d.points_possible}</strong><br/>
-                      Avg assignment grade: <strong>{d.avg_score}</strong><br/>
+                      Avg. assignment grade: <strong>{d.avg_score}</strong><br/>
                       Percentage worth in final grade: <strong>{d.towards_final_grade}%</strong><br/>
                     </Typography>
                     {parseInt(d.drop_lowest) !== 0 ?
