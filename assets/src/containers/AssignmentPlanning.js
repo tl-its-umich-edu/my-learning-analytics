@@ -64,7 +64,9 @@ function AssignmentPlanning (props) {
   const [showSaveSetting, setShowSaveSetting] = useState(false)
   const [saveSettingClicked, setSaveSettingClicked] = useState(false)
 
+  // this is the filter setting currently set
   const [assignmentGradeFilter, setAssignmentGradeFilter] = useState(0)
+  // this is the filter setting last saved by the user
   const [userSavedFilterSetting, setUserSavedFilterSetting] = useState(assignmentGradeFilter)
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'assignment')
   const [assignmentLoaded, assignmentError, assignmentData] = useAssignmentData(courseId, assignmentGradeFilter, !userSettingLoaded)
@@ -73,7 +75,7 @@ function AssignmentPlanning (props) {
   const [userSettingSaved, savingError, userSettingResponse] = useSetUserSetting(
     courseId,
     { assignment: assignmentGradeFilter },
-    userSavedFilterSetting !== assignmentGradeFilter && saveSettingClicked,
+    userSavedFilterSetting !== assignmentGradeFilter && saveSettingClicked, // only save if the filter setting last saved does not equal the current grade filter, and checkbox is checked.
     [saveSettingClicked]
   )
 
