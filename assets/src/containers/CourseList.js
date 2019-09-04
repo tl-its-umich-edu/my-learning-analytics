@@ -15,7 +15,11 @@ import WarningBanner from '../components/WarningBanner'
 
 const styles = theme => ({
   root: {
+    flexGrow: 1
+  },
+  content: {
     flexGrow: 1,
+    padding: 8
   },
   container: {
     display: 'flex',
@@ -39,8 +43,6 @@ const styles = theme => ({
 
 function CourseList (props) {
   const { classes, user } = props
-
-  console.log(classes);
 
   if (!user.enrolledCourses && !user.isSuperuser) {
     return (<WarningBanner>You are not enrolled in any courses with MyLA enabled.</WarningBanner>)
@@ -82,25 +84,25 @@ function CourseList (props) {
           </Popover>
         </Toolbar>
       </AppBar>
-      <div className={classes.root}>
+      <div className={classes.content}>
         {
           user.isSuperuser
-            ? <Grid container xs={16}>
-              <Grid item xs={12}>
-                <Paper className={classes.paper}>
-                  <Typography variant='h5' gutterBottom>Select a course of your choice</Typography>
-                </Paper>
+            ? <Grid container spacing={16}>
+                <Grid item xs={12}>
+                  <Paper className={classes.paper}>
+                    <Typography variant='h5' gutterBottom>Select a course of your choice</Typography>
+                  </Paper>
+                </Grid>
               </Grid>
-            </Grid>
-            : <Grid container xs={16}>
-              <Grid item xs={12} className={classes.container}>
-                {user.enrolledCourses.map((course, key) =>
-                  <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
-                    <SelectCard cardData={{ title: course.course_name }} />
-                  </Link>
-                )}
+            : <Grid container spacing={16}>
+                <Grid item xs={12} className={classes.container}>
+                  {user.enrolledCourses.map((course, key) =>
+                    <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
+                      <SelectCard cardData={{ title: course.course_name }} />
+                    </Link>
+                  )}
+                </Grid>
               </Grid>
-            </Grid>
         }
       </div>
     </>

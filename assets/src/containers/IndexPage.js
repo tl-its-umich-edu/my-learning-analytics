@@ -9,8 +9,7 @@ import routes from '../routes/routes'
 
 const styles = theme => ({
   root: {
-    flexGrow: 1,
-    width: '100%'
+    flexGrow: 1
   },
   container: {
     display: 'flex',
@@ -36,7 +35,7 @@ function IndexPage (props) {
   }
 
   return (
-    <Grid container spacing={16} className={classes.root}>
+    <Grid container className={classes.root}>
       <Grid item xs={12} className={classes.container}>
         <Grid
           container
