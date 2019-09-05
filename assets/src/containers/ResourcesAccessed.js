@@ -26,17 +26,21 @@ const styles = theme => ({
     padding: 8
   },
   paper: {
-    padding: theme.spacing.unit * 2,
-    color: theme.palette.text.secondary
+    color: theme.palette.text.secondary,
+    padding: theme.spacing.unit * 2
   },
   formController: {
-    display: 'flex',
-    marginTop: theme.spacing.unit * 2,
     alignItems: 'center',
-    justifyContent: 'center'
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: theme.spacing.unit * 2,
+  },
+  controlText: {
+    paddingLeft: 8,
+    paddingRight: 8
   },
   checkBox: {
-    marginLeft: 20,
+    marginLeft: 20
   },
 })
 
@@ -75,7 +79,7 @@ function ResourcesAccessed (props) {
           <div style={{ textAlign: "center" }}>
             <FormControl>
               <FormGroup row>
-                <p style={{fontWeight: "bold"}}>Select resource types to be viewed:&nbsp;&nbsp;</p>
+                <p className={classes.controlText}>Select resource types to be viewed:</p>
                 {
                   resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeResourceHandler} value={el}></Checkbox>} label={el}/>))
                 }
@@ -249,7 +253,7 @@ function ResourcesAccessed (props) {
               onWeekChange={onWeekChangeHandler}
             /> : ''}
             <div className={classes.formController}>
-              <p>Resources accessed from week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now) ' : ''}</b> by students with these grades:&nbsp;&nbsp;</p>
+              <p className={classes.controlText}>Resources accessed from week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now) ' : ''}</b> by students with these grades:</p>
               <FormControl>
                 <Select
                   value={gradeRangeFilter}
