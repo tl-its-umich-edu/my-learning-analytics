@@ -457,7 +457,7 @@ if CSRF_COOKIE_SECURE:
     These have to be updated if you add additional settings
     Added as a security check to prevent unwanted types being added
 """
-VALID_DEFAULT_SELECTION_TYPES=['grade','resource','demomode']
+VALID_DEFAULT_SELECTION_TYPES=['grade', 'assignment', 'resource', 'demomode']
 
 # IMPORT LOCAL ENV
 # =====================
