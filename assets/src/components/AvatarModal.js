@@ -15,6 +15,7 @@ import LogoutIcon from '@material-ui/icons/ExitToApp'
 import HelpIcon from '@material-ui/icons/HelpOutline'
 import Lock from '@material-ui/icons/Lock'
 import Launch from '@material-ui/icons/Launch'
+import BorderClear from '@material-ui/icons/BorderClear'
 import Checkbox from '@material-ui/core/Checkbox'
 import useSetUserSetting from '../hooks/useSetUserSetting'
 import useUserSetting from '../hooks/useUserSetting'
@@ -71,7 +72,7 @@ function AvatarModal (props) {
       <Divider />
         <ListItem>
           <ListItemIcon>
-            <Lock />
+            <BorderClear />
           </ListItemIcon>
           <ListItemText inset primary='Demo Mode' />
           <Checkbox checked={demoMode} 
