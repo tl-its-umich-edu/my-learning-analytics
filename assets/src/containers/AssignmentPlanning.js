@@ -18,6 +18,8 @@ import { isObjectEmpty } from '../util/object'
 import useUserSetting from '../hooks/useUserSetting'
 import useSetUserSetting from '../hooks/useSetUserSetting'
 import { AssignmentPlanningTooltip } from '../components/Tooltip'
+import clsx from 'clsx';
+
 
 const styles = theme => ({
   root: {
@@ -46,7 +48,7 @@ const currentSetting = 'My current setting'
 const rememberSetting = 'Remember my setting'
 const settingNotUpdated = 'Setting not updated'
 
-const assignmentTable = assignmentData => {
+const assignmentTable = (assignmentData, user) => {
   if (!assignmentData || Object.keys(assignmentData).length === 0) {
     return (<Typography>No data provided</Typography>)
   }
@@ -54,11 +56,12 @@ const assignmentTable = assignmentData => {
     tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
     tableData={assignmentData}
     currentWeek={getCurrentWeek(assignmentData)}
+    user={user}
   />
 }
 
 function AssignmentPlanning (props) {
-  const { classes, disabled, courseId } = props
+  const { classes, disabled, courseId, user} = props
   if (disabled) return (<Error>Assignment view is hidden for this course.</Error>)
 
   const [showSaveSetting, setShowSaveSetting] = useState(false)
@@ -133,6 +136,7 @@ function AssignmentPlanning (props) {
               <Typography variant='h5' gutterBottom>Progress toward Final Grade</Typography>
               {assignmentData
                 ? <ProgressBar
+                  sensitive = {user.user_defaults.demomode === "True"}
                   data={assignmentData.progress}
                   aspectRatio={0.12}
                   tip={AssignmentPlanningTooltip(classes)} />
@@ -188,7 +192,7 @@ function AssignmentPlanning (props) {
               response={userSettingResponse}
               successMessage={'Assignment filter setting saved!'} />
             { /* in case of no data empty list is sent */}
-            {assignmentLoaded ? assignmentTable(assignmentData.plan) : <Spinner />}
+            {assignmentLoaded ? assignmentTable(assignmentData.plan, user) : <Spinner />}
           </Paper>
         </Grid>
       </Grid>

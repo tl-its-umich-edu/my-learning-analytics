@@ -44,7 +44,7 @@ const rememberSetting = 'Remember my setting'
 const settingNotUpdated = 'Setting not updated'
 
 function ResourcesAccessed (props) {
-  const { classes, courseInfo, courseId, disabled } = props
+  const { classes, courseInfo, courseId, disabled, user} = props
   if (disabled) return (<Error>Files view is hidden for this course.</Error>)
   let resourceTypes = courseInfo.resource_types
   if (resourceTypes.length === 0) {

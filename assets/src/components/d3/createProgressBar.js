@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 
-function createProgressBar ({ data, width, height, domElement, tip }) {
+function createProgressBar ({ data, width, height, domElement, tip, sensitive }) {
   const margin = { top: 20, right: 20, bottom: 20, left: 50 }
   let [aWidth, aHeight] = adjustViewport(width, height, margin)
 
@@ -31,6 +31,7 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
   const svg = d3.select(domElement).append('svg')
     .attr('width', aWidth)
     .attr('height', aHeight)
+    .attr('class', sensitive ? 'sensitive' : '')
 
   const bar = svg.selectAll('g')
     .data(data).enter()
@@ -153,7 +154,7 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
   svg.append('g')
     .call(xAxis)
 
-  if (tip) {
+  if (tip && !sensitive) {
     svg.call(tip)
     bar
       .on('mouseover', tip.show)

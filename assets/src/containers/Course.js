@@ -46,10 +46,12 @@ function Course (props) {
             <Route path='/courses/:courseId/assignments'
               render={props => <AssignmentPlanning {...props}
                 disabled={!courseInfo.course_view_options.ap}
-                courseId={courseId} />} />
+                courseId={courseId} 
+                user={user} />} />
             <Route path='/courses/:courseId/resources'
               render={props => <ResourcesAccessed {...props} disabled={!courseInfo.course_view_options.ra} courseInfo={courseInfo}
-                courseId={courseId} />} />
+                courseId={courseId} 
+                user={user} />} />
           </>
           : <Spinner />
       }

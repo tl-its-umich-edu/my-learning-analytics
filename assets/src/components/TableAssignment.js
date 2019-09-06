@@ -13,6 +13,7 @@ import createToolTip from '../util/createToolTip'
 import { renderToString } from 'react-dom/server'
 import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
+import clsx from 'clsx';
 
 const tableStyle = theme => ({
   table: {
@@ -74,7 +75,7 @@ const generateAssignmentTable = plan => {
 }
 
 function CustomAssignmentTable (props) {
-  const { classes, tableHead, tableData, currentWeek = null } = props
+  const { classes, tableHead, tableData, currentWeek=null, user} = props
   const currentWeekRow = useRef(null)
   const tableRef = useRef(null)
   const toolTipContent = (data) => {
@@ -168,9 +169,10 @@ function CustomAssignmentTable (props) {
           if (j === 3) {
             borderAndCurrentWeekStyle['paddingLeft'] = 0
           }
+          let tcSensitive=clsx(classes.tableCell, user.user_defaults.demomode === "True" ? 'sensitive' : '');
           return (
             j === 2 ?
-              <TableCell title={displayProp ? prop : null} className={classes.tableCell} key={j}
+              <TableCell title={displayProp ? prop : null} className={tcSensitive} key={j}
                          style={borderAndCurrentWeekStyle}>
                 {displayProp ? prop : null}
               </TableCell> :
