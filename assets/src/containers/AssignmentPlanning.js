@@ -84,7 +84,7 @@ function AssignmentPlanning (props) {
 
   useEffect(() => {
     if (userSettingLoaded) {
-      if (isObjectEmpty(userSetting.default)) {
+      if (isObjectEmpty(userSetting) || isObjectEmpty(userSetting.default)) {
         setAssignmentGradeFilter(0)
       } else {
         setAssignmentGradeFilter(Number(userSetting.default))
