@@ -45,7 +45,7 @@ function CourseList (props) {
   const { classes, user } = props
 
   if (!user.enrolledCourses && !user.isSuperuser) {
-    return (<WarningBanner>You are not enrolled in any courses with MyLA enabled.</WarningBanner>)
+    return (<WarningBanner>You are not enrolled in any courses with My Learning Analytics enabled.</WarningBanner>)
   }
 
   const [avatarEl, setAvatarEl] = useState(null)

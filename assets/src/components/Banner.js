@@ -18,15 +18,20 @@ const styles = theme => ({
             "0px 4px 5px 0px rgba(0,0,0,0.14), " +
             "0px 1px 10px 0px rgba(0,0,0,0.12)"
     }
-})
+});
 
 function Banner (props) {
     const { classes, settings, children } = props;
 
     const paperStyle = {
-        'background': settings.backgroundColor,
-        'borderColor': settings.borderColor,
-        'width': settings.width,
+        background: settings.backgroundColor,
+        borderColor: settings.borderColor
+    };
+
+    const typographyStyle = {
+        textAlign: "center",
+        color: settings.textColor,
+        fontWeight: "bold"
     };
 
     return (
@@ -34,7 +39,7 @@ function Banner (props) {
             <Grid container spacing={16}>
                 <Grid item xs={12}>
                     <Paper className={classes.paper} style={paperStyle}>
-                        <Typography variant="body1" align="center" style={{'color': settings.textColor}} gutterBottom>
+                        <Typography variant="body1" style={typographyStyle} gutterBottom>
                             {children}
                         </Typography>
                     </Paper>

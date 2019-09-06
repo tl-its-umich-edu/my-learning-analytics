@@ -6,9 +6,9 @@ function WarningBanner (props) {
     const defaultMessage = "Something went wrong; please try again later.";
 
     const bannerSettings = {
-        backgroundColor: "#fff3cd",
-        borderColor: "#ffeeba",
-        textColor: "#856404"
+        backgroundColor: "#FFF3CD",
+        borderColor: "#FFEEBA",
+        textColor: "#4C3319"
     };
 
     return (

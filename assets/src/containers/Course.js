@@ -9,8 +9,7 @@ import IndexPage from './IndexPage'
 import Spinner from '../components/Spinner'
 import { isObjectEmpty } from '../util/object'
 import { useCourseInfo } from '../service/api'
-import AlertBanner from "../components/AlertBanner";
-import WarningBanner from "../components/WarningBanner";
+import WarningBanner from "../components/WarningBanner"
 
 function Course (props) {
   const { courseId, user } = props
@@ -18,7 +17,7 @@ function Course (props) {
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
   if (error) return (<WarningBanner/>)
-  if (loaded && isObjectEmpty(courseInfo)) return (<AlertBanner>Tool is not enabled for this course.</AlertBanner>)
+  if (loaded && isObjectEmpty(courseInfo)) return (<WarningBanner>My Learning Analytics is not enabled for this course.</WarningBanner>)
 
   return (
     <>

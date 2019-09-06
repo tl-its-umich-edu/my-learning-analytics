@@ -6,7 +6,7 @@ function AlertBanner (props) {
 
     const bannerSettings = {
         backgroundColor: "#CCE5FF",
-        borderColor: "#b8daff",
+        borderColor: "#B8DAFF",
         textColor: "#004085"
     };
 
