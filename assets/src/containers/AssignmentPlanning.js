@@ -65,7 +65,7 @@ function AssignmentPlanning (props) {
   const [saveSettingClicked, setSaveSettingClicked] = useState(false)
 
   // this is the filter setting currently set
-  const [assignmentGradeFilter, setAssignmentGradeFilter] = useState(0)
+  const [assignmentGradeFilter, setAssignmentGradeFilter] = useState('')
   // this is the filter setting last saved by the user
   const [userSavedFilterSetting, setUserSavedFilterSetting] = useState(assignmentGradeFilter)
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'assignment')
