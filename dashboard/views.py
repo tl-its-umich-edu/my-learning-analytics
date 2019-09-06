@@ -1,5 +1,5 @@
 from django.forms.models import model_to_dict
-from rules.contrib.views import permission_required, objectgetter
+from rules.contrib.views import permission_required
 
 import math, json, logging
 from datetime import datetime, timedelta
@@ -17,6 +17,8 @@ from dashboard.event_logs_types.event_logs_types import EventLogTypes
 from dashboard.common import db_util
 from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
+
 
 from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
 from dashboard.settings import RESOURCE_VALUES
@@ -40,9 +42,11 @@ RESOURCE_VALUES = settings.RESOURCE_VALUES
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
 
-# Either the user is in the course or the course is 0 (special case)
-def is_in_course(request, course_id=0):
-    return course_id == 0 or objectgetter(Course, 'course_id', 'canvas_id')
+# We need to handle the special courseid of 0 so not using objectgetter
+def get_course(request, course_id=0):
+    if course_id == 0:
+        return Course()
+    return get_object_or_404(Course, canvas_id = course_id)
 
 def gpa_map(grade):
     if grade is None:
@@ -64,13 +68,13 @@ def get_home_template(request):
 
 
 @permission_required('dashboard.get_course_template',
-    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
+    fn=get_course, raise_exception=True)
 def get_course_template(request, course_id=0):
     return render(request, 'frontend/index.html', {'course_id': course_id})
 
 
 @permission_required('dashboard.get_course_info',
-    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
+    fn=get_course, raise_exception=True)
 def get_course_info(request, course_id=0):
     """Returns JSON data about a course
 
@@ -129,7 +133,7 @@ def get_course_info(request, course_id=0):
 
 # show percentage of users who read the resource within prior n weeks
 @permission_required('dashboard.resource_access_within_week',
-    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
+    fn=get_course, raise_exception=True)
 def resource_access_within_week(request, course_id=0):
 
     course_id = db_util.canvas_id_to_incremented_id(course_id)
@@ -295,7 +299,7 @@ def resource_access_within_week(request, course_id=0):
 
 
 @permission_required('dashboard.grade_distribution',
-    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
+    fn=get_course, raise_exception=True)
 def grade_distribution(request, course_id=0):
     logger.info(grade_distribution.__name__)
 
@@ -330,7 +334,7 @@ def grade_distribution(request, course_id=0):
 
 
 @permission_required('dashboard.update_user_default_selection_for_views',
-    fn=is_in_course, raise_exception=True)
+    fn=get_course, raise_exception=True)
 def update_user_default_selection_for_views(request, course_id=0):
     logger.info(update_user_default_selection_for_views.__name__)
     # Don't do anything for course id 0
@@ -365,7 +369,7 @@ def update_user_default_selection_for_views(request, course_id=0):
 
 
 @permission_required('dashboard.get_user_default_selection',
-    fn=is_in_course, raise_exception=True)
+    fn=get_course, raise_exception=True)
 def get_user_default_selection(request, course_id=0):
     logger.info(get_user_default_selection.__name__)
     # Don't do anything for course id 0
@@ -384,7 +388,7 @@ def get_user_default_selection(request, course_id=0):
     return HttpResponse(result, content_type='application/json')
 
 @permission_required('dashboard.assignments',
-    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
+    fn=get_course, raise_exception=True)
 def assignments(request, course_id=0):
     
     logger.info(assignments.__name__)
