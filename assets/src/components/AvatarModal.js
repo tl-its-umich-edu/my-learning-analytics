@@ -93,8 +93,8 @@ function AvatarModal (props) {
       ? '/grade-distribution'
       : url.includes('assignment')
         ? '/assignment-planning'
-        : url.includes('file')
-          ? '/files-accessed'
+        : url.includes('resources')
+          ? '/resources-accessed'
           : ''
     setHelpURL(`${helpURL}${helpUrlContext}`)
   }, [url])
