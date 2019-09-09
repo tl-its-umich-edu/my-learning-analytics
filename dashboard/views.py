@@ -108,7 +108,10 @@ def get_course_info(request, course_id=0):
     current_week_number = math.ceil((today - course_start).days/7)
     total_weeks = math.ceil((course_end - course_start).days/7)
 
-    resp['term'] = model_to_dict(course.term)
+    if course.term is not None:
+        resp['term'] = model_to_dict(course.term)
+    else:
+        resp['term'] = None
 
     # Have a fixed maximum number of weeks
     if total_weeks > settings.MAX_DEFAULT_WEEKS:
