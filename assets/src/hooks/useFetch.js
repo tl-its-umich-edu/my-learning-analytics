@@ -4,7 +4,7 @@ import { handleError, defaultFetchOptions } from '../util/data'
 
 const cache = new Map()
 
-const useFetch = (dataURL, options) => {
+const useFetch = (dataURL, options, doNotFetch = false) => {
   const fetchOptions = options
     ? { ...options, ...defaultFetchOptions }
     : { method: 'get', ...defaultFetchOptions }
@@ -14,12 +14,15 @@ const useFetch = (dataURL, options) => {
   const [error, setError] = useState(false)
 
   useEffect(() => {
+    // doNotFetch is used in AssignmentPlanning to ensure data is fetched after user setting is loaded
+    if (doNotFetch) return
     if (fetchOptions.method === 'get') {
       // only cache 'get' calls
       if (cache.has(dataURL)) {
         setData(cache.get(dataURL))
         setLoaded(true)
       } else {
+        setLoaded(false)
         fetch(dataURL, fetchOptions)
           .then(handleError)
           .then(res => res.json())
@@ -31,6 +34,7 @@ const useFetch = (dataURL, options) => {
           .catch(error => setError(error))
       }
     } else {
+      setLoaded(false)
       fetch(dataURL, fetchOptions)
         .then(handleError)
         .then(res => res.json())

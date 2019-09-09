@@ -6,6 +6,7 @@ import Cookie from 'js-cookie'
 const useSetUserSetting = (courseId, userSetting, settingChanged, conditionalArray) => {
   const [loaded, setLoaded] = useState(false)
   const [response, setResponse] = useState(null)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     if (settingChanged) {
@@ -24,11 +25,11 @@ const useSetUserSetting = (courseId, userSetting, settingChanged, conditionalArr
         .then(res => {
           setResponse(res)
           setLoaded(true)
-        })
+        }).catch(error => setError(error.message))
     }
   }, conditionalArray)
 
-  return [loaded, response]
+  return [loaded, error, response]
 }
 
 export default useSetUserSetting

@@ -214,7 +214,7 @@ class CourseViewOption(models.Model):
         """
 
         try:
-            options = {'fa': int(self.show_resources_accessed and 'show_resources_accessed'
+            options = {'ra': int(self.show_resources_accessed and 'show_resources_accessed'
                                  not in settings.VIEWS_DISABLED),
                        'ap': int(self.show_assignment_planning and 'show_assignment_planning'
                                  not in settings.VIEWS_DISABLED),

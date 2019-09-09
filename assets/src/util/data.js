@@ -14,7 +14,16 @@ const defaultFetchOptions = {
   credentials: 'include'
 }
 
+const getCurrentWeek = assignmentData => {
+  const currentWeekObject = assignmentData
+    .find(x => x.due_date_items[0].assignment_items[0].current_week)
+  return currentWeekObject
+    ? currentWeekObject.week
+    : null
+}
+
 export {
   handleError,
-  defaultFetchOptions
+  defaultFetchOptions,
+  getCurrentWeek
 }

@@ -12,9 +12,6 @@ RUN npm run prod && \
     # src is no longer needed (saves time for collect static)
     rm -rf /usr/src/app/assets/src
 
-
-
-
 # build node libraries for production mode
 FROM node-webpack AS node-prod-deps
 
@@ -36,13 +33,14 @@ RUN apt-get update && \
     apt-get clean -y && \
     pip install -r requirements.txt
 
-# NOTE: project files likely to change between dev builds
-COPY . /code/
 # copy built react and node libraries for production mode
 COPY --from=node-prod-deps /usr/src/app/package-lock.json /code/package-lock.json
 COPY --from=node-prod-deps /usr/src/app/webpack-stats.json /code/webpack-stats.json
 COPY --from=node-prod-deps /usr/src/app/assets /code/assets
 COPY --from=node-prod-deps /usr/src/app/node_modules /code/node_modules
+
+# NOTE: project files likely to change between dev builds
+COPY . /code/
 
 # This DJANGO_SECRET_KEY is set here just so collectstatic runs with an empty key. It can be set to anything
 RUN echo yes | DJANGO_SECRET_KEY="collectstatic" python manage.py collectstatic --verbosity 0

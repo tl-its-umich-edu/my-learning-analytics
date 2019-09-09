@@ -48,7 +48,7 @@ function Course (props) {
                 disabled={!courseInfo.course_view_options.ap}
                 courseId={courseId} />} />
             <Route path='/courses/:courseId/resources'
-              render={props => <ResourcesAccessed {...props} disabled={!courseInfo.course_view_options.fa} courseInfo={courseInfo}
+              render={props => <ResourcesAccessed {...props} disabled={!courseInfo.course_view_options.ra} courseInfo={courseInfo}
                 courseId={courseId} />} />
           </>
           : <Spinner />
