@@ -163,7 +163,7 @@ class Course(models.Model):
     date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
     date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)
     ab_test_course = models.BooleanField(blank=False, null=False, default=False, verbose_name=
-                                         "AB test course")
+                                         "AB test course (For showing grades count on bars)")
 
     objects = CourseManager()
 

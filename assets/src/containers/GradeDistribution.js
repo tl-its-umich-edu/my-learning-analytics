@@ -36,14 +36,14 @@ function GradeDistribution (props) {
   const [gradeLoaded, gradeError, gradeData] = useGradeData(courseId)
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'grade')
   const [settingChanged, setSettingChanged] = useState(false)
-  const [showGrade, setShowGrade] = useState(false)
+  const [showGrade, setShowGrade] = useState(true)
 
   useEffect(() => {
     if (userSettingLoaded) {
       if (isObjectEmpty(userSetting.default)) {
-        setShowGrade(false)
+        setShowGrade(true)
       } else {
-        setShowGrade(userSetting.default !== 'False')
+        setShowGrade(userSetting.default === 'False' ? false : true)
       }
     }
   }, [userSettingLoaded])
@@ -65,8 +65,7 @@ function GradeDistribution (props) {
       ['Average grade', <strong>{gradeData[0].grade_avg}%</strong>],
       ['Median grade', <strong>{gradeData[0].median_grade}%</strong>],
       ['Number of students', <strong>{gradeData[0].tot_students}</strong>],
-      ['Outlier_Found', <strong>{gradeData[0].is_outliers_found.toString()}</strong>],
-      showGrade ?
+      !user.admin && showGrade ?
         [
           'My grade',
           <strong>{
@@ -108,7 +107,7 @@ function GradeDistribution (props) {
             yAxisLabel={'Number of Students'}
             myGrade={showGrade ? gradeData[0].current_user_grade : null}
             maxGrade={gradeData[0].graph_upper_limit}
-            isABTestingCourse={gradeData[0].ab_test_course}/>
+            showNumberOnBars={gradeData[0].show_number_on_bars}/>
         </Grid>
       </Grid>
     )

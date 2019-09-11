@@ -295,41 +295,34 @@ def resource_access_within_week(request, course_id=0):
 def grade_distribution(request, course_id=0):
     logger.info(grade_distribution.__name__)
 
-
     course_id = canvas_id_to_incremented_id(course_id)
 
     current_user = request.user.get_username()
 
-    grade_score_sql= f"""select current_grade,
-       (select ab_test_course From course where id=%(course_id)s) as ab_test_course,
+    grade_score_sql = f"""select current_grade,
+       (select ab_test_course From course where id=%(course_id)s) as show_number_on_bars,
     (select current_grade from user where sis_name=%(current_user)s and course_id=%(course_id)s) as current_user_grade
         from user where course_id=%(course_id)s and enrollment_type='StudentEnrollment';
                     """
     df = pd.read_sql(grade_score_sql, conn, params={"current_user": current_user, 'course_id': course_id})
     if df.empty or df['current_grade'].isnull().all():
         return HttpResponse(json.dumps({}), content_type='application/json')
-    # df.to_json(f'user_{course_id}.json', orient='records')
+    df.to_json(f'user_{course_id}.json', orient='records')
 
     df['tot_students'] = df.shape[0]
     df = df[df['current_grade'].notnull()]
     df['current_grade'] = df['current_grade'].astype(float)
     df['grade_avg'] = df['current_grade'].mean().round(2)
     df['median_grade'] = df['current_grade'].median().round(2)
-    df['is_outliers_found'] = False
-    df['ab_test_course']=df['ab_test_course'].apply(lambda x:True if x == 1 else False)
+    df['show_number_on_bars'] = df['show_number_on_bars'].apply(lambda x: True if x == 1 else False)
 
-    grades = sorted(df['current_grade'].values.tolist())
-    outliers = detect_outlier(grades)
     df.sort_values(by=['current_grade'], inplace=True)
     df.reset_index(drop=True, inplace=True)
-
-    if outliers:
-        df['current_grade'] = df['current_grade'].replace(outliers, max(outliers))
-        df['is_outliers_found'] = True
-    else:
-        df.sort_values(by=['current_grade'], inplace=True)
-        lowest_5_grades = df['current_grade'].head(5)
-        df['current_grade']= df['current_grade'].replace(lowest_5_grades, max(lowest_5_grades))
+    df.sort_values(by=['current_grade'], inplace=True)
+    binning_cutoff_number = find_binning_cutoff(df['current_grade'].values.tolist())
+    # adding +1 since
+    binning_grade_value = find_binning_grade_value(df['current_grade'].values.tolist(), df['current_grade'].head(binning_cutoff_number + 1))
+    df['current_grade'] = df['current_grade'].replace(df['current_grade'].head(binning_cutoff_number+1), binning_grade_value)
 
     if df[df['current_grade'] > 100.0].shape[0] > 0:
         df['graph_upper_limit'] = int((5 * round(float(df['current_grade'].max()) / 5) + 5))
@@ -342,7 +335,7 @@ def grade_distribution(request, course_id=0):
     # json for eventlog
     data = {
         "course_id": course_id,
-        "ab_test_course":df['ab_test_course'].values[0]
+        "show_number_on_bars": df['show_number_on_bars'].values[0]
     }
     eventlog(request.user, EventLogTypes.EVENT_VIEW_GRADE_DISTRIBUTION.value, extra=data)
 
@@ -646,23 +639,37 @@ def are_weighted_assignments_hidden(course_id, df):
             return True
 
 
-def detect_outlier(data_1):
-    threshold = 3
-    outliers = []
-    mean_1 = np.mean(data_1)
-    std_1 = np.std(data_1)
-    for y in data_1:
-        z_score = (y - mean_1) / std_1
-        if np.abs(z_score) > threshold:
-            outliers.append(y)
-    return outliers
+def find_binning_grade_value(grades, lowest_grades_binned_list):
+    """
+    finding the binning grade value so that binned grade values is bit far way from the normal distribution
+
+    :param grades: ordered list, eg: [40, 50, 60, 70, 75, 94.87, 95.55, 96.28]
+    :param lowest_grades_binned_list: eg: [40, 50, 60, 70, 75]
+    :return: binning grade value eg: 80
+    """
+    for grade in grades:
+        if grade > max(lowest_grades_binned_list):
+            r = 10 * round(grade / 10)
+            binning_grade_value = r - 10 if r >= 10 else 0
+            return binning_grade_value
 
 
-def range_spread(grades):
-    grade_range = np.ptp(grades)
-    min_grade = np.amin(grades)
-    grades_range_spread = (min_grade / grade_range) * 100
-    return grades_range_spread
+def find_binning_cutoff(grade_list):
+    """
+    finding lowest 5 grades values with and with out repetition and returning the index of that
+    for eg, [11,12,13,14,15,16,17] the index returned is 4 so that lowest 5 grades [11,12,13,14,15] are binned
+    [11,12,13,14,15,15,15,15,16,17] index returned is 7, lowest [11,12,13,14,15,15,15,15] are binned
+
+    :param grade_list: ordered grades list
+    :return: index in the grade_list for binning
+    """
+    fifth_item_in_list = grade_list[4]
+    logger.info(f"Fifth item in the list: {fifth_item_in_list}")
+    return_index = 0
+    for index, i in enumerate(grade_list):
+        if i == fifth_item_in_list:
+            return_index = index
+    return return_index
 
 
 def df_default_display_settings():
