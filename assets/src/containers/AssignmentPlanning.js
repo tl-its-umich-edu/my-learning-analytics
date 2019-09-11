@@ -1,23 +1,24 @@
 import React, { useEffect, useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import Paper from '@material-ui/core/Paper'
-import Grid from '@material-ui/core/Grid'
-import Spinner from '../components/Spinner'
-import Typography from '@material-ui/core/Typography'
-import Select from '@material-ui/core/Select'
-import FormControl from '@material-ui/core/FormControl'
-import MenuItem from '@material-ui/core/MenuItem'
-import ProgressBar from '../components/ProgressBar'
-import TableAssignment from '../components/TableAssignment'
 import Checkbox from '@material-ui/core/Checkbox'
-import UserSettingSnackbar from '../components/UserSettingSnackbar'
-import Error from './Error'
-import { getCurrentWeek } from '../util/data'
-import { useAssignmentData } from '../service/api'
-import { isObjectEmpty } from '../util/object'
-import useUserSetting from '../hooks/useUserSetting'
-import useSetUserSetting from '../hooks/useSetUserSetting'
+import FormControl from '@material-ui/core/FormControl'
+import Grid from '@material-ui/core/Grid'
+import MenuItem from '@material-ui/core/MenuItem'
+import Paper from '@material-ui/core/Paper'
+import Select from '@material-ui/core/Select'
+import Typography from '@material-ui/core/Typography'
 import { AssignmentPlanningTooltip } from '../components/Tooltip'
+import AlertBanner from '../components/AlertBanner'
+import ProgressBar from '../components/ProgressBar'
+import Spinner from '../components/Spinner'
+import TableAssignment from '../components/TableAssignment'
+import UserSettingSnackbar from '../components/UserSettingSnackbar'
+import WarningBanner from '../components/WarningBanner'
+import useSetUserSetting from '../hooks/useSetUserSetting'
+import useUserSetting from '../hooks/useUserSetting'
+import { useAssignmentData } from '../service/api'
+import { getCurrentWeek } from '../util/data'
+import { isObjectEmpty } from '../util/object'
 
 const styles = theme => ({
   root: {
@@ -48,7 +49,7 @@ const settingNotUpdated = 'Setting not updated'
 
 const assignmentTable = assignmentData => {
   if (!assignmentData || Object.keys(assignmentData).length === 0) {
-    return (<Typography>No data provided</Typography>)
+    return (<AlertBanner>No assignments meet the selected criteria.</AlertBanner>)
   }
   return <TableAssignment
     tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
@@ -59,7 +60,7 @@ const assignmentTable = assignmentData => {
 
 function AssignmentPlanning (props) {
   const { classes, disabled, courseId } = props
-  if (disabled) return (<Error>Assignment view is hidden for this course.</Error>)
+  if (disabled) return (<AlertBanner>The Assignment Planning view is hidden for this course.</AlertBanner>)
 
   const [showSaveSetting, setShowSaveSetting] = useState(false)
   const [saveSettingClicked, setSaveSettingClicked] = useState(false)
@@ -121,8 +122,7 @@ function AssignmentPlanning (props) {
     }
   }
 
-  if (assignmentError) return (<Error>Something went wrong, please try again later.</Error>)
-  if (assignmentLoaded && isObjectEmpty(assignmentData)) return (<Error>No data provided.</Error>)
+  if (assignmentError) return (<WarningBanner/>)
 
   return (
     <div className={classes.root}>
