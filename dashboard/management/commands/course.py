@@ -44,8 +44,8 @@ class Command(BaseCommand):
             is_new = True
 
         course_obj.canvas_id = course_id
-        course_obj.name = name
         course_obj.term = term_obj
+        course_obj.name = name
         course_obj.date_start = date_start
         course_obj.date_end = date_end
         course_obj.save()
