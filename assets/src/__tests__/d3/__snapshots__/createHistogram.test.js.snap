@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`createHistogram should build a histogram bar chart with MyGrade line with out outliers 1`] = `
+exports[`createHistogram should build a histogram bar chart with MyGrade line with outliers 1`] = `
 <div>
   <svg
     height="430"
@@ -14,12 +14,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="41"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="48.8"
-        y="395"
-      />
     </g>
     <g>
       <rect
@@ -28,12 +22,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         width="16.6"
         x="58.6"
         y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="66.4"
-        y="395"
       />
     </g>
     <g>
@@ -44,12 +32,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="76.2"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="84"
-        y="395"
-      />
     </g>
     <g>
       <rect
@@ -58,12 +40,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         width="16.60000000000001"
         x="93.8"
         y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="101.60000000000001"
-        y="395"
       />
     </g>
     <g>
@@ -74,12 +50,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="111.4"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="119.2"
-        y="395"
-      />
     </g>
     <g>
       <rect
@@ -88,12 +58,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         width="16.599999999999994"
         x="129"
         y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="136.8"
-        y="395"
       />
     </g>
     <g>
@@ -104,12 +68,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="146.6"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="154.4"
-        y="395"
-      />
     </g>
     <g>
       <rect
@@ -118,12 +76,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         width="16.599999999999994"
         x="164.20000000000002"
         y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="172"
-        y="395"
       />
     </g>
     <g>
@@ -134,12 +86,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="181.8"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="189.60000000000002"
-        y="395"
-      />
     </g>
     <g>
       <rect
@@ -148,12 +94,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         width="16.599999999999994"
         x="199.4"
         y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="207.2"
-        y="395"
       />
     </g>
     <g>
@@ -164,12 +104,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="217"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="224.79999999999998"
-        y="395"
-      />
     </g>
     <g>
       <rect
@@ -179,29 +113,15 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="234.6"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="242.4"
-        y="395"
-      />
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="360"
+        height="0"
         width="16.600000000000023"
         x="252.2"
-        y="20"
+        y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="260"
-        y="35"
-      >
-        22
-      </text>
     </g>
     <g>
       <rect
@@ -210,12 +130,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         width="16.600000000000023"
         x="269.8"
         y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="277.6"
-        y="395"
       />
     </g>
     <g>
@@ -226,12 +140,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="287.40000000000003"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="295.2"
-        y="395"
-      />
     </g>
     <g>
       <rect
@@ -240,12 +148,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         width="16.600000000000023"
         x="305"
         y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="312.8"
-        y="395"
       />
     </g>
     <g>
@@ -256,12 +158,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="322.6"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="330.40000000000003"
-        y="395"
-      />
     </g>
     <g>
       <rect
@@ -270,12 +166,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         width="16.599999999999966"
         x="340.20000000000005"
         y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="348"
-        y="395"
       />
     </g>
     <g>
@@ -286,29 +176,15 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="357.8"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="365.6"
-        y="395"
-      />
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="32.72727272727275"
+        height="0"
         width="16.600000000000023"
         x="375.4"
-        y="347.27272727272725"
+        y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="383.2"
-        y="362.27272727272725"
-      >
-        2
-      </text>
     </g>
     <g>
       <rect
@@ -317,12 +193,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         width="16.599999999999966"
         x="393"
         y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="400.79999999999995"
-        y="395"
       />
     </g>
     <g>
@@ -333,12 +203,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="410.59999999999997"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="418.4"
-        y="395"
-      />
     </g>
     <g>
       <rect
@@ -347,12 +211,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         width="16.600000000000023"
         x="428.2"
         y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="436"
-        y="395"
       />
     </g>
     <g>
@@ -363,97 +221,51 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="445.8"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="453.59999999999997"
-        y="395"
-      />
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="16.363636363636374"
+        height="0"
         width="16.600000000000023"
         x="463.4"
-        y="363.6363636363636"
+        y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="471.2"
-        y="378.6363636363636"
-      >
-        1
-      </text>
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="32.72727272727275"
+        height="0"
         width="16.600000000000023"
         x="481"
-        y="347.27272727272725"
+        y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="488.8"
-        y="362.27272727272725"
-      >
-        2
-      </text>
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="16.363636363636374"
+        height="0"
         width="16.600000000000023"
         x="498.6"
-        y="363.6363636363636"
+        y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="506.40000000000003"
-        y="378.6363636363636"
-      >
-        1
-      </text>
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="16.363636363636374"
+        height="0"
         width="16.600000000000023"
         x="516.2"
-        y="363.6363636363636"
+        y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="524"
-        y="378.6363636363636"
-      >
-        1
-      </text>
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="16.363636363636374"
+        height="0"
         width="16.59999999999991"
         x="533.8000000000001"
-        y="363.6363636363636"
+        y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="541.5999999999999"
-        y="378.6363636363636"
-      >
-        1
-      </text>
     </g>
     <g>
       <rect
@@ -463,29 +275,15 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="551.4"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="559.1999999999999"
-        y="395"
-      />
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="32.72727272727275"
+        height="163.63636363636363"
         width="16.600000000000023"
         x="569"
-        y="347.27272727272725"
+        y="216.36363636363637"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="576.8"
-        y="362.27272727272725"
-      >
-        2
-      </text>
     </g>
     <g>
       <rect
@@ -495,46 +293,24 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="586.6"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="594.4"
-        y="395"
-      />
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="16.363636363636374"
+        height="0"
         width="16.600000000000023"
         x="604.2"
-        y="363.6363636363636"
+        y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="612"
-        y="378.6363636363636"
-      >
-        1
-      </text>
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="16.363636363636374"
+        height="0"
         width="16.600000000000023"
         x="621.8000000000001"
-        y="363.6363636363636"
+        y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="629.6"
-        y="378.6363636363636"
-      >
-        1
-      </text>
     </g>
     <g>
       <rect
@@ -544,260 +320,140 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         x="639.4000000000001"
         y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="647.1999999999999"
-        y="395"
-      />
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="32.72727272727275"
+        height="0"
         width="16.600000000000023"
         x="657"
-        y="347.27272727272725"
+        y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="664.8"
-        y="362.27272727272725"
-      >
-        2
-      </text>
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="32.72727272727275"
+        height="0"
         width="16.600000000000023"
         x="674.6"
-        y="347.27272727272725"
+        y="380"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="682.4"
-        y="362.27272727272725"
-      >
-        2
-      </text>
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="16.363636363636374"
+        height="98.18181818181819"
         width="16.59999999999991"
         x="692.2"
-        y="363.6363636363636"
+        y="281.8181818181818"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="700"
-        y="378.6363636363636"
-      >
-        1
-      </text>
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="32.72727272727275"
+        height="98.18181818181819"
         width="16.600000000000023"
         x="709.8"
-        y="347.27272727272725"
+        y="281.8181818181818"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="717.6"
-        y="362.27272727272725"
-      >
-        2
-      </text>
     </g>
     <g>
       <rect
         fill="steelblue"
-        height="49.090909090909065"
+        height="130.9090909090909"
         width="16.600000000000023"
         x="727.4"
-        y="330.90909090909093"
+        y="249.0909090909091"
       />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="735.2"
-        y="345.90909090909093"
-      >
-        3
-      </text>
+    </g>
+    <g>
+      <rect
+        fill="steelblue"
+        height="163.63636363636363"
+        width="16.59999999999991"
+        x="745"
+        y="216.36363636363637"
+      />
+    </g>
+    <g>
+      <rect
+        fill="steelblue"
+        height="98.18181818181819"
+        width="16.600000000000023"
+        x="762.5999999999999"
+        y="281.8181818181818"
+      />
+    </g>
+    <g>
+      <rect
+        fill="steelblue"
+        height="261.8181818181818"
+        width="16.600000000000023"
+        x="780.1999999999999"
+        y="118.18181818181819"
+      />
+    </g>
+    <g>
+      <rect
+        fill="steelblue"
+        height="163.63636363636363"
+        width="16.600000000000023"
+        x="797.8"
+        y="216.36363636363637"
+      />
+    </g>
+    <g>
+      <rect
+        fill="steelblue"
+        height="261.8181818181818"
+        width="16.600000000000023"
+        x="815.4"
+        y="118.18181818181819"
+      />
+    </g>
+    <g>
+      <rect
+        fill="steelblue"
+        height="229.0909090909091"
+        width="16.600000000000023"
+        x="833"
+        y="150.9090909090909"
+      />
+    </g>
+    <g>
+      <rect
+        fill="steelblue"
+        height="360"
+        width="16.59999999999991"
+        x="850.6"
+        y="20"
+      />
+    </g>
+    <g>
+      <rect
+        fill="steelblue"
+        height="327.27272727272725"
+        width="16.600000000000023"
+        x="868.1999999999999"
+        y="52.72727272727275"
+      />
+    </g>
+    <g>
+      <rect
+        fill="steelblue"
+        height="229.0909090909091"
+        width="16.600000000000023"
+        x="885.8"
+        y="150.9090909090909"
+      />
     </g>
     <g>
       <rect
         fill="steelblue"
         height="65.45454545454544"
-        width="16.59999999999991"
-        x="745"
-        y="314.54545454545456"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="752.8000000000001"
-        y="329.54545454545456"
-      >
-        4
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="16.363636363636374"
-        width="16.600000000000023"
-        x="762.5999999999999"
-        y="363.6363636363636"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="770.4"
-        y="378.6363636363636"
-      >
-        1
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="49.090909090909065"
-        width="16.600000000000023"
-        x="780.1999999999999"
-        y="330.90909090909093"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="788"
-        y="345.90909090909093"
-      >
-        3
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="49.090909090909065"
-        width="16.600000000000023"
-        x="797.8"
-        y="330.90909090909093"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="805.6"
-        y="345.90909090909093"
-      >
-        3
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="49.090909090909065"
-        width="16.600000000000023"
-        x="815.4"
-        y="330.90909090909093"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="823.2"
-        y="345.90909090909093"
-      >
-        3
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="16.363636363636374"
-        width="16.600000000000023"
-        x="833"
-        y="363.6363636363636"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="840.8000000000001"
-        y="378.6363636363636"
-      >
-        1
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="16.363636363636374"
-        width="16.59999999999991"
-        x="850.6"
-        y="363.6363636363636"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="858.4000000000001"
-        y="378.6363636363636"
-      >
-        1
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="868.1999999999999"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="876"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="885.8"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="893.6"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
         width="16.600000000000023"
         x="903.4"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="911.2"
-        y="395"
+        y="314.54545454545456"
       />
     </g>
     <g>
@@ -807,12 +463,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         width="0"
         x="921"
         y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="920"
-        y="395"
       />
     </g>
     <g
@@ -827,168 +477,6 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
         d="M40.5,0.5H920.5"
         stroke="currentColor"
       />
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(304.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          30%
-        </text>
-        <text
-          dx="-26"
-          dy="7"
-          fill="currentColor"
-          x="4"
-          y="9"
-        >
-          &lt;
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(348.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          35%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(392.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          40%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(436.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          45%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(480.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          50%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(524.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          55%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(568.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          60%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(612.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          65%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(656.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          70%
-        </text>
-      </g>
       <g
         class="tick"
         opacity="1"
@@ -1129,7 +617,7 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
       <g
         class="tick"
         opacity="1"
-        transform="translate(0,298.6818181818182)"
+        transform="translate(0,315.04545454545456)"
       >
         <line
           stroke="currentColor"
@@ -1140,13 +628,13 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
           fill="currentColor"
           x="-3"
         >
-          5
+          2
         </text>
       </g>
       <g
         class="tick"
         opacity="1"
-        transform="translate(0,216.86363636363637)"
+        transform="translate(0,249.5909090909091)"
       >
         <line
           stroke="currentColor"
@@ -1157,13 +645,13 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
           fill="currentColor"
           x="-3"
         >
-          10
+          4
         </text>
       </g>
       <g
         class="tick"
         opacity="1"
-        transform="translate(0,135.04545454545456)"
+        transform="translate(0,184.13636363636365)"
       >
         <line
           stroke="currentColor"
@@ -1174,7 +662,24 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
           fill="currentColor"
           x="-3"
         >
-          15
+          6
+        </text>
+      </g>
+      <g
+        class="tick"
+        opacity="1"
+        transform="translate(0,118.68181818181819)"
+      >
+        <line
+          stroke="currentColor"
+          x2="940"
+        />
+        <text
+          dy="0.32em"
+          fill="currentColor"
+          x="-3"
+        >
+          8
         </text>
       </g>
       <g
@@ -1191,1201 +696,15 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
           fill="currentColor"
           x="-3"
         >
-          20
-        </text>
-        <text
-          dy="-4"
-          fill="rgba(0, 0, 0, 0.87)"
-          font-size="0.875rem"
-          font-weight="400"
-          line-height="1.46429em"
-          text-anchor="start"
-          x="4"
-        />
-      </g>
-    </g>
-    <line
-      stroke="darkorange"
-      stroke-width="2"
-      transform="translate(0, 380)"
-      x1="263.25600000000003"
-      x2="263.25600000000003"
-      y1="-430"
-      y2="0"
-    />
-    <text
-      font-size="0.875rem"
-      font-weight="bold"
-      line-height="1.46429em"
-      text-anchor="start"
-      x="153.25600000000003"
-      y="15"
-    >
-      My Grade: 20.8%
-    </text>
-  </svg>
-</div>
-`;
-
-exports[`createHistogram should build a histogram bar chart with MyGrade line with outliers 1`] = `
-<div>
-  <svg
-    height="430"
-    width="940"
-  >
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.6"
-        x="41"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="48.8"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.6"
-        x="58.6"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="66.4"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.599999999999994"
-        x="76.2"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="84"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.60000000000001"
-        x="93.8"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="101.60000000000001"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.599999999999994"
-        x="111.4"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="119.2"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.599999999999994"
-        x="129"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="136.8"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="146.6"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="154.4"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.599999999999994"
-        x="164.20000000000002"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="172"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.599999999999994"
-        x="181.8"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="189.60000000000002"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.599999999999994"
-        x="199.4"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="207.2"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.599999999999994"
-        x="217"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="224.79999999999998"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.599999999999994"
-        x="234.6"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="242.4"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="252.2"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="260"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="269.8"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="277.6"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.599999999999966"
-        x="287.40000000000003"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="295.2"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="305"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="312.8"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="322.6"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="330.40000000000003"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.599999999999966"
-        x="340.20000000000005"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="348"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="48"
-        width="16.599999999999966"
-        x="357.8"
-        y="332"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="365.6"
-        y="347"
-      >
-        6
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="375.4"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="383.2"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.599999999999966"
-        x="393"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="400.79999999999995"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="410.59999999999997"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="418.4"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="428.2"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="436"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="8"
-        width="16.599999999999966"
-        x="445.8"
-        y="372"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="453.59999999999997"
-        y="387"
-      >
-        1
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="463.4"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="471.2"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="481"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="488.8"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="498.6"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="506.40000000000003"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="516.2"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="524"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.59999999999991"
-        x="533.8000000000001"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="541.5999999999999"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="551.4"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="559.1999999999999"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="8"
-        width="16.600000000000023"
-        x="569"
-        y="372"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="576.8"
-        y="387"
-      >
-        1
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="8"
-        width="16.600000000000023"
-        x="586.6"
-        y="372"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="594.4"
-        y="387"
-      >
-        1
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="8"
-        width="16.600000000000023"
-        x="604.2"
-        y="372"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="612"
-        y="387"
-      >
-        1
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="8"
-        width="16.600000000000023"
-        x="621.8000000000001"
-        y="372"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="629.6"
-        y="387"
-      >
-        1
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.59999999999991"
-        x="639.4000000000001"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="647.1999999999999"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="8"
-        width="16.600000000000023"
-        x="657"
-        y="372"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="664.8"
-        y="387"
-      >
-        1
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="8"
-        width="16.600000000000023"
-        x="674.6"
-        y="372"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="682.4"
-        y="387"
-      >
-        1
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.59999999999991"
-        x="692.2"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="700"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="16.600000000000023"
-        x="709.8"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="717.6"
-        y="395"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="8"
-        width="16.600000000000023"
-        x="727.4"
-        y="372"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="735.2"
-        y="387"
-      >
-        1
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="16"
-        width="16.59999999999991"
-        x="745"
-        y="364"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="752.8000000000001"
-        y="379"
-      >
-        2
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="32"
-        width="16.600000000000023"
-        x="762.5999999999999"
-        y="348"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="770.4"
-        y="363"
-      >
-        4
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="72"
-        width="16.600000000000023"
-        x="780.1999999999999"
-        y="308"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="788"
-        y="323"
-      >
-        9
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="128"
-        width="16.600000000000023"
-        x="797.8"
-        y="252"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="805.6"
-        y="267"
-      >
-        16
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="312"
-        width="16.600000000000023"
-        x="815.4"
-        y="68"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="823.2"
-        y="83"
-      >
-        39
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="272"
-        width="16.600000000000023"
-        x="833"
-        y="108"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="840.8000000000001"
-        y="123"
-      >
-        34
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="336"
-        width="16.59999999999991"
-        x="850.6"
-        y="44"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="858.4000000000001"
-        y="59"
-      >
-        42
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="192"
-        width="16.600000000000023"
-        x="868.1999999999999"
-        y="188"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="876"
-        y="203"
-      >
-        24
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="128"
-        width="16.600000000000023"
-        x="885.8"
-        y="252"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="893.6"
-        y="267"
-      >
-        16
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="40"
-        width="16.600000000000023"
-        x="903.4"
-        y="340"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="911.2"
-        y="355"
-      >
-        5
-      </text>
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
-        height="0"
-        width="0"
-        x="921"
-        y="380"
-      />
-      <text
-        fill="white"
-        text-anchor="middle"
-        x="920"
-        y="395"
-      />
-    </g>
-    <g
-      fill="none"
-      font-family="sans-serif"
-      font-size="10"
-      text-anchor="middle"
-      transform="translate(0, 380)"
-    >
-      <path
-        class="domain"
-        d="M40.5,0.5H920.5"
-        stroke="currentColor"
-      />
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(392.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          40%
-        </text>
-        <text
-          dx="-26"
-          dy="7"
-          fill="currentColor"
-          x="4"
-          y="9"
-        >
-          &lt;
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(436.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          45%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(480.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          50%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(524.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          55%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(568.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          60%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(612.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          65%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(656.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          70%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(700.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          75%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(744.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          80%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(788.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          85%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(832.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          90%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(876.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          95%
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(920.5,0)"
-      >
-        <line
-          stroke="currentColor"
-          y2="6"
-        />
-        <text
-          dy="0.71em"
-          fill="currentColor"
-          y="9"
-        >
-          100%
-        </text>
-      </g>
-      <text
-        dy="-4"
-        fill="rgba(0, 0, 0, 0.87)"
-        font-size="0.875rem"
-        font-weight="400"
-        line-height="1.46429em"
-        x="470"
-        y="40"
-      />
-    </g>
-    <g
-      class="axis"
-      fill="none"
-      font-family="sans-serif"
-      font-size="10"
-      text-anchor="end"
-      transform="translate(40,0)"
-    >
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(0,380.5)"
-      >
-        <line
-          stroke="currentColor"
-          x2="940"
-        />
-        <text
-          dy="0.32em"
-          fill="currentColor"
-          x="-3"
-        >
-          0
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(0,300.5)"
-      >
-        <line
-          stroke="currentColor"
-          x2="940"
-        />
-        <text
-          dy="0.32em"
-          fill="currentColor"
-          x="-3"
-        >
           10
         </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(0,220.5)"
-      >
-        <line
-          stroke="currentColor"
-          x2="940"
-        />
-        <text
-          dy="0.32em"
-          fill="currentColor"
-          x="-3"
-        >
-          20
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(0,140.5)"
-      >
-        <line
-          stroke="currentColor"
-          x2="940"
-        />
-        <text
-          dy="0.32em"
-          fill="currentColor"
-          x="-3"
-        >
-          30
-        </text>
-      </g>
-      <g
-        class="tick"
-        opacity="1"
-        transform="translate(0,60.5)"
-      >
-        <line
-          stroke="currentColor"
-          x2="940"
-        />
-        <text
-          dy="0.32em"
-          fill="currentColor"
-          x="-3"
-        >
-          40
-        </text>
         <text
           dy="-4"
           fill="rgba(0, 0, 0, 0.87)"
           font-size="0.875rem"
           font-weight="400"
           line-height="1.46429em"
+          opacity="1"
           text-anchor="start"
           x="4"
         />
@@ -2395,9 +714,9 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
       stroke="darkorange"
       stroke-width="2"
       transform="translate(0, 380)"
-      x1="539.8399999999999"
-      x2="539.8399999999999"
-      y1="-430"
+      x1="715.84"
+      x2="715.84"
+      y1="-355"
       y2="0"
     />
     <text
@@ -2405,10 +724,29 @@ exports[`createHistogram should build a histogram bar chart with MyGrade line wi
       font-weight="bold"
       line-height="1.46429em"
       text-anchor="start"
-      x="539.8399999999999"
+      x="715.84"
+      y="35"
+    >
+      My Grade:76.8%
+    </text>
+    <line
+      stroke="rgba(0, 0, 0, 0.54)"
+      stroke-dasharray="3, 3"
+      transform="translate(0, 380)"
+      x1="584.6"
+      x2="584.6"
+      y1="-430"
+      y2="0"
+    />
+    <text
+      fill="rgba(0, 0, 0, 0.54)"
+      font-size="0.875rem"
+      line-height="1.46429em"
+      text-anchor="start"
+      x="556"
       y="15"
     >
-      My Grade: 56.8%
+      &lt;74%
     </text>
   </svg>
 </div>
