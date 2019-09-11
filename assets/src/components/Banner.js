@@ -29,9 +29,9 @@ function Banner (props) {
     };
 
     const typographyStyle = {
-        textAlign: "center",
         color: settings.textColor,
-        fontWeight: "bold"
+        fontSize: "1.0rem",
+        textAlign: "center"
     };
 
     return (
@@ -39,7 +39,7 @@ function Banner (props) {
             <Grid container spacing={16}>
                 <Grid item xs={12}>
                     <Paper className={classes.paper} style={paperStyle}>
-                        <Typography variant="body1" style={typographyStyle} gutterBottom>
+                        <Typography style={typographyStyle} gutterBottom>
                             {children}
                         </Typography>
                     </Paper>
