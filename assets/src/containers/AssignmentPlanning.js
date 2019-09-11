@@ -49,7 +49,7 @@ const settingNotUpdated = 'Setting not updated'
 
 const assignmentTable = assignmentData => {
   if (!assignmentData || Object.keys(assignmentData).length === 0) {
-    return (<AlertBanner>Assignment data at or above the selected weight is not available.</AlertBanner>)
+    return (<AlertBanner>No assignments meet the selected criteria.</AlertBanner>)
   }
   return <TableAssignment
     tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
