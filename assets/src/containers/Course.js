@@ -4,6 +4,7 @@ import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
 import GradeDistribution from './GradeDistribution'
 import AssignmentPlanning from './AssignmentPlanning'
+import AssignmentPlanningV2 from './AssignmentPlanningV2'
 import ResourcesAccessed from './ResourcesAccessed'
 import IndexPage from './IndexPage'
 import Spinner from '../components/Spinner'
@@ -21,37 +22,71 @@ function Course (props) {
 
   return (
     <>
-      {
-        loaded
-          ? <>
-            <DashboardAppBar
-              onMenuBarClick={setSideDrawerState}
-              sideDrawerState={sideDrawerState}
-              user={user}
-              courseName={courseInfo.name}
-              courseId={courseId} />
-            <SideDrawer
-              toggleDrawer={setSideDrawerState}
-              sideDrawerState={sideDrawerState}
-              courseId={courseId}
-              courseInfo={courseInfo} />
-            <Route path='/courses/:courseId/' exact
-              render={props => <IndexPage {...props}
-                courseInfo={courseInfo} courseId={courseId} />} />
-            <Route path='/courses/:courseId/grades'
-              render={props => <GradeDistribution {...props}
+      {loaded
+        ? <>
+          <DashboardAppBar
+            onMenuBarClick={setSideDrawerState}
+            sideDrawerState={sideDrawerState}
+            user={user}
+            courseName={courseInfo.name}
+            courseId={courseId}
+          />
+          <SideDrawer
+            toggleDrawer={setSideDrawerState}
+            sideDrawerState={sideDrawerState}
+            courseId={courseId}
+            courseInfo={courseInfo}
+          />
+          <Route
+            path='/courses/:courseId/'
+            exact
+            render={props =>
+              <IndexPage
+                {...props}
+                courseInfo={courseInfo}
+                courseId={courseId}
+              />}
+          />
+          <Route
+            path='/courses/:courseId/grades'
+            render={props =>
+              <GradeDistribution
+                {...props}
                 disabled={!courseInfo.course_view_options.gd}
                 courseId={courseId}
-                user={user} />} />
-            <Route path='/courses/:courseId/assignments'
-              render={props => <AssignmentPlanning {...props}
+                user={user}
+              />}
+          />
+          <Route
+            path='/courses/:courseId/assignments'
+            render={props =>
+              <AssignmentPlanning
+                {...props}
                 disabled={!courseInfo.course_view_options.ap}
-                courseId={courseId} />} />
-            <Route path='/courses/:courseId/resources'
-              render={props => <ResourcesAccessed {...props} disabled={!courseInfo.course_view_options.ra} courseInfo={courseInfo}
-                courseId={courseId} />} />
-          </>
-          : <Spinner />
+                courseId={courseId}
+              />}
+          />
+          <Route
+            path='/courses/:courseId/assignmentsv2'
+            render={props =>
+              <AssignmentPlanningV2
+                {...props}
+                disabled={!courseInfo.course_view_options.ap}
+                courseId={courseId}
+              />}
+          />
+          <Route
+            path='/courses/:courseId/resources'
+            render={props =>
+              <ResourcesAccessed
+                {...props}
+                disabled={!courseInfo.course_view_options.ra}
+                courseInfo={courseInfo}
+                courseId={courseId}
+              />}
+          />
+        </>
+        : <Spinner />
       }
     </>
   )
