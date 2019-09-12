@@ -78,9 +78,9 @@ function AssignmentPlanningV2 (props) {
                 setWhatIfGrade={(key, whatIfGrade) => {
                   setAssignments(
                     [
-                      ...grades.assignments.slice(0, key),
-                      { ...grades.assignments[key], whatIfGrade },
-                      ...grades.assignments.slice(key + 1)
+                      ...assignments.slice(0, key),
+                      { ...assignments[key], whatIfGrade },
+                      ...assignments.slice(key + 1)
                     ]
                   )
                 }}
