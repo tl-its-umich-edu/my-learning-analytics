@@ -61,7 +61,7 @@ const grades = {
 function AssignmentPlanningV2(props) {
   const { classes, disabled, courseId } = props
 
-  const [goal, setGoal] = useState(grades.goalGrade || grades.currentGrade)
+  const [assignments, setAssignments] = useState(grades.assignments)
 
   return (
     <div className={classes.root}>
@@ -71,7 +71,7 @@ function AssignmentPlanningV2(props) {
             <>
               <Typography variant='h5' gutterBottom>Assignment Planning</Typography>
               <AssignmentProgressBar />
-              <AssignmentTable assignments={grades.assignments} />
+              <AssignmentTable assignments={assignments} />
             </>
           </Paper>
         </Grid>

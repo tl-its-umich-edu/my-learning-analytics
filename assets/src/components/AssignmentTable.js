@@ -5,6 +5,7 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
+import TextField from '@material-ui/core/TextField'
 
 const styles = theme => ({
   root: {
@@ -17,6 +18,9 @@ const styles = theme => ({
   },
   sliderCell: {
     minWidth: '150px'
+  },
+  numberField: {
+    width: 50
   }
 })
 
@@ -66,7 +70,20 @@ function AssignmentTable (props) {
                 {
                   assignment.graded
                     ? `${assignment.score} / ${assignment.outOf}`
-                    : `box for grades / ${assignment.outOf}`
+                    : (
+                      <>
+                        <TextField
+                          id='standard-number'
+                          value={assignment.outOf}
+                          // onChange={handleChange('age')}
+                          type='number'
+                          className={classes.numberField}
+                          InputLabelProps={{ shrink: true }}
+                          margin='normal'
+                        /> {` / ${assignment.outOf}`}
+                      </>
+                    )
+
                 }
               </TableCell>
             </TableRow>
