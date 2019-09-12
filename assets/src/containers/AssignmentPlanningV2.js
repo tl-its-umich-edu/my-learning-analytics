@@ -58,10 +58,12 @@ const grades = {
   ]
 }
 
-function AssignmentPlanningV2(props) {
+function AssignmentPlanningV2 (props) {
   const { classes, disabled, courseId } = props
 
   const [assignments, setAssignments] = useState(grades.assignments)
+
+  console.log(assignments)
 
   return (
     <div className={classes.root}>
@@ -71,7 +73,16 @@ function AssignmentPlanningV2(props) {
             <>
               <Typography variant='h5' gutterBottom>Assignment Planning</Typography>
               <AssignmentProgressBar />
-              <AssignmentTable assignments={assignments} />
+              <AssignmentTable
+                assignments={assignments}
+                setWhatIfGrade={(key, whatIfGrade) => {
+
+                  grades.assignments[key].whatIfGrade = whatIfGrade
+
+                  console.log(grades.assignments)
+                  setAssignments(grades.assignments)
+                }}
+              />
             </>
           </Paper>
         </Grid>

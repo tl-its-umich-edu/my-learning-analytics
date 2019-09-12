@@ -25,7 +25,7 @@ const styles = theme => ({
 })
 
 function AssignmentTable (props) {
-  const { classes, assignments } = props
+  const { classes, assignments, setWhatIfGrade } = props
 
   return (
     <MTable className={classes.table}>
@@ -45,8 +45,7 @@ function AssignmentTable (props) {
               >
                 {heading}
               </TableCell>
-            )
-            )
+            ))
           }
         </TableRow>
       </TableHead>
@@ -74,8 +73,12 @@ function AssignmentTable (props) {
                       <>
                         <TextField
                           id='standard-number'
-                          value={assignment.outOf}
-                          // onChange={handleChange('age')}
+                          value={
+                            Object.prototype.hasOwnProperty.call(assignment, 'whatIfGrade')
+                              ? assignment.whatIfGrade
+                              : assignment.outOf
+                          }
+                          onChange={event => setWhatIfGrade(key, event.target.value)}
                           type='number'
                           className={classes.numberField}
                           InputLabelProps={{ shrink: true }}
