@@ -76,11 +76,13 @@ function AssignmentPlanningV2 (props) {
               <AssignmentTable
                 assignments={assignments}
                 setWhatIfGrade={(key, whatIfGrade) => {
-
-                  grades.assignments[key].whatIfGrade = whatIfGrade
-
-                  console.log(grades.assignments)
-                  setAssignments(grades.assignments)
+                  setAssignments(
+                    [
+                      ...grades.assignments.slice(0, key),
+                      { ...grades.assignments[key], whatIfGrade },
+                      ...grades.assignments.slice(key + 1)
+                    ]
+                  )
                 }}
               />
             </>
