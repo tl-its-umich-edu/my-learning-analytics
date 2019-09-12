@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# All values provided in this sample are fabricated; replace them with data relevant to your local application instance.
-# All passed DateTime strings are assumed to be in the UTC timezone.
-
 # Case insenstive match
 shopt -s nocaseglob
+
+# All values provided in this sample are fabricated; replace them with data relevant to your local application instance.
+# All passed DateTime strings are assumed to be in the UTC timezone.
 
 # Setup demo term(s)
 ./manage.py term --term_id=999 --name='Some Winter Term' --date_start='3000-01-01 00:00:00' --date_end='3000-04-29 23:59:59'
