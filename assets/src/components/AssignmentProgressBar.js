@@ -1,16 +1,16 @@
-import createProgressBar from './d3/createProgressBar'
+import createAssignmentProgressBar from './d3/createAssignmentProgressBar'
 import React, { useState } from 'react'
 import useResponsiveness from '../hooks/useResponsiveness'
 import useCreateChart from '../hooks/useCreateChart'
 
-function ProgressBar (props) {
+function AssignmentProgressBar (props) {
   const [domElement, setDomElement] = useState(null)
 
   const [width, height] = useResponsiveness({ ...props, domElement })
-  useCreateChart({ ...props, domElement, width, height }, createProgressBar)
+  useCreateChart({ ...props, domElement, width, height }, createAssignmentProgressBar)
   return (
     <div ref={domElement => setDomElement(domElement)} />
   )
 }
 
-export default ProgressBar
+export default AssignmentProgressBar

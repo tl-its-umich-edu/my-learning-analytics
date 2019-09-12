@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Spinner from '../components/Spinner'
-import AssignmentmentProgessBar from '../components/AssignmentmentProgessBar'
+import AssignmentProgressBar from '../components/AssignmentProgressBar'
 import Error from './Error'
 import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
@@ -58,7 +58,7 @@ const grades = {
   ]
 }
 
-function AssignmentPlanningV2 (props) {
+function AssignmentPlanningV2(props) {
   const { classes, disabled, courseId } = props
 
   const [goal, setGoal] = useState(grades.goalGrade || grades.currentGrade)
@@ -70,8 +70,8 @@ function AssignmentPlanningV2 (props) {
           <Paper className={classes.paper}>
             <>
               <Typography variant='h5' gutterBottom>Assignment Planning</Typography>
-              <AssignmentmentProgessBar />
-              <AssignmentTable />wee
+              <AssignmentProgressBar />
+              <AssignmentTable assignments={grades.assignments} />
             </>
           </Paper>
         </Grid>
