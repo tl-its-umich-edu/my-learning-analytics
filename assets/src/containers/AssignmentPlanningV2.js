@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Spinner from '../components/Spinner'
 import AssignmentProgressBar from '../components/AssignmentProgressBar'
+import AssignmentGradeBoxes from '../components/AssignmentGradeBoxes'
 import Error from './Error'
 import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
@@ -22,6 +23,7 @@ const styles = theme => ({
 const grades = {
   currentGrade: 85,
   goalGrade: 90,
+  maxPossibleGrade: 95,
   assignments: [
     {
       week: 1,
@@ -62,8 +64,19 @@ function AssignmentPlanningV2 (props) {
   const { classes, disabled, courseId } = props
 
   const [assignments, setAssignments] = useState(grades.assignments)
+  const [goalGrade, setGoalGrade] = useState(grades.goalGrade)
 
-  console.log(assignments)
+  const setHandleWhatIfGrade = (key, whatIfGrade) => {
+    setAssignments([
+      ...assignments.slice(0, key),
+      { ...assignments[key], whatIfGrade },
+      ...assignments.slice(key + 1)
+    ])
+  }
+
+  const setHandleGoalGrade = grade => {
+
+  }
 
   return (
     <div className={classes.root}>
@@ -73,17 +86,15 @@ function AssignmentPlanningV2 (props) {
             <>
               <Typography variant='h5' gutterBottom>Assignment Planning</Typography>
               <AssignmentProgressBar />
+              <AssignmentGradeBoxes
+                currentGrade={grades.currentGrade}
+                goalGrade={goalGrade}
+                maxPossibleGrade={grades.maxPossibleGrade}
+                setGoalGrade={setHandleGoalGrade}
+              />
               <AssignmentTable
                 assignments={assignments}
-                setWhatIfGrade={(key, whatIfGrade) => {
-                  setAssignments(
-                    [
-                      ...assignments.slice(0, key),
-                      { ...assignments[key], whatIfGrade },
-                      ...assignments.slice(key + 1)
-                    ]
-                  )
-                }}
+                setWhatIfGrade={setHandleWhatIfGrade}
               />
             </>
           </Paper>
