@@ -13,7 +13,15 @@ const styles = theme => ({
 })
 
 function ProgressBarV2 (props) {
-  const { classes, score, outOf, goalGrade, percentWidth, height = '10px', lines } = props
+  const {
+    classes,
+    score,
+    outOf,
+    goalGrade,
+    percentWidth,
+    height = '10px',
+    lines
+  } = props
 
   const scoreRatio = score
     ? score / outOf
@@ -29,11 +37,20 @@ function ProgressBarV2 (props) {
         scoreRatio
           ? (
             <>
-              <div className={classes.gradedBar} style={{ width: `${percentWidth * scoreRatio}%`, height }} />
-              <div className={classes.outOfBar} style={{ width: `${percentWidth - percentWidth * scoreRatio}%`, height }} />
+              <div
+                className={classes.gradedBar}
+                style={{ width: `${percentWidth * scoreRatio}%`, height }}
+              />
+              <div
+                className={classes.outOfBar}
+                style={{ width: `${percentWidth - percentWidth * scoreRatio}%`, height }}
+              />
             </>
           )
-          : <div className={classes.outOfBar} style={{ width: `${percentWidth}%`, height }} />
+          : <div
+            className={classes.outOfBar}
+            style={{ width: `${percentWidth}%`, height }}
+          />
       }
     </>
   )

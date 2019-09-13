@@ -99,7 +99,6 @@ function AssignmentTable (props) {
                         /> {` / ${assignment.outOf}`}
                       </>
                     )
-
                 }
               </TableCell>
             </TableRow>
