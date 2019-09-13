@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import MTable from '@material-ui/core/Table'
 import TableHead from '@material-ui/core/TableHead'
@@ -6,6 +6,7 @@ import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TextField from '@material-ui/core/TextField'
+import ProgressBarV2 from './ProgressBarV2'
 
 const styles = theme => ({
   root: {
@@ -63,7 +64,12 @@ function AssignmentTable (props) {
                 {assignment.title}
               </TableCell>
               <TableCell>
-                {/* insert horizontal bar component */}
+                <ProgressBarV2
+                  score={assignment.score}
+                  outOf={assignment.outOf}
+                  goalGrade={assignment.goalGrade}
+                  percentWidth={assignment.percentOfFinalGrade}
+                />
               </TableCell>
               <TableCell>
                 {

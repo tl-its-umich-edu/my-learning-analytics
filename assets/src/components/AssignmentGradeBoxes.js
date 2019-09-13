@@ -5,7 +5,9 @@ import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 
 const styles = theme => ({
-
+  numberField: {
+    width: 50
+  }
 })
 
 function AssignmentGradeBoxes (props) {

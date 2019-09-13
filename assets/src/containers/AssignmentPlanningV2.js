@@ -31,7 +31,8 @@ const grades = {
       title: 'Attendance',
       graded: true,
       score: 1,
-      outOf: 1
+      outOf: 1,
+      percentOfFinalGrade: 5
     },
     {
       week: 1,
@@ -39,7 +40,8 @@ const grades = {
       title: 'Group Project',
       graded: true,
       score: 90,
-      outOf: 100
+      outOf: 100,
+      percentOfFinalGrade: 15
     },
     {
       week: 2,
@@ -47,7 +49,8 @@ const grades = {
       title: 'Attendance',
       graded: false,
       score: null,
-      outOf: 1
+      outOf: 1,
+      percentOfFinalGrade: 1
     },
     {
       week: 2,
@@ -55,7 +58,8 @@ const grades = {
       title: 'Discussion',
       graded: false,
       score: null,
-      outOf: 5
+      outOf: 5,
+      percentOfFinalGrade: 20
     }
   ]
 }
@@ -85,12 +89,16 @@ function AssignmentPlanningV2 (props) {
           <Paper className={classes.paper}>
             <>
               <Typography variant='h5' gutterBottom>Assignment Planning</Typography>
-              <AssignmentProgressBar />
+              <AssignmentProgressBar
+                currentGrade={grades.currentGrade}
+                goalGrade={goalGrade}
+                maxPossibleGrade={grades.maxPossibleGrade}
+              />
               <AssignmentGradeBoxes
                 currentGrade={grades.currentGrade}
                 goalGrade={goalGrade}
                 maxPossibleGrade={grades.maxPossibleGrade}
-                setGoalGrade={setHandleGoalGrade}
+                setGoalGrade={grade => setGoalGrade(grade)}
               />
               <AssignmentTable
                 assignments={assignments}
