@@ -4,18 +4,16 @@ import { withStyles } from '@material-ui/core/styles'
 const styles = theme => ({
   gradedBar: {
     float: 'left',
-    height: '10px',
-    backgroundColor: 'blue'
+    backgroundColor: 'steelblue'
   },
   outOfBar: {
     float: 'left',
-    height: '10px',
     backgroundColor: 'grey'
   }
 })
 
 function ProgressBarV2 (props) {
-  const { classes, score, outOf, goalGrade, percentWidth, lines } = props
+  const { classes, score, outOf, goalGrade, percentWidth, height = '10px', lines } = props
 
   const scoreRatio = score
     ? score / outOf
@@ -29,13 +27,13 @@ function ProgressBarV2 (props) {
     <>
       {
         scoreRatio
-          ? <div className={classes.outOfBar} style={{ backgroundColor: 'grey', width: `${percentWidth}%` }} />
-          : (
+          ? (
             <>
-              <div className={classes.gradedBar} style={{ backgroundColor: 'blue', width: `${percentWidth * scoreRatio}%` }} />
-              <div className={classes.outOfBar} style={{ backgroundColor: 'grey', width: `${percentWidth - percentWidth * scoreRatio}%` }} />
+              <div className={classes.gradedBar} style={{ width: `${percentWidth * scoreRatio}%`, height }} />
+              <div className={classes.outOfBar} style={{ width: `${percentWidth - percentWidth * scoreRatio}%`, height }} />
             </>
           )
+          : <div className={classes.outOfBar} style={{ width: `${percentWidth}%`, height }} />
       }
     </>
   )

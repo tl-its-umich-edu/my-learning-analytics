@@ -73,8 +73,10 @@ function AssignmentTable (props) {
                   score={assignment.score}
                   outOf={assignment.outOf}
                   goalGrade={assignment.goalGrade}
-                  percentWidth={assignment.percentOfFinalGrade / maxPercentOfFinalGrade * 100}
+                  percentWidth={assignment.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
+                  displayLabel
                 />
+                <>{`${assignment.percentOfFinalGrade}%`}</>
               </TableCell>
               <TableCell>
                 {
