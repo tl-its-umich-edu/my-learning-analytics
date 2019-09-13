@@ -28,6 +28,11 @@ const styles = theme => ({
 function AssignmentTable (props) {
   const { classes, assignments, setWhatIfGrade } = props
 
+  const maxPercentOfFinalGrade = Math.max(
+    ...assignments
+      .map(({ percentOfFinalGrade }) => percentOfFinalGrade)
+  )
+
   return (
     <MTable className={classes.table}>
       <TableHead>
@@ -68,7 +73,7 @@ function AssignmentTable (props) {
                   score={assignment.score}
                   outOf={assignment.outOf}
                   goalGrade={assignment.goalGrade}
-                  percentWidth={assignment.percentOfFinalGrade}
+                  percentWidth={assignment.percentOfFinalGrade / maxPercentOfFinalGrade * 100}
                 />
               </TableCell>
               <TableCell>
