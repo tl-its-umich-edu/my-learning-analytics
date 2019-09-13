@@ -45,24 +45,18 @@ python manage.py migrate
 # If these values aren't set or they're set to false
 # This syntax substitutes False if null or unset
 if [ "${IS_CRON_POD:-"false",,}" == "false" ]; then
-    if [ "${PTVSD_ENABLE:-"false",,}" == "false" ]; then
-        # Start Gunicorn processes
-        echo Starting Gunicorn for production
-
-        # application pod
-        exec gunicorn dashboard.wsgi:application \
-            --bind 0.0.0.0:${GUNICORN_PORT} \
-            --workers="${GUNICORN_WORKERS}" \
-            ${GUNICORN_RELOAD}
-    else
-        # Currently ptvsd doesn't work with gunicorn
-        # https://github.com/Microsoft/vscode-python/issues/2138
-        echo Starting Runserver for development
-        export PYTHONPATH="/code:$PYTHONPATH"
-        export DJANGO_SETTINGS_MODULE=dashboard.settings
-        exec django-admin runserver --ptvsd 0.0.0.0:${GUNICORN_PORT}
-
+    if [ "${PTVSD_ENABLE:-"true",,}" == "true" ]; then
+        echo "PTVSD is enabled, setting workers to 1"
+        GUNICORN_WORKERS=1
     fi
+    # Start Gunicorn processes
+    echo Starting Gunicorn for production
+
+    # application pod
+    exec gunicorn dashboard.wsgi:application \
+        --bind 0.0.0.0:${GUNICORN_PORT} \
+        --workers="${GUNICORN_WORKERS}" \
+        ${GUNICORN_RELOAD}
 else
     if [ -z "${CRONTAB_SCHEDULE}" ]; then
         echo "CRONTAB_SCHEDULE environment variable not set, crontab cannot be started. Please set this to a crontab acceptable format."
