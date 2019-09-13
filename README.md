@@ -94,14 +94,20 @@ Environment variables:
 
 All of the Content Security Policy headers can be configured. In the env_sample.json there is a sample security policy that should work to bring it up. It has REPORT_ONLY set to true by default it won't actually do anything. If you're using LTI to embed this tool or you want to configure the policy you need to adjust these values and set REPORT_ONLY to false.
 
-### Populate initial demo terms and courses
-Before adding initial terms and courses, ensure that the `CANVAS_DATA_ID_INCREMENT` environment variable is set correctly
+### Populate initial terms and courses using demo
+A `demo_init.sh.sample` file has been provided to help initialize terms and courses. This can be used in combination 
+with `cron.py` to provide some data to start exploring the tool's features. Rename the file to `demo_init.sh` and 
+replace the provided fabricated values with those of terms and courses relevant to your local institution, providing 
+additional courses or terms as desired. Ensure that the `CANVAS_DATA_ID_INCREMENT` environment variable is set 
+appropriately in `dashboard/settings.py`, and then run the following command:
+
 
     docker exec -it student_dashboard /bin/bash ./demo_init.sh
 
-If you have problems you can connect direct into a specific container with the command
+   
+If you have problems, you can connect direct into a specific container with the command
 
-    `docker-compose run web /bin/bash
+    docker-compose run web /bin/bash
 
 ### Openshift process
 You should login via Shibboleth into the application. Once you do that for the first admin you'll have to go into the database auth_user table and change is_staff and is_superuser to both be true. After doing this you can change future users with any admin via the GUI.
