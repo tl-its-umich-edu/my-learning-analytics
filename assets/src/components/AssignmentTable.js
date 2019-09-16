@@ -21,7 +21,7 @@ const styles = theme => ({
     minWidth: '150px'
   },
   numberField: {
-    width: 50
+    width: 30
   }
 })
 
@@ -81,25 +81,21 @@ function AssignmentTable (props) {
               <TableCell>
                 {
                   assignment.graded
-                    ? `${assignment.score} / ${assignment.outOf}`
+                    ? `${assignment.score}`
                     : (
-                      <>
-                        <TextField
-                          id='standard-number'
-                          value={
-                            Object.prototype.hasOwnProperty.call(assignment, 'whatIfGrade')
-                              ? assignment.whatIfGrade
-                              : assignment.outOf
-                          }
-                          onChange={event => setWhatIfGrade(key, event.target.value)}
-                          type='number'
-                          className={classes.numberField}
-                          InputLabelProps={{ shrink: true }}
-                          margin='normal'
-                        /> {` / ${assignment.outOf}`}
-                      </>
+                      <TextField
+                        id='standard-number'
+                        value={
+                          Object.prototype.hasOwnProperty.call(assignment, 'whatIfGrade')
+                            ? assignment.whatIfGrade
+                            : assignment.outOf
+                        }
+                        onChange={event => setWhatIfGrade(key, event.target.value)}
+                        type='number'
+                        className={classes.numberField}
+                      />
                     )
-                }
+                }{<div style={{ margin: 'auto', display: 'inline' }}>{` / ${assignment.outOf}`}</div>}
               </TableCell>
             </TableRow>
           ))

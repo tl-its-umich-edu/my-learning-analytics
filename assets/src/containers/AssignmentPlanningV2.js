@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Spinner from '../components/Spinner'
-import AssignmentProgressBar from '../components/AssignmentProgressBar'
+import ProgressBarV2 from '../components/ProgressBarV2'
 import AssignmentGradeBoxes from '../components/AssignmentGradeBoxes'
 import Error from './Error'
 import AssignmentTable from '../components/AssignmentTable'
@@ -78,9 +78,13 @@ function AssignmentPlanningV2 (props) {
     ])
   }
 
-  const setHandleGoalGrade = grade => {
-
-  }
+  // const setHandleGoalGrade = (key, grade) => {
+  //   setAssignments([
+  //     ...assignments.slice(0, key),
+  //     { ...assignments[key], whatIfGrade },
+  //     ...assignments.slice(key + 1)
+  //   ])
+  // }
 
   return (
     <div className={classes.root}>
@@ -89,10 +93,25 @@ function AssignmentPlanningV2 (props) {
           <Paper className={classes.paper}>
             <>
               <Typography variant='h5' gutterBottom>Assignment Planning</Typography>
-              <AssignmentProgressBar
-                currentGrade={grades.currentGrade}
-                goalGrade={goalGrade}
-                maxPossibleGrade={grades.maxPossibleGrade}
+              <ProgressBarV2
+                score={grades.currentGrade}
+                lines={[
+                  {
+                    label: 'Current',
+                    value: grades.currentGrade,
+                    color: 'steelblue'
+                  },
+                  {
+                    label: 'Goal',
+                    value: grades.goalGrade,
+                    color: 'green'
+                  },
+                  {
+                    label: 'Max Possible',
+                    value: grades.maxPossibleGrade,
+                    color: 'grey'
+                  }
+                ]}
               />
               <AssignmentGradeBoxes
                 currentGrade={grades.currentGrade}

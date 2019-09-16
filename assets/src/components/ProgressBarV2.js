@@ -47,10 +47,12 @@ function ProgressBarV2 (props) {
               />
             </>
           )
-          : <div
-            className={classes.outOfBar}
-            style={{ width: `${percentWidth}%`, height }}
-          />
+          : (
+            <div
+              className={classes.outOfBar}
+              style={{ width: `${percentWidth}%`, height }}
+            />
+          )
       }
     </>
   )
