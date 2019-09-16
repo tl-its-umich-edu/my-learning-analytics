@@ -8,7 +8,7 @@ const styles = theme => ({
   },
   outOfBar: {
     float: 'left',
-    backgroundColor: 'grey'
+    backgroundColor: '#f1f1f1'
   }
 })
 
@@ -20,7 +20,7 @@ function ProgressBarV2 (props) {
     goalGrade,
     percentWidth,
     height = '10px',
-    lines
+    lines = []
   } = props
 
   const scoreRatio = score
@@ -31,28 +31,44 @@ function ProgressBarV2 (props) {
     ? goalGrade / outOf
     : null
 
+  console.log(percentWidth)
+
   return (
     <>
       {
-        scoreRatio
-          ? (
-            <>
-              <div
-                className={classes.gradedBar}
-                style={{ width: `${percentWidth * scoreRatio}%`, height }}
-              />
-              <div
-                className={classes.outOfBar}
-                style={{ width: `${percentWidth - percentWidth * scoreRatio}%`, height }}
-              />
-            </>
-          )
-          : (
-            <div
-              className={classes.outOfBar}
-              style={{ width: `${percentWidth}%`, height }}
-            />
-          )
+        <div
+          className={classes.outOfBar}
+          style={{ width: `${percentWidth}%`, height }}
+        >
+          {
+            scoreRatio
+              ? (
+                <div
+                  className={classes.gradedBar}
+                  style={{ width: `${scoreRatio * 100}%`, height }}
+                />
+              )
+              : null
+          }
+          {
+            lines.length > 0
+              ? (
+                lines.map((line, key) => (
+                  <div
+                    style={{
+                      position: 'relative',
+                      width: '2px',
+                      backgroundColor: line.color,
+                      height,
+                      left: `${line.value / outOf * 100}%`
+                    }}
+                    key={key}
+                  />
+                ))
+              )
+              : null
+          }
+        </div>
       }
     </>
   )

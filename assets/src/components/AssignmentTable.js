@@ -75,6 +75,7 @@ function AssignmentTable (props) {
                   goalGrade={assignment.goalGrade}
                   percentWidth={assignment.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
                   displayLabel
+                  lines={[{ color: 'blue', value: assignment.outOf }]}
                 />
                 <>{`${assignment.percentOfFinalGrade}%`}</>
               </TableCell>
