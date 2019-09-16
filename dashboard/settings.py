@@ -63,6 +63,9 @@ WATCHMAN_TOKEN_NAME = ENV.get('DJANGO_WATCHMAN_TOKEN_NAME', 'token')
 # Only report on the default database
 WATCHMAN_DATABASES = ('default',)
 
+# courses_enabled api
+COURSES_ENABLED = ENV.get('COURSES_ENABLED', True)
+
 # Defaults for PTVSD
 PTVSD_ENABLE = ENV.get("PTVSD_ENABLE", False)
 PTVSD_REMOTE_ADDRESS = ENV.get("PTVSD_REMOTE_ADDRESS", "0.0.0.0")

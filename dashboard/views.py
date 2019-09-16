@@ -19,7 +19,7 @@ from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
 
 from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
-from dashboard.settings import RESOURCE_VALUES
+from dashboard.settings import RESOURCE_VALUES, COURSES_ENABLED
 
 logger = logging.getLogger(__name__)
 # strings for construct resource download url
@@ -36,6 +36,9 @@ NO_GRADE_STRING = "NO_GRADE"
 # string for resource type
 RESOURCE_TYPE_STRING = "resource_type"
 RESOURCE_VALUES = settings.RESOURCE_VALUES
+
+# Is courses_enabled api enabled/disabled?
+COURSES_ENABLED = settings.COURSES_ENABLED
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
@@ -639,19 +642,21 @@ def logout(request):
     return redirect(settings.LOGOUT_REDIRECT_URL)
 
 
-@permission_required('dashboard.courses_enabled', raise_exception=True)
+
 def courses_enabled(request):
     """ Returns json for all courses we currntly support and are enabled
 
     """
-    data = {}
-    for cvo in CourseViewOption.objects.all():
-        data.update(cvo.json())
+    current_user_is_admin = request.user.is_superuser
+    if COURSES_ENABLED or current_user_is_admin:
+        data = {}
+        for cvo in CourseViewOption.objects.all():
+            data.update(cvo.json())
 
-    callback = request.GET.get('callback')
-    # Return json
-    if callback is None:
-        return HttpResponse(json.dumps(data), content_type='application/json')
-    # Return jsonp
-    else:
-        return HttpResponse("{0}({1})".format(callback, json.dumps(data)), content_type='application/json')
+        callback = request.GET.get('callback')
+        # Return json
+        if callback is None:
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        # Return jsonp
+        else:
+            return HttpResponse("{0}({1})".format(callback, json.dumps(data)), content_type='application/json')
