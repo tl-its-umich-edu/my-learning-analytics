@@ -63,7 +63,7 @@
         {% if settings.GA_ID %}
             "google_analytics_id":'{{ settings.GA_ID }}',
         {% endif %}
-        {% if flatpages %}
+        {% if flatpages.first.content %}
             "help_url": '{{flatpages.first.content|safe}}',
         {% else %}
             "help_url": "https://sites.google.com/umich.edu/my-learning-analytics-help/home",

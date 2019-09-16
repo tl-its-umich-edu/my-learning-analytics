@@ -37,13 +37,12 @@ const styles = theme => ({
 })
 
 function AvatarModal (props) {
-  let globals = myla_globals
   const { classes, user } = props
 
   const url = window.location.href
   const logoutURL = '/accounts/logout'
 
-  const [helpURL, setHelpURL] = useState(globals.help_url)
+  const [helpURL, setHelpURL] = useState(user.helpURL)
   const [openChangeCourseDialog, setOpenChangeCourseDialog] = useState(false)
 
   const Admin = () => (
