@@ -26,12 +26,14 @@ const styles = theme => ({
 })
 
 function AssignmentTable (props) {
-  const { classes, assignments, setWhatIfGrade } = props
+  const { classes, assignments, setGoalGrade } = props
 
   const maxPercentOfFinalGrade = Math.max(
     ...assignments
       .map(({ percentOfFinalGrade }) => percentOfFinalGrade)
   )
+
+  console.log(assignments)
 
   return (
     <MTable className={classes.table}>
@@ -75,7 +77,11 @@ function AssignmentTable (props) {
                   goalGrade={assignment.goalGrade}
                   percentWidth={assignment.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
                   displayLabel
-                  lines={[{ color: 'blue', value: assignment.outOf }]}
+                  lines={
+                    assignment.goalGrade
+                      ? [{ color: 'blue', value: assignment.goalGrade }]
+                      : []
+                  }
                 />
                 <>{`${assignment.percentOfFinalGrade}%`}</>
               </TableCell>
@@ -87,11 +93,11 @@ function AssignmentTable (props) {
                       <TextField
                         id='standard-number'
                         value={
-                          Object.prototype.hasOwnProperty.call(assignment, 'whatIfGrade')
-                            ? assignment.whatIfGrade
+                          Object.prototype.hasOwnProperty.call(assignment, 'goalGrade')
+                            ? assignment.goalGrade
                             : assignment.outOf
                         }
-                        onChange={event => setWhatIfGrade(key, event.target.value)}
+                        onChange={event => setGoalGrade(key, event.target.value)}
                         type='number'
                         className={classes.numberField}
                       />

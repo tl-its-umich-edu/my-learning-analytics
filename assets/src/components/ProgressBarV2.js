@@ -12,7 +12,7 @@ const styles = theme => ({
   }
 })
 
-function ProgressBarV2(props) {
+function ProgressBarV2 (props) {
   const {
     classes,
     score,
@@ -30,8 +30,6 @@ function ProgressBarV2(props) {
   const goalGradeRatio = goalGrade
     ? goalGrade / outOf
     : null
-
-  console.log(percentWidth)
 
   return (
     <>

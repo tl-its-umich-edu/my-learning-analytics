@@ -70,21 +70,13 @@ function AssignmentPlanningV2 (props) {
   const [assignments, setAssignments] = useState(grades.assignments)
   const [goalGrade, setGoalGrade] = useState(grades.goalGrade)
 
-  const setHandleWhatIfGrade = (key, whatIfGrade) => {
+  const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setAssignments([
       ...assignments.slice(0, key),
-      { ...assignments[key], whatIfGrade },
+      { ...assignments[key], goalGrade: assignmentGoalGrade },
       ...assignments.slice(key + 1)
     ])
   }
-
-  // const setHandleGoalGrade = (key, grade) => {
-  //   setAssignments([
-  //     ...assignments.slice(0, key),
-  //     { ...assignments[key], whatIfGrade },
-  //     ...assignments.slice(key + 1)
-  //   ])
-  // }
 
   return (
     <div className={classes.root}>
@@ -124,7 +116,7 @@ function AssignmentPlanningV2 (props) {
               />
               <AssignmentTable
                 assignments={assignments}
-                setWhatIfGrade={setHandleWhatIfGrade}
+                setGoalGrade={setHandleAssignmentGoalGrade}
               />
             </>
           </Paper>
