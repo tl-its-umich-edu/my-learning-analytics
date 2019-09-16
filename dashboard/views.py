@@ -10,7 +10,7 @@ import pandas as pd
 from django.conf import settings
 from django.contrib import auth
 from django.db import connection as conn
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
@@ -660,3 +660,5 @@ def courses_enabled(request):
         # Return jsonp
         else:
             return HttpResponse("{0}({1})".format(callback, json.dumps(data)), content_type='application/json')
+    else:
+        return HttpResponseForbidden()
