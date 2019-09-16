@@ -112,6 +112,9 @@ function AssignmentPlanningV2 (props) {
                     color: 'grey'
                   }
                 ]}
+                outOf={100}
+                percentWidth={100}
+                height='70px'
               />
               <AssignmentGradeBoxes
                 currentGrade={grades.currentGrade}

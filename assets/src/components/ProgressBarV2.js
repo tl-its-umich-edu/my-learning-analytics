@@ -12,7 +12,7 @@ const styles = theme => ({
   }
 })
 
-function ProgressBarV2 (props) {
+function ProgressBarV2(props) {
   const {
     classes,
     score,
@@ -38,33 +38,41 @@ function ProgressBarV2 (props) {
       {
         <div
           className={classes.outOfBar}
-          style={{ width: `${percentWidth}%`, height }}
+          style={{
+            width: `${percentWidth}%`,
+            height,
+            position: 'relative'
+          }}
         >
+          {
+            lines.length > 0
+              ? (lines.map((line, key) => (
+                <div
+                  style={{
+                    position: 'absolute',
+                    display: 'inline-block',
+                    width: '2px',
+                    backgroundColor: line.color,
+                    height,
+                    left: `${line.value / outOf * 100}%`
+                  }}
+                  key={key}
+                />
+              )))
+              : null
+          }
           {
             scoreRatio
               ? (
                 <div
                   className={classes.gradedBar}
-                  style={{ width: `${scoreRatio * 100}%`, height }}
+                  style={{
+                    position: 'absolute',
+                    display: 'inline-block',
+                    width: `${scoreRatio * 100}%`,
+                    height
+                  }}
                 />
-              )
-              : null
-          }
-          {
-            lines.length > 0
-              ? (
-                lines.map((line, key) => (
-                  <div
-                    style={{
-                      position: 'relative',
-                      width: '2px',
-                      backgroundColor: line.color,
-                      height,
-                      left: `${line.value / outOf * 100}%`
-                    }}
-                    key={key}
-                  />
-                ))
               )
               : null
           }
