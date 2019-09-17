@@ -2,7 +2,7 @@ import React from 'react'
 // import { useDrag } from 'react-dnd'
 
 function Line (props) {
-  const { height, left, color, key } = props
+  const { height, left, color, width = '2px' } = props
 
   // const [{ isDragging }, drag] = useDrag({
   //   item: { id: key, type: 'line' },
@@ -16,12 +16,11 @@ function Line (props) {
       style={{
         position: 'absolute',
         display: 'inline-block',
-        width: '2px',
+        width,
         backgroundColor: color,
         height,
         left
       }}
-      key={key}
       // ref={drag}
     />
   )
