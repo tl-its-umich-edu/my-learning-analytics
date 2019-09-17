@@ -91,50 +91,50 @@ function AssignmentPlanningV2 (props) {
 
   return (
     // <DndProvider backend={HTML5Backend}>
-      <div className={classes.root}>
-        <Grid container spacing={16}>
-          <Grid item xs={12}>
-            <Paper className={classes.paper}>
-              <>
-                <Typography variant='h5' gutterBottom>Assignment Planning</Typography>
-                <ProgressBarV2
-                  score={grades.currentGrade}
-                  lines={[
-                    {
-                      label: 'Current',
-                      value: grades.currentGrade,
-                      color: 'steelblue'
-                    },
-                    {
-                      label: 'Goal',
-                      value: grades.goalGrade,
-                      color: 'green'
-                    },
-                    {
-                      label: 'Max Possible',
-                      value: grades.maxPossibleGrade,
-                      color: 'grey'
-                    }
-                  ]}
-                  outOf={100}
-                  percentWidth={100}
-                  height='70px'
-                />
-                <AssignmentGradeBoxes
-                  currentGrade={grades.currentGrade}
-                  goalGrade={goalGrade}
-                  maxPossibleGrade={grades.maxPossibleGrade}
-                  setGoalGrade={grade => setGoalGrade(grade)}
-                />
-                <AssignmentTable
-                  assignments={assignments}
-                  setGoalGrade={setHandleAssignmentGoalGrade}
-                />
-              </>
-            </Paper>
-          </Grid>
+    <div className={classes.root}>
+      <Grid container spacing={16}>
+        <Grid item xs={12}>
+          <Paper className={classes.paper}>
+            <>
+              <Typography variant='h5' gutterBottom>Assignment Planning</Typography>
+              <ProgressBarV2
+                score={grades.currentGrade}
+                lines={[
+                  {
+                    label: 'Current',
+                    value: grades.currentGrade,
+                    color: 'steelblue'
+                  },
+                  {
+                    label: 'Goal',
+                    value: grades.goalGrade,
+                    color: 'green'
+                  },
+                  {
+                    label: 'Max Possible',
+                    value: grades.maxPossibleGrade,
+                    color: 'grey'
+                  }
+                ]}
+                outOf={100}
+                percentWidth={100}
+                height='70px'
+              />
+              <AssignmentGradeBoxes
+                currentGrade={grades.currentGrade}
+                goalGrade={goalGrade}
+                maxPossibleGrade={grades.maxPossibleGrade}
+                setGoalGrade={grade => setGoalGrade(grade)}
+              />
+              <AssignmentTable
+                assignments={assignments}
+                setGoalGrade={setHandleAssignmentGoalGrade}
+              />
+            </>
+          </Paper>
         </Grid>
-      </div>
+      </Grid>
+    </div>
     // </DndProvider>
   )
 }
