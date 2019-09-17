@@ -1,7 +1,9 @@
 import React from 'react'
+import Line from './Line'
 import { withStyles } from '@material-ui/core/styles'
+// import { DropTarget } from 'react-dnd'
 
-const styles = theme => ({
+const styles = ({
   gradedBar: {
     float: 'left',
     backgroundColor: 'steelblue'
@@ -31,6 +33,12 @@ function ProgressBarV2 (props) {
     ? goalGrade / outOf
     : null
 
+  const calculateLineLeftOffset = (value, maxValue) => {
+    if (value > maxValue) return maxValue
+    if (value < 0) return 0
+    else return value / maxValue * 100
+  }
+
   return (
     <>
       {
@@ -44,19 +52,15 @@ function ProgressBarV2 (props) {
         >
           {
             lines.length > 0
-              ? (lines.map((line, key) => (
-                <div
-                  style={{
-                    position: 'absolute',
-                    display: 'inline-block',
-                    width: '2px',
-                    backgroundColor: line.color,
-                    height,
-                    left: `${line.value / outOf * 100}%`
-                  }}
+              ? lines.map((line, key) => (
+                <Line
+                  className='handle'
+                  height={height}
+                  left={`${calculateLineLeftOffset(line.value, outOf)}%`}
+                  color={line.color}
                   key={key}
                 />
-              )))
+              ))
               : null
           }
           {

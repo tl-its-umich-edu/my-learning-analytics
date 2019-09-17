@@ -21,7 +21,7 @@ const styles = theme => ({
     minWidth: '150px'
   },
   numberField: {
-    width: 30
+    width: 60
   }
 })
 
@@ -32,8 +32,6 @@ function AssignmentTable (props) {
     ...assignments
       .map(({ percentOfFinalGrade }) => percentOfFinalGrade)
   )
-
-  console.log(assignments)
 
   return (
     <MTable className={classes.table}>
@@ -79,7 +77,7 @@ function AssignmentTable (props) {
                   displayLabel
                   lines={
                     assignment.goalGrade
-                      ? [{ color: 'blue', value: assignment.goalGrade }]
+                      ? [{ color: 'green', value: assignment.goalGrade, draggable: true }]
                       : []
                   }
                 />
