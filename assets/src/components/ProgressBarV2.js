@@ -21,7 +21,7 @@ function ProgressBarV2 (props) {
     outOf,
     goalGrade,
     percentWidth,
-    height = '10px',
+    height = 10,
     lines = []
   } = props
 
@@ -46,7 +46,7 @@ function ProgressBarV2 (props) {
           className={classes.outOfBar}
           style={{
             width: `${percentWidth}%`,
-            height,
+            height: `${height}px`,
             position: 'relative'
           }}
         >
@@ -59,6 +59,8 @@ function ProgressBarV2 (props) {
                   left={`${calculateLineLeftOffset(line.value, outOf)}%`}
                   color={line.color}
                   key={key}
+                  labelUp={line.labelUp}
+                  labelDown={line.labelDown}
                 />
               ))
               : null
@@ -72,7 +74,7 @@ function ProgressBarV2 (props) {
                     position: 'absolute',
                     display: 'inline-block',
                     width: `${scoreRatio * 100}%`,
-                    height
+                    height: `${height}px`
                   }}
                 />
               )

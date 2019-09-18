@@ -103,22 +103,25 @@ function AssignmentPlanningV2 (props) {
                   {
                     label: 'Current',
                     value: grades.currentGrade,
-                    color: 'steelblue'
+                    color: 'steelblue',
+                    labelDown: true
                   },
                   {
                     label: 'Goal',
                     value: goalGrade,
-                    color: 'green'
+                    color: 'green',
+                    labelUp: true
                   },
                   {
                     label: 'Max Possible',
                     value: grades.maxPossibleGrade,
-                    color: 'grey'
+                    color: 'grey',
+                    labelDown: true
                   }
                 ]}
                 outOf={100}
                 percentWidth={100}
-                height='70px'
+                height={70}
               />
               <AssignmentGradeBoxes
                 currentGrade={grades.currentGrade}
