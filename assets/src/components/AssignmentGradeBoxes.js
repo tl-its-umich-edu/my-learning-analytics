@@ -6,7 +6,7 @@ import TextField from '@material-ui/core/TextField'
 
 const styles = ({
   numberField: {
-    width: 50
+    width: 80
   }
 })
 
@@ -23,17 +23,18 @@ function AssignmentGradeBoxes (props) {
     <Grid container>
       <Grid item xs={4}>
         <Typography variant='h5'>Current Grade</Typography>
-        <Typography variant='h4'>{`${currentGrade}%`}</Typography>
+        <Typography variant='h4' style={{ color: 'steelblue' }}>{`${currentGrade}%`}</Typography>
       </Grid>
       <Grid item xs={4}>
         <Typography variant='h5'>Max Possible Grade</Typography>
-        <Typography variant='h4'>{`${maxPossibleGrade}%`}</Typography>
+        <Typography variant='h4' style={{ color: 'grey' }}>{`${maxPossibleGrade}%`}</Typography>
       </Grid>
       <Grid item xs={4}>
         <Typography variant='h5'>Goal</Typography>
         <TextField
           id='standard-number'
-          value={goalGrade}
+          value={goalGrade || ''}
+          label={goalGrade ? '' : 'Set Goal'}
           onChange={event => setGoalGrade(event.target.value)}
           type='number'
           className={classes.numberField}
