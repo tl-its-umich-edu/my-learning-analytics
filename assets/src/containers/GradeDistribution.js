@@ -9,7 +9,7 @@ import Spinner from '../components/Spinner'
 import Table from '../components/Table'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
 import Error from './Error'
-import { average, roundToOneDecimal, median } from '../util/math'
+import { roundToOneDecimal } from '../util/math'
 import { useGradeData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 import useSetUserSetting from '../hooks/useSetUserSetting'
@@ -26,7 +26,12 @@ const styles = theme => ({
   },
   table: {
     width: '300px'
+  },
+  checkboxPosition: {
+    position: 'relative',
+    left: '200px',
   }
+
 })
 
 function GradeDistribution (props) {
@@ -78,7 +83,7 @@ function GradeDistribution (props) {
 
     const gradeCheckbox = !user.admin ?
       <> {userSettingLoaded ?
-        <> {'Show my grade'}
+        <> <Typography align='right'>{'Show my grade'}
           <Checkbox
             color='primary'
             checked={showGrade}
@@ -86,20 +91,20 @@ function GradeDistribution (props) {
               setSettingChanged(true)
               setShowGrade(!showGrade)
             }}
-          />
-        </> : <Spinner />}
+          /></Typography>
+        </> : <Spinner/>}
       </> : null
 
     return (
       <Grid container>
         <Grid item xs={12} lg={2}>
-          <Table className={classes.table} noBorder tableData={tableRows} />
-          {gradeCheckbox}
+          <Table className={classes.table} noBorder tableData={tableRows}/>
           <UserSettingSnackbar
             saved={userSettingSaved}
-            response={userSettingResponse} />
+            response={userSettingResponse}/>
         </Grid>
         <Grid item xs={12} lg={10}>
+          {gradeCheckbox}
           <Histogram
             data={grades}
             aspectRatio={0.3}
@@ -121,8 +126,8 @@ function GradeDistribution (props) {
             <Typography variant='h5' gutterBottom>Grade Distribution</Typography>
             {
               gradeLoaded
-                ? <BuildGradeView />
-                : <Spinner />
+                ? <BuildGradeView/>
+                : <Spinner/>
             }
           </Paper>
         </Grid>

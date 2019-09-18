@@ -307,7 +307,6 @@ def grade_distribution(request, course_id=0):
     df = pd.read_sql(grade_score_sql, conn, params={"current_user": current_user, 'course_id': course_id})
     if df.empty or df['current_grade'].isnull().all():
         return HttpResponse(json.dumps({}), content_type='application/json')
-    df.to_json(f'user_{course_id}.json', orient='records')
 
     df['tot_students'] = df.shape[0]
     df = df[df['current_grade'].notnull()]
@@ -318,11 +317,11 @@ def grade_distribution(request, course_id=0):
 
     df.sort_values(by=['current_grade'], inplace=True)
     df.reset_index(drop=True, inplace=True)
-    df.sort_values(by=['current_grade'], inplace=True)
-    binning_cutoff_number = find_binning_cutoff(df['current_grade'].values.tolist())
-    # adding +1 since
-    binning_grade_value = find_binning_grade_value(df['current_grade'].values.tolist(), df['current_grade'].head(binning_cutoff_number + 1))
-    df['current_grade'] = df['current_grade'].replace(df['current_grade'].head(binning_cutoff_number+1), binning_grade_value)
+    grades = df['current_grade'].values.tolist()
+    logger.debug(f"Grades distribution: {grades}")
+    binning_grade_value, index = find_binning_grade_value(grades)
+    df['current_grade'] = df['current_grade'].replace(df['current_grade'].head(index),
+                                                      binning_grade_value)
 
     if df[df['current_grade'] > 100.0].shape[0] > 0:
         df['graph_upper_limit'] = int((5 * round(float(df['current_grade'].max()) / 5) + 5))
@@ -639,37 +638,55 @@ def are_weighted_assignments_hidden(course_id, df):
             return True
 
 
-def find_binning_grade_value(grades, lowest_grades_binned_list):
-    """
-    finding the binning grade value so that binned grade values is bit far way from the normal distribution
-
-    :param grades: ordered list, eg: [40, 50, 60, 70, 75, 94.87, 95.55, 96.28]
-    :param lowest_grades_binned_list: eg: [40, 50, 60, 70, 75]
-    :return: binning grade value eg: 80
-    """
-    for grade in grades:
-        if grade > max(lowest_grades_binned_list):
-            r = 10 * round(grade / 10)
-            binning_grade_value = r - 10 if r >= 10 else 0
-            return binning_grade_value
+def find_binning_grade_value(grades):
+    fifth_item = grades[4]
+    next_to_fifth_element = grades[5]
+    if next_to_fifth_element - fifth_item > 2:
+        binning_grade_value, index = fifth_item, 4
+    else:
+        binning_grade_value, index = binning_logic(grades, fifth_item)
+    return binning_grade_value, index
 
 
-def find_binning_cutoff(grade_list):
-    """
-    finding lowest 5 grades values with and with out repetition and returning the index of that
-    for eg, [11,12,13,14,15,16,17] the index returned is 4 so that lowest 5 grades [11,12,13,14,15] are binned
-    [11,12,13,14,15,15,15,15,16,17] index returned is 7, lowest [11,12,13,14,15,15,15,15] are binned
+def is_odd(num):
+    if num % 2 == 0:
+        return False
+    else:
+        return True
 
-    :param grade_list: ordered grades list
-    :return: index in the grade_list for binning
+
+def check_if_grade_qualify_for_binning(grade, fifthElement):
+    # case: 96.7, 94.76,
+    if int(grade) - int(fifthElement) > 1:
+        return False
+    # case: 94.86, 94.76
+    if int(grade) - int(fifthElement) == 0:
+        return True
+    # case 95.89, 94.76
+    if is_odd(int(grade)):
+        return True
+
+
+def binning_logic(grades, fifth_item_in_list):
     """
-    fifth_item_in_list = grade_list[4]
-    logger.info(f"Fifth item in the list: {fifth_item_in_list}")
-    return_index = 0
-    for index, i in enumerate(grade_list):
-        if i == fifth_item_in_list:
-            return_index = index
-    return return_index
+    Histogram binning is by 2 [ [0,2], [2,4], [4,6], …..] each item in the list starting number is inclusive and second
+    is exclusive.
+    Case 1: Just last 5 are binned
+    Actual distribution: [69.79, 80.0, 80.5, 88.21, 88.79, 92.71, 92.71, 92.71, 93.14, 94.43]
+    Binning Distribution: [88.79, 88.79, 88.79, 88.79, 88.79, 92.71, 92.71, 92.71, 93.14, 94.43]
+    Case 2: More than last 5 are binned based on histogram binning by count of 2
+    Actual Distribution: [90.77, 93.09, 93.42, 94.85, 94.87, 94.88, 94.9, 95.55, 95.89, 96.28, 96.4, 96.47, 96.49, 96.68]
+    Binning Distribution: [95.89, 95.89, 95.89, 95.89, 95.89, 95.89, 95.89, 95.89, 95.89,96.28, 96.4, 96.47, 96.49, 96.68]
+
+    :param grades: sorted in asc
+    :param fifth_item_in_list:
+    :return: max grade in the binned list, length of binned grades
+    """
+    binning_list=grades[:5]
+    for grade in grades[5:]:
+        if check_if_grade_qualify_for_binning(grade, fifth_item_in_list):
+            binning_list.append(grade)
+    return max(binning_list), len(binning_list)
 
 
 def df_default_display_settings():
