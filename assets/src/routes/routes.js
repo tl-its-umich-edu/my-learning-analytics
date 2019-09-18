@@ -24,7 +24,7 @@ const routes = (courseId, activeViews) => {
       icon: Grade,
       description: 'See what resources you and your peers are viewing.',
       image: '/static/images/file_access_trends_icon.png',
-      viewCode: 'fa'
+      viewCode: 'ra'
     }
   ]
   return allViews.filter(view => activeViews[view.viewCode])

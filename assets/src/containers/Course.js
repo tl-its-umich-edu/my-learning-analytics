@@ -7,17 +7,17 @@ import AssignmentPlanning from './AssignmentPlanning'
 import ResourcesAccessed from './ResourcesAccessed'
 import IndexPage from './IndexPage'
 import Spinner from '../components/Spinner'
-import Error from './Error'
 import { isObjectEmpty } from '../util/object'
 import { useCourseInfo } from '../service/api'
+import WarningBanner from "../components/WarningBanner"
 
 function Course (props) {
   const { courseId, user } = props
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
-  if (error) return (<Error>Something went wrong, please try again later.</Error>)
-  if (loaded && isObjectEmpty(courseInfo)) return (<Error>Tool is not enabled for this course.</Error>)
+  if (error) return (<WarningBanner/>)
+  if (loaded && isObjectEmpty(courseInfo)) return (<WarningBanner>My Learning Analytics is not enabled for this course.</WarningBanner>)
 
   return (
     <>
@@ -48,7 +48,7 @@ function Course (props) {
                 disabled={!courseInfo.course_view_options.ap}
                 courseId={courseId} />} />
             <Route path='/courses/:courseId/resources'
-              render={props => <ResourcesAccessed {...props} disabled={!courseInfo.course_view_options.fa} courseInfo={courseInfo}
+              render={props => <ResourcesAccessed {...props} disabled={!courseInfo.course_view_options.ra} courseInfo={courseInfo}
                 courseId={courseId} />} />
           </>
           : <Spinner />

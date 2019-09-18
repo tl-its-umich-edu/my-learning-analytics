@@ -14,8 +14,6 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   const binningGrade = tempUniqData[0]
   const firstGradeAfterBinnedGrade = tempUniqData[1]
 
-  console.log(data)
-
   // show the binning line only between 2 and 96 grades.
   const createDashedLine = () => {
     if (binningGrade > 96) {

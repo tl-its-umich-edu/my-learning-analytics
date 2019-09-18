@@ -28,7 +28,8 @@ const styles = theme => ({
   homeButton: {
     textDecoration: 'none',
     color: 'white',
-    textTransform: 'capitalize'
+    textTransform: 'capitalize',
+    padding: 4
   },
   roundButton: {
     borderRadius: '50%',

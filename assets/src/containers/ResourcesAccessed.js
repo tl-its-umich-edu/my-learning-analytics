@@ -3,9 +3,7 @@ import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
-import Spinner from '../components/Spinner'
 import Checkbox from '@material-ui/core/Checkbox'
-import RangeSlider from '../components/RangeSlider'
 import FormControl from '@material-ui/core/FormControl'
 import FormGroup from '@material-ui/core/FormGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
@@ -13,9 +11,13 @@ import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import { useUserSettingData } from '../service/api'
 import { handleError, defaultFetchOptions } from '../util/data'
-import ResourceAccessChart from '../components/ResourceAccessChart'
 import Cookie from 'js-cookie'
-import Error from './Error'
+import AlertBanner from '../components/AlertBanner'
+import WarningBanner from '../components/WarningBanner'
+import RangeSlider from '../components/RangeSlider'
+import ResourceAccessChart from '../components/ResourceAccessChart'
+import Spinner from '../components/Spinner'
+
 import { type } from 'os';
 
 const styles = theme => ({
@@ -24,17 +26,21 @@ const styles = theme => ({
     padding: 8
   },
   paper: {
-    padding: theme.spacing.unit * 2,
-    color: theme.palette.text.secondary
+    color: theme.palette.text.secondary,
+    padding: theme.spacing.unit * 2
   },
   formController: {
-    display: 'flex',
-    marginTop: theme.spacing.unit * 2,
     alignItems: 'center',
-    justifyContent: 'center'
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: theme.spacing.unit * 2,
+  },
+  controlText: {
+    paddingLeft: 8,
+    paddingRight: 8
   },
   checkBox: {
-    marginLeft: 20,
+    marginLeft: 20
   },
 })
 
@@ -44,7 +50,7 @@ const settingNotUpdated = 'Setting not updated'
 
 function ResourcesAccessed (props) {
   const { classes, courseInfo, courseId, disabled } = props
-  if (disabled) return (<Error>Files view is hidden for this course.</Error>)
+  if (disabled) return (<AlertBanner>The Resources Accessed view is hidden for this course.</AlertBanner>)
   let resourceTypes = courseInfo.resource_types
   if (resourceTypes.length === 0) {
     resourceTypes = ['Files']
@@ -66,14 +72,14 @@ function ResourcesAccessed (props) {
 
   const [dataLoaded, setDataLoaded] = useState(false)
 
-  function filterCheckox() {
+  function filterCheckbox() {
     if (resourceAccessData) {
       if (resourceTypes.length > 1) {
         return(
           <div style={{ textAlign: "center" }}>
             <FormControl>
               <FormGroup row>
-                <p style={{fontWeight: "bold"}}>Select Resources to be Viewed:</p>
+                <p className={classes.controlText}>Select resource types to be viewed:</p>
                 {
                   resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeResourceHandler} value={el}></Checkbox>} label={el}/>))
                 }
@@ -214,10 +220,10 @@ function ResourcesAccessed (props) {
 
   const ResourceAccessChartBuilder = (resourceData) => {
     if (resourceFilter.length === 0) {
-      return (<div style={{textAlign: "center", fontWeight: "900", color:"#D8000C"}}><p>Please select a resource type to display data</p></div>)
+      return (<AlertBanner>Please select a resource type to display data.</AlertBanner>)
     }
     else if (!resourceData || Object.keys(resourceData).length === 0) {
-      return (<p>No data provided</p>)
+      return (<AlertBanner>Resource data for your selections is not available.</AlertBanner>)
     }
     else {
       return (
@@ -230,7 +236,7 @@ function ResourcesAccessed (props) {
       )
     }
   }
-  if (error) return (<Error>Something went wrong, please try again later.</Error>)
+  if (error) return (<WarningBanner/>)
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
@@ -247,10 +253,8 @@ function ResourcesAccessed (props) {
               onWeekChange={onWeekChangeHandler}
             /> : ''}
             <div className={classes.formController}>
-              <p>Resources accessed from
-                week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now)' : ''}</b> with
-                these grades: </p>
-              <FormControl className={classes.formControl}>
+              <p className={classes.controlText}>Resources accessed from week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now) ' : ''}</b> by students with these grades:</p>
+              <FormControl>
                 <Select
                   value={gradeRangeFilter}
                   onChange={onChangeGradeRangeHandler}
@@ -273,7 +277,7 @@ function ResourcesAccessed (props) {
               <div style={{ padding: '15px 2px' }}>{defaultLabel}</div>
             </div>
             {
-              filterCheckox()
+              filterCheckbox()
             }
             {(resourceAccessData && dataLoaded) || resourceFilter.length === 0
               ? ResourceAccessChartBuilder(resourceAccessData)

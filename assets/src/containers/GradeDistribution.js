@@ -4,11 +4,12 @@ import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import Checkbox from '@material-ui/core/Checkbox'
+import AlertBanner from '../components/AlertBanner'
+import WarningBanner from '../components/WarningBanner'
 import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
-import Error from './Error'
 import { roundToOneDecimal } from '../util/math'
 import { useGradeData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
@@ -26,17 +27,12 @@ const styles = theme => ({
   },
   table: {
     width: '300px'
-  },
-  checkboxPosition: {
-    position: 'relative',
-    left: '200px',
   }
-
 })
 
 function GradeDistribution (props) {
   const { classes, disabled, courseId, user } = props
-  if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
+  if (disabled) return (<AlertBanner>The Grade Distribution view is hidden for this course.</AlertBanner>)
 
   const [gradeLoaded, gradeError, gradeData] = useGradeData(courseId)
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'grade')
@@ -53,15 +49,14 @@ function GradeDistribution (props) {
     }
   }, [userSettingLoaded])
 
-  const [userSettingSaved, userSettingResponse] = useSetUserSetting(
+  const [userSettingSaved, _, userSettingResponse] = useSetUserSetting(
     courseId,
     { grade: showGrade },
     settingChanged,
     [showGrade]
   )
 
-  if (gradeError) return (<Error>Something went wrong, please try again later.</Error>)
-  if (gradeLoaded && isObjectEmpty(gradeData)) return (<Error>No data provided.</Error>)
+  if (gradeError) return (<WarningBanner/>)
 
   const BuildGradeView = () => {
     const grades = gradeData.map(x => x.current_grade)
@@ -118,17 +113,17 @@ function GradeDistribution (props) {
     )
   }
 
+  const content = (gradeLoaded && isObjectEmpty(gradeData)) ?
+      (<AlertBanner>Grade data is not available.</AlertBanner>) :
+      (gradeLoaded ? <BuildGradeView /> : <Spinner />);
+
   return (
     <div className={classes.root}>
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom>Grade Distribution</Typography>
-            {
-              gradeLoaded
-                ? <BuildGradeView/>
-                : <Spinner/>
-            }
+            {content}
           </Paper>
         </Grid>
       </Grid>

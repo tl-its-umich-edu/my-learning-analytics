@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 import SelectCard from '../components/SelectCard'
-import Error from './Error'
 import Typography from '@material-ui/core/Typography'
 import { Link } from 'react-router-dom'
 import Paper from '@material-ui/core/Paper'
@@ -12,10 +11,15 @@ import IconButton from '@material-ui/core/IconButton'
 import Avatar from '@material-ui/core/Avatar'
 import Popover from '@material-ui/core/Popover'
 import AvatarModal from '../components/AvatarModal'
+import WarningBanner from '../components/WarningBanner'
 
 const styles = theme => ({
   root: {
     flexGrow: 1
+  },
+  content: {
+    flexGrow: 1,
+    padding: 8
   },
   container: {
     display: 'flex',
@@ -41,7 +45,7 @@ function CourseList (props) {
   const { classes, user } = props
 
   if (!user.enrolledCourses && !user.isSuperuser) {
-    return (<Error>You are not enrolled in any courses with MyLA enabled.</Error>)
+    return (<WarningBanner>You are not enrolled in any courses with My Learning Analytics enabled.</WarningBanner>)
   }
 
   const [avatarEl, setAvatarEl] = useState(null)
@@ -80,25 +84,25 @@ function CourseList (props) {
           </Popover>
         </Toolbar>
       </AppBar>
-      <div className={classes.root}>
+      <div className={classes.content}>
         {
           user.isSuperuser
             ? <Grid container spacing={16}>
-              <Grid item xs={12}>
-                <Paper className={classes.paper}>
-                  <Typography variant='h5' gutterBottom>Select a course of your choice</Typography>
-                </Paper>
+                <Grid item xs={12}>
+                  <Paper className={classes.paper}>
+                    <Typography variant='h5' gutterBottom>Select a course of your choice</Typography>
+                  </Paper>
+                </Grid>
               </Grid>
-            </Grid>
             : <Grid container spacing={16}>
-              <Grid item xs={12} className={classes.container}>
-                {user.enrolledCourses.map((course, key) =>
-                  <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
-                    <SelectCard cardData={{ title: course.course_name }} />
-                  </Link>
-                )}
+                <Grid item xs={12} className={classes.container}>
+                  {user.enrolledCourses.map((course, key) =>
+                    <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
+                      <SelectCard cardData={{ title: course.course_name }} />
+                    </Link>
+                  )}
+                </Grid>
               </Grid>
-            </Grid>
         }
       </div>
     </>
