@@ -121,7 +121,7 @@ function AssignmentPlanningV2 (props) {
                 ]}
                 outOf={100}
                 percentWidth={100}
-                height={70}
+                height={50}
               />
               <AssignmentGradeBoxes
                 currentGrade={grades.currentGrade}

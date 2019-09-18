@@ -1,5 +1,6 @@
 import React from 'react'
 import Line from './Line'
+import Label from './Label'
 import { withStyles } from '@material-ui/core/styles'
 // import { DropTarget } from 'react-dnd'
 
@@ -53,15 +54,24 @@ function ProgressBarV2 (props) {
           {
             lines.length > 0
               ? lines.map((line, key) => (
-                <Line
-                  className='handle'
-                  height={height}
-                  left={`${calculateLineLeftOffset(line.value, outOf)}%`}
-                  color={line.color}
-                  key={key}
-                  labelUp={line.labelUp}
-                  labelDown={line.labelDown}
-                />
+                <>
+                  <Line
+                    height={height}
+                    left={`${calculateLineLeftOffset(line.value, outOf)}%`}
+                    color={line.color}
+                    key={key}
+                    labelUp={line.labelUp}
+                    labelDown={line.labelDown}
+                  />
+                  <Label
+                    left={`${calculateLineLeftOffset(line.value, outOf)}%`}
+                    color={line.color}
+                    key={key}
+                    labelUp={line.labelUp}
+                    labelDown={line.labelDown}
+                    labelText={line.label}
+                  />
+                </>
               ))
               : null
           }

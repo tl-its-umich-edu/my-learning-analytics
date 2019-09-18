@@ -2,9 +2,11 @@ import React from 'react'
 
 function Label (props) {
   const {
+    left,
     color,
     labelUp,
-    labelDown
+    labelDown,
+    labelText
   } = props
 
   return (
@@ -13,9 +15,14 @@ function Label (props) {
         position: 'absolute',
         display: 'inline-block',
         color,
-        zIndex: 1
+        left,
+        zIndex: 1,
+        marginTop: labelUp ? '-20px' : 0,
+        marginBottom: labelDown ? '-20px' : 0
       }}
-    />
+    >
+      {labelText}
+    </div>
   )
 }
 
