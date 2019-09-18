@@ -64,7 +64,7 @@ function ProgressBarV2 (props) {
                     labelDown={line.labelDown}
                   />
                   <Label
-                    left={`${calculateLineLeftOffset(line.value, outOf)}%`}
+                    left={`${calculateLineLeftOffset(line.value, outOf) + 0.5}%`}
                     color={line.color}
                     key={key}
                     labelUp={line.labelUp}

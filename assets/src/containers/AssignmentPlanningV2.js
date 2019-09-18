@@ -24,7 +24,7 @@ const styles = theme => ({
 
 const grades = {
   currentGrade: 85,
-  goalGrade: null, // can be null
+  goalGrade: 90, // can be null
   maxPossibleGrade: 95,
   assignments: [
     {

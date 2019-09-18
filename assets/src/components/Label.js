@@ -17,8 +17,7 @@ function Label (props) {
         color,
         left,
         zIndex: 1,
-        marginTop: labelUp ? '-20px' : 0,
-        marginBottom: labelDown ? '-20px' : 0
+        top: labelDown ? '50px' : labelUp ? '-20px' : 0
       }}
     >
       {labelText}
