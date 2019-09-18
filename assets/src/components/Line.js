@@ -19,7 +19,8 @@ function Line (props) {
         width,
         backgroundColor: color,
         height,
-        left
+        left,
+        zIndex: 1
       }}
       // ref={drag}
     />

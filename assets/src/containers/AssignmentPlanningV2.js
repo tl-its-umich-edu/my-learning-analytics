@@ -107,7 +107,7 @@ function AssignmentPlanningV2 (props) {
                   },
                   {
                     label: 'Goal',
-                    value: grades.goalGrade,
+                    value: goalGrade,
                     color: 'green'
                   },
                   {
