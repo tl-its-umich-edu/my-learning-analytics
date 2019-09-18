@@ -100,7 +100,12 @@ function AssignmentTable (props) {
                         className={classes.numberField}
                       />
                     )
-                }{<div style={{ margin: 'auto', display: 'inline' }}>{` / ${assignment.outOf}`}</div>}
+                }
+                {
+                  <div style={{ margin: 'auto', display: 'inline' }}>
+                    {` / ${assignment.outOf}`}
+                  </div>
+                }
               </TableCell>
             </TableRow>
           ))

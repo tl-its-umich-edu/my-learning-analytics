@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
+import InputAdornment from '@material-ui/core/InputAdornment'
 
 const styles = ({
   numberField: {
@@ -23,11 +24,15 @@ function AssignmentGradeBoxes (props) {
     <Grid container>
       <Grid item xs={4}>
         <Typography variant='h5'>Current Grade</Typography>
-        <Typography variant='h4' style={{ color: 'steelblue' }}>{`${currentGrade}%`}</Typography>
+        <Typography variant='h4' style={{ color: 'steelblue' }}>
+          {`${currentGrade}%`}
+        </Typography>
       </Grid>
       <Grid item xs={4}>
         <Typography variant='h5'>Max Possible Grade</Typography>
-        <Typography variant='h4' style={{ color: 'grey' }}>{`${maxPossibleGrade}%`}</Typography>
+        <Typography variant='h4' style={{ color: 'grey' }}>
+          {`${maxPossibleGrade}%`}
+        </Typography>
       </Grid>
       <Grid item xs={4}>
         <Typography variant='h5'>Goal</Typography>
@@ -38,7 +43,9 @@ function AssignmentGradeBoxes (props) {
           onChange={event => setGoalGrade(event.target.value)}
           type='number'
           className={classes.numberField}
-          InputLabelProps={{ shrink: true }}
+          InputLabelProps={{
+            endAdornment: <InputAdornment position='start'>%</InputAdornment> // doesn't seem to be working
+          }}
           margin='normal'
         />
       </Grid>

@@ -54,24 +54,22 @@ function ProgressBarV2 (props) {
           {
             lines.length > 0
               ? lines.map((line, key) => (
-                <>
+                <div key={key}>
                   <Line
                     height={height}
                     left={`${calculateLineLeftOffset(line.value, outOf)}%`}
                     color={line.color}
-                    key={key}
                     labelUp={line.labelUp}
                     labelDown={line.labelDown}
                   />
                   <Label
                     left={`${calculateLineLeftOffset(line.value, outOf) + 0.5}%`}
                     color={line.color}
-                    key={key}
                     labelUp={line.labelUp}
                     labelDown={line.labelDown}
                     labelText={line.label}
                   />
-                </>
+                </div>
               ))
               : null
           }
