@@ -15,7 +15,7 @@ const styles = ({
   }
 })
 
-function ProgressBarV2(props) {
+function ProgressBarV2 (props) {
   const {
     classes,
     score,

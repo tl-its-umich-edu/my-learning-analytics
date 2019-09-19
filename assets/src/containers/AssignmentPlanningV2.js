@@ -94,8 +94,6 @@ function AssignmentPlanningV2 (props) {
 
   }, [assignments, goalGrade])
 
-  const syncCourseGoalWithAssignmentGoals = () => {}
-
   console.log(assignments)
 
   return (
