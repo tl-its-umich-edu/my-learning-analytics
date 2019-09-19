@@ -15,7 +15,7 @@ const styles = ({
   }
 })
 
-function ProgressBarV2 (props) {
+function ProgressBarV2(props) {
   const {
     classes,
     score,
@@ -53,24 +53,25 @@ function ProgressBarV2 (props) {
         >
           {
             lines.length > 0
-              ? lines.map((line, key) => (
-                <div key={key}>
-                  <Line
-                    height={height}
-                    left={`${calculateLineLeftOffset(line.value, outOf)}%`}
-                    color={line.color}
-                    labelUp={line.labelUp}
-                    labelDown={line.labelDown}
-                  />
-                  <Label
-                    left={`${calculateLineLeftOffset(line.value, outOf) + 0.5}%`}
-                    color={line.color}
-                    labelUp={line.labelUp}
-                    labelDown={line.labelDown}
-                    labelText={line.label}
-                  />
-                </div>
-              ))
+              ? lines.filter(line => line.value) // filter any lines without value
+                .map((line, key) => (
+                  <div key={key}>
+                    <Line
+                      height={height}
+                      left={`${calculateLineLeftOffset(line.value, outOf)}%`}
+                      color={line.color}
+                      labelUp={line.labelUp}
+                      labelDown={line.labelDown}
+                    />
+                    <Label
+                      left={`${calculateLineLeftOffset(line.value, outOf) + 0.5}%`}
+                      color={line.color}
+                      labelUp={line.labelUp}
+                      labelDown={line.labelDown}
+                      labelText={line.label}
+                    />
+                  </div>
+                ))
               : null
           }
           {

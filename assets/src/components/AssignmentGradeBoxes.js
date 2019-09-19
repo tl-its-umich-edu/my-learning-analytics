@@ -44,7 +44,7 @@ function AssignmentGradeBoxes (props) {
           type='number'
           className={classes.numberField}
           InputLabelProps={{
-            endAdornment: <InputAdornment position='start'>%</InputAdornment> // doesn't seem to be working
+            // endAdornment: <InputAdornment position='start'>%</InputAdornment> // doesn't seem to be working
           }}
           margin='normal'
         />

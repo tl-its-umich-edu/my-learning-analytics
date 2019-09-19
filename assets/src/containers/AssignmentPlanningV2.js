@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
@@ -24,7 +24,7 @@ const styles = theme => ({
 
 const grades = {
   currentGrade: 85,
-  goalGrade: 90, // can be null
+  goalGrade: null, // can be null
   maxPossibleGrade: 95,
   assignments: [
     {
@@ -84,10 +84,19 @@ function AssignmentPlanningV2 (props) {
   const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setAssignments([
       ...assignments.slice(0, key),
-      { ...assignments[key], goalGrade: assignmentGoalGrade },
+      { ...assignments[key], goalGrade: Number(assignmentGoalGrade) },
       ...assignments.slice(key + 1)
     ])
   }
+
+  // this effect is used to keep the goal of the course and assignments "in sync"
+  useEffect(() => {
+
+  }, [assignments, goalGrade])
+
+  const syncCourseGoalWithAssignmentGoals = () => {}
+
+  console.log(assignments)
 
   return (
     // <DndProvider backend={HTML5Backend}>
