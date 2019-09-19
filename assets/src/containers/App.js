@@ -19,7 +19,8 @@ const user = Object.freeze({
   admin: myla_globals.is_superuser,
   enrolledCourses,
   isSuperuser: myla_globals.is_superuser,
-  isLoggedIn: !!myla_globals.username
+  isLoggedIn: !!myla_globals.username,
+  helpURL: myla_globals.help_url
 })
 
 function App (props) {
