@@ -74,7 +74,7 @@ The relative LTI launch url is `/lti/auth/` (ex: `https://example.com/lti/auth/`
 #### Canvas Notes
 * When you configure the tool in Canvas the "Privacy" option must be changed from Anonymous to Public to pass along the user information required.
 
-* You should use the [XML builder](https://www.edu-apps.org/build_xml.html) to generate an XML and past the XML that rather than manually adding it. This will allow options like "Course Navigation" extension.
+* You should use the [XML builder](https://www.edu-apps.org/build_xml.html) to generate and paste the XML that rather than manually adding it. This will allow options like "Course Navigation" extension.
 
 * You also need to configure CSP value in the environment, specifically the FRAME_SRC. (See next section) In addtiion you make sure you are using https and CSRF_COOKIE_SECURE is true with your domain (or instructure.com) in trusted origins.
 

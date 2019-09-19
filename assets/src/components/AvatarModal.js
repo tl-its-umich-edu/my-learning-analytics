@@ -42,7 +42,7 @@ function AvatarModal (props) {
   const url = window.location.href
   const logoutURL = '/accounts/logout'
 
-  const [helpURL, setHelpURL] = useState('https://sites.google.com/umich.edu/my-learning-analytics-help/home')
+  const [helpURL, setHelpURL] = useState(user.helpURL)
   const [openChangeCourseDialog, setOpenChangeCourseDialog] = useState(false)
 
   const Admin = () => (

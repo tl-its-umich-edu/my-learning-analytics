@@ -12,7 +12,7 @@ MyLA Backend is build using [Django](https://www.djangoproject.com/) Framework, 
 Cron schedule for getting the Canvas context and event data to the MySQL DB each institution might set this up differently based on the infrastruture support.
 MyLA can be run as a stand alone tool with [SAML](https://developers.onelogin.com/saml) support and as LTI tool. 
 
-More info of various institutions infrastructure set up is [here](https://github.com/tl-its-umich-edu/my-learning-analytics/wiki/Myla-institutions-Architecture-flow) 
+More info of various institutions infrastructure set up is [here](https://github.com/tl-its-umich-edu/my-learning-analytics/wiki/Myla-institutions-Architecture-flow).
 
 
 
