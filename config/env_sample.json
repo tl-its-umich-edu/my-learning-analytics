@@ -177,5 +177,7 @@
             "/* mention if the caliper event data is providing long or short canvas id and change the query to store long id as in this case": "*/",
             "canvas_course_id_format": "SHORT"
         }
-    }
+    },
+    "/* Disable/Enable courses_enabled api": "*/",
+    "COURSES_ENABLED" : false
 }

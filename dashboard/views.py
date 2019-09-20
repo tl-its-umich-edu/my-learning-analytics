@@ -10,7 +10,7 @@ import pandas as pd
 from django.conf import settings
 from django.contrib import auth
 from django.db import connection as conn
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
@@ -20,7 +20,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from collections import namedtuple
 
 from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
-from dashboard.settings import RESOURCE_VALUES
+from dashboard.settings import RESOURCE_VALUES, COURSES_ENABLED
 
 logger = logging.getLogger(__name__)
 # strings for construct resource download url
@@ -37,6 +37,9 @@ NO_GRADE_STRING = "NO_GRADE"
 # string for resource type
 RESOURCE_TYPE_STRING = "resource_type"
 RESOURCE_VALUES = settings.RESOURCE_VALUES
+
+# Is courses_enabled api enabled/disabled?
+COURSES_ENABLED = settings.COURSES_ENABLED
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
@@ -711,19 +714,23 @@ def logout(request):
     return redirect(settings.LOGOUT_REDIRECT_URL)
 
 
-@permission_required('dashboard.courses_enabled', raise_exception=True)
+
 def courses_enabled(request):
     """ Returns json for all courses we currntly support and are enabled
 
     """
-    data = {}
-    for cvo in CourseViewOption.objects.all():
-        data.update(cvo.json())
+    
+    if COURSES_ENABLED:
+        data = {}
+        for cvo in CourseViewOption.objects.all():
+            data.update(cvo.json())
 
-    callback = request.GET.get('callback')
-    # Return json
-    if callback is None:
-        return HttpResponse(json.dumps(data), content_type='application/json')
-    # Return jsonp
+        callback = request.GET.get('callback')
+        # Return json
+        if callback is None:
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        # Return jsonp
+        else:
+            return HttpResponse("{0}({1})".format(callback, json.dumps(data)), content_type='application/json')
     else:
-        return HttpResponse("{0}({1})".format(callback, json.dumps(data)), content_type='application/json')
+        return HttpResponseForbidden()
