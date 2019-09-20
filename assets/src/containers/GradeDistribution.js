@@ -10,7 +10,7 @@ import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
-import { average, roundToOneDecimal, median } from '../util/math'
+import { roundToOneDecimal } from '../util/math'
 import { useGradeData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 import useSetUserSetting from '../hooks/useSetUserSetting'
@@ -37,12 +37,12 @@ function GradeDistribution (props) {
   const [gradeLoaded, gradeError, gradeData] = useGradeData(courseId)
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'grade')
   const [settingChanged, setSettingChanged] = useState(false)
-  const [showGrade, setShowGrade] = useState(false)
+  const [showGrade, setShowGrade] = useState(true)
 
   useEffect(() => {
     if (userSettingLoaded) {
       if (isObjectEmpty(userSetting.default)) {
-        setShowGrade(false)
+        setShowGrade(true)
       } else {
         setShowGrade(userSetting.default !== 'False')
       }
@@ -62,10 +62,10 @@ function GradeDistribution (props) {
     const grades = gradeData.map(x => x.current_grade)
 
     const tableRows = [
-      ['Average grade', <strong>{roundToOneDecimal(average(grades))}%</strong>],
-      ['Median grade', <strong>{roundToOneDecimal(median(grades))}%</strong>],
-      ['Number of students', <strong>{gradeData.length}</strong>],
-      showGrade ?
+      ['Average grade', <strong>{gradeData[0].grade_avg}%</strong>],
+      ['Median grade', <strong>{gradeData[0].median_grade}%</strong>],
+      ['Number of students', <strong>{gradeData[0].tot_students}</strong>],
+      !user.admin && showGrade ?
         [
           'My grade',
           <strong>{
@@ -73,12 +73,12 @@ function GradeDistribution (props) {
               `${roundToOneDecimal(gradeData[0].current_user_grade)}%` :
               'There are no grades yet for you in this course'
           }</strong>
-        ] : []
+        ] : [],
     ]
 
     const gradeCheckbox = !user.admin ?
       <> {userSettingLoaded ?
-        <> {'Show my grade'}
+        <> <Typography align='right'>{'Show my grade'}
           <Checkbox
             color='primary'
             checked={showGrade}
@@ -86,27 +86,28 @@ function GradeDistribution (props) {
               setSettingChanged(true)
               setShowGrade(!showGrade)
             }}
-          />
-        </> : <Spinner />}
+          /></Typography>
+        </> : <Spinner/>}
       </> : null
 
     return (
       <Grid container>
         <Grid item xs={12} lg={2}>
-          <Table className={classes.table} noBorder tableData={tableRows} />
-          {gradeCheckbox}
+          <Table className={classes.table} noBorder tableData={tableRows}/>
           <UserSettingSnackbar
             saved={userSettingSaved}
-            response={userSettingResponse} />
+            response={userSettingResponse}/>
         </Grid>
         <Grid item xs={12} lg={10}>
+          {gradeCheckbox}
           <Histogram
             data={grades}
             aspectRatio={0.3}
             xAxisLabel={'Grade %'}
             yAxisLabel={'Number of Students'}
             myGrade={showGrade ? gradeData[0].current_user_grade : null}
-            maxGrade={gradeData[0].graph_upper_limit} />
+            maxGrade={gradeData[0].graph_upper_limit}
+            showNumberOnBars={gradeData[0].show_number_on_bars}/>
         </Grid>
       </Grid>
     )
