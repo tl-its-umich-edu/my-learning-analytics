@@ -647,8 +647,8 @@ def courses_enabled(request):
     """ Returns json for all courses we currntly support and are enabled
 
     """
-    current_user_is_admin = request.user.is_superuser
-    if COURSES_ENABLED or current_user_is_admin:
+    
+    if COURSES_ENABLED:
         data = {}
         for cvo in CourseViewOption.objects.all():
             data.update(cvo.json())
