@@ -7,7 +7,8 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
-  // data usually will be [50.6, 50.6, 50.6, 50.6, 50.6, 74.28, 74.52, 75.89, 76.69,,.,.,.,.] the first 5 or few will be binning grades
+  // data usually will be [50.6, 50.6, 50.6, 50.6, 50.6, 74.28, 74.52, 75.89, 76.69,,.,.,.,.] lowest grades binned
+  //  to hide low performers.
 
   // the set operation removes duplicates
   const tempUniqData = [...new Set(data)]
@@ -128,9 +129,9 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
       .attr('stroke', 'darkorange')
       .attr('stroke-width', '2')
     svg.append('text')
-      .attr('x', myGrade < 5 ? x(myGrade) + 3 : x(myGrade) - 110)
+      .attr('x', myGrade < 5 ? x(myGrade) + 3 : x(myGrade) - 120)
       .attr('y', margin.top + 15)
-      .text(`My Grade:${roundToOneDecimal(myGrade)}%`)
+      .text(`My Grade: ${roundToOneDecimal(myGrade)}%`)
       .attr('font-size', '0.875rem')
       .attr('font-weight', 'bold')
       .attr('line-height', '1.46429em')

@@ -17,6 +17,7 @@ from dashboard.event_logs_types.event_logs_types import EventLogTypes
 from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
+from collections import namedtuple
 
 from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
 from dashboard.settings import RESOURCE_VALUES
@@ -303,7 +304,7 @@ def grade_distribution(request, course_id=0):
     current_user = request.user.get_username()
 
     grade_score_sql = f"""select current_grade,
-       (select ab_test_course From course where id=%(course_id)s) as show_number_on_bars,
+       (select show_grade_counts From course where id=%(course_id)s) as show_number_on_bars,
     (select current_grade from user where sis_name=%(current_user)s and course_id=%(course_id)s) as current_user_grade
         from user where course_id=%(course_id)s and enrollment_type='StudentEnrollment';
                     """
@@ -322,9 +323,9 @@ def grade_distribution(request, course_id=0):
     df.reset_index(drop=True, inplace=True)
     grades = df['current_grade'].values.tolist()
     logger.debug(f"Grades distribution: {grades}")
-    binning_grade_value, index = find_binning_grade_value(grades)
-    df['current_grade'] = df['current_grade'].replace(df['current_grade'].head(index),
-                                                      binning_grade_value)
+    BinningGrade = find_binning_grade_value(grades)
+    df['current_grade'] = df['current_grade'].replace(df['current_grade'].head(BinningGrade.index),
+                                                      BinningGrade.value)
 
     if df[df['current_grade'] > 100.0].shape[0] > 0:
         df['graph_upper_limit'] = int((5 * round(float(df['current_grade'].max()) / 5) + 5))
@@ -332,7 +333,6 @@ def grade_distribution(request, course_id=0):
         df['current_grade'] = df['current_grade'].apply(lambda x: 99.99 if x == 100.00 else x)
         df['graph_upper_limit'] = 100
 
-    df['graph_lower_limit'] = df['current_grade'].min()
 
     # json for eventlog
     data = {
@@ -643,12 +643,12 @@ def are_weighted_assignments_hidden(course_id, df):
 
 def find_binning_grade_value(grades):
     fifth_item = grades[4]
-    next_to_fifth_element = grades[5]
-    if next_to_fifth_element - fifth_item > 2:
-        binning_grade_value, index = fifth_item, 4
+    next_to_fifth_item = grades[5]
+    if next_to_fifth_item - fifth_item > 2:
+        BinningGrade = get_binning_grade()
+        return BinningGrade(value=fifth_item, index=4)
     else:
-        binning_grade_value, index = binning_logic(grades, fifth_item)
-    return binning_grade_value, index
+        return binning_logic(grades, fifth_item)
 
 
 def is_odd(num):
@@ -658,7 +658,7 @@ def is_odd(num):
         return True
 
 
-def check_if_grade_qualify_for_binning(grade, fifthElement):
+def check_if_grade_qualifies_for_binning(grade, fifthElement):
     # case: 96.7, 94.76,
     if int(grade) - int(fifthElement) > 1:
         return False
@@ -685,12 +685,17 @@ def binning_logic(grades, fifth_item_in_list):
     :param fifth_item_in_list:
     :return: max grade in the binned list, length of binned grades
     """
-    binning_list=grades[:5]
+    binning_list = grades[:5]
+    BinningGrade = get_binning_grade()
     for grade in grades[5:]:
-        if check_if_grade_qualify_for_binning(grade, fifth_item_in_list):
+        if check_if_grade_qualifies_for_binning(grade, fifth_item_in_list):
             binning_list.append(grade)
-    return max(binning_list), len(binning_list)
+        else:
+            return BinningGrade(max(binning_list), len(binning_list))
 
+
+def get_binning_grade():
+    return namedtuple('BinningGrade', ['value', 'index'])
 
 def df_default_display_settings():
     pd.set_option('display.max_column', None)

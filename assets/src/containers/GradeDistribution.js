@@ -44,7 +44,7 @@ function GradeDistribution (props) {
       if (isObjectEmpty(userSetting.default)) {
         setShowGrade(true)
       } else {
-        setShowGrade(userSetting.default === 'False' ? false : true)
+        setShowGrade(userSetting.default !== 'False')
       }
     }
   }, [userSettingLoaded])

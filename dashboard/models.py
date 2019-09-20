@@ -159,14 +159,14 @@ class CourseManager(models.Manager):
 
 
 class Course(models.Model):
-    id = models.BigIntegerField(primary_key=True, verbose_name="Course Id", db_column='id')
+    id = models.BigIntegerField(primary_key=True, verbose_name="Course Id", db_column='id', editable=False)
     canvas_id = models.BigIntegerField(verbose_name="Canvas Course Id", db_column='canvas_id')
     term = models.ForeignKey(AcademicTerms, verbose_name="Term", on_delete=models.SET_NULL, db_column="term_id", null=True, db_constraint=False)
     name = models.CharField(max_length=255, verbose_name="Name")
     date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
     date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)
-    ab_test_course = models.BooleanField(blank=False, null=False, default=False, verbose_name=
-                                         "AB test course (For showing grades count on bars)")
+    show_grade_counts = models.BooleanField(blank=False, null=False, default=False, verbose_name=
+                                         "Show Grade Counts")
 
     objects = CourseManager()
 

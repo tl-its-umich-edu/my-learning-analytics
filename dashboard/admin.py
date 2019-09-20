@@ -48,9 +48,9 @@ class CourseForm(forms.ModelForm):
 class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseViewOptionInline, ]
     form = CourseForm
-    list_display = ('canvas_id', 'name', 'ab_test_course', 'term', '_courseviewoption')
+    list_display = ('canvas_id', 'name', 'term', 'show_grade_counts', '_courseviewoption')
     list_select_related = True
-    readonly_fields = ('id', 'term',)
+    readonly_fields = ('term',)
 
     # Need this method to correctly display the line breaks
     def _courseviewoption(self, obj):
