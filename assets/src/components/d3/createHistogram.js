@@ -2,9 +2,34 @@ import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import { roundToOneDecimal } from '../../util/math'
 
-function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100 }) {
+function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100,
+                            showNumberOnBars = false}) {
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
+
+  // data usually will be [50.6, 50.6, 50.6, 50.6, 50.6, 74.28, 74.52, 75.89, 76.69,,.,.,.,.] lowest grades binned
+  //  to hide low performers.
+
+  // the set operation removes duplicates
+  const tempUniqData = [...new Set(data)]
+  const binningGrade = tempUniqData[0]
+  const firstGradeAfterBinnedGrade = tempUniqData[1]
+
+  // show the binning line only between 2 and 96 grades.
+  const createDashedLine = () => {
+    if (binningGrade > 96) {
+      return false
+    }
+    if (binningGrade < 2) {
+      return false
+    }
+    return true
+  }
+
+  /* only showing the tick values above the binned grades eg, with above data the tick will start from 75%
+  * if course has 0% or > 95% grades then we just show the whole distribution
+  * */
+  const minTickGrade = !createDashedLine() ? 0 : Math.round(firstGradeAfterBinnedGrade / 5) * 5
 
   const x = d3.scaleLinear()
     .domain([0, maxGrade]).nice()
@@ -13,6 +38,16 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   const bins = d3.histogram()
     .domain(x.domain())
     .thresholds(x.ticks(40))(data)
+
+
+    // getting the first bin that has some grades in them, accessing the x1(higher bin) value
+  const dashLine = () => {
+    for (let bin in bins) {
+      if (bins[bin].length > 0) {
+        return bins[bin].x1
+      }
+    }
+  }
 
   const y = d3.scaleLinear()
     .domain([0, d3.max(bins, d => d.length)]).nice()
@@ -33,12 +68,15 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     .attr('height', d => y(0) - y(d.length))
     .attr('fill', 'steelblue')
 
-  bar.append('text')
-    .attr('x', d => x((d.x1 + d.x0) / 2))
-    .attr('y', d => y(d.length) + margin.top-5)
-    .attr('text-anchor', 'middle')
-    .attr('fill', 'white')
-    .text(d => d.length === 0 ? '' : d.length)
+  // Default is not show count on bar text, in case of AB testing a feature we want to leave it a configurable option
+  if (showNumberOnBars) {
+    bar.append('text')
+      .attr('x', d => x((d.x1 + d.x0) / 2))
+      .attr('y', d => y(d.length) + margin.top - 5)
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'white')
+      .text(d => d.length === 0 ? '' : d.length)
+  }
 
   const xAxis = g => g
     .attr(`transform`, `translate(0, ${aHeight - margin.bottom})`)
@@ -57,6 +95,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
       .attr('line-height', '1.46429em')
       .text(xAxisLabel).attr('dy', -4)
     )
+    .call(g => g.selectAll('.tick').filter(d => d < minTickGrade).remove())
 
   const yAxis = g => g
     .attr('transform', `translate(${margin.left},0)`)
@@ -70,9 +109,9 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
       .attr('font-size', '0.875rem')
       .attr('font-weight', '400')
       .attr('line-height', '1.46429em')
+      .attr('opacity', 1)
       .attr('text-anchor', 'start')
-      .text(yAxisLabel).attr('dy', -4)
-    )
+      .text(yAxisLabel).attr('dy', -4))
 
   svg.append('g')
     .call(xAxis)
@@ -84,21 +123,41 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     svg.append('line')
       .attr(`transform`, `translate(0, ${aHeight - margin.bottom})`)
       .attr('x1', x(myGrade))
-      .attr('y1', -aHeight)
+      .attr('y1', -aHeight + 75)
       .attr('x2', x(myGrade))
       .attr('y2', 0)
       .attr('stroke', 'darkorange')
       .attr('stroke-width', '2')
     svg.append('text')
-      .attr('x', x(myGrade) - 110)
-      .attr('y', margin.top-5)
+      .attr('x', myGrade < 5 ? x(myGrade) + 3 : x(myGrade) - 120)
+      .attr('y', margin.top + 15)
       .text(`My Grade: ${roundToOneDecimal(myGrade)}%`)
       .attr('font-size', '0.875rem')
       .attr('font-weight', 'bold')
       .attr('line-height', '1.46429em')
       .attr('text-anchor', 'start')
   }
+  // Dashed line to show difference b/w binned and normal distribution
+  if (createDashedLine()) {
+    svg.append('line')
+      .attr(`transform`, `translate(0, ${aHeight - margin.bottom})`)
+      .attr('x1', x(dashLine()))
+      .attr('y1', -aHeight)
+      .attr('x2', x(dashLine()))
+      .attr('y2', 0)
+      .attr('stroke-dasharray', ('3, 3'))
+      .attr('stroke', 'rgba(0, 0, 0, 0.54)')
+    svg.append('text')
+      .attr('x', x(dashLine()) - 40)
+      .attr('y', margin.top - 5)
+      .text(`<${Math.trunc(firstGradeAfterBinnedGrade)}%`)
+      .attr('font-size', '0.875rem')
+      .attr('line-height', '1.46429em')
+      .attr('text-anchor', 'start')
+      .attr('fill', 'rgba(0, 0, 0, 0.54)')
+  }
 
 }
+
 
 export default createHistogram
