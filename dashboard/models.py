@@ -298,9 +298,12 @@ class UnizinMetadata(models.Model):
 
 class UserQuerySet(models.query.QuerySet):
     def get_user_in_course(self, user, course):
+        return self.get_user_in_course_id(user, course.id)
+
+    def get_user_in_course_id(self, user, course_id):
         return self.filter(
             Q(sis_name=user.get_username()) | Q(sis_id=user.get_username()),
-            course_id=course.id
+            course_id=course_id
         )
 
 class User(models.Model):

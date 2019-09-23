@@ -20,6 +20,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.views.static import serve
 from django.views.generic.base import TemplateView
+from dashboard.graphql.view import DashboardGraphQLView
 
 from django.conf import settings
 from django.conf.urls import include
@@ -43,6 +44,8 @@ urlpatterns = [
     url(r'^courses/', login_required(views.get_home_template,), name="courses"),
     url(r'^courses/(?P<course_id>[0-9]+|)', login_required(views.get_course_template,), name="courses"),
 
+    # graphql access
+    url('graphql', DashboardGraphQLView.as_view(graphiql=True)),
 
     # Thse URL's are data patterns
     # GET access patterns
