@@ -8,6 +8,8 @@ import AssignmentGradeBoxes from '../components/AssignmentGradeBoxes'
 import Error from './Error'
 import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
+import { gql } from 'apollo-boost'
+import { useQuery } from '@apollo/react-hooks'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
 
@@ -88,6 +90,25 @@ function AssignmentPlanningV2 (props) {
       ...assignments.slice(key + 1)
     ])
   }
+
+  const { loading, error, data } = useQuery(gql`
+    {
+      course(courseId:17700000000235420) {
+        name,
+        assignments {
+          name,
+          dueDate,
+          pointsPossible,
+          submissions {
+
+            score
+          }
+        }
+      }
+    }
+  `)
+
+  console.log(data)
 
   // this effect is used to keep the goal of the course and assignments "in sync"
   useEffect(() => {
