@@ -81,12 +81,34 @@
     <footer>
         {% load flatpages %}
         {% get_flatpages '/copyright/' as flatpages %}
-        <div>
-        <div style="float: left; width: 50%">{{ flatpages.first.content|safe }}</div>
-        <div style="float: left; width: 50%; text-align: right">Data last updated on {{last_updated|date:"m/d/Y P T"}}</div>
-        </div>
+        <table style="width: 100%; padding: 8px">
+            <tr>
+                <td style="width: 50%; text-align: left">
+                    {{ flatpages.first.content|safe }}
+                </td>
+                <td style="width: 50%; text-align: right">Data last updated on {{last_updated|date:"m/d/Y P T"}}</td>
+            </tr>
+        </table>
         {% if user.is_superuser %}
-        <div id="build-info" class="alert alert-info" style="display:none;">{{build}}</div>
+        <div id="build-info" class="alert alert-info">
+            <table style="width: 100%; padding: 8px; text-align: left">
+                <tr>
+                    <th>Build Namespace</th>
+                    <th>Build Name</th>
+                    <th>Git Source</th>
+                    <th>Git Branch</th>
+                    <th>Git Commit</th>
+                </tr>
+                <tr>
+                    <!-- Need to add a template tag or some other way to access values-->
+                    <td>{build.build_namespace}</td>
+                    <td>{build.build_name}</td>
+                    <td><a href="{build.git_source}">my-learning-analytics</a></td>
+                    <td>{build.git_branch}</td>
+                    <td><a href="{build.git_source}/commits/{build.git_commit}">{build.git_commit_abbrev}</a></td>
+                </tr>
+            </table>
+        </div>
         {% endif %}
     </footer>
 </body>
