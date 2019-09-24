@@ -28,7 +28,7 @@ def is_enrolled_in_course_id(self, user, course_id):
         return self.context.get(f"{user.id}|{course_id}")
 
     try:
-        result = User.objects.get_user_in_course_id(user, course_id).count()
+        result = User.objects.get_user_in_course_id(user, course_id).count() > 0
     except User.DoesNotExist:
         logger.error(f'Permissions is_enrolled_in_course_id: user {user.id} is not enrolled in course {course_id}')
         result = False
@@ -49,7 +49,8 @@ def is_instructor_in_course_id(self, user, course_id):
 
     try:
         result = User.objects.get_user_in_course_id(user, course_id).filter(
-            enrollment_type=User.ENROLLMENT_TYPES.TeacherEnrollment).count()
+            enrollment_type=User.ENROLLMENT_TYPES.TeacherEnrollment
+        ).count() > 0
     except User.DoesNotExist:
         logger.error(f'Permission is_instructor_in_course_id: user {user.id} is not an instructor in course {course_id}')
         result = False

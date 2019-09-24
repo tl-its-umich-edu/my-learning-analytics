@@ -1,30 +1,56 @@
 from graphene_django import DjangoObjectType
 import graphene
+import numpy as np
 
 from dashboard.rules import is_admin_or_instructor_in_course_id
-from django.db.models import Q
-from dashboard.models import Course, User, Assignment, Submission
+from dashboard.models import Course, User, Assignment, Submission, \
+    AssignmentGroups, UserDefaultSelection
 
 import logging
 logger = logging.getLogger(__name__)
 
 
-class PartialSubmissionType(DjangoObjectType):
-    assignment_id = graphene.ID()
+# Note: only allow instructors to view all and students to view own
+class UserDefaultSelectionType(DjangoObjectType):
     course_id = graphene.ID()
+    default_view_value = graphene.JSONString()
 
     class Meta:
-        model = Submission
-        only_fields = ('assignment_id', 'course_id', 'score', 'avg_score')
+        model = UserDefaultSelection
+        only_fields = ('course_id', 'default_view_type', 'default_view_value')
 
-class FullSubmissionType(PartialSubmissionType):
+# Note: only allow instructors to view all and students to view own
+class SubmissionType(DjangoObjectType):
     id = graphene.ID()
+    assignment_id = graphene.ID()
+    course_id = graphene.ID()
     user_id = graphene.ID()
     graded_date = graphene.types.datetime.DateTime()
 
     class Meta:
         model = Submission
         only_fields = ('id', 'assignment_id', 'course_id', 'user_id', 'score', 'avg_score', 'graded_date')
+
+class AssignmentGroupType(DjangoObjectType):
+    id = graphene.ID()
+    course_id = graphene.ID()
+
+    # init below
+    #assignments = graphene.List(AssignmentType)
+    #assignment = graphene.Field(AssignmentType, assignment_id=graphene.ID())
+
+    def resolve_assignments(parent, info):
+        return info.context.assignments_by_assignment_group_id_loader.load(parent.id)
+
+    def resolve_assignment(parent, info, assignment_id):
+        return info.context.assignment_by_assignment_group_id_and_id_loader.load({
+            'assignment_group_id': parent.id,
+            'id': assignment_id,
+        })
+
+    class Meta:
+        model = AssignmentGroups
+        only_fields = ('id', 'course_id', 'name', 'weight', 'group_points', 'drop_lowest', 'drop_highest')
 
 
 class AssignmentType(DjangoObjectType):
@@ -34,15 +60,15 @@ class AssignmentType(DjangoObjectType):
     course_id = graphene.ID()
     assignment_group_id = graphene.ID()
 
-    submissions = graphene.List(PartialSubmissionType)
-    instructor_submissions = graphene.List(FullSubmissionType)
+    submissions = graphene.List(SubmissionType)
+    current_user_submission = graphene.Field(SubmissionType)
 
-    current_user_submission = graphene.Field(FullSubmissionType)
+    assignment_group = graphene.Field(AssignmentGroupType)
+
+    average_grade = graphene.Float()
+    median_grade = graphene.Float()
 
     def resolve_submissions(parent, info):
-        return info.context.submissions_by_assignment_id_loader.load(parent.id)
-
-    def resolve_instructor_submissions(parent, info):
         user = info.context.user
         if not is_admin_or_instructor_in_course_id.test(user, parent.course_id):
             raise GraphQLError('You do not have permission to access this resource!')
@@ -50,36 +76,103 @@ class AssignmentType(DjangoObjectType):
         return info.context.submissions_by_assignment_id_loader.load(parent.id)
 
     def resolve_current_user_submission(parent, info):
-        user = info.context.user
+        canvas_user_id = info.context.canvas_user_id
 
-        result = Submission.objects.filter(
-            Q(course_id=parent.course_id),
-            Q(assignment_id=parent.id),
-            Q(user_id=user.id),
+        return info.context.submission_by_assignment_id_and_user_id_loader.load({
+            'assignment_id': parent.id,
+            'user_id': canvas_user_id,
+        })
+
+    def resolve_assignment_group(parent, info):
+        return info.context.assignment_group_by_course_id_and_id_loader.load({
+            'course_id': parent.course_id,
+            'id': parent.assignment_group_id,
+        })
+
+    def _average_grade_lambda(parent, info, submissions):
+        if len(submissions) > 0:
+            return np.average([submission.score if submission.score else 0 for submission in submissions])
+        return 0
+
+    def resolve_average_grade(parent, info):
+        return info.context.submissions_by_assignment_id_loader.load(parent.id).then(
+            lambda submissions: AssignmentType._average_grade_lambda(parent, info, submissions)
         )
-        return result if result else None
+
+    def _median_grade_lambda(parent, info, submissions):
+        if len(submissions) > 0:
+            return np.median([submission.score if submission.score else 0 for submission in submissions])
+        return 0
+
+    def resolve_median_grade(parent, info):
+        return info.context.submissions_by_assignment_id_loader.load(parent.id).then(
+            lambda submissions: AssignmentType._median_grade_lambda(parent, info, submissions)
+        )
 
     class Meta:
         model = Assignment
-        only_fields = ('id', 'name', 'due_date', 'local_date', 'points_possible', 'course_id', 'assignment_group_id')
+        only_fields = (
+            'id', 'name', 'due_date', 'local_date', 'points_possible',
+            'course_id', 'assignment_group_id', 'average_grade', 'median_grade'
+        )
+AssignmentGroupType.assignments = graphene.List(AssignmentType)
+AssignmentGroupType.assignments = graphene.List(AssignmentType)
 
 
 class CourseType(DjangoObjectType):
     id = graphene.ID()
     name = graphene.String()
+    assignment_weight_consideration = graphene.Boolean()
 
     assignments = graphene.List(AssignmentType)
     assignment = graphene.Field(AssignmentType, assignment_id=graphene.ID())
+
+    assignment_groups = graphene.List(AssignmentGroupType)
+    assignment_group = graphene.Field(AssignmentGroupType, assignment_group_id=graphene.ID())
+
+    current_user_default_selections = graphene.List(UserDefaultSelectionType)
+    current_user_default_selection = graphene.Field(UserDefaultSelectionType, default_view_type=graphene.String())
 
     def resolve_assignments(parent, info):
         return info.context.assignments_by_course_id_loader.load(parent.id)
 
     def resolve_assignment(parent, info, assignment_id):
-        return Assignment.objects.filter(
-            Q(id=assignment_id),
-            Q(course_id=parent.id),
+        return info.context.assignment_by_course_id_and_id_loader.load({
+            'course_id': parent.id,
+            'id': assignment_id,
+        })
+
+    def resolve_assignment_groups(parent, info):
+        return info.context.assignment_groups_by_course_id_loader.load(parent.id)
+
+    def resolve_assignment_group(parent, info, assignment_group_id):
+        return info.context.assignment_group_by_course_id_and_id_loader.load({
+            'course_id': parent.id,
+            'id': assignment_group_id,
+        })
+
+    def resolve_assignment_weight_consideration(parent, info):
+        return info.context.assignment_weight_consideration_by_course_id_loader.load(parent.id).then(
+            lambda awc: awc.consider_weight if awc else False
         )
+
+    def resolve_current_user_default_selections(parent, info):
+        user_sis_name = info.context.user.get_username()
+
+        return info.context.user_default_selections_by_course_id_and_user_loader.load({
+            'course_id': parent.id,
+            'user_sis_name': user_sis_name,
+        })
+
+    def resolve_current_user_default_selection(parent, info, default_view_type):
+        user_sis_name = info.context.user.get_username()
+
+        return info.context.user_default_selection_by_course_id_and_user_and_view_type_loader.load({
+            'course_id': parent.id,
+            'user_sis_name': user_sis_name,
+            'default_view_type': default_view_type,
+        })
 
     class Meta:
         model = Course
-        only_fields = ('id', 'name')
+        only_fields = ('id', 'name', 'assignment_weight_consideration')
