@@ -4,13 +4,21 @@ import numpy as np
 
 from dashboard.rules import is_admin_or_instructor_in_course_id
 from dashboard.models import Course, User, Assignment, Submission, \
-    AssignmentGroups, UserDefaultSelection
+    AssignmentGroups, UserDefaultSelection, AcademicTerms
 
 import logging
 logger = logging.getLogger(__name__)
 
 
-# Note: only allow instructors to view all and students to view own
+class AcademicTermType(DjangoObjectType):
+    id = graphene.ID()
+    date_start = graphene.types.datetime.DateTime()
+    date_end = graphene.types.datetime.DateTime()
+
+    class Meta:
+        model = AcademicTerms
+        only_fields = ('id', 'name', 'date_start', 'date_end')
+
 class UserDefaultSelectionType(DjangoObjectType):
     course_id = graphene.ID()
     default_view_value = graphene.JSONString()
@@ -123,6 +131,9 @@ class CourseType(DjangoObjectType):
     id = graphene.ID()
     name = graphene.String()
     assignment_weight_consideration = graphene.Boolean()
+    date_start = graphene.types.datetime.DateTime()
+    date_end = graphene.types.datetime.DateTime()
+    term_id = graphene.ID()
 
     assignments = graphene.List(AssignmentType)
     assignment = graphene.Field(AssignmentType, assignment_id=graphene.ID())
@@ -132,6 +143,8 @@ class CourseType(DjangoObjectType):
 
     current_user_default_selections = graphene.List(UserDefaultSelectionType)
     current_user_default_selection = graphene.Field(UserDefaultSelectionType, default_view_type=graphene.String())
+
+    term = graphene.Field(AcademicTermType)
 
     def resolve_assignments(parent, info):
         return info.context.assignments_by_course_id_loader.load(parent.id)
@@ -172,6 +185,9 @@ class CourseType(DjangoObjectType):
             'user_sis_name': user_sis_name,
             'default_view_type': default_view_type,
         })
+
+    def resolve_term(parent, info):
+        return info.context.academic_term_by_id_loader.load(parent.term_id) if parent.term_id else None
 
     class Meta:
         model = Course

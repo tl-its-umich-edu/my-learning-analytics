@@ -5,7 +5,8 @@ from promise.dataloader import DataLoader
 from django.db.models import Q
 
 from dashboard.models import Course, User, Assignment, Submission, \
-    AssignmentGroups, AssignmentWeightConsideration, UserDefaultSelection
+    AssignmentGroups, AssignmentWeightConsideration, UserDefaultSelection, \
+    AcademicTerms
 
 import logging
 logger = logging.getLogger(__name__)
@@ -200,3 +201,12 @@ class UserDefaultSelectionByCourseIdAndUserAndViewTypeLoader(DataLoader):
         return Promise.resolve([
             results.get(self.get_cache_key(key)) for key in keys
         ])
+
+class AcademicTermByIdLoader(DataLoader):
+    def batch_load_fn(self, keys):
+        results = defaultdict(None)
+
+        for result in AcademicTerms.objects.filter(id__in=keys).iterator():
+            results[result.id] = result
+
+        return Promise.resolve([results.get(key, None) for key in keys])

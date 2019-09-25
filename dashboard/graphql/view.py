@@ -4,7 +4,8 @@ from dashboard.graphql.loaders import AssignmentsByCourseIdLoader, \
     AssignmentByCourseIdAndIdLoader, AssignmentsByAssignmentGroupIdLoader, \
     AssignmentByAssignmentGroupIdAndIdLoader, AssignmentGroupsByCourseIdLoader, \
     AssignmentGroupByCourseIdAndIdLoader, AssignmentWeightConsiderationByCourseIdLoader, \
-    UserDefaultSelectionsByCourseIdAndUserLoader, UserDefaultSelectionByCourseIdAndUserAndViewTypeLoader
+    UserDefaultSelectionsByCourseIdAndUserLoader, UserDefaultSelectionByCourseIdAndUserAndViewTypeLoader, \
+    AcademicTermByIdLoader
 
 from django.db.models import Q
 from dashboard.models import User
@@ -23,6 +24,7 @@ class DashboardGraphQLView(GraphQLView):
             'assignment_group_by_course_id_and_id_loader': AssignmentGroupByCourseIdAndIdLoader(),
             'user_default_selections_by_course_id_and_user_loader': UserDefaultSelectionsByCourseIdAndUserLoader(),
             'user_default_selection_by_course_id_and_user_and_view_type_loader': UserDefaultSelectionByCourseIdAndUserAndViewTypeLoader(),
+            'academic_term_by_id_loader': AcademicTermByIdLoader(),
         }
         for method_, instance in loaders.items():
             setattr(request, method_, instance)
