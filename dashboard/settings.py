@@ -437,6 +437,9 @@ CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
 RESOURCE_ACCESS_CONFIG = ENV.get("RESOURCE_ACCESS_CONFIG", {})
 
+# Git info settings
+SHA_ABBREV_LENGTH = 7
+
 # Django CSP Settings, load up from file if set
 if "CSP" in ENV:
     MIDDLEWARE_CLASSES += ['csp.middleware.CSPMiddleware',]

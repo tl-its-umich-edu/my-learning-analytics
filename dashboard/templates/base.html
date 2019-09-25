@@ -79,6 +79,34 @@
     {% endblock %}
     {% csrf_token %}
     <footer>
+        {% if user.is_superuser %}
+        <div id="build-info" class="alert alert-info">
+            <table style="width: 100%; padding: 8px; text-align: left">
+                <tr>
+                    <th>Git Source</th>
+                    <th>Git Branch</th>
+                    <th>Git Commit</th>
+                    {% if build.build_namespace %}
+                    <th>Build Namespace</th>
+                    {% endif %}
+                    {% if build.build_namespace %}
+                    <th>Build Name</th>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td><a href="{{ build.git_repo }}">my-learning-analytics</a></td>
+                    <td>{{ build.git_branch }}</td>
+                    <td><a href="{{ build.git_repo }}/commits/{{ build.git_commit }}">{{ build.git_commit_abbrev }}</a></td>
+                    {% if build.build_namespace %}
+                    <td>{{ build.build_namespace }}</td>
+                    {% endif %}
+                    {% if build.build_namespace %}
+                    <td>{{ build.build_name }}</td>
+                    {% endif %}
+                </tr>
+            </table>
+        </div>
+        {% endif %}
         {% load flatpages %}
         {% get_flatpages '/copyright/' as flatpages %}
         <table style="width: 100%; padding: 8px">
@@ -89,27 +117,6 @@
                 <td style="width: 50%; text-align: right">Data last updated on {{last_updated|date:"m/d/Y P T"}}</td>
             </tr>
         </table>
-        {% if user.is_superuser %}
-        <div id="build-info" class="alert alert-info">
-            <table style="width: 100%; padding: 8px; text-align: left">
-                <tr>
-                    <th>Build Namespace</th>
-                    <th>Build Name</th>
-                    <th>Git Source</th>
-                    <th>Git Branch</th>
-                    <th>Git Commit</th>
-                </tr>
-                <tr>
-                    <!-- Need to add a template tag or some other way to access values-->
-                    <td>{build.build_namespace}</td>
-                    <td>{build.build_name}</td>
-                    <td><a href="{build.git_source}">my-learning-analytics</a></td>
-                    <td>{build.git_branch}</td>
-                    <td><a href="{build.git_source}/commits/{build.git_commit}">{build.git_commit_abbrev}</a></td>
-                </tr>
-            </table>
-        </div>
-        {% endif %}
     </footer>
 </body>
 </html>
