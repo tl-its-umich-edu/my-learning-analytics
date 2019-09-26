@@ -6,6 +6,9 @@ from dashboard.graphql.objects import CourseType
 from dashboard.rules import is_admin_or_enrolled_in_course, is_admin
 from graphql import GraphQLError
 
+import logging
+logger = logging.getLogger(__name__)
+
 class Query(graphene.ObjectType):
     course = graphene.Field(CourseType, course_id=graphene.ID())
     courses = graphene.List(CourseType)
@@ -37,6 +40,3 @@ class Query(graphene.ObjectType):
                 where user.sis_name = '{user.username}'
             """)
             return courses
-
-
-schema = graphene.Schema(query=Query)

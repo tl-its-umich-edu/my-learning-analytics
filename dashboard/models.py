@@ -85,7 +85,7 @@ class UserDefaultSelection(models.Model):
     course_id = models.BigIntegerField(blank=True, null=True, verbose_name="Course Id")
     user_sis_name = models.CharField(max_length=255,blank=True, null=True, verbose_name="User Id")
     default_view_type = models.CharField(max_length=255, blank=True, null=True, verbose_name="Default Type")
-    default_view_value = models.CharField(max_length=255, blank=True, null=True, verbose_name="Default Value")
+    default_view_value = models.TextField(blank=True, null=True, verbose_name="Default Value")
 
     objects = UserDefaultManager()
 
