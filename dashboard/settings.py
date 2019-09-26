@@ -25,8 +25,10 @@ PROJECT_ROOT = os.path.abspath(
 )
 
 if os.getenv("ENV_JSON"):
+    # optionally load settings from an environment variable
     ENV = json.loads(os.getenv("ENV_JSON"))
 else:
+    # else try loading settings from the json config file
     try:
         with open(os.getenv("ENV_FILE", "/secrets/env.json")) as f:
             ENV = json.load(f)

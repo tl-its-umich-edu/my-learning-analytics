@@ -22,6 +22,8 @@ These instructions will get a copy of MyLA up and running on your local machine 
 1. Download the latest SQL file from this link: https://drive.google.com/drive/u/0/folders/1Pj7roNjRPGyumKKal8-h5E6ukUiXTDI9.
 1. Load database with data. `docker exec -i student_dashboard_mysql mysql -u student_dashboard_user --password=student_dashboard_pw student_dashboard < {name of sql file}`
 
+You may also optionally place the json settings directly into the `ENV_JSON` environment variable if your deployment environment doesn't easily support mounting the `env.json` file into container. When using `ENV_JSON` put the entire contents of `env.json` into it as single line string.
+
 #### Logging in as admininstrator
 1. Navigate to http://localhost:5001/ and log in as:
     ```
