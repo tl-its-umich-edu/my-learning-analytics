@@ -94,7 +94,7 @@ function AssignmentPlanningV2 (props) {
 
   const { loading, error, data } = useQuery(gql`
     {
-      course(courseId: 17700000000362855) {
+      course(courseId: 17700000000${courseId}) {
         assignments {
           name
           dueDate
@@ -106,18 +106,16 @@ function AssignmentPlanningV2 (props) {
     }
   `)
 
-  console.log(data)
-
   useEffect(() => {
     if (!loading && !error) {
-      setAssignments(data.course.assignments
-        .map(assignment => {
-          const dueDate = assignment.dueDate
-          const courseStartDate = data.course.dateStart
-
-          assignment.week = calculateWeekOffset(courseStartDate, dueDate)
-          return assignment
-        }).sort((a, b) => a.week - b.week)
+      setAssignments(
+        data.course.assignments
+          .map(assignment => {
+            const dueDate = assignment.dueDate
+            const courseStartDate = data.course.dateStart
+            assignment.week = calculateWeekOffset(courseStartDate, dueDate)
+            return assignment
+          }).sort((a, b) => a.week - b.week)
       )
     }
   }, [loading])
