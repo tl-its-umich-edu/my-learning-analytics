@@ -23,7 +23,11 @@ describe('calculateWeekOffset', () => {
     const jan16 = '2019-01-16T10:36:17+00:00'
     expect(calculateWeekOffset(jan1, jan16)).toEqual(3)
 
-    // const dec31 = '2019-12-31T10:36:17+00:00'
-    // expect(calculateWeekOffset(jan1, dec31)).toEqual(52)
+    const dec31 = '2019-12-31T10:36:17+00:00'
+    expect(calculateWeekOffset(jan1, dec31)).toEqual(53)
+
+    expect(calculateWeekOffset(jan7, jan8)).toEqual(1)
+    expect(calculateWeekOffset(jan7, jan14)).toEqual(1)
+    expect(calculateWeekOffset(jan7, jan15)).toEqual(2)
   })
 })
