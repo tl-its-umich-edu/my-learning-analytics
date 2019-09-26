@@ -22,8 +22,13 @@ const getCurrentWeek = assignmentData => {
     : null
 }
 
+const calculateAssignmentWeek = (startDateOfCourse, assignments) => {
+
+}
+
 export {
   handleError,
   defaultFetchOptions,
-  getCurrentWeek
+  getCurrentWeek,
+  calculateAssignmentWeek
 }

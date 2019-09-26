@@ -93,16 +93,11 @@ function AssignmentPlanningV2 (props) {
 
   const { loading, error, data } = useQuery(gql`
     {
-      course(courseId:17700000000235420) {
-        name,
+      course(courseId: 17700000000362855) {
         assignments {
-          name,
-          dueDate,
-          pointsPossible,
-          submissions {
-
-            score
-          }
+          name
+          dueDate
+          pointsPossible
         }
       }
     }
@@ -115,7 +110,7 @@ function AssignmentPlanningV2 (props) {
 
   }, [assignments, goalGrade])
 
-  console.log(assignments)
+  if (error) return (<Error>Something went wrong, please try again later.</Error>)
 
   return (
     // <DndProvider backend={HTML5Backend}>
@@ -123,45 +118,51 @@ function AssignmentPlanningV2 (props) {
       <Grid container spacing={16}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <>
-              <Typography variant='h5' gutterBottom>Assignment Planning</Typography>
-              <ProgressBarV2
-                score={grades.currentGrade}
-                lines={[
-                  {
-                    label: 'Current',
-                    value: grades.currentGrade,
-                    color: 'steelblue',
-                    labelDown: true
-                  },
-                  {
-                    label: 'Goal',
-                    value: goalGrade,
-                    color: 'green',
-                    labelUp: true
-                  },
-                  {
-                    label: 'Max Possible',
-                    value: grades.maxPossibleGrade,
-                    color: 'grey',
-                    labelDown: true
-                  }
-                ]}
-                outOf={100}
-                percentWidth={100}
-                height={50}
-              />
-              <AssignmentGradeBoxes
-                currentGrade={grades.currentGrade}
-                goalGrade={goalGrade}
-                maxPossibleGrade={grades.maxPossibleGrade}
-                setGoalGrade={grade => setGoalGrade(grade)}
-              />
-              <AssignmentTable
-                assignments={assignments}
-                setGoalGrade={setHandleAssignmentGoalGrade}
-              />
-            </>
+            <Typography variant='h5' gutterBottom>Assignment Planning</Typography>
+            {
+              loading
+                ? <Spinner />
+                : (
+                  <>
+                    <ProgressBarV2
+                      score={grades.currentGrade}
+                      lines={[
+                        {
+                          label: 'Current',
+                          value: grades.currentGrade,
+                          color: 'steelblue',
+                          labelDown: true
+                        },
+                        {
+                          label: 'Goal',
+                          value: goalGrade,
+                          color: 'green',
+                          labelUp: true
+                        },
+                        {
+                          label: 'Max Possible',
+                          value: grades.maxPossibleGrade,
+                          color: 'grey',
+                          labelDown: true
+                        }
+                      ]}
+                      outOf={100}
+                      percentWidth={100}
+                      height={50}
+                    />
+                    <AssignmentGradeBoxes
+                      currentGrade={grades.currentGrade}
+                      goalGrade={goalGrade}
+                      maxPossibleGrade={grades.maxPossibleGrade}
+                      setGoalGrade={grade => setGoalGrade(grade)}
+                    />
+                    <AssignmentTable
+                      assignments={assignments}
+                      setGoalGrade={setHandleAssignmentGoalGrade}
+                    />
+                  </>
+                )
+            }
           </Paper>
         </Grid>
       </Grid>

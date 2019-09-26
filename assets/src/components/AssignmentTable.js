@@ -41,7 +41,7 @@ function AssignmentTable (props) {
             [
               'Week',
               'Due',
-              'Table',
+              'Assignment Name',
               'Percent of Final Grade',
               'Score / Out of'
             ].map((heading, key) => (

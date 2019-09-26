@@ -1,6 +1,6 @@
 /* global describe, it, expect */
 
-import { calculateAssignmentGoalsFromCourseGoal } from '../../util/array'
+import { calculateAssignmentGoalsFromCourseGoal } from '../../util/assignment'
 
 const assignments = [
   {
@@ -58,6 +58,6 @@ describe('calculateAssignmentGradeFromCourseGrade', () => {
     const result = [
 
     ]
-    expect(calculateAssignmentGoalsFromCourseGoal(assignments, 70)).
+    expect(calculateAssignmentGoalsFromCourseGoal(assignments, 70))
   })
 })
