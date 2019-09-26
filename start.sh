@@ -27,12 +27,21 @@ else
     GUNICORN_RELOAD=""
 fi
 
-MYSQL_HOST=$(jq -r -c ".MYSQL_HOST | values" ${ENV_FILE})
-MYSQL_PORT=$(jq -r -c ".MYSQL_PORT | values" ${ENV_FILE})
-IS_CRON_POD=$(jq -r -c ".IS_CRON_POD | values" ${ENV_FILE})
-PTVSD_ENABLE=$(jq -r -c ".PTVSD_ENABLE | values" ${ENV_FILE})
-CRONTAB_SCHEDULE=$(jq -r -c ".CRONTAB_SCHEDULE | values" ${ENV_FILE})
-RUN_AT_TIMES=$(jq -r -c ".RUN_AT_TIMES | values" ${ENV_FILE})
+if [ -z "${ENV_JSON}" ]; then
+    MYSQL_HOST=$(jq -r -c ".MYSQL_HOST | values" ${ENV_FILE})
+    MYSQL_PORT=$(jq -r -c ".MYSQL_PORT | values" ${ENV_FILE})
+    IS_CRON_POD=$(jq -r -c ".IS_CRON_POD | values" ${ENV_FILE})
+    PTVSD_ENABLE=$(jq -r -c ".PTVSD_ENABLE | values" ${ENV_FILE})
+    CRONTAB_SCHEDULE=$(jq -r -c ".CRONTAB_SCHEDULE | values" ${ENV_FILE})
+    RUN_AT_TIMES=$(jq -r -c ".RUN_AT_TIMES | values" ${ENV_FILE})
+else
+    MYSQL_HOST=$(echo "${ENV_JSON}" | jq -r -c ".MYSQL_HOST | values")
+    MYSQL_PORT=$(echo "${ENV_JSON}" | jq -r -c ".MYSQL_PORT | values")
+    IS_CRON_POD=$(echo "${ENV_JSON}" | jq -r -c ".IS_CRON_POD | values")
+    PTVSD_ENABLE=$(echo "${ENV_JSON}" | jq -r -c ".PTVSD_ENABLE | values")
+    CRONTAB_SCHEDULE=$(echo "${ENV_JSON}" | jq -r -c ".CRONTAB_SCHEDULE | values")
+    RUN_AT_TIMES=$(echo "${ENV_JSON}" | jq -r -c ".RUN_AT_TIMES | values")
+fi
 
 echo "Waiting for DB"
 while ! nc -z ${MYSQL_HOST} ${MYSQL_PORT}; do   
