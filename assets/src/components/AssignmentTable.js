@@ -8,6 +8,7 @@ import TableCell from '@material-ui/core/TableCell'
 import TextField from '@material-ui/core/TextField'
 import ProgressBarV2 from './ProgressBarV2'
 
+
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -26,7 +27,7 @@ const styles = theme => ({
 })
 
 function AssignmentTable (props) {
-  const { classes, assignments, setGoalGrade } = props
+  const { classes, assignments, setGoalGrade, courseStartDate } = props
 
   const maxPercentOfFinalGrade = Math.max(
     ...assignments
@@ -66,9 +67,9 @@ function AssignmentTable (props) {
                 {assignment.dueDate}
               </TableCell>
               <TableCell>
-                {assignment.title}
+                {assignment.name}
               </TableCell>
-              <TableCell>
+              {/* <TableCell>
                 <ProgressBarV2
                   score={assignment.score}
                   outOf={assignment.outOf}
@@ -82,8 +83,8 @@ function AssignmentTable (props) {
                   }
                 />
                 <>{`${assignment.percentOfFinalGrade}%`}</>
-              </TableCell>
-              <TableCell>
+              </TableCell> */}
+              {/* <TableCell>
                 {
                   assignment.graded
                     ? `${assignment.score}`
@@ -106,7 +107,7 @@ function AssignmentTable (props) {
                     {` / ${assignment.outOf}`}
                   </div>
                 }
-              </TableCell>
+              </TableCell> */}
             </TableRow>
           ))
         }

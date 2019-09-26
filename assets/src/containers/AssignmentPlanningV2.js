@@ -10,6 +10,7 @@ import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
 import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks'
+import { calculateWeekOffset } from '../util/date'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
 
@@ -24,64 +25,64 @@ const styles = theme => ({
   }
 })
 
-const grades = {
-  currentGrade: 85,
-  goalGrade: null, // can be null
-  maxPossibleGrade: 95,
-  assignments: [
-    {
-      week: 1,
-      dueDate: '10/15',
-      title: 'Attendance',
-      graded: true,
-      score: 1,
-      outOf: 1,
-      percentOfFinalGrade: 5
-    },
-    {
-      week: 1,
-      dueDate: '10/15',
-      title: 'Group Project',
-      graded: true,
-      score: 90,
-      outOf: 100,
-      percentOfFinalGrade: 15
-    },
-    {
-      week: 2,
-      dueDate: '10/22',
-      title: 'Attendance',
-      graded: false,
-      score: null,
-      outOf: 1,
-      percentOfFinalGrade: 1
-    },
-    {
-      week: 2,
-      dueDate: '10/24',
-      title: 'Discussion',
-      graded: false,
-      score: null,
-      outOf: 5,
-      percentOfFinalGrade: 20
-    },
-    {
-      week: 3,
-      dueDate: '11/24',
-      title: 'Final Exam',
-      graded: false,
-      score: null,
-      outOf: 100,
-      percentOfFinalGrade: 50
-    }
-  ]
-}
+// const grades = {
+//   currentGrade: 85,
+//   goalGrade: null, // can be null
+//   maxPossibleGrade: 95,
+//   assignments: [
+//     {
+//       week: 1,
+//       dueDate: '10/15',
+//       title: 'Attendance',
+//       graded: true,
+//       score: 1,
+//       outOf: 1,
+//       percentOfFinalGrade: 5
+//     },
+//     {
+//       week: 1,
+//       dueDate: '10/15',
+//       title: 'Group Project',
+//       graded: true,
+//       score: 90,
+//       outOf: 100,
+//       percentOfFinalGrade: 15
+//     },
+//     {
+//       week: 2,
+//       dueDate: '10/22',
+//       title: 'Attendance',
+//       graded: false,
+//       score: null,
+//       outOf: 1,
+//       percentOfFinalGrade: 1
+//     },
+//     {
+//       week: 2,
+//       dueDate: '10/24',
+//       title: 'Discussion',
+//       graded: false,
+//       score: null,
+//       outOf: 5,
+//       percentOfFinalGrade: 20
+//     },
+//     {
+//       week: 3,
+//       dueDate: '11/24',
+//       title: 'Final Exam',
+//       graded: false,
+//       score: null,
+//       outOf: 100,
+//       percentOfFinalGrade: 50
+//     }
+//   ]
+// }
 
 function AssignmentPlanningV2 (props) {
   const { classes, disabled, courseId } = props
 
-  const [assignments, setAssignments] = useState(grades.assignments)
-  const [goalGrade, setGoalGrade] = useState(grades.goalGrade)
+  const [assignments, setAssignments] = useState([])
+  const [goalGrade, setGoalGrade] = useState(null)
 
   const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setAssignments([
@@ -98,12 +99,28 @@ function AssignmentPlanningV2 (props) {
           name
           dueDate
           pointsPossible
+          averageGrade
         }
+        dateStart
       }
     }
   `)
 
   console.log(data)
+
+  useEffect(() => {
+    if (!loading && !error) {
+      setAssignments(data.course.assignments
+        .map(assignment => {
+          const dueDate = assignment.dueDate
+          const courseStartDate = data.course.dateStart
+
+          assignment.week = calculateWeekOffset(courseStartDate, dueDate)
+          return assignment
+        }).sort((a, b) => a.week - b.week)
+      )
+    }
+  }, [loading])
 
   // this effect is used to keep the goal of the course and assignments "in sync"
   useEffect(() => {
@@ -125,11 +142,11 @@ function AssignmentPlanningV2 (props) {
                 : (
                   <>
                     <ProgressBarV2
-                      score={grades.currentGrade}
+                      score={86}
                       lines={[
                         {
                           label: 'Current',
-                          value: grades.currentGrade,
+                          value: 86,
                           color: 'steelblue',
                           labelDown: true
                         },
@@ -141,7 +158,7 @@ function AssignmentPlanningV2 (props) {
                         },
                         {
                           label: 'Max Possible',
-                          value: grades.maxPossibleGrade,
+                          value: 90,
                           color: 'grey',
                           labelDown: true
                         }
@@ -151,9 +168,9 @@ function AssignmentPlanningV2 (props) {
                       height={50}
                     />
                     <AssignmentGradeBoxes
-                      currentGrade={grades.currentGrade}
+                      currentGrade={86}
                       goalGrade={goalGrade}
-                      maxPossibleGrade={grades.maxPossibleGrade}
+                      maxPossibleGrade={90}
                       setGoalGrade={grade => setGoalGrade(grade)}
                     />
                     <AssignmentTable
