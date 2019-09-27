@@ -2,7 +2,8 @@
 
 import {
   calculateAssignmentGoalsFromCourseGoal,
-  calculateWeightOfAssignment
+  calculateWeightOfAssignment,
+  calculateCourseGrade
 } from '../../util/assignment'
 import { roundToOneDecimal } from '../../util/math'
 
@@ -102,7 +103,82 @@ describe('calculateWeightedAssignmentGrade', () => {
       }
     ]
 
-    expect(calculateWeightOfAssignment(assignment1, assignmentGroups)).toEqual(roundToOneDecimal(5 * (14 / 50)))
-    expect(calculateWeightOfAssignment(assignment2, assignmentGroups)).toEqual(roundToOneDecimal(17 * (29 / 100)))
+    expect(
+      calculateWeightOfAssignment(assignment1.pointsPossible, assignment1.assignmentGroupId, assignmentGroups)
+    ).toEqual(roundToOneDecimal(5 * (14 / 50)))
+    expect(
+      calculateWeightOfAssignment(assignment2.pointsPossible, assignment2.assignmentGroupId, assignmentGroups)
+    ).toEqual(roundToOneDecimal(17 * (29 / 100)))
+  })
+})
+
+describe('calculateCourseGrade', () => {
+  it('takes assignments and assignmentGroups and returns the course grade of the student', () => {
+    const assignments1 = [
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 40
+        }
+      }
+    ]
+
+    const assignmentGroups = [
+      {
+        weight: 14,
+        id: '17700000000320044',
+        groupPoints: 98
+      }
+    ]
+
+    expect(calculateCourseGrade(assignments1, assignmentGroups)).toEqual(100)
+
+    const assignments2 = [
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 20
+        }
+      }
+    ]
+    expect(calculateCourseGrade(assignments2, assignmentGroups)).toEqual(50)
+
+    const assignments3 = [
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 20
+        }
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 20
+        }
+      }
+    ]
+    expect(calculateCourseGrade(assignments3, assignmentGroups)).toEqual(50)
+
+    const assignments4 = [
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 20
+        }
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 40
+        }
+      }
+    ]
+    expect(calculateCourseGrade(assignments4, assignmentGroups)).toEqual(75)
   })
 })
