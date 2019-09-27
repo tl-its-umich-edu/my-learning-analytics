@@ -121,6 +121,7 @@ function AssignmentPlanningV2 (props) {
             const dueDate = assignment.dueDate
             const courseStartDate = data.course.dateStart
             assignment.week = calculateWeekOffset(courseStartDate, dueDate)
+            
             return assignment
           }).sort((a, b) => a.week - b.week)
       )

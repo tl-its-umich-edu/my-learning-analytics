@@ -4,7 +4,7 @@ const calculateAssignmentGoalsFromCourseGoal = (assignments, courseGoalGrade) =>
 
 }
 
-const calculateWeightedAssignmentGrade = (assignment, assignmentGroups) => {
+const calculateWeightOfAssignment = (assignment, assignmentGroups) => {
   const { assignmentGroupId, pointsPossible } = assignment
   const assignmentGroup = assignmentGroups.find(aGroup => aGroup.id === assignmentGroupId)
   const assignmentGrade = assignmentGroup.weight * (pointsPossible / assignmentGroup.groupPoints)
@@ -13,5 +13,5 @@ const calculateWeightedAssignmentGrade = (assignment, assignmentGroups) => {
 
 export {
   calculateAssignmentGoalsFromCourseGoal,
-  calculateWeightedAssignmentGrade
+  calculateWeightOfAssignment
 }

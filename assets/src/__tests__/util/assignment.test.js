@@ -2,8 +2,9 @@
 
 import {
   calculateAssignmentGoalsFromCourseGoal,
-  calculateWeightedAssignmentGrade
+  calculateWeightOfAssignment
 } from '../../util/assignment'
+import { roundToOneDecimal } from '../../util/math'
 
 const assignments = [
   {
@@ -67,12 +68,20 @@ describe('calculateAssignmentGradeFromCourseGrade', () => {
 
 describe('calculateWeightedAssignmentGrade', () => {
   it('takes an assignment and an array of assignment Groups and calculates the weighted assignment grade', () => {
-    const assignment = {
+    const assignment1 = {
       name: 'Random Assignment #349',
       dueDate: '2019-06-18T15:58:38+00:00',
       pointsPossible: 14,
       averageGrade: 28.29705882352941,
       assignmentGroupId: '17700000000448862'
+    }
+
+    const assignment2 = {
+      name: 'Information Assignment #607',
+      dueDate: '2019-05-16T18:42:35+00:00',
+      pointsPossible: 29,
+      averageGrade: 2.611764705882352,
+      assignmentGroupId: '17700000000400251'
     }
 
     const assignmentGroups = [
@@ -93,6 +102,7 @@ describe('calculateWeightedAssignmentGrade', () => {
       }
     ]
 
-    expect(calculateWeightedAssignmentGrade(assignment, assignmentGroups)).toEqual(1.4)
+    expect(calculateWeightOfAssignment(assignment1, assignmentGroups)).toEqual(roundToOneDecimal(5 * (14 / 50)))
+    expect(calculateWeightOfAssignment(assignment2, assignmentGroups)).toEqual(roundToOneDecimal(17 * (29 / 100)))
   })
 })
