@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography'
 import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks'
 import { calculateWeekOffset } from '../util/date'
-import { calculateWeightOfAssignment } from '../util/assignment'
+import { calculateWeightOfAssignment, calculateMaxPossibleCourseGrade } from '../util/assignment'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
 
@@ -79,12 +79,13 @@ const styles = theme => ({
 //   ]
 // }
 
-function AssignmentPlanningV2 (props) {
+function AssignmentPlanningV2(props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
 
   const [assignments, setAssignments] = useState([])
   const [goalGrade, setGoalGrade] = useState(null)
+  const [maxPossibleCourseGrade, setMaxPossibleCourseGrade] = useState(0)
 
   const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setAssignments([
@@ -140,6 +141,9 @@ function AssignmentPlanningV2 (props) {
             return assignment
           }).sort((a, b) => a.week - b.week)
       )
+      setMaxPossibleCourseGrade(
+        calculateMaxPossibleCourseGrade(data.course.assignments, data.course.assignmentGroups)
+      )
     }
   }, [loading])
 
@@ -179,7 +183,7 @@ function AssignmentPlanningV2 (props) {
                         },
                         {
                           label: 'Max Possible',
-                          value: 90,
+                          value: maxPossibleCourseGrade,
                           color: 'grey',
                           labelDown: true
                         }
@@ -191,7 +195,7 @@ function AssignmentPlanningV2 (props) {
                     <AssignmentGradeBoxes
                       currentGrade={86}
                       goalGrade={goalGrade}
-                      maxPossibleGrade={90}
+                      maxPossibleGrade={maxPossibleCourseGrade}
                       setGoalGrade={grade => setGoalGrade(grade)}
                     />
                     <AssignmentTable

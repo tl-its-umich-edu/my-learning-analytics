@@ -3,7 +3,7 @@
 import {
   calculateAssignmentGoalsFromCourseGoal,
   calculateWeightOfAssignment,
-  calculateCourseGrade
+  calculateMaxPossibleCourseGrade
 } from '../../util/assignment'
 import { roundToOneDecimal } from '../../util/math'
 
@@ -112,7 +112,7 @@ describe('calculateWeightedAssignmentGrade', () => {
   })
 })
 
-describe('calculateCourseGrade', () => {
+describe('calculateMaxPossibleCourseGrade', () => {
   it('takes assignments and assignmentGroups and returns the course grade of the student', () => {
     const assignments1 = [
       {
@@ -132,7 +132,7 @@ describe('calculateCourseGrade', () => {
       }
     ]
 
-    expect(calculateCourseGrade(assignments1, assignmentGroups)).toEqual(100)
+    expect(calculateMaxPossibleCourseGrade(assignments1, assignmentGroups)).toEqual(100)
 
     const assignments2 = [
       {
@@ -143,7 +143,7 @@ describe('calculateCourseGrade', () => {
         }
       }
     ]
-    expect(calculateCourseGrade(assignments2, assignmentGroups)).toEqual(50)
+    expect(calculateMaxPossibleCourseGrade(assignments2, assignmentGroups)).toEqual(50)
 
     const assignments3 = [
       {
@@ -161,7 +161,7 @@ describe('calculateCourseGrade', () => {
         }
       }
     ]
-    expect(calculateCourseGrade(assignments3, assignmentGroups)).toEqual(50)
+    expect(calculateMaxPossibleCourseGrade(assignments3, assignmentGroups)).toEqual(50)
 
     const assignments4 = [
       {
@@ -179,6 +179,6 @@ describe('calculateCourseGrade', () => {
         }
       }
     ]
-    expect(calculateCourseGrade(assignments4, assignmentGroups)).toEqual(75)
+    expect(calculateMaxPossibleCourseGrade(assignments4, assignmentGroups)).toEqual(75)
   })
 })

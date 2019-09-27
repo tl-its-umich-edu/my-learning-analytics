@@ -10,7 +10,7 @@ const calculateWeightOfAssignment = (pointsPossible, assignmentGroupId, assignme
   return roundToOneDecimal(assignmentGrade)
 }
 
-const calculateCourseGrade = (assignments, assignmentGroups) => {
+const calculateMaxPossibleCourseGrade = (assignments, assignmentGroups) => {
   const [totalUserPoints, totalPossiblePoints] = assignments
     .filter(assignment => assignment.currentUserSubmission)
     .reduce((acc, assignment) => {
@@ -21,8 +21,6 @@ const calculateCourseGrade = (assignments, assignmentGroups) => {
 
       acc[0] += pointsTowardsFinalGrade
       acc[1] += totalPointsPossible
-      console.log(pointsTowardsFinalGrade, totalPointsPossible)
-      console.log(acc)
       return acc
     }, [0, 0])
   return roundToOneDecimal(totalUserPoints / totalPossiblePoints * 100)
@@ -31,5 +29,5 @@ const calculateCourseGrade = (assignments, assignmentGroups) => {
 export {
   calculateAssignmentGoalsFromCourseGoal,
   calculateWeightOfAssignment,
-  calculateCourseGrade
+  calculateMaxPossibleCourseGrade
 }
