@@ -1,6 +1,9 @@
 /* global describe, it, expect */
 
-import { calculateAssignmentGoalsFromCourseGoal } from '../../util/assignment'
+import {
+  calculateAssignmentGoalsFromCourseGoal,
+  calculateWeightedAssignmentGrade
+} from '../../util/assignment'
 
 const assignments = [
   {
@@ -59,5 +62,37 @@ describe('calculateAssignmentGradeFromCourseGrade', () => {
 
     ]
     expect(calculateAssignmentGoalsFromCourseGoal(assignments, 70))
+  })
+})
+
+describe('calculateWeightedAssignmentGrade', () => {
+  it('takes an assignment and an array of assignment Groups and calculates the weighted assignment grade', () => {
+    const assignment = {
+      name: 'Random Assignment #349',
+      dueDate: '2019-06-18T15:58:38+00:00',
+      pointsPossible: 14,
+      averageGrade: 28.29705882352941,
+      assignmentGroupId: '17700000000448862'
+    }
+
+    const assignmentGroups = [
+      {
+        weight: 17,
+        id: '17700000000400251',
+        groupPoints: 100
+      },
+      {
+        weight: 5,
+        id: '17700000000448862',
+        groupPoints: 50
+      },
+      {
+        weight: 15,
+        id: '17700000000900838',
+        groupPoints: 30
+      }
+    ]
+
+    expect(calculateWeightedAssignmentGrade(assignment, assignmentGroups)).toEqual(1.4)
   })
 })

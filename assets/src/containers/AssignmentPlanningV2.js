@@ -80,6 +80,7 @@ const styles = theme => ({
 
 function AssignmentPlanningV2 (props) {
   const { classes, disabled, courseId } = props
+  if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
 
   const [assignments, setAssignments] = useState([])
   const [goalGrade, setGoalGrade] = useState(null)
@@ -100,8 +101,14 @@ function AssignmentPlanningV2 (props) {
           dueDate
           pointsPossible
           averageGrade
+          assignmentGroupId
         }
         dateStart
+        assignmentWeightConsideration
+        assignmentGroups{
+          weight,
+          id
+        }
       }
     }
   `)
