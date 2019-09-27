@@ -15,7 +15,11 @@ const calculateMaxPossibleCourseGrade = (assignments, assignmentGroups) => {
     .filter(assignment => assignment.currentUserSubmission)
     .reduce((acc, assignment) => {
       const assignmentGrade = assignment.currentUserSubmission.score / assignment.pointsPossible
-      const weightOfAssignment = calculateWeightOfAssignment(assignment.pointsPossible, assignment.assignmentGroupId, assignmentGroups)
+      const weightOfAssignment = calculateWeightOfAssignment(
+        assignment.pointsPossible,
+        assignment.assignmentGroupId,
+        assignmentGroups
+      )
       const pointsTowardsFinalGrade = assignmentGrade * weightOfAssignment
 
       acc[0] += pointsTowardsFinalGrade
