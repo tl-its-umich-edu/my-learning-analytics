@@ -1,4 +1,7 @@
 const calculateWeekOffset = (startDateTime, targetDateTime) => {
+  if (!targetDateTime) {
+    return null
+  }
   const secondsInADay = 1000 * 60 * 60 * 24
 
   const startDate = new Date(startDateTime)
