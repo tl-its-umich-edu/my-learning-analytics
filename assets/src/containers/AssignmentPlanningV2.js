@@ -11,6 +11,7 @@ import Typography from '@material-ui/core/Typography'
 import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks'
 import { calculateWeekOffset } from '../util/date'
+import { calculateWeightOfAssignment } from '../util/assignment'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
 
@@ -102,12 +103,16 @@ function AssignmentPlanningV2 (props) {
           pointsPossible
           averageGrade
           assignmentGroupId
+          currentUserSubmission {
+            score
+          }
         }
         dateStart
         assignmentWeightConsideration
         assignmentGroups{
-          weight,
+          weight
           id
+          groupPoints
         }
       }
     }
@@ -118,10 +123,20 @@ function AssignmentPlanningV2 (props) {
       setAssignments(
         data.course.assignments
           .map(assignment => {
-            const dueDate = assignment.dueDate
+            const {
+              dueDate,
+              pointsPossible,
+              assignmentGroupId,
+              currentUserSubmission: { score }
+            } = assignment
             const courseStartDate = data.course.dateStart
+            const assignmentGroups = data.course.assignmentGroups
+
             assignment.week = calculateWeekOffset(courseStartDate, dueDate)
-            
+            assignment.percentOfFinalGrade = calculateWeightOfAssignment(pointsPossible, assignmentGroupId, assignmentGroups)
+            assignment.score = score
+            assignment.outOf = pointsPossible
+
             return assignment
           }).sort((a, b) => a.week - b.week)
       )
