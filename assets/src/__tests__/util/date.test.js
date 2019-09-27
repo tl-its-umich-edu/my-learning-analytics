@@ -5,6 +5,7 @@ import { calculateWeekOffset } from '../../util/date'
 describe('calculateWeekOffset', () => {
   it('takes as input a date time string and returns the week of the year', () => {
     const jan1 = '2019-01-01T10:36:17+00:00'
+    const jan13 = '2019-01-13T10:36:17+00:00'
     const jan6 = '2019-01-06T10:36:17+00:00'
     expect(calculateWeekOffset(jan1, jan6)).toEqual(1)
 
@@ -27,7 +28,8 @@ describe('calculateWeekOffset', () => {
     expect(calculateWeekOffset(jan1, dec31)).toEqual(53)
 
     expect(calculateWeekOffset(jan7, jan8)).toEqual(1)
-    expect(calculateWeekOffset(jan7, jan14)).toEqual(1)
+    expect(calculateWeekOffset(jan7, jan13)).toEqual(1)
+    expect(calculateWeekOffset(jan7, jan14)).toEqual(2)
     expect(calculateWeekOffset(jan7, jan15)).toEqual(2)
   })
 })
