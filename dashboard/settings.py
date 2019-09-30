@@ -391,11 +391,15 @@ if ENV.get('STUDENT_DASHBOARD_LTI', False):
         "next_url": "home"
     }
     LTI_PERSON_SOURCED_ID_FIELD = ENV.get('LTI_PERSON_SOURCED_ID_FIELD',
-        "lis_person_sourcedid")
+        "custom_canvas_user_login_id")
     LTI_EMAIL_FIELD = ENV.get('LTI_EMAIL_FIELD',
         "lis_person_contact_email_primary")
     LTI_CANVAS_COURSE_ID_FIELD = ENV.get('LTI_CANVAS_COURSE_ID_FIELD',
         "custom_canvas_course_id")
+    LTI_FIRST_NAME = ENV.get('LTI_FIRST_NAME',
+        "lis_person_name_given")
+    LTI_LAST_NAME = ENV.get('LTI_LAST_NAME',
+        "lis_person_name_family")
     
 # controls whether Unizin specific features/data is available from the Canvas Data source
 DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)

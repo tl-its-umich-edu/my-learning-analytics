@@ -21,13 +21,15 @@ def valid_lti_request(user_payload, request):
     username = user_payload.get(settings.LTI_PERSON_SOURCED_ID_FIELD, None)
     email = user_payload.get(settings.LTI_EMAIL_FIELD,  None)
     canvas_course_id = user_payload.get(settings.LTI_CANVAS_COURSE_ID_FIELD, None)
+    first_name = user_payload.get(settings.LTI_FIRST_NAME, None)
+    last_name = user_payload.get(settings.LTI_LAST_NAME, None)
 
     if username:
         try:
             user_obj = User.objects.get(username=username)
         except User.DoesNotExist:
             password = ''.join(random.sample(string.ascii_letters, RANDOM_PASSWORD_DEFAULT_LENGTH))
-            user_obj = User.objects.create_user(username=username, email=email, password=password)
+            user_obj = User.objects.create_user(username=username, email=email, password=password, first_name=first_name, last_name=last_name)
         user_obj.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, user_obj)
     else:
