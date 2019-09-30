@@ -47,8 +47,6 @@ function AssignmentPlanningV2 (props) {
     ])
   }
 
-  console.log(assignments)
-
   const { loading, error, data } = useQuery(gql`
     {
       course(courseId: 17700000000${courseId}) {
