@@ -40,7 +40,7 @@ function AssignmentGradeBoxes (props) {
           id='standard-number'
           value={goalGrade || ''}
           label={goalGrade ? '' : 'Set Goal'}
-          onChange={event => setGoalGrade(event.target.value)}
+          onChange={event => setGoalGrade(Number(event.target.value))}
           type='number'
           className={classes.numberField}
           InputLabelProps={{
