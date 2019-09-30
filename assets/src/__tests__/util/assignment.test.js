@@ -8,63 +8,78 @@ import {
 } from '../../util/assignment'
 import { roundToOneDecimal } from '../../util/math'
 
-const assignments = [
-  {
-    week: 1,
-    dueDate: '10/15',
-    title: 'Attendance',
-    graded: true,
-    score: 1,
-    outOf: 1,
-    percentOfFinalGrade: 5
-  },
-  {
-    week: 1,
-    dueDate: '10/15',
-    title: 'Group Project',
-    graded: true,
-    score: 90,
-    outOf: 100,
-    percentOfFinalGrade: 15
-  },
-  {
-    week: 2,
-    dueDate: '10/22',
-    title: 'Attendance',
-    graded: false,
-    score: null,
-    outOf: 1,
-    percentOfFinalGrade: 10
-  },
-  {
-    week: 2,
-    dueDate: '10/24',
-    title: 'Discussion',
-    graded: false,
-    score: null,
-    outOf: 5,
-    percentOfFinalGrade: 20
-  },
-  {
-    week: 3,
-    dueDate: '11/24',
-    title: 'Final Exam',
-    graded: false,
-    score: null,
-    outOf: 100,
-    percentOfFinalGrade: 50
-  }
-]
-
 describe('calculateAssignmentGradeFromCourseGrade', () => {
   it(`takes an array of assignments and a course goal as input,
     and returns a new array of assignments with the goalGrade for each assignment set,
     such that the course grade is achieved.
   `, () => {
-    const result = [
-
+    const assignments = [
+      {
+        pointsPossible: 100,
+        assignmentGroupId: '17700000000320046',
+        currentUserSubmission: {
+          score: 80
+        },
+        graded: true
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 0
+        },
+        graded: false
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 0
+        },
+        graded: false
+      }
     ]
-    expect(calculateAssignmentGoalsFromCourseGoal(assignments, 70))
+    const assignmentGroups = [
+      {
+        weight: 50,
+        id: '17700000000320046',
+        groupPoints: 100
+      },
+      {
+        weight: 50,
+        id: '17700000000320044',
+        groupPoints: 80
+      }
+    ]
+    const result = [
+      {
+        pointsPossible: 100,
+        assignmentGroupId: '17700000000320046',
+        currentUserSubmission: {
+          score: 80
+        },
+        graded: true
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 0
+        },
+        graded: false,
+        goalGrade: 40
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 0
+        },
+        graded: false,
+        goalGrade: 40
+      }
+    ]
+    expect(calculateAssignmentGoalsFromCourseGoal(90, 80, assignments, assignmentGroups)).toEqual(result)
   })
 })
 

@@ -1,7 +1,21 @@
 import { roundToOneDecimal } from './math'
 
-const calculateAssignmentGoalsFromCourseGoal = (assignments, courseGoalGrade) => {
+const calculateAssignmentGoalsFromCourseGoal = (goalGrade, currentGrade, assignments, assignmentGroups) => {
+  const gradedAssignments = assignments.filter(a => a.graded)
 
+  const weightOfGradedAssignments = gradedAssignments
+    .map(a => calculateWeight(a.pointsPossible, a.assignmentGroupId, assignmentGroups))
+    .reduce((acc, cur) => (acc += cur), 0) / 100
+
+  const ungradedAssignmentGrade = (goalGrade - currentGrade * weightOfGradedAssignments) /
+    (1 - weightOfGradedAssignments)
+
+  return assignments.map(a => {
+    if (!a.graded) {
+      a.goalGrade = ungradedAssignmentGrade / 100 * a.pointsPossible
+    }
+    return a
+  })
 }
 
 const calculateWeight = (pointsPossible, assignmentGroupId, assignmentGroups) => {
@@ -12,14 +26,14 @@ const calculateWeight = (pointsPossible, assignmentGroupId, assignmentGroups) =>
 
 const calculateMaxGrade = (assignments, assignmentGroups) => {
   const [totalUserPoints, totalPossiblePoints] = assignments
-    .reduce((acc, assignment) => {
-      const assignmentGrade = assignment.graded
-        ? assignment.currentUserSubmission.score / assignment.pointsPossible
+    .reduce((acc, a) => {
+      const assignmentGrade = a.graded
+        ? a.currentUserSubmission.score / a.pointsPossible
         : 1 // give a perfect score if assignment is not graded to calculate the max grade possible.
 
       const weightOfAssignment = calculateWeight(
-        assignment.pointsPossible,
-        assignment.assignmentGroupId,
+        a.pointsPossible,
+        a.assignmentGroupId,
         assignmentGroups
       )
       const pointsTowardsFinalGrade = assignmentGrade * weightOfAssignment
@@ -35,7 +49,7 @@ const calculateMaxGrade = (assignments, assignmentGroups) => {
 // calculateCurrentGrade ignores any ungraded assignments
 const calculateCurrentGrade = (assignments, assignmentGroups) => {
   return calculateMaxGrade(
-    assignments.filter(assignment => assignment.graded), assignmentGroups
+    assignments.filter(a => a.graded), assignmentGroups
   )
 }
 

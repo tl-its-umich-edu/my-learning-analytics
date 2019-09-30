@@ -14,7 +14,8 @@ import { calculateWeekOffset } from '../util/date'
 import {
   calculateWeight,
   calculateCurrentGrade,
-  calculateMaxGrade
+  calculateMaxGrade,
+  calculateAssignmentGoalsFromCourseGoal
 } from '../util/assignment'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
@@ -104,8 +105,12 @@ function AssignmentPlanningV2 (props) {
 
   // this effect is used to keep the goal of the course and assignments "in sync"
   useEffect(() => {
-
-  }, [assignments, goalGrade])
+    if (goalGrade) {
+      setAssignments(
+        calculateAssignmentGoalsFromCourseGoal(goalGrade, currentGrade, assignments, data.course.assignmentGroups)
+      )
+    }
+  }, [goalGrade])
 
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
 
