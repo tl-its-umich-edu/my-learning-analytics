@@ -676,9 +676,6 @@ def show_dashed_line(grade, BinningGrade):
         return True
 
 
-
-
-
 def check_if_grade_qualifies_for_binning(grade, fifthElement):
     # case: 96.7, 94.76,
     if int(grade) - int(fifthElement) > 1:
@@ -704,7 +701,7 @@ def binning_logic(grades, fifth_item_in_list):
 
     :param grades: sorted in asc
     :param fifth_item_in_list:
-    :return: max grade in the binned list, length of binned grades, bool value of all grades are being binned
+    :return: max grade in the binned list, length of binned grades, bool value indicating whether all grades are being binned
     """
     binning_list = grades[:5]
     BinningGrade = get_binning_grade()
