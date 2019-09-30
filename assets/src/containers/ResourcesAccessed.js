@@ -104,32 +104,25 @@ function ResourcesAccessed (props) {
 
     setDefaultCheckedState(didUserChecked)
     setDefaultLabel(didUserChecked ? currentSetting : rememberSetting)
-
+    // aligns with process inside useSetUserSetting
+    // TODO: use similar approach as AssignmentPlanning and GradeDistribution, and use
+    // useSetUserSetting.js
     if (didUserChecked) {
-      // Django rejects PUT/DELETE/POST calls with out CSRF token.
-      const csrfToken = Cookie.get('csrftoken')
-      const body = { resource: gradeRangeFilter }
-      const dataURL = `/api/v1/courses/${courseId}/set_user_default_selection`
-
-      defaultFetchOptions.headers['X-CSRFToken'] = csrfToken
-      defaultFetchOptions['method'] = 'PUT'
-      defaultFetchOptions['body'] = JSON.stringify(body)
-
-      fetch(dataURL, defaultFetchOptions)
-        .then(handleError)
-        .then(res => res.json())
-        .then(data => {
-          const res = data.default
-          if (res === 'success') {
-            setGradeRangeFilter(gradeRangeFilter)
-            setDefaultCheckedState(true)
-            setDefaultValue(gradeRangeFilter)
-            return
-          }
-          setDefaultLabel(settingNotUpdated)
-        }).catch(err => {
-        setDefaultLabel(settingNotUpdated)
-      })
+      fetch(`/api/v1/courses/${courseId}/set_user_default_selection`, {
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': Cookie.get('csrftoken')
+          },
+          credentials: 'include',
+          body: JSON.stringify({resource: gradeRangeFilter}),
+          method: 'PUT'
+        }).then(handleError)
+          .then(res => res.json())
+          .then(res => {
+            setResponse(res)
+            setLoaded(true)
+        }).catch(error => setError(error.message))
     }
   }
 
