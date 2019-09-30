@@ -1,7 +1,7 @@
 import { roundToOneDecimal } from './math'
 
 const calculateAssignmentGoalsFromCourseGoal = (goalGrade, currentGrade, assignments, assignmentGroups) => {
-  const gradedAssignments = assignments.filter(a => a.graded)
+  const gradedAssignments = assignments.filter(a => a.graded || a.goalGradeSetByUser)
 
   const weightOfGradedAssignments = gradedAssignments
     .map(a => calculateWeight(a.pointsPossible, a.assignmentGroupId, assignmentGroups))
@@ -11,7 +11,7 @@ const calculateAssignmentGoalsFromCourseGoal = (goalGrade, currentGrade, assignm
     (1 - weightOfGradedAssignments)
 
   return assignments.map(a => {
-    if (!a.graded) {
+    if (!a.graded && !a.goalGradeSetByUser) {
       a.goalGrade = ungradedAssignmentGrade / 100 * a.pointsPossible
     }
     return a

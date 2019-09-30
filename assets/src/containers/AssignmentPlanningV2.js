@@ -43,10 +43,24 @@ function AssignmentPlanningV2 (props) {
   const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setAssignments([
       ...assignments.slice(0, key),
-      { ...assignments[key], goalGrade: Number(assignmentGoalGrade) },
+      {
+        ...assignments[key],
+        goalGrade: Number(assignmentGoalGrade),
+        goalGradeSetByUser: true
+      },
       ...assignments.slice(key + 1)
     ])
+    if (goalGrade) {
+      calculateAssignmentGoalsFromCourseGoal(
+        goalGrade,
+        currentGrade,
+        assignments,
+        data.course.assignmentGroups
+      )
+    }
   }
+
+  console.log(assignments)
 
   const { loading, error, data } = useQuery(gql`
     {
@@ -107,7 +121,12 @@ function AssignmentPlanningV2 (props) {
   useEffect(() => {
     if (goalGrade) {
       setAssignments(
-        calculateAssignmentGoalsFromCourseGoal(goalGrade, currentGrade, assignments, data.course.assignmentGroups)
+        calculateAssignmentGoalsFromCourseGoal(
+          goalGrade,
+          currentGrade,
+          assignments,
+          data.course.assignmentGroups
+        )
       )
     }
   }, [goalGrade])
