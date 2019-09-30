@@ -3,7 +3,7 @@ import { adjustViewport } from '../../util/chart'
 import { roundToOneDecimal } from '../../util/math'
 
 function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100,
-                            showNumberOnBars = false}) {
+                            showNumberOnBars = false, showDashedLine = true}) {
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
@@ -15,21 +15,10 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   const binningGrade = tempUniqData[0]
   const firstGradeAfterBinnedGrade = tempUniqData[1]
 
-  // show the binning line only between 2 and 96 grades.
-  const createDashedLine = () => {
-    if (binningGrade > 96) {
-      return false
-    }
-    if (binningGrade < 2) {
-      return false
-    }
-    return true
-  }
-
   /* only showing the tick values above the binned grades eg, with above data the tick will start from 75%
   * if course has 0% or > 95% grades then we just show the whole distribution
   * */
-  const minTickGrade = !createDashedLine() ? 0 : Math.round(firstGradeAfterBinnedGrade / 5) * 5
+  const minTickGrade = showDashedLine ? Math.round(firstGradeAfterBinnedGrade / 5) * 5 : 0
 
   const x = d3.scaleLinear()
     .domain([0, maxGrade]).nice()
@@ -138,7 +127,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
       .attr('text-anchor', 'start')
   }
   // Dashed line to show difference b/w binned and normal distribution
-  if (createDashedLine()) {
+  if (showDashedLine) {
     svg.append('line')
       .attr(`transform`, `translate(0, ${aHeight - margin.bottom})`)
       .attr('x1', x(dashLine()))
