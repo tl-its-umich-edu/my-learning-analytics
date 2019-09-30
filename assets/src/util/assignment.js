@@ -4,18 +4,20 @@ const calculateAssignmentGoalsFromCourseGoal = (assignments, courseGoalGrade) =>
 
 }
 
-const calculateWeightOfAssignment = (pointsPossible, assignmentGroupId, assignmentGroups) => {
+const calculateWeight = (pointsPossible, assignmentGroupId, assignmentGroups) => {
   const assignmentGroup = assignmentGroups.find(aGroup => aGroup.id === assignmentGroupId)
   const assignmentWeight = assignmentGroup.weight * (pointsPossible / assignmentGroup.groupPoints)
   return roundToOneDecimal(assignmentWeight)
 }
 
-const calculateMaxPossibleCourseGrade = (assignments, assignmentGroups) => {
+const calculateMaxGrade = (assignments, assignmentGroups) => {
   const [totalUserPoints, totalPossiblePoints] = assignments
-    .filter(assignment => assignment.currentUserSubmission)
     .reduce((acc, assignment) => {
-      const assignmentGrade = assignment.currentUserSubmission.score / assignment.pointsPossible
-      const weightOfAssignment = calculateWeightOfAssignment(
+      const assignmentGrade = assignment.graded
+        ? assignment.currentUserSubmission.score / assignment.pointsPossible
+        : 1 // give a perfect score if assignment is not graded to calculate the max grade possible.
+
+      const weightOfAssignment = calculateWeight(
         assignment.pointsPossible,
         assignment.assignmentGroupId,
         assignmentGroups
@@ -26,13 +28,20 @@ const calculateMaxPossibleCourseGrade = (assignments, assignmentGroups) => {
       acc[1] += weightOfAssignment
       return acc
     }, [0, 0])
+
   return roundToOneDecimal(totalUserPoints / totalPossiblePoints * 100)
 }
 
-// const calculateTotalCourseGrade
+// calculateCurrentGrade ignores any ungraded assignments
+const calculateCurrentGrade = (assignments, assignmentGroups) => {
+  return calculateMaxGrade(
+    assignments.filter(assignment => assignment.graded), assignmentGroups
+  )
+}
 
 export {
   calculateAssignmentGoalsFromCourseGoal,
-  calculateWeightOfAssignment,
-  calculateMaxPossibleCourseGrade
+  calculateWeight,
+  calculateCurrentGrade,
+  calculateMaxGrade
 }

@@ -2,8 +2,9 @@
 
 import {
   calculateAssignmentGoalsFromCourseGoal,
-  calculateWeightOfAssignment,
-  calculateMaxPossibleCourseGrade
+  calculateWeight,
+  calculateCurrentGrade,
+  calculateMaxGrade
 } from '../../util/assignment'
 import { roundToOneDecimal } from '../../util/math'
 
@@ -104,15 +105,15 @@ describe('calculateWeightedAssignmentGrade', () => {
     ]
 
     expect(
-      calculateWeightOfAssignment(assignment1.pointsPossible, assignment1.assignmentGroupId, assignmentGroups)
+      calculateWeight(assignment1.pointsPossible, assignment1.assignmentGroupId, assignmentGroups)
     ).toEqual(roundToOneDecimal(5 * (14 / 50)))
     expect(
-      calculateWeightOfAssignment(assignment2.pointsPossible, assignment2.assignmentGroupId, assignmentGroups)
+      calculateWeight(assignment2.pointsPossible, assignment2.assignmentGroupId, assignmentGroups)
     ).toEqual(roundToOneDecimal(17 * (29 / 100)))
   })
 })
 
-describe('calculateMaxPossibleCourseGrade', () => {
+describe('calculateCurrentGrade', () => {
   it('takes assignments and assignmentGroups and returns the course grade of the student', () => {
     const assignments1 = [
       {
@@ -120,7 +121,8 @@ describe('calculateMaxPossibleCourseGrade', () => {
         assignmentGroupId: '17700000000320044',
         currentUserSubmission: {
           score: 40
-        }
+        },
+        graded: true
       }
     ]
 
@@ -128,11 +130,11 @@ describe('calculateMaxPossibleCourseGrade', () => {
       {
         weight: 14,
         id: '17700000000320044',
-        groupPoints: 98
+        groupPoints: 80
       }
     ]
 
-    expect(calculateMaxPossibleCourseGrade(assignments1, assignmentGroups)).toEqual(100)
+    expect(calculateCurrentGrade(assignments1, assignmentGroups)).toEqual(100)
 
     const assignments2 = [
       {
@@ -140,10 +142,11 @@ describe('calculateMaxPossibleCourseGrade', () => {
         assignmentGroupId: '17700000000320044',
         currentUserSubmission: {
           score: 20
-        }
+        },
+        graded: true
       }
     ]
-    expect(calculateMaxPossibleCourseGrade(assignments2, assignmentGroups)).toEqual(50)
+    expect(calculateCurrentGrade(assignments2, assignmentGroups)).toEqual(50)
 
     const assignments3 = [
       {
@@ -151,17 +154,19 @@ describe('calculateMaxPossibleCourseGrade', () => {
         assignmentGroupId: '17700000000320044',
         currentUserSubmission: {
           score: 20
-        }
+        },
+        graded: true
       },
       {
         pointsPossible: 40,
         assignmentGroupId: '17700000000320044',
         currentUserSubmission: {
           score: 20
-        }
+        },
+        graded: true
       }
     ]
-    expect(calculateMaxPossibleCourseGrade(assignments3, assignmentGroups)).toEqual(50)
+    expect(calculateCurrentGrade(assignments3, assignmentGroups)).toEqual(50)
 
     const assignments4 = [
       {
@@ -169,16 +174,66 @@ describe('calculateMaxPossibleCourseGrade', () => {
         assignmentGroupId: '17700000000320044',
         currentUserSubmission: {
           score: 20
-        }
+        },
+        graded: true
       },
       {
         pointsPossible: 40,
         assignmentGroupId: '17700000000320044',
         currentUserSubmission: {
           score: 40
-        }
+        },
+        graded: true
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 0
+        },
+        graded: false
       }
     ]
-    expect(calculateMaxPossibleCourseGrade(assignments4, assignmentGroups)).toEqual(75)
+    expect(calculateCurrentGrade(assignments4, assignmentGroups)).toEqual(75)
+  })
+})
+
+describe('calculateMaxGrade', () => {
+  it('takes assignments and assignmentGroups and calculates the max possible grade achievable', () => {
+    const assignmentGroups = [
+      {
+        weight: 100,
+        id: '17700000000320044',
+        groupPoints: 120
+      }
+    ]
+
+    const assignments = [
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 20
+        },
+        graded: true
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 40
+        },
+        graded: true
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 0
+        },
+        graded: false
+      }
+    ]
+    expect(calculateMaxGrade(assignments, assignmentGroups)).toEqual(roundToOneDecimal(100 / 120 * 100))
   })
 })
