@@ -327,8 +327,10 @@ def grade_distribution(request, course_id=0):
     grades = df['current_grade'].values.tolist()
     logger.debug(f"Grades distribution: {grades}")
     BinningGrade = find_binning_grade_value(grades)
-    df['current_grade'] = df['current_grade'].replace(df['current_grade'].head(BinningGrade.index),
+    if BinningGrade is not None and not BinningGrade.binning_all:
+        df['current_grade'] = df['current_grade'].replace(df['current_grade'].head(BinningGrade.index),
                                                       BinningGrade.value)
+    df['show_dash_line'] = show_dashed_line(df['current_grade'].iloc[0], BinningGrade)
 
     if df[df['current_grade'] > 100.0].shape[0] > 0:
         df['graph_upper_limit'] = int((5 * round(float(df['current_grade'].max()) / 5) + 5))
@@ -649,13 +651,26 @@ def find_binning_grade_value(grades):
     next_to_fifth_item = grades[5]
     if next_to_fifth_item - fifth_item > 2:
         BinningGrade = get_binning_grade()
-        return BinningGrade(value=fifth_item, index=4)
+        return BinningGrade(value=fifth_item, index=4, binning_all=False)
     else:
         return binning_logic(grades, fifth_item)
 
 
 def is_odd(num):
     if num % 2 == 0:
+        return False
+    else:
+        return True
+
+
+def show_dashed_line(grade, BinningGrade):
+    """
+    logic determine to show dashed line or not.
+    :param grade:
+    :param BinningGrade:
+    :return:
+    """
+    if BinningGrade.binning_all or grade > 96 or grade < 2:
         return False
     else:
         return True
@@ -686,7 +701,7 @@ def binning_logic(grades, fifth_item_in_list):
 
     :param grades: sorted in asc
     :param fifth_item_in_list:
-    :return: max grade in the binned list, length of binned grades
+    :return: max grade in the binned list, length of binned grades, bool value indicating whether all grades are being binned
     """
     binning_list = grades[:5]
     BinningGrade = get_binning_grade()
@@ -694,11 +709,12 @@ def binning_logic(grades, fifth_item_in_list):
         if check_if_grade_qualifies_for_binning(grade, fifth_item_in_list):
             binning_list.append(grade)
         else:
-            return BinningGrade(max(binning_list), len(binning_list))
+            return BinningGrade(max(binning_list), len(binning_list),False)
+    return BinningGrade(max(binning_list), len(binning_list), True)
 
 
 def get_binning_grade():
-    return namedtuple('BinningGrade', ['value', 'index'])
+    return namedtuple('BinningGrade', ['value', 'index','binning_all'])
 
 def df_default_display_settings():
     pd.set_option('display.max_column', None)
