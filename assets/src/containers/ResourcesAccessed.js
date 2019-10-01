@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
+import useSetUserSetting from '../hooks/useSetUserSetting'
+import useUserSetting from '../hooks/useUserSetting'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
@@ -11,14 +13,15 @@ import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import { useUserSettingData } from '../service/api'
 import { handleError, defaultFetchOptions } from '../util/data'
+import { useResourceData } from '../service/api'
+import { isObjectEmpty } from '../util/object'
 import Cookie from 'js-cookie'
 import AlertBanner from '../components/AlertBanner'
 import WarningBanner from '../components/WarningBanner'
 import RangeSlider from '../components/RangeSlider'
 import ResourceAccessChart from '../components/ResourceAccessChart'
 import Spinner from '../components/Spinner'
-
-import { type } from 'os';
+import { type } from 'os'
 
 const styles = theme => ({
   root: {
@@ -55,7 +58,7 @@ function ResourcesAccessed (props) {
   if (resourceTypes.length === 0) {
     resourceTypes = ['Files']
   }
-  const [loaded, error, resourcesDefaultData] = useUserSettingData(courseId, 'resource') // Used to update default setting
+  const [userSettingLoaded, error, userSetting] = useUserSettingData(courseId, 'resource') // Used to update default setting
   const [minMaxWeek, setMinMaxWeek] = useState([]) // Should be updated from info
   const [curWeek, setCurWeek] = useState(0) // Should be updated from info
   const [weekRange, setWeekRange] = useState([]) // Should be depend on curWeek
@@ -69,8 +72,6 @@ function ResourcesAccessed (props) {
   // defaults setting controllers
   const [defaultCheckboxState, setDefaultCheckedState] = useState(true)
   const [defaultLabel, setDefaultLabel] = useState(currentSetting)
-
-  const [dataLoaded, setDataLoaded] = useState(false)
 
   function filterCheckbox() {
     if (resourceAccessData) {
@@ -99,33 +100,6 @@ function ResourcesAccessed (props) {
     }
   }
 
-  const changeDefaultSetting = (event) => {
-    const didUserChecked = event.target.checked
-
-    setDefaultCheckedState(didUserChecked)
-    setDefaultLabel(didUserChecked ? currentSetting : rememberSetting)
-    // aligns with process inside useSetUserSetting
-    // TODO: use similar approach as AssignmentPlanning and GradeDistribution, and use
-    // useSetUserSetting.js
-    if (didUserChecked) {
-      fetch(`/api/v1/courses/${courseId}/set_user_default_selection`, {
-        headers: {
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRFToken': Cookie.get('csrftoken')
-          },
-          credentials: 'include',
-          body: JSON.stringify({resource: gradeRangeFilter}),
-          method: 'PUT'
-        }).then(handleError)
-          .then(res => res.json())
-          .then(res => {
-            setResponse(res)
-            setLoaded(true)
-        }).catch(error => setError(error.message))
-    }
-  }
-
   useEffect(() => {
     // Fetch info data and update slider length, slider range, and current week
     if (courseInfo) {
@@ -146,57 +120,61 @@ function ResourcesAccessed (props) {
     }
   }, [courseInfo])
 
+
+  const [showSaveSetting, setShowSaveSetting] = useState(false)
+  const [saveSettingClicked, setSaveSettingClicked] = useState(false)
+  
+  // this is the filter setting last saved by the user
+  const [userSavedFilterSetting, setUserSavedFilterSetting] = useState(gradeRangeFilter)
+  const [resourceLoaded, recourseError, resourceData] = useResourceData(courseId, weekRange, gradeRangeFilter, resourceFilter, !userSettingLoaded)
+  const [saveLabel, setSaveLabel] = useState(currentSetting)
+
+  const [userSettingSaved, savingError, userSettingResponse] = useSetUserSetting(
+    courseId,
+    { resource: gradeRangeFilter },
+    userSavedFilterSetting !== gradeRangeFilter && saveSettingClicked, // only save if the filter setting last saved does not equal the current grade filter, and checkbox is checked.
+    [saveSettingClicked]
+  )
+
   useEffect(() => {
-    // Fetch grade range from default setting if any
-    if (loaded) {
-      if (resourcesDefaultData.default !== '') {
-        setGradeRangeFilter(resourcesDefaultData.default)
-        setDefaultValue(resourcesDefaultData.default)
-      } else {
-        // setting it to default
+    if (userSettingLoaded) {
+      if (isObjectEmpty(userSetting.default)) {
         setGradeRangeFilter('All')
-        setDefaultValue('All')
+      } else {
+        setGradeRangeFilter(userSetting.default)
+        setUserSavedFilterSetting(userSetting.default)
       }
-      setDataControllerLoad(dataControllerLoad + 1)
     }
-  }, [loaded])
+  }, [userSettingLoaded])
 
   useEffect(() => {
-    // Fetch data once all the setting data is fetched
-    if (dataControllerLoad === 2 && !(resourceFilter.length === 0)) {
-      const dataURL = `/api/v1/courses/${courseId}/resource_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${gradeRangeFilter}&resource_type=${resourceFilter}`
-      const fetchOptions = { method: 'get', ...defaultFetchOptions }
-      fetch(dataURL, fetchOptions)
-        .then(handleError)
-        .then(res => res.json())
-        .then(data => {
-          setResourceAccessData(data)
-          setDataLoaded(true)
-        })
-        .catch(err => {
-          setResourceAccessData({})
-        })
+    // if user setting is different from current grade filter, show label for remembering setting
+    if (userSavedFilterSetting !== gradeRangeFilter) {
+      setSaveLabel(rememberSetting)
+    } else if (savingError) {
+      setSaveLabel(settingNotUpdated)
+    } else {
+      setSaveLabel(currentSetting)
     }
-    else {
-      setResourceAccessData({})
+  })
+
+  // if user setting is saved, don't show checkbox and sync userSavedFilterSetting with gradeRangeFilter
+  useEffect(() => {
+    if (userSettingSaved) {
+      setShowSaveSetting(false)
+      setUserSavedFilterSetting(gradeRangeFilter)
     }
-  }, [dataControllerLoad, weekRange, gradeRangeFilter, resourceFilter])
+  }, [userSettingSaved])
 
-  const onWeekChangeHandler = value => {
-    // Update week range slider
-    setWeekRange(value)
-  }
-
-  const onChangeGradeRangeHandler = event => {
-    // Update grade range selection
+  const handleResourceGradeFilter = event => {
     const value = event.target.value
     setGradeRangeFilter(value)
-    if (defaultValue === value) {
-      setDefaultCheckedState(true)
-      setDefaultLabel(currentSetting)
+
+    if (userSavedFilterSetting !== value) {
+      setSaveSettingClicked(false)
+      setShowSaveSetting(true)
     } else {
-      setDefaultCheckedState(false)
-      setDefaultLabel(rememberSetting)
+      setShowSaveSetting(false)
     }
   }
 
@@ -209,6 +187,14 @@ function ResourcesAccessed (props) {
     else if (!event.target.checked) { 
       setResourceFilter(resourceFilter.filter(val => val !== value))
     }
+  }
+
+
+
+
+  const onWeekChangeHandler = value => {
+    // Update week range slider
+    setWeekRange(value)
   }
 
   const ResourceAccessChartBuilder = (resourceData) => {
@@ -248,13 +234,10 @@ function ResourcesAccessed (props) {
             <div className={classes.formController}>
               <p className={classes.controlText}>Resources accessed from week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now) ' : ''}</b> by students with these grades:</p>
               <FormControl>
+
                 <Select
                   value={gradeRangeFilter}
-                  onChange={onChangeGradeRangeHandler}
-                  inputProps={{
-                    name: 'grade',
-                    id: 'grade-range',
-                  }}
+                  onChange={handleResourceGradeFilter}
                 >
                   <MenuItem value="All">All</MenuItem>
                   <MenuItem value="90-100">90-100%</MenuItem>
@@ -262,18 +245,22 @@ function ResourcesAccessed (props) {
                   <MenuItem value="70-79">70-79%</MenuItem>
                 </Select>
               </FormControl>
-              {defaultCheckboxState ? <div style={{ padding: '10px' }}></div> : <Checkbox
-                checked={defaultCheckboxState}
-                onChange={changeDefaultSetting}
-                value="checked"
-              />}
-              <div style={{ padding: '15px 2px' }}>{defaultLabel}</div>
+              {showSaveSetting
+                ? <Checkbox
+                  checked={saveSettingClicked}
+                  onChange={() => setSaveSettingClicked(!saveSettingClicked)}
+                  value='checked'
+                  color='primary'
+                />
+                : null
+              }
+              <div style={{ padding: '15px 2px' }}>{saveLabel}</div>
             </div>
             {
               filterCheckbox()
             }
-            {(resourceAccessData && dataLoaded) || resourceFilter.length === 0
-              ? ResourceAccessChartBuilder(resourceAccessData)
+            { /* in case of no data empty list is sent */}
+            {resourceLoaded ? ResourceAccessChartBuilder(resourceData)
               : <Spinner/>}
           </Paper>
         </Grid>
