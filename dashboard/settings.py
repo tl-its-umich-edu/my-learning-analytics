@@ -137,7 +137,7 @@ TEMPLATES = [
                 'django_settings_export.settings_export',
                 'dashboard.context_processors.current_user_courses_info',
                 'dashboard.context_processors.last_updated',
-                'dashboard.context_processors.get_build_info',
+                'dashboard.context_processors.get_git_version_info',
             ],
         },
     },
@@ -445,6 +445,9 @@ CANVAS_FILE_POSTFIX = ENV.get("CANVAS_FILE_POSTFIX", "")
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
 RESOURCE_ACCESS_CONFIG = ENV.get("RESOURCE_ACCESS_CONFIG", {})
+
+# Git info settings
+SHA_ABBREV_LENGTH = 7
 
 # Django CSP Settings, load up from file if set
 if "CSP" in ENV:
