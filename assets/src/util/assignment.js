@@ -6,8 +6,6 @@ const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignme
 
   const currentGrade = calculateMaxGrade(gradedAssignments, assignmentGroups)
 
-  console.log(currentGrade)
-
   const weightOfGradedAssignments = gradedAssignments
     .map(a => calculateWeight(a.pointsPossible, a.assignmentGroupId, assignmentGroups))
     .reduce((acc, cur) => (acc += cur), 0) / 100
@@ -34,7 +32,7 @@ const calculateMaxGrade = (assignments, assignmentGroups) => {
     .reduce((acc, a) => {
       const assignmentGrade = a.graded
         ? a.currentUserSubmission.score / a.pointsPossible
-        : a.goalGradeSetByUser
+        : a.goalGradeSetByUser // if user sets assignment goal, use the set goal as part of grade calc.
           ? a.goalGrade / a.pointsPossible
           : 1 // give a perfect score if assignment is not graded to calculate the max grade possible.
 
@@ -60,9 +58,13 @@ const calculateCurrentGrade = (assignments, assignmentGroups) => {
   )
 }
 
+const sumAssignmentGoalGrade = assignments => assignments
+  .reduce((acc, a) => (acc += a.goalGrade || 0), 0)
+
 export {
   calculateAssignmentGoalsFromCourseGoal,
   calculateWeight,
   calculateCurrentGrade,
-  calculateMaxGrade
+  calculateMaxGrade,
+  sumAssignmentGoalGrade
 }

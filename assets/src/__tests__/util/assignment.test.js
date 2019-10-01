@@ -4,7 +4,8 @@ import {
   calculateAssignmentGoalsFromCourseGoal,
   calculateWeight,
   calculateCurrentGrade,
-  calculateMaxGrade
+  calculateMaxGrade,
+  sumAssignmentGoalGrade
 } from '../../util/assignment'
 import { roundToOneDecimal } from '../../util/math'
 
@@ -250,5 +251,22 @@ describe('calculateMaxGrade', () => {
       }
     ]
     expect(calculateMaxGrade(assignments, assignmentGroups)).toEqual(roundToOneDecimal(100 / 120 * 100))
+  })
+})
+
+describe('sumAssignmentGoalGrade', () => {
+  it('sums the assignment goal grade set by the user', () => {
+    const assignments = [
+      {
+        goalGrade: null
+      },
+      {
+        goalGrade: 65
+      },
+      {
+        goalGrade: 100
+      }
+    ]
+    expect(sumAssignmentGoalGrade(assignments)).toEqual(165)
   })
 })

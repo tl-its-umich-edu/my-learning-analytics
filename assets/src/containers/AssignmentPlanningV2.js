@@ -15,7 +15,8 @@ import {
   calculateWeight,
   calculateCurrentGrade,
   calculateMaxGrade,
-  calculateAssignmentGoalsFromCourseGoal
+  calculateAssignmentGoalsFromCourseGoal,
+  sumAssignmentGoalGrade
 } from '../util/assignment'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
@@ -118,7 +119,7 @@ function AssignmentPlanningV2 (props) {
         )
       )
     }
-  }, [goalGrade, assignments.reduce((acc, a) => (acc += a.goalGrade || 0), 0)])
+  }, [goalGrade, sumAssignmentGoalGrade(assignments)])
 
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
 
