@@ -109,6 +109,7 @@ function AssignmentPlanningV2 (props) {
   }, [loading])
 
   // this effect is used to keep the goal of the course and assignments "in sync"
+  // run if goalGrade changes, or if the sum of goal grades set by user changes
   useEffect(() => {
     if (goalGrade) {
       setAssignments(
