@@ -20,7 +20,6 @@ function ProgressBarV2 (props) {
     classes,
     score,
     outOf,
-    goalGrade,
     percentWidth,
     height = 10,
     lines = []
@@ -30,14 +29,10 @@ function ProgressBarV2 (props) {
     ? score / outOf
     : null
 
-  const goalGradeRatio = goalGrade
-    ? goalGrade / outOf
-    : null
-
   const calculateLineLeftOffset = (value, maxValue) => {
-    if (value > maxValue) return maxValue
+    if (value > maxValue) return 100
     if (value < 0) return 0
-    else return value / maxValue * 100
+    return value / maxValue * 100
   }
 
   return (

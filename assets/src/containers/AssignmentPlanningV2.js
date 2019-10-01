@@ -11,7 +11,13 @@ import Typography from '@material-ui/core/Typography'
 import { gql } from 'apollo-boost'
 import { useQuery } from '@apollo/react-hooks'
 import { calculateWeekOffset } from '../util/date'
-import { calculateWeightOfAssignment } from '../util/assignment'
+import {
+  calculateWeight,
+  calculateCurrentGrade,
+  calculateMaxGrade,
+  calculateAssignmentGoalsFromCourseGoal,
+  sumAssignmentGoalGrade
+} from '../util/assignment'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
 
@@ -26,70 +32,23 @@ const styles = theme => ({
   }
 })
 
-// const grades = {
-//   currentGrade: 85,
-//   goalGrade: null, // can be null
-//   maxPossibleGrade: 95,
-//   assignments: [
-//     {
-//       week: 1,
-//       dueDate: '10/15',
-//       title: 'Attendance',
-//       graded: true,
-//       score: 1,
-//       outOf: 1,
-//       percentOfFinalGrade: 5
-//     },
-//     {
-//       week: 1,
-//       dueDate: '10/15',
-//       title: 'Group Project',
-//       graded: true,
-//       score: 90,
-//       outOf: 100,
-//       percentOfFinalGrade: 15
-//     },
-//     {
-//       week: 2,
-//       dueDate: '10/22',
-//       title: 'Attendance',
-//       graded: false,
-//       score: null,
-//       outOf: 1,
-//       percentOfFinalGrade: 1
-//     },
-//     {
-//       week: 2,
-//       dueDate: '10/24',
-//       title: 'Discussion',
-//       graded: false,
-//       score: null,
-//       outOf: 5,
-//       percentOfFinalGrade: 20
-//     },
-//     {
-//       week: 3,
-//       dueDate: '11/24',
-//       title: 'Final Exam',
-//       graded: false,
-//       score: null,
-//       outOf: 100,
-//       percentOfFinalGrade: 50
-//     }
-//   ]
-// }
-
 function AssignmentPlanningV2 (props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
 
   const [assignments, setAssignments] = useState([])
   const [goalGrade, setGoalGrade] = useState(null)
+  const [currentGrade, setCurrentGrade] = useState(0)
+  const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
 
   const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setAssignments([
       ...assignments.slice(0, key),
-      { ...assignments[key], goalGrade: Number(assignmentGoalGrade) },
+      {
+        ...assignments[key],
+        goalGrade: Number(assignmentGoalGrade),
+        goalGradeSetByUser: true
+      },
       ...assignments.slice(key + 1)
     ])
   }
@@ -105,6 +64,7 @@ function AssignmentPlanningV2 (props) {
           assignmentGroupId
           currentUserSubmission {
             score
+            gradedDate
           }
         }
         dateStart
@@ -127,26 +87,39 @@ function AssignmentPlanningV2 (props) {
               dueDate,
               pointsPossible,
               assignmentGroupId,
-              currentUserSubmission: { score }
+              currentUserSubmission
             } = assignment
             const courseStartDate = data.course.dateStart
             const assignmentGroups = data.course.assignmentGroups
 
             assignment.week = calculateWeekOffset(courseStartDate, dueDate)
-            assignment.percentOfFinalGrade = calculateWeightOfAssignment(pointsPossible, assignmentGroupId, assignmentGroups)
-            assignment.score = score
+            assignment.percentOfFinalGrade = calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
             assignment.outOf = pointsPossible
-
+            assignment.graded = !!currentUserSubmission.gradedDate
             return assignment
           }).sort((a, b) => a.week - b.week)
+      )
+      setCurrentGrade(
+        calculateCurrentGrade(data.course.assignments, data.course.assignmentGroups)
+      )
+      setMaxPossibleGrade(
+        calculateMaxGrade(data.course.assignments, data.course.assignmentGroups)
       )
     }
   }, [loading])
 
   // this effect is used to keep the goal of the course and assignments "in sync"
   useEffect(() => {
-
-  }, [assignments, goalGrade])
+    if (goalGrade) {
+      setAssignments(
+        calculateAssignmentGoalsFromCourseGoal(
+          goalGrade,
+          assignments,
+          data.course.assignmentGroups
+        )
+      )
+    }
+  }, [goalGrade, sumAssignmentGoalGrade(assignments)])
 
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
 
@@ -163,11 +136,11 @@ function AssignmentPlanningV2 (props) {
                 : (
                   <>
                     <ProgressBarV2
-                      score={86}
+                      score={currentGrade}
                       lines={[
                         {
                           label: 'Current',
-                          value: 86,
+                          value: currentGrade,
                           color: 'steelblue',
                           labelDown: true
                         },
@@ -179,7 +152,7 @@ function AssignmentPlanningV2 (props) {
                         },
                         {
                           label: 'Max Possible',
-                          value: 90,
+                          value: maxPossibleGrade,
                           color: 'grey',
                           labelDown: true
                         }
@@ -189,9 +162,9 @@ function AssignmentPlanningV2 (props) {
                       height={50}
                     />
                     <AssignmentGradeBoxes
-                      currentGrade={86}
+                      currentGrade={currentGrade}
                       goalGrade={goalGrade}
-                      maxPossibleGrade={90}
+                      maxPossibleGrade={maxPossibleGrade}
                       setGoalGrade={grade => setGoalGrade(grade)}
                     />
                     <AssignmentTable

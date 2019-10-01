@@ -70,7 +70,7 @@ function AssignmentTable (props) {
               </TableCell>
               <TableCell>
                 <ProgressBarV2
-                  score={assignment.score}
+                  score={assignment.currentUserSubmission.score}
                   outOf={assignment.outOf}
                   goalGrade={assignment.goalGrade}
                   percentWidth={assignment.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
@@ -86,7 +86,8 @@ function AssignmentTable (props) {
               <TableCell>
                 {
                   assignment.graded || assignment.outOf == 0
-                    ? assignment.outOf == 0 ? `0` : `${assignment.score}`
+                    ? assignment.outOf === 0 ? `0` : `${assignment.currentUserSubmission.score}`
+
                     : (
                       <TextField
                         id='standard-number'

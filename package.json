@@ -22,7 +22,8 @@
     "prod": "BABEL_ENV=production webpack --config webpack.config.js --mode production",
     "build": "BABEL_ENV=development webpack --config webpack.config.js --mode development --display-error-details",
     "watch": "BABEL_ENV=development webpack --config webpack.config.js --watch --mode development --display-error-details",
-    "test": "jest --watchAll",
+    "test": "jest",
+    "test:watch": "jest --watchAll",
     "update-snapshot": "jest --updateSnapshot"
   },
   "eslintConfig": {

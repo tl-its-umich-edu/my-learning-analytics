@@ -2,67 +2,85 @@
 
 import {
   calculateAssignmentGoalsFromCourseGoal,
-  calculateWeightOfAssignment
+  calculateWeight,
+  calculateCurrentGrade,
+  calculateMaxGrade,
+  sumAssignmentGoalGrade
 } from '../../util/assignment'
 import { roundToOneDecimal } from '../../util/math'
-
-const assignments = [
-  {
-    week: 1,
-    dueDate: '10/15',
-    title: 'Attendance',
-    graded: true,
-    score: 1,
-    outOf: 1,
-    percentOfFinalGrade: 5
-  },
-  {
-    week: 1,
-    dueDate: '10/15',
-    title: 'Group Project',
-    graded: true,
-    score: 90,
-    outOf: 100,
-    percentOfFinalGrade: 15
-  },
-  {
-    week: 2,
-    dueDate: '10/22',
-    title: 'Attendance',
-    graded: false,
-    score: null,
-    outOf: 1,
-    percentOfFinalGrade: 10
-  },
-  {
-    week: 2,
-    dueDate: '10/24',
-    title: 'Discussion',
-    graded: false,
-    score: null,
-    outOf: 5,
-    percentOfFinalGrade: 20
-  },
-  {
-    week: 3,
-    dueDate: '11/24',
-    title: 'Final Exam',
-    graded: false,
-    score: null,
-    outOf: 100,
-    percentOfFinalGrade: 50
-  }
-]
 
 describe('calculateAssignmentGradeFromCourseGrade', () => {
   it(`takes an array of assignments and a course goal as input,
     and returns a new array of assignments with the goalGrade for each assignment set,
     such that the course grade is achieved.
   `, () => {
-    const result = [
-
+    const assignments = [
+      {
+        pointsPossible: 100,
+        assignmentGroupId: '17700000000320046',
+        currentUserSubmission: {
+          score: 80
+        },
+        graded: true
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 0
+        },
+        graded: false
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 0
+        },
+        graded: false
+      }
     ]
-    expect(calculateAssignmentGoalsFromCourseGoal(assignments, 70))
+    const assignmentGroups = [
+      {
+        weight: 50,
+        id: '17700000000320046',
+        groupPoints: 100
+      },
+      {
+        weight: 50,
+        id: '17700000000320044',
+        groupPoints: 80
+      }
+    ]
+    const result = [
+      {
+        pointsPossible: 100,
+        assignmentGroupId: '17700000000320046',
+        currentUserSubmission: {
+          score: 80
+        },
+        graded: true
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 0
+        },
+        graded: false,
+        goalGrade: 40
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 0
+        },
+        graded: false,
+        goalGrade: 40
+      }
+    ]
+    expect(calculateAssignmentGoalsFromCourseGoal(90, assignments, assignmentGroups)).toEqual(result)
   })
 })
 
@@ -102,7 +120,153 @@ describe('calculateWeightedAssignmentGrade', () => {
       }
     ]
 
-    expect(calculateWeightOfAssignment(assignment1, assignmentGroups)).toEqual(roundToOneDecimal(5 * (14 / 50)))
-    expect(calculateWeightOfAssignment(assignment2, assignmentGroups)).toEqual(roundToOneDecimal(17 * (29 / 100)))
+    expect(
+      calculateWeight(assignment1.pointsPossible, assignment1.assignmentGroupId, assignmentGroups)
+    ).toEqual(roundToOneDecimal(5 * (14 / 50)))
+    expect(
+      calculateWeight(assignment2.pointsPossible, assignment2.assignmentGroupId, assignmentGroups)
+    ).toEqual(roundToOneDecimal(17 * (29 / 100)))
+  })
+})
+
+describe('calculateCurrentGrade', () => {
+  it('takes assignments and assignmentGroups and returns the course grade of the student', () => {
+    const assignments1 = [
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 40
+        },
+        graded: true
+      }
+    ]
+
+    const assignmentGroups = [
+      {
+        weight: 14,
+        id: '17700000000320044',
+        groupPoints: 80
+      }
+    ]
+
+    expect(calculateCurrentGrade(assignments1, assignmentGroups)).toEqual(100)
+
+    const assignments2 = [
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 20
+        },
+        graded: true
+      }
+    ]
+    expect(calculateCurrentGrade(assignments2, assignmentGroups)).toEqual(50)
+
+    const assignments3 = [
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 20
+        },
+        graded: true
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 20
+        },
+        graded: true
+      }
+    ]
+    expect(calculateCurrentGrade(assignments3, assignmentGroups)).toEqual(50)
+
+    const assignments4 = [
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 20
+        },
+        graded: true
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 40
+        },
+        graded: true
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 0
+        },
+        graded: false
+      }
+    ]
+    expect(calculateCurrentGrade(assignments4, assignmentGroups)).toEqual(75)
+  })
+})
+
+describe('calculateMaxGrade', () => {
+  it('takes assignments and assignmentGroups and calculates the max possible grade achievable', () => {
+    const assignmentGroups = [
+      {
+        weight: 100,
+        id: '17700000000320044',
+        groupPoints: 120
+      }
+    ]
+
+    const assignments = [
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 20
+        },
+        graded: true
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 40
+        },
+        graded: true
+      },
+      {
+        pointsPossible: 40,
+        assignmentGroupId: '17700000000320044',
+        currentUserSubmission: {
+          score: 0
+        },
+        graded: false
+      }
+    ]
+    expect(calculateMaxGrade(assignments, assignmentGroups)).toEqual(roundToOneDecimal(100 / 120 * 100))
+  })
+})
+
+describe('sumAssignmentGoalGrade', () => {
+  it('sums the assignment goal grade set by the user', () => {
+    const assignments = [
+      {
+        goalGrade: null
+      },
+      {
+        goalGrade: 65
+      },
+      {
+        goalGrade: 100
+      }
+    ]
+    expect(sumAssignmentGoalGrade(assignments)).toEqual(165)
   })
 })
