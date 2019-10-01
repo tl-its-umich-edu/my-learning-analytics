@@ -60,7 +60,7 @@ function AssignmentTable (props) {
           assignments.map((assignment, key) => (
             <TableRow key={key}>
               <TableCell>
-                {`Week ${assignment.week}`}
+                {assignment.week ? `Week ${assignment.week}` : ``}
               </TableCell>
               <TableCell>
                 {assignment.dueDate}
@@ -85,8 +85,9 @@ function AssignmentTable (props) {
               </TableCell>
               <TableCell>
                 {
-                  assignment.graded
-                    ? `${assignment.currentUserSubmission.score}`
+                  assignment.graded || assignment.outOf == 0
+                    ? assignment.outOf === 0 ? `0` : `${assignment.currentUserSubmission.score}`
+
                     : (
                       <TextField
                         id='standard-number'

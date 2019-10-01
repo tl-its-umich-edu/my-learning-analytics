@@ -12,20 +12,26 @@ logger = logging.getLogger(__name__)
 
 class AcademicTermType(DjangoObjectType):
     id = graphene.ID()
+    name = graphene.String()
     date_start = graphene.types.datetime.DateTime()
     date_end = graphene.types.datetime.DateTime()
 
     class Meta:
         model = AcademicTerms
-        only_fields = ('id', 'name', 'date_start', 'date_end')
+        only_fields = (
+            'id', 'name', 'date_start', 'date_end'
+        )
 
 class UserDefaultSelectionType(DjangoObjectType):
     course_id = graphene.ID()
+    default_view_type = graphene.String()
     default_view_value = graphene.JSONString()
 
     class Meta:
         model = UserDefaultSelection
-        only_fields = ('course_id', 'default_view_type', 'default_view_value')
+        only_fields = (
+            'course_id', 'default_view_type', 'default_view_value'
+        )
 
 # Note: only allow instructors to view all and students to view own
 class SubmissionType(DjangoObjectType):
@@ -33,15 +39,25 @@ class SubmissionType(DjangoObjectType):
     assignment_id = graphene.ID()
     course_id = graphene.ID()
     user_id = graphene.ID()
+    score = graphene.Float()
+    #avg_score = graphene.Float()
     graded_date = graphene.types.datetime.DateTime()
 
     class Meta:
         model = Submission
-        only_fields = ('id', 'assignment_id', 'course_id', 'user_id', 'score', 'avg_score', 'graded_date')
+        only_fields = (
+            'id', 'assignment_id', 'course_id', 'user_id',
+            'score', 'graded_date'
+        )
 
 class AssignmentGroupType(DjangoObjectType):
     id = graphene.ID()
     course_id = graphene.ID()
+    name = graphene.String()
+    weight = graphene.Float()
+    group_points = graphene.Float()
+    drop_lowest = graphene.Int()
+    drop_highest = graphene.Int()
 
     # init below
     #assignments = graphene.List(AssignmentType)
@@ -58,23 +74,27 @@ class AssignmentGroupType(DjangoObjectType):
 
     class Meta:
         model = AssignmentGroups
-        only_fields = ('id', 'course_id', 'name', 'weight', 'group_points', 'drop_lowest', 'drop_highest')
+        only_fields = (
+            'id', 'course_id', 'name', 'weight'
+            'group_points', 'drop_lowest', 'drop_highest'
+        )
 
 
 class AssignmentType(DjangoObjectType):
     id = graphene.ID()
+    name = graphene.String()
     due_date = graphene.types.datetime.DateTime()
     local_date = graphene.types.datetime.DateTime()
+    points_possible = graphene.Float()
     course_id = graphene.ID()
     assignment_group_id = graphene.ID()
+    average_grade = graphene.Float()
+    median_grade = graphene.Float()
 
     submissions = graphene.List(SubmissionType)
     current_user_submission = graphene.Field(SubmissionType)
 
     assignment_group = graphene.Field(AssignmentGroupType)
-
-    average_grade = graphene.Float()
-    median_grade = graphene.Float()
 
     def resolve_submissions(parent, info):
         user = info.context.user
@@ -120,7 +140,7 @@ class AssignmentType(DjangoObjectType):
     class Meta:
         model = Assignment
         only_fields = (
-            'id', 'name', 'due_date', 'local_date', 'points_possible',
+            'id', 'name', 'due_date', 'local_date', 'points_possible'
             'course_id', 'assignment_group_id', 'average_grade', 'median_grade'
         )
 AssignmentGroupType.assignments = graphene.List(AssignmentType)
@@ -129,6 +149,7 @@ AssignmentGroupType.assignments = graphene.List(AssignmentType)
 
 class CourseType(DjangoObjectType):
     id = graphene.ID()
+    canvas_id = graphene.ID()
     name = graphene.String()
     assignment_weight_consideration = graphene.Boolean()
     date_start = graphene.types.datetime.DateTime()
@@ -191,4 +212,7 @@ class CourseType(DjangoObjectType):
 
     class Meta:
         model = Course
-        only_fields = ('id', 'name', 'assignment_weight_consideration')
+        only_fields = (
+            'id', 'canvas_id', 'name', 'assignment_weight_consideration'
+            'date_start', 'date_end', 'term_id'
+        )

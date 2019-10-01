@@ -55,7 +55,7 @@ function AssignmentPlanningV2 (props) {
 
   const { loading, error, data } = useQuery(gql`
     {
-      course(courseId: 17700000000${courseId}) {
+      course(canvasId: ${courseId}) {
         assignments {
           name
           dueDate
