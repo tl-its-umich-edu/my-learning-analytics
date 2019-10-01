@@ -9,7 +9,7 @@ import Error from './Error'
 import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
 import { gql } from 'apollo-boost'
-import { useQuery } from '@apollo/react-hooks'
+import { useQuery, useMutation } from '@apollo/react-hooks'
 import { calculateWeekOffset } from '../util/date'
 import {
   calculateWeight,
@@ -31,6 +31,18 @@ const styles = theme => ({
     color: theme.palette.text.secondary
   }
 })
+
+const updateUserSetting = courseId => gql`
+  mutation setUserDefaultSelection($input: UserDefaultSelectionInput!) {
+    setUserDefaultSelection(data: $input) {
+      userDefaultSelection {
+        courseId,
+        defaultViewType,
+        defaultViewValue,
+      }
+    }
+  }
+`
 
 function AssignmentPlanningV2 (props) {
   const { classes, disabled, courseId } = props
@@ -80,30 +92,32 @@ function AssignmentPlanningV2 (props) {
 
   useEffect(() => {
     if (!loading && !error) {
+      const course = data.course
       setAssignments(
-        data.course.assignments
-          .map(assignment => {
+        course.assignments
+          .map(a => {
             const {
               dueDate,
               pointsPossible,
               assignmentGroupId,
               currentUserSubmission
-            } = assignment
-            const courseStartDate = data.course.dateStart
-            const assignmentGroups = data.course.assignmentGroups
+            } = a
 
-            assignment.week = calculateWeekOffset(courseStartDate, dueDate)
-            assignment.percentOfFinalGrade = calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
-            assignment.outOf = pointsPossible
-            assignment.graded = !!currentUserSubmission.gradedDate
-            return assignment
+            const courseStartDate = course.dateStart
+            const assignmentGroups = course.assignmentGroups
+
+            a.week = calculateWeekOffset(courseStartDate, dueDate)
+            a.percentOfFinalGrade = calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
+            a.outOf = pointsPossible
+            a.graded = !!currentUserSubmission.gradedDate
+            return a
           }).sort((a, b) => a.week - b.week)
       )
       setCurrentGrade(
-        calculateCurrentGrade(data.course.assignments, data.course.assignmentGroups)
+        calculateCurrentGrade(course.assignments, course.assignmentGroups)
       )
       setMaxPossibleGrade(
-        calculateMaxGrade(data.course.assignments, data.course.assignmentGroups)
+        calculateMaxGrade(course.assignments, course.assignmentGroups)
       )
     }
   }, [loading])

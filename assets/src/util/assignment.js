@@ -54,11 +54,8 @@ const calculateMaxGrade = (assignments, assignmentGroups) => {
 }
 
 // calculateCurrentGrade ignores any ungraded assignments
-const calculateCurrentGrade = (assignments, assignmentGroups) => {
-  return calculateMaxGrade(
-    assignments.filter(a => a.graded), assignmentGroups
-  )
-}
+const calculateCurrentGrade = (assignments, assignmentGroups) =>
+  calculateMaxGrade(assignments.filter(a => a.graded), assignmentGroups)
 
 const sumAssignmentGoalGrade = assignments => assignments
   .reduce((acc, a) => (acc += a.goalGrade || 0), 0)
