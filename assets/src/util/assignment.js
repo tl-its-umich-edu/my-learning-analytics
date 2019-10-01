@@ -23,8 +23,10 @@ const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignme
 
 const calculateWeight = (pointsPossible, assignmentGroupId, assignmentGroups) => {
   const assignmentGroup = assignmentGroups.find(aGroup => aGroup.id === assignmentGroupId)
-  const assignmentWeight = assignmentGroup.weight * (pointsPossible / assignmentGroup.groupPoints)
-  return roundToOneDecimal(assignmentWeight)
+  const assignmentGrade = assignmentGroup.groupPoints > 0
+    ? assignmentGroup.weight * (pointsPossible / assignmentGroup.groupPoints)
+    : 0
+  return roundToOneDecimal(assignmentGrade)
 }
 
 const calculateMaxGrade = (assignments, assignmentGroups) => {
