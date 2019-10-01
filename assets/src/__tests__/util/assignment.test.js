@@ -79,7 +79,7 @@ describe('calculateAssignmentGradeFromCourseGrade', () => {
         goalGrade: 40
       }
     ]
-    expect(calculateAssignmentGoalsFromCourseGoal(90, 80, assignments, assignmentGroups)).toEqual(result)
+    expect(calculateAssignmentGoalsFromCourseGoal(90, assignments, assignmentGroups)).toEqual(result)
   })
 })
 

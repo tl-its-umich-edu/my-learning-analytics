@@ -1,7 +1,12 @@
 import { roundToOneDecimal } from './math'
 
-const calculateAssignmentGoalsFromCourseGoal = (goalGrade, currentGrade, assignments, assignmentGroups) => {
-  const gradedAssignments = assignments.filter(a => a.graded || a.goalGradeSetByUser)
+const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignmentGroups) => {
+  const gradedAssignments = assignments
+    .filter(a => a.graded || a.goalGradeSetByUser)
+
+  const currentGrade = calculateMaxGrade(gradedAssignments, assignmentGroups)
+
+  console.log(currentGrade)
 
   const weightOfGradedAssignments = gradedAssignments
     .map(a => calculateWeight(a.pointsPossible, a.assignmentGroupId, assignmentGroups))
@@ -29,7 +34,9 @@ const calculateMaxGrade = (assignments, assignmentGroups) => {
     .reduce((acc, a) => {
       const assignmentGrade = a.graded
         ? a.currentUserSubmission.score / a.pointsPossible
-        : 1 // give a perfect score if assignment is not graded to calculate the max grade possible.
+        : a.goalGradeSetByUser
+          ? a.goalGrade / a.pointsPossible
+          : 1 // give a perfect score if assignment is not graded to calculate the max grade possible.
 
       const weightOfAssignment = calculateWeight(
         a.pointsPossible,

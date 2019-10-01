@@ -50,17 +50,7 @@ function AssignmentPlanningV2 (props) {
       },
       ...assignments.slice(key + 1)
     ])
-    if (goalGrade) {
-      calculateAssignmentGoalsFromCourseGoal(
-        goalGrade,
-        currentGrade,
-        assignments,
-        data.course.assignmentGroups
-      )
-    }
   }
-
-  console.log(assignments)
 
   const { loading, error, data } = useQuery(gql`
     {
@@ -123,13 +113,12 @@ function AssignmentPlanningV2 (props) {
       setAssignments(
         calculateAssignmentGoalsFromCourseGoal(
           goalGrade,
-          currentGrade,
           assignments,
           data.course.assignmentGroups
         )
       )
     }
-  }, [goalGrade])
+  }, [goalGrade, assignments.reduce((acc, a) => (acc += a.goalGrade || 0), 0)])
 
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
 
