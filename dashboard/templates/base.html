@@ -81,13 +81,23 @@
     <footer>
         {% load flatpages %}
         {% get_flatpages '/copyright/' as flatpages %}
-        <div>
-        <div style="float: left; width: 50%">{{ flatpages.first.content|safe }}</div>
-        <div style="float: left; width: 50%; text-align: right">Data last updated on {{last_updated|date:"m/d/Y P T"}}</div>
-        </div>
-        {% if user.is_superuser %}
-        <div id="build-info" class="alert alert-info" style="display:none;">{{build}}</div>
-        {% endif %}
+        <table cellspacing="8" style="width: 100%; padding: 8px">
+            <tr>
+                {% if flatpages.first.content %}
+                <td style="text-align: left">
+                    {{ flatpages.first.content|safe }}
+                </td>
+                {% endif %}
+                {% if user.is_superuser %}
+                <td style="text-align: left">
+                    Git version:
+                    <a href="{{ git_version.repo }}/commit/{{ git_version.commit }}">{{ git_version.commit_abbrev }}</a>
+                    (commit), {{ git_version.branch }} (branch)
+                </td>
+                {% endif %}
+                <td style="text-align: left">Data last updated on {{last_updated|date:"m/d/Y P T"}}</td>
+            </tr>
+        </table>
     </footer>
 </body>
 </html>
