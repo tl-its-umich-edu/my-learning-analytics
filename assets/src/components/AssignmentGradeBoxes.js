@@ -42,7 +42,7 @@ function AssignmentGradeBoxes (props) {
           label={
             goalGrade > 100
               ? 'Over 100%'
-              : 'Set a goal grade'
+              : 'Set a goal'
           }
           onChange={event => setGoalGrade(Number(event.target.value))}
           type='number'

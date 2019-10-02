@@ -102,7 +102,7 @@ function AssignmentTable (props) {
                         label={
                           a.goalGrade > 100
                             ? 'Over 100%'
-                            : ''
+                            : 'Set a goal'
                         }
                         onChange={event => setGoalGrade(key, event.target.value)}
                         type='number'
