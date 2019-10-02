@@ -21,7 +21,7 @@ const styles = theme => ({
     minWidth: '150px'
   },
   numberField: {
-    width: 60
+    width: 90
   }
 })
 
@@ -57,45 +57,51 @@ function AssignmentTable (props) {
       </TableHead>
       <TableBody>
         {
-          assignments.map((assignment, key) => (
+          assignments.map((a, key) => (
             <TableRow key={key}>
               <TableCell>
-                {assignment.week ? `Week ${assignment.week}` : ``}
+                {assignments.week ? `Week ${a.week}` : ``}
               </TableCell>
               <TableCell>
-                {assignment.dueDate}
+                {a.dueDate}
               </TableCell>
               <TableCell>
-                {assignment.name}
+                {a.name}
               </TableCell>
               <TableCell>
                 <ProgressBarV2
-                  score={assignment.currentUserSubmission.score}
-                  outOf={assignment.outOf}
-                  goalGrade={assignment.goalGrade}
-                  percentWidth={assignment.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
+                  score={a.currentUserSubmission.score}
+                  outOf={a.outOf}
+                  goalGrade={a.goalGrade}
+                  percentWidth={a.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
                   displayLabel
                   lines={
-                    assignment.goalGrade
-                      ? [{ color: 'green', value: assignment.goalGrade, draggable: true }]
+                    a.goalGrade
+                      ? [{ color: 'green', value: a.goalGrade, draggable: true }]
                       : []
                   }
                 />
-                <>{`${assignment.percentOfFinalGrade}%`}</>
+                <>{`${a.percentOfFinalGrade}%`}</>
               </TableCell>
               <TableCell>
                 {
-                  assignment.graded || assignment.outOf === 0
-                    ? assignment.outOf === 0
+                  a.graded || a.outOf === 0
+                    ? a.outOf === 0
                       ? '0'
-                      : `${assignment.currentUserSubmission.score}`
+                      : `${a.currentUserSubmission.score}`
 
                     : (
                       <TextField
+                        error={a.goalGrade > 100}
                         id='standard-number'
                         value={
-                          Object.prototype.hasOwnProperty.call(assignment, 'goalGrade')
-                            ? assignment.goalGrade
+                          Object.prototype.hasOwnProperty.call(a, 'goalGrade')
+                            ? a.goalGrade
+                            : ''
+                        }
+                        label={
+                          a.goalGrade > 100
+                            ? 'Over 100%'
                             : ''
                         }
                         onChange={event => setGoalGrade(key, event.target.value)}
@@ -106,7 +112,7 @@ function AssignmentTable (props) {
                 }
                 {
                   <div style={{ margin: 'auto', display: 'inline' }}>
-                    {` / ${assignment.outOf}`}
+                    {` / ${a.outOf}`}
                   </div>
                 }
               </TableCell>

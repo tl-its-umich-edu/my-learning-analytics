@@ -6,7 +6,7 @@ import TextField from '@material-ui/core/TextField'
 
 const styles = ({
   numberField: {
-    width: 80
+    width: 150
   }
 })
 
@@ -36,9 +36,14 @@ function AssignmentGradeBoxes (props) {
       <Grid item xs={3}>
         <Typography variant='h5'>Goal</Typography>
         <TextField
+          error={goalGrade > 100}
           id='standard-number'
           value={goalGrade || ''}
-          label={goalGrade ? '' : 'Set Goal'}
+          label={
+            goalGrade > 100
+              ? 'Over 100%'
+              : 'Set a goal grade'
+          }
           onChange={event => setGoalGrade(Number(event.target.value))}
           type='number'
           className={classes.numberField}
