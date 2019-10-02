@@ -103,7 +103,7 @@ INSTALLED_APPS = [
 
 # The order of this is important. It says DebugToolbar should be on top but
 # The tips has it on the bottom
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -451,14 +451,14 @@ SHA_ABBREV_LENGTH = 7
 
 # Django CSP Settings, load up from file if set
 if "CSP" in ENV:
-    MIDDLEWARE_CLASSES += ['csp.middleware.CSPMiddleware',]
+    MIDDLEWARE += ['csp.middleware.CSPMiddleware',]
     for csp_key, csp_val in ENV.get("CSP").items():
         # If there's a value set for this CSP config, set it as a global
         if (csp_val):
             globals()["CSP_"+csp_key] = csp_val
 # If CSP not set, add in XFrameOptionsMiddleware
 else:
-    MIDDLEWARE_CLASSES += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
+    MIDDLEWARE += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
 
 # These are mostly needed by Canvas but it should also be in on general 
 CSRF_COOKIE_SECURE = ENV.get("CSRF_COOKIE_SECURE", False)
