@@ -85,8 +85,10 @@ function AssignmentTable (props) {
               </TableCell>
               <TableCell>
                 {
-                  assignment.graded || assignment.outOf == 0
-                    ? assignment.outOf === 0 ? `0` : `${assignment.currentUserSubmission.score}`
+                  assignment.graded || assignment.outOf === 0
+                    ? assignment.outOf === 0
+                      ? '0'
+                      : `${assignment.currentUserSubmission.score}`
 
                     : (
                       <TextField
@@ -94,7 +96,7 @@ function AssignmentTable (props) {
                         value={
                           Object.prototype.hasOwnProperty.call(assignment, 'goalGrade')
                             ? assignment.goalGrade
-                            : assignment.outOf
+                            : ''
                         }
                         onChange={event => setGoalGrade(key, event.target.value)}
                         type='number'

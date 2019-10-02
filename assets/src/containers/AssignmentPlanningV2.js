@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
+import Button from '@material-ui/core/Button'
 import Spinner from '../components/Spinner'
 import ProgressBarV2 from '../components/ProgressBarV2'
 import AssignmentGradeBoxes from '../components/AssignmentGradeBoxes'
@@ -29,6 +30,10 @@ const styles = theme => ({
   paper: {
     padding: theme.spacing.unit * 2,
     color: theme.palette.text.secondary
+  },
+  clearButton: {
+    float: 'right',
+    margin: '30px'
   }
 })
 
@@ -63,6 +68,17 @@ function AssignmentPlanningV2 (props) {
       },
       ...assignments.slice(key + 1)
     ])
+  }
+
+  const handleResetClick = () => {
+    setAssignments(
+      assignments.map(a => {
+        a.goalGrade = ''
+        a.goalGradeSetByUser = null
+        return a
+      })
+    )
+    setGoalGrade(null)
   }
 
   const { loading, error, data } = useQuery(gql`
@@ -182,6 +198,13 @@ function AssignmentPlanningV2 (props) {
                       maxPossibleGrade={maxPossibleGrade}
                       setGoalGrade={grade => setGoalGrade(grade)}
                     />
+                    <Button
+                      variant='contained'
+                      className={classes.clearButton}
+                      onClick={handleResetClick}
+                    >
+                      {'Clear goal grades'}
+                    </Button>
                     <AssignmentTable
                       assignments={assignments}
                       setGoalGrade={setHandleAssignmentGoalGrade}

@@ -21,19 +21,19 @@ function AssignmentGradeBoxes (props) {
 
   return (
     <Grid container>
-      <Grid item xs={4}>
+      <Grid item xs={3}>
         <Typography variant='h5'>Current Grade</Typography>
         <Typography variant='h4' style={{ color: 'steelblue' }}>
           {`${currentGrade}%`}
         </Typography>
       </Grid>
-      <Grid item xs={4}>
+      <Grid item xs={3}>
         <Typography variant='h5'>Max Possible Grade</Typography>
         <Typography variant='h4' style={{ color: 'grey' }}>
           {`${maxPossibleGrade}%`}
         </Typography>
       </Grid>
-      <Grid item xs={4}>
+      <Grid item xs={3}>
         <Typography variant='h5'>Goal</Typography>
         <TextField
           id='standard-number'
