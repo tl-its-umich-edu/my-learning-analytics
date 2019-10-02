@@ -84,6 +84,7 @@ function AssignmentPlanning (props) {
     if (userSettingLoaded) {
       if (isObjectEmpty(userSetting.default)) {
         setAssignmentGradeFilter(0)
+        setUserSavedFilterSetting(0)
       } else {
         setAssignmentGradeFilter(Number(userSetting.default))
         setUserSavedFilterSetting(Number(userSetting.default))
