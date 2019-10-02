@@ -119,7 +119,6 @@ function ResourcesAccessed (props) {
 
   // if user setting is saved, don't show checkbox and sync userSavedFilterSetting with assignmentGradeFilter
   useEffect(() => {
-    console.log()
     if (userSettingSaved) {
       setShowSaveSetting(false)
       setUserSavedFilterSetting(resourceGradeFilter)
@@ -127,7 +126,6 @@ function ResourcesAccessed (props) {
   }, [userSettingSaved])
 
   useEffect(() => {
-    console.log("Setting the slider range")
     // Fetch info data and update slider length, slider range, and current week
     if (courseInfo) {
       const totalWeeks = courseInfo.total_weeks
