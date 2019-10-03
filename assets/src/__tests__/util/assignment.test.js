@@ -80,7 +80,7 @@ describe('calculateAssignmentGradeFromCourseGrade', () => {
         goalGrade: 40
       }
     ]
-    expect(calculateAssignmentGoalsFromCourseGoal(90, assignments, assignmentGroups)).toEqual(result)
+    expect(calculateAssignmentGoalsFromCourseGoal(90, assignments, assignmentGroups, true)).toEqual(result)
   })
 })
 
@@ -150,7 +150,7 @@ describe('calculateCurrentGrade', () => {
       }
     ]
 
-    expect(calculateCurrentGrade(assignments1, assignmentGroups)).toEqual(100)
+    expect(calculateCurrentGrade(assignments1, assignmentGroups, true)).toEqual(100)
 
     const assignments2 = [
       {
@@ -162,7 +162,7 @@ describe('calculateCurrentGrade', () => {
         graded: true
       }
     ]
-    expect(calculateCurrentGrade(assignments2, assignmentGroups)).toEqual(50)
+    expect(calculateCurrentGrade(assignments2, assignmentGroups, true)).toEqual(50)
 
     const assignments3 = [
       {
@@ -182,7 +182,7 @@ describe('calculateCurrentGrade', () => {
         graded: true
       }
     ]
-    expect(calculateCurrentGrade(assignments3, assignmentGroups)).toEqual(50)
+    expect(calculateCurrentGrade(assignments3, assignmentGroups, true)).toEqual(50)
 
     const assignments4 = [
       {
@@ -210,7 +210,7 @@ describe('calculateCurrentGrade', () => {
         graded: false
       }
     ]
-    expect(calculateCurrentGrade(assignments4, assignmentGroups)).toEqual(75)
+    expect(calculateCurrentGrade(assignments4, assignmentGroups, true)).toEqual(75)
   })
 })
 
@@ -250,7 +250,7 @@ describe('calculateMaxGrade', () => {
         graded: false
       }
     ]
-    expect(calculateMaxGrade(assignments, assignmentGroups)).toEqual(roundToOneDecimal(100 / 120 * 100))
+    expect(calculateMaxGrade(assignments, assignmentGroups, true)).toEqual(roundToOneDecimal(100 / 120 * 100))
   })
 })
 

@@ -1,10 +1,10 @@
 import { roundToOneDecimal } from './math'
 
-const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignmentGroups) => {
+const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignmentGroups, assignmentWeightConsideration) => {
   const gradedAssignments = assignments
     .filter(a => a.graded || a.goalGradeSetByUser)
 
-  const currentGrade = calculateMaxGrade(gradedAssignments, assignmentGroups)
+  const currentGrade = calculateMaxGrade(gradedAssignments, assignmentGroups, assignmentWeightConsideration)
 
   const weightOfGradedAssignments = gradedAssignments
     .map(a => calculateWeight(a.pointsPossible, a.assignmentGroupId, assignmentGroups))
@@ -29,7 +29,7 @@ const calculateWeight = (pointsPossible, assignmentGroupId, assignmentGroups) =>
   return roundToOneDecimal(assignmentGrade)
 }
 
-const calculateMaxGrade = (assignments, assignmentGroups) => {
+const calculateMaxGrade = (assignments, assignmentGroups, assignmentWeightConsideration) => {
   const [totalUserPoints, totalPossiblePoints] = assignments
     .reduce((acc, a) => {
       const assignmentGrade = a.graded
@@ -38,11 +38,13 @@ const calculateMaxGrade = (assignments, assignmentGroups) => {
           ? a.goalGrade / a.pointsPossible
           : 1 // give a perfect score if assignment is not graded to calculate the max grade possible.
 
-      const weightOfAssignment = calculateWeight(
-        a.pointsPossible,
-        a.assignmentGroupId,
-        assignmentGroups
-      )
+      const weightOfAssignment = assignmentWeightConsideration
+        ? calculateWeight(
+          a.pointsPossible,
+          a.assignmentGroupId,
+          assignmentGroups
+        )
+        : a.pointsPossible
       const pointsTowardsFinalGrade = assignmentGrade * weightOfAssignment
 
       acc[0] += pointsTowardsFinalGrade

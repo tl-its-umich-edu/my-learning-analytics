@@ -133,10 +133,10 @@ function AssignmentPlanningV2 (props) {
           }).sort((a, b) => a.week - b.week)
       )
       setCurrentGrade(
-        calculateCurrentGrade(course.assignments, course.assignmentGroups)
+        calculateCurrentGrade(course.assignments, course.assignmentGroups, course.assignmentWeightConsideration)
       )
       setMaxPossibleGrade(
-        calculateMaxGrade(course.assignments, course.assignmentGroups)
+        calculateMaxGrade(course.assignments, course.assignmentGroups, course.assignmentWeightConsideration)
       )
     }
   }, [loading])
@@ -149,7 +149,8 @@ function AssignmentPlanningV2 (props) {
         calculateAssignmentGoalsFromCourseGoal(
           goalGrade,
           assignments,
-          data.course.assignmentGroups
+          data.course.assignmentGroups,
+          data.course.assignmentWeightConsideration
         )
       )
     }
@@ -203,13 +204,6 @@ function AssignmentPlanningV2 (props) {
                       setGoalGrade={grade => setGoalGrade(grade)}
                       handleResetClick={handleResetClick}
                     />
-                    {/* <Button
-                      variant='contained'
-                      className={classes.clearButton}
-                      onClick={handleResetClick}
-                    >
-                      {'Clear goal grades'}
-                    </Button> */}
                     <AssignmentTable
                       assignments={assignments}
                       setGoalGrade={setHandleAssignmentGoalGrade}
