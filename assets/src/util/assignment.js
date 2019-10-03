@@ -7,7 +7,9 @@ const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignme
   const currentGrade = calculateMaxGrade(gradedAssignments, assignmentGroups, assignmentWeightConsideration)
 
   const weightOfGradedAssignments = gradedAssignments
-    .map(a => calculateWeight(a.pointsPossible, a.assignmentGroupId, assignmentGroups))
+    .map(a => assignmentWeightConsideration
+      ? calculateWeight(a.pointsPossible, a.assignmentGroupId, assignmentGroups)
+      : a.pointsPossible)
     .reduce((acc, cur) => (acc += cur), 0) / 100
 
   const ungradedAssignmentGrade = (goalGrade - currentGrade * weightOfGradedAssignments) /
@@ -45,6 +47,7 @@ const calculateMaxGrade = (assignments, assignmentGroups, assignmentWeightConsid
           assignmentGroups
         )
         : a.pointsPossible
+
       const pointsTowardsFinalGrade = assignmentGrade * weightOfAssignment
 
       acc[0] += pointsTowardsFinalGrade
