@@ -29,9 +29,10 @@ function AssignmentTable (props) {
   const { classes, assignments, setGoalGrade } = props
 
   const maxPercentOfFinalGrade = Math.max(
-    ...assignments
-      .map(({ percentOfFinalGrade }) => percentOfFinalGrade)
+    ...assignments.map(({ percentOfFinalGrade }) => percentOfFinalGrade)
   )
+
+  console.log(assignments)
 
   return (
     <MTable className={classes.table}>
@@ -60,7 +61,7 @@ function AssignmentTable (props) {
           assignments.map((a, key) => (
             <TableRow key={key}>
               <TableCell>
-                {assignments.week ? `Week ${a.week}` : ``}
+                {a.week ? `Week ${a.week}` : ''}
               </TableCell>
               <TableCell>
                 {a.dueDate}
