@@ -36,12 +36,17 @@ function AssignmentTable(props) {
     ...assignments.map(({ percentOfFinalGrade }) => percentOfFinalGrade)
   )
 
-  const noBorderIfSameWeek = (week, assignments, key) => {
+  const isNextWeekTheSame = (week, key) => {
     return assignments[key + 1]
       ? assignments[key + 1].week === week
-        ? { borderBottom: 'none' }
-        : {}
-      : {}
+      : false
+  }
+
+  const isPreviousWeekTheSame = (week, key) => {
+    if (key >= 1) {
+      return assignments[key - 1].week === week
+    }
+    return false
   }
 
   return (
@@ -70,13 +75,37 @@ function AssignmentTable(props) {
         {
           assignments.map((a, key) => (
             <TableRow key={key}>
-              <TableCell style={noBorderIfSameWeek(a.week, assignments, key)}>
-                {a.week ? `Week ${a.week}` : ''}
+              <TableCell
+                style={
+                  isNextWeekTheSame(a.week, key)
+                    ? { borderBottom: 'none' }
+                    : {}
+                }
+              >
+                {
+                  a.week
+                    ? isPreviousWeekTheSame(a.week, key)
+                      ? ''
+                      : `Week ${a.week}`
+                    : ''
+                }
               </TableCell>
-              <TableCell style={noBorderIfSameWeek(a.week, assignments, key)}>
-                {a.dueDate}
+              <TableCell
+                style={
+                  isNextWeekTheSame(a.week, key)
+                    ? { borderBottom: 'none' }
+                    : {}
+                }
+              >
+                {
+                  a.week
+                    ? isPreviousWeekTheSame(a.week, key)
+                      ? ''
+                      : a.dueDate
+                    : ''
+                }
               </TableCell>
-              <TableCell style={noBorderIfSameWeek(a.week, assignments, key)}>
+              <TableCell>
                 {a.name}
               </TableCell>
               <TableCell>
