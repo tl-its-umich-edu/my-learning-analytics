@@ -189,7 +189,7 @@ function AssignmentPlanningV2 (props) {
                           label: 'Max Possible',
                           value: maxPossibleGrade,
                           color: 'grey',
-                          labelDown: true
+                          labelDownLower: true
                         }
                       ]}
                       outOf={100}

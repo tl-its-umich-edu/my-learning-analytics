@@ -6,6 +6,7 @@ function Label (props) {
     color,
     labelUp,
     labelDown,
+    labelDownLower,
     labelText
   } = props
 
@@ -17,7 +18,13 @@ function Label (props) {
         color,
         left,
         zIndex: 1,
-        top: labelDown ? '50px' : labelUp ? '-20px' : 0
+        top: labelDown
+          ? '50px'
+          : labelDownLower
+            ? '75px'
+            : labelUp
+              ? '-20px'
+              : 0
       }}
     >
       {labelText}
