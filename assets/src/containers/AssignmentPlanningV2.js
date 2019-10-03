@@ -11,7 +11,7 @@ import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
 import { gql } from 'apollo-boost'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { calculateWeekOffset } from '../util/date'
+import { calculateWeekOffset, dateToMonthDay } from '../util/date'
 import {
   calculateWeight,
   calculateCurrentGrade,
@@ -126,6 +126,7 @@ function AssignmentPlanningV2 (props) {
             a.percentOfFinalGrade = calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
             a.outOf = pointsPossible
             a.graded = !!currentUserSubmission.gradedDate
+            a.dueDate = dateToMonthDay(dueDate)
             return a
           }).sort((a, b) => a.week - b.week)
       )

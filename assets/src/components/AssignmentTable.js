@@ -32,8 +32,6 @@ function AssignmentTable (props) {
     ...assignments.map(({ percentOfFinalGrade }) => percentOfFinalGrade)
   )
 
-  console.log(assignments)
-
   return (
     <MTable className={classes.table}>
       <TableHead>

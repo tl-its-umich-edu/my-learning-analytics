@@ -11,6 +11,16 @@ const calculateWeekOffset = (startDateTime, targetDateTime) => {
   return Math.ceil((differenceInDays + 1) / 7)
 }
 
+const dateToMonthDay = date => {
+  const dateObj = new Date(date)
+
+  const month = dateObj.getMonth() + 1
+  const day = dateObj.getDate()
+
+  return `${month}/${day}`
+}
+
 export {
-  calculateWeekOffset
+  calculateWeekOffset,
+  dateToMonthDay
 }

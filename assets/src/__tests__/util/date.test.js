@@ -1,6 +1,6 @@
 /* global describe, it, expect */
 
-import { calculateWeekOffset } from '../../util/date'
+import { calculateWeekOffset, dateToMonthDay } from '../../util/date'
 
 describe('calculateWeekOffset', () => {
   it('takes as input a date time string and returns the week of the year', () => {
@@ -31,5 +31,12 @@ describe('calculateWeekOffset', () => {
     expect(calculateWeekOffset(jan7, jan13)).toEqual(1)
     expect(calculateWeekOffset(jan7, jan14)).toEqual(2)
     expect(calculateWeekOffset(jan7, jan15)).toEqual(2)
+  })
+})
+
+describe('dateToMonthDay', () => {
+  it('takes as input a date time string and returns in ${month}/${day} format', () => {
+    const date = new Date('2019-05-16T18:42:35+00:00')
+    expect(dateToMonthDay(date)).toEqual('5/16')
   })
 })
