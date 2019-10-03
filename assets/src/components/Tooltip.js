@@ -8,7 +8,7 @@ export const AssignmentPlanningTooltip = classes => createToolTip(d => renderToS
   <Paper className={classes.paper}>
     <Typography>
       Assignment: <strong>{d.name}</strong><br />
-      Due at: <strong>{d.due_dates}</strong><br />
+      Due: <strong>{d.due_dates}</strong><br />
       Your grade: <strong>{d.score ? `${d.score}` : 'Not available'}</strong><br />
       Total points possible: <strong>{d.points_possible}</strong><br />
       Avg. assignment grade: <strong>{d.avg_score}</strong><br />
