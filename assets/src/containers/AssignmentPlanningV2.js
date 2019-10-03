@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
-import Button from '@material-ui/core/Button'
 import Spinner from '../components/Spinner'
 import ProgressBarV2 from '../components/ProgressBarV2'
 import AssignmentGradeBoxes from '../components/AssignmentGradeBoxes'
@@ -202,14 +201,15 @@ function AssignmentPlanningV2 (props) {
                       goalGrade={goalGrade}
                       maxPossibleGrade={maxPossibleGrade}
                       setGoalGrade={grade => setGoalGrade(grade)}
+                      handleResetClick={handleResetClick}
                     />
-                    <Button
+                    {/* <Button
                       variant='contained'
                       className={classes.clearButton}
                       onClick={handleResetClick}
                     >
                       {'Clear goal grades'}
-                    </Button>
+                    </Button> */}
                     <AssignmentTable
                       assignments={assignments}
                       setGoalGrade={setHandleAssignmentGoalGrade}
