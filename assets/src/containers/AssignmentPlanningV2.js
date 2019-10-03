@@ -34,6 +34,9 @@ const styles = theme => ({
   clearButton: {
     float: 'right',
     margin: '30px'
+  },
+  mainProgressBar: {
+    marginBottom: '50px'
   }
 })
 
@@ -190,8 +193,9 @@ function AssignmentPlanningV2 (props) {
                         }
                       ]}
                       outOf={100}
-                      percentWidth={100}
+                      percentWidth={90}
                       height={50}
+                      margin={50}
                     />
                     <AssignmentGradeBoxes
                       currentGrade={currentGrade}

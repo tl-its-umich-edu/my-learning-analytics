@@ -29,7 +29,7 @@ const styles = theme => ({
   }
 })
 
-function AssignmentTable(props) {
+function AssignmentTable (props) {
   const { classes, assignments, setGoalGrade } = props
 
   const maxPercentOfFinalGrade = Math.max(

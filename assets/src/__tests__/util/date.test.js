@@ -35,7 +35,7 @@ describe('calculateWeekOffset', () => {
 })
 
 describe('dateToMonthDay', () => {
-  it('takes as input a date time string and returns in ${month}/${day} format', () => {
+  it('takes as input a date time string and returns in {month}/{day} format', () => {
     const date = new Date('2019-05-16T18:42:35+00:00')
     expect(dateToMonthDay(date)).toEqual('5/16')
 

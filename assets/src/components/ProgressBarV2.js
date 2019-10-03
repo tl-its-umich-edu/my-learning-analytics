@@ -22,6 +22,7 @@ function ProgressBarV2 (props) {
     outOf,
     percentWidth,
     height = 10,
+    margin = 0,
     lines = []
   } = props
 
@@ -43,7 +44,8 @@ function ProgressBarV2 (props) {
           style={{
             width: `${percentWidth}%`,
             height: `${height}px`,
-            position: 'relative'
+            position: 'relative',
+            margin: `${margin}px`
           }}
         >
           {
@@ -77,7 +79,7 @@ function ProgressBarV2 (props) {
                   style={{
                     position: 'absolute',
                     display: 'inline-block',
-                    width: `${scoreRatio * 100}%`,
+                    width: `${(scoreRatio * 100) > 100 ? 100 : scoreRatio * 100}%`,
                     height: `${height}px`
                   }}
                 />
