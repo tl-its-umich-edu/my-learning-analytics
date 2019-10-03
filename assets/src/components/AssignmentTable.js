@@ -20,20 +20,32 @@ const styles = theme => ({
   sliderCell: {
     minWidth: '150px'
   },
-  numberField: {
-    width: 90
+  goalGradeInput: {
+    marginTop: 0,
+    width: 85
+  },
+  tableCell: {
+    border: 'none'
   }
 })
 
-function AssignmentTable (props) {
+function AssignmentTable(props) {
   const { classes, assignments, setGoalGrade } = props
 
   const maxPercentOfFinalGrade = Math.max(
     ...assignments.map(({ percentOfFinalGrade }) => percentOfFinalGrade)
   )
 
+  const noBorderIfSameWeek = (week, assignments, key) => {
+    return assignments[key + 1]
+      ? assignments[key + 1].week === week
+        ? { borderBottom: 'none' }
+        : {}
+      : {}
+  }
+
   return (
-    <MTable className={classes.table}>
+    <MTable>
       <TableHead>
         <TableRow>
           {
@@ -58,13 +70,13 @@ function AssignmentTable (props) {
         {
           assignments.map((a, key) => (
             <TableRow key={key}>
-              <TableCell>
+              <TableCell style={noBorderIfSameWeek(a.week, assignments, key)}>
                 {a.week ? `Week ${a.week}` : ''}
               </TableCell>
-              <TableCell>
+              <TableCell style={noBorderIfSameWeek(a.week, assignments, key)}>
                 {a.dueDate}
               </TableCell>
-              <TableCell>
+              <TableCell style={noBorderIfSameWeek(a.week, assignments, key)}>
                 {a.name}
               </TableCell>
               <TableCell>
@@ -105,7 +117,7 @@ function AssignmentTable (props) {
                         }
                         onChange={event => setGoalGrade(key, event.target.value)}
                         type='number'
-                        className={classes.numberField}
+                        className={classes.goalGradeInput}
                       />
                     )
                 }

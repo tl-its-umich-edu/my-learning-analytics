@@ -38,5 +38,8 @@ describe('dateToMonthDay', () => {
   it('takes as input a date time string and returns in ${month}/${day} format', () => {
     const date = new Date('2019-05-16T18:42:35+00:00')
     expect(dateToMonthDay(date)).toEqual('5/16')
+
+    const date2 = new Date('2019-06-02T06:03:19+00:00')
+    expect(dateToMonthDay(date2)).toEqual('6/2')
   })
 })

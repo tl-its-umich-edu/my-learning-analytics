@@ -5,7 +5,8 @@ import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 
 const styles = ({
-  numberField: {
+  goalGradeInput: {
+    marginTop: 0,
     width: 150
   }
 })
@@ -46,7 +47,7 @@ function AssignmentGradeBoxes (props) {
           }
           onChange={event => setGoalGrade(Number(event.target.value))}
           type='number'
-          className={classes.numberField}
+          className={classes.goalGradeInput}
           InputLabelProps={{
             // endAdornment: <InputAdornment position='start'>%</InputAdornment> // doesn't seem to be working
           }}

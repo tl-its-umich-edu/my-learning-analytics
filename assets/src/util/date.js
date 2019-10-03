@@ -15,7 +15,7 @@ const dateToMonthDay = date => {
   const dateObj = new Date(date)
 
   const month = dateObj.getMonth() + 1
-  const day = dateObj.getDate()
+  const day = dateObj.getUTCDate()
 
   return `${month}/${day}`
 }
