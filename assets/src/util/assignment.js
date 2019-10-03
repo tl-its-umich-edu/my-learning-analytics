@@ -15,7 +15,7 @@ const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignme
 
   return assignments.map(a => {
     if (!a.graded && !a.goalGradeSetByUser) {
-      a.goalGrade = ungradedAssignmentGrade / 100 * a.pointsPossible
+      a.goalGrade = roundToOneDecimal(ungradedAssignmentGrade / 100 * a.pointsPossible)
     }
     return a
   })
