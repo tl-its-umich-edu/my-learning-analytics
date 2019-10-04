@@ -5,14 +5,22 @@ import {Range} from 'rc-slider';
 import theme from "../theme";
 
 const rangeSlider = props => {
-    const wrapperStyle = { width: "70%", margin: "0 auto" }
-    const dotStyle = {
+    const activeDotStyle = {
         borderColor: theme.palette.primary.light,
     };
-    const trackStyle = {
+    const dotStyle = {
+        borderColor: theme.palette.secondary.light,
+    }
+    const unselectedStyle = {
+        borderColor: theme.palette.secondary.light,
+        backgroundColor: theme.palette.secondary.light,
+    };
+    const selectedStyle = {
         borderColor: theme.palette.primary.light,
         backgroundColor: theme.palette.primary.light,
     };
+    const wrapperStyle = { width: "70%", margin: "0 auto" }
+
     const marks = {}
     
     for (let week = props.min; week <= props.max; week++) {
@@ -27,9 +35,11 @@ const rangeSlider = props => {
         <div style={wrapperStyle}>
             <p style={{textAlign: "center"}}>Select a start and end week</p>
             <Range
-            activeDotStyle={dotStyle}
-            handleStyle={[dotStyle, dotStyle]}
-            trackStyle={[trackStyle]}
+            activeDotStyle={activeDotStyle}
+            dotStyle={dotStyle}
+            handleStyle={[activeDotStyle, activeDotStyle]}
+            railStyle={unselectedStyle}
+            trackStyle={[selectedStyle]}
             allowCross={false}
             min={props.min} 
             max={props.max}
