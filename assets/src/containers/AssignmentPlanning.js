@@ -32,7 +32,7 @@ const styles = theme => ({
   graded: {
     width: '10px',
     height: '10px',
-    background: 'lightskyblue',
+    background: theme.palette.primary.light,
     display: 'inline-block'
   },
   ungraded: {
