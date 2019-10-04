@@ -2,6 +2,7 @@ import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import d3tip from 'd3-tip'
 import './createResourceAccessChart.css'
+import theme from "../../theme";
 
 /*
   References:
@@ -11,7 +12,7 @@ import './createResourceAccessChart.css'
     - D3 V4 Changes: https://github.com/d3/d3/blob/master/CHANGES.md
 */
 
-const accessedResourceColor = 'steelblue'
+const accessedResourceColor = theme.palette.primary.light
 const notAccessedResourceColor = 'gray'
 const mainMargin = { top: 50, right: 10, bottom: 50, left: 200 }
 

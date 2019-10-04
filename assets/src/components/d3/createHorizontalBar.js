@@ -1,8 +1,10 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
+import theme from "../../theme";
 
 function createHorizontalBar ({ data, width, height, domElement, tip }) {
   const margin = { top: 0, bottom: 0, left: 0, right: 0 }
+  const gradedColor = theme.palette.primary.light
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   const x = d3.scaleLinear()
@@ -33,7 +35,7 @@ function createHorizontalBar ({ data, width, height, domElement, tip }) {
       y(d.label)
     })
     .attr('height', y.bandwidth())
-    .attr('fill', d => d.graded ? '#a0d4ee' : '#e1e1e1')
+    .attr('fill', d => d.graded ? gradedColor : '#e1e1e1')
 
   // appending text end of the bar with some padding
   bar.append('text')
