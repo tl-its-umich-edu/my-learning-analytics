@@ -36,7 +36,6 @@ function App (props) {
   const courseId = coursePageMatch ? coursePageMatch.params.courseId : null
 
   return (
-
     <MuiThemeProvider theme={theme}>
       <GoogleAnalyticsTracking gaId={myla_globals.google_analytics_id} />
       <Route path='/' exact render={props => <CourseList {...props} user={user} />} />

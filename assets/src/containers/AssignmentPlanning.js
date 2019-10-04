@@ -38,7 +38,7 @@ const styles = theme => ({
   ungraded: {
     width: '10px',
     height: '10px',
-    background: 'gray',
+    background: theme.palette.secondary.main,
     display: 'inline-block'
   }
 })
