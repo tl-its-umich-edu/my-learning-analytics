@@ -13,7 +13,7 @@ import theme from "../../theme";
 */
 
 const accessedResourceColor = theme.palette.primary.light
-const notAccessedResourceColor = 'gray'
+const notAccessedResourceColor = theme.palette.secondary.main
 const mainMargin = { top: 50, right: 10, bottom: 50, left: 200 }
 
 const toolTip = d3tip().attr('class', 'd3-tip')
