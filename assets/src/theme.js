@@ -11,7 +11,7 @@ const theme = createMuiTheme({
         /* A minor color. 'main' is used currently to indicate a negative/un-completed/un-viewed state. If another
         * core color is needed, this could be bumped to a separate object in the palette. */
         secondary: {
-            main: "#9E9E9E"
+            main: "#BDBDBD"
         }
     }
 });

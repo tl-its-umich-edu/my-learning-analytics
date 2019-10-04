@@ -9,11 +9,11 @@ const rangeSlider = props => {
         borderColor: theme.palette.primary.light,
     };
     const dotStyle = {
-        borderColor: theme.palette.secondary.light,
+        borderColor: theme.palette.secondary.main,
     }
     const unselectedStyle = {
-        borderColor: theme.palette.secondary.light,
-        backgroundColor: theme.palette.secondary.light,
+        borderColor: theme.palette.secondary.main,
+        backgroundColor: theme.palette.secondary.main,
     };
     const selectedStyle = {
         borderColor: theme.palette.primary.light,
