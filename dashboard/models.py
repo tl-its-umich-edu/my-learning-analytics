@@ -281,7 +281,8 @@ class Submission(models.Model):
     user_id = models.BigIntegerField(verbose_name="User Id")
     score = models.FloatField(blank=True, null=True, verbose_name="Score")
     graded_date = models.DateTimeField(blank=True, null=True, verbose_name="Graded DateTime")
-    grade_posted_local_date = models.DateTimeField(blank=True, null=True, verbose_name="Posted Grade in local DateTime")
+    # This is used for tracking of grade posted date and not used in Assignment view hence making it CharField
+    grade_posted_local_date = models.CharField(max_length=255,blank=True, null=True, verbose_name="Posted Grade in local DateTime")
     avg_score = models.FloatField(blank=True, null=True, verbose_name="Average Grade")
 
     def __str__(self):
