@@ -44,10 +44,9 @@ function AssignmentTable (props) {
   }
 
   const isPreviousWeekTheSame = (week, key) => {
-    if (key >= 1) {
-      return assignments[key - 1].week === week
-    }
-    return false
+    return key >= 1
+      ? assignments[key - 1].week === week
+      : false
   }
 
   return (
