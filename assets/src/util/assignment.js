@@ -16,12 +16,14 @@ const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignme
   const totalGradedAssignmentPoints = calculateTotalPointsPossible(gradedAssignments, assignmentGroups, assignmentWeightConsideration)
   const totalUngradedAssignmentPoints = calculateTotalPointsPossible(ungradedAssingments, assignmentGroups, assignmentWeightConsideration)
 
-  const percentageOfCourseUngraded = totalUngradedAssignmentPoints / (totalUngradedAssignmentPoints + totalGradedAssignmentPoints)
+  const percentageOfCourseUngraded = totalUngradedAssignmentPoints /
+    (totalUngradedAssignmentPoints + totalGradedAssignmentPoints)
 
-  const requiredGrade = (goalGrade - ((1 - percentageOfCourseUngraded) * currentGrade)) / (percentageOfCourseUngraded * 100)
+  const requiredGrade = (goalGrade - ((1 - percentageOfCourseUngraded) * currentGrade)) /
+    (percentageOfCourseUngraded * 100)
 
   return assignments.map(a => {
-    if (!a.graded && !a.goalGradeSetByUser) {
+    if (!(a.graded || a.goalGradeSetByUser)) {
       a.goalGrade = requiredGrade * a.pointsPossible
     }
     return a

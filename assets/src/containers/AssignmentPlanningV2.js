@@ -39,7 +39,7 @@ const styles = theme => ({
   }
 })
 
-const updateUserSetting = courseId => gql`
+const UPDATE_USER_SETTING = gql`
   mutation setUserDefaultSelection($input: UserDefaultSelectionInput!) {
     setUserDefaultSelection(data: $input) {
       userDefaultSelection {
@@ -59,6 +59,7 @@ function AssignmentPlanningV2 (props) {
   const [goalGrade, setGoalGrade] = useState(null)
   const [currentGrade, setCurrentGrade] = useState(0)
   const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
+  const [updateUserSetting] = useMutation(UPDATE_USER_SETTING)
 
   const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setAssignments([
@@ -128,7 +129,8 @@ function AssignmentPlanningV2 (props) {
             a.percentOfFinalGrade = calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
             a.outOf = pointsPossible
             a.graded = !!currentUserSubmission.gradedDate
-            a.dueDate = dateToMonthDay(dueDate)
+            a.dueDateMonthDay = dateToMonthDay(dueDate)
+
             return a
           }).sort((a, b) => a.week - b.week)
       )
