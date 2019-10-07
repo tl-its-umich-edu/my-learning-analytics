@@ -59,6 +59,7 @@ function AssignmentPlanningV2 (props) {
   const [goalGrade, setGoalGrade] = useState(null)
   const [currentGrade, setCurrentGrade] = useState(0)
   const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
+  const [userSetting, setUserSetting] = useState(null)
   const [updateUserSetting] = useMutation(UPDATE_USER_SETTING)
 
   const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
@@ -73,7 +74,7 @@ function AssignmentPlanningV2 (props) {
     ])
   }
 
-  const handleResetClick = () => {
+  const handleClearGoalGrades = () => {
     setAssignments(
       assignments.map(a => {
         a.goalGrade = ''
@@ -204,7 +205,7 @@ function AssignmentPlanningV2 (props) {
                       goalGrade={goalGrade}
                       maxPossibleGrade={maxPossibleGrade}
                       setGoalGrade={grade => setGoalGrade(grade)}
-                      handleResetClick={handleResetClick}
+                      handleClearGoalGrades={handleClearGoalGrades}
                     />
                     <AssignmentTable
                       assignments={assignments}

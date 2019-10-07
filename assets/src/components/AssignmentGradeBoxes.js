@@ -19,7 +19,7 @@ function AssignmentGradeBoxes (props) {
     maxPossibleGrade,
     goalGrade,
     setGoalGrade,
-    handleResetClick,
+    handleClearGoalGrades,
     classes
   } = props
 
@@ -61,7 +61,7 @@ function AssignmentGradeBoxes (props) {
         <Button
           variant='contained'
           className={classes.clearButton}
-          onClick={handleResetClick}
+          onClick={handleClearGoalGrades}
         >
           {'Clear goal grades'}
         </Button>

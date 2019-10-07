@@ -133,15 +133,11 @@ function AssignmentTable (props) {
 
                     : (
                       <TextField
-                        error={a.goalGrade > 100}
+                        error={(a.goalGrade / a.pointsPossible) > 1}
                         id='standard-number'
-                        value={
-                          Object.prototype.hasOwnProperty.call(a, 'goalGrade')
-                            ? roundToOneDecimal(a.goalGrade)
-                            : ''
-                        }
+                        value={roundToOneDecimal(a.goalGrade) || ''}
                         label={
-                          a.goalGrade > 100
+                          (a.goalGrade / a.pointsPossible) > 1
                             ? 'Over 100%'
                             : 'Set a goal'
                         }
