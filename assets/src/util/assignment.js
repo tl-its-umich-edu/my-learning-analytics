@@ -1,23 +1,28 @@
-import { roundToOneDecimal } from './math'
+const calculateTotalPointsPossible = (assignments, assignmentGroups, assignmentWeightConsideration) => {
+  return assignments.map(
+    a => assignmentWeightConsideration
+      ? calculateWeight(a.pointsPossible, a.assignmentGroupId, assignmentGroups)
+      : a.pointsPossible
+  ).reduce((acc, cur) => (acc += cur), 0)
+}
 
 const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignmentGroups, assignmentWeightConsideration) => {
   const gradedAssignments = assignments
     .filter(a => a.graded || a.goalGradeSetByUser)
+  const ungradedAssingments = assignments
+    .filter(a => !(a.graded || a.goalGradeSetByUser))
 
   const currentGrade = calculateMaxGrade(gradedAssignments, assignmentGroups, assignmentWeightConsideration)
+  const totalGradedAssignmentPoints = calculateTotalPointsPossible(gradedAssignments, assignmentGroups, assignmentWeightConsideration)
+  const totalUngradedAssignmentPoints = calculateTotalPointsPossible(ungradedAssingments, assignmentGroups, assignmentWeightConsideration)
 
-  const weightOfGradedAssignments = gradedAssignments
-    .map(a => assignmentWeightConsideration
-      ? calculateWeight(a.pointsPossible, a.assignmentGroupId, assignmentGroups)
-      : a.pointsPossible)
-    .reduce((acc, cur) => (acc += cur), 0) / 100
+  const percentageOfCourseUngraded = totalUngradedAssignmentPoints / (totalUngradedAssignmentPoints + totalGradedAssignmentPoints)
 
-  const ungradedAssignmentGrade = (goalGrade - currentGrade * weightOfGradedAssignments) /
-    (1 - weightOfGradedAssignments)
+  const requiredGrade = (goalGrade - ((1 - percentageOfCourseUngraded) * currentGrade)) / (percentageOfCourseUngraded * 100)
 
   return assignments.map(a => {
     if (!a.graded && !a.goalGradeSetByUser) {
-      a.goalGrade = roundToOneDecimal(ungradedAssignmentGrade / 100 * a.pointsPossible)
+      a.goalGrade = requiredGrade * a.pointsPossible
     }
     return a
   })
@@ -28,7 +33,7 @@ const calculateWeight = (pointsPossible, assignmentGroupId, assignmentGroups) =>
   const assignmentGrade = assignmentGroup.groupPoints > 0
     ? assignmentGroup.weight * (pointsPossible / assignmentGroup.groupPoints)
     : 0
-  return roundToOneDecimal(assignmentGrade)
+  return assignmentGrade
 }
 
 const calculateMaxGrade = (assignments, assignmentGroups, assignmentWeightConsideration) => {
@@ -51,7 +56,7 @@ const calculateMaxGrade = (assignments, assignmentGroups, assignmentWeightConsid
       return acc
     }, [0, 0])
 
-  return roundToOneDecimal(totalUserPoints / totalPossiblePoints * 100)
+  return (totalUserPoints / totalPossiblePoints * 100)
 }
 
 // calculateCurrentGrade ignores any ungraded assignments

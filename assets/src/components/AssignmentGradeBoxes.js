@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
+import { roundToOneDecimal } from '../util/math'
 
 const styles = ({
   goalGradeInput: {
@@ -27,13 +28,13 @@ function AssignmentGradeBoxes (props) {
       <Grid item xs={2}>
         <Typography variant='h5'>Current Grade</Typography>
         <Typography variant='h4' style={{ color: 'steelblue' }}>
-          {`${currentGrade}%`}
+          {`${roundToOneDecimal(currentGrade)}%`}
         </Typography>
       </Grid>
       <Grid item xs={2}>
         <Typography variant='h5'>Max Possible Grade</Typography>
         <Typography variant='h4' style={{ color: 'grey' }}>
-          {`${maxPossibleGrade}%`}
+          {`${roundToOneDecimal(maxPossibleGrade)}%`}
         </Typography>
       </Grid>
       <Grid item xs={2}>

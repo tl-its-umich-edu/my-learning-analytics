@@ -7,7 +7,6 @@ import {
   calculateMaxGrade,
   sumAssignmentGoalGrade
 } from '../../util/assignment'
-import { roundToOneDecimal } from '../../util/math'
 
 describe('calculateAssignmentGradeFromCourseGrade', () => {
   it(`takes an array of assignments and a course goal as input,
@@ -122,10 +121,10 @@ describe('calculateWeightedAssignmentGrade', () => {
 
     expect(
       calculateWeight(assignment1.pointsPossible, assignment1.assignmentGroupId, assignmentGroups)
-    ).toEqual(roundToOneDecimal(5 * (14 / 50)))
+    ).toEqual(5 * (14 / 50))
     expect(
       calculateWeight(assignment2.pointsPossible, assignment2.assignmentGroupId, assignmentGroups)
-    ).toEqual(roundToOneDecimal(17 * (29 / 100)))
+    ).toEqual(17 * (29 / 100))
   })
 })
 
@@ -250,7 +249,7 @@ describe('calculateMaxGrade', () => {
         graded: false
       }
     ]
-    expect(calculateMaxGrade(assignments, assignmentGroups, true)).toEqual(roundToOneDecimal(100 / 120 * 100))
+    expect(calculateMaxGrade(assignments, assignmentGroups, true)).toEqual(83.33333333333333)
   })
 })
 

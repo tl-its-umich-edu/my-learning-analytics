@@ -7,6 +7,7 @@ import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TextField from '@material-ui/core/TextField'
 import ProgressBarV2 from './ProgressBarV2'
+import { roundToOneDecimal } from '../util/math'
 
 const styles = theme => ({
   root: {
@@ -136,7 +137,7 @@ function AssignmentTable (props) {
                         id='standard-number'
                         value={
                           Object.prototype.hasOwnProperty.call(a, 'goalGrade')
-                            ? a.goalGrade
+                            ? roundToOneDecimal(a.goalGrade)
                             : ''
                         }
                         label={
