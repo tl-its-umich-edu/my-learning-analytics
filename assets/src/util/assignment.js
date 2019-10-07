@@ -41,11 +41,7 @@ const calculateMaxGrade = (assignments, assignmentGroups, assignmentWeightConsid
           : 1 // give a perfect score if assignment is not graded to calculate the max grade possible.
 
       const weightOfAssignment = assignmentWeightConsideration
-        ? calculateWeight(
-          a.pointsPossible,
-          a.assignmentGroupId,
-          assignmentGroups
-        )
+        ? calculateWeight(a.pointsPossible, a.assignmentGroupId, assignmentGroups)
         : a.pointsPossible
 
       const pointsTowardsFinalGrade = assignmentGrade * weightOfAssignment
@@ -59,8 +55,8 @@ const calculateMaxGrade = (assignments, assignmentGroups, assignmentWeightConsid
 }
 
 // calculateCurrentGrade ignores any ungraded assignments
-const calculateCurrentGrade = (assignments, assignmentGroups) =>
-  calculateMaxGrade(assignments.filter(a => a.graded), assignmentGroups)
+const calculateCurrentGrade = (assignments, assignmentGroups, assignmentWeightConsideration) =>
+  calculateMaxGrade(assignments.filter(a => a.graded), assignmentGroups, assignmentWeightConsideration)
 
 const sumAssignmentGoalGrade = assignments => assignments
   .reduce((acc, a) => (acc += a.goalGrade || 0), 0)
