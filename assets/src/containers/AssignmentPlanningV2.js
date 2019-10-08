@@ -16,7 +16,8 @@ import {
   calculateCurrentGrade,
   calculateMaxGrade,
   calculateAssignmentGoalsFromCourseGoal,
-  sumAssignmentGoalGrade
+  sumAssignmentGoalGrade,
+  setAssignmentFields
 } from '../util/assignment'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
@@ -53,6 +54,7 @@ const UPDATE_USER_SETTING = gql`
 
 function AssignmentPlanningV2 (props) {
   const { classes, disabled, courseId } = props
+  const COURSE_ID_WITH_INCREMENT = `17700000000${courseId}`
   if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
 
   const [assignments, setAssignments] = useState([])
@@ -60,7 +62,7 @@ function AssignmentPlanningV2 (props) {
   const [currentGrade, setCurrentGrade] = useState(0)
   const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
   const [userSetting, setUserSetting] = useState(null)
-  const [updateUserSetting] = useMutation(UPDATE_USER_SETTING)
+  const [updateUserSetting, { loading: mutationLoading, error: mutationError }] = useMutation(UPDATE_USER_SETTING)
 
   const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setAssignments([
@@ -113,28 +115,7 @@ function AssignmentPlanningV2 (props) {
   useEffect(() => {
     if (!loading && !error) {
       const course = data.course
-      setAssignments(
-        course.assignments
-          .map(a => {
-            const {
-              dueDate,
-              pointsPossible,
-              assignmentGroupId,
-              currentUserSubmission
-            } = a
-
-            const courseStartDate = course.dateStart
-            const assignmentGroups = course.assignmentGroups
-
-            a.week = calculateWeekOffset(courseStartDate, dueDate)
-            a.percentOfFinalGrade = calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
-            a.outOf = pointsPossible
-            a.graded = !!currentUserSubmission.gradedDate
-            a.dueDateMonthDay = dateToMonthDay(dueDate)
-
-            return a
-          }).sort((a, b) => a.week - b.week)
-      )
+      setAssignments(setAssignmentFields(course))
       setCurrentGrade(
         calculateCurrentGrade(course.assignments, course.assignmentGroups, course.assignmentWeightConsideration)
       )
@@ -143,6 +124,12 @@ function AssignmentPlanningV2 (props) {
       )
     }
   }, [loading])
+
+  useEffect(() => {
+    if (!mutationLoading && !mutationError) {
+
+    }
+  }, [mutationLoading])
 
   // this effect is used to keep the goal of the course and assignments "in sync"
   // run if goalGrade changes, or if the sum of goal grades set by user changes

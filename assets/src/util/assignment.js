@@ -1,3 +1,5 @@
+import { calculateWeekOffset, dateToMonthDay } from './date'
+
 const calculateTotalPointsPossible = (assignments, assignmentGroups, assignmentWeightConsideration) => {
   return assignments.map(
     a => assignmentWeightConsideration
@@ -68,10 +70,32 @@ const calculateCurrentGrade = (assignments, assignmentGroups, assignmentWeightCo
 const sumAssignmentGoalGrade = assignments => assignments
   .reduce((acc, a) => (acc += a.goalGrade || 0), 0)
 
+const setAssignmentFields = course =>
+  course.assignments.map(a => {
+    const {
+      dueDate,
+      pointsPossible,
+      assignmentGroupId,
+      currentUserSubmission
+    } = a
+
+    const courseStartDate = course.dateStart
+    const assignmentGroups = course.assignmentGroups
+
+    a.week = calculateWeekOffset(courseStartDate, dueDate)
+    a.percentOfFinalGrade = calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
+    a.outOf = pointsPossible
+    a.graded = !!currentUserSubmission.gradedDate
+    a.dueDateMonthDay = dateToMonthDay(dueDate)
+
+    return a
+  }).sort((a, b) => a.week - b.week)
+
 export {
   calculateAssignmentGoalsFromCourseGoal,
   calculateWeight,
   calculateCurrentGrade,
   calculateMaxGrade,
-  sumAssignmentGoalGrade
+  sumAssignmentGoalGrade,
+  setAssignmentFields
 }
