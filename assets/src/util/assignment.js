@@ -91,11 +91,39 @@ const setAssignmentFields = course =>
     return a
   }).sort((a, b) => a.week - b.week)
 
+const createUserSettings = (goalGrade, courseId, assignments) => {
+  const assignmentsSetByUser = assignments
+    .filter(a => a.goalGradeSetByUser)
+    .map(({ id, goalGradeSetByUser, goalGrade }) => (
+      {
+        assignmentId: id,
+        goalGradeSetByUser,
+        goalGrade
+      }
+    ))
+
+  const mutation = {
+    variables: {
+      input: {
+        courseId: courseId,
+        defaultViewType: 'assignment',
+        defaultViewValue: JSON.stringify({
+          goalGrade: goalGrade,
+          assignments: assignmentsSetByUser
+        })
+      }
+    }
+  }
+
+  return mutation
+}
+
 export {
   calculateAssignmentGoalsFromCourseGoal,
   calculateWeight,
   calculateCurrentGrade,
   calculateMaxGrade,
   sumAssignmentGoalGrade,
-  setAssignmentFields
+  setAssignmentFields,
+  createUserSettings
 }

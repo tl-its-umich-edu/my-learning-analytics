@@ -10,14 +10,13 @@ import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
 import { gql } from 'apollo-boost'
 import { useQuery, useMutation } from '@apollo/react-hooks'
-import { calculateWeekOffset, dateToMonthDay } from '../util/date'
 import {
-  calculateWeight,
   calculateCurrentGrade,
   calculateMaxGrade,
   calculateAssignmentGoalsFromCourseGoal,
   sumAssignmentGoalGrade,
-  setAssignmentFields
+  setAssignmentFields,
+  createUserSettings
 } from '../util/assignment'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
@@ -62,7 +61,12 @@ function AssignmentPlanningV2 (props) {
   const [currentGrade, setCurrentGrade] = useState(0)
   const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
   const [userSetting, setUserSetting] = useState(null)
-  const [updateUserSetting, { loading: mutationLoading, error: mutationError }] = useMutation(UPDATE_USER_SETTING)
+  const [
+    updateUserSetting,
+    { loading: mutationLoading, error: mutationError }
+  ] = useMutation(UPDATE_USER_SETTING)
+
+  console.log(assignments)
 
   const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setAssignments([
@@ -91,6 +95,7 @@ function AssignmentPlanningV2 (props) {
     {
       course(canvasId: ${courseId}) {
         assignments {
+          id
           name
           dueDate
           pointsPossible
@@ -143,6 +148,7 @@ function AssignmentPlanningV2 (props) {
           data.course.assignmentWeightConsideration
         )
       )
+      updateUserSetting(createUserSettings(goalGrade, COURSE_ID_WITH_INCREMENT, assignments))
     }
   }, [goalGrade, sumAssignmentGoalGrade(assignments)])
 
