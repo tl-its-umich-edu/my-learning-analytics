@@ -10,7 +10,7 @@ const styles = theme => ({
   card: {
     width: 325,
     display: 'flex',
-    margin: theme.spacing.unit * 1
+    margin: theme.spacing(1)
   },
   media: {
     height: 140,
@@ -22,13 +22,13 @@ const styles = theme => ({
   },
   title: {
     boxSizing: 'border-box',
-    padding: theme.spacing.unit * 1,
+    padding: theme.spacing(1),
     color: 'white',
     marginBottom: 0,
     backgroundColor: theme.palette.primary.main
   },
   description: {
-    padding: theme.spacing.unit * 1
+    padding: theme.spacing(1)
   }
 })
 

@@ -11,7 +11,7 @@ const styles = theme => ({
     },
     paper: {
         align: "center",
-        padding: theme.spacing.unit * 2,
+        padding: theme.spacing(2),
         opacity: 0.9,
         boxShadow:
             "0px 2px 4px -1px rgba(0,0,0,0.2), " +

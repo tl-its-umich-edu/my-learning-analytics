@@ -21,7 +21,7 @@ const styles = theme => ({
     flexGrow: 1
   },
   typography: {
-    marginTop: theme.spacing.unit * 2
+    marginTop: theme.spacing(2)
   },
   avatar: {
     padding: '10px',

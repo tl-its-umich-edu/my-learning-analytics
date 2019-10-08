@@ -27,13 +27,13 @@ const styles = theme => ({
   },
   paper: {
     color: theme.palette.text.secondary,
-    padding: theme.spacing.unit * 2
+    padding: theme.spacing(2)
   },
   formController: {
     alignItems: 'center',
     display: 'flex',
     justifyContent: 'center',
-    marginTop: theme.spacing.unit * 2,
+    marginTop: theme.spacing(2)
   },
   controlText: {
     paddingLeft: 8,
@@ -41,7 +41,7 @@ const styles = theme => ({
   },
   checkBox: {
     marginLeft: 20
-  },
+  }
 })
 
 const currentSetting = 'My current setting'
@@ -203,8 +203,8 @@ function ResourcesAccessed (props) {
     const value = event.target.value
     if (event.target.checked && !resourceTypeFilter.includes(value)) {
       setResourceTypeFilter([...resourceTypeFilter, value])
-    } 
-    else if (!event.target.checked) { 
+    }
+    else if (!event.target.checked) {
       setResourceTypeFilter(resourceTypeFilter.filter(val => val !== value))
     }
   }
@@ -229,7 +229,7 @@ function ResourcesAccessed (props) {
   }
   return (
     <div className={classes.root}>
-      <Grid container spacing={16}>
+      <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom className="title">Resources Accessed</Typography>

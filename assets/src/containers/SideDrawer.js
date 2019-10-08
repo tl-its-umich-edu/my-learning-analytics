@@ -18,6 +18,9 @@ const styles = {
   },
   sideDrawerLinks: {
     textDecoration: 'none'
+  },
+  text: {
+    color: 'black'
   }
 }
 
@@ -43,7 +46,7 @@ function SideDrawer (props) {
               selected={selectedIndex === key}
               onClick={() => setSelectedIndex(key)}>
               <ListItemIcon><props.icon /></ListItemIcon>
-              <ListItemText primary={props.title} />
+              <ListItemText primary={props.title} className={classes.text}/>
             </ListItem>
           </Link>
         ))}

@@ -27,12 +27,12 @@ const styles = theme => ({
   },
   wrapper: {
     maxWidth: 1023,
-    margin: theme.spacing.unit * 2 + 'px auto',
+    margin: theme.spacing(2) + 'px auto',
     flexDirection: 'row',
     justifyContent: 'flex-start'
   },
   paper: {
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
     color: theme.palette.text.secondary,
     display: 'flex'
   },
@@ -87,14 +87,14 @@ function CourseList (props) {
       <div className={classes.content}>
         {
           user.isSuperuser
-            ? <Grid container spacing={16}>
+            ? <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
                     <Typography variant='h5' gutterBottom>Select a course of your choice</Typography>
                   </Paper>
                 </Grid>
               </Grid>
-            : <Grid container spacing={16}>
+            : <Grid container spacing={2}>
                 <Grid item xs={12} className={classes.container}>
                   {user.enrolledCourses.map((course, key) =>
                     <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
