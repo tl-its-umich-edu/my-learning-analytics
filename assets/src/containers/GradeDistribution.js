@@ -31,7 +31,13 @@ const styles = theme => ({
 })
 
 function GradeDistribution (props) {
-  const { classes, disabled, courseId, user } = props
+  const {
+    classes,
+    disabled,
+    courseId,
+    user,
+    sideDrawerState
+  } = props
   if (disabled) return (<AlertBanner>The Grade Distribution view is hidden for this course.</AlertBanner>)
 
   const [gradeLoaded, gradeError, gradeData] = useGradeData(courseId)
@@ -55,6 +61,8 @@ function GradeDistribution (props) {
     settingChanged,
     [showGrade]
   )
+
+  console.log(userSettingSaved)
 
   if (gradeError) return (<WarningBanner />)
 
@@ -103,6 +111,7 @@ function GradeDistribution (props) {
           <UserSettingSnackbar
             saved={userSettingSaved}
             response={userSettingResponse}
+            sideDrawerState={sideDrawerState}
           />
         </Grid>
         <Grid item xs={12} lg={10}>
