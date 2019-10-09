@@ -1,13 +1,13 @@
 import { calculateWeekOffset, dateToMonthDay } from './date'
 import { sum } from './math'
 
-const calculateTotalPointsPossible = (assignments, assignmentGroups, assignmentWeightConsideration) => {
-  return sum(assignments.map(
+const calculateTotalPointsPossible = (assignments, assignmentGroups, assignmentWeightConsideration) => sum(
+  assignments.map(
     a => assignmentWeightConsideration
       ? calculateWeight(a.pointsPossible, a.assignmentGroupId, assignmentGroups)
       : a.pointsPossible
-  ))
-}
+  )
+)
 
 const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignmentGroups, assignmentWeightConsideration) => {
   const gradedAssignments = assignments
