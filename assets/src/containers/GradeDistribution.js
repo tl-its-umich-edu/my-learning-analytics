@@ -56,67 +56,77 @@ function GradeDistribution (props) {
     [showGrade]
   )
 
-  if (gradeError) return (<WarningBanner/>)
+  if (gradeError) return (<WarningBanner />)
 
   const BuildGradeView = () => {
     const grades = gradeData.map(x => x.current_grade)
 
     const tableRows = [
-      ['Average grade', <strong>{gradeData[0].grade_avg}%</strong>],
-      ['Median grade', <strong>{gradeData[0].median_grade}%</strong>],
-      ['Number of students', <strong>{gradeData[0].tot_students}</strong>],
-      !user.admin && showGrade ?
-        [
+      ['Average grade', <strong key={0}>{gradeData[0].grade_avg}%</strong>],
+      ['Median grade', <strong key={1}>{gradeData[0].median_grade}%</strong>],
+      ['Number of students', <strong key={2}>{gradeData[0].tot_students}</strong>],
+      !user.admin && showGrade
+        ? ([
           'My grade',
-          <strong>{
-            gradeData[0].current_user_grade ?
-              `${roundToOneDecimal(gradeData[0].current_user_grade)}%` :
-              'There are no grades yet for you in this course'
-          }</strong>
-        ] : [],
+          <strong key={0}>
+            {
+              gradeData[0].current_user_grade
+                ? `${roundToOneDecimal(gradeData[0].current_user_grade)}%`
+                : 'There are no grades yet for you in this course'
+            }
+          </strong>
+        ])
+        : []
     ]
 
-    const gradeCheckbox = !user.admin ?
-      <> {userSettingLoaded ?
-        <> <Typography align='right'>{'Show my grade'}
-          <Checkbox
-            color='primary'
-            checked={showGrade}
-            onChange={() => {
-              setSettingChanged(true)
-              setShowGrade(!showGrade)
-            }}
-          /></Typography>
-        </> : <Spinner/>}
-      </> : null
+    const gradeCheckbox = !user.admin
+      ? userSettingLoaded
+        ? (
+          <Typography align='right'>{'Show my grade'}
+            <Checkbox
+              color='primary'
+              checked={showGrade}
+              onChange={() => {
+                setSettingChanged(true)
+                setShowGrade(!showGrade)
+              }}
+            />
+          </Typography>
+        )
+        : <Spinner />
+      : null
 
     return (
       <Grid container>
         <Grid item xs={12} lg={2}>
-          <Table className={classes.table} noBorder tableData={tableRows}/>
+          <Table className={classes.table} noBorder tableData={tableRows} />
           <UserSettingSnackbar
             saved={userSettingSaved}
-            response={userSettingResponse}/>
+            response={userSettingResponse}
+          />
         </Grid>
         <Grid item xs={12} lg={10}>
           {gradeCheckbox}
           <Histogram
             data={grades}
             aspectRatio={0.3}
-            xAxisLabel={'Grade %'}
-            yAxisLabel={'Number of Students'}
+            xAxisLabel='Grade %'
+            yAxisLabel='Number of Students'
             myGrade={showGrade ? gradeData[0].current_user_grade : null}
             maxGrade={gradeData[0].graph_upper_limit}
             showNumberOnBars={gradeData[0].show_number_on_bars}
-            showDashedLine={gradeData[0].show_dash_line}/>
+            showDashedLine={gradeData[0].show_dash_line}
+          />
         </Grid>
       </Grid>
     )
   }
 
-  const content = (gradeLoaded && isObjectEmpty(gradeData)) ?
-      (<AlertBanner>Grade data is not available.</AlertBanner>) :
-      (gradeLoaded ? <BuildGradeView /> : <Spinner />);
+  const content = (gradeLoaded && isObjectEmpty(gradeData))
+    ? <AlertBanner>Grade data is not available.</AlertBanner>
+    : gradeLoaded
+      ? <BuildGradeView />
+      : <Spinner />
 
   return (
     <div className={classes.root}>
