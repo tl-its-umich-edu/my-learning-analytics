@@ -59,7 +59,6 @@ function Course (props) {
                       disabled={!courseInfo.course_view_options.gd}
                       courseId={courseId}
                       user={user}
-                      sideDrawerState={sideDrawerState}
                     />
                 }
               />

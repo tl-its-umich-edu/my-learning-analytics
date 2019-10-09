@@ -35,8 +35,7 @@ function GradeDistribution (props) {
     classes,
     disabled,
     courseId,
-    user,
-    sideDrawerState
+    user
   } = props
   if (disabled) return (<AlertBanner>The Grade Distribution view is hidden for this course.</AlertBanner>)
 
@@ -61,8 +60,6 @@ function GradeDistribution (props) {
     settingChanged,
     [showGrade]
   )
-
-  console.log(userSettingSaved)
 
   if (gradeError) return (<WarningBanner />)
 
@@ -108,11 +105,6 @@ function GradeDistribution (props) {
       <Grid container>
         <Grid item xs={12} lg={2}>
           <Table className={classes.table} noBorder tableData={tableRows} />
-          <UserSettingSnackbar
-            saved={userSettingSaved}
-            response={userSettingResponse}
-            sideDrawerState={sideDrawerState}
-          />
         </Grid>
         <Grid item xs={12} lg={10}>
           {gradeCheckbox}
@@ -131,11 +123,9 @@ function GradeDistribution (props) {
     )
   }
 
-  const content = (gradeLoaded && isObjectEmpty(gradeData))
-    ? <AlertBanner>Grade data is not available.</AlertBanner>
-    : gradeLoaded
-      ? <BuildGradeView />
-      : <Spinner />
+  if (gradeLoaded && isObjectEmpty(gradeData)) {
+    return <AlertBanner>Grade data is not available.</AlertBanner>
+  }
 
   return (
     <div className={classes.root}>
@@ -143,7 +133,15 @@ function GradeDistribution (props) {
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom>Grade Distribution</Typography>
-            {content}
+            {
+              gradeLoaded
+                ? <BuildGradeView />
+                : <Spinner />
+            }
+            <UserSettingSnackbar
+              saved={userSettingSaved}
+              response={userSettingResponse}
+            />
           </Paper>
         </Grid>
       </Grid>

@@ -8,15 +8,14 @@ function UserSettingSnackbar (props) {
     saved,
     response,
     successMessage = 'Setting saved successfully!',
-    failureMessage = 'Setting not saved.',
-    sideDrawerState
+    failureMessage = 'Setting not saved.'
   } = props
 
   const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
 
   useEffect(() => {
-    if (saved && !sideDrawerState) {
+    if (saved) {
       if (response.default === 'success') {
         setSnackbarMessage(successMessage)
       } else {
@@ -24,7 +23,7 @@ function UserSettingSnackbar (props) {
       }
       setSavedSnackbarOpen(true)
     }
-  })
+  }, [saved])
 
   return (
     <Snackbar
