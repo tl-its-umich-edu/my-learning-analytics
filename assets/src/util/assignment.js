@@ -1,11 +1,12 @@
 import { calculateWeekOffset, dateToMonthDay } from './date'
+import { sum } from './math'
 
 const calculateTotalPointsPossible = (assignments, assignmentGroups, assignmentWeightConsideration) => {
-  return assignments.map(
+  return sum(assignments.map(
     a => assignmentWeightConsideration
       ? calculateWeight(a.pointsPossible, a.assignmentGroupId, assignmentGroups)
       : a.pointsPossible
-  ).reduce((acc, cur) => (acc += cur), 0)
+  ))
 }
 
 const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignmentGroups, assignmentWeightConsideration) => {
@@ -67,10 +68,13 @@ const calculateMaxGrade = (assignments, assignmentGroups, assignmentWeightConsid
 const calculateCurrentGrade = (assignments, assignmentGroups, assignmentWeightConsideration) =>
   calculateMaxGrade(assignments.filter(a => a.graded), assignmentGroups, assignmentWeightConsideration)
 
-const sumAssignmentGoalGrade = assignments => assignments
-  .reduce((acc, a) => (acc += a.goalGrade || 0), 0)
+const sumAssignmentGoalGrade = assignments => sum(
+  assignments.map(a => a.goalGrade || 0)
+)
 
-const setAssignmentFields = (assignments, assignmentGroups, dateStart) =>
+const sortAssignmentsByWeek = assignments => assignments.sort((a, b) => a.week - b.week)
+
+const setAssignmentFields = (assignments, assignmentGroups, dateStart) => sortAssignmentsByWeek(
   assignments.map(a => {
     const {
       dueDate,
@@ -88,7 +92,8 @@ const setAssignmentFields = (assignments, assignmentGroups, dateStart) =>
     a.dueDateMonthDay = dateToMonthDay(dueDate)
 
     return a
-  }).sort((a, b) => a.week - b.week)
+  })
+)
 
 const createUserSettings = (goalGrade, courseId, viewName, assignments) => {
   const assignmentsSetByUser = assignments

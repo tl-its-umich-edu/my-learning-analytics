@@ -68,11 +68,14 @@ const median = arr => {
     : sorted[middle]
 }
 
+const sum = arr => arr.reduce((acc, cur) => (acc += cur), 0)
+
 export {
   average,
   pearsonCorrelation,
   standardDeviation,
   roundToOneDecimal,
   roundToTwoDecimal,
-  median
+  median,
+  sum
 }

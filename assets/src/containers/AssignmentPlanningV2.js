@@ -149,7 +149,12 @@ function AssignmentPlanningV2 (props) {
         )
       )
       updateUserSetting(
-        createUserSettings(goalGrade, COURSE_ID_WITH_INCREMENT, assignments)
+        createUserSettings(
+          goalGrade,
+          COURSE_ID_WITH_INCREMENT,
+          'assignment',
+          assignments
+        )
       )
     }
   }, [goalGrade, sumAssignmentGoalGrade(assignments)])
