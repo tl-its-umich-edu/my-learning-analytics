@@ -33,6 +33,10 @@ const styles = theme => ({
   link: {
     textDecoration: 'none',
     marginLeft: 0
+  },
+  text: {
+    paddingLeft: 0,
+    color: 'black'
   }
 })
 
@@ -65,20 +69,22 @@ function AvatarModal (props) {
         <ListItemIcon>
           <Launch />
         </ListItemIcon>
-        <ListItemText inset primary='Switch courses' style={{ marginLeft: 0 }} />
+        <ListItemText inset primary='Switch courses' className={classes.text} />
       </ListItem>
       <Dialog
         onClose={() => setOpenChangeCourseDialog(false)}
-        open={openChangeCourseDialog}>
+        open={openChangeCourseDialog}
+      >
         <DialogTitle>Select a course</DialogTitle>
         <List>
           {user.enrolledCourses.map((course, i) => (
             <Link
               style={{ textDecoration: 'none' }}
               href={`/courses/${course.course_id}`}
-              key={i}>
+              key={i}
+            >
               <ListItem button>
-                <ListItemText inset primary={course.course_name} style={{ marginLeft: 0 }} />
+                <ListItemText inset primary={course.course_name} className={classes.text} />
               </ListItem>
             </Link>
           ))}
@@ -114,7 +120,8 @@ function AvatarModal (props) {
           <Typography
             className={classes.typography}
             variant='subtitle1'
-            style={{ marginTop: 0 }}>
+            style={{ marginTop: 0 }}
+          >
             {user.username}
           </Typography>
         </Grid>
@@ -126,7 +133,7 @@ function AvatarModal (props) {
                 <ListItemIcon>
                   <HelpIcon />
                 </ListItemIcon>
-                <ListItemText inset primary='Help' />
+                <ListItemText inset primary='Help' className={classes.text} />
               </ListItem>
             </Link>
             <Divider />
@@ -145,7 +152,7 @@ function AvatarModal (props) {
                 <ListItemIcon>
                   <LogoutIcon />
                 </ListItemIcon>
-                <ListItemText inset primary='Logout' style={{ marginLeft: 0 }} />
+                <ListItemText inset primary='Logout' className={classes.text} />
               </ListItem>
             </Link>
           </List>
