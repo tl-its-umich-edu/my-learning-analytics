@@ -5,7 +5,8 @@ import {
   calculateWeight,
   calculateCurrentGrade,
   calculateMaxGrade,
-  sumAssignmentGoalGrade
+  sumAssignmentGoalGrade,
+  createUserSettings
 } from '../../util/assignment'
 
 describe('calculateAssignmentGradeFromCourseGrade', () => {
@@ -267,5 +268,51 @@ describe('sumAssignmentGoalGrade', () => {
       }
     ]
     expect(sumAssignmentGoalGrade(assignments)).toEqual(165)
+  })
+})
+
+describe('createUserSettings', () => {
+  it('takes goalGrade, courseId, and assignments as input and returns a GraphQL mutation object', () => {
+    let goalGrade = 85
+    let courseId = '123456'
+    let viewName = 'assignment'
+    let assignments = [
+      {
+        id: 'abcd1234',
+        goalGradeSetByUser: false,
+        goalGrade: 90
+      },
+      {
+        id: '12345678',
+        goalGradeSetByUser: true,
+        goalGrade: 90
+      },
+      {
+        id: '1234abcd',
+        goalGradeSetByUser: false,
+        goalGrade: 90
+      }
+    ]
+
+    let output = {
+      variables: {
+        input: {
+          courseId: courseId,
+          defaultViewType: viewName,
+          defaultViewValue: JSON.stringify({
+            goalGrade: 85,
+            assignments: [
+              {
+                assignmentId: '12345678',
+                goalGradeSetByUser: true,
+                goalGrade: 90
+              }
+            ]
+          })
+        }
+      }
+    }
+
+    expect(createUserSettings(goalGrade, courseId, viewName, assignments)).toEqual(output)
   })
 })

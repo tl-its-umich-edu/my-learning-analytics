@@ -70,8 +70,8 @@ const calculateCurrentGrade = (assignments, assignmentGroups, assignmentWeightCo
 const sumAssignmentGoalGrade = assignments => assignments
   .reduce((acc, a) => (acc += a.goalGrade || 0), 0)
 
-const setAssignmentFields = course =>
-  course.assignments.map(a => {
+const setAssignmentFields = (assignments, assignmentGroups, dateStart) =>
+  assignments.map(a => {
     const {
       dueDate,
       pointsPossible,
@@ -79,8 +79,7 @@ const setAssignmentFields = course =>
       currentUserSubmission
     } = a
 
-    const courseStartDate = course.dateStart
-    const assignmentGroups = course.assignmentGroups
+    const courseStartDate = dateStart
 
     a.week = calculateWeekOffset(courseStartDate, dueDate)
     a.percentOfFinalGrade = calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
@@ -91,7 +90,7 @@ const setAssignmentFields = course =>
     return a
   }).sort((a, b) => a.week - b.week)
 
-const createUserSettings = (goalGrade, courseId, assignments) => {
+const createUserSettings = (goalGrade, courseId, viewName, assignments) => {
   const assignmentsSetByUser = assignments
     .filter(a => a.goalGradeSetByUser)
     .map(({ id, goalGradeSetByUser, goalGrade }) => (
@@ -106,7 +105,7 @@ const createUserSettings = (goalGrade, courseId, assignments) => {
     variables: {
       input: {
         courseId: courseId,
-        defaultViewType: 'assignment',
+        defaultViewType: viewName,
         defaultViewValue: JSON.stringify({
           goalGrade: goalGrade,
           assignments: assignmentsSetByUser

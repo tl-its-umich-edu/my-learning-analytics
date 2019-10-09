@@ -61,12 +61,6 @@ function AssignmentPlanningV2 (props) {
   const [currentGrade, setCurrentGrade] = useState(0)
   const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
   const [userSetting, setUserSetting] = useState(null)
-  const [
-    updateUserSetting,
-    { loading: mutationLoading, error: mutationError }
-  ] = useMutation(UPDATE_USER_SETTING)
-
-  console.log(assignments)
 
   const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setAssignments([
@@ -90,6 +84,11 @@ function AssignmentPlanningV2 (props) {
     )
     setGoalGrade(null)
   }
+
+  const [
+    updateUserSetting,
+    { loading: mutationLoading, error: mutationError }
+  ] = useMutation(UPDATE_USER_SETTING)
 
   const { loading, error, data } = useQuery(gql`
     {
@@ -119,13 +118,13 @@ function AssignmentPlanningV2 (props) {
 
   useEffect(() => {
     if (!loading && !error) {
-      const course = data.course
-      setAssignments(setAssignmentFields(course))
+      const { assignments, assignmentGroups, dateStart, assignmentWeightConsideration } = data.course
+      setAssignments(setAssignmentFields(assignments, assignmentGroups, dateStart))
       setCurrentGrade(
-        calculateCurrentGrade(course.assignments, course.assignmentGroups, course.assignmentWeightConsideration)
+        calculateCurrentGrade(assignments, assignmentGroups, assignmentWeightConsideration)
       )
       setMaxPossibleGrade(
-        calculateMaxGrade(course.assignments, course.assignmentGroups, course.assignmentWeightConsideration)
+        calculateMaxGrade(assignments, assignmentGroups, assignmentWeightConsideration)
       )
     }
   }, [loading])
@@ -140,15 +139,18 @@ function AssignmentPlanningV2 (props) {
   // run if goalGrade changes, or if the sum of goal grades set by user changes
   useEffect(() => {
     if (goalGrade) {
+      const course = data.course
       setAssignments(
         calculateAssignmentGoalsFromCourseGoal(
           goalGrade,
           assignments,
-          data.course.assignmentGroups,
-          data.course.assignmentWeightConsideration
+          course.assignmentGroups,
+          course.assignmentWeightConsideration
         )
       )
-      updateUserSetting(createUserSettings(goalGrade, COURSE_ID_WITH_INCREMENT, assignments))
+      updateUserSetting(
+        createUserSettings(goalGrade, COURSE_ID_WITH_INCREMENT, assignments)
+      )
     }
   }, [goalGrade, sumAssignmentGoalGrade(assignments)])
 
