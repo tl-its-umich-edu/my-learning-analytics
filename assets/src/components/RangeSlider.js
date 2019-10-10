@@ -6,18 +6,18 @@ import theme from "../theme";
 
 const rangeSlider = props => {
     const activeDotStyle = {
-        borderColor: theme.palette.primary.light,
+        borderColor: theme.palette.secondary.light,
     };
     const dotStyle = {
-        borderColor: theme.palette.secondary.main,
+        borderColor: theme.palette.uncompleted.main,
     }
     const unselectedStyle = {
-        borderColor: theme.palette.secondary.main,
-        backgroundColor: theme.palette.secondary.main,
+        borderColor: theme.palette.uncompleted.main,
+        backgroundColor: theme.palette.uncompleted.main,
     };
     const selectedStyle = {
-        borderColor: theme.palette.primary.light,
-        backgroundColor: theme.palette.primary.light,
+        borderColor: theme.palette.secondary.light,
+        backgroundColor: theme.palette.secondary.light,
     };
     const wrapperStyle = { width: "70%", margin: "0 auto" }
 

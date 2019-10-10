@@ -4,8 +4,8 @@ import theme from "../../theme";
 
 function createHorizontalBar ({ data, width, height, domElement, tip }) {
   const margin = { top: 0, bottom: 0, left: 0, right: 0 }
-  const gradedColor = theme.palette.primary.light
-  const ungradedColor = theme.palette.secondary.main
+  const gradedColor = theme.palette.secondary.main
+  const ungradedColor = theme.palette.uncompleted.main
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   const x = d3.scaleLinear()

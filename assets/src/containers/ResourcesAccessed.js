@@ -88,7 +88,7 @@ function ResourcesAccessed (props) {
               <FormGroup row>
                 <p className={classes.controlText}>Select resource types to be viewed:</p>
                 {
-                  resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked={true} onChange={onChangeResourceTypeHandler} value={el}></Checkbox>} label={el}/>))
+                  resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='secondary' defaultChecked={true} onChange={onChangeResourceTypeHandler} value={el}></Checkbox>} label={el}/>))
                 }
               </FormGroup>
             </FormControl>
@@ -265,7 +265,7 @@ function ResourcesAccessed (props) {
                     checked={saveSettingClicked}
                     onChange={() => setSaveSettingClicked(!saveSettingClicked)}
                     value='checked'
-                    color='primary'/>
+                    color='secondary'/>
               : <div style={{ padding: '10px' }}></div>
               }
               <div style={{ padding: '15px 2px' }}>{saveLabel}</div>

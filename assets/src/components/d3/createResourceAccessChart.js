@@ -12,7 +12,7 @@ import theme from "../../theme";
     - D3 V4 Changes: https://github.com/d3/d3/blob/master/CHANGES.md
 */
 
-const accessedResourceColor = theme.palette.primary.light
+const accessedResourceColor = theme.palette.secondary.main
 const notAccessedResourceColor = theme.palette.secondary.main
 const mainMargin = { top: 50, right: 10, bottom: 50, left: 200 }
 

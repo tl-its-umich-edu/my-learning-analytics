@@ -67,7 +67,7 @@ function DashboardAppBar (props) {
               <Link
                 to={{ pathname: `/courses/` }}
                 className={classes.homeButton}
-                color='primary'>
+                color='secondary'>
                 My Learning Analytics:
               </Link>
               <Link
