@@ -297,7 +297,7 @@ describe('createUserSettings', () => {
     let output = {
       variables: {
         input: {
-          courseId: courseId,
+          canvasCourseId: courseId,
           defaultViewType: viewName,
           defaultViewValue: JSON.stringify({
             goalGrade: 85,

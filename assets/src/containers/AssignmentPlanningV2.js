@@ -53,7 +53,6 @@ const UPDATE_USER_SETTING = gql`
 
 function AssignmentPlanningV2 (props) {
   const { classes, disabled, courseId } = props
-  const COURSE_ID_WITH_INCREMENT = `17700000000${courseId}`
   if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
 
   const [assignments, setAssignments] = useState([])
@@ -92,7 +91,7 @@ function AssignmentPlanningV2 (props) {
 
   const { loading, error, data } = useQuery(gql`
     {
-      course(canvasId: ${courseId}) {
+      course(canvasCourseId: ${courseId}) {
         assignments {
           id
           name
@@ -151,7 +150,7 @@ function AssignmentPlanningV2 (props) {
       updateUserSetting(
         createUserSettings(
           goalGrade,
-          COURSE_ID_WITH_INCREMENT,
+          courseId,
           'assignment',
           assignments
         )

@@ -121,7 +121,7 @@ function AssignmentTable (props) {
                   onMouseLeave={() => setAnchorEl(null)}
                 >
                   <ProgressBarV2
-                    score={a.currentUserSubmission.score}
+                    score={a.currentUserSubmission ? a.currentUserSubmission.score : 0}
                     outOf={a.outOf}
                     goalGrade={a.goalGrade}
                     percentWidth={a.percentOfFinalGrade / maxPercentOfFinalGrade * 70}

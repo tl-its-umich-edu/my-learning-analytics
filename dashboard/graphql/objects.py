@@ -1,6 +1,7 @@
 from graphene_django import DjangoObjectType
 import graphene
 import numpy as np
+import json
 
 from dashboard.rules import is_admin_or_instructor_in_course_id
 from dashboard.models import Course, User, Assignment, Submission, \
@@ -26,6 +27,9 @@ class UserDefaultSelectionType(DjangoObjectType):
     course_id = graphene.ID()
     default_view_type = graphene.String()
     default_view_value = graphene.JSONString()
+
+    def resolve_default_view_value(parent, info):
+        return json.loads(parent.default_view_value)
 
     class Meta:
         model = UserDefaultSelection
