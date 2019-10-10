@@ -84,7 +84,7 @@ function GradeDistribution (props) {
         ? (
           <Typography align='right'>{'Show my grade'}
             <Checkbox
-              color='primary'
+              color='secondary'
               checked={showGrade}
               onChange={() => {
                 setSettingChanged(true)

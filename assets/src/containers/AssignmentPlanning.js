@@ -32,13 +32,13 @@ const styles = theme => ({
   graded: {
     width: '10px',
     height: '10px',
-    background: theme.palette.primary.light,
+    background: theme.palette.secondary.main,
     display: 'inline-block'
   },
   ungraded: {
     width: '10px',
     height: '10px',
-    background: theme.palette.secondary.main,
+    background: theme.palette.uncompleted.main,
     display: 'inline-block'
   }
 })
@@ -177,7 +177,7 @@ function AssignmentPlanning (props) {
                     checked={saveSettingClicked}
                     onChange={() => setSaveSettingClicked(!saveSettingClicked)}
                     value='checked'
-                    color='primary'
+                    color='secondary'
                   />
                   : null
                 }
