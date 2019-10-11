@@ -56,6 +56,16 @@ export GIT_BRANCH="$(git name-rev $GIT_COMMIT --name-only)"
 echo Running python startups
 python manage.py migrate
 
+echo "Setting domain of default site record"
+DOMAIN_JQ='.ALLOWED_HOSTS | . - ["127.0.0.1", "localhost", ".ngrok.io"] | if . | length == 0 then "localhost" else .[0] end'
+DOMAIN=$(jq -r -c "${DOMAIN_JQ}" ${ENV_FILE})
+PORT="$(jq -r -c ".LOCAL_HOST_PORT" ${ENV_FILE})"
+if [ ${DOMAIN} == "localhost" ]; then
+  python manage.py site --domain="${DOMAIN}:${PORT}" --name="${DOMAIN}"
+else
+  python manage.py site --domain="${DOMAIN}" --name="${DOMAIN}"
+fi
+
 # If these values aren't set or they're set to false
 # This syntax substitutes False if null or unset
 if [ "${IS_CRON_POD:-"false",,}" == "false" ]; then
