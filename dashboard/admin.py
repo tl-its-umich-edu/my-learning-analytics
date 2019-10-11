@@ -48,7 +48,7 @@ class CourseForm(forms.ModelForm):
 class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseViewOptionInline, ]
     form = CourseForm
-    list_display = ('canvas_id', 'name', 'term', 'show_grade_counts', '_courseviewoption')
+    list_display = ('canvas_id', 'name', 'term', 'show_grade_counts', 'course_link', '_courseviewoption')
     list_select_related = True
     readonly_fields = ('term',)
 
