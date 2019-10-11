@@ -6,7 +6,7 @@ import theme from "../theme";
 
 const rangeSlider = props => {
     const activeDotStyle = {
-        borderColor: theme.palette.secondary.light,
+        borderColor: theme.palette.secondary.main,
     };
     const dotStyle = {
         borderColor: theme.palette.uncompleted.main,
@@ -16,8 +16,8 @@ const rangeSlider = props => {
         backgroundColor: theme.palette.uncompleted.main,
     };
     const selectedStyle = {
-        borderColor: theme.palette.secondary.light,
-        backgroundColor: theme.palette.secondary.light,
+        borderColor: theme.palette.secondary.main,
+        backgroundColor: theme.palette.secondary.main,
     };
     const wrapperStyle = { width: "70%", margin: "0 auto" }
 
