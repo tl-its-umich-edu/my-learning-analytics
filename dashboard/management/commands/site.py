@@ -12,9 +12,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         domain = options.get('domain')
         name = options.get('name')
-        create_new_site = options.get('new')
+        new = options.get('new')
 
-        if create_new_site:
+        if new:
             new_site = Site.objects.create(domain=domain, name=name)
             new_site.save()
         else:
