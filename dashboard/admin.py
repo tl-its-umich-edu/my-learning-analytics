@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django import forms
 from django.conf import settings
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.template.defaultfilters import linebreaksbr
 
@@ -56,6 +57,9 @@ class CourseAdmin(admin.ModelAdmin):
     def _courseviewoption(self, obj):
         return mark_safe(linebreaksbr(obj.courseviewoption))
     _courseviewoption.short_description = "Course View Option(s)"
+
+    def course_link(self, obj):
+        return format_html('<a href="{}">Link</a>', obj.get_absolute_url())
 
     # When saving the course, update the id based on canvas id
     def save_model(self, request, obj, form, change):
