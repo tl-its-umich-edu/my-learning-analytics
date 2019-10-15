@@ -16,7 +16,7 @@ const styles = theme => ({
     flexGrow: 1
   },
   button: {
-    margin: theme.spacing()
+    margin: theme.spacing(1)
   },
   grow: {
     flexGrow: 1
