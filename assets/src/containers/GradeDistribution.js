@@ -31,12 +31,7 @@ const styles = theme => ({
 })
 
 function GradeDistribution (props) {
-  const {
-    classes,
-    disabled,
-    courseId,
-    user
-  } = props
+  const { classes, disabled, courseId, user } = props
   if (disabled) return (<AlertBanner>The Grade Distribution view is hidden for this course.</AlertBanner>)
 
   const [gradeLoaded, gradeError, gradeData] = useGradeData(courseId)
