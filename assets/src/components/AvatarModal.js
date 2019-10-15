@@ -56,7 +56,7 @@ function AvatarModal (props) {
           <ListItemIcon>
             <Lock />
           </ListItemIcon>
-          <ListItemText inset primary='Admin' />
+          <ListItemText inset primary='Admin' className={classes.text} />
         </ListItem>
       </Link>
       <Divider />
