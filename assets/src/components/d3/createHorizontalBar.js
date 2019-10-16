@@ -1,11 +1,11 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
-import theme from "../../theme";
+import theme from "../../theme"
 
 function createHorizontalBar ({ data, width, height, domElement, tip }) {
   const margin = { top: 0, bottom: 0, left: 0, right: 0 }
   const gradedColor = theme.palette.secondary.main
-  const ungradedColor = theme.palette.uncompleted.main
+  const ungradedColor = theme.palette.negative.main
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   const x = d3.scaleLinear()
