@@ -2,19 +2,20 @@ import { createMuiTheme } from '@material-ui/core/styles';
 
 const theme = createMuiTheme({
     palette: {
-        /* The core color. 'main' is used for structural components like the AppBar and SelectCard;
-        *  'light' is used in visualizations as a primary color to indicate a positive/completed/viewed state. */
+        /* The 'primary' color is used for structural components like the AppBar and SelectCard.
+           Different institutions using this application are encouraged to modify the provided value. */
         primary: {
-            main: "#7e57c2",
-            light: "#b085f5"
+            main: "#40658F"
         },
-        /* A minor color. 'main' is used currently to indicate a negative/un-completed/un-viewed state. If another
-        * core color is needed, this could be bumped to a separate object in the palette. */
+        /* The 'secondary' color is used currently to indicate a positive, completed, viewed, or selected state.
+           This value was arrived at through research and design work; modification is not recommended. */
         secondary: {
             main: "#4682b4"
         },
-        uncompleted: {
-            main: "#BDBDBD"
+        /* The 'negative' color is used currently to indicate a negative, un-completed, un-viewed, or un-selected state.
+           This value was arrived at through research and design work; modification is not recommended. */
+        negative: {
+            main: "#777777"
         }
     }
 });
