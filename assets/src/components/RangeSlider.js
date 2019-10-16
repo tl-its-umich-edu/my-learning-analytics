@@ -1,28 +1,27 @@
-import React from 'react';
-import 'rc-slider/assets/index.css';
-import 'rc-tooltip/assets/bootstrap.css';
-import {Range} from 'rc-slider';
-import theme from "../theme";
+import React from 'react'
+import 'rc-slider/assets/index.css'
+import 'rc-tooltip/assets/bootstrap.css'
+import {Range} from 'rc-slider'
+import theme from "../theme"
 
 const rangeSlider = props => {
     const activeDotStyle = {
         borderColor: theme.palette.secondary.main,
-    };
+    }
     const dotStyle = {
-        borderColor: theme.palette.uncompleted.main,
+        borderColor: theme.palette.negative.main,
     }
     const unselectedStyle = {
-        borderColor: theme.palette.uncompleted.main,
-        backgroundColor: theme.palette.uncompleted.main,
-    };
+        borderColor: theme.palette.negative.main,
+        backgroundColor: theme.palette.negative.main,
+    }
     const selectedStyle = {
         borderColor: theme.palette.secondary.main,
         backgroundColor: theme.palette.secondary.main,
-    };
+    }
     const wrapperStyle = { width: "70%", margin: "0 auto" }
 
     const marks = {}
-    
     for (let week = props.min; week <= props.max; week++) {
         if (week === props.curWeek) {
             marks[week] = `${week} (now)`
