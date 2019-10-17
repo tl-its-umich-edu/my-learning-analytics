@@ -13,8 +13,9 @@ RUN npm run prod && \
     rm -rf /usr/src/app/assets/src
 
 # build node libraries for production mode
-FROM node-webpack AS node-prod-deps
+FROM node:11.10-alpine AS node-prod-deps
 
+COPY --from=node-webpack /usr/src/app /usr/src/app
 RUN npm prune --production && \
     # This is needed to clean up the examples files as these cause collectstatic to fail (and take up extra space)
     find /usr/src/app/node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
