@@ -15,7 +15,7 @@ const theme = createMuiTheme({
         /* The 'negative' color is used currently to indicate a negative, un-completed, un-viewed, or un-selected state.
            This value was arrived at through research and design work; modification is not recommended. */
         negative: {
-            main: "#777777"
+            main: "#E1E1E1"
         }
     }
 });
