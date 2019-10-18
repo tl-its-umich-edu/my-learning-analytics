@@ -37,7 +37,7 @@ if [ -z "${ENV_JSON}" ]; then
     CRONTAB_SCHEDULE=$(jq -r -c ".CRONTAB_SCHEDULE | values" ${ENV_FILE})
     RUN_AT_TIMES=$(jq -r -c ".RUN_AT_TIMES | values" ${ENV_FILE})
     DOMAIN=$(jq -r -c "${DOMAIN_JQ} | values" ${ENV_FILE})
-    PORT=$(jq -r -c ".LOCALHOST_PORT | values" ${ENV_FILE})
+    LOCALHOST_PORT=$(jq -r -c ".LOCALHOST_PORT | values" ${ENV_FILE})
 else
     MYSQL_HOST=$(echo "${ENV_JSON}" | jq -r -c ".MYSQL_HOST | values")
     MYSQL_PORT=$(echo "${ENV_JSON}" | jq -r -c ".MYSQL_PORT | values")
@@ -46,7 +46,7 @@ else
     CRONTAB_SCHEDULE=$(echo "${ENV_JSON}" | jq -r -c ".CRONTAB_SCHEDULE | values")
     RUN_AT_TIMES=$(echo "${ENV_JSON}" | jq -r -c ".RUN_AT_TIMES | values")
     DOMAIN=$(echo "${ENV_JSON}" | jq -r -c "${DOMAIN_JQ} | values")
-    PORT=$(echo "${ENV_JSON}" | jq -r -c ".LOCALHOST_PORT | values")
+    LOCALHOST_PORT=$(echo "${ENV_JSON}" | jq -r -c ".LOCALHOST_PORT | values")
 fi
 
 echo "Waiting for DB"
@@ -63,8 +63,12 @@ echo Running python startups
 python manage.py migrate
 
 echo "Setting domain of default site record"
+if [ -z "${LOCALHOST_PORT}" ]; then
+    LOCALHOST_PORT=5001
+fi
+
 if [ ${DOMAIN} == "localhost" ]; then
-  python manage.py site --domain="${DOMAIN}:${PORT}" --name="${DOMAIN}"
+  python manage.py site --domain="${DOMAIN}:${LOCALHOST_PORT}" --name="${DOMAIN}"
 else
   python manage.py site --domain="${DOMAIN}" --name="${DOMAIN}"
 fi
