@@ -157,7 +157,8 @@ WEBPACK_LOADER = {
 
 NPM_FILE_PATTERNS = {
     'bootstrap': ['dist/css/*'],
-    'jquery': ['dist/jquery.min.js']
+    'jquery': ['dist/jquery.min.js'],
+    '@fortawesome': ['fontawesome-free/*']
 }
 
 ROOT_URLCONF = 'dashboard.urls'

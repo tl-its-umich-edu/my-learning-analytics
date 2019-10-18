@@ -2,6 +2,7 @@ import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import d3tip from 'd3-tip'
 import './createResourceAccessChart.css'
+import '@fortawesome/fontawesome-free'
 
 /*
   References:
