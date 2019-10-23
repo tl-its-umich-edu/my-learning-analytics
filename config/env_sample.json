@@ -9,8 +9,6 @@
         "127.0.0.1",
         "localhost"
     ],
-    "/* Port in use when the application is running on localhost": "*/",
-    "LOCALHOST_PORT": 5001,
     "/* Configuration of CSP see https://django-csp.readthedocs.io/en/latest/configuration.html": "*/",
     "/* To enable this at all you must set have the CSP key set": "*/",
     "/* and REPORT_ONLY should be be false, otherwise it will just console Warn": "*/",
