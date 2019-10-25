@@ -300,7 +300,6 @@ class DashboardCronJob(CronJobBase):
 
             # First update the resource table
             # write to MySQL
-            print(resource_df.head())
             try:
                 resource_df.to_sql(con=engine, name='resource', if_exists='append', index=False)
             except Exception as e:
