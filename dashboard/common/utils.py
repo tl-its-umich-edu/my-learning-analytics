@@ -35,7 +35,7 @@ def get_git_version_info():
 
 def look_up_key_for_value(myDict, searchFor):
     for key, value in myDict.items():
-        for v in value:
+        for v in value["types"]:
             if searchFor in v:
                 return key
     return None
