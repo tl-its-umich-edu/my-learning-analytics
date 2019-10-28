@@ -430,8 +430,8 @@ class DashboardCronJob(CronJobBase):
         # delete all records in the table first
         status += deleteAllRecordInTable("academic_terms")
 
-        #select term records from DATA_WAREHOUSE
-        term_sql = f"select id, canvas_id, name, date_start, date_end from enrollment_term_dim where date_start > '{settings.EARLIEST_TERM_DATE}'"
+        # select term records from DATA_WAREHOUSE
+        term_sql = "SELECT id, canvas_id, name, date_start, date_end FROM enrollment_term_dim;"
         logger.debug(term_sql)
         status += util_function(None, term_sql, 'academic_terms')
 
