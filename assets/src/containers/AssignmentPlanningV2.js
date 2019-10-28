@@ -141,7 +141,9 @@ function AssignmentPlanningV2 (props) {
         calculateMaxGrade(assignments, assignmentGroups, assignmentWeightConsideration)
       )
       setUserSetting(
-        JSON.parse(currentUserDefaultSelection.defaultViewValue)
+        currentUserDefaultSelection
+          ? JSON.parse(currentUserDefaultSelection.defaultViewValue)
+          : null
       )
     }
   }, [loading])
