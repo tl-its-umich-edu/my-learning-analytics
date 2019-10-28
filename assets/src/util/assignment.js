@@ -61,7 +61,9 @@ const calculateMaxGrade = (assignments, assignmentGroups, assignmentWeightConsid
       return acc
     }, [0, 0])
 
-  return (totalUserPoints / totalPossiblePoints * 100)
+  return totalPossiblePoints > 0
+    ? (totalUserPoints / totalPossiblePoints * 100)
+    : 0
 }
 
 // calculateCurrentGrade ignores any ungraded assignments
@@ -74,7 +76,7 @@ const sumAssignmentGoalGrade = assignments => sum(
 
 const sortAssignmentsByWeek = assignments => assignments.sort((a, b) => a.week - b.week)
 
-const setAssignmentFields = (assignments, assignmentGroups, dateStart) => sortAssignmentsByWeek(
+const createAssignmentFields = (assignments, assignmentGroups, dateStart) => sortAssignmentsByWeek(
   assignments.map(a => {
     const {
       dueDate,
@@ -88,7 +90,7 @@ const setAssignmentFields = (assignments, assignmentGroups, dateStart) => sortAs
     a.week = calculateWeekOffset(courseStartDate, dueDate)
     a.percentOfFinalGrade = calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
     a.outOf = pointsPossible
-    a.graded = !!currentUserSubmission.gradedDate
+    a.graded = !!currentUserSubmission && !!currentUserSubmission.gradedDate
     a.dueDateMonthDay = dateToMonthDay(dueDate)
 
     return a
@@ -109,7 +111,7 @@ const createUserSettings = (goalGrade, courseId, viewName, assignments) => {
   const mutation = {
     variables: {
       input: {
-        courseId: courseId,
+        canvasCourseId: courseId,
         defaultViewType: viewName,
         defaultViewValue: JSON.stringify({
           goalGrade: goalGrade,
@@ -128,6 +130,6 @@ export {
   calculateCurrentGrade,
   calculateMaxGrade,
   sumAssignmentGoalGrade,
-  setAssignmentFields,
+  createAssignmentFields,
   createUserSettings
 }

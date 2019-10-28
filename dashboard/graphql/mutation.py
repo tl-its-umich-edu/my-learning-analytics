@@ -1,4 +1,5 @@
 import graphene
+import json
 
 from graphene_django import DjangoObjectType
 from django.db.models import Q
@@ -6,13 +7,14 @@ from graphql import GraphQLError
 
 from dashboard.graphql.objects import UserDefaultSelectionType
 from dashboard.rules import is_admin_or_enrolled_in_course_id
-from dashboard.models import UserDefaultSelection
+from dashboard.models import UserDefaultSelection, Course
 
 import logging
 logger = logging.getLogger(__name__)
 
 class UserDefaultSelectionInput(graphene.InputObjectType):
-    course_id = graphene.ID(required=True)
+    course_id = graphene.ID()
+    canvas_course_id = graphene.ID()
     default_view_type = graphene.String(required=True)
     default_view_value = graphene.JSONString(required=True)
 
@@ -29,24 +31,26 @@ class UserDefaultSelectionMutation(graphene.Mutation):
         if not user.is_authenticated():
             raise GraphQLError('You must be logged in to update this resource!')
 
-        if not data.course_id or not is_admin_or_enrolled_in_course_id.test(user, data.course_id):
+        course_id = data.course_id
+        canvas_course_id = data.canvas_course_id
+
+        if not course_id and not canvas_course_id:
+            raise GraphQLError('You must provide courseId or canvasCourseId')
+
+        if not course_id:
+            course = Course.objects.get(canvas_id=canvas_course_id)
+            course_id = course.id
+
+        if not is_admin_or_enrolled_in_course_id.test(user, course_id):
             raise GraphQLError('You do not have permission to update this resource!')
 
         # check if exists
-        user_default_selection = UserDefaultSelection.objects.filter(
-            course_id = data.course_id,
+        user_default_selection, created = UserDefaultSelection.objects.get_or_create(
+            course_id = course_id,
             user_sis_name = user.get_username(),
-            default_view_type = data.default_view_type
-        ).first()
-
-        # if not exists, init a new one
-        if not user_default_selection:
-            user_default_selection = UserDefaultSelection(
-                course_id = data.course_id,
-                user_sis_name = user.get_username(),
-                default_view_type = data.default_view_type
-            )
-        user_default_selection.default_view_value = data.default_view_value
+            default_view_type = data.default_view_type,
+        )
+        user_default_selection.default_view_value = json.dumps(data.default_view_value)
         user_default_selection.save()
 
         # Notice we return an instance of this mutation
