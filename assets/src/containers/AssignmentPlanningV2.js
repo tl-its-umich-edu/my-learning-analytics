@@ -15,7 +15,7 @@ import {
   calculateMaxGrade,
   calculateAssignmentGoalsFromCourseGoal,
   sumAssignmentGoalGrade,
-  setAssignmentFields,
+  createAssignmentFields,
   createUserSettings
 } from '../util/assignment'
 // import { DndProvider } from 'react-dnd'
@@ -61,6 +61,9 @@ function AssignmentPlanningV2 (props) {
   const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
   const [userSetting, setUserSetting] = useState(null)
 
+  console.log(assignments)
+  console.log(userSetting)
+
   const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setAssignments([
       ...assignments.slice(0, key),
@@ -91,7 +94,7 @@ function AssignmentPlanningV2 (props) {
 
   const { loading, error, data } = useQuery(gql`
     {
-      course(canvasCourseId: ${courseId}) {
+      course(canvasId: ${courseId}) {
         assignments {
           id
           name
@@ -111,19 +114,34 @@ function AssignmentPlanningV2 (props) {
           id
           groupPoints
         }
+        currentUserDefaultSelection (defaultViewType: "assignment") {
+          defaultViewType,
+          defaultViewValue
+        }
       }
     }
   `)
 
   useEffect(() => {
     if (!loading && !error) {
-      const { assignments, assignmentGroups, dateStart, assignmentWeightConsideration } = data.course
-      setAssignments(setAssignmentFields(assignments, assignmentGroups, dateStart))
+      const {
+        assignments,
+        assignmentGroups,
+        dateStart,
+        assignmentWeightConsideration,
+        currentUserDefaultSelection
+      } = data.course
+      setAssignments(
+        createAssignmentFields(assignments, assignmentGroups, dateStart)
+      )
       setCurrentGrade(
         calculateCurrentGrade(assignments, assignmentGroups, assignmentWeightConsideration)
       )
       setMaxPossibleGrade(
         calculateMaxGrade(assignments, assignmentGroups, assignmentWeightConsideration)
+      )
+      setUserSetting(
+        JSON.parse(currentUserDefaultSelection.defaultViewValue)
       )
     }
   }, [loading])
@@ -133,6 +151,27 @@ function AssignmentPlanningV2 (props) {
 
     }
   }, [mutationLoading])
+
+  // this effect runs exactly once, if there is a previously saved user setting
+  useEffect(() => {
+    if (!loading && !error) {
+      if (userSetting) {
+        setGoalGrade(userSetting.goalGrade)
+        if (userSetting.assignments.length > 0) {
+          setAssignments(
+            assignments.map(a => {
+              const assignmentSetting = userSetting.assignments.find(x => x.id === a.id)
+              if (assignmentSetting) {
+                a.goalGrade = assignmentSetting.goalGrade
+                a.goalGradeSetByUser = assignmentSetting.goalGradeSetByUser
+              }
+              return a
+            })
+          )
+        }
+      }
+    }
+  }, [!!userSetting])
 
   // this effect is used to keep the goal of the course and assignments "in sync"
   // run if goalGrade changes, or if the sum of goal grades set by user changes

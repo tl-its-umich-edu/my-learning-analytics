@@ -76,7 +76,7 @@ const sumAssignmentGoalGrade = assignments => sum(
 
 const sortAssignmentsByWeek = assignments => assignments.sort((a, b) => a.week - b.week)
 
-const setAssignmentFields = (assignments, assignmentGroups, dateStart) => sortAssignmentsByWeek(
+const createAssignmentFields = (assignments, assignmentGroups, dateStart) => sortAssignmentsByWeek(
   assignments.map(a => {
     const {
       dueDate,
@@ -130,6 +130,6 @@ export {
   calculateCurrentGrade,
   calculateMaxGrade,
   sumAssignmentGoalGrade,
-  setAssignmentFields,
+  createAssignmentFields,
   createUserSettings
 }
