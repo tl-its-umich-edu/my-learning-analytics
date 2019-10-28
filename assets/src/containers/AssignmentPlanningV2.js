@@ -162,7 +162,7 @@ function AssignmentPlanningV2 (props) {
         if (userSetting.assignments.length > 0) {
           setAssignments(
             assignments.map(a => {
-              const assignmentSetting = userSetting.assignments.find(x => x.id === a.id)
+              const assignmentSetting = userSetting.assignments.find(x => x.assignmentId === a.id)
               if (assignmentSetting) {
                 a.goalGrade = assignmentSetting.goalGrade
                 a.goalGradeSetByUser = assignmentSetting.goalGradeSetByUser
