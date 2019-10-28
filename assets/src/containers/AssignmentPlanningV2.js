@@ -59,7 +59,7 @@ function AssignmentPlanningV2 (props) {
   const [goalGrade, setGoalGrade] = useState(null)
   const [currentGrade, setCurrentGrade] = useState(0)
   const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
-  const [userSetting, setUserSetting] = useState(null)
+  const [userSetting, setUserSetting] = useState({})
 
   console.log(assignments)
   console.log(userSetting)
@@ -85,6 +85,14 @@ function AssignmentPlanningV2 (props) {
       })
     )
     setGoalGrade(null)
+    const clearUserSettings = createUserSettings(
+      goalGrade,
+      courseId,
+      'assignment',
+      assignments
+    )
+    clearUserSettings.variables.input.defaultViewValue = JSON.stringify({})
+    updateUserSetting(clearUserSettings)
   }
 
   const [
@@ -143,7 +151,7 @@ function AssignmentPlanningV2 (props) {
       setUserSetting(
         currentUserDefaultSelection
           ? JSON.parse(currentUserDefaultSelection.defaultViewValue)
-          : null
+          : {}
       )
     }
   }, [loading])
@@ -159,10 +167,11 @@ function AssignmentPlanningV2 (props) {
     if (!loading && !error) {
       if (userSetting) {
         setGoalGrade(userSetting.goalGrade)
-        if (userSetting.assignments.length > 0) {
+        if (userSetting.assignments) {
           setAssignments(
             assignments.map(a => {
-              const assignmentSetting = userSetting.assignments.find(x => x.assignmentId === a.id)
+              const assignmentSetting = userSetting.assignments
+                .find(x => x.assignmentId === a.id)
               if (assignmentSetting) {
                 a.goalGrade = assignmentSetting.goalGrade
                 a.goalGradeSetByUser = assignmentSetting.goalGradeSetByUser
@@ -173,7 +182,7 @@ function AssignmentPlanningV2 (props) {
         }
       }
     }
-  }, [!!userSetting])
+  }, [Object.keys(userSetting).length])
 
   // this effect is used to keep the goal of the course and assignments "in sync"
   // run if goalGrade changes, or if the sum of goal grades set by user changes
