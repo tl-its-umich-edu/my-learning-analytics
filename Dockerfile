@@ -8,9 +8,15 @@ RUN npm install
 
 # NOTE: assets/ likely to change between dev builds
 COPY assets /usr/src/app/assets
-RUN npm run prod && \
-    # src is no longer needed (saves time for collect static)
-    rm -rf /usr/src/app/assets/src
+RUN npm run prod 
+
+# This is to find and remove symlinks that break some Docker builds.
+# We we need these later we'll just uncompress them 
+# Also remove src and the symlinks afterward
+RUN apk --update add tar && \ 
+    find . -type l -print0 | tar -cvf node_modules_symlinks.tgz --null -T - && \
+    rm -rf /usr/src/app/assets/src && \
+    find . -type l -print0 | xargs -0 rm -rf
 
 # build node libraries for production mode
 FROM node:11.10-alpine AS node-prod-deps
