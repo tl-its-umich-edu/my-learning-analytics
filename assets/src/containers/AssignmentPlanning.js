@@ -26,7 +26,7 @@ const styles = theme => ({
     padding: 8
   },
   paper: {
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
     color: theme.palette.text.secondary
   },
   graded: {
@@ -127,7 +127,7 @@ function AssignmentPlanning (props) {
 
   return (
     <div className={classes.root}>
-      <Grid container spacing={16}>
+      <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <>
