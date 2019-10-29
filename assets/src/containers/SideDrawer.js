@@ -41,7 +41,8 @@ function SideDrawer (props) {
               button
               key={props.title}
               selected={selectedIndex === key}
-              onClick={() => setSelectedIndex(key)}>
+              onClick={() => setSelectedIndex(key)}
+            >
               <ListItemIcon><props.icon /></ListItemIcon>
               <ListItemText primary={props.title} />
             </ListItem>
@@ -58,7 +59,8 @@ function SideDrawer (props) {
           tabIndex={0}
           role='button'
           onClick={() => toggleDrawer(!sideDrawerState)}
-          onKeyDown={() => toggleDrawer(!sideDrawerState)} >
+          onKeyDown={() => toggleDrawer(!sideDrawerState)}
+        >
           {courseInfo
             ? sideList
             : <Spinner />}
