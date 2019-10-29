@@ -5,7 +5,7 @@ import { matchPath } from 'react-router'
 import GoogleAnalyticsTracking from '../components/GoogleAnalyticsTracking'
 import CourseList from './CourseList'
 import Course from './Course'
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider'
+import { ThemeProvider } from '@material-ui/core/styles'
 import theme from "../theme"
 
 const enrolledCourses = (myla_globals.user_courses_info.length !== 0)
@@ -36,12 +36,12 @@ function App (props) {
   const courseId = coursePageMatch ? coursePageMatch.params.courseId : null
 
   return (
-    <MuiThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <GoogleAnalyticsTracking gaId={myla_globals.google_analytics_id} />
       <Route path='/' exact render={props => <CourseList {...props} user={user} />} />
       <Route path='/courses' exact render={props => <CourseList {...props} user={user} />} />
       {courseId ? <Course user={user} courseId={courseId} {...props} /> : null}
-    </MuiThemeProvider>
+    </ThemeProvider>
   )
 }
 
