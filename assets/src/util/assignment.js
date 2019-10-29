@@ -97,30 +97,16 @@ const createAssignmentFields = (assignments, assignmentGroups, dateStart) => sor
   })
 )
 
-const createUserSettings = (goalGrade, courseId, viewName, assignments) => {
-  const assignmentsSetByUser = assignments
-    .filter(a => a.goalGradeSetByUser)
-    .map(({ id, goalGradeSetByUser, goalGrade }) => (
-      {
-        assignmentId: id,
-        goalGradeSetByUser,
-        goalGrade
-      }
-    ))
-
+const createUserSettings = (courseId, viewName, setting) => {
   const mutation = {
     variables: {
       input: {
         canvasCourseId: courseId,
         defaultViewType: viewName,
-        defaultViewValue: JSON.stringify({
-          goalGrade: goalGrade,
-          assignments: assignmentsSetByUser
-        })
+        defaultViewValue: JSON.stringify(setting)
       }
     }
   }
-
   return mutation
 }
 

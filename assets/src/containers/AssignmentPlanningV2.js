@@ -18,6 +18,7 @@ import {
   createAssignmentFields,
   createUserSettings
 } from '../util/assignment'
+import debounce from 'lodash.debounce'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
 
@@ -61,7 +62,6 @@ function AssignmentPlanningV2 (props) {
   const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
   const [userSetting, setUserSetting] = useState({})
 
-  console.log(assignments)
   console.log(userSetting)
 
   const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
@@ -85,20 +85,8 @@ function AssignmentPlanningV2 (props) {
       })
     )
     setGoalGrade(null)
-    const clearUserSettings = createUserSettings(
-      goalGrade,
-      courseId,
-      'assignment',
-      assignments
-    )
-    clearUserSettings.variables.input.defaultViewValue = JSON.stringify({})
-    updateUserSetting(clearUserSettings)
+    setUserSetting({})
   }
-
-  const [
-    updateUserSetting,
-    { loading: mutationLoading, error: mutationError }
-  ] = useMutation(UPDATE_USER_SETTING)
 
   const { loading, error, data } = useQuery(gql`
     {
@@ -129,6 +117,16 @@ function AssignmentPlanningV2 (props) {
       }
     }
   `)
+
+  const [
+    updateUserSetting,
+    { loading: mutationLoading, error: mutationError }
+  ] = useMutation(UPDATE_USER_SETTING)
+
+  const debouncedUpdateUserSetting = debounce(updateUserSetting, 1000, {
+    leading: false,
+    trailing: true
+  })
 
   useEffect(() => {
     if (!loading && !error) {
@@ -168,21 +166,20 @@ function AssignmentPlanningV2 (props) {
       if (userSetting) {
         setGoalGrade(userSetting.goalGrade)
         if (userSetting.assignments) {
-          setAssignments(
-            assignments.map(a => {
-              const assignmentSetting = userSetting.assignments
-                .find(x => x.assignmentId === a.id)
-              if (assignmentSetting) {
-                a.goalGrade = assignmentSetting.goalGrade
-                a.goalGradeSetByUser = assignmentSetting.goalGradeSetByUser
-              }
-              return a
-            })
-          )
+          const assignmentsWithUserSetting = assignments.map(a => {
+            const assignmentSetting = userSetting.assignments
+              .find(x => x.assignmentId === a.id)
+            if (assignmentSetting) {
+              a.goalGrade = assignmentSetting.goalGrade
+              a.goalGradeSetByUser = assignmentSetting.goalGradeSetByUser
+            }
+            return a
+          })
+          setAssignments(assignmentsWithUserSetting)
         }
       }
     }
-  }, [Object.keys(userSetting).length])
+  }, [JSON.stringify(userSetting)]) // seems a bit hacky
 
   // this effect is used to keep the goal of the course and assignments "in sync"
   // run if goalGrade changes, or if the sum of goal grades set by user changes
@@ -197,16 +194,29 @@ function AssignmentPlanningV2 (props) {
           course.assignmentWeightConsideration
         )
       )
-      updateUserSetting(
-        createUserSettings(
-          goalGrade,
-          courseId,
-          'assignment',
-          assignments
-        )
-      )
+      const assignmentsSetByUser = assignments
+        .filter(a => a.goalGradeSetByUser)
+        .map(({ id, goalGradeSetByUser, goalGrade }) => (
+          {
+            assignmentId: id,
+            goalGradeSetByUser,
+            goalGrade
+          }
+        ))
+      setUserSetting({
+        goalGrade,
+        assignments: assignmentsSetByUser
+      })
     }
   }, [goalGrade, sumAssignmentGoalGrade(assignments)])
+
+  useEffect(() => {
+    if (Object.keys(userSetting).length > 0) {
+      debouncedUpdateUserSetting(
+        createUserSettings(courseId, 'assignment', userSetting)
+      )
+    }
+  }, [JSON.stringify(userSetting)])
 
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
 
