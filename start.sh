@@ -27,6 +27,8 @@ else
     GUNICORN_RELOAD=""
 fi
 
+DOMAIN_JQ='.ALLOWED_HOSTS | . - ["127.0.0.1", "localhost", ".ngrok.io"] | if . | length == 0 then "localhost" else .[0] end'
+
 if [ -z "${ENV_JSON}" ]; then
     MYSQL_HOST=$(jq -r -c ".MYSQL_HOST | values" ${ENV_FILE})
     MYSQL_PORT=$(jq -r -c ".MYSQL_PORT | values" ${ENV_FILE})
@@ -34,6 +36,7 @@ if [ -z "${ENV_JSON}" ]; then
     PTVSD_ENABLE=$(jq -r -c ".PTVSD_ENABLE | values" ${ENV_FILE})
     CRONTAB_SCHEDULE=$(jq -r -c ".CRONTAB_SCHEDULE | values" ${ENV_FILE})
     RUN_AT_TIMES=$(jq -r -c ".RUN_AT_TIMES | values" ${ENV_FILE})
+    DOMAIN=$(jq -r -c "${DOMAIN_JQ} | values" ${ENV_FILE})
 else
     MYSQL_HOST=$(echo "${ENV_JSON}" | jq -r -c ".MYSQL_HOST | values")
     MYSQL_PORT=$(echo "${ENV_JSON}" | jq -r -c ".MYSQL_PORT | values")
@@ -41,6 +44,7 @@ else
     PTVSD_ENABLE=$(echo "${ENV_JSON}" | jq -r -c ".PTVSD_ENABLE | values")
     CRONTAB_SCHEDULE=$(echo "${ENV_JSON}" | jq -r -c ".CRONTAB_SCHEDULE | values")
     RUN_AT_TIMES=$(echo "${ENV_JSON}" | jq -r -c ".RUN_AT_TIMES | values")
+    DOMAIN=$(echo "${ENV_JSON}" | jq -r -c "${DOMAIN_JQ} | values")
 fi
 
 echo "Waiting for DB"
@@ -55,6 +59,14 @@ export GIT_BRANCH="$(git name-rev $GIT_COMMIT --name-only)"
 
 echo Running python startups
 python manage.py migrate
+
+echo "Setting domain of default site record"
+# The value for LOCALHOST_PORT is set in docker-compose.yml
+if [ ${DOMAIN} == "localhost" ]; then
+  python manage.py site --domain="${DOMAIN}:${LOCALHOST_PORT}" --name="${DOMAIN}"
+else
+  python manage.py site --domain="${DOMAIN}" --name="${DOMAIN}"
+fi
 
 # If these values aren't set or they're set to false
 # This syntax substitutes False if null or unset

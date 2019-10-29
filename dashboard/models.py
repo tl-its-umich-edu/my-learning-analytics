@@ -12,8 +12,9 @@ from django.db.models import Q
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from collections import namedtuple
+from django.urls import reverse
 
+from collections import namedtuple
 from datetime import datetime, timedelta
 import pytz
 
@@ -190,6 +191,9 @@ class Course(models.Model):
             end = start + timedelta(weeks=2)
         DateRange = namedtuple("DateRange", ["start", "end"])
         return DateRange(start, end)
+
+    def get_absolute_url(self):
+        return reverse('courses', kwargs={'course_id': self.canvas_id})
 
     class Meta:
         db_table = "course"
