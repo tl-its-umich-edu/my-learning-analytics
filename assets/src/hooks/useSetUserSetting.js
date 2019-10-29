@@ -13,7 +13,7 @@ const useSetUserSetting = (courseId, userSetting, settingChanged, conditionalArr
       setLoaded(false)
       fetch(`/api/v1/courses/${courseId}/set_user_default_selection`, {
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
           'X-CSRFToken': Cookie.get('csrftoken')
         },
