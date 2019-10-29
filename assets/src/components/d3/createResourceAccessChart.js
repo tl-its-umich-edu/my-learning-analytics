@@ -15,7 +15,6 @@ import '@fortawesome/fontawesome-free'
 const accessedResourceColor = 'steelblue'
 const notAccessedResourceColor = 'gray'
 const mainMargin = { top: 50, right: 10, bottom: 50, left: 200 }
-const icons = {files: 'fas fa-file fa-lg', videos: 'fas fa-video fa-lg'}
 
 const toolTip = d3tip().attr('class', 'd3-tip')
   .direction('n').offset([-5, 5])
