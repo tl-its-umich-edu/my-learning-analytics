@@ -8,12 +8,12 @@ const theme = createMuiTheme({
             main: "#40658F"
         },
         /* The 'secondary' color is used currently to indicate a positive, completed, viewed, or selected state.
-           This value was arrived at through research and design work; modification is not recommended. */
+           This value was arrived at through research and design work; use caution when modifying. */
         secondary: {
             main: "#4682b4"
         },
         /* The 'negative' color is used currently to indicate a negative, un-completed, un-viewed, or un-selected state.
-           This value was arrived at through research and design work; modification is not recommended. */
+           This value was arrived at through research and design work; use caution when modifying. */
         negative: {
             main: "#E1E1E1"
         }
