@@ -52,7 +52,7 @@ const UPDATE_USER_SETTING = gql`
   }
 `
 
-function AssignmentPlanningV2(props) {
+function AssignmentPlanningV2 (props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
 
@@ -123,7 +123,7 @@ function AssignmentPlanningV2(props) {
     { loading: mutationLoading, error: mutationError }
   ] = useMutation(UPDATE_USER_SETTING)
 
-  const debouncedUpdateUserSetting = debounce(updateUserSetting, 1000, {
+  const debouncedUpdateUserSetting = debounce(updateUserSetting, 500, {
     leading: false,
     trailing: true
   })
