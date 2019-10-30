@@ -10,7 +10,6 @@
         "localhost"
     ],
     "/* Configuration of CSP see https://django-csp.readthedocs.io/en/latest/configuration.html": "*/",
-    
     "/* To enable this at all you must set have the CSP key set": "*/",
     "/* and REPORT_ONLY should be be false, otherwise it will just console Warn": "*/",
     "CSP": {
@@ -81,6 +80,17 @@
     "STUDENT_DASHBOARD_LTI": false,
     "/*  list LTI consumers as per https://github.com/rohitjose/django-lti-authusage make sure to change this secret!": "*/",
     "PYLTI_CONFIG_CONSUMERS": { "LTI_CONSUMER_KEY_1": { "secret": "LTI_CONSUMER_SECRET_1" }},
+    "/*  LTI Default ID field.": "*/",
+    "/*  custom_canvas_use_login_id is the default, you could also use lis_person_sourcedid": "*/",
+    "LTI_PERSON_SOURCED_ID_FIELD": "custom_canvas_user_login_id",
+    "/*  LTI Email field.": "*/",
+    "LTI_EMAIL_FIELD": "lis_person_contact_email_primary",
+    "/*  LTI Course ID field.": "*/",
+    "LTI_CANVAS_COURSE_ID_FIELD": "custom_canvas_course_id",
+    "/*  LTI First Name.": "*/",
+    "LTI_FIRST_NAME": "lis_person_name_given",
+    "/*  LTI Last Name.": "*/",
+    "LTI_LAST_NAME": "lis_person_name_family",
     "/*  SAML Configuration": "*/",
     "/*  Need to set this to false to turn it off for dev, but default is true": "*/",
     "STUDENT_DASHBOARD_SAML": false,
@@ -95,15 +105,13 @@
     "/*  ACS Redirect": "*/",
     "DJANGO_ACS_DEFAULT_REDIRECT": "http://localhost:5001/",
     "/*  Login Redirect (If SAML enabled)": "*/",
-    "LOGIN_REDIRECT_URL": "http://localhost:5001/",
+    "DJANGO_LOGIN_REDIRECT_URL": "http://localhost:5001/",
     "/*  Logout redirect (If SAML enabled)": "*/",
-    "LOGOUT_REDIRECT_URL": "http://localhost:5001/",
+    "DJANGO_LOGOUT_REDIRECT_URL": "http://localhost:5001/",
     "/*  Optional token value to be used for token based authentication": "*/",
     "DJANGO_WATCHMAN_TOKEN": "",
     "/*  A single default IDP to use if multiple are present in the SAML metadata (Get from Metadata)": "*/",
     "DJANGO_SAML2_DEFAULT_IDP": "",
-    "/*  Earliest term date from database that we'll show and support academic terms from (default is 2016-11-15 which the first date of 'our' data)": "*/",
-    "EARLIEST_TERM_DATE": "2016-11-15",
     "/*  CRON POD SETTINGS": "*/",
     "/* ": "*/",
     "/*  All of these settings go together and need to be enabled for cron job": "*/",
@@ -167,7 +175,7 @@
     "/*cron queries to pull the data from various caliper data sources replace if not relevant with your institution": "*/",
     "RESOURCE_ACCESS_CONFIG": {
         "canvas_data": {
-            "query": "SELECT 'canvas' AS resource_type, CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS resource_id, CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS INT64) AS user_id, CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.group.id'),31) AS INT64) AS course_id, JSON_EXTRACT_SCALAR(event, '$.object.name') as name, datetime(EVENT_TIME) as access_time FROM event_store.events where JSON_EXTRACT_SCALAR(event, '$.edApp.id') IN UNNEST(['http://m.canvas.umich.edu/', 'http://umich.instructure.com/']) and type = 'NavigationEvent' and SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'),24,10) = 'attachment' and JSON_EXTRACT_SCALAR(event, '$.action') = 'NavigatedTo' and JSON_EXTRACT_SCALAR(event, '$.membership.member.id') is not null and SUBSTR(JSON_EXTRACT_SCALAR(event, '$.group.id'),31) IN UNNEST(@course_ids)",
+            "query": "SELECT 'canvas' AS resource_type, CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS resource_id, CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS INT64) AS user_id, CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.group.id'),31) AS INT64) AS course_id, JSON_EXTRACT_SCALAR(event, '$.object.extensions[\\'com.instructure.canvas\\'].asset_name') as name, datetime(EVENT_TIME) as access_time FROM event_store.events where JSON_EXTRACT_SCALAR(event, '$.edApp.id') IN UNNEST(['http://m.canvas.umich.edu/' , 'http://umich.instructure.com/' ]) and type = 'NavigationEvent' and SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'),24,10) = 'attachment' and JSON_EXTRACT_SCALAR(event, '$.action') = 'NavigatedTo' and JSON_EXTRACT_SCALAR(event, '$.membership.member.id') is not null and SUBSTR(JSON_EXTRACT_SCALAR(event, '$.group.id'),31) IN UNNEST(@course_ids)",
             "app_display_name": "Canvas Files",
             "canvas_course_id_format": "LONG"
         },
@@ -177,5 +185,7 @@
             "/* mention if the caliper event data is providing long or short canvas id and change the query to store long id as in this case": "*/",
             "canvas_course_id_format": "SHORT"
         }
-    }
+    },
+    "/* Disable/Enable courses_enabled api": "*/",
+    "COURSES_ENABLED" : false
 }

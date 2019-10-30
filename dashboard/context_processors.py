@@ -15,5 +15,5 @@ def last_updated(request):
     return {'last_updated': db_util.get_canvas_data_date()}
 
 
-def get_build_info(request):
-    return {'build': utils.get_build_info()}
+def get_git_version_info(request):
+    return {'git_version': utils.get_git_version_info()}

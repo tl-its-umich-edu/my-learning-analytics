@@ -24,13 +24,18 @@ PROJECT_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), ".."),
 )
 
-try:
-    with open(os.getenv("ENV_FILE", "/secrets/env.json")) as f:
-        ENV = json.load(f)
-except FileNotFoundError as fnfe:
-    print("Default config file or one defined in environment variable ENV_FILE not found. This is normal for the build, should define for operation")
-    # Set ENV so collectstatic will still run in the build
-    ENV = os.environ
+if os.getenv("ENV_JSON"):
+    # optionally load settings from an environment variable
+    ENV = json.loads(os.getenv("ENV_JSON"))
+else:
+    # else try loading settings from the json config file
+    try:
+        with open(os.getenv("ENV_FILE", "/secrets/env.json")) as f:
+            ENV = json.load(f)
+    except FileNotFoundError as fnfe:
+        print("Default config file or one defined in environment variable ENV_FILE not found. This is normal for the build, should define for operation")
+        # Set ENV so collectstatic will still run in the build
+        ENV = os.environ
 
 LOGOUT_URL = '/accounts/logout'
 LOGIN_URL = '/accounts/login'
@@ -62,6 +67,9 @@ WATCHMAN_TOKEN_NAME = ENV.get('DJANGO_WATCHMAN_TOKEN_NAME', 'token')
 
 # Only report on the default database
 WATCHMAN_DATABASES = ('default',)
+
+# courses_enabled api
+COURSES_ENABLED = ENV.get('COURSES_ENABLED', False)
 
 # Defaults for PTVSD
 PTVSD_ENABLE = ENV.get("PTVSD_ENABLE", False)
@@ -96,7 +104,7 @@ INSTALLED_APPS = [
 
 # The order of this is important. It says DebugToolbar should be on top but
 # The tips has it on the bottom
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -130,7 +138,7 @@ TEMPLATES = [
                 'django_settings_export.settings_export',
                 'dashboard.context_processors.current_user_courses_info',
                 'dashboard.context_processors.last_updated',
-                'dashboard.context_processors.get_build_info',
+                'dashboard.context_processors.get_git_version_info',
             ],
         },
     },
@@ -388,11 +396,15 @@ if ENV.get('STUDENT_DASHBOARD_LTI', False):
         "next_url": "home"
     }
     LTI_PERSON_SOURCED_ID_FIELD = ENV.get('LTI_PERSON_SOURCED_ID_FIELD',
-        "lis_person_sourcedid")
+        "custom_canvas_user_login_id")
     LTI_EMAIL_FIELD = ENV.get('LTI_EMAIL_FIELD',
         "lis_person_contact_email_primary")
     LTI_CANVAS_COURSE_ID_FIELD = ENV.get('LTI_CANVAS_COURSE_ID_FIELD',
         "custom_canvas_course_id")
+    LTI_FIRST_NAME = ENV.get('LTI_FIRST_NAME',
+        "lis_person_name_given")
+    LTI_LAST_NAME = ENV.get('LTI_LAST_NAME',
+        "lis_person_name_family")
     
 # controls whether Unizin specific features/data is available from the Canvas Data source
 DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)
@@ -402,10 +414,6 @@ CANVAS_DATA_ID_INCREMENT = ENV.get("CANVAS_DATA_ID_INCREMENT", 17700000000000000
 
 # Allow enabling/disabling the View options globally
 VIEWS_DISABLED = ENV.get('VIEWS_DISABLED', [])
-
-# This is to set a date so that MyLA will track all terms with start date after this date.
-
-EARLIEST_TERM_DATE = ENV.get('EARLIEST_TERM_DATE', '2016-11-15')
 
 # Time to run cron
 RUN_AT_TIMES = ENV.get('RUN_AT_TIMES', [])
@@ -439,16 +447,19 @@ CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
 RESOURCE_ACCESS_CONFIG = ENV.get("RESOURCE_ACCESS_CONFIG", {})
 
+# Git info settings
+SHA_ABBREV_LENGTH = 7
+
 # Django CSP Settings, load up from file if set
 if "CSP" in ENV:
-    MIDDLEWARE_CLASSES += ['csp.middleware.CSPMiddleware',]
+    MIDDLEWARE += ['csp.middleware.CSPMiddleware',]
     for csp_key, csp_val in ENV.get("CSP").items():
         # If there's a value set for this CSP config, set it as a global
         if (csp_val):
             globals()["CSP_"+csp_key] = csp_val
 # If CSP not set, add in XFrameOptionsMiddleware
 else:
-    MIDDLEWARE_CLASSES += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
+    MIDDLEWARE += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
 
 # These are mostly needed by Canvas but it should also be in on general 
 CSRF_COOKIE_SECURE = ENV.get("CSRF_COOKIE_SECURE", False)

@@ -10,16 +10,17 @@ import pandas as pd
 from django.conf import settings
 from django.contrib import auth
 from django.db import connection as conn
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
 from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
+from collections import namedtuple
 
 from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
-from dashboard.settings import RESOURCE_VALUES
+from dashboard.settings import RESOURCE_VALUES, COURSES_ENABLED
 
 logger = logging.getLogger(__name__)
 # strings for construct resource download url
@@ -36,6 +37,9 @@ NO_GRADE_STRING = "NO_GRADE"
 # string for resource type
 RESOURCE_TYPE_STRING = "resource_type"
 RESOURCE_VALUES = settings.RESOURCE_VALUES
+
+# Is courses_enabled api enabled/disabled?
+COURSES_ENABLED = settings.COURSES_ENABLED
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
@@ -301,27 +305,44 @@ def grade_distribution(request, course_id=0):
     course_id = canvas_id_to_incremented_id(course_id)
 
     current_user = request.user.get_username()
-    grade_score_sql = "select current_grade,(select current_grade from user where sis_name=" \
-                      "%(current_user)s and course_id=%(course_id)s) as current_user_grade " \
-                      "from user where course_id=%(course_id)s and enrollment_type='StudentEnrollment';"
-    df = pd.read_sql(grade_score_sql, conn, params={"current_user": current_user,'course_id': course_id})
+
+    grade_score_sql = f"""select current_grade,
+       (select show_grade_counts From course where id=%(course_id)s) as show_number_on_bars,
+    (select current_grade from user where sis_name=%(current_user)s and course_id=%(course_id)s) as current_user_grade
+        from user where course_id=%(course_id)s and enrollment_type='StudentEnrollment';
+                    """
+    df = pd.read_sql(grade_score_sql, conn, params={"current_user": current_user, 'course_id': course_id})
     if df.empty or df['current_grade'].isnull().all():
         return HttpResponse(json.dumps({}), content_type='application/json')
-    number_of_students = df.shape[0]
+
+    df['tot_students'] = df.shape[0]
     df = df[df['current_grade'].notnull()]
     df['current_grade'] = df['current_grade'].astype(float)
+    df['grade_avg'] = df['current_grade'].mean().round(2)
+    df['median_grade'] = df['current_grade'].median().round(2)
+    df['show_number_on_bars'] = df['show_number_on_bars'].apply(lambda x: True if x == 1 else False)
+
+    df.sort_values(by=['current_grade'], inplace=True)
+    df.reset_index(drop=True, inplace=True)
+    grades = df['current_grade'].values.tolist()
+    logger.debug(f"Grades distribution: {grades}")
+    BinningGrade = find_binning_grade_value(grades)
+    if BinningGrade is not None and not BinningGrade.binning_all:
+        df['current_grade'] = df['current_grade'].replace(df['current_grade'].head(BinningGrade.index),
+                                                      BinningGrade.value)
+    df['show_dash_line'] = show_dashed_line(df['current_grade'].iloc[0], BinningGrade)
+
     if df[df['current_grade'] > 100.0].shape[0] > 0:
-        df['graph_upper_limit']=int((5 * round(float(df['current_grade'].max())/5)+5))
+        df['graph_upper_limit'] = int((5 * round(float(df['current_grade'].max()) / 5) + 5))
     else:
         df['current_grade'] = df['current_grade'].apply(lambda x: 99.99 if x == 100.00 else x)
-        df['graph_upper_limit']=100
-    average_grade = df['current_grade'].mean().round(2)
-    df['tot_students'] = number_of_students
-    df['grade_avg'] = average_grade
+        df['graph_upper_limit'] = 100
+
 
     # json for eventlog
     data = {
-        "course_id": course_id
+        "course_id": course_id,
+        "show_number_on_bars": df['show_number_on_bars'].values[0]
     }
     eventlog(request.user, EventLogTypes.EVENT_VIEW_GRADE_DISTRIBUTION.value, extra=data)
 
@@ -625,6 +646,76 @@ def are_weighted_assignments_hidden(course_id, df):
             return True
 
 
+def find_binning_grade_value(grades):
+    fifth_item = grades[4]
+    next_to_fifth_item = grades[5]
+    if next_to_fifth_item - fifth_item > 2:
+        BinningGrade = get_binning_grade()
+        return BinningGrade(value=fifth_item, index=4, binning_all=False)
+    else:
+        return binning_logic(grades, fifth_item)
+
+
+def is_odd(num):
+    if num % 2 == 0:
+        return False
+    else:
+        return True
+
+
+def show_dashed_line(grade, BinningGrade):
+    """
+    logic determine to show dashed line or not.
+    :param grade:
+    :param BinningGrade:
+    :return:
+    """
+    if BinningGrade.binning_all or grade > 96 or grade < 2:
+        return False
+    else:
+        return True
+
+
+def check_if_grade_qualifies_for_binning(grade, fifthElement):
+    # case: 96.7, 94.76,
+    if int(grade) - int(fifthElement) > 1:
+        return False
+    # case: 94.86, 94.76
+    if int(grade) - int(fifthElement) == 0:
+        return True
+    # case 95.89, 94.76
+    if is_odd(int(grade)):
+        return True
+
+
+def binning_logic(grades, fifth_item_in_list):
+    """
+    Histogram binning is by 2 [ [0,2], [2,4], [4,6], …..] each item in the list starting number is inclusive and second
+    is exclusive.
+    Case 1: Just last 5 are binned
+    Actual distribution: [69.79, 80.0, 80.5, 88.21, 88.79, 92.71, 92.71, 92.71, 93.14, 94.43]
+    Binning Distribution: [88.79, 88.79, 88.79, 88.79, 88.79, 92.71, 92.71, 92.71, 93.14, 94.43]
+    Case 2: More than last 5 are binned based on histogram binning by count of 2
+    Actual Distribution: [90.77, 93.09, 93.42, 94.85, 94.87, 94.88, 94.9, 95.55, 95.89, 96.28, 96.4, 96.47, 96.49, 96.68]
+    Binning Distribution: [95.89, 95.89, 95.89, 95.89, 95.89, 95.89, 95.89, 95.89, 95.89,96.28, 96.4, 96.47, 96.49, 96.68]
+
+    :param grades: sorted in asc
+    :param fifth_item_in_list:
+    :return: max grade in the binned list, length of binned grades, bool value indicating whether all grades are being binned
+    """
+    binning_list = grades[:5]
+    BinningGrade = get_binning_grade()
+    for grade in grades[5:]:
+        if check_if_grade_qualifies_for_binning(grade, fifth_item_in_list):
+            binning_list.append(grade)
+        else:
+            return BinningGrade(max(binning_list), len(binning_list),False)
+    return BinningGrade(max(binning_list), len(binning_list), True)
+
+
+def get_binning_grade():
+    return namedtuple('BinningGrade', ['value', 'index','binning_all'])
+
 def df_default_display_settings():
     pd.set_option('display.max_column', None)
     pd.set_option('display.max_rows', None)
@@ -639,19 +730,23 @@ def logout(request):
     return redirect(settings.LOGOUT_REDIRECT_URL)
 
 
-@permission_required('dashboard.courses_enabled', raise_exception=True)
+
 def courses_enabled(request):
     """ Returns json for all courses we currntly support and are enabled
 
     """
-    data = {}
-    for cvo in CourseViewOption.objects.all():
-        data.update(cvo.json())
+    
+    if COURSES_ENABLED:
+        data = {}
+        for cvo in CourseViewOption.objects.all():
+            data.update(cvo.json())
 
-    callback = request.GET.get('callback')
-    # Return json
-    if callback is None:
-        return HttpResponse(json.dumps(data), content_type='application/json')
-    # Return jsonp
+        callback = request.GET.get('callback')
+        # Return json
+        if callback is None:
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        # Return jsonp
+        else:
+            return HttpResponse("{0}({1})".format(callback, json.dumps(data)), content_type='application/json')
     else:
-        return HttpResponse("{0}({1})".format(callback, json.dumps(data)), content_type='application/json')
+        return HttpResponseForbidden()

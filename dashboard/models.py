@@ -12,8 +12,9 @@ from django.db.models import Q
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from collections import namedtuple
+from django.urls import reverse
 
+from collections import namedtuple
 from datetime import datetime, timedelta
 import pytz
 
@@ -159,12 +160,14 @@ class CourseManager(models.Manager):
 
 
 class Course(models.Model):
-    id = models.BigIntegerField(primary_key=True, verbose_name="Course Id", db_column='id')
+    id = models.BigIntegerField(primary_key=True, verbose_name="Course Id", db_column='id', editable=False)
     canvas_id = models.BigIntegerField(verbose_name="Canvas Course Id", db_column='canvas_id')
     term = models.ForeignKey(AcademicTerms, verbose_name="Term", on_delete=models.SET_NULL, db_column="term_id", null=True, db_constraint=False)
     name = models.CharField(max_length=255, verbose_name="Name")
     date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
     date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)
+    show_grade_counts = models.BooleanField(blank=False, null=False, default=False, verbose_name=
+                                         "Show Grade Counts")
 
     objects = CourseManager()
 
@@ -174,18 +177,23 @@ class Course(models.Model):
     def get_course_date_range(self):
         if self.date_start is not None:
             start = self.date_start
-        elif self.term is not None:
+        elif self.term is not None and self.term.date_start is not None:
             start = self.term.date_start
         else:
+            logger.warning("No date_start value was found for course or term; setting to current date and time")
             start = datetime.now(pytz.UTC)
         if self.date_end is not None:
             end = self.date_end
-        elif self.term is not None:
+        elif self.term is not None and self.term.date_end is not None:
             end = self.term.get_correct_date_end()
         else:
+            logger.warning("No date_end value was found for course or term; setting to two weeks from now")
             end = start + timedelta(weeks=2)
         DateRange = namedtuple("DateRange", ["start", "end"])
         return DateRange(start, end)
+
+    def get_absolute_url(self):
+        return reverse('courses', kwargs={'course_id': self.canvas_id})
 
     class Meta:
         db_table = "course"
@@ -279,6 +287,8 @@ class Submission(models.Model):
     user_id = models.BigIntegerField(verbose_name="User Id")
     score = models.FloatField(blank=True, null=True, verbose_name="Score")
     graded_date = models.DateTimeField(blank=True, null=True, verbose_name="Graded DateTime")
+    # This is used for tracking of grade posted date and not used in Assignment view hence making it CharField
+    grade_posted_local_date = models.CharField(max_length=255,blank=True, null=True, verbose_name="Posted Grade in local DateTime")
     avg_score = models.FloatField(blank=True, null=True, verbose_name="Average Grade")
 
     def __str__(self):

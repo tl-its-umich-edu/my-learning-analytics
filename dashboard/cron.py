@@ -385,14 +385,14 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         for data_warehouse_course_id in Course.objects.get_supported_courses():
             submission_url = f"""with sub_fact as (select submission_id, assignment_id, course_id, user_id, global_canvas_id, published_score from submission_fact sf join user_dim u on sf.user_id = u.id where course_id = '{data_warehouse_course_id}'),
-                             enrollment as (select  distinct(user_id) from enrollment_dim where course_id = '{data_warehouse_course_id}' and workflow_state='active' and type = 'StudentEnrollment'),
-                             sub_with_enroll as (select sf.* from sub_fact sf join enrollment e on e.user_id = sf.user_id),
-                             submission_time as (select sd.id, sd.graded_at from submission_dim sd join sub_fact suf on sd.id=suf.submission_id),
-                             assign_fact as (select s.*,a.title from assignment_dim a join sub_with_enroll s on s.assignment_id=a.id where a.course_id='{data_warehouse_course_id}' and a.workflow_state='published' and muted = false),
-                             assign_sub_time as (select a.*, t.graded_at from assign_fact a join submission_time t on a.submission_id = t.id),
-                             all_assign_sub as (select submission_id AS id, assignment_id AS assignment_id, course_id, global_canvas_id AS user_id, round(published_score,1) AS score, graded_at AS graded_date from assign_sub_time order by assignment_id)
-                             select f.*, f1.avg_score from all_assign_sub f join (select assignment_id, round(avg(score),1) as avg_score from all_assign_sub group by assignment_id) as f1 on f.assignment_id = f1.assignment_id
-                             """
+                enrollment as (select  distinct(user_id) from enrollment_dim where course_id = '{data_warehouse_course_id}' and workflow_state='active' and type = 'StudentEnrollment'),
+                sub_with_enroll as (select sf.* from sub_fact sf join enrollment e on e.user_id = sf.user_id),
+                submission_time as (select sd.id, sd.graded_at, sd.posted_at at time zone 'utc' at time zone '{settings.TIME_ZONE}' as grade_posted_local_date from submission_dim sd join sub_fact suf on sd.id=suf.submission_id where posted_at is not null and posted_at < getdate()),
+                assign_fact as (select s.*,a.title from assignment_dim a join sub_with_enroll s on s.assignment_id=a.id where a.course_id='{data_warehouse_course_id}' and a.workflow_state='published'),
+                assign_sub_time as (select a.*, t.graded_at, t.grade_posted_local_date from assign_fact a join submission_time t on a.submission_id = t.id),
+                all_assign_sub as (select submission_id AS id, assignment_id AS assignment_id, course_id, global_canvas_id AS user_id, round(published_score,1) AS score, graded_at AS graded_date, grade_posted_local_date from assign_sub_time order by assignment_id)
+                select f.*, f1.avg_score from all_assign_sub f join (select assignment_id, round(avg(score),1) as avg_score from all_assign_sub group by assignment_id) as f1 on f.assignment_id = f1.assignment_id;
+          """
             status += util_function(data_warehouse_course_id, submission_url,'submission')
 
         return status
@@ -430,8 +430,8 @@ class DashboardCronJob(CronJobBase):
         # delete all records in the table first
         status += deleteAllRecordInTable("academic_terms")
 
-        #select term records from DATA_WAREHOUSE
-        term_sql = f"select id, canvas_id, name, date_start, date_end from enrollment_term_dim where date_start > '{settings.EARLIEST_TERM_DATE}'"
+        # select term records from DATA_WAREHOUSE
+        term_sql = "SELECT id, canvas_id, name, date_start, date_end FROM enrollment_term_dim;"
         logger.debug(term_sql)
         status += util_function(None, term_sql, 'academic_terms')
 

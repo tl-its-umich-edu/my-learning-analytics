@@ -38,11 +38,11 @@ const tableStyle = theme => ({
   tableResponsive: {
     width: '70%',
     height: 400,
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing(3),
     overflowX: 'auto'
   },
   paper: {
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
     color: theme.palette.text.secondary
   }
 })

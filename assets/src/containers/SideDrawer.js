@@ -18,6 +18,9 @@ const styles = {
   },
   sideDrawerLinks: {
     textDecoration: 'none'
+  },
+  text: {
+    color: 'black'
   }
 }
 
@@ -41,9 +44,10 @@ function SideDrawer (props) {
               button
               key={props.title}
               selected={selectedIndex === key}
-              onClick={() => setSelectedIndex(key)}>
+              onClick={() => setSelectedIndex(key)}
+            >
               <ListItemIcon><props.icon /></ListItemIcon>
-              <ListItemText primary={props.title} />
+              <ListItemText primary={props.title} className={classes.text}/>
             </ListItem>
           </Link>
         ))}
@@ -58,7 +62,8 @@ function SideDrawer (props) {
           tabIndex={0}
           role='button'
           onClick={() => toggleDrawer(!sideDrawerState)}
-          onKeyDown={() => toggleDrawer(!sideDrawerState)} >
+          onKeyDown={() => toggleDrawer(!sideDrawerState)}
+        >
           {courseInfo
             ? sideList
             : <Spinner />}
