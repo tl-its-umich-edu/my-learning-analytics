@@ -5,7 +5,8 @@ import Grid from '@material-ui/core/Grid'
 import Spinner from '../components/Spinner'
 import ProgressBarV2 from '../components/ProgressBarV2'
 import AssignmentGradeBoxes from '../components/AssignmentGradeBoxes'
-import Error from './Error'
+import AlertBanner from '../components/AlertBanner'
+import WarningBanner from '../components/WarningBanner'
 import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
 import { gql } from 'apollo-boost'
@@ -54,7 +55,7 @@ const UPDATE_USER_SETTING = gql`
 
 function AssignmentPlanningV2 (props) {
   const { classes, disabled, courseId } = props
-  if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
+  if (disabled) return (<AlertBanner>Grade Distribution view is hidden for this course.</AlertBanner>)
 
   const [assignments, setAssignments] = useState([])
   const [goalGrade, setGoalGrade] = useState(null)
@@ -216,7 +217,7 @@ function AssignmentPlanningV2 (props) {
     )
   }, [JSON.stringify(userSetting)])
 
-  if (error) return (<Error>Something went wrong, please try again later.</Error>)
+  if (error) return (<WarningBanner />)
 
   return (
     // <DndProvider backend={HTML5Backend}>
