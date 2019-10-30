@@ -52,7 +52,7 @@ const UPDATE_USER_SETTING = gql`
   }
 `
 
-function AssignmentPlanningV2 (props) {
+function AssignmentPlanningV2(props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<Error>Grade Distribution view is hidden for this course.</Error>)
 
@@ -179,7 +179,7 @@ function AssignmentPlanningV2 (props) {
         }
       }
     }
-  }, [JSON.stringify(userSetting)]) // seems a bit hacky
+  }, [JSON.stringify(userSetting)])
 
   // this effect is used to keep the goal of the course and assignments "in sync"
   // run if goalGrade changes, or if the sum of goal grades set by user changes
@@ -211,11 +211,9 @@ function AssignmentPlanningV2 (props) {
   }, [goalGrade, sumAssignmentGoalGrade(assignments)])
 
   useEffect(() => {
-    if (Object.keys(userSetting).length > 0) {
-      debouncedUpdateUserSetting(
-        createUserSettings(courseId, 'assignment', userSetting)
-      )
-    }
+    debouncedUpdateUserSetting(
+      createUserSettings(courseId, 'assignment', userSetting)
+    )
   }, [JSON.stringify(userSetting)])
 
   if (error) return (<Error>Something went wrong, please try again later.</Error>)
