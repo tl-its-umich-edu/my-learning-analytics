@@ -10,7 +10,7 @@ import WarningBanner from '../components/WarningBanner'
 import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
 import { gql } from 'apollo-boost'
-import { useQuery, useMutation } from '@apollo/react-hooks'
+import { useQuery } from '@apollo/react-hooks'
 import {
   calculateCurrentGrade,
   calculateMaxGrade,
@@ -19,7 +19,7 @@ import {
   createAssignmentFields,
   createUserSettings
 } from '../util/assignment'
-import debounce from 'lodash.debounce'
+import useDebouncedSetUserSettingGQL from '../hooks/useDebouncedSetUserSettingGQL'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
 
@@ -41,16 +41,34 @@ const styles = theme => ({
   }
 })
 
-const UPDATE_USER_SETTING = gql`
-  mutation setUserDefaultSelection($input: UserDefaultSelectionInput!) {
-    setUserDefaultSelection(data: $input) {
-      userDefaultSelection {
-        courseId,
-        defaultViewType,
-        defaultViewValue,
+const GET_ASSIGNMENT_PLANNING_DATA = courseId => gql`
+{
+  course(canvasId: ${courseId}) {
+    assignments {
+      id
+      name
+      dueDate
+      pointsPossible
+      averageGrade
+      assignmentGroupId
+      currentUserSubmission {
+        score
+        gradedDate
       }
     }
+    dateStart
+    assignmentWeightConsideration
+    assignmentGroups{
+      weight
+      id
+      groupPoints
+    }
+    currentUserDefaultSelection (defaultViewType: "assignment") {
+      defaultViewType,
+      defaultViewValue
+    }
   }
+}
 `
 
 function AssignmentPlanningV2 (props) {
@@ -62,6 +80,9 @@ function AssignmentPlanningV2 (props) {
   const [currentGrade, setCurrentGrade] = useState(0)
   const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
   const [userSetting, setUserSetting] = useState({})
+
+  const { loading, error, data } = useQuery(GET_ASSIGNMENT_PLANNING_DATA(courseId))
+  const [debouncedUpdateUserSetting, mutationLoading, mutationError] = useDebouncedSetUserSettingGQL()
 
   console.log(userSetting)
 
@@ -88,46 +109,6 @@ function AssignmentPlanningV2 (props) {
     setGoalGrade(null)
     setUserSetting({})
   }
-
-  const { loading, error, data } = useQuery(gql`
-    {
-      course(canvasId: ${courseId}) {
-        assignments {
-          id
-          name
-          dueDate
-          pointsPossible
-          averageGrade
-          assignmentGroupId
-          currentUserSubmission {
-            score
-            gradedDate
-          }
-        }
-        dateStart
-        assignmentWeightConsideration
-        assignmentGroups{
-          weight
-          id
-          groupPoints
-        }
-        currentUserDefaultSelection (defaultViewType: "assignment") {
-          defaultViewType,
-          defaultViewValue
-        }
-      }
-    }
-  `)
-
-  const [
-    updateUserSetting,
-    { loading: mutationLoading, error: mutationError }
-  ] = useMutation(UPDATE_USER_SETTING)
-
-  const debouncedUpdateUserSetting = debounce(updateUserSetting, 500, {
-    leading: false,
-    trailing: true
-  })
 
   useEffect(() => {
     if (!loading && !error) {
