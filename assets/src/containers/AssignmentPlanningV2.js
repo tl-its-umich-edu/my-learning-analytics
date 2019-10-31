@@ -9,8 +9,6 @@ import AlertBanner from '../components/AlertBanner'
 import WarningBanner from '../components/WarningBanner'
 import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
-import { gql } from 'apollo-boost'
-import { useQuery } from '@apollo/react-hooks'
 import {
   calculateCurrentGrade,
   calculateMaxGrade,
@@ -19,7 +17,8 @@ import {
   createAssignmentFields,
   createUserSettings
 } from '../util/assignment'
-import useDebouncedSetUserSettingGQL from '../hooks/useDebouncedSetUserSettingGQL'
+import useSetUserSettingGQL from '../hooks/useSetUserSettingGQL'
+import useAssignmentData from '../hooks/useAssignmentData'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
 
@@ -41,36 +40,6 @@ const styles = theme => ({
   }
 })
 
-const GET_ASSIGNMENT_PLANNING_DATA = courseId => gql`
-{
-  course(canvasId: ${courseId}) {
-    assignments {
-      id
-      name
-      dueDate
-      pointsPossible
-      averageGrade
-      assignmentGroupId
-      currentUserSubmission {
-        score
-        gradedDate
-      }
-    }
-    dateStart
-    assignmentWeightConsideration
-    assignmentGroups{
-      weight
-      id
-      groupPoints
-    }
-    currentUserDefaultSelection (defaultViewType: "assignment") {
-      defaultViewType,
-      defaultViewValue
-    }
-  }
-}
-`
-
 function AssignmentPlanningV2 (props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<AlertBanner>Grade Distribution view is hidden for this course.</AlertBanner>)
@@ -81,8 +50,8 @@ function AssignmentPlanningV2 (props) {
   const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
   const [userSetting, setUserSetting] = useState({})
 
-  const { loading, error, data } = useQuery(GET_ASSIGNMENT_PLANNING_DATA(courseId))
-  const [debouncedUpdateUserSetting, mutationLoading, mutationError] = useDebouncedSetUserSettingGQL()
+  const { loading, error, data } = useAssignmentData(courseId)
+  const { debouncedUpdateUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
 
   console.log(userSetting)
 

@@ -14,7 +14,7 @@ const UPDATE_USER_SETTING = gql`
   }
 `
 
-const useDebouncedSetUserSettingGQL = () => {
+const useSetUserSettingGQL = () => {
   const [
     updateUserSetting,
     { loading: mutationLoading, error: mutationError }
@@ -25,7 +25,7 @@ const useDebouncedSetUserSettingGQL = () => {
     trailing: true
   })
 
-  return [debouncedUpdateUserSetting, mutationLoading, mutationError]
+  return { debouncedUpdateUserSetting, mutationLoading, mutationError }
 }
 
-export default useDebouncedSetUserSettingGQL
+export default useSetUserSettingGQL
