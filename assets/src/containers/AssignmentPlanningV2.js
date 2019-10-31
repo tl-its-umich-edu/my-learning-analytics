@@ -29,7 +29,7 @@ const styles = theme => ({
     padding: 8
   },
   paper: {
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
     color: theme.palette.text.secondary
   },
   clearButton: {
@@ -110,6 +110,7 @@ function AssignmentPlanningV2 (props) {
     setUserSetting({})
   }
 
+  // initialize the state
   useEffect(() => {
     if (!loading && !error) {
       const {
@@ -203,7 +204,7 @@ function AssignmentPlanningV2 (props) {
   return (
     // <DndProvider backend={HTML5Backend}>
     <div className={classes.root}>
-      <Grid container spacing={16}>
+      <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
             <Typography variant='h5' gutterBottom>Assignment Planning</Typography>
