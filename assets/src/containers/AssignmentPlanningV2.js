@@ -46,19 +46,12 @@ function AssignmentPlanningV2 (props) {
   const [currentGrade, setCurrentGrade] = useState(0)
   const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
   const [userSetting, setUserSetting] = useState({})
+  const [settingChanged, setSettingChanged] = useState(false)
 
   const { loading, error, data } = useAssignmentData(courseId)
   const { debouncedUpdateUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
 
-  useInitAssignmentState(
-    loading,
-    error,
-    data,
-    setAssignments,
-    setCurrentGrade,
-    setMaxPossibleGrade,
-    setUserSetting
-  )
+  useInitAssignmentState(loading, error, data, setAssignments, setCurrentGrade, setMaxPossibleGrade, setUserSetting)
   useAssignmentUserSetting(loading, error, assignments, userSetting, setGoalGrade, setAssignments)
   useSyncAssignmentAndGoalGrade(data, assignments, goalGrade, setAssignments, setUserSetting)
 
@@ -67,9 +60,10 @@ function AssignmentPlanningV2 (props) {
     debouncedUpdateUserSetting(
       createUserSettings(courseId, 'assignment', userSetting)
     )
-  }, [JSON.stringify(userSetting)])
+  }, [JSON.stringify(userSetting), settingChanged])
 
   const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
+    setSettingChanged(true)
     setAssignments([
       ...assignments.slice(0, key),
       {
@@ -91,6 +85,7 @@ function AssignmentPlanningV2 (props) {
     )
     setGoalGrade(null)
     setUserSetting({})
+    setSettingChanged(true)
   }
 
   if (error) return (<WarningBanner />)
@@ -138,7 +133,10 @@ function AssignmentPlanningV2 (props) {
                       currentGrade={currentGrade}
                       goalGrade={goalGrade}
                       maxPossibleGrade={maxPossibleGrade}
-                      setGoalGrade={grade => setGoalGrade(grade)}
+                      setGoalGrade={grade => {
+                        setSettingChanged(true)
+                        setGoalGrade(grade)
+                      }}
                       handleClearGoalGrades={handleClearGoalGrades}
                     />
                     <AssignmentTable
@@ -149,7 +147,7 @@ function AssignmentPlanningV2 (props) {
                 )
             }
             <UserSettingSnackbar
-              saved={!mutationError && !mutationLoading}
+              saved={!mutationError && !mutationLoading && settingChanged}
               response={{ default: 'success' }}
             />
           </Paper>
