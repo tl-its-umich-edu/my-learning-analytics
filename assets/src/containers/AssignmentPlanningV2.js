@@ -9,9 +9,7 @@ import AlertBanner from '../components/AlertBanner'
 import WarningBanner from '../components/WarningBanner'
 import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
-import {
-  createUserSettings
-} from '../util/assignment'
+import { createUserSettings } from '../util/assignment'
 import useAssignmentData from '../hooks/useAssignmentData'
 import useInitalizeAssignmentState from '../hooks/useInitalizeAssignmentState'
 import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrade'
@@ -49,34 +47,7 @@ function AssignmentPlanningV2 (props) {
   const [userSetting, setUserSetting] = useState({})
 
   const { loading, error, data } = useAssignmentData(courseId)
-  console.log(data)
   const { debouncedUpdateUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
-
-  const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
-    setAssignments([
-      ...assignments.slice(0, key),
-      {
-        ...assignments[key],
-        goalGrade: Number(assignmentGoalGrade),
-        goalGradeSetByUser: true
-      },
-      ...assignments.slice(key + 1)
-    ])
-  }
-
-  const handleClearGoalGrades = () => {
-    setAssignments(
-      assignments.map(a => {
-        a.goalGrade = ''
-        a.goalGradeSetByUser = null
-        return a
-      })
-    )
-    setGoalGrade(null)
-    setUserSetting({})
-  }
-
-  // initialize the state
 
   // need this to indicate when user setting is saved
   useEffect(() => {
@@ -102,6 +73,29 @@ function AssignmentPlanningV2 (props) {
       createUserSettings(courseId, 'assignment', userSetting)
     )
   }, [JSON.stringify(userSetting)])
+
+  const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
+    setAssignments([
+      ...assignments.slice(0, key),
+      {
+        ...assignments[key],
+        goalGrade: Number(assignmentGoalGrade),
+        goalGradeSetByUser: true
+      },
+      ...assignments.slice(key + 1)
+    ])
+  }
+
+  const handleClearGoalGrades = () => {
+    setAssignments(
+      assignments.map(a => {
+        a.goalGrade = ''
+        a.goalGradeSetByUser = null
+      })
+    )
+    setGoalGrade(null)
+    setUserSetting({})
+  }
 
   if (error) return (<WarningBanner />)
 

@@ -5,6 +5,7 @@ import {
   createAssignmentFields
 } from '../util/assignment'
 
+// initialize the state
 const useInitalizeAssignmentState =
   (
     loading,
