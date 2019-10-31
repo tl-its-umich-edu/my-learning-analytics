@@ -10,8 +10,9 @@ import WarningBanner from '../components/WarningBanner'
 import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
 import { createUserSettings } from '../util/assignment'
+import UserSettingSnackbar from '../components/UserSettingSnackbar'
 import useAssignmentData from '../hooks/useAssignmentData'
-import useInitalizeAssignmentState from '../hooks/useInitalizeAssignmentState'
+import useInitAssignmentState from '../hooks/useInitAssignmentState'
 import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrade'
 import useAssignmentUserSetting from '../hooks/useAssignmentUserSetting'
 import useSetUserSettingGQL from '../hooks/useSetUserSettingGQL'
@@ -49,13 +50,7 @@ function AssignmentPlanningV2 (props) {
   const { loading, error, data } = useAssignmentData(courseId)
   const { debouncedUpdateUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
 
-  // need this to indicate when user setting is saved
-  useEffect(() => {
-    if (!mutationLoading && !mutationError) {
-
-    }
-  }, [mutationLoading])
-  useInitalizeAssignmentState(
+  useInitAssignmentState(
     loading,
     error,
     data,
@@ -91,6 +86,7 @@ function AssignmentPlanningV2 (props) {
       assignments.map(a => {
         a.goalGrade = ''
         a.goalGradeSetByUser = null
+        return a
       })
     )
     setGoalGrade(null)
@@ -152,6 +148,10 @@ function AssignmentPlanningV2 (props) {
                   </>
                 )
             }
+            <UserSettingSnackbar
+              saved={!mutationError && !mutationLoading}
+              response={{ default: 'success' }}
+            />
           </Paper>
         </Grid>
       </Grid>

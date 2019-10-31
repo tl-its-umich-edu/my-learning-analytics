@@ -6,7 +6,7 @@ import {
 } from '../util/assignment'
 
 // initialize the state
-const useInitalizeAssignmentState =
+const useInitAssignmentState =
   (
     loading,
     error,
@@ -43,4 +43,4 @@ const useInitalizeAssignmentState =
     }, [loading])
   }
 
-export default useInitalizeAssignmentState
+export default useInitAssignmentState
