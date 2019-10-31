@@ -19,6 +19,7 @@ import {
 } from '../util/assignment'
 import useSetUserSettingGQL from '../hooks/useSetUserSettingGQL'
 import useAssignmentData from '../hooks/useAssignmentData'
+import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrade'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
 
@@ -51,9 +52,8 @@ function AssignmentPlanningV2 (props) {
   const [userSetting, setUserSetting] = useState({})
 
   const { loading, error, data } = useAssignmentData(courseId)
+  console.log(data)
   const { debouncedUpdateUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
-
-  console.log(userSetting)
 
   const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setAssignments([
@@ -106,6 +106,7 @@ function AssignmentPlanningV2 (props) {
     }
   }, [loading])
 
+  // need this to indicate when user setting is saved
   useEffect(() => {
     if (!mutationLoading && !mutationError) {
 
@@ -135,33 +136,9 @@ function AssignmentPlanningV2 (props) {
 
   // this effect is used to keep the goal of the course and assignments "in sync"
   // run if goalGrade changes, or if the sum of goal grades set by user changes
-  useEffect(() => {
-    if (goalGrade) {
-      const course = data.course
-      setAssignments(
-        calculateAssignmentGoalsFromCourseGoal(
-          goalGrade,
-          assignments,
-          course.assignmentGroups,
-          course.assignmentWeightConsideration
-        )
-      )
-      const assignmentsSetByUser = assignments
-        .filter(a => a.goalGradeSetByUser)
-        .map(({ id, goalGradeSetByUser, goalGrade }) => (
-          {
-            assignmentId: id,
-            goalGradeSetByUser,
-            goalGrade
-          }
-        ))
-      setUserSetting({
-        goalGrade,
-        assignments: assignmentsSetByUser
-      })
-    }
-  }, [goalGrade, sumAssignmentGoalGrade(assignments)])
+  useSyncAssignmentAndGoalGrade(data, assignments, goalGrade, setAssignments, setUserSetting)
 
+  // this effect saves the user setting
   useEffect(() => {
     debouncedUpdateUserSetting(
       createUserSettings(courseId, 'assignment', userSetting)
