@@ -21,9 +21,9 @@ const toolTip = d3tip().attr('class', 'd3-tip')
     if (d.self_access_count === 0) {
       return `<b>You haven't accessed this resource. </b>`
     } else if (d.self_access_count === 1) {
-      return `You have accessed this resource once on ${new Date(d.self_access_last_time).toDateString()}.`
+      return `You accessed this resource once on ${new Date(d.self_access_last_time).toDateString()}.`
     } else {
-      return `You have accsessed this resource ${d.self_access_count} times. The last time you accessed this resource was on ${new Date(d.self_access_last_time).toDateString()}.`
+      return `You accessed this resource ${d.self_access_count} times. The last time you accessed this resource was on ${new Date(d.self_access_last_time).toDateString()}.`
     }
   })
 
