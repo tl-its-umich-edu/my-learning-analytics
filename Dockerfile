@@ -8,8 +8,13 @@ RUN npm install
 
 # NOTE: assets/ likely to change between dev builds
 COPY assets /usr/src/app/assets
-RUN npm run prod && \
-    # src is no longer needed (saves time for collect static)
+RUN npm run prod 
+
+# This is to find and remove symlinks that break some Docker builds.
+# We we need these later we'll just uncompress them 
+# Also remove src and the symlinks afterward
+RUN apk --update add tar && \ 
+    find . -type l -print0 | tar -zcvf all_symlinks.tgz --remove-files --null -T - && \
     rm -rf /usr/src/app/assets/src
 
 # build node libraries for production mode
@@ -28,20 +33,21 @@ EXPOSE 5000
 WORKDIR /code
 
 # NOTE: requirements.txt not likely to change between dev builds
-COPY requirements.txt /code/requirements.txt
+COPY requirements.txt .
 RUN apt-get update && \
     apt-get install -y --no-install-recommends netcat vim-tiny jq python3-dev xmlsec1 cron && \
     apt-get clean -y && \
     pip install -r requirements.txt
 
 # copy built react and node libraries for production mode
-COPY --from=node-prod-deps /usr/src/app/package-lock.json /code/package-lock.json
-COPY --from=node-prod-deps /usr/src/app/webpack-stats.json /code/webpack-stats.json
-COPY --from=node-prod-deps /usr/src/app/assets /code/assets
-COPY --from=node-prod-deps /usr/src/app/node_modules /code/node_modules
+COPY --from=node-prod-deps /usr/src/app/package-lock.json package-lock.json
+COPY --from=node-prod-deps /usr/src/app/webpack-stats.json webpack-stats.json
+COPY --from=node-prod-deps /usr/src/app/assets assets
+COPY --from=node-prod-deps /usr/src/app/node_modules node_modules
+COPY --from=node-prod-deps /usr/src/app/all_symlinks.tgz .
 
 # NOTE: project files likely to change between dev builds
-COPY . /code/
+COPY . .
 
 # This DJANGO_SECRET_KEY is set here just so collectstatic runs with an empty key. It can be set to anything
 RUN echo yes | DJANGO_SECRET_KEY="collectstatic" python manage.py collectstatic --verbosity 0
