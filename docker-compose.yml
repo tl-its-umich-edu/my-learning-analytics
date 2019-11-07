@@ -44,7 +44,6 @@ services:
       context: .
       target: node-webpack
     command: sh -c "tar zxvf node_modules/all_symlinks.tgz && npm run watch"
-    
     volumes:
       - .:/usr/src/app
       # use the container's node_modules folder (don't override)

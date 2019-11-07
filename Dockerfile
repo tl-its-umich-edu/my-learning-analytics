@@ -11,7 +11,7 @@ COPY assets /usr/src/app/assets
 RUN npm run prod 
 
 # This is to find and remove symlinks that break some Docker builds.
-# We we need these later we'll just uncompress them 
+# We need these later we'll just uncompress them 
 # Put them in node_modules as this directory isn't masked by docker-compose
 # Also remove src and the symlinks afterward
 RUN apk --update add tar && \ 
