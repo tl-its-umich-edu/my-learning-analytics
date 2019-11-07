@@ -56,8 +56,7 @@ class UserDefaultQuerySet(models.QuerySet):
                             user_sis_name=str(sis_user_name),
                             default_view_type=str(default_view_type)).default_view_value
         except (self.model.DoesNotExist, Exception) as e:
-            logger.error(f"""Couldn't get the default value for in course: {course_id} for user: {sis_user_name}
-                         with default_view_type: {default_view_type} due to {e} """)
+            logger.info(f"""Couldn't get the default value for default_view_type: {default_view_type} in course: {course_id} for user: {sis_user_name}: {e} """)
             return None
 
     def set_user_default(self, course_id, sis_user_name, default_view_type, default_view_value):
