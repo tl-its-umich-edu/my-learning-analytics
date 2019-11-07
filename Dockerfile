@@ -11,10 +11,11 @@ COPY assets /usr/src/app/assets
 RUN npm run prod 
 
 # This is to find and remove symlinks that break some Docker builds.
-# We we need these later we'll just uncompress them 
+# We need these later we'll just uncompress them 
+# Put them in node_modules as this directory isn't masked by docker-compose
 # Also remove src and the symlinks afterward
 RUN apk --update add tar && \ 
-    find . -type l -print0 | tar -zcvf all_symlinks.tgz --remove-files --null -T - && \
+    find node_modules -type l -print0 | tar -zcvf node_modules/all_symlinks.tgz --remove-files --null -T - && \
     rm -rf /usr/src/app/assets/src
 
 # build node libraries for production mode
@@ -44,7 +45,6 @@ COPY --from=node-prod-deps /usr/src/app/package-lock.json package-lock.json
 COPY --from=node-prod-deps /usr/src/app/webpack-stats.json webpack-stats.json
 COPY --from=node-prod-deps /usr/src/app/assets assets
 COPY --from=node-prod-deps /usr/src/app/node_modules node_modules
-COPY --from=node-prod-deps /usr/src/app/all_symlinks.tgz .
 
 # NOTE: project files likely to change between dev builds
 COPY . .
