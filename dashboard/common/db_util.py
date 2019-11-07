@@ -85,7 +85,7 @@ def get_default_user_course_id(user_id):
 def get_user_courses_info(user_id):
     logger.info(get_user_courses_info.__name__)
     course_list = []
-    course_info={}
+    course_info = []
     with django.db.connection.cursor() as cursor:
         cursor.execute("SELECT course_id FROM user WHERE sis_name= %s", [user_id])
         courses = cursor.fetchall()
@@ -99,9 +99,9 @@ def get_user_courses_info(user_id):
             cursor.execute("select canvas_id, name from course where canvas_id in %s",[course_tuple])
             course_names = cursor.fetchall()
             df = pd.DataFrame(list(course_names))
-            df.columns=["course_id", "course_name"]
-            course_info=df.to_json(orient='records')
-            logger.info(f"User {user_id} is enrolled in courses {course_info}")
+            df.columns = ["course_id", "course_name"]
+            course_info = df.to_dict(orient='records')
+            logger.info(f"User {user_id} is affiliated with these courses {df.to_json(orient='records')}")
     return course_info
 
 

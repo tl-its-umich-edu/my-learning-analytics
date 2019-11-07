@@ -77,7 +77,7 @@ function AvatarModal (props) {
       >
         <DialogTitle>Select a course</DialogTitle>
         <List>
-          {user.enrolledCourses.map((course, i) => (
+          {user.relatedCourses.map((course, i) => (
             <Link
               style={{ textDecoration: 'none' }}
               href={`/courses/${course.course_id}`}
@@ -143,7 +143,7 @@ function AvatarModal (props) {
                 : null
             }
             {
-              user.enrolledCourses.length > 1
+              user.relatedCourses.length > 1
                 ? SwitchCourses()
                 : null
             }
