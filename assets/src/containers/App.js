@@ -29,8 +29,6 @@ function App (props) {
   const coursePageMatch = matchPath(location.pathname, '/courses/:courseId/')
   const courseId = coursePageMatch ? coursePageMatch.params.courseId : null
 
-  console.log(user);
-
   return (
     <>
       <GoogleAnalyticsTracking gaId={myla_globals.google_analytics_id} />
