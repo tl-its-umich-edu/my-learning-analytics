@@ -97,9 +97,9 @@ function CourseList (props) {
             : <Grid container spacing={2}>
                 <Grid item xs={12} className={classes.container}>
                   {user.relatedCourses.map((course, key) =>
-                      <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
-                        <SelectCard cardData={{ title: course.course_name }} />
-                      </Link>
+                    <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
+                      <SelectCard cardData={{ title: course.course_name }} />
+                    </Link>
                   )}
                 </Grid>
               </Grid>
