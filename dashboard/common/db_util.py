@@ -11,6 +11,7 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
+
 def canvas_id_to_incremented_id(canvas_id):
     try:
         int(canvas_id)
@@ -19,6 +20,7 @@ def canvas_id_to_incremented_id(canvas_id):
 
     return int(canvas_id) + settings.CANVAS_DATA_ID_INCREMENT
 
+
 def incremented_id_to_canvas_id(incremented_id):
     try:
         int(incremented_id)
@@ -26,6 +28,7 @@ def incremented_id_to_canvas_id(incremented_id):
         return None
 
     return str(int(incremented_id) - settings.CANVAS_DATA_ID_INCREMENT)
+
 
 def get_course_name_from_id(course_id):
     """[Get the long course name from the id]
@@ -48,7 +51,6 @@ def get_course_name_from_id(course_id):
 
 
 def get_course_view_options (course_id):
-
     logger.info(get_course_view_options.__name__)
     course_id = canvas_id_to_incremented_id(course_id)
     logger.debug("course_id=" + str(course_id))
@@ -101,7 +103,7 @@ def get_user_courses_info(user_id):
             df = pd.DataFrame(list(course_names))
             df.columns = ["course_id", "course_name"]
             course_info = df.to_dict(orient='records')
-            logger.info(f"User {user_id} is affiliated with these courses {df.to_json(orient='records')}")
+            logger.info(f"User {user_id} is enrolled in these courses {df.to_json(orient='records')}")
     return course_info
 
 
@@ -113,6 +115,7 @@ def get_last_cron_run():
     except CronJobLog.DoesNotExist:
         logger.info("CronJobLog did not exist", exc_info = True)
     return datetime.min
+
 
 def get_canvas_data_date():
     if not settings.DATA_WAREHOUSE_IS_UNIZIN:
