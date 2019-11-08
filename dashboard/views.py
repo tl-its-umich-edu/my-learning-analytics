@@ -80,7 +80,7 @@ def get_home_template(request):
     if settings.GA_ID:
         google_analytics_id = settings.GA_ID
     flatpages = FlatPage.objects.all()
-    if len(flatpages) != 0:
+    if flatpages:
         help_url = flatpages[0].content
     else:
         help_url = "https://sites.google.com/umich.edu/my-learning-analytics-help/home"
@@ -95,10 +95,7 @@ def get_home_template(request):
         "help_url": help_url
     }
 
-    logger.info(myla_globals)
-    myla_globals_json = json.dumps(myla_globals)
-    logger.info(myla_globals_json)
-    return render(request, 'frontend/index.html', context={'myla_globals': myla_globals_json})
+    return render(request, 'frontend/index.html', context={'myla_globals': json.dumps(myla_globals)})
 
 
 @permission_required('dashboard.get_course_template',
@@ -768,7 +765,6 @@ def logout(request):
     return redirect(settings.LOGOUT_REDIRECT_URL)
 
 
-
 def courses_enabled(request):
     """ Returns json for all courses we currently support and are enabled """
     
@@ -781,7 +777,7 @@ def courses_enabled(request):
         # Return json
         if callback is None:
             return HttpResponse(json.dumps(data), content_type='application/json')
-        # Return jsonp
+        # Return json
         else:
             return HttpResponse("{0}({1})".format(callback, json.dumps(data)), content_type='application/json')
     else:
