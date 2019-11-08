@@ -11,7 +11,7 @@ import IconButton from '@material-ui/core/IconButton'
 import Avatar from '@material-ui/core/Avatar'
 import Popover from '@material-ui/core/Popover'
 import AvatarModal from '../components/AvatarModal'
-import AlertBanner from '../components/AlertBanner'
+import WarningBanner from '../components/WarningBanner'
 
 const styles = theme => ({
   root: {
@@ -43,6 +43,10 @@ const styles = theme => ({
 
 function CourseList (props) {
   const { classes, user } = props
+
+  if (!user.relatedCourses && !user.isSuperuser) {
+    return (<WarningBanner>You are not enrolled in any courses with My Learning Analytics enabled.</WarningBanner>)
+  }
 
   const [avatarEl, setAvatarEl] = useState(null)
   const avatarOpen = Boolean(avatarEl)
@@ -81,19 +85,25 @@ function CourseList (props) {
         </Toolbar>
       </AppBar>
       <div className={classes.content}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} className={classes.container}>
-            {
-              (user.relatedCourses.length === 0) ?
-                (<AlertBanner>You are not enrolled in any courses with My Learning Analytics enabled.</AlertBanner>)
-              : user.relatedCourses.map((course, key) =>
-                (<Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
-                  <SelectCard cardData={{ title: course.course_name }} />
-                </Link>)
-              )
-            }
-          </Grid>
-        </Grid>
+        {
+          user.isSuperuser
+            ? <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Paper className={classes.paper}>
+                  <Typography variant='h5' gutterBottom>Select a course of your choice</Typography>
+                </Paper>
+              </Grid>
+            </Grid>
+            : <Grid container spacing={2}>
+              <Grid item xs={12} className={classes.container}>
+                {user.relatedCourses.map((course, key) =>
+                    <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
+                      <SelectCard cardData={{ title: course.course_name }} />
+                    </Link>
+                )}
+              </Grid>
+            </Grid>
+        }
       </div>
     </>
   )
