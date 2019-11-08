@@ -10,7 +10,6 @@
         "localhost"
     ],
     "/* Configuration of CSP see https://django-csp.readthedocs.io/en/latest/configuration.html": "*/",
-    
     "/* To enable this at all you must set have the CSP key set": "*/",
     "/* and REPORT_ONLY should be be false, otherwise it will just console Warn": "*/",
     "CSP": {
@@ -113,8 +112,6 @@
     "DJANGO_WATCHMAN_TOKEN": "",
     "/*  A single default IDP to use if multiple are present in the SAML metadata (Get from Metadata)": "*/",
     "DJANGO_SAML2_DEFAULT_IDP": "",
-    "/*  Earliest term date from database that we'll show and support academic terms from (default is 2016-11-15 which the first date of 'our' data)": "*/",
-    "EARLIEST_TERM_DATE": "2016-11-15",
     "/*  CRON POD SETTINGS": "*/",
     "/* ": "*/",
     "/*  All of these settings go together and need to be enabled for cron job": "*/",

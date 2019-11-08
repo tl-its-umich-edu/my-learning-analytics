@@ -43,11 +43,6 @@
         {% else %}
             "username": "",
         {% endif %}
-        {% if settings.GA_ID  %}
-            "GA": '{{ settings.GA_ID }}',
-        {% else %}
-            "GA": "",
-        {% endif %}
         {% if settings.LOGIN_URL  %}
             "login": '{{ settings.LOGIN_URL }}',
         {% else %}
@@ -61,10 +56,12 @@
         {% if user.is_authenticated%}
             "user_courses_info":'{{current_user_courses_info|safe}}',
         {% else %}
-            "user_courses_info":"",
+            "user_courses_info": "",
         {% endif %}
         {% if settings.GA_ID %}
             "google_analytics_id":'{{ settings.GA_ID }}',
+        {% else %}
+            "google_analytics_id": "",
         {% endif %}
         {% if flatpages.first.content %}
             "help_url": '{{flatpages.first.content|safe}}',

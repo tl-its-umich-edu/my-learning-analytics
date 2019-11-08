@@ -411,10 +411,6 @@ CANVAS_DATA_ID_INCREMENT = ENV.get("CANVAS_DATA_ID_INCREMENT", 17700000000000000
 # Allow enabling/disabling the View options globally
 VIEWS_DISABLED = ENV.get('VIEWS_DISABLED', [])
 
-# This is to set a date so that MyLA will track all terms with start date after this date.
-
-EARLIEST_TERM_DATE = ENV.get('EARLIEST_TERM_DATE', '2016-11-15')
-
 # Time to run cron
 RUN_AT_TIMES = ENV.get('RUN_AT_TIMES', [])
 

@@ -17,7 +17,7 @@ const styles = theme => ({
   },
   wrapper: {
     maxWidth: 1023,
-    margin: theme.spacing.unit * 2 + 'px auto',
+    margin: theme.spacing(2) + 'px auto',
     flexDirection: 'row',
     justifyContent: 'flex-start'
   }

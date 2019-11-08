@@ -36,12 +36,14 @@ services:
       - .env
     environment:
       - GUNICORN_RELOAD=True
+      # port in use when the application is running on localhost
+      - LOCALHOST_PORT=5001
     container_name: student_dashboard
   webpack_watcher:
     build:
       context: .
       target: node-webpack
-    command: npm run watch
+    command: sh -c "tar zxvf node_modules/all_symlinks.tgz && npm run watch"
     volumes:
       - .:/usr/src/app
       # use the container's node_modules folder (don't override)
