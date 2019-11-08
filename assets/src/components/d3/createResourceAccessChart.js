@@ -365,7 +365,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('xlink:target', '_blank')
       .attr('xlink:href', link)
     a.node().appendChild(this)
-    
 
     let icon = d.split('|')[2]
     d3.select(this).insert('foreignObject')
