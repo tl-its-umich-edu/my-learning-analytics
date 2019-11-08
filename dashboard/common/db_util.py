@@ -103,7 +103,7 @@ def get_user_courses_info(username):
             df = pd.DataFrame(list(course_names))
             df.columns = ["course_id", "course_name"]
             course_info = df.to_dict(orient='records')
-            logger.info(f"User {username} is enrolled in these courses {df.to_json(orient='records')}")
+            logger.info(f"User {username} is enrolled in these courses: {course_info}")
     return course_info
 
 
