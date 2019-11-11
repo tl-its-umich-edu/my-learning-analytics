@@ -37,6 +37,7 @@ WORKDIR /code
 COPY requirements.txt .
 RUN apt-get update && \
     apt-get install -y --no-install-recommends netcat vim-tiny jq python3-dev xmlsec1 cron && \
+    apt-get upgrade -y && \
     apt-get clean -y && \
     pip install -r requirements.txt
 
