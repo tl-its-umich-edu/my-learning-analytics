@@ -361,20 +361,21 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   d3.selectAll('.axis--y .tick').each(function (d) {
     // Have to use ES5 function to correctly use `this` keyword
     let link = d.split('|')[0]
+    let name = d.split('|')[1]
     const a = d3.select(this.parentNode).append('a')
+      .attr('xlink:title', "HI")
       .attr('xlink:target', '_blank')
       .attr('xlink:href', link)
     a.node().appendChild(this)
 
     let icon = d.split('|')[2]
     d3.select(this).insert('foreignObject')
-      .attr("x", -90)
+      .attr("x", -80)
       .attr('y', -6)
       .attr("width", 32)
       .attr("height", 32)
       .append("xhtml:i")
       .attr('class', icon);
-
   })
 
   yLabel.selectAll('text')

@@ -33,9 +33,9 @@ def get_git_version_info():
     return git_version
 
 
-def look_up_key_for_value(myDict, searchFor):
+def look_up_key_for_resource_value(myDict, searchFor):
     for key, value in myDict.items():
-        for v in value["types"]:
-            if searchFor in v:
+        for resourceTypes in value["types"]:
+            if searchFor in resourceTypes:
                 return key
     return None
