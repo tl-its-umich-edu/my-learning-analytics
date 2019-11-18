@@ -1,7 +1,7 @@
 # My Learning Analytics
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0fd487531e244c0ebbfbc25e8753c484)](https://app.codacy.com/app/ITS_Teaching_And_Learning/student-dashboard-django?utm_source=github.com&utm_medium=referral&utm_content=tl-its-umich-edu/student-dashboard-django&utm_campaign=Badge_Grade_Settings)
 
-My Learning Analytics (MyLA) is a [learning analytics](https://en.wikipedia.org/wiki/Learning_analytics) platform designed for students to view their own learning data generated in the [Canvas Learning Management System](https://www.instructure.com/canvas/?newhome=canvas). It currently has 3 views ([Files Accessed](https://sites.google.com/umich.edu/my-learning-analytics-help/home/files-accessed), [Assignment Planning](https://sites.google.com/umich.edu/my-learning-analytics-help/home/assignment-planning), and [Grade Distribution](https://sites.google.com/umich.edu/my-learning-analytics-help/home/grade-distribution)), with more views planned in the future.
+My Learning Analytics (MyLA) is a [learning analytics](https://en.wikipedia.org/wiki/Learning_analytics) platform designed for students to view their own learning data generated in the [Canvas Learning Management System](https://www.instructure.com/canvas/?newhome=canvas). It currently has 3 views ([Resources Accessed](https://sites.google.com/umich.edu/my-learning-analytics-help/home/resources-accessed), [Assignment Planning](https://sites.google.com/umich.edu/my-learning-analytics-help/home/assignment-planning), and [Grade Distribution](https://sites.google.com/umich.edu/my-learning-analytics-help/home/grade-distribution)), with more views planned in the future.
 
 ## Getting Started
 These instructions will get a copy of MyLA up and running on your local machine with anonymized/fake student data.
@@ -64,7 +64,7 @@ The `bq_cred.json` defined in the `.env` file is service account for BigQuery, a
 ### Control course view options
 View options can be controlled at the global and course level. If a view is disabled globally, it will be disabled for every course, even if previously enabled at the course level. If a view is not globally disabled, it can still be disabled at the course level.
 
-`VIEWS_DISABLED` is the comma delimited list of views to disable (default empty). The expected name of the view is the same as the view's column name in the `course_view_option` table. For example `VIEWS_DISABLED=show_resources_accessed,show_grade_distribution` will disable both the Files Accessed and Grade Distribution views.
+`VIEWS_DISABLED` is the comma delimited list of views to disable (default empty). The expected name of the view is the same as the view's column name in the `course_view_option` table. For example `VIEWS_DISABLED=show_resources_accessed,show_grade_distribution` will disable both the Resources Accessed and Grade Distribution views.
 
 Note that by default all views are enabled when a course is added.
 
