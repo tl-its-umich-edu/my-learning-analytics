@@ -29,45 +29,7 @@
         }
     </style>
     <script>
-        {%load flatpages%}
-        {%get_flatpages '/help_url/' as flatpages%}
-
-        // Setup a top level js object to hold global values
-        var myla_globals = {
-            "is_superuser": {{user.is_superuser|lower}},
-        {% if user.is_authenticated %}
-            "username": '{{ user.get_username }}',
-        {% else %}
-            "username": "",
-        {% endif %}
-        {% if settings.LOGIN_URL  %}
-            "login": '{{ settings.LOGIN_URL }}',
-        {% else %}
-            "login": "",
-        {% endif %}
-        {% if settings.LOGOUT_URL  %}
-            "logout": '{{ settings.LOGOUT_URL }}',
-        {% else %}
-            "logout": "",
-        {% endif %}
-        {% if user.is_authenticated%}
-            "user_courses_info":'{{current_user_courses_info|safe}}',
-        {% else %}
-            "user_courses_info": "",
-        {% endif %}
-        {% if settings.GA_ID %}
-            "google_analytics_id":'{{ settings.GA_ID }}',
-        {% else %}
-            "google_analytics_id": "",
-        {% endif %}
-        {% if flatpages.first.content %}
-            "help_url": '{{flatpages.first.content|safe}}',
-        {% else %}
-            "help_url": "https://sites.google.com/umich.edu/my-learning-analytics-help/home",
-        {% endif %}
-        }
-        
-
+        const myla_globals = {{ myla_globals | safe }};
     </script>
 </head>
 <body>

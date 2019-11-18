@@ -44,7 +44,7 @@ const styles = theme => ({
 function CourseList (props) {
   const { classes, user } = props
 
-  if (!user.enrolledCourses && !user.isSuperuser) {
+  if (!user.relatedCourses && !user.isSuperuser) {
     return (<WarningBanner>You are not enrolled in any courses with My Learning Analytics enabled.</WarningBanner>)
   }
 
@@ -96,7 +96,7 @@ function CourseList (props) {
               </Grid>
             : <Grid container spacing={2}>
                 <Grid item xs={12} className={classes.container}>
-                  {user.enrolledCourses.map((course, key) =>
+                  {user.relatedCourses.map((course, key) =>
                     <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
                       <SelectCard cardData={{ title: course.course_name }} />
                     </Link>
