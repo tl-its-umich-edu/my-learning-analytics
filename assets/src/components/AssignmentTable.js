@@ -35,7 +35,7 @@ const styles = theme => ({
   }
 })
 
-function AssignmentTable (props) {
+function AssignmentTable(props) {
   const { classes, assignments, setGoalGrade } = props
 
   const [anchorEl, setAnchorEl] = useState(null)
@@ -116,44 +116,7 @@ function AssignmentTable (props) {
                 {a.name}
               </TableCell>
               <TableCell>
-                <div
-                  onMouseEnter={event => setAnchorEl(event.currentTarget)}
-                  onMouseLeave={() => setAnchorEl(null)}
-                >
-                  <ProgressBarV2
-                    score={a.currentUserSubmission ? a.currentUserSubmission.score : 0}
-                    outOf={a.outOf}
-                    goalGrade={a.goalGrade}
-                    percentWidth={a.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
-                    displayLabel
-                    lines={
-                      a.goalGrade
-                        ? [{ color: 'green', value: a.goalGrade, draggable: true }]
-                        : []
-                    }
-                  />
-                </div>
-                <div style={{ marginLeft: '2px' }}>{`${a.percentOfFinalGrade}%`}</div>
-                <Popover
-                  className={classes.popover}
-                  classes={{
-                    paper: classes.paper
-                  }}
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={() => setAnchorEl(null)}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left'
-                  }}
-                  transformOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left'
-                  }}
-                  disableRestoreFocus
-                >
-                  <Typography>Put something in here...</Typography>
-                </Popover>
+                {`${a.percentOfFinalGrade}%`}
               </TableCell>
               <TableCell>
                 {
@@ -183,6 +146,43 @@ function AssignmentTable (props) {
                     {` / ${a.outOf}`}
                   </div>
                 }
+                <div
+                  onMouseEnter={event => setAnchorEl(event.currentTarget)}
+                  onMouseLeave={() => setAnchorEl(null)}
+                >
+                  <ProgressBarV2
+                    score={a.currentUserSubmission ? a.currentUserSubmission.score : 0}
+                    outOf={a.outOf}
+                    goalGrade={a.goalGrade}
+                    percentWidth={a.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
+                    displayLabel
+                    lines={
+                      a.goalGrade
+                        ? [{ color: 'green', value: a.goalGrade, draggable: true }]
+                        : []
+                    }
+                  />
+                  <Popover
+                    className={classes.popover}
+                    classes={{
+                      paper: classes.paper
+                    }}
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={() => setAnchorEl(null)}
+                    anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'left'
+                    }}
+                    transformOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'left'
+                    }}
+                    disableRestoreFocus
+                  >
+                    <Typography>Put something in here...</Typography>
+                  </Popover>
+                </div>
               </TableCell>
             </TableRow>
           ))

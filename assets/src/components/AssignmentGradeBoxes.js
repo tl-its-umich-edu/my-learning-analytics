@@ -63,7 +63,7 @@ function AssignmentGradeBoxes (props) {
           className={classes.clearButton}
           onClick={handleClearGoalGrades}
         >
-          {'Clear goal grades'}
+          {'Clear goals'}
         </Button>
       </Grid>
     </Grid>
