@@ -62,20 +62,11 @@ function DashboardAppBar (props) {
             aria-label='Menu'>
             <MenuIcon />
           </IconButton>
-          <Button>
-            <Typography variant='h6' color='inherit' className={classes.grow}>
-              <Link
-                to={{ pathname: `/courses/` }}
-                className={classes.homeButton}
-                color='primary'>
-                My Learning Analytics:
-              </Link>
-              <Link
-                to={{ pathname: `/courses/${courseId}` }}
-                className={classes.homeButton}>
-                {courseName}
-              </Link>
-            </Typography>
+          <Button href='/courses/' className={classes.homeButton} style={{ fontSize: '1.25rem' }}>
+            My Learning Analytics:
+          </Button>
+          <Button href={`/courses/${courseId}`} className={classes.homeButton} style={{ fontSize: '1.25rem' }}>
+            {courseName}
           </Button>
           <div className={classes.grow} />
           <IconButton
