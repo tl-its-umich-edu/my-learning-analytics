@@ -1,5 +1,5 @@
 # build react components for production mode
-FROM node:11.10-alpine AS node-webpack
+FROM node:12-alpine AS node-webpack
 WORKDIR /usr/src/app
 
 # NOTE: package.json and webpack.config.js not likely to change between dev builds
@@ -19,7 +19,7 @@ RUN apk --update add tar && \
     rm -rf /usr/src/app/assets/src
 
 # build node libraries for production mode
-FROM node:11.10-alpine AS node-prod-deps
+FROM node:12-alpine AS node-prod-deps
 
 COPY --from=node-webpack /usr/src/app /usr/src/app
 RUN npm prune --production && \
@@ -37,6 +37,7 @@ WORKDIR /code
 COPY requirements.txt .
 RUN apt-get update && \
     apt-get install -y --no-install-recommends netcat vim-tiny jq python3-dev xmlsec1 cron && \
+    apt-get upgrade -y && \
     apt-get clean -y && \
     pip install -r requirements.txt
 
