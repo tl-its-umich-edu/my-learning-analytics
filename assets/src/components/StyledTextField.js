@@ -10,7 +10,8 @@ const StyledTextField = withStyles({
       borderBottomColor: '#ffae42'
     },
     '& .MuiInputBase-input': {
-      marginTop: '10px'
+      marginTop: '10px',
+      color: 'green'
     }
   }
 })(TextField)
