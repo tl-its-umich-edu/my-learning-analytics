@@ -5,11 +5,11 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
-import TextField from '@material-ui/core/TextField'
 import ProgressBarV2 from './ProgressBarV2'
 import Popover from '@material-ui/core/Popover'
 import { roundToOneDecimal } from '../util/math'
 import { Typography } from '@material-ui/core'
+import StyledTextField from './StyledTextField'
 
 const styles = theme => ({
   root: {
@@ -126,7 +126,7 @@ function AssignmentTable (props) {
                       : `${a.currentUserSubmission.score}`
 
                     : (
-                      <TextField
+                      <StyledTextField
                         error={(a.goalGrade / a.pointsPossible) > 1}
                         id='standard-number'
                         value={roundToOneDecimal(a.goalGrade) || ''}

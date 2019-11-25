@@ -2,8 +2,8 @@ import React from 'react'
 import { withStyles } from '@material-ui/core'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
-import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
+import StyledTextField from './StyledTextField'
 import { roundToOneDecimal } from '../util/math'
 
 const styles = ({
@@ -40,7 +40,7 @@ function AssignmentGradeBoxes (props) {
       </Grid>
       <Grid item xs={2}>
         <Typography variant='h5'>Goal</Typography>
-        <TextField
+        <StyledTextField
           error={goalGrade > 100 || mathWarning || goalGrade > maxPossibleGrade}
           id='standard-number'
           value={goalGrade || ''}
