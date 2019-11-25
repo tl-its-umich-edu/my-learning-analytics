@@ -20,6 +20,7 @@ function AssignmentGradeBoxes (props) {
     goalGrade,
     setGoalGrade,
     handleClearGoalGrades,
+    mathWarning,
     classes
   } = props
 
@@ -40,13 +41,15 @@ function AssignmentGradeBoxes (props) {
       <Grid item xs={2}>
         <Typography variant='h5'>Goal</Typography>
         <TextField
-          error={goalGrade > 100}
+          error={goalGrade > 100 || mathWarning}
           id='standard-number'
           value={goalGrade || ''}
           label={
             goalGrade > 100
               ? 'Over 100%'
-              : 'Set a goal'
+              : mathWarning
+                ? 'Math may no longer add up'
+                : 'Set a goal'
           }
           onChange={event => setGoalGrade(Number(event.target.value))}
           type='number'

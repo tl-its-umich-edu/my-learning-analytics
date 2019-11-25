@@ -9,13 +9,14 @@ import AlertBanner from '../components/AlertBanner'
 import WarningBanner from '../components/WarningBanner'
 import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
-import { createUserSettings } from '../util/assignment'
+import { createUserSettings, sumAssignmentGoalGrade } from '../util/assignment'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
 import useAssignmentData from '../hooks/useAssignmentData'
 import useInitAssignmentState from '../hooks/useInitAssignmentState'
 import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrade'
 import useUserAssignmentSetting from '../hooks/useUserAssignmentSetting'
 import useSetUserSettingGQL from '../hooks/useSetUserSettingGQL'
+import useMathWarning from '../hooks/useMathWarning'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
 
@@ -47,6 +48,7 @@ function AssignmentPlanningV2 (props) {
   const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
   const [userSetting, setUserSetting] = useState({})
   const [settingChanged, setSettingChanged] = useState(false)
+  const showMathWarning = useMathWarning(assignments, goalGrade)
 
   const { loading, error, data } = useAssignmentData(courseId)
   const { debouncedUpdateUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
@@ -138,6 +140,7 @@ function AssignmentPlanningV2 (props) {
                         setGoalGrade(grade)
                       }}
                       handleClearGoalGrades={handleClearGoalGrades}
+                      mathWarning={showMathWarning}
                     />
                     <AssignmentTable
                       assignments={assignments}
