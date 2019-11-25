@@ -35,7 +35,7 @@ const styles = theme => ({
   }
 })
 
-function AssignmentTable(props) {
+function AssignmentTable (props) {
   const { classes, assignments, setGoalGrade } = props
 
   const [anchorEl, setAnchorEl] = useState(null)
@@ -138,6 +138,7 @@ function AssignmentTable(props) {
                         onChange={event => setGoalGrade(key, event.target.value)}
                         type='number'
                         className={classes.goalGradeInput}
+                        style={{ marginBottom: '10px' }}
                       />
                     )
                 }
