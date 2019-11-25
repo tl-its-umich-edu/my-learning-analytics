@@ -56,7 +56,7 @@ function AssignmentPlanningV2 (props) {
   useUserAssignmentSetting(loading, error, assignments, userSetting, setGoalGrade, setAssignments)
   useSyncAssignmentAndGoalGrade(data, assignments, goalGrade, setAssignments, setUserSetting)
 
-  const showMathWarning = useMathWarning(assignments, goalGrade)
+  const showMathWarning = useMathWarning(assignments)
 
   // this effect saves the user setting
   useEffect(() => {

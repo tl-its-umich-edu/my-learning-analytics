@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-const useMathWarning = (assignments, goalGrade) => {
+const useMathWarning = assignments => {
   const [showMathWarning, setShowMathWarning] = useState(false)
 
   useEffect(() => {
