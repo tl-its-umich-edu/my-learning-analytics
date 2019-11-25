@@ -41,15 +41,17 @@ function AssignmentGradeBoxes (props) {
       <Grid item xs={2}>
         <Typography variant='h5'>Goal</Typography>
         <TextField
-          error={goalGrade > 100 || mathWarning}
+          error={goalGrade > 100 || mathWarning || goalGrade > maxPossibleGrade}
           id='standard-number'
           value={goalGrade || ''}
           label={
-            goalGrade > 100
-              ? 'Over 100%'
-              : mathWarning
-                ? 'Math may no longer add up'
-                : 'Set a goal'
+            mathWarning
+              ? 'Math may no longer add up'
+              : goalGrade > 100
+                ? 'Over 100%'
+                : goalGrade > maxPossibleGrade
+                  ? 'Greater than max possible grade'
+                  : 'Set a goal'
           }
           onChange={event => setGoalGrade(Number(event.target.value))}
           type='number'

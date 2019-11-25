@@ -9,7 +9,7 @@ import AlertBanner from '../components/AlertBanner'
 import WarningBanner from '../components/WarningBanner'
 import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
-import { createUserSettings, sumAssignmentGoalGrade } from '../util/assignment'
+import { createUserSettings } from '../util/assignment'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
 import useAssignmentData from '../hooks/useAssignmentData'
 import useInitAssignmentState from '../hooks/useInitAssignmentState'
@@ -48,7 +48,6 @@ function AssignmentPlanningV2 (props) {
   const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
   const [userSetting, setUserSetting] = useState({})
   const [settingChanged, setSettingChanged] = useState(false)
-  const showMathWarning = useMathWarning(assignments, goalGrade)
 
   const { loading, error, data } = useAssignmentData(courseId)
   const { debouncedUpdateUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
@@ -56,6 +55,8 @@ function AssignmentPlanningV2 (props) {
   useInitAssignmentState(loading, error, data, setAssignments, setCurrentGrade, setMaxPossibleGrade, setUserSetting)
   useUserAssignmentSetting(loading, error, assignments, userSetting, setGoalGrade, setAssignments)
   useSyncAssignmentAndGoalGrade(data, assignments, goalGrade, setAssignments, setUserSetting)
+
+  const showMathWarning = useMathWarning(assignments, goalGrade)
 
   // this effect saves the user setting
   useEffect(() => {

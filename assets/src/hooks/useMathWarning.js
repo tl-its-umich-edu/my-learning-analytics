@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react'
-import { sumAssignmentGoalGrade } from '../util/assignment'
 
 const useMathWarning = (assignments, goalGrade) => {
   const [showMathWarning, setShowMathWarning] = useState(false)
 
   useEffect(() => {
-    if (goalGrade) {
-      if (assignments.filter(a => !(a.graded || a.goalGradeSetByUser)).length === 0) {
-        setShowMathWarning(true)
-      }
+    if (assignments.filter(a => !(a.graded || a.goalGradeSetByUser)).length === 0) {
+      setShowMathWarning(true)
+    } else {
+      setShowMathWarning(false)
     }
-  }, [sumAssignmentGoalGrade(assignments), goalGrade])
+  })
 
   return showMathWarning
 }
