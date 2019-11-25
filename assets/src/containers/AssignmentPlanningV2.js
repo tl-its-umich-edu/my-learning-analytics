@@ -14,7 +14,7 @@ import UserSettingSnackbar from '../components/UserSettingSnackbar'
 import useAssignmentData from '../hooks/useAssignmentData'
 import useInitAssignmentState from '../hooks/useInitAssignmentState'
 import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrade'
-import useAssignmentUserSetting from '../hooks/useAssignmentUserSetting'
+import useUserAssignmentSetting from '../hooks/useUserAssignmentSetting'
 import useSetUserSettingGQL from '../hooks/useSetUserSettingGQL'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
@@ -52,7 +52,7 @@ function AssignmentPlanningV2 (props) {
   const { debouncedUpdateUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
 
   useInitAssignmentState(loading, error, data, setAssignments, setCurrentGrade, setMaxPossibleGrade, setUserSetting)
-  useAssignmentUserSetting(loading, error, assignments, userSetting, setGoalGrade, setAssignments)
+  useUserAssignmentSetting(loading, error, assignments, userSetting, setGoalGrade, setAssignments)
   useSyncAssignmentAndGoalGrade(data, assignments, goalGrade, setAssignments, setUserSetting)
 
   // this effect saves the user setting

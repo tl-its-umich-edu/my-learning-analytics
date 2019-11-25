@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 // this effect runs exactly once, if there is a previously saved user setting
-const useAssignmentUserSetting =
+const useUserAssignmentSetting =
   (
     loading,
     error,
@@ -31,4 +31,4 @@ const useAssignmentUserSetting =
     }, [JSON.stringify(userSetting)])
   }
 
-export default useAssignmentUserSetting
+export default useUserAssignmentSetting

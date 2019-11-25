@@ -12,12 +12,12 @@ const calculateTotalPointsPossible = (assignments, assignmentGroups, assignmentW
 const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignmentGroups, assignmentWeightConsideration) => {
   const gradedAssignments = assignments
     .filter(a => a.graded || a.goalGradeSetByUser)
-  const ungradedAssingments = assignments
+  const ungradedAssigmments = assignments
     .filter(a => !(a.graded || a.goalGradeSetByUser))
 
   const currentGrade = calculateMaxGrade(gradedAssignments, assignmentGroups, assignmentWeightConsideration)
   const totalGradedAssignmentPoints = calculateTotalPointsPossible(gradedAssignments, assignmentGroups, assignmentWeightConsideration)
-  const totalUngradedAssignmentPoints = calculateTotalPointsPossible(ungradedAssingments, assignmentGroups, assignmentWeightConsideration)
+  const totalUngradedAssignmentPoints = calculateTotalPointsPossible(ungradedAssigmments, assignmentGroups, assignmentWeightConsideration)
 
   const percentageOfCourseUngraded = totalUngradedAssignmentPoints /
     (totalUngradedAssignmentPoints + totalGradedAssignmentPoints)
