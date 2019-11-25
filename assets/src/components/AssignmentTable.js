@@ -32,6 +32,9 @@ const styles = theme => ({
   },
   popover: {
     pointerEvents: 'none'
+  },
+  narrowCell: {
+    width: '120px'
   }
 })
 
@@ -88,6 +91,7 @@ function AssignmentTable (props) {
                     ? { borderBottom: 'none' }
                     : {}
                 }
+                className={classes.narrowCell}
               >
                 {
                   a.week
@@ -103,6 +107,7 @@ function AssignmentTable (props) {
                     ? { borderBottom: 'none' }
                     : {}
                 }
+                className={classes.narrowCell}
               >
                 {
                   a.week
@@ -112,13 +117,13 @@ function AssignmentTable (props) {
                     : ''
                 }
               </TableCell>
-              <TableCell>
+              <TableCell style={{ width: '30%' }}>
                 {a.name}
               </TableCell>
-              <TableCell>
+              <TableCell className={classes.narrowCell}>
                 {`${a.percentOfFinalGrade}%`}
               </TableCell>
-              <TableCell>
+              <TableCell style={{ width: '30%' }}>
                 {
                   a.graded || a.outOf === 0
                     ? a.outOf === 0

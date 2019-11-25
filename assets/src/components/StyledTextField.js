@@ -8,6 +8,9 @@ const StyledTextField = withStyles({
     },
     '& .MuiInput-underline.Mui-error:after': {
       borderBottomColor: '#ffae42'
+    },
+    '& .MuiInputBase-input': {
+      marginTop: '10px'
     }
   }
 })(TextField)
