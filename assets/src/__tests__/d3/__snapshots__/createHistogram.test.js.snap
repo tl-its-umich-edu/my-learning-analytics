@@ -724,10 +724,10 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
       font-weight="bold"
       line-height="1.46429em"
       text-anchor="start"
-      x="605.84"
+      x="595.84"
       y="35"
     >
-      My Grade:76.8%
+      My Grade: 76.8%
     </text>
     <line
       stroke="rgba(0, 0, 0, 0.54)"

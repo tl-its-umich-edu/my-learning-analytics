@@ -273,10 +273,9 @@ describe('sumAssignmentGoalGrade', () => {
 
 describe('createUserSettings', () => {
   it('takes goalGrade, courseId, and assignments as input and returns a GraphQL mutation object', () => {
-    let goalGrade = 85
-    let courseId = '123456'
-    let viewName = 'assignment'
-    let assignments = [
+    const courseId = '123456'
+    const viewName = 'assignment'
+    const setting = [
       {
         id: 'abcd1234',
         goalGradeSetByUser: false,
@@ -294,25 +293,16 @@ describe('createUserSettings', () => {
       }
     ]
 
-    let output = {
+    const output = {
       variables: {
         input: {
           canvasCourseId: courseId,
           defaultViewType: viewName,
-          defaultViewValue: JSON.stringify({
-            goalGrade: 85,
-            assignments: [
-              {
-                assignmentId: '12345678',
-                goalGradeSetByUser: true,
-                goalGrade: 90
-              }
-            ]
-          })
+          defaultViewValue: JSON.stringify(setting)
         }
       }
     }
 
-    expect(createUserSettings(goalGrade, courseId, viewName, assignments)).toEqual(output)
+    expect(createUserSettings(courseId, viewName, setting)).toEqual(output)
   })
 })
