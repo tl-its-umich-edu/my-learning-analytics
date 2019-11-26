@@ -14,7 +14,7 @@ const styles = ({
   }
 })
 
-function AssignmentGradeBoxes(props) {
+function AssignmentGradeBoxes (props) {
   const {
     currentGrade,
     maxPossibleGrade,
@@ -39,33 +39,33 @@ function AssignmentGradeBoxes(props) {
           {`${roundToOneDecimal(maxPossibleGrade)}%`}
         </Typography>
       </Grid>
-      <Grid item xs={2}>
+      <Grid item xs={4}>
         <Typography variant='h5'>Goal</Typography>
-        <StyledTextField
-          error={goalGrade > 100 || mathWarning || goalGrade > maxPossibleGrade}
-          id='standard-number'
-          value={goalGrade || ''}
-          label={
-            mathWarning
-              ? 'Math may no longer add up'
-              : goalGrade > 100
-                ? 'Over 100%'
-                : goalGrade > maxPossibleGrade
-                  ? 'Greater than max possible grade'
-                  : 'Set a goal'
-          }
-          onChange={event => setGoalGrade(Number(event.target.value))}
-          type='number'
-          className={classes.goalGradeInput}
-          InputLabelProps={{
-            // endAdornment: <InputAdornment position='start'>%</InputAdornment> // doesn't seem to be working
-          }}
-          margin='normal'
-        />
-        {
-          goalGrade
-            ? (
-              <>
+        <div style={{ display: 'inline-block' }}>
+          <StyledTextField
+            error={goalGrade > 100 || mathWarning || goalGrade > maxPossibleGrade}
+            id='standard-number'
+            value={goalGrade || ''}
+            label={
+              mathWarning
+                ? 'Math may no longer add up'
+                : goalGrade > 100
+                  ? 'Over 100%'
+                  : goalGrade > maxPossibleGrade
+                    ? 'Greater than max possible grade'
+                    : 'Set a goal'
+            }
+            onChange={event => setGoalGrade(Number(event.target.value))}
+            type='number'
+            className={classes.goalGradeInput}
+            InputLabelProps={{
+              // endAdornment: <InputAdornment position='start'>%</InputAdornment> // doesn't seem to be working
+            }}
+            margin='normal'
+          />
+          {
+            goalGrade
+              ? (
                 <Button
                   variant='contained'
                   className={classes.clearButton}
@@ -74,10 +74,10 @@ function AssignmentGradeBoxes(props) {
                   <LayersClearIcon />
                   {' Clear goals'}
                 </Button>
-              </>
-            )
-            : null
-        }
+              )
+              : null
+          }
+        </div>
       </Grid>
     </Grid>
   )
