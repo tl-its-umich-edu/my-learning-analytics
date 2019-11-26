@@ -170,9 +170,7 @@ function AssignmentTable (props) {
                   />
                   <Popover
                     className={classes.popover}
-                    classes={{
-                      paper: classes.paper
-                    }}
+                    classes={{ paper: classes.paper }}
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
                     onClose={() => setAnchorEl(null)}

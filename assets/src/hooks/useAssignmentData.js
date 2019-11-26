@@ -22,6 +22,8 @@ const GET_ASSIGNMENT_PLANNING_DATA = courseId => gql`
       weight
       id
       groupPoints
+      dropLowest
+      dropHighest
     }
     currentUserDefaultSelection (defaultViewType: "assignment") {
       defaultViewType,
