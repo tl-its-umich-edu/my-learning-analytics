@@ -1,6 +1,6 @@
 import { createMuiTheme } from '@material-ui/core/styles';
 
-const theme = createMuiTheme({
+const siteTheme = createMuiTheme({
     palette: {
         /* The 'primary' color is used for structural components like the AppBar and SelectCard.
            Different institutions using this application are encouraged to modify the provided value. */
@@ -10,7 +10,7 @@ const theme = createMuiTheme({
         /* The 'secondary' color is used currently to indicate a positive, completed, viewed, or selected state.
            This value was arrived at through research and design work; use caution when modifying. */
         secondary: {
-            main: "#4682b4"
+            main: "#4682B4"
         },
         /* The 'negative' color is used currently to indicate a negative, un-completed, un-viewed, or un-selected state.
            This value was arrived at through research and design work; use caution when modifying. */
@@ -20,4 +20,4 @@ const theme = createMuiTheme({
     }
 });
 
-export default theme;
+export default siteTheme;

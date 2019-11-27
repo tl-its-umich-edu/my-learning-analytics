@@ -2,22 +2,22 @@ import React from 'react'
 import 'rc-slider/assets/index.css'
 import 'rc-tooltip/assets/bootstrap.css'
 import {Range} from 'rc-slider'
-import theme from "../theme"
+import siteTheme from "../siteTheme"
 
 const rangeSlider = props => {
     const activeDotStyle = {
-        borderColor: theme.palette.secondary.main,
+        borderColor: siteTheme.palette.secondary.main,
     }
     const dotStyle = {
-        borderColor: theme.palette.negative.main,
+        borderColor: siteTheme.palette.negative.main,
     }
     const unselectedStyle = {
-        borderColor: theme.palette.negative.main,
-        backgroundColor: theme.palette.negative.main,
+        borderColor: siteTheme.palette.negative.main,
+        backgroundColor: siteTheme.palette.negative.main,
     }
     const selectedStyle = {
-        borderColor: theme.palette.secondary.main,
-        backgroundColor: theme.palette.secondary.main,
+        borderColor: siteTheme.palette.secondary.main,
+        backgroundColor: siteTheme.palette.secondary.main,
     }
     const wrapperStyle = { width: "70%", margin: "0 auto" }
 

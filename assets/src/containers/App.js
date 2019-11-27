@@ -6,7 +6,7 @@ import GoogleAnalyticsTracking from '../components/GoogleAnalyticsTracking'
 import CourseList from './CourseList'
 import Course from './Course'
 import { ThemeProvider } from '@material-ui/core/styles'
-import theme from "../theme"
+import siteTheme from "../siteTheme"
 
 const enrolledCourses = (myla_globals.user_courses_info.length !== 0)
   ? JSON.parse(myla_globals.user_courses_info)
@@ -36,7 +36,7 @@ function App (props) {
   const courseId = coursePageMatch ? coursePageMatch.params.courseId : null
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={siteTheme}>
       <GoogleAnalyticsTracking gaId={myla_globals.google_analytics_id} />
       <Route path='/' exact render={props => <CourseList {...props} user={user} />} />
       <Route path='/courses' exact render={props => <CourseList {...props} user={user} />} />

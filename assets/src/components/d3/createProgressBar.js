@@ -1,11 +1,11 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
-import theme from "../../theme"
+import siteTheme from "../../siteTheme"
 
 function createProgressBar ({ data, width, height, domElement, tip }) {
   const margin = { top: 20, right: 20, bottom: 20, left: 50 }
-  const gradedColor = theme.palette.secondary.main
-  const ungradedColor = theme.palette.negative.main
+  const gradedColor = siteTheme.palette.secondary.main
+  const ungradedColor = siteTheme.palette.negative.main
   let [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   // prevent height from being too tall or too short

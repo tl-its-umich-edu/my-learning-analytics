@@ -1,12 +1,12 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import { roundToOneDecimal } from '../../util/math'
-import theme from "../../theme"
+import siteTheme from "../../siteTheme"
 
 function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100,
                             showNumberOnBars = false, showDashedLine = true}) {
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
-  const barColor = theme.palette.secondary.main
+  const barColor = siteTheme.palette.secondary.main
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   // data usually will be [50.6, 50.6, 50.6, 50.6, 50.6, 74.28, 74.52, 75.89, 76.69,,.,.,.,.] lowest grades binned

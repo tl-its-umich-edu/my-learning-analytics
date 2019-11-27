@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import d3tip from 'd3-tip'
 import './createResourceAccessChart.css'
-import theme from "../../theme"
+import siteTheme from "../../siteTheme"
 
 /*
   References:
@@ -12,8 +12,8 @@ import theme from "../../theme"
     - D3 V4 Changes: https://github.com/d3/d3/blob/master/CHANGES.md
 */
 
-const accessedResourceColor = theme.palette.secondary.main
-const notAccessedResourceColor = theme.palette.negative.main
+const accessedResourceColor = siteTheme.palette.secondary.main
+const notAccessedResourceColor = siteTheme.palette.negative.main
 const mainMargin = { top: 50, right: 10, bottom: 50, left: 200 }
 
 const toolTip = d3tip().attr('class', 'd3-tip')
