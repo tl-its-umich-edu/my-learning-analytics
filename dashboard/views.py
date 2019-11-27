@@ -135,7 +135,7 @@ def get_course_info(request, course_id=0):
             logger.info(f"Course {course_id} resources data type are: {resource_list}")
             resource_defaults = RESOURCE_VALUES
             for item in resource_list:
-                result = utils.look_up_key_for_resource_value(resource_defaults, item)
+                result = utils.search_key_for_resource_value(resource_defaults, item)
                 if result is not None:
                     course_resource_list.append(result.capitalize())
             logger.info(f"Mapped generic resource types in a course {course_id}: {course_resource_list}")
