@@ -30,7 +30,7 @@ You may also optionally place the json settings directly into the `ENV_JSON` env
     username: root
     password: root
     ```
-1. As you are now logged in as `root`, there are no courses listed. 
+1. As you are now logged in as `root`, there are no courses listed. Go through the latest SQL file you downloaded from the link in the setup and search for the line "INSERT INTO `course` VALUES". You can find the course_id in the second column of the tuples. And then nagivate to http://localhost:5001/courses/{course_id} with the course_id you found. (For example, with SQL file myla_test_data_2019_10_16.sql, on line 323, you can find course_id = 235420 or course_id = 362855. And then nagivate to http://localhost:5001/courses/235420 or http://localhost:5001/courses/362855 and you can view the course page as an admin.)
 1. To get to the Django admin panel, click on the Avator in the top right, then click `Admin`, or go here: http://localhost:5001/admin.
 
 #### Logging in as a student
