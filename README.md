@@ -30,7 +30,7 @@ You may also optionally place the json settings directly into the `ENV_JSON` env
     username: root
     password: root
     ```
-1. As you are now logged in as `root`, there are no courses listed. Navigate to http://localhost:5001/courses/231768 or http://localhost:5001/courses/430174 to view a sample course as a superuser.
+1. As you are now logged in as `root`, there are no courses listed. 
 1. To get to the Django admin panel, click on the Avator in the top right, then click `Admin`, or go here: http://localhost:5001/admin.
 
 #### Logging in as a student
