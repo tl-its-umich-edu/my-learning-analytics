@@ -259,8 +259,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .tickSize(0)
     .tickFormat(d => d.split('|')[1])
 
-  
-
   // Brush
   const brush = d3.brushY()
     .extent([[0, 0], [miniWidth, miniHeight]])

@@ -3,7 +3,7 @@ import { adjustViewport } from '../../util/chart'
 import { roundToOneDecimal } from '../../util/math'
 
 function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100,
-                            showNumberOnBars = false, showDashedLine = true}) {
+  showNumberOnBars = false, showDashedLine = true }) {
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
@@ -12,7 +12,6 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
 
   // the set operation removes duplicates
   const tempUniqData = [...new Set(data)]
-  const binningGrade = tempUniqData[0]
   const firstGradeAfterBinnedGrade = tempUniqData[1]
 
   /* only showing the tick values above the binned grades eg, with above data the tick will start from 75%
@@ -28,8 +27,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     .domain(x.domain())
     .thresholds(x.ticks(40))(data)
 
-
-    // getting the first bin that has some grades in them, accessing the x1(higher bin) value
+  // getting the first bin that has some grades in them, accessing the x1(higher bin) value
   const dashLine = () => {
     for (let bin in bins) {
       if (bins[bin].length > 0) {
@@ -145,8 +143,6 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
       .attr('text-anchor', 'start')
       .attr('fill', 'rgba(0, 0, 0, 0.54)')
   }
-
 }
-
 
 export default createHistogram

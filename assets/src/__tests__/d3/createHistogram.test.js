@@ -16,6 +16,4 @@ describe('createHistogram', () => {
     })
     expect(div).toMatchSnapshot()
   })
-
 })
-
