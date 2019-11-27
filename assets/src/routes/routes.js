@@ -27,8 +27,8 @@ const routes = (courseId, activeViews) => {
       viewCode: 'ap'
     },
     {
-      path: `/courses/${courseId}/resources`,
-      title: 'Resources Accessed',
+      path: `/courses/${courseId}/grades`,
+      title: 'Grade Distribution',
       icon: Grade,
       description: 'See where your grade sits within the course grade distribution.',
       image: '/static/images/grade_distribution_icon.png',
