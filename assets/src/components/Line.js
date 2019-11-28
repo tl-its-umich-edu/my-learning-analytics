@@ -6,10 +6,8 @@ function Line (props) {
     height,
     left,
     color,
-    width = '2',
-    labelUp,
-    labelDown,
-    labelDownLower
+    width = 2,
+    labelPlacement
   } = props
 
   // const [{ isDragging }, drag] = useDrag({
@@ -19,9 +17,9 @@ function Line (props) {
   //   })
   // })
 
-  const lineHeight = labelUp || labelDown
+  const lineHeight = labelPlacement === 'up' || labelPlacement === 'down'
     ? height + 20
-    : labelDownLower
+    : labelPlacement === 'downLower'
       ? height + 50
       : height + 2
 
@@ -35,8 +33,9 @@ function Line (props) {
         height: `${lineHeight}px`,
         left,
         zIndex: 1,
-        marginTop: labelUp ? '-20px' : 0,
-        marginBottom: labelDown || labelDownLower ? '-20px' : 0
+        marginTop: labelPlacement === 'up' ? '-20px' : 0,
+        marginBottom: labelPlacement === 'down' ||
+          labelPlacement === 'downLower' ? '-20px' : 0
       }}
       // ref={drag}
     />

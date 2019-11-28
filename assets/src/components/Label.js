@@ -4,9 +4,7 @@ function Label (props) {
   const {
     left,
     color,
-    labelUp,
-    labelDown,
-    labelDownLower,
+    labelPlacement,
     labelText
   } = props
 
@@ -18,11 +16,11 @@ function Label (props) {
         color,
         left,
         zIndex: 1,
-        top: labelDown
+        top: labelPlacement === 'down'
           ? '50px'
-          : labelDownLower
+          : labelPlacement === 'downLower'
             ? '75px'
-            : labelUp
+            : labelPlacement === 'up'
               ? '-20px'
               : 0
       }}

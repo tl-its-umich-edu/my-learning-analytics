@@ -57,17 +57,13 @@ function ProgressBarV2 (props) {
                       height={height}
                       left={`${calculateLineLeftOffset(line.value, outOf)}%`}
                       color={line.color}
-                      labelUp={line.labelUp}
-                      labelDown={line.labelDown}
-                      labelDownLower={line.labelDownLower}
+                      labelPlacement={line.labelPlacement}
                     />
                     <Label
                       left={`${calculateLineLeftOffset(line.value, outOf) + 0.5}%`}
                       color={line.color}
-                      labelUp={line.labelUp}
                       labelText={line.label}
-                      labelDown={line.labelDown}
-                      labelDownLower={line.labelDownLower}
+                      labelPlacement={line.labelPlacement}
                     />
                   </div>
                 ))
