@@ -38,7 +38,7 @@ const styles = theme => ({
   }
 })
 
-function AssignmentTable(props) {
+function AssignmentTable (props) {
   const { classes, assignments, assignmentGroups, setGoalGrade } = props
 
   const [anchorEl, setAnchorEl] = useState(null)
