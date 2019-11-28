@@ -38,8 +38,8 @@ const styles = theme => ({
   }
 })
 
-function AssignmentTable (props) {
-  const { classes, assignments, setGoalGrade } = props
+function AssignmentTable(props) {
+  const { classes, assignments, assignmentGroups, setGoalGrade } = props
 
   const [anchorEl, setAnchorEl] = useState(null)
 
@@ -56,6 +56,18 @@ function AssignmentTable (props) {
   const isPreviousWeekTheSame = (week, key) => {
     return key >= 1
       ? assignments[key - 1].week === week
+      : false
+  }
+
+  const getAssignmentRules = (a, assignmentGroups) => {
+    const assignmenGroup = assignmentGroups.find(ag => ag.id === a.assignmentGroupId)
+    return assignmenGroup
+      ? (
+        {
+          dropLowest: assignmenGroup.dropLowest,
+          dropHighest: assignmenGroup.dropHighest
+        }
+      )
       : false
   }
 
@@ -184,7 +196,36 @@ function AssignmentTable (props) {
                     }}
                     disableRestoreFocus
                   >
-                    <Typography>Put something in here...</Typography>
+                    {
+                      getAssignmentRules(a, assignmentGroups).dropHighest !== 0
+                        ? (
+                          <Typography>
+                            {
+                              `The highest ${getAssignmentRules(a, assignmentGroups).dropHighest}
+                                scores will be dropped from this assignment group
+                              `
+                            }
+                          </Typography>
+                        ) : null
+                    }
+                    {
+                      getAssignmentRules(a, assignmentGroups).dropLowest !== 0
+                        ? (
+                          <Typography>
+                            {
+                              `The lowest ${getAssignmentRules(a, assignmentGroups).dropLowest}
+                                scores will be dropped from this assignment group
+                              `
+                            }
+                          </Typography>
+                        ) : null
+                    }
+                    {
+                      getAssignmentRules(a, assignmentGroups).dropHighest === 0 &&
+                      getAssignmentRules(a, assignmentGroups).dropLowest === 0
+                        ? <Typography>There are no rules for this assignment</Typography>
+                        : null
+                    }
                   </Popover>
                 </div>
               </TableCell>

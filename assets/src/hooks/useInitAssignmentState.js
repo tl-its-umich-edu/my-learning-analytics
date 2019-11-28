@@ -12,6 +12,7 @@ const useInitAssignmentState =
     error,
     data,
     setAssignments,
+    setAssignmentGroups,
     setCurrentGrade,
     setMaxPossibleGrade,
     setUserSetting
@@ -28,6 +29,7 @@ const useInitAssignmentState =
         setAssignments(
           createAssignmentFields(assignments, assignmentGroups, dateStart)
         )
+        setAssignmentGroups(assignmentGroups)
         setCurrentGrade(
           calculateCurrentGrade(assignments, assignmentGroups, assignmentWeightConsideration)
         )

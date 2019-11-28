@@ -43,6 +43,7 @@ function AssignmentPlanningV2 (props) {
   if (disabled) return (<AlertBanner>Grade Distribution view is hidden for this course.</AlertBanner>)
 
   const [assignments, setAssignments] = useState([])
+  const [assignmentGroups, setAssignmentGroups] = useState([])
   const [goalGrade, setGoalGrade] = useState(null)
   const [currentGrade, setCurrentGrade] = useState(0)
   const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
@@ -52,9 +53,31 @@ function AssignmentPlanningV2 (props) {
   const { loading, error, data } = useAssignmentData(courseId)
   const { debouncedUpdateUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
 
-  useInitAssignmentState(loading, error, data, setAssignments, setCurrentGrade, setMaxPossibleGrade, setUserSetting)
-  useUserAssignmentSetting(loading, error, assignments, userSetting, setGoalGrade, setAssignments)
-  useSyncAssignmentAndGoalGrade(data, assignments, goalGrade, setAssignments, setUserSetting)
+  useInitAssignmentState(
+    loading,
+    error,
+    data,
+    setAssignments,
+    setAssignmentGroups,
+    setCurrentGrade,
+    setMaxPossibleGrade,
+    setUserSetting
+  )
+  useUserAssignmentSetting(
+    loading,
+    error,
+    assignments,
+    userSetting,
+    setGoalGrade,
+    setAssignments
+  )
+  useSyncAssignmentAndGoalGrade(
+    data,
+    assignments,
+    goalGrade,
+    setAssignments,
+    setUserSetting
+  )
 
   const showMathWarning = useMathWarning(assignments)
 
@@ -145,6 +168,7 @@ function AssignmentPlanningV2 (props) {
                     />
                     <AssignmentTable
                       assignments={assignments}
+                      assignmentGroups={assignmentGroups}
                       setGoalGrade={setHandleAssignmentGoalGrade}
                     />
                   </>
