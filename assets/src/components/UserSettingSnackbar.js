@@ -17,7 +17,7 @@ function UserSettingSnackbar (props) {
     failureMessage = 'Setting not saved.'
   } = props
 
-  // const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false)
+  const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
 
   useEffect(() => {
@@ -27,7 +27,7 @@ function UserSettingSnackbar (props) {
       } else {
         setSnackbarMessage(failureMessage)
       }
-      // setSavedSnackbarOpen(true)
+      setSavedSnackbarOpen(true)
     }
   }, [saved])
 
@@ -38,26 +38,23 @@ function UserSettingSnackbar (props) {
         horizontal: 'left'
       }}
       open={savedSnackbarOpen}
-      role="alert"
       // show for 50ms for each of the characters in the message
       autoHideDuration={"{snackbarMessage}".length * 50}
       // Fade in (or slide in) for 200-400ms for saccade time for the eye to refocus
-      // set for 800ms temporily for better view
       TransitionComponent={SlideTransition}
-      transitionDuration={{exit: 800, enter: 800}}
-      // onClose={() => setSavedSnackbarOpen(false)}
+      transitionDuration={{exit: 400, enter: 800}}
+      onClose={() => setSavedSnackbarOpen(false)}
       message={<span>{snackbarMessage}</span>}
-      // should not require users to close a Snackbar if the role is set to alert
-      // action={[
-      //   <IconButton
-      //     key='close'
-      //     aria-label='close'
-      //     color='inherit'
-      //     onClick={() => setSavedSnackbarOpen(false)}
-      //   >
-      //     <CloseIcon />
-      //   </IconButton>
-      // ]}
+      action={[
+        <IconButton
+          key='close'
+          aria-label='close'
+          color='inherit'
+          onClick={() => setSavedSnackbarOpen(false)}
+        >
+          <CloseIcon />
+        </IconButton>
+      ]}
     />
   )
 }
