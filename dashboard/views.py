@@ -340,13 +340,24 @@ def grade_distribution(request, course_id=0):
     course_id = canvas_id_to_incremented_id(course_id)
 
     current_user = request.user.get_username()
+    user_id = get_user_id(current_user)
+
+    grading_type = get_course_grading_type(course_id)
 
     grade_score_sql = f"""select current_grade,
        (select show_grade_counts From course where id=%(course_id)s) as show_number_on_bars,
     (select current_grade from user where sis_name=%(current_user)s and course_id=%(course_id)s) as current_user_grade
         from user where course_id=%(course_id)s and enrollment_type='StudentEnrollment';
                     """
-    df = pd.read_sql(grade_score_sql, conn, params={"current_user": current_user, 'course_id': course_id})
+
+    grade_points_sql = f"""select sum(score) as current_grade,
+        (select show_grade_counts from course where id=%(course_id)s) as show_number_on_bars,
+        (select sum(score) from submission where course_id=%(course_id)s and user_id=%(user_id)s) as current_user_grade
+        from submission where course_id=%(course_id)s and user_id in (select user_id from user where enrollment_type='StudentEnrollment') group by user_id"""
+
+    sql = grade_points_sql if grading_type == 'PT' else grade_score_sql
+
+    df = pd.read_sql(sql, conn, params={"current_user": current_user, 'course_id': course_id, 'user_id': user_id})
     if df.empty or df['current_grade'].isnull().all():
         return HttpResponse(json.dumps({}), content_type='application/json')
 
@@ -442,7 +453,7 @@ def get_user_default_selection(request, course_id=0):
 @permission_required('dashboard.assignments',
     fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def assignments(request, course_id=0):
-    
+
     logger.info(assignments.__name__)
 
     course_id = canvas_id_to_incremented_id(course_id)
@@ -596,12 +607,28 @@ def no_show_avg_score_for_ungraded_assignments(row):
     else: return row['avg_score']
 
 
+# determine the type of grading that is used for a course (percent, point, or both)
+def get_course_grading_type(course_id):
+    sql = "select myla_grading_type from course where id = %(course_id)s"
+    df = pd.read_sql(sql, conn, params={'course_id': course_id})
+    return df['myla_grading_type'].iloc[0]
+
+
 def user_percent(row):
     if row['graded']:
         s = round((row['score'] / row['points_possible']) * row['towards_final_grade'], 2)
         return s
     else:
         return row['towards_final_grade']
+
+
+# Retrieve the user id based on the sis_name of the user
+def get_user_id(current_user):
+    sql = "select user_id from user where sis_name=%(current_user)s"
+    df = pd.read_sql(sql, conn, params={'current_user': current_user})
+    if df.empty:
+        return None
+    return df['user_id'].iloc[0]
 
 
 def percent_calculation(consider_weight,total_points,hidden_assignments,row):
@@ -767,7 +794,7 @@ def logout(request):
 
 def courses_enabled(request):
     """ Returns json for all courses we currently support and are enabled """
-    
+
     if COURSES_ENABLED:
         data = {}
         for cvo in CourseViewOption.objects.all():
