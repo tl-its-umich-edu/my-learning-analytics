@@ -135,6 +135,8 @@ function AssignmentPlanning (props) {
               {assignmentData
                 ? <ProgressBar
                   data={assignmentData.progress}
+                  gradeType={assignmentData.grading_type}
+                  totalPoints={assignmentData.total_points}
                   aspectRatio={0.12}
                   tip={AssignmentPlanningTooltip(classes)} />
                 : <Spinner />}

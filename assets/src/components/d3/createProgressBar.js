@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 
-function createProgressBar ({ data, width, height, domElement, tip }) {
+function createProgressBar ({ data, gradeType, totalPoints, width, height, domElement, tip }) {
   const margin = { top: 20, right: 20, bottom: 20, left: 50 }
   let [aWidth, aHeight] = adjustViewport(width, height, margin)
 
@@ -10,19 +10,19 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
   aHeight = aHeight < 60 ? 60 : aHeight
 
   const memo = new Map()
-  const calculatePercentSoFar = i => {
+  const calculateProgressSoFar = i => {
     if (memo.has(i)) {
       return memo.get(i)
     } else {
       const percentSoFar = data.slice(0, i)
-        .reduce((acc, d) => (acc += d.percent_gotten), 0)
+        .reduce((acc, d) => (acc += (gradeType === 'PT' ? d.points_gotten : d.percent_gotten)), 0)
       memo.set(i, percentSoFar)
       return percentSoFar
     }
   }
 
   const x = d3.scaleLinear()
-    .domain([0, 100])
+    .domain(gradeType === 'PT' ? [0, totalPoints] : [0, 100])
     .range([margin.left, aWidth - margin.right])
 
   const y = d3.scaleBand()
@@ -43,8 +43,8 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
   }
 
   bar.append('rect')
-    .attr('width', d => x(d.percent_gotten) - margin.left)
-    .attr('x', (_, i) => x(calculatePercentSoFar(i)))
+    .attr('width', d => (gradeType === 'PT' ? x(d.points_gotten) : x(d.percent_gotten)) - margin.left)
+    .attr('x', (_, i) => x(calculateProgressSoFar(i)))
     .attr('height', y.bandwidth())
     .attr('y', margin.top)
     .attr('fill', d => d.graded ? '#a0d4ee' : '#e1e1e1')
@@ -71,11 +71,11 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
     })
 
   bar.append('text')
-    .attr('x', (_, i) => x(calculatePercentSoFar(i)))
+    .attr('x', (_, i) => x(calculateProgressSoFar(i)))
     .attr('y', margin.top + y.bandwidth() / 2)
     .text(d => {
       const name = d.name
-      const widthOfRect = x(d.percent_gotten) - margin.left
+      const widthOfRect = (gradeType === 'PT' ? x(d.points_gotten) : x(d.percent_gotten)) - margin.left
       const charsThatCanFit = Math.floor(widthOfRect / 9)
       const displayable = name.length < charsThatCanFit
         ? name
@@ -89,7 +89,7 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
     .attr('transform', `translate(0, ${aHeight - margin.bottom})`)
     .call(d3
       .axisBottom(x)
-      .tickFormat(d => `${d}%`)
+      .tickFormat(d => gradeType === 'PT' ? `${d}` : `${d}%`)
       .ticks(width > 750 ? 20 : width > 500 ? 10 : 5)
     )
 
@@ -99,8 +99,8 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
   if (currentIndex !== 0) {
     currentLine
       .append('line')
-      .attr('x1', x(calculatePercentSoFar(currentIndex)))
-      .attr('x2', x(calculatePercentSoFar(currentIndex)))
+      .attr('x1', x(calculateProgressSoFar(currentIndex)))
+      .attr('x2', x(calculateProgressSoFar(currentIndex)))
       .attr('y1', 0)
       .attr('y2', aHeight - margin.bottom)
       .attr('stroke', 'darkorange')
@@ -108,7 +108,7 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
 
     currentLine.append('text')
       .attr('text-anchor', 'middle')
-      .attr('x', x(calculatePercentSoFar(currentIndex)) - 26)
+      .attr('x', x(calculateProgressSoFar(currentIndex)) - 26)
       .attr('y', margin.top)
       .attr('dy', -7)
       .attr('fill', 'darkorange')
@@ -132,8 +132,8 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
   if (showMaxLine(data)) {
     maxLine
       .append('line')
-      .attr('x1', x(calculatePercentSoFar(data.length)))
-      .attr('x2', x(calculatePercentSoFar(data.length)))
+      .attr('x1', x(calculateProgressSoFar(data.length)))
+      .attr('x2', x(calculateProgressSoFar(data.length)))
       .attr('y1', 0)
       .attr('y2', aHeight - margin.bottom)
       .attr('stroke', 'green')
@@ -141,7 +141,7 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
 
     maxLine.append('text')
       .attr('text-anchor', 'middle')
-      .attr('x', x(calculatePercentSoFar(data.length)) - 42)
+      .attr('x', x(calculateProgressSoFar(data.length)) - 42)
       .attr('y', margin.top)
       .attr('dy', -7)
       .attr('fill', 'green')
