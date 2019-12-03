@@ -44,7 +44,7 @@ function UserSettingSnackbar (props) {
       // Fade in (or slide in) for 200-400ms for saccade time for the eye to refocus
       // set for 800ms temporily for better view
       TransitionComponent={SlideTransition}
-      transitionDuration={{exit: 800, enter: 800}}
+      transitionDuration={{exit: 400, enter: 400}}
       onClose={() => setSavedSnackbarOpen(false)}
       message={<span>{snackbarMessage}</span>}
       // should not require users to close a Snackbar if the role is set to alert
