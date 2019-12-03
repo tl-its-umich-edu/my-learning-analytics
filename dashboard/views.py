@@ -442,7 +442,7 @@ def get_user_default_selection(request, course_id=0):
 @permission_required('dashboard.assignments',
     fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def assignments(request, course_id=0):
-    
+
     logger.info(assignments.__name__)
 
     course_id = canvas_id_to_incremented_id(course_id)
@@ -487,6 +487,7 @@ def assignments(request, course_id=0):
     df3['graded'] = df3['graded'].fillna(False)
     df3[['score']] = df3[['score']].astype(float)
     df3['percent_gotten'] = df3.apply(lambda x: user_percent(x), axis=1)
+    df3['points_gotten'] = df3.apply(lambda x: user_points(x), axis=1)
     df3.sort_values(by=['graded', 'due_date_mod'], ascending=[False, True], inplace=True)
     df3.reset_index(inplace=True)
     df3.drop(columns=['index'], inplace=True)
@@ -516,6 +517,7 @@ def assignments(request, course_id=0):
         week_list.add(item['week'])
     weeks = sorted(week_list)
     full = []
+    total_points_possible = 0
     for i, week in enumerate(weeks):
         data = {}
         data["week"] = np.uint64(week).item()
@@ -524,11 +526,14 @@ def assignments(request, course_id=0):
         for item in assignment_list:
             assignment_due_date_grp = {}
             if item['week'] == week:
+                total_points_possible += sum(assign['points_possible'] for assign in item['assign'])
                 assignment_due_date_grp['due_date'] = item['due_date']
                 assignment_due_date_grp['assignment_items'] = item['assign']
                 dd_items.append(assignment_due_date_grp)
         full.append(data)
     assignment_data['plan'] = json.loads(json.dumps(full))
+    assignment_data['grading_type'] = get_course_grading_type(course_id)
+    assignment_data['total_points'] = total_points_possible
     return HttpResponse(json.dumps(assignment_data), content_type='application/json')
 
 
@@ -596,12 +601,26 @@ def no_show_avg_score_for_ungraded_assignments(row):
     else: return row['avg_score']
 
 
+# determine the type of grading that is used for a course (percent, point, or both)
+def get_course_grading_type(course_id):
+    sql = "select myla_grading_type from course where id = %(course_id)s"
+    df = pd.read_sql(sql, conn, params={'course_id': course_id})
+    return df['myla_grading_type'].iloc[0]
+
+
 def user_percent(row):
     if row['graded']:
         s = round((row['score'] / row['points_possible']) * row['towards_final_grade'], 2)
         return s
     else:
         return row['towards_final_grade']
+
+
+# calculate the points for assignments - for non-graded, the points_possible is returned
+def user_points(row):
+    if row['graded']:
+        return row['score']
+    return row['points_possible']
 
 
 def percent_calculation(consider_weight,total_points,hidden_assignments,row):
@@ -767,7 +786,7 @@ def logout(request):
 
 def courses_enabled(request):
     """ Returns json for all courses we currently support and are enabled """
-    
+
     if COURSES_ENABLED:
         data = {}
         for cvo in CourseViewOption.objects.all():
