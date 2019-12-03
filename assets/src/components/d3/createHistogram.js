@@ -2,10 +2,13 @@ import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import { roundToOneDecimal } from '../../util/math'
 
-function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100,
+function createHistogram ({ data, gradingType, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100,
                             showNumberOnBars = false, showDashedLine = true}) {
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
+
+  // Used for display the ticks correctly depending on grading type
+  const percent = (gradingType === 'PT' ? `` : `%`)
 
   // data usually will be [50.6, 50.6, 50.6, 50.6, 50.6, 74.28, 74.52, 75.89, 76.69,,.,.,.,.] lowest grades binned
   //  to hide low performers.
@@ -73,7 +76,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
       .axisBottom(x)
       .tickSizeOuter(0)
       .ticks(width > 750 ? 20 : 10)
-      .tickFormat(d => `${d}%`)
+      .tickFormat(d => `${d}` + percent)
     )
     .call(g => g.append('text')
       .attr('x', aWidth / 2)
@@ -120,7 +123,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     svg.append('text')
       .attr('x', myGrade < 5 ? x(myGrade) + 3 : x(myGrade) - 120)
       .attr('y', margin.top + 15)
-      .text(`My Grade: ${roundToOneDecimal(myGrade)}%`)
+      .text(`My Grade: ${roundToOneDecimal(myGrade)}` + percent)
       .attr('font-size', '0.875rem')
       .attr('font-weight', 'bold')
       .attr('line-height', '1.46429em')
@@ -139,7 +142,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     svg.append('text')
       .attr('x', x(dashLine()) - 40)
       .attr('y', margin.top - 5)
-      .text(`<${Math.trunc(firstGradeAfterBinnedGrade)}%`)
+      .text(`<${Math.trunc(firstGradeAfterBinnedGrade)}` + percent)
       .attr('font-size', '0.875rem')
       .attr('line-height', '1.46429em')
       .attr('text-anchor', 'start')

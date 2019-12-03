@@ -61,9 +61,11 @@ function GradeDistribution (props) {
   const BuildGradeView = () => {
     const grades = gradeData.map(x => x.current_grade)
 
+    const percent = (gradeData[0].grading_type === 'PT') ? '' : '%'
+
     const tableRows = [
-      ['Average grade', <strong key={0}>{gradeData[0].grade_avg}%</strong>],
-      ['Median grade', <strong key={1}>{gradeData[0].median_grade}%</strong>],
+      ['Average grade', <strong key={0}>{gradeData[0].grade_avg}{percent}</strong>],
+      ['Median grade', <strong key={1}>{gradeData[0].median_grade}{percent}</strong>],
       ['Number of students', <strong key={2}>{gradeData[0].tot_students}</strong>],
       !user.admin && showGrade
         ? ([
@@ -71,7 +73,7 @@ function GradeDistribution (props) {
           <strong key={0}>
             {
               gradeData[0].current_user_grade
-                ? `${roundToOneDecimal(gradeData[0].current_user_grade)}%`
+                ? `${roundToOneDecimal(gradeData[0].current_user_grade)}${percent}`
                 : 'There are no grades yet for you in this course'
             }
           </strong>
@@ -105,6 +107,7 @@ function GradeDistribution (props) {
           {gradeCheckbox}
           <Histogram
             data={grades}
+            gradingType={gradeData[0].grading_type}
             aspectRatio={0.3}
             xAxisLabel='Grade %'
             yAxisLabel='Number of Students'

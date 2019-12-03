@@ -384,6 +384,7 @@ def grade_distribution(request, course_id=0):
         df['current_grade'] = df['current_grade'].apply(lambda x: 99.99 if x == 100.00 else x)
         df['graph_upper_limit'] = 100
 
+    df['grading_type'] = grading_type
 
     # json for eventlog
     data = {
