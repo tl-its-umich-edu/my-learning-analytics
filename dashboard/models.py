@@ -23,6 +23,8 @@ logger = logging.getLogger(__name__)
 
 from model_utils import Choices
 
+from typing import Union
+from django.http import HttpRequest, HttpResponse, JsonResponse
 
 class AcademicTerms(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Term Id")
@@ -31,12 +33,12 @@ class AcademicTerms(models.Model):
     date_start = models.DateTimeField(verbose_name="Start Date and Time", blank=True, null=True)
     date_end = models.DateTimeField(verbose_name="End Date and Time", blank=True, null=True)
 
-    def __str__(self):
+    def __str__(self) -> models.CharField:
         return self.name
 
     # # Replace the year in the end date with start date (Hack to get around far out years)
     # # This should be replaced in the future via an API call so the terms have correct end years, or Canvas data adjusted
-    def get_correct_date_end(self):
+    def get_correct_date_end(self) -> models.DateTimeField:
         if (self.date_end.year - self.date_start.year) > 1:
             logger.info(f'{self.date_end.year} - {self.date_start.year} greater than 1 so setting end year to match start year.')
             return self.date_end.replace(year=self.date_start.year)
@@ -50,7 +52,10 @@ class AcademicTerms(models.Model):
 
 
 class UserDefaultQuerySet(models.QuerySet):
-    def get_user_defaults(self, course_id, sis_user_name, default_view_type):
+    def get_user_defaults(self,
+                          course_id: models.BigIntegerField,
+                          sis_user_name: models.CharField,
+                          default_view_type: models.CharField) -> Union[tuple, None]:
         try:
             return self.get(course_id=course_id,
                             user_sis_name=str(sis_user_name),
@@ -60,7 +65,11 @@ class UserDefaultQuerySet(models.QuerySet):
                 in course: {course_id} for user: {sis_user_name}: {e} """)
             return None
 
-    def set_user_default(self, course_id, sis_user_name, default_view_type, default_view_value):
+    def set_user_default(self,
+                         course_id: models.BigIntegerField,
+                         sis_user_name: models.CharField,
+                         default_view_type: models.CharField,
+                         default_view_value: models.CharField) -> tuple:
         try:
             return self.update_or_create(course_id=course_id, user_sis_name=sis_user_name, default_view_type=default_view_type,
                                          defaults={'default_view_value': default_view_value})
@@ -71,13 +80,20 @@ class UserDefaultQuerySet(models.QuerySet):
 
 
 class UserDefaultManager(models.Manager):
-    def get_queryset(self):
+    def get_queryset(self) -> UserDefaultQuerySet:
         return UserDefaultQuerySet(self.model, using=self._db)
 
-    def get_user_defaults(self, course_id, sis_user_name, default_view_type):
+    def get_user_defaults(self,
+                          course_id: models.BigIntegerField,
+                          sis_user_name: models.CharField,
+                          default_view_type: models.CharField) -> Union[tuple, None]:
         return self.get_queryset().get_user_defaults(course_id, sis_user_name, default_view_type)
 
-    def set_user_defaults(self, course_id, sis_user_name, default_view_type, default_view_value):
+    def set_user_defaults(self,
+                          course_id: models.BigIntegerField,
+                          sis_user_name: models.CharField,
+                          default_view_type: models.CharField,
+                          default_view_value: models.CharField) -> tuple:
         return self.get_queryset().set_user_default(course_id, sis_user_name, default_view_type, default_view_value)
 
 
@@ -104,7 +120,7 @@ class Assignment(models.Model):
     course_id = models.BigIntegerField(verbose_name="Course Id")
     assignment_group_id = models.BigIntegerField(verbose_name="Assignment Group Id")
 
-    def __str__(self):
+    def __str__(self) -> models.CharField:
         return self.name
 
     class Meta:
@@ -120,7 +136,7 @@ class AssignmentGroups(models.Model):
     drop_lowest = models.IntegerField(blank=True, null=True, verbose_name="Drop Lowest")
     drop_highest = models.IntegerField(blank=True, null=True, verbose_name="Drop Highest")
 
-    def __str__(self):
+    def __str__(self) -> models.CharField:
         return self.name
 
     class Meta:
@@ -138,9 +154,8 @@ class AssignmentWeightConsideration(models.Model):
 
 
 class CourseQuerySet(models.QuerySet):
-    def get_supported_courses(self):
+    def get_supported_courses(self) -> list:
         """Returns the list of supported courses from the database
-
         :return: [List of supported course ids]
         :rtype: [list of str (possibly incremented depending on parameter)]
         """
@@ -152,10 +167,10 @@ class CourseQuerySet(models.QuerySet):
 
 
 class CourseManager(models.Manager):
-    def get_queryset(self):
+    def get_queryset(self) -> CourseQuerySet:
         return CourseQuerySet(self.model, using=self._db)
 
-    def get_supported_courses(self):
+    def get_supported_courses(self) -> list:
         return self.get_queryset().get_supported_courses()
 
 
@@ -171,10 +186,10 @@ class Course(models.Model):
 
     objects = CourseManager()
 
-    def __str__(self):
+    def __str__(self) -> models.CharField:
         return self.name
 
-    def get_course_date_range(self):
+    def get_course_date_range(self) -> namedtuple:
         if self.date_start is not None:
             start = self.date_start
         elif self.term is not None and self.term.date_start is not None:
@@ -192,7 +207,7 @@ class Course(models.Model):
         DateRange = namedtuple("DateRange", ["start", "end"])
         return DateRange(start, end)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> HttpResponse:
         return reverse('courses', kwargs={'course_id': self.canvas_id})
 
     class Meta:
@@ -208,7 +223,7 @@ class CourseViewOption(models.Model):
 
     VIEWS = ['show_resources_accessed', 'show_assignment_planning', 'show_grade_distribution']
 
-    def __str__(self):
+    def __str__(self) -> str:
         retval = ""
         if self.show_resources_accessed and 'show_resources_accessed' not in settings.VIEWS_DISABLED: retval += "Resources Accessed\n"
         if self.show_assignment_planning and 'show_assignment_planning' not in settings.VIEWS_DISABLED: retval += "Assignment Planning\n"
@@ -219,9 +234,8 @@ class CourseViewOption(models.Model):
         db_table = 'course_view_option'
         verbose_name = "Course View Option"
 
-    def json(self, include_id=True):
+    def json(self, include_id=True) -> Union[JsonResponse, str]:
         """Format the json output that we want for this record
-
         :param include_id: Whether or not to include the id in the return
         This should be of the format canvas_id : {options}
         :return: JSON formatted CourseViewOption
@@ -245,7 +259,7 @@ class CourseViewOption(models.Model):
 
 
 class ResourceQuerySet(models.QuerySet):
-    def get_course_resource_type(self, course_id):
+    def get_course_resource_type(self, course_id: models.BigIntegerField) -> Union[list, None]:
         """
         Return a list of resources type data collected in the course
         :return:
@@ -258,10 +272,10 @@ class ResourceQuerySet(models.QuerySet):
 
 
 class ResourceManager(models.Manager):
-    def get_queryset(self):
+    def get_queryset(self) -> ResourceQuerySet:
         return ResourceQuerySet(self.model, using=self._db)
 
-    def get_course_resource_type(self, course_id):
+    def get_course_resource_type(self, course_id: models.BigIntegerField) -> Union[list, None]:
         return self.get_queryset().get_course_resource_type(course_id)
 
 
@@ -273,7 +287,7 @@ class Resource(models.Model):
 
     objects = ResourceManager()
 
-    def __str__(self):
+    def __str__(self) -> models.TextField:
         return self.name
 
     class Meta:
@@ -291,7 +305,7 @@ class Submission(models.Model):
     grade_posted_local_date = models.CharField(max_length=255,blank=True, null=True, verbose_name="Posted Grade in local DateTime")
     avg_score = models.FloatField(blank=True, null=True, verbose_name="Average Grade")
 
-    def __str__(self):
+    def __str__(self) -> unicode_literals:
         return f"Submission Id {self.id} for assignment id {self.assignment_id} for course id {self.course_id} for user id {self.user_id}"
 
     class Meta:
@@ -307,7 +321,9 @@ class UnizinMetadata(models.Model):
 
 
 class UserQuerySet(models.query.QuerySet):
-    def get_user_in_course(self, user, course):
+    def get_user_in_course(self,
+                           user: models.CharField,
+                           course: models.CharField) -> filter:
         return self.filter(
             Q(sis_name=user.get_username()) | Q(sis_id=user.get_username()),
             course_id=course.id
@@ -335,7 +351,7 @@ class User(models.Model):
 
     objects = UserQuerySet.as_manager()
 
-    def __str__(self):
+    def __str__(self) -> models.CharField:
         return self.name
 
     class Meta:
@@ -349,7 +365,7 @@ class ResourceAccess(models.Model):
     user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id')
     access_time = models.DateTimeField(verbose_name="Access Time")
 
-    def __str__(self):
+    def __str__(self) -> unicode_literals:
         return f"Resource {self.resource_id} accessed by {self.user_id}"
 
     class Meta:

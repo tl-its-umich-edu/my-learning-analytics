@@ -10,12 +10,15 @@ from .models import CourseViewOption, Course
 
 from django.forms.models import ModelForm
 
+from typing import Union
+from django.http import HttpRequest, HttpResponse, JsonResponse
+
 # Always save the OneToOne Fields
 # https://stackoverflow.com/a/3734700/3708872
 
 
 class AlwaysChangedModelForm(ModelForm):
-    def has_changed(self):
+    def has_changed(self) -> Union[bool, super]:
         if not self.instance.pk:
             return True
         return super(AlwaysChangedModelForm, self).has_changed()
@@ -38,7 +41,7 @@ class CourseForm(forms.ModelForm):
         model = Course
         exclude = ()
 
-    def clean(self):
+    def clean(self) -> str:
         canvas_id = self.cleaned_data.get('canvas_id')
         if not canvas_id or not str(canvas_id).isdigit():
             raise forms.ValidationError(
@@ -54,15 +57,15 @@ class CourseAdmin(admin.ModelAdmin):
     readonly_fields = ('term',)
 
     # Need this method to correctly display the line breaks
-    def _courseviewoption(self, obj):
+    def _courseviewoption(self, obj: Course) -> mark_safe:
         return mark_safe(linebreaksbr(obj.courseviewoption))
     _courseviewoption.short_description = "Course View Option(s)"
 
-    def course_link(self, obj):
+    def course_link(self, obj: Course) -> format_html:
         return format_html('<a href="{}">Link</a>', obj.get_absolute_url())
 
     # When saving the course, update the id based on canvas id
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request: HttpRequest, obj: Course, form: ModelForm, change: AlwaysChangedModelForm) -> super:
         obj.id = canvas_id_to_incremented_id(obj.canvas_id)
         return super(CourseAdmin, self).save_model(request, obj, form, change)
 
