@@ -25,26 +25,30 @@ PROJECT_ROOT = os.path.abspath(
 )
 
 USER_ENV = os.environ
-with open(os.getenv("ENV_FILE", "secrets/env.json")) as f:
-    DEFAULT_ENV = json.load(f)
-
+try:
+    with open(os.getenv("ENV_FILE", "/secrets/env.json")) as f:
+        DEFAULT_ENV = json.load(f)
+except FileNotFoundError as fnfe:
+        print("Default config file or one defined in environment variable ENV_FILE not found. This is normal for the build, should define for operation")
+        # Set ENV so collectstatic will still run in the build
+        DEFAULT_ENV = os.environ
 
 LOGOUT_URL = '/accounts/logout'
 LOGIN_URL = '/accounts/login'
 
 # Google Analytics ID
-if USER_ENV['GA_ID'] is None:
+if 'GA_ID' not in USER_ENV:
     GA_ID = DEFAULT_ENV.get('GA_ID', '')
 else:
     GA_ID = USER_ENV.get('GA_ID')
 
 # Resource values from env
-if USER_ENV['RESOURCE_VALUES'] is None:
+if 'RESOURCE_VALUES' not in USER_ENV:
     RESOURCE_VALUES = DEFAULT_ENV.get("RESOURCE_VALUES", {"files": ["canvas"]})
 else:
     RESOURCE_VALUES = USER_ENV.get("RESOURCE_VALUES")
 
-if USER_ENV['RESOURCE_URLS'] is None:
+if 'RESOURCE_URLS' not in USER_ENV:
     RESOURCE_URLS = DEFAULT_ENV.get("RESOURCE_URLS", {"canvas": {"prefix": "https://demo.instructure.com/files/", "postfix": "/download?download_frd=1"}})
 else:
     RESOURCE_URLS = USER_ENV.get("RESOURCE_URLS")
@@ -56,28 +60,28 @@ SITE_ID = 1
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-if USER_ENV['DJANGO_SECRET_KEY'] is None:
+if 'DJANGO_SECRET_KEY' not in USER_ENV:
     SECRET_KEY = DEFAULT_ENV.get('DJANGO_SECRET_KEY')
 else:
     SECRET_KEY = USER_ENV.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if USER_ENV['DJANGO_DEBUG'] is None:
+if 'DJANGO_DEBUG' not in USER_ENV:
     DEBUG = DEFAULT_ENV.get('DJANGO_DEBUG', True)
 else:
     DEBUG = USER_ENV.get('DJANGO_DEBUG')
 
-if USER_ENV['ALLOWED_HOSTS'] is None:
+if 'ALLOWED_HOSTS' not in USER_ENV:
     ALLOWED_HOSTS = DEFAULT_ENV.get("ALLOWED_HOSTS", ["127.0.0.1", "localhost"])
 else:
     ALLOWED_HOSTS = USER_ENV.get("ALLOWED_HOSTS")
 
-if USER_ENV['DJANGO_WATCHMAN_TOKEN'] is None:
+if 'DJANGO_WATCHMAN_TOKEN' not in USER_ENV:
     WATCHMAN_TOKEN = DEFAULT_ENV.get('DJANGO_WATCHMAN_TOKEN', None)
 else:
     WATCHMAN_TOKEN = USER_ENV.get('DJANGO_WATCHMAN_TOKEN')
 
-if USER_ENV['DJANGO_WATCHMAN_TOKEN_NAME'] is None:
+if 'DJANGO_WATCHMAN_TOKEN_NAME' not in USER_ENV:
     WATCHMAN_TOKEN_NAME = DEFAULT_ENV.get('DJANGO_WATCHMAN_TOKEN_NAME', 'token')
 else:
     WATCHMAN_TOKEN_NAME = USER_ENV.get('DJANGO_WATCHMAN_TOKEN_NAME')
@@ -86,28 +90,28 @@ else:
 WATCHMAN_DATABASES = ('default',)
 
 # courses_enabled api
-if USER_ENV['COURSES_ENABLED'] is None:
+if 'COURSES_ENABLED' not in USER_ENV:
     COURSES_ENABLED = DEFAULT_ENV.get('COURSES_ENABLED', False)
 else:
     COURSES_ENABLED = USER_ENV.get('COURSES_ENABLED')
 
 # Defaults for PTVSD
-if USER_ENV['PTVSD_ENABLE'] is None:
+if 'PTVSD_ENABLE' not in USER_ENV:
     PTVSD_ENABLE = DEFAULT_ENV.get("PTVSD_ENABLE", False)
 else:
     PTVSD_ENABLE = USER_ENV.get("PTVSD_ENABLE")
 
-if USER_ENV['PTVSD_REMOTE_ADDRESS'] is None:
+if 'PTVSD_REMOTE_ADDRESS' not in USER_ENV:
     PTVSD_REMOTE_ADDRESS = DEFAULT_ENV.get("PTVSD_REMOTE_ADDRESS", "0.0.0.0")
 else:
     PTVSD_REMOTE_ADDRESS = USER_ENV.get("PTVSD_REMOTE_ADDRESS")
 
-if USER_ENV['PTVSD_REMOTE_PORT'] is None:
+if 'PTVSD_REMOTE_PORT' not in USER_ENV:
     PTVSD_REMOTE_PORT = DEFAULT_ENV.get("PTVSD_REMOTE_PORT", 3000)
 else:
     PTVSD_REMOTE_PORT = USER_ENV.get("PTVSD_REMOTE_PORT")
 
-if USER_ENV['PTVSD_WAIT_FOR_ATTACH'] is None:
+if 'PTVSD_WAIT_FOR_ATTACH' not in USER_ENV:
     PTVSD_WAIT_FOR_ATTACH = DEFAULT_ENV.get("PTVSD_WAIT_FOR_ATTACH", False)
 else:
     PTVSD_WAIT_FOR_ATTACH = USER_ENV.get("PTVSD_WAIT_FOR_ATTACH")
@@ -134,7 +138,6 @@ INSTALLED_APPS = [
     'pinax.eventlog',
     'webpack_loader',
     'rules.apps.AutodiscoverRulesConfig',
-    'constance',
 ]
 
 CONSTANCE_CONFIG = {
@@ -161,7 +164,7 @@ CRON_CLASSES = [
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-if USER_ENV['DJANGO_TEMPLATE_DEBUG'] is None:
+if 'DJANGO_TEMPLATE_DEBUG' not in USER_ENV:
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -432,7 +435,7 @@ if USER_ENV.get('STUDENT_DASHBOARD_SAML'):
         'givenName': ('first_name', ),
         'sn': ('last_name', ),
     }
-else if DEFAULT_ENV.get('STUDENT_DASHBOARD_SAML', True):
+elif DEFAULT_ENV.get('STUDENT_DASHBOARD_SAML', True):
     import saml2
 
     SAML2_URL_PATH = '/accounts/'
@@ -551,7 +554,7 @@ if USER_ENV.get('STUDENT_DASHBOARD_LTI'):
         "lis_person_name_given")
     LTI_LAST_NAME = USER_ENV.get('LTI_LAST_NAME',
         "lis_person_name_family")
-else if DEFAULT_ENV.get('STUDENT_DASHBOARD_LTI', False):
+elif DEFAULT_ENV.get('STUDENT_DASHBOARD_LTI', False):
     INSTALLED_APPS += ('django_lti_auth',)
     if not 'django.contrib.auth.backends.ModelBackend' in AUTHENTICATION_BACKENDS:
         AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
@@ -576,25 +579,25 @@ else if DEFAULT_ENV.get('STUDENT_DASHBOARD_LTI', False):
         "lis_person_name_family")
     
 # controls whether Unizin specific features/data is available from the Canvas Data source
-if USER_ENV['DATA_WAREHOUSE_IS_UNIZIN'] is None:
+if 'DATA_WAREHOUSE_IS_UNIZIN' not in USER_ENV:
     DATA_WAREHOUSE_IS_UNIZIN = DEFAULT_ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)
 else:
     DATA_WAREHOUSE_IS_UNIZIN = USER_ENV.get("DATA_WAREHOUSE_IS_UNIZIN")
 
 # This is used to fix ids from Canvas Data which are incremented by some large number
-if USER_ENV['CANVAS_DATA_ID_INCREMENT'] is None:
+if 'CANVAS_DATA_ID_INCREMENT' not in USER_ENV:
     CANVAS_DATA_ID_INCREMENT = DEFAULT_ENV.get("CANVAS_DATA_ID_INCREMENT", 17700000000000000)
 else:
     CANVAS_DATA_ID_INCREMENT = USER_ENV.get("CANVAS_DATA_ID_INCREMENT")
 
 # Allow enabling/disabling the View options globally
-if USER_ENV['VIEWS_DISABLED'] is None:
+if 'VIEWS_DISABLED' not in USER_ENV:
     VIEWS_DISABLED = DEFAULT_ENV.get('VIEWS_DISABLED', [])
 else:
     VIEWS_DISABLED = USER_ENV.get('VIEWS_DISABLED')
 
 # Time to run cron
-if USER_ENV['RUN_AT_TIMES'] is None:
+if 'RUN_AT_TIMES' not in USER_ENV:
     RUN_AT_TIMES = DEFAULT_ENV.get('RUN_AT_TIMES', [])
 else:
     RUN_AT_TIMES = USER_ENV.get('RUN_AT_TIMES')
@@ -613,27 +616,27 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 # Number of weeks max to allow by default. some begin/end dates in Canvas aren't correct
-if USER_ENV['MAX_DEFAULT_WEEKS'] is None:
+if 'MAX_DEFAULT_WEEKS' not in USER_ENV:
     MAX_DEFAULT_WEEKS = DEFAULT_ENV.get("MAX_DEFAULT_WEEKS", 16)
 else:
     MAX_DEFAULT_WEEKS = USER_ENV.get("MAX_DEFAULT_WEEKS")
 
-if USER_ENV['CLIENT_CACHE_TIME'] is None:
+if 'CLIENT_CACHE_TIME' not in USER_ENV:
     CLIENT_CACHE_TIME = DEFAULT_ENV.get("CLIENT_CACHE_TIME", 3600)
 else:
     CLIENT_CACHE_TIME = USER_ENV.get("CLIENT_CACHE_TIME")
 
-if USER_ENV['CRON_BQ_IN_LIMIT'] is None:
+if 'CRON_BQ_IN_LIMIT' not in USER_ENV:
     CRON_BQ_IN_LIMIT = DEFAULT_ENV.get("CRON_BQ_IN_LIMIT", 20)
 else:
     CRON_BQ_IN_LIMIT = USER_ENV.get("CRON_BQ_IN_LIMIT")
 
-if USER_ENV['CANVAS_FILE_PREFIX'] is None:
+if 'CANVAS_FILE_PREFIX' not in USER_ENV:
     CANVAS_FILE_PREFIX = DEFAULT_ENV.get("CANVAS_FILE_PREFIX", "")
 else:
     CANVAS_FILE_PREFIX = USER_ENV.get("CANVAS_FILE_PREFIX")
 
-if USER_ENV['CANVAS_FILE_POSTFIX'] is None:
+if 'CANVAS_FILE_POSTFIX' not in USER_ENV:
     CANVAS_FILE_POSTFIX = DEFAULT_ENV.get("CANVAS_FILE_POSTFIX", "")
 else:
     CANVAS_FILE_POSTFIX = USER_ENV.get("CANVAS_FILE_POSTFIX")
@@ -642,7 +645,7 @@ else:
 
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
-if USER_ENV['RESOURCE_ACCESS_CONFIG'] is None:
+if 'RESOURCE_ACCESS_CONFIG' not in USER_ENV:
     RESOURCE_ACCESS_CONFIG = DEFAULT_ENV.get("RESOURCE_ACCESS_CONFIG", {})
 else:
     RESOURCE_ACCESS_CONFIG = USER_ENV.get("RESOURCE_ACCESS_CONFIG")
@@ -668,13 +671,13 @@ else:
     MIDDLEWARE += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
 
 # These are mostly needed by Canvas but it should also be in on general 
-if USER_ENV['CSRF_COOKIE_SECURE'] is None:
+if 'CSRF_COOKIE_SECURE' not in USER_ENV:
     CSRF_COOKIE_SECURE = DEFAULT_ENV.get("CSRF_COOKIE_SECURE", False)
 else:
     CSRF_COOKIE_SECURE = USER_ENV.get("CSRF_COOKIE_SECURE")
 
 if CSRF_COOKIE_SECURE:
-    if USER_ENV['CSRF_TRUSTED_ORIGINS'] is None:
+    if 'CSRF_TRUSTED_ORIGINS' not in USER_ENV:
         CSRF_TRUSTED_ORIGINS = DEFAULT_ENV.get("CSRF_TRUSTED_ORIGINS", [])
     else:
         CSRF_TRUSTED_ORIGINS = USER_ENV.get("CSRF_TRUSTED_ORIGINS")
