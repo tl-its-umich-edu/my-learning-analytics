@@ -350,17 +350,17 @@ def grade_distribution(request, course_id=0):
     if df.empty or df['current_grade'].isnull().all():
         return HttpResponse(json.dumps({}), content_type='application/json')
 
-    result = {}
-    result['summary'] = {}
-    result['summary']['current_user_grade'] = df['current_user_grade'].values[0]
-    result['summary']['tot_students'] = df.shape[0]
+    grade_view_data = dict()
+    summary = dict()
+    summary['current_user_grade'] = df['current_user_grade'].values[0]
+    summary['tot_students'] = df.shape[0]
     df = df[df['current_grade'].notnull()]
     df['current_grade'] = df['current_grade'].astype(float)
-    result['summary']['grade_avg'] = df['current_grade'].mean().round(2)
-    result['summary']['median_grade'] = df['current_grade'].median().round(2)
-    result['summary']['show_number_on_bars'] = False
+    summary['grade_avg'] = df['current_grade'].mean().round(2)
+    summary['median_grade'] = df['current_grade'].median().round(2)
+    summary['show_number_on_bars'] = False
     if df['show_number_on_bars'].values[0] == 1:
-        result['summary']['show_number_on_bar'] = True
+        summary['show_number_on_bar'] = True
 
     df.sort_values(by=['current_grade'], inplace=True)
     df.reset_index(drop=True, inplace=True)
@@ -370,15 +370,16 @@ def grade_distribution(request, course_id=0):
     if BinningGrade is not None and not BinningGrade.binning_all:
         df['current_grade'] = df['current_grade'].replace(df['current_grade'].head(BinningGrade.index),
                                                       BinningGrade.value)
-    result['summary']['show_dash_line'] = show_dashed_line(df['current_grade'].iloc[0], BinningGrade)
+    summary['show_dash_line'] = show_dashed_line(df['current_grade'].iloc[0], BinningGrade)
     
     if df[df['current_grade'] > 100.0].shape[0] > 0:
-        result['summary']['graph_upper_limit'] = int((5 * round(float(df['current_grade'].max()) / 5) + 5))
+        summary['graph_upper_limit'] = int((5 * round(float(df['current_grade'].max()) / 5) + 5))
     else:
         df['current_grade'] = df['current_grade'].apply(lambda x: 99.99 if x == 100.00 else x)
-        result['summary']['graph_upper_limit'] = 100
+        summary['graph_upper_limit'] = 100
 
-    result['grades'] = df['current_grade'].values.tolist()
+    grade_view_data['summary'] = summary
+    grade_view_data['grades'] = df['current_grade'].values.tolist()
 
     # json for eventlog
     data = {
@@ -387,7 +388,7 @@ def grade_distribution(request, course_id=0):
     }
     eventlog(request.user, EventLogTypes.EVENT_VIEW_GRADE_DISTRIBUTION.value, extra=data)
 
-    return HttpResponse(json.dumps(result))
+    return HttpResponse(json.dumps(grade_view_data))
 
 
 @permission_required('dashboard.update_user_default_selection_for_views',
