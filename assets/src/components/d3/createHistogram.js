@@ -1,10 +1,12 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import { roundToOneDecimal } from '../../util/math'
+import siteTheme from "../../siteTheme"
 
 function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100,
                             showNumberOnBars = false, showDashedLine = true}) {
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
+  const barColor = siteTheme.palette.secondary.main
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   // data usually will be [50.6, 50.6, 50.6, 50.6, 50.6, 74.28, 74.52, 75.89, 76.69,,.,.,.,.] lowest grades binned
@@ -55,7 +57,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     .attr('width', d => Math.max(0, x(d.x1) - x(d.x0) - 1))
     .attr('y', d => y(d.length))
     .attr('height', d => y(0) - y(d.length))
-    .attr('fill', 'steelblue')
+    .attr('fill', barColor)
 
   // Default is not show count on bar text, in case of AB testing a feature we want to leave it a configurable option
   if (showNumberOnBars) {
