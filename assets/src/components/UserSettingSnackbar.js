@@ -37,6 +37,10 @@ function UserSettingSnackbar (props) {
         vertical: 'bottom',
         horizontal: 'left'
       }}
+      // If a Snackbar requires focus to close it, then content authors should use the role of alertdialog.
+      ContentProps={{
+        'role': 'alertdialog',
+      }}
       open={savedSnackbarOpen}
       // show for 200ms for each of the characters in the message
       autoHideDuration={"{snackbarMessage}".length * 200}
