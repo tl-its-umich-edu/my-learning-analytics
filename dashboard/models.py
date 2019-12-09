@@ -169,7 +169,7 @@ class Course(models.Model):
     show_grade_counts = models.BooleanField(blank=False, null=False, default=False, verbose_name=
                                          "Show Grade Counts")
     GRADING_CHOICES = [('Percent', 'Percent'), ('Point', 'Point'), ]
-    myla_grading_type = models.CharField(verbose_name="Grading Type", max_length=255,
+    show_grade_type = models.CharField(verbose_name="Show Grade Type", max_length=255,
                                          choices=GRADING_CHOICES, default='Percent')
 
     objects = CourseManager()
