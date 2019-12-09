@@ -4,7 +4,7 @@ import IconButton from '@material-ui/core/IconButton'
 import CloseIcon from '@material-ui/icons/Close'
 import Slide from '@material-ui/core/Slide'
 
-function SlideTransition(props) {
+function SlideTransition (props) {
   return <Slide {...props} direction='up' />
 }
 
@@ -39,12 +39,12 @@ function UserSettingSnackbar (props) {
         horizontal: 'left'
       }}
       ContentProps={{
-        'role': 'alertdialog',
+        role: 'alertdialog'
       }}
       open={savedSnackbarOpen}
       autoHideDuration={snackbarDuration}
       TransitionComponent={SlideTransition}
-      transitionDuration={{exit: 400, enter: 400}}
+      transitionDuration={{ exit: 400, enter: 400 }}
       onClose={() => setSavedSnackbarOpen(false)}
       message={<span>{snackbarMessage}</span>}
       action={[
