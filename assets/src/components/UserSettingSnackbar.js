@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react'
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 import CloseIcon from '@material-ui/icons/Close'
-import Fade from '@material-ui/core/Fade';
-import Slide from '@material-ui/core/Slide';
+import Slide from '@material-ui/core/Slide'
 
 function SlideTransition(props) {
-  return <Slide {...props} direction="up" />;
+  return <Slide {...props} direction='up' />
 }
 
 function UserSettingSnackbar (props) {
@@ -31,20 +30,19 @@ function UserSettingSnackbar (props) {
     }
   }, [saved])
 
+  const snackbarDuration = Math.max(snackbarMessage.length * 200, 4000)
+  
   return (
     <Snackbar
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'left'
       }}
-      // If a Snackbar requires focus to close it, then content authors should use the role of alertdialog.
       ContentProps={{
         'role': 'alertdialog',
       }}
       open={savedSnackbarOpen}
-      // show for 200ms for each of the characters in the message
-      autoHideDuration={"{snackbarMessage}".length * 200}
-      // Fade in (or slide in) for 400ms for saccade time for the eye to refocus
+      autoHideDuration={snackbarDuration}
       TransitionComponent={SlideTransition}
       transitionDuration={{exit: 400, enter: 400}}
       onClose={() => setSavedSnackbarOpen(false)}
