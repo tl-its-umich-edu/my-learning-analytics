@@ -1,0 +1,20 @@
+
+
+Welcome to my_learning_analytics's documentation!
+=================================================
+
+.. toctree::
+   :maxdepth: 3
+   
+   CONTRIBUTING.txt
+   LICENSE.txt
+   README.txt
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+
