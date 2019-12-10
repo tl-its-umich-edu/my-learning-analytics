@@ -76,6 +76,8 @@ View options can be controlled at the global and course level. If a view is disa
 
 `VIEWS_DISABLED` is the comma delimited list of views to disable (default empty). The expected name of the view is the same as the view's column name in the `course_view_option` table. For example `VIEWS_DISABLED=show_resources_accessed,show_grade_distribution` will disable both the Resources Accessed and Grade Distribution views.
 
+'show_grade_type' is a field in the 'course' table that can either be 'Percent' or 'Point'. This specifies how the grades should be displayed in the different views in MyLA.  
+
 Note that by default all views are enabled when a course is added.
 
 ### LTI v1.1.1 Configuration
