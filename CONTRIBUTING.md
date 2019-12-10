@@ -27,6 +27,8 @@ Once you have had a chance to discuss the issue with one of the project maintain
 1. Try to create local branches to keep your contributions organized - generally one branch for each issue.
 1. Once you've pushed your changes to your fork, you should see a button on Github to create a pull request from your forked repository to the main project repository.
 
+Reference these github guides on [Forking Projects](https://guides.github.com/activities/forking/) and [Understanding the Github flow](https://guides.github.com/introduction/flow/) for further information. 
+
 ## Testing tips!
 
 1. Connect to the docker and edit some files!
