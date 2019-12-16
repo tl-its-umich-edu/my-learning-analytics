@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
-import siteTheme from "../../siteTheme"
+import siteTheme from '../../siteTheme'
 
 function createHorizontalBar ({ data, width, height, domElement, tip }) {
   const margin = { top: 0, bottom: 0, left: 0, right: 0 }

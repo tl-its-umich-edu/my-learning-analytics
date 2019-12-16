@@ -6,7 +6,7 @@ import GoogleAnalyticsTracking from '../components/GoogleAnalyticsTracking'
 import CourseList from './CourseList'
 import Course from './Course'
 import { ThemeProvider } from '@material-ui/core/styles'
-import siteTheme from "../siteTheme"
+import siteTheme from '../siteTheme'
 
 /*
 Frozen to prevent unintentional changes to this object. This object is strictly readonly.

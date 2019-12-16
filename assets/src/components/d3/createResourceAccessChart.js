@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import d3tip from 'd3-tip'
 import './createResourceAccessChart.css'
-import siteTheme from "../../siteTheme"
+import siteTheme from '../../siteTheme'
 
 /*
   References:
@@ -319,7 +319,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .text('Percentage of All Students in the Selected Grade Range')
     .style('font-size', '14px')
 
-  const yLabel = mainGroup.append('g')
+  mainGroup.append('g')
     .attr('class', 'axis axis--y')
     .attr('transform', 'translate(-5,0)')
     .call(mainYAxis)

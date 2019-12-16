@@ -31,7 +31,7 @@ function UserSettingSnackbar (props) {
   }, [saved])
 
   const snackbarDuration = Math.max(snackbarMessage.length * 200, 4000)
-  
+
   return (
     <Snackbar
       anchorOrigin={{
@@ -62,4 +62,3 @@ function UserSettingSnackbar (props) {
 }
 
 export default UserSettingSnackbar
-
