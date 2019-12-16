@@ -90,7 +90,7 @@ function ResourcesAccessed (props) {
               <FormGroup row>
                 <p className={classes.controlText}>Select resource types to be viewed:</p>
                 {
-                  resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='primary' defaultChecked onChange={onChangeResourceTypeHandler} value={el} />} label={el} />))
+                  resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='secondary' defaultChecked onChange={onChangeResourceTypeHandler} value={el} />} label={el} />))
                 }
               </FormGroup>
             </FormControl>
@@ -241,7 +241,8 @@ function ResourcesAccessed (props) {
                     max={minMaxWeek[1]}
                     onWeekChange={onWeekChangeHandler}
                   />
-                ) : ''}
+                ) : ''
+            }
             <div className={classes.formController}>
               <p className={classes.controlText}>Resources accessed from week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now) ' : ''}</b> by students with these grades:</p>
               <FormControl>
@@ -259,13 +260,17 @@ function ResourcesAccessed (props) {
                   <MenuItem value='70-79'>70-79%</MenuItem>
                 </Select>
               </FormControl>
-              {showSaveSetting
-                ? <Checkbox
-                  checked={saveSettingClicked}
-                  onChange={() => setSaveSettingClicked(!saveSettingClicked)}
-                  value='checked'
-                  color='primary' />
-                : <div style={{ padding: '10px' }} />
+              {
+                showSaveSetting
+                  ? (
+                    <Checkbox
+                      checked={saveSettingClicked}
+                      onChange={() => setSaveSettingClicked(!saveSettingClicked)}
+                      value='checked'
+                      color='secondary'
+                    />
+                  )
+                  : <div style={{ padding: '10px' }} />
               }
               <div style={{ padding: '15px 2px' }}>{saveLabel}</div>
             </div>
@@ -275,7 +280,8 @@ function ResourcesAccessed (props) {
             <UserSettingSnackbar
               saved={userSettingSaved}
               response={userSettingResponse}
-              successMessage={'Resource filter setting saved!'} />
+              successMessage='Resource filter setting saved!'
+            />
             {(resourceAccessData && dataLoaded) || resourceTypeFilter.length === 0
               ? ResourceAccessChartBuilder(resourceAccessData)
               : <Spinner />}

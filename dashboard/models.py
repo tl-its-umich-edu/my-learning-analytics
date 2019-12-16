@@ -56,7 +56,7 @@ class UserDefaultQuerySet(models.QuerySet):
                             user_sis_name=str(sis_user_name),
                             default_view_type=str(default_view_type)).default_view_value
         except (self.model.DoesNotExist, Exception) as e:
-            logger.debug(f"""Couldn't get the default value for default_view_type: {default_view_type} 
+            logger.debug(f"""Couldn't get the default value for default_view_type: {default_view_type}
                 in course: {course_id} for user: {sis_user_name}: {e} """)
             return None
 
@@ -168,6 +168,9 @@ class Course(models.Model):
     date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)
     show_grade_counts = models.BooleanField(blank=False, null=False, default=False, verbose_name=
                                          "Show Grade Counts")
+    GRADING_CHOICES = [('Percent', 'Percent'), ('Point', 'Point'), ]
+    show_grade_type = models.CharField(verbose_name="Show Grade Type", max_length=255,
+                                         choices=GRADING_CHOICES, default='Percent')
 
     objects = CourseManager()
 
