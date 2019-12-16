@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
-import siteTheme from "../../siteTheme"
+import siteTheme from '../../siteTheme'
 
 function createProgressBar ({ data, width, height, domElement, tip }) {
   const margin = { top: 20, right: 20, bottom: 20, left: 50 }

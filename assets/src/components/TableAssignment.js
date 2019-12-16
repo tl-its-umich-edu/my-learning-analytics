@@ -92,26 +92,35 @@ function CustomAssignmentTable (props) {
   const data = generateAssignmentTable(tableData)
     .map(row => {
       const { percentOfFinalGrade, graded, pointsPossible, score, dropLowest, dropHighest } = row.pop()
-      row.push(<HorizontalBar
-        data={[{ label: 'grade', data: percentOfFinalGrade, graded, pointsPossible, score, dropLowest, dropHighest }]}
-        width={200}
-        height={20}
-        tip={createToolTip(d =>
-          renderToString(
-            <Paper className={classes.paper}>
-              <Typography component="p">Score: {toolTipContent(d)}</Typography>
-              {d.dropLowest != 0 ?
-                <Typography component="p">
-                  The lowest <strong>{d.dropLowest}</strong> scores will dropped from this assigment group
-                </Typography> : ''
-              }
-              {d.dropHighest != 0 ?
-                <Typography component="p">
-                  The highest <strong>{d.dropHighest}</strong> scores will dropped from this assigment group
-                </Typography> : ''}
-            </Paper>
-          ))}
-      />)
+      row.push(
+        <HorizontalBar
+          data={[{ label: 'grade', data: percentOfFinalGrade, graded, pointsPossible, score, dropLowest, dropHighest }]}
+          width={200}
+          height={20}
+          tip={createToolTip(d =>
+            renderToString(
+              <Paper className={classes.paper}>
+                <Typography component='p'>Score: {toolTipContent(d)}</Typography>
+                {
+                  d.dropLowest !== 0
+                    ? (
+                      <Typography component='p'>
+                        The lowest <strong>{d.dropLowest}</strong> scores will dropped from this assigment group
+                      </Typography>
+                    ) : ''
+                }
+                {
+                  d.dropHighest !== 0
+                    ? (
+                      <Typography component='p'>
+                        The highest <strong>{d.dropHighest}</strong> scores will dropped from this assigment group
+                      </Typography>
+                    ) : ''
+                }
+              </Paper>
+            ))}
+        />
+      )
       return row
     })
 
@@ -169,12 +178,12 @@ function CustomAssignmentTable (props) {
             borderAndCurrentWeekStyle['paddingLeft'] = 0
           }
           return (
-            j === 2 ?
-              <TableCell title={displayProp ? prop : null} className={classes.tableCell} key={j}
-                         style={borderAndCurrentWeekStyle}>
+            j === 2
+              ? <TableCell title={displayProp ? prop : null} className={classes.tableCell} key={j}
+                style={borderAndCurrentWeekStyle}>
                 {displayProp ? prop : null}
-              </TableCell> :
-              <TableCell className={classes.tableCell} key={j} style={borderAndCurrentWeekStyle}>
+              </TableCell>
+              : <TableCell className={classes.tableCell} key={j} style={borderAndCurrentWeekStyle}>
                 {displayProp ? prop : null}
               </TableCell>
 

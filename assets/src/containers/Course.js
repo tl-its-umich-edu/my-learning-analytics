@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { BrowserRouter as Router, Route, withRouter } from 'react-router-dom'
+import { BrowserRouter as Router, Route, withRouter } from 'react-router-dom' // eslint-disable-line
 import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
 import GradeDistribution from './GradeDistribution'
@@ -16,9 +16,9 @@ function Course (props) {
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
-  if (error.message === "Not Found") return (<WarningBanner>Course {courseId} does not exist.</WarningBanner>)
-  else if (error.message === "Forbidden") return (<WarningBanner>You do not have access to course {courseId}.</WarningBanner>)
-  else if (error) return (<WarningBanner />) 
+  if (error.message === 'Not Found') return (<WarningBanner>Course {courseId} does not exist.</WarningBanner>)
+  else if (error.message === 'Forbidden') return (<WarningBanner>You do not have access to course {courseId}.</WarningBanner>)
+  else if (error) return (<WarningBanner />)
   if (loaded && isObjectEmpty(courseInfo)) return (<WarningBanner>My Learning Analytics is not enabled for this course.</WarningBanner>)
 
   return (

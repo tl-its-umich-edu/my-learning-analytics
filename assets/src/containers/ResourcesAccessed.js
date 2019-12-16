@@ -1,3 +1,5 @@
+/* global fetch */
+
 import React, { useEffect, useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
@@ -79,27 +81,26 @@ function ResourcesAccessed (props) {
     [saveSettingClicked]
   )
 
-  function filterCheckbox() {
+  function filterCheckbox () {
     if (resourceAccessData) {
       if (resourceTypes.length > 1) {
-        return(
-          <div style={{ textAlign: "center" }}>
+        return (
+          <div style={{ textAlign: 'center' }}>
             <FormControl>
               <FormGroup row>
                 <p className={classes.controlText}>Select resource types to be viewed:</p>
                 {
-                  resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='secondary' defaultChecked={true} onChange={onChangeResourceTypeHandler} value={el}></Checkbox>} label={el}/>))
+                  resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='secondary' defaultChecked onChange={onChangeResourceTypeHandler} value={el} />} label={el} />))
                 }
               </FormGroup>
             </FormControl>
           </div>
         )
-      }
-      else if (resourceTypes.length === 1) {
-        let message = "You are viewing " + resourceTypes[0] + " data"
-        return(
-          <div style={{ textAlign: "center" }}>
-            <p style={{fontWeight: "bold"}}>{message}</p>
+      } else if (resourceTypes.length === 1) {
+        const message = 'You are viewing ' + resourceTypes[0] + ' data'
+        return (
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontWeight: 'bold' }}>{message}</p>
           </div>
         )
       }
@@ -145,7 +146,6 @@ function ResourcesAccessed (props) {
     }
   }, [courseInfo])
 
-
   useEffect(() => {
     if (userSettingLoaded) {
       if (isObjectEmpty(userSetting.default)) {
@@ -171,11 +171,10 @@ function ResourcesAccessed (props) {
           setResourceAccessData(data)
           setDataLoaded(true)
         })
-        .catch(err => {
+        .catch(_ => {
           setResourceAccessData({})
         })
-    }
-    else {
+    } else {
       setResourceAccessData({})
     }
   }, [dataControllerLoad, weekRange, resourceGradeFilter, resourceTypeFilter])
@@ -203,8 +202,7 @@ function ResourcesAccessed (props) {
     const value = event.target.value
     if (event.target.checked && !resourceTypeFilter.includes(value)) {
       setResourceTypeFilter([...resourceTypeFilter, value])
-    }
-    else if (!event.target.checked) {
+    } else if (!event.target.checked) {
       setResourceTypeFilter(resourceTypeFilter.filter(val => val !== value))
     }
   }
@@ -212,11 +210,9 @@ function ResourcesAccessed (props) {
   const ResourceAccessChartBuilder = (resourceData) => {
     if (resourceTypeFilter.length === 0) {
       return (<AlertBanner>Please select a resource type to display data.</AlertBanner>)
-    }
-    else if (!resourceData || Object.keys(resourceData).length === 0) {
+    } else if (!resourceData || Object.keys(resourceData).length === 0) {
       return (<AlertBanner>Resource data for your selections is not available.</AlertBanner>)
-    }
-    else {
+    } else {
       return (
         <Grid item xs={12} lg={10}>
           <ResourceAccessChart
@@ -232,16 +228,21 @@ function ResourcesAccessed (props) {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Typography variant='h5' gutterBottom className="title">Resources Accessed</Typography>
-            {dataControllerLoad == 2 ? <RangeSlider
-              curWeek={curWeek}
-              className="slider"
-              startWeek={weekRange[0]}
-              endWeek={weekRange[1]}
-              min={minMaxWeek[0]}
-              max={minMaxWeek[1]}
-              onWeekChange={onWeekChangeHandler}
-            /> : ''}
+            <Typography variant='h5' gutterBottom className='title'>Resources Accessed</Typography>
+            {
+              dataControllerLoad === 2
+                ? (
+                  <RangeSlider
+                    curWeek={curWeek}
+                    className='slider'
+                    startWeek={weekRange[0]}
+                    endWeek={weekRange[1]}
+                    min={minMaxWeek[0]}
+                    max={minMaxWeek[1]}
+                    onWeekChange={onWeekChangeHandler}
+                  />
+                ) : ''
+            }
             <div className={classes.formController}>
               <p className={classes.controlText}>Resources accessed from week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now) ' : ''}</b> by students with these grades:</p>
               <FormControl>
@@ -250,23 +251,26 @@ function ResourcesAccessed (props) {
                   onChange={handleResourceGradeFilter}
                   inputProps={{
                     name: 'grade',
-                    id: 'grade-range',
+                    id: 'grade-range'
                   }}
                 >
-                  <MenuItem value="All">All</MenuItem>
-                  <MenuItem value="90-100">90-100%</MenuItem>
-                  <MenuItem value="80-89">80-89%</MenuItem>
-                  <MenuItem value="70-79">70-79%</MenuItem>
+                  <MenuItem value='All'>All</MenuItem>
+                  <MenuItem value='90-100'>90-100%</MenuItem>
+                  <MenuItem value='80-89'>80-89%</MenuItem>
+                  <MenuItem value='70-79'>70-79%</MenuItem>
                 </Select>
               </FormControl>
-              {showSaveSetting
-                ?
-                  <Checkbox
-                    checked={saveSettingClicked}
-                    onChange={() => setSaveSettingClicked(!saveSettingClicked)}
-                    value='checked'
-                    color='secondary'/>
-              : <div style={{ padding: '10px' }}></div>
+              {
+                showSaveSetting
+                  ? (
+                    <Checkbox
+                      checked={saveSettingClicked}
+                      onChange={() => setSaveSettingClicked(!saveSettingClicked)}
+                      value='checked'
+                      color='secondary'
+                    />
+                  )
+                  : <div style={{ padding: '10px' }} />
               }
               <div style={{ padding: '15px 2px' }}>{saveLabel}</div>
             </div>
@@ -276,10 +280,11 @@ function ResourcesAccessed (props) {
             <UserSettingSnackbar
               saved={userSettingSaved}
               response={userSettingResponse}
-              successMessage={'Resource filter setting saved!'} />
+              successMessage='Resource filter setting saved!'
+            />
             {(resourceAccessData && dataLoaded) || resourceTypeFilter.length === 0
               ? ResourceAccessChartBuilder(resourceAccessData)
-              : <Spinner/>}
+              : <Spinner />}
           </Paper>
         </Grid>
       </Grid>

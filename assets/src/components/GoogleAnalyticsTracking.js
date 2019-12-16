@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react"
-import GoogleAnalytics from "react-ga"
+import { useState, useEffect } from 'react'
+import GoogleAnalytics from 'react-ga'
 import { withRouter } from 'react-router-dom'
 
 function GoogleAnalyticsTracking (props) {
@@ -17,7 +17,7 @@ function GoogleAnalyticsTracking (props) {
 
   useEffect(() => {
     const page = window.location.pathname + window.location.search + window.location.hash
-    if (gaId && page != previousPage) {
+    if (gaId && page !== previousPage) {
       setPreviousPage(page)
       GoogleAnalytics.pageview(page)
     }

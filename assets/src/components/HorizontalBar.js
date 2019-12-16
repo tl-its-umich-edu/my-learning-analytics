@@ -7,9 +7,8 @@ function HorizontalBar (props) {
   useCreateChart({ ...props, domElement }, createHorizontalBar)
 
   return (
-    <div ref={domElement => setDomElement(domElement)}/>
+    <div ref={domElement => setDomElement(domElement)} />
   )
-
 }
 
 export default HorizontalBar
