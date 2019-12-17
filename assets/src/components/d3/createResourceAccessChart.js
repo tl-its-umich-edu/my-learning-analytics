@@ -84,7 +84,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   const miniMargin = { top: 50, right: 10, bottom: 50, left: 10 }
   const miniWidth = 100 - miniMargin.left - miniMargin.right
 
-  const mainXScale = d3.scaleLinear().range([0, mainWidth])
+  const mainXScale = d3.scaleLinear().range([150, mainWidth])
   const miniXScale = d3.scaleLinear().range([0, miniWidth])
   let mainYScale = d3.scaleBand().range([0, miniHeight])
   const miniYScale = d3.scaleBand().range([0, miniHeight])
@@ -106,16 +106,16 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .data(resourceData, d => d.resource_name)
 
     // Initialize
-    bar.attr('x', 0)
+    bar.attr('x', 150)
       .attr('y', d => mainYScale(d.resource_name))
-      .attr('width', d => mainXScale(d.total_count))
+      .attr('width', d => mainXScale(d.total_count) - 150)
       .attr('height', mainYScale.bandwidth())
 
     bar.enter()
       .append('rect')
-      .attr('x', 0)
+      .attr('x', 150)
       .attr('y', d => mainYScale(d.resource_name))
-      .attr('width', d => mainXScale(d.total_count))
+      .attr('width', d => mainXScale(d.total_count) - 150)
       .attr('height', mainYScale.bandwidth())
       .attr('class', 'bar')
       .attr('fill', d => d.self_access_count > 0
@@ -132,7 +132,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .enter()
       .append('text')
       .attr('class', 'label')
-      .attr('x', d => mainXScale(d.total_count) + 3 + mainMargin.left)
+      .attr('x', d => mainXScale(d.total_count) + 3 + mainMargin.left )
       .attr('y', d => mainYScale(d.resource_name) + mainYScale.bandwidth() / 2 + mainMargin.top)
       .attr('dx', -10)
       .attr('dy', '.35em')
@@ -324,7 +324,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   mainGroup.append('g')
     .attr('class', 'axis axis--y')
-    .attr('transform', 'translate(-5,0)')
+    .attr('transform', 'translate(145,0)')
     .call(mainYAxis)
 
   // Draw mini bars
@@ -359,20 +359,22 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     let link = d.split('|')[0]
     let name = d.split('|')[1]
     const a = d3.select(this.parentNode).append('a')
-      .attr('xlink:title', "HI")
+      .attr('xlink:title', name)
       .attr('xlink:target', '_blank')
       .attr('xlink:href', link)
+      .attr('text-anchor', 'start')
     a.node().appendChild(this)
 
     let icon = d.split('|')[2]
     d3.select(this).insert('foreignObject')
-      .attr("x", -80)
+      .attr('x', -180)
       .attr('y', -6)
-      .attr("width", 32)
-      .attr("height", 32)
-      .append("xhtml:i")
-      .attr('class', icon);
+      .attr('width', 32)
+      .attr('height', 32)
+      .append('xhtml:i')
+      .attr('class', icon)
+
+    d3.select('text').attr('x', -150)
   })
 }
-
 export default createResourceAccessChart
