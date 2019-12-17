@@ -329,13 +329,13 @@ def resource_access_within_week(request, course_id=0):
     output_df['resource_id_part'], output_df['resource_name_part'] = output_df['resource_id_name'].str.split(';', 1).str
 
     output_df['resource_name'] = output_df.apply(
-        lambda row: 
-            RESOURCE_URLS[row.resource_type]["prefix"] + 
-            row.resource_id_part + 
-            RESOURCE_URLS[row.resource_type]["postfix"] + 
-            CANVAS_FILE_ID_NAME_SEPARATOR + 
-            row.resource_name_part + CANVAS_FILE_ID_NAME_SEPARATOR + 
-            RESOURCE_VALUES[INVERSE[row.resource_type]]['icon'], 
+        lambda row:
+            RESOURCE_URLS[row.resource_type]["prefix"] +
+            row.resource_id_part +
+            RESOURCE_URLS[row.resource_type]["postfix"] +
+            CANVAS_FILE_ID_NAME_SEPARATOR +
+            row.resource_name_part + CANVAS_FILE_ID_NAME_SEPARATOR +
+            RESOURCE_VALUES[INVERSE[row.resource_type]]['icon'],
         axis=1)
     output_df.drop(columns=['resource_id_part', 'resource_name_part', 'resource_id_name'], inplace=True)
 
