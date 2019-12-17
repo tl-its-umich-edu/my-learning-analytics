@@ -110,7 +110,7 @@ function AssignmentTable (props) {
                     ? isPreviousWeekTheSame(a.week, key)
                       ? ''
                       : `Week ${a.week}`
-                    : ''
+                    : 'No due date'
                 }
               </TableCell>
               <TableCell
