@@ -3,7 +3,7 @@ import { adjustViewport } from '../../util/chart'
 import d3tip from 'd3-tip'
 import './createResourceAccessChart.css'
 import '@fortawesome/fontawesome-free'
-import siteTheme from "../../siteTheme"
+import siteTheme from '../../siteTheme'
 
 /*
   References:
@@ -263,8 +263,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .tickSize(0)
     .tickFormat(d => truncate(d.split('|')[1]))
 
-  
-
   // Brush
   const brush = d3.brushY()
     .extent([[0, 0], [miniWidth, miniHeight]])
@@ -324,7 +322,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .text('Percentage of All Students in the Selected Grade Range')
     .style('font-size', '14px')
 
-  const yLabel = mainGroup.append('g')
+  mainGroup.append('g')
     .attr('class', 'axis axis--y')
     .attr('transform', 'translate(-5,0)')
     .call(mainYAxis)

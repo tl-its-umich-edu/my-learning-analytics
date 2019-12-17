@@ -126,6 +126,7 @@
     "react-router-dom": "^5.0.0",
     "resolve": "1.10.0",
     "sass-loader": "~7.1.0",
+    "standard": "^14.3.1",
     "style-loader": "~0.23.1",
     "terser-webpack-plugin": "1.2.3",
     "typeface-roboto": "0.0.54",

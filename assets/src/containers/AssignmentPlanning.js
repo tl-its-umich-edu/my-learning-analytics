@@ -123,7 +123,7 @@ function AssignmentPlanning (props) {
     }
   }
 
-  if (assignmentError) return (<WarningBanner/>)
+  if (assignmentError) return (<WarningBanner />)
 
   return (
     <div className={classes.root}>

@@ -4,8 +4,7 @@ import {
   average,
   roundToOneDecimal,
   roundToTwoDecimal,
-  median,
-  pearsonCorrelation
+  median
 } from '../../util/math'
 
 describe('average', () => {
