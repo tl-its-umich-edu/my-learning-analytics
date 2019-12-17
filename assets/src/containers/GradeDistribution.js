@@ -49,7 +49,7 @@ function GradeDistribution (props) {
     }
   }, [userSettingLoaded])
 
-  const [userSettingSaved, _, userSettingResponse] = useSetUserSetting(
+  const [userSettingSaved, , userSettingResponse] = useSetUserSetting(
     courseId,
     { grade: showGrade },
     settingChanged,
@@ -59,19 +59,19 @@ function GradeDistribution (props) {
   if (gradeError) return (<WarningBanner />)
 
   const BuildGradeView = () => {
-    const grades = gradeData.map(x => x.current_grade)
+    const grades = gradeData.grades
 
     const tableRows = [
-      ['Average grade', <strong key={0}>{gradeData[0].grade_avg}%</strong>],
-      ['Median grade', <strong key={1}>{gradeData[0].median_grade}%</strong>],
-      ['Number of students', <strong key={2}>{gradeData[0].tot_students}</strong>],
+      ['Average grade', <strong key={0}>{gradeData.summary.grade_avg}%</strong>],
+      ['Median grade', <strong key={1}>{gradeData.summary.median_grade}%</strong>],
+      ['Number of students', <strong key={2}>{gradeData.summary.tot_students}</strong>],
       !user.admin && showGrade
         ? ([
           'My grade',
           <strong key={0}>
             {
-              gradeData[0].current_user_grade
-                ? `${roundToOneDecimal(gradeData[0].current_user_grade)}%`
+              gradeData.summary.current_user_grade
+                ? `${roundToOneDecimal(gradeData.summary.current_user_grade)}%`
                 : 'There are no grades yet for you in this course'
             }
           </strong>
@@ -84,7 +84,7 @@ function GradeDistribution (props) {
         ? (
           <Typography align='right'>{'Show my grade'}
             <Checkbox
-              color='primary'
+              color='secondary'
               checked={showGrade}
               onChange={() => {
                 setSettingChanged(true)
@@ -108,10 +108,10 @@ function GradeDistribution (props) {
             aspectRatio={0.3}
             xAxisLabel='Grade %'
             yAxisLabel='Number of Students'
-            myGrade={showGrade ? gradeData[0].current_user_grade : null}
-            maxGrade={gradeData[0].graph_upper_limit}
-            showNumberOnBars={gradeData[0].show_number_on_bars}
-            showDashedLine={gradeData[0].show_dash_line}
+            myGrade={showGrade ? gradeData.summary.current_user_grade : null}
+            maxGrade={gradeData.summary.graph_upper_limit}
+            showNumberOnBars={gradeData.summary.show_number_on_bars}
+            showDashedLine={gradeData.summary.show_dash_line}
           />
         </Grid>
       </Grid>

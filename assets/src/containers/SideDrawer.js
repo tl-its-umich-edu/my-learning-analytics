@@ -47,7 +47,7 @@ function SideDrawer (props) {
               onClick={() => setSelectedIndex(key)}
             >
               <ListItemIcon><props.icon /></ListItemIcon>
-              <ListItemText primary={props.title} className={classes.text}/>
+              <ListItemText primary={props.title} className={classes.text} />
             </ListItem>
           </Link>
         ))}

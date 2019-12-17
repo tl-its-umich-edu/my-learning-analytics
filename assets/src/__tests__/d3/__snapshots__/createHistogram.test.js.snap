@@ -8,43 +8,43 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
   >
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.6"
+        width="16.60000000000001"
         x="41"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.6"
-        x="58.6"
+        width="16.599999999999994"
+        x="58.60000000000001"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.599999999999994"
+        width="16.59999999999998"
         x="76.2"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.60000000000001"
-        x="93.8"
+        width="16.600000000000023"
+        x="93.79999999999998"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.599999999999994"
         x="111.4"
@@ -53,7 +53,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.599999999999994"
         x="129"
@@ -62,7 +62,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.600000000000023"
         x="146.6"
@@ -71,7 +71,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.599999999999994"
         x="164.20000000000002"
@@ -80,7 +80,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.599999999999994"
         x="181.8"
@@ -89,7 +89,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.599999999999994"
         x="199.4"
@@ -98,25 +98,25 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.599999999999994"
+        width="16.600000000000023"
         x="217"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.599999999999994"
-        x="234.6"
+        width="16.599999999999966"
+        x="234.60000000000002"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.600000000000023"
         x="252.2"
@@ -125,7 +125,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.600000000000023"
         x="269.8"
@@ -134,7 +134,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.599999999999966"
         x="287.40000000000003"
@@ -143,7 +143,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.600000000000023"
         x="305"
@@ -152,43 +152,43 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.600000000000023"
+        width="16.599999999999966"
         x="322.6"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.599999999999966"
-        x="340.20000000000005"
+        width="16.600000000000023"
+        x="340.2"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.599999999999966"
+        width="16.600000000000023"
         x="357.8"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.600000000000023"
-        x="375.4"
+        width="16.599999999999966"
+        x="375.40000000000003"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.599999999999966"
         x="393"
@@ -197,7 +197,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.600000000000023"
         x="410.59999999999997"
@@ -206,25 +206,25 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.600000000000023"
+        width="16.60000000000008"
         x="428.2"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.599999999999966"
-        x="445.8"
+        width="16.59999999999991"
+        x="445.80000000000007"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.600000000000023"
         x="463.4"
@@ -233,7 +233,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.600000000000023"
         x="481"
@@ -242,7 +242,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.600000000000023"
         x="498.6"
@@ -251,7 +251,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.600000000000023"
         x="516.2"
@@ -260,25 +260,25 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.59999999999991"
+        width="16.599999999999795"
         x="533.8000000000001"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.600000000000023"
-        x="551.4"
+        width="16.600000000000136"
+        x="551.3999999999999"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.600000000000023"
         x="569"
@@ -287,7 +287,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.600000000000023"
         x="586.6"
@@ -296,7 +296,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.600000000000023"
         x="604.2"
@@ -305,25 +305,25 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.600000000000023"
+        width="16.59999999999991"
         x="621.8000000000001"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
-        width="16.59999999999991"
-        x="639.4000000000001"
+        width="16.600000000000023"
+        x="639.4"
         y="380"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="16.600000000000023"
         x="657"
@@ -332,34 +332,34 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
-        height="163.63636363636363"
-        width="16.600000000000023"
+        fill="#4682B4"
+        height="163.63636363636365"
+        width="16.59999999999991"
         x="674.6"
-        y="216.36363636363637"
+        y="216.36363636363635"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
+        height="98.18181818181819"
+        width="16.600000000000136"
+        x="692.1999999999999"
+        y="281.8181818181818"
+      />
+    </g>
+    <g>
+      <rect
+        fill="#4682B4"
         height="98.18181818181819"
         width="16.59999999999991"
-        x="692.2"
+        x="709.8000000000001"
         y="281.8181818181818"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
-        height="98.18181818181819"
-        width="16.600000000000023"
-        x="709.8"
-        y="281.8181818181818"
-      />
-    </g>
-    <g>
-      <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="130.9090909090909"
         width="16.600000000000023"
         x="727.4"
@@ -368,79 +368,79 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
-        height="163.63636363636363"
-        width="16.59999999999991"
+        fill="#4682B4"
+        height="163.63636363636365"
+        width="16.600000000000023"
         x="745"
-        y="216.36363636363637"
+        y="216.36363636363635"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="98.18181818181819"
-        width="16.600000000000023"
-        x="762.5999999999999"
+        width="16.59999999999991"
+        x="762.6"
         y="281.8181818181818"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="261.8181818181818"
         width="16.600000000000023"
         x="780.1999999999999"
-        y="118.18181818181819"
+        y="118.18181818181817"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
-        height="163.63636363636363"
+        fill="#4682B4"
+        height="163.63636363636365"
         width="16.600000000000023"
         x="797.8"
-        y="216.36363636363637"
+        y="216.36363636363635"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="261.8181818181818"
         width="16.600000000000023"
         x="815.4"
-        y="118.18181818181819"
+        y="118.18181818181817"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="229.0909090909091"
-        width="16.600000000000023"
+        width="16.600000000000136"
         x="833"
         y="150.9090909090909"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="360"
-        width="16.59999999999991"
-        x="850.6"
+        width="16.599999999999795"
+        x="850.6000000000001"
         y="20"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="327.27272727272725"
         width="16.600000000000023"
         x="868.1999999999999"
-        y="52.72727272727275"
+        y="52.727272727272734"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="229.0909090909091"
         width="16.600000000000023"
         x="885.8"
@@ -449,16 +449,16 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
     </g>
     <g>
       <rect
-        fill="steelblue"
-        height="65.45454545454544"
+        fill="#4682B4"
+        height="65.4545454545455"
         width="16.600000000000023"
         x="903.4"
-        y="314.54545454545456"
+        y="314.5454545454545"
       />
     </g>
     <g>
       <rect
-        fill="steelblue"
+        fill="#4682B4"
         height="0"
         width="0"
         x="921"
@@ -617,7 +617,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
       <g
         class="tick"
         opacity="1"
-        transform="translate(0,315.04545454545456)"
+        transform="translate(0,315.0454545454545)"
       >
         <line
           stroke="currentColor"
@@ -668,7 +668,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
       <g
         class="tick"
         opacity="1"
-        transform="translate(0,118.68181818181819)"
+        transform="translate(0,118.68181818181817)"
       >
         <line
           stroke="currentColor"
@@ -685,7 +685,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
       <g
         class="tick"
         opacity="1"
-        transform="translate(0,53.22727272727275)"
+        transform="translate(0,53.227272727272734)"
       >
         <line
           stroke="currentColor"
@@ -724,17 +724,17 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
       font-weight="bold"
       line-height="1.46429em"
       text-anchor="start"
-      x="605.84"
+      x="595.84"
       y="35"
     >
-      My Grade:76.8%
+      My Grade: 76.8%
     </text>
     <line
       stroke="rgba(0, 0, 0, 0.54)"
       stroke-dasharray="3, 3"
       transform="translate(0, 380)"
-      x1="691.2"
-      x2="691.2"
+      x1="691.1999999999999"
+      x2="691.1999999999999"
       y1="-430"
       y2="0"
     />
@@ -743,7 +743,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
       font-size="0.875rem"
       line-height="1.46429em"
       text-anchor="start"
-      x="651.2"
+      x="651.1999999999999"
       y="15"
     >
       &lt;74%

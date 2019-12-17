@@ -88,21 +88,21 @@ function CourseList (props) {
         {
           user.isSuperuser
             ? <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Paper className={classes.paper}>
-                    <Typography variant='h5' gutterBottom>Select a course of your choice</Typography>
-                  </Paper>
-                </Grid>
+              <Grid item xs={12}>
+                <Paper className={classes.paper}>
+                  <Typography variant='h5' gutterBottom>Select a course of your choice</Typography>
+                </Paper>
               </Grid>
+            </Grid>
             : <Grid container spacing={2}>
-                <Grid item xs={12} className={classes.container}>
-                  {user.relatedCourses.map((course, key) =>
-                    <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
-                      <SelectCard cardData={{ title: course.course_name }} />
-                    </Link>
-                  )}
-                </Grid>
+              <Grid item xs={12} className={classes.container}>
+                {user.relatedCourses.map((course, key) =>
+                  <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
+                    <SelectCard cardData={{ title: course.course_name }} />
+                  </Link>
+                )}
               </Grid>
+            </Grid>
         }
       </div>
     </>

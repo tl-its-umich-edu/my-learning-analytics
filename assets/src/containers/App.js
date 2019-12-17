@@ -5,6 +5,8 @@ import { matchPath } from 'react-router'
 import GoogleAnalyticsTracking from '../components/GoogleAnalyticsTracking'
 import CourseList from './CourseList'
 import Course from './Course'
+import { ThemeProvider } from '@material-ui/core/styles'
+import siteTheme from '../siteTheme'
 
 /*
 Frozen to prevent unintentional changes to this object. This object is strictly readonly.
@@ -30,12 +32,12 @@ function App (props) {
   const courseId = coursePageMatch ? coursePageMatch.params.courseId : null
 
   return (
-    <>
+    <ThemeProvider theme={siteTheme}>
       <GoogleAnalyticsTracking gaId={myla_globals.google_analytics_id} />
       <Route path='/' exact render={props => <CourseList {...props} user={user} />} />
       <Route path='/courses' exact render={props => <CourseList {...props} user={user} />} />
       {courseId ? <Course user={user} courseId={courseId} {...props} /> : null}
-    </>
+    </ThemeProvider>
   )
 }
 

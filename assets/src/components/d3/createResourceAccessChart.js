@@ -2,6 +2,7 @@ import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import d3tip from 'd3-tip'
 import './createResourceAccessChart.css'
+import siteTheme from '../../siteTheme'
 
 /*
   References:
@@ -11,8 +12,8 @@ import './createResourceAccessChart.css'
     - D3 V4 Changes: https://github.com/d3/d3/blob/master/CHANGES.md
 */
 
-const accessedResourceColor = 'steelblue'
-const notAccessedResourceColor = 'gray'
+const accessedResourceColor = siteTheme.palette.secondary.main
+const notAccessedResourceColor = siteTheme.palette.negative.main
 const mainMargin = { top: 50, right: 10, bottom: 50, left: 200 }
 
 const toolTip = d3tip().attr('class', 'd3-tip')
@@ -259,8 +260,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .tickSize(0)
     .tickFormat(d => d.split('|')[1])
 
-  
-
   // Brush
   const brush = d3.brushY()
     .extent([[0, 0], [miniWidth, miniHeight]])
@@ -320,13 +319,10 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .text('Percentage of All Students in the Selected Grade Range')
     .style('font-size', '14px')
 
-  const yLabel = mainGroup.append('g')
+  mainGroup.append('g')
     .attr('class', 'axis axis--y')
     .attr('transform', 'translate(-5,0)')
     .call(mainYAxis)
-
-  yLabel.selectAll('text')
-    .attr('fill', 'steelblue')
 
   // Draw mini bars
   miniGroup.selectAll('.bar')
@@ -363,9 +359,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('xlink:href', link)
     a.node().appendChild(this)
   })
-
-  yLabel.selectAll('text')
-    .attr('fill', accessedResourceColor)
 }
 
 export default createResourceAccessChart

@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react'
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
 import CloseIcon from '@material-ui/icons/Close'
+import Slide from '@material-ui/core/Slide'
+
+function SlideTransition (props) {
+  return <Slide {...props} direction='up' />
+}
 
 function UserSettingSnackbar (props) {
   const {
@@ -25,14 +30,21 @@ function UserSettingSnackbar (props) {
     }
   }, [saved])
 
+  const snackbarDuration = Math.max(snackbarMessage.length * 200, 4000)
+
   return (
     <Snackbar
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'left'
       }}
+      ContentProps={{
+        role: 'alertdialog'
+      }}
       open={savedSnackbarOpen}
-      autoHideDuration={3000}
+      autoHideDuration={snackbarDuration}
+      TransitionComponent={SlideTransition}
+      transitionDuration={{ exit: 400, enter: 400 }}
       onClose={() => setSavedSnackbarOpen(false)}
       message={<span>{snackbarMessage}</span>}
       action={[

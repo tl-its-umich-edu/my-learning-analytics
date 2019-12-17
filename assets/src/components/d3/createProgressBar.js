@@ -1,8 +1,11 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
+import siteTheme from '../../siteTheme'
 
 function createProgressBar ({ data, width, height, domElement, tip }) {
   const margin = { top: 20, right: 20, bottom: 20, left: 50 }
+  const gradedColor = siteTheme.palette.secondary.main
+  const ungradedColor = siteTheme.palette.negative.main
   let [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   // prevent height from being too tall or too short
@@ -47,7 +50,7 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
     .attr('x', (_, i) => x(calculatePercentSoFar(i)))
     .attr('height', y.bandwidth())
     .attr('y', margin.top)
-    .attr('fill', d => d.graded ? '#a0d4ee' : '#e1e1e1')
+    .attr('fill', d => d.graded ? gradedColor : ungradedColor)
     .style('border', '1px solid transparent')
     .style('outline-color', 'rgb(255, 255, 255)')
     .style('outline-style', 'solid')
@@ -61,12 +64,12 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
         tipPosition('s')
       }
       d3.select(this)
-        .attr('fill', d => d.graded ? '#a0d4ee' : '#e1e1e1')
+        .attr('fill', d => d.graded ? gradedColor : ungradedColor)
         .style('outline', '1px solid black')
     })
     .on('mouseout', function () {
       d3.select(this)
-        .attr('fill', d => d.graded ? '#a0d4ee' : '#e1e1e1')
+        .attr('fill', d => d.graded ? gradedColor : ungradedColor)
         .style('outline', '1px solid rgb(255, 255, 255)')
     })
 

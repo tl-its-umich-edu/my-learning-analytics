@@ -32,13 +32,13 @@ const styles = theme => ({
   graded: {
     width: '10px',
     height: '10px',
-    background: 'lightskyblue',
+    background: theme.palette.secondary.main,
     display: 'inline-block'
   },
   ungraded: {
     width: '10px',
     height: '10px',
-    background: 'gray',
+    background: theme.palette.negative.main,
     display: 'inline-block'
   }
 })
@@ -123,7 +123,7 @@ function AssignmentPlanning (props) {
     }
   }
 
-  if (assignmentError) return (<WarningBanner/>)
+  if (assignmentError) return (<WarningBanner />)
 
   return (
     <div className={classes.root}>
@@ -177,7 +177,7 @@ function AssignmentPlanning (props) {
                     checked={saveSettingClicked}
                     onChange={() => setSaveSettingClicked(!saveSettingClicked)}
                     value='checked'
-                    color='primary'
+                    color='secondary'
                   />
                   : null
                 }
