@@ -4,7 +4,7 @@ import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Spinner from '../components/Spinner'
 import ProgressBarV2 from '../components/ProgressBarV2'
-import AssignmentGradeBoxes from '../components/AssignmentGradeBoxes'
+import AssignmentGoalInput from '../components/AssignmentGoalInput'
 import AlertBanner from '../components/AlertBanner'
 import WarningBanner from '../components/WarningBanner'
 import AssignmentTable from '../components/AssignmentTable'
@@ -128,6 +128,7 @@ function AssignmentPlanningV2 (props) {
                 ? <Spinner />
                 : (
                   <>
+                    <Typography variant='h6'>Grade Progress</Typography>
                     <ProgressBarV2
                       score={currentGrade}
                       lines={[
@@ -155,7 +156,7 @@ function AssignmentPlanningV2 (props) {
                       height={50}
                       margin={50}
                     />
-                    <AssignmentGradeBoxes
+                    <AssignmentGoalInput
                       currentGrade={currentGrade}
                       goalGrade={goalGrade}
                       maxPossibleGrade={maxPossibleGrade}
@@ -166,6 +167,7 @@ function AssignmentPlanningV2 (props) {
                       handleClearGoalGrades={handleClearGoalGrades}
                       mathWarning={showMathWarning}
                     />
+                    <Typography variant='h6'>Assignments by Due Date</Typography>
                     <AssignmentTable
                       assignments={assignments}
                       assignmentGroups={assignmentGroups}

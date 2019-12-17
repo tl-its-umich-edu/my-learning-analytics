@@ -58,7 +58,7 @@ exports[`renders correctly 1`] = `
       }
     >
       <div
-        className="MuiFormControl-root MuiTextField-root WithStyles(ForwardRef(TextField))-root-135 AssignmentGradeBoxes-goalGradeInput-1 MuiFormControl-marginNormal"
+        className="MuiFormControl-root MuiTextField-root WithStyles(ForwardRef(TextField))-root-135 AssignmentGoalInput-goalGradeInput-1 MuiFormControl-marginNormal"
       >
         <label
           className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiFormLabel-filled"

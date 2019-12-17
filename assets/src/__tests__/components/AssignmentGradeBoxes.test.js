@@ -1,13 +1,13 @@
 /* global it, expect */
 
 import React from 'react'
-import AssignmentGradeBoxes from '../../components/AssignmentGradeBoxes'
+import AssignmentGoalInput from '../../components/AssignmentGoalInput'
 import renderer from 'react-test-renderer'
 
 it('renders correctly', () => {
   const tree = renderer
     .create(
-      <AssignmentGradeBoxes
+      <AssignmentGoalInput
         currentGrade={85}
         goalGrade={90}
         maxPossibleGrade={95}
