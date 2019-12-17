@@ -3,6 +3,7 @@ import { adjustViewport } from '../../util/chart'
 import d3tip from 'd3-tip'
 import './createResourceAccessChart.css'
 import '@fortawesome/fontawesome-free'
+import siteTheme from "../../siteTheme"
 
 /*
   References:
@@ -12,8 +13,8 @@ import '@fortawesome/fontawesome-free'
     - D3 V4 Changes: https://github.com/d3/d3/blob/master/CHANGES.md
 */
 
-const accessedResourceColor = 'steelblue'
-const notAccessedResourceColor = 'gray'
+const accessedResourceColor = siteTheme.palette.secondary.main
+const notAccessedResourceColor = siteTheme.palette.negative.main
 const mainMargin = { top: 50, right: 10, bottom: 50, left: 200 }
 
 const toolTip = d3tip().attr('class', 'd3-tip')
@@ -328,9 +329,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('transform', 'translate(-5,0)')
     .call(mainYAxis)
 
-  yLabel.selectAll('text')
-    .attr('fill', 'steelblue')
-
   // Draw mini bars
   miniGroup.selectAll('.bar')
     .data(resourceData, d => d.resource_name)
@@ -377,9 +375,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .append("xhtml:i")
       .attr('class', icon);
   })
-
-  yLabel.selectAll('text')
-    .attr('fill', accessedResourceColor)
 }
 
 export default createResourceAccessChart
