@@ -24,9 +24,9 @@ function AssignmentGoalInput (props) {
   } = props
 
   return (
-    <Grid container>
-      <Grid item xs={4} style={{ display: 'inline-block' }}>
-        <Typography variant='h5' display='inline'>Goal</Typography>
+    <Grid container justify='center'>
+      <Grid item xs={3} style={{ display: 'inline-block' }}>
+        {/* <Typography variant='h6' display='inline'>Goal</Typography> */}
         <StyledTextField
           error={goalGrade > 100 || mathWarning || goalGrade > maxPossibleGrade}
           id='standard-number'
@@ -47,6 +47,7 @@ function AssignmentGoalInput (props) {
             // endAdornment: <InputAdornment position='start'>%</InputAdornment> // doesn't seem to be working
           }}
           margin='normal'
+          variant='outlined'
         />
         {
           goalGrade
@@ -57,7 +58,6 @@ function AssignmentGoalInput (props) {
                 onClick={handleClearGoalGrades}
               >
                 <LayersClearIcon />
-                {' Clear goals'}
               </Button>
             )
             : null
