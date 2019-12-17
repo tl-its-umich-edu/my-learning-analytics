@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Link, withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Button from '@material-ui/core/Button'
-import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
 import MenuIcon from '@material-ui/icons/Menu'
 import Avatar from '@material-ui/core/Avatar'
@@ -29,7 +28,8 @@ const styles = theme => ({
     textDecoration: 'none',
     color: 'white',
     textTransform: 'capitalize',
-    padding: 4
+    padding: 4,
+    fontSize: '1.25rem'
   },
   roundButton: {
     borderRadius: '50%',
@@ -62,10 +62,10 @@ function DashboardAppBar (props) {
             aria-label='Menu'>
             <MenuIcon />
           </IconButton>
-          <Button href='/courses/' className={classes.homeButton} style={{ fontSize: '1.25rem' }}>
+          <Button href='/courses/' className={classes.homeButton}>
             My Learning Analytics:
           </Button>
-          <Button href={`/courses/${courseId}`} className={classes.homeButton} style={{ fontSize: '1.25rem' }}>
+          <Button href={`/courses/${courseId}`} className={classes.homeButton}>
             {courseName}
           </Button>
           <div className={classes.grow} />
