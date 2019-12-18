@@ -7,14 +7,14 @@ The front end of MyLA is written in JavaScript using [React](https://reactjs.org
 
 The code for the front-end is located under `/assets/src/`. MyLA uses functional components instead of class-based components and uses [React hooks](https://reactjs.org/docs/hooks-intro.html) for state and side-effects.
 
+[Standard](https://standardjs.com/) is the JavaScript linter. Please ensure that your code is Standard-complaint by running the linter manually. It is installed as a dev-dependency and you should be able to run it by simply typing `standard`.
+
 ### Back-end
 MyLA Backend is build using [Django](https://www.djangoproject.com/) Framework, [MySQL](https://www.mysql.com/) DataBase,
 Cron schedule for getting the Canvas context and event data to the MySQL DB each institution might set this up differently based on the infrastruture support.
-MyLA can be run as a stand alone tool with [SAML](https://developers.onelogin.com/saml) support and as LTI tool. 
+MyLA can be run as a stand alone tool with [SAML](https://developers.onelogin.com/saml) support and as LTI tool.
 
 More info of various institutions infrastructure set up is [here](https://github.com/tl-its-umich-edu/my-learning-analytics/wiki/Myla-institutions-Architecture-flow).
-
-
 
 ## Create an issue
 Before sending a pull request, please create an [issue](https://github.com/tl-its-umich-edu/my-learning-analytics/issues/new) describing either a problem (i.e. bug) in MyLA or a feature you would like to contribute. We'll do our best to review the issue in a timely manner to discuss before starting work to address the issue.
@@ -26,6 +26,8 @@ Once you have had a chance to discuss the issue with one of the project maintain
 1. Clone the forked repository to your local machine. `git clone https://github.com/{github-username}/my-learning-analytics.git`.
 1. Try to create local branches to keep your contributions organized - generally one branch for each issue.
 1. Once you've pushed your changes to your fork, you should see a button on Github to create a pull request from your forked repository to the main project repository.
+
+Reference these github guides on [Forking Projects](https://guides.github.com/activities/forking/) and [Understanding the Github flow](https://guides.github.com/introduction/flow/) for further information. 
 
 ## Testing tips!
 

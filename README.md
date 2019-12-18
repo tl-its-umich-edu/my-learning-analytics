@@ -30,7 +30,17 @@ You may also optionally place the json settings directly into the `ENV_JSON` env
     username: root
     password: root
     ```
-1. As you are now logged in as `root`, there are no courses listed. Navigate to http://localhost:5001/courses/231768 or http://localhost:5001/courses/430174 to view a sample course as a superuser.
+1. As you are now logged in as `root`, there are no courses listed. Next 3 steps will help you view a sample course.
+1. Connect to MySQL database.
+    ```
+    Host: 127.0.0.1
+    Username: student_dashboard_user
+    Password: student_dashboard_pw
+    Database: student_dashboard
+    Port: 5306
+    ```
+1. Navigate to `course` table and select canvas_id `canvas_id`("SELECT canvas_id From course"), which will be used in the next step.
+1. Nagivate to http://localhost:5001/courses/{canvas_id} with the canvas_id you found. (For example, with SQL file myla_test_data_2019_10_16.sql loaded in, nagivate to http://localhost:5001/courses/235420 or http://localhost:5001/courses/362855 and you can view the course page as an admin.) 
 1. To get to the Django admin panel, click on the Avator in the top right, then click `Admin`, or go here: http://localhost:5001/admin.
 
 #### Logging in as a student
@@ -65,6 +75,8 @@ The `bq_cred.json` defined in the `.env` file is service account for BigQuery, a
 View options can be controlled at the global and course level. If a view is disabled globally, it will be disabled for every course, even if previously enabled at the course level. If a view is not globally disabled, it can still be disabled at the course level.
 
 `VIEWS_DISABLED` is the comma delimited list of views to disable (default empty). The expected name of the view is the same as the view's column name in the `course_view_option` table. For example `VIEWS_DISABLED=show_resources_accessed,show_grade_distribution` will disable both the Resources Accessed and Grade Distribution views.
+
+'show_grade_type' is a field in the 'course' table that can either be 'Percent' or 'Point'. This specifies how the grades should be displayed in the different views in MyLA.  
 
 Note that by default all views are enabled when a course is added.
 
