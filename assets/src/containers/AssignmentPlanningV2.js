@@ -100,7 +100,6 @@ function AssignmentPlanningV2 (props) {
       ...assignments.slice(key + 1)
     ])
   }
-
   const handleClearGoalGrades = () => {
     setAssignments(
       assignments.map(a => {

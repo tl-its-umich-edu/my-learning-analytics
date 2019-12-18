@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
+import TableContainer from '@material-ui/core/TableContainer'
 import MTable from '@material-ui/core/Table'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
@@ -19,6 +20,9 @@ const styles = theme => ({
   paper: {
     padding: theme.spacing(2),
     color: theme.palette.text.secondary
+  },
+  container: {
+    maxHeight: 500
   },
   sliderCell: {
     minWidth: '150px'
@@ -72,168 +76,170 @@ function AssignmentTable (props) {
   }
 
   return (
-    <MTable>
-      <TableHead>
-        <TableRow>
+    <TableContainer className={classes.container}>
+      <MTable>
+        <TableHead>
+          <TableRow>
+            {
+              [
+                'Week',
+                'Due',
+                'Assignment Name',
+                'Percent of Final Grade',
+                'Score / Out of'
+              ].map((heading, key) => (
+                <TableCell
+                  className={classes.tableCell + ' ' + classes.tableHeadCell}
+                  key={key}
+                >
+                  {heading}
+                </TableCell>
+              ))
+            }
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {
-            [
-              'Week',
-              'Due',
-              'Assignment Name',
-              'Percent of Final Grade',
-              'Score / Out of'
-            ].map((heading, key) => (
-              <TableCell
-                className={classes.tableCell + ' ' + classes.tableHeadCell}
-                key={key}
-              >
-                {heading}
-              </TableCell>
+            assignments.map((a, key) => (
+              <TableRow key={key}>
+                <TableCell
+                  style={
+                    isNextWeekTheSame(a.week, key)
+                      ? { borderBottom: 'none' }
+                      : {}
+                  }
+                  className={classes.narrowCell}
+                >
+                  {
+                    a.week
+                      ? isPreviousWeekTheSame(a.week, key)
+                        ? ''
+                        : `Week ${a.week}`
+                      : 'No due date'
+                  }
+                </TableCell>
+                <TableCell
+                  style={
+                    isNextWeekTheSame(a.week, key)
+                      ? { borderBottom: 'none' }
+                      : {}
+                  }
+                  className={classes.narrowCell}
+                >
+                  {
+                    a.week
+                      ? isPreviousWeekTheSame(a.week, key)
+                        ? ''
+                        : a.dueDateMonthDay
+                      : ''
+                  }
+                </TableCell>
+                <TableCell style={{ width: '30%' }}>
+                  {a.name}
+                </TableCell>
+                <TableCell className={classes.narrowCell}>
+                  {`${a.percentOfFinalGrade}%`}
+                </TableCell>
+                <TableCell style={{ width: '30%' }}>
+                  {
+                    a.graded || a.outOf === 0
+                      ? a.outOf === 0
+                        ? '0'
+                        : `${a.currentUserSubmission.score}`
+
+                      : (
+                        <StyledTextField
+                          error={(a.goalGrade / a.pointsPossible) > 1}
+                          id='standard-number'
+                          value={roundToOneDecimal(a.goalGrade) || ''}
+                          label={
+                            (a.goalGrade / a.pointsPossible) > 1
+                              ? 'Over 100%'
+                              : 'Set a goal'
+                          }
+                          onChange={event => setGoalGrade(key, event.target.value)}
+                          type='number'
+                          className={classes.goalGradeInput}
+                          style={{ marginBottom: '10px' }}
+                        />
+                      )
+                  }
+                  {
+                    <div style={{ margin: 'auto', display: 'inline' }}>
+                      {` / ${a.outOf}`}
+                    </div>
+                  }
+                  <div
+                    onMouseEnter={event => setAnchorEl(event.currentTarget)}
+                    onMouseLeave={() => setAnchorEl(null)}
+                  >
+                    <ProgressBarV2
+                      score={a.currentUserSubmission ? a.currentUserSubmission.score : 0}
+                      outOf={a.outOf}
+                      goalGrade={a.goalGrade}
+                      percentWidth={a.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
+                      displayLabel
+                      lines={
+                        a.goalGrade
+                          ? [{ color: 'green', value: a.goalGrade, draggable: true }]
+                          : []
+                      }
+                    />
+                    <Popover
+                      className={classes.popover}
+                      classes={{ paper: classes.paper }}
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl)}
+                      onClose={() => setAnchorEl(null)}
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left'
+                      }}
+                      transformOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left'
+                      }}
+                      disableRestoreFocus
+                    >
+                      {
+                        getAssignmentRules(a, assignmentGroups).dropHighest !== 0
+                          ? (
+                            <Typography>
+                              {
+                                `The highest ${getAssignmentRules(a, assignmentGroups).dropHighest}
+                                scores will be dropped from this assignment group
+                              `
+                              }
+                            </Typography>
+                          ) : null
+                      }
+                      {
+                        getAssignmentRules(a, assignmentGroups).dropLowest !== 0
+                          ? (
+                            <Typography>
+                              {
+                                `The lowest ${getAssignmentRules(a, assignmentGroups).dropLowest}
+                                scores will be dropped from this assignment group
+                              `
+                              }
+                            </Typography>
+                          ) : null
+                      }
+                      {
+                        getAssignmentRules(a, assignmentGroups).dropHighest === 0 &&
+                          getAssignmentRules(a, assignmentGroups).dropLowest === 0
+                          ? <Typography>There are no rules for this assignment</Typography>
+                          : null
+                      }
+                    </Popover>
+                  </div>
+                </TableCell>
+              </TableRow>
             ))
           }
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {
-          assignments.map((a, key) => (
-            <TableRow key={key}>
-              <TableCell
-                style={
-                  isNextWeekTheSame(a.week, key)
-                    ? { borderBottom: 'none' }
-                    : {}
-                }
-                className={classes.narrowCell}
-              >
-                {
-                  a.week
-                    ? isPreviousWeekTheSame(a.week, key)
-                      ? ''
-                      : `Week ${a.week}`
-                    : 'No due date'
-                }
-              </TableCell>
-              <TableCell
-                style={
-                  isNextWeekTheSame(a.week, key)
-                    ? { borderBottom: 'none' }
-                    : {}
-                }
-                className={classes.narrowCell}
-              >
-                {
-                  a.week
-                    ? isPreviousWeekTheSame(a.week, key)
-                      ? ''
-                      : a.dueDateMonthDay
-                    : ''
-                }
-              </TableCell>
-              <TableCell style={{ width: '30%' }}>
-                {a.name}
-              </TableCell>
-              <TableCell className={classes.narrowCell}>
-                {`${a.percentOfFinalGrade}%`}
-              </TableCell>
-              <TableCell style={{ width: '30%' }}>
-                {
-                  a.graded || a.outOf === 0
-                    ? a.outOf === 0
-                      ? '0'
-                      : `${a.currentUserSubmission.score}`
-
-                    : (
-                      <StyledTextField
-                        error={(a.goalGrade / a.pointsPossible) > 1}
-                        id='standard-number'
-                        value={roundToOneDecimal(a.goalGrade) || ''}
-                        label={
-                          (a.goalGrade / a.pointsPossible) > 1
-                            ? 'Over 100%'
-                            : 'Set a goal'
-                        }
-                        onChange={event => setGoalGrade(key, event.target.value)}
-                        type='number'
-                        className={classes.goalGradeInput}
-                        style={{ marginBottom: '10px' }}
-                      />
-                    )
-                }
-                {
-                  <div style={{ margin: 'auto', display: 'inline' }}>
-                    {` / ${a.outOf}`}
-                  </div>
-                }
-                <div
-                  onMouseEnter={event => setAnchorEl(event.currentTarget)}
-                  onMouseLeave={() => setAnchorEl(null)}
-                >
-                  <ProgressBarV2
-                    score={a.currentUserSubmission ? a.currentUserSubmission.score : 0}
-                    outOf={a.outOf}
-                    goalGrade={a.goalGrade}
-                    percentWidth={a.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
-                    displayLabel
-                    lines={
-                      a.goalGrade
-                        ? [{ color: 'green', value: a.goalGrade, draggable: true }]
-                        : []
-                    }
-                  />
-                  <Popover
-                    className={classes.popover}
-                    classes={{ paper: classes.paper }}
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={() => setAnchorEl(null)}
-                    anchorOrigin={{
-                      vertical: 'top',
-                      horizontal: 'left'
-                    }}
-                    transformOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'left'
-                    }}
-                    disableRestoreFocus
-                  >
-                    {
-                      getAssignmentRules(a, assignmentGroups).dropHighest !== 0
-                        ? (
-                          <Typography>
-                            {
-                              `The highest ${getAssignmentRules(a, assignmentGroups).dropHighest}
-                                scores will be dropped from this assignment group
-                              `
-                            }
-                          </Typography>
-                        ) : null
-                    }
-                    {
-                      getAssignmentRules(a, assignmentGroups).dropLowest !== 0
-                        ? (
-                          <Typography>
-                            {
-                              `The lowest ${getAssignmentRules(a, assignmentGroups).dropLowest}
-                                scores will be dropped from this assignment group
-                              `
-                            }
-                          </Typography>
-                        ) : null
-                    }
-                    {
-                      getAssignmentRules(a, assignmentGroups).dropHighest === 0 &&
-                      getAssignmentRules(a, assignmentGroups).dropLowest === 0
-                        ? <Typography>There are no rules for this assignment</Typography>
-                        : null
-                    }
-                  </Popover>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))
-        }
-      </TableBody>
-    </MTable>
+        </TableBody>
+      </MTable>
+    </TableContainer>
   )
 }
 

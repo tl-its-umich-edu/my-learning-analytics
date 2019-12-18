@@ -51,11 +51,13 @@ const assignmentTable = assignmentData => {
   if (!assignmentData || Object.keys(assignmentData).length === 0) {
     return (<AlertBanner>No assignments meet the selected criteria.</AlertBanner>)
   }
-  return <TableAssignment
-    tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
-    tableData={assignmentData}
-    currentWeek={getCurrentWeek(assignmentData)}
-  />
+  return (
+    <TableAssignment
+      tableHead={['Week', 'Due', 'Title', 'Percent of final grade']}
+      tableData={assignmentData}
+      currentWeek={getCurrentWeek(assignmentData)}
+    />
+  )
 }
 
 function AssignmentPlanning (props) {

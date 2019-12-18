@@ -24,7 +24,7 @@ function AssignmentGoalInput (props) {
   } = props
 
   return (
-    <Grid container justify='center'>
+    <Grid container>
       <Grid item xs={3} style={{ display: 'inline-block' }}>
         {/* <Typography variant='h6' display='inline'>Goal</Typography> */}
         <StyledTextField
