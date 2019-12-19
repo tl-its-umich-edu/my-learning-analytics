@@ -1,5 +1,5 @@
 import React from 'react'
-import { withStyles } from '@material-ui/core'
+import { withStyles, Typography } from '@material-ui/core'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import StyledTextField from './StyledTextField'
@@ -24,7 +24,8 @@ function AssignmentGoalInput (props) {
 
   return (
     <Grid container>
-      <Grid item xs={3} style={{ display: 'inline-block' }}>
+      <Grid item style={{ display: 'inline-block' }}>
+        <Typography style={{ display: 'inline-block', marginRight: '10px' }} variant='h6'>Goal</Typography>
         <StyledTextField
           error={goalGrade > 100 || mathWarning || goalGrade > maxPossibleGrade}
           id='standard-number'
@@ -46,6 +47,7 @@ function AssignmentGoalInput (props) {
           }}
           margin='normal'
           variant='outlined'
+          style={{ marginRight: '10px' }}
         />
         {
           goalGrade
@@ -54,7 +56,9 @@ function AssignmentGoalInput (props) {
                 variant='contained'
                 className={classes.clearButton}
                 onClick={handleClearGoalGrades}
+                aria-label='clear'
               >
+                Clear
                 <LayersClearIcon />
               </Button>
             )
