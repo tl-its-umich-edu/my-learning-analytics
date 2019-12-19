@@ -34,6 +34,9 @@ const styles = theme => ({
   tableCell: {
     border: 'none'
   },
+  tableHeadCell: {
+    fontSize: '1em'
+  },
   popover: {
     pointerEvents: 'none'
   },
@@ -77,7 +80,7 @@ function AssignmentTable (props) {
 
   return (
     <TableContainer className={classes.container}>
-      <MTable>
+      <MTable stickyHeader>
         <TableHead>
           <TableRow>
             {
