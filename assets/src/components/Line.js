@@ -18,9 +18,9 @@ function Line (props) {
   // })
 
   const lineHeight = labelPlacement === 'up' || labelPlacement === 'down'
-    ? height + 20
+    ? height + 25
     : labelPlacement === 'downLower'
-      ? height + 50
+      ? height + 42
       : height + 2
 
   return (
@@ -33,9 +33,9 @@ function Line (props) {
         height: `${lineHeight}px`,
         left,
         zIndex: 1,
-        marginTop: labelPlacement === 'up' ? '-20px' : 0,
+        marginTop: labelPlacement === 'up' ? '-25px' : 0,
         marginBottom: labelPlacement === 'down' ||
-          labelPlacement === 'downLower' ? '-20px' : 0
+          labelPlacement === 'downLower' ? '-25px' : 0
       }}
       // ref={drag}
     />

@@ -14,14 +14,16 @@ function Label (props) {
         position: 'absolute',
         display: 'inline-block',
         color,
-        left,
+        left: labelPlacement === 'down'
+          ? `calc(${left} - 115px)`
+          : left,
         zIndex: 1,
         top: labelPlacement === 'down'
-          ? '50px'
+          ? '55px'
           : labelPlacement === 'downLower'
             ? '75px'
             : labelPlacement === 'up'
-              ? '-20px'
+              ? '-25px'
               : 0
       }}
     >
