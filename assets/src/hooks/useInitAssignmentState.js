@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
   calculateCurrentGrade,
   calculateMaxGrade,
@@ -12,11 +12,12 @@ const useInitAssignmentState =
     error,
     data,
     setAssignments,
-    setAssignmentGroups,
-    setCurrentGrade,
-    setMaxPossibleGrade,
     setUserSetting
   ) => {
+    const [assignmentGroups, setAssignmentGroups] = useState([])
+    const [currentGrade, setCurrentGrade] = useState(0)
+    const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
+
     useEffect(() => {
       if (!loading && !error) {
         const {
@@ -43,6 +44,8 @@ const useInitAssignmentState =
         )
       }
     }, [loading])
+
+    return [assignmentGroups, currentGrade, maxPossibleGrade]
   }
 
 export default useInitAssignmentState

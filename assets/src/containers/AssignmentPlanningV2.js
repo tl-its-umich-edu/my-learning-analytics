@@ -43,24 +43,18 @@ function AssignmentPlanningV2 (props) {
   if (disabled) return (<AlertBanner>Grade Distribution view is hidden for this course.</AlertBanner>)
 
   const [assignments, setAssignments] = useState([])
-  const [assignmentGroups, setAssignmentGroups] = useState([])
   const [goalGrade, setGoalGrade] = useState(null)
-  const [currentGrade, setCurrentGrade] = useState(0)
-  const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
   const [userSetting, setUserSetting] = useState({})
   const [settingChanged, setSettingChanged] = useState(false)
 
   const { loading, error, data } = useAssignmentData(courseId)
   const { debouncedUpdateUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
 
-  useInitAssignmentState(
+  const [assignmentGroups, currentGrade, maxPossibleGrade] = useInitAssignmentState(
     loading,
     error,
     data,
     setAssignments,
-    setAssignmentGroups,
-    setCurrentGrade,
-    setMaxPossibleGrade,
     setUserSetting
   )
   useUserAssignmentSetting(

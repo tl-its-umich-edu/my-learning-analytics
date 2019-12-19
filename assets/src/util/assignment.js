@@ -76,7 +76,7 @@ const sumAssignmentGoalGrade = assignments => sum(
 
 const sortAssignmentsByWeek = assignments => assignments.sort((a, b) => a.week - b.week)
 
-const createAssignmentFields = (assignments, assignmentGroups, dateStart) => sortAssignmentsByWeek(
+const createAssignmentFields = (assignments, assignmentGroups, courseStartDate) => sortAssignmentsByWeek(
   assignments.map(a => {
     const {
       dueDate,
@@ -84,8 +84,6 @@ const createAssignmentFields = (assignments, assignmentGroups, dateStart) => sor
       assignmentGroupId,
       currentUserSubmission
     } = a
-
-    const courseStartDate = dateStart
 
     a.week = calculateWeekOffset(courseStartDate, dueDate)
     a.percentOfFinalGrade = calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)

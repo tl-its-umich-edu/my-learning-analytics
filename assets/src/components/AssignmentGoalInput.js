@@ -1,7 +1,6 @@
 import React from 'react'
 import { withStyles } from '@material-ui/core'
 import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
 import StyledTextField from './StyledTextField'
 import LayersClearIcon from '@material-ui/icons/LayersClear'
@@ -26,7 +25,6 @@ function AssignmentGoalInput (props) {
   return (
     <Grid container>
       <Grid item xs={3} style={{ display: 'inline-block' }}>
-        {/* <Typography variant='h6' display='inline'>Goal</Typography> */}
         <StyledTextField
           error={goalGrade > 100 || mathWarning || goalGrade > maxPossibleGrade}
           id='standard-number'
