@@ -10,6 +10,7 @@ import ProgressBarV2 from './ProgressBarV2'
 import Popover from '@material-ui/core/Popover'
 import { roundToOneDecimal } from '../util/math'
 import { Typography } from '@material-ui/core'
+import StyledTextField from './StyledTextField'
 import GradeInput from './GradeInput'
 
 const styles = theme => ({
@@ -151,7 +152,7 @@ function AssignmentTable (props) {
                         : `${a.currentUserSubmission.score}`
 
                       : (
-                        <GradeInput
+                        <StyledTextField
                           error={(a.goalGrade / a.pointsPossible) > 1}
                           id='standard-number'
                           value={roundToOneDecimal(a.goalGrade) || ''}
@@ -164,16 +165,14 @@ function AssignmentTable (props) {
                           type='number'
                           className={classes.goalGradeInput}
                           style={{ marginBottom: '10px' }}
-                        >
-                          {`/${a.pointsPossible}`}
-                        </GradeInput>
+                        />
                       )
                   }
-                  {/* {
+                  {
                     <div style={{ margin: 'auto', display: 'inline' }}>
                       {` / ${a.outOf}`}
                     </div>
-                  } */}
+                  }
                   <div
                     onMouseEnter={event => setAnchorEl(event.currentTarget)}
                     onMouseLeave={() => setAnchorEl(null)}
