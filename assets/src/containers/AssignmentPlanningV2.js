@@ -164,6 +164,7 @@ function AssignmentPlanningV2 (props) {
                     <AssignmentTable
                       assignments={assignments}
                       assignmentGroups={assignmentGroups}
+                      dateStart={data.course.dateStart}
                       setGoalGrade={setHandleAssignmentGoalGrade}
                     />
                   </>
