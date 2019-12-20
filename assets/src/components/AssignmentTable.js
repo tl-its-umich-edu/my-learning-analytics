@@ -11,7 +11,6 @@ import Popover from '@material-ui/core/Popover'
 import { roundToOneDecimal } from '../util/math'
 import { Typography } from '@material-ui/core'
 import StyledTextField from './StyledTextField'
-import GradeInput from './GradeInput'
 
 const styles = theme => ({
   root: {
