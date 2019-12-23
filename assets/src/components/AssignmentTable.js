@@ -89,7 +89,7 @@ function AssignmentTable (props) {
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
     if (currentWeekRow.current) {
-      const tableHeaderOffset = 50
+      const tableHeaderOffset = 120
       tableRef.current.scrollTo({
         top: currentWeekRow.current.offsetTop - tableHeaderOffset,
         behavior: 'smooth'
