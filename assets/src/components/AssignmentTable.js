@@ -165,7 +165,6 @@ function AssignmentTable (props) {
                           ? a.outOf === 0
                             ? '0'
                             : `${a.currentUserSubmission.score}`
-
                           : (
                             <StyledTextField
                               error={(a.goalGrade / a.pointsPossible) > 1}

@@ -74,7 +74,16 @@ const sumAssignmentGoalGrade = assignments => sum(
   assignments.map(a => a.goalGrade || 0)
 )
 
-const sortAssignmentsByWeek = assignments => assignments.sort((a, b) => a.week - b.week)
+const sortAssignmentsByWeek = assignments => {
+  const assignmentsWithDueDates = assignments
+    .filter(a => a.week)
+    .sort((a, b) => a.week - b.week)
+
+  const assignmentsWithoutDueDates = assignments
+    .filter(a => !a.week)
+
+  return [...assignmentsWithDueDates, ...assignmentsWithoutDueDates]
+}
 
 const createAssignmentFields = (assignments, assignmentGroups, courseStartDate) => sortAssignmentsByWeek(
   assignments.map(a => {
