@@ -40,7 +40,7 @@ const styles = theme => ({
 
 function AssignmentPlanningV2 (props) {
   const { classes, disabled, courseId } = props
-  if (disabled) return (<AlertBanner>Grade Distribution view is hidden for this course.</AlertBanner>)
+  if (disabled) return (<AlertBanner>Assignment Planning view is hidden for this course.</AlertBanner>)
 
   const [assignments, setAssignments] = useState([])
   const [goalGrade, setGoalGrade] = useState(null)
