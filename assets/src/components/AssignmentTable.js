@@ -56,7 +56,7 @@ function AssignmentTable (props) {
   const currentWeekRow = useRef(null)
 
   const currentDate = new Date()
-  const currentWeek = 17 // calculateWeekOffset(dateStart, currentDate)
+  const currentWeek = calculateWeekOffset(dateStart, currentDate)
 
   const maxPercentOfFinalGrade = Math.max(
     ...assignments.map(({ percentOfFinalGrade }) => percentOfFinalGrade)
@@ -131,11 +131,14 @@ function AssignmentTable (props) {
                 >
                   <TableRow key={key}>
                     <TableCell
-                      style={
-                        isNextWeekTheSame(a.week, key)
+                      style={{
+                        ...isNextWeekTheSame(a.week, key)
                           ? { borderBottom: 'none' }
+                          : {},
+                        ...a.week === currentWeek
+                          ? { color: 'orange' }
                           : {}
-                      }
+                      }}
                       className={classes.narrowCell}
                     >
                       {
