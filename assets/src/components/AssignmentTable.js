@@ -90,7 +90,7 @@ function AssignmentTable (props) {
   useEffect(() => {
     if (currentWeekRow.current) {
       const tableHeaderOffset = 50
-      tableRef.current.parentNode.scrollTo({
+      tableRef.current.scrollTo({
         top: currentWeekRow.current.offsetTop - tableHeaderOffset,
         behavior: 'smooth'
       })
