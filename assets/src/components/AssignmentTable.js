@@ -8,10 +8,9 @@ import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import ProgressBarV2 from './ProgressBarV2'
+import AssignmentTablePopover from './AssignmentTablePopover'
 import ConditionalWrapper from './ConditionalWrapper'
-import Popover from '@material-ui/core/Popover'
 import { roundToOneDecimal } from '../util/math'
-import { Typography } from '@material-ui/core'
 import StyledTextField from './StyledTextField'
 import { calculateWeekOffset } from '../util/date'
 
@@ -52,6 +51,7 @@ function AssignmentTable (props) {
   const { classes, assignments, assignmentGroups, dateStart, setGoalGrade } = props
 
   const [anchorEl, setAnchorEl] = useState(null)
+
   const tableRef = useRef(null)
   const currentWeekRow = useRef(null)
 
@@ -71,18 +71,6 @@ function AssignmentTable (props) {
   const isPreviousWeekTheSame = (week, key) => {
     return key >= 1
       ? assignments[key - 1].week === week
-      : false
-  }
-
-  const getAssignmentRules = (a, assignmentGroups) => {
-    const assignmenGroup = assignmentGroups.find(ag => ag.id === a.assignmentGroupId)
-    return assignmenGroup
-      ? (
-        {
-          dropLowest: assignmenGroup.dropLowest,
-          dropHighest: assignmenGroup.dropHighest
-        }
-      )
       : false
   }
 
@@ -216,53 +204,13 @@ function AssignmentTable (props) {
                               : []
                           }
                         />
-                        <Popover
-                          className={classes.popover}
-                          classes={{ paper: classes.paper }}
+                        <AssignmentTablePopover
                           anchorEl={anchorEl}
-                          open={Boolean(anchorEl)}
-                          onClose={() => setAnchorEl(null)}
-                          anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'left'
-                          }}
-                          transformOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left'
-                          }}
-                          disableRestoreFocus
-                        >
-                          {
-                            getAssignmentRules(a, assignmentGroups).dropHighest !== 0
-                              ? (
-                                <Typography>
-                                  {
-                                    `The highest ${getAssignmentRules(a, assignmentGroups).dropHighest}
-                                    scores will be dropped from this assignment group
-                                  `
-                                  }
-                                </Typography>
-                              ) : null
-                          }
-                          {
-                            getAssignmentRules(a, assignmentGroups).dropLowest !== 0
-                              ? (
-                                <Typography>
-                                  {
-                                    `The lowest ${getAssignmentRules(a, assignmentGroups).dropLowest}
-                                    scores will be dropped from this assignment group
-                                  `
-                                  }
-                                </Typography>
-                              ) : null
-                          }
-                          {
-                            getAssignmentRules(a, assignmentGroups).dropHighest === 0 &&
-                              getAssignmentRules(a, assignmentGroups).dropLowest === 0
-                              ? <Typography>There are no rules for this assignment</Typography>
-                              : null
-                          }
-                        </Popover>
+                          assignmentGroup={assignmentGroups}
+                          a={a}
+                          setAnchorEl={setAnchorEl}
+                          {...props}
+                        />
                       </div>
                     </TableCell>
                   </TableRow>
