@@ -164,8 +164,8 @@
     "DATA_WAREHOUSE_IS_UNIZIN": true,
     "/* resource type for resource view add or remove per institution needs": "/*",
     "RESOURCE_VALUES": {
-        "files":  ["canvas"],
-        "videos": ["leccap"]
+        "files":  {"types": ["canvas"], "icon": "fas fa-file fa-lg"},
+        "videos": {"types": ["leccap"], "icon": "fas fa-video fa-lg"}
     },
     "/* Institute specific urls add or remove to your needs, will be used for Resources view": "*/",
     "RESOURCE_URLS": {
