@@ -45,7 +45,12 @@ GA_ID = ENV.get('GA_ID', '')
 
 # Resource values from env
 RESOURCE_VALUES = ENV.get("RESOURCE_VALUES", {"files": {"types": ["canvas"], "icon": "fas fa-file fa-lg"}})
-RESOURCE_URLS = ENV.get("RESOURCE_URLS", {"canvas": {"prefix": "https://demo.instructure.com/files/", "postfix": "/download?download_frd=1"}})
+
+# Convience map to be able to get from types
+RESOURCE_VALUES_MAP = {type : value
+    for value in RESOURCE_VALUES
+    for type in RESOURCE_VALUES.get(value).get('types')
+}
 
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
 SITE_ID = 1
