@@ -11,7 +11,7 @@ services:
     ports:
       - "5306:3306"
     volumes:
-      - ./.data/mysql:/var/lib/mysql
+      - ./.data/mysql:/var/lib/mysql:delegated
     container_name: student_dashboard_mysql
   web:
     build:
@@ -20,7 +20,7 @@ services:
         TZ: ${TZ}
     command: bash -c "./start.sh"
     volumes:
-      - .:/code
+      - .:/code:delegated
       # use the container's node_modules folder (don't override)
       - /code/node_modules/
       - /code/static/
@@ -45,7 +45,7 @@ services:
       target: node-webpack
     command: sh -c "tar zxvf node_modules/all_symlinks.tgz && npm run watch"
     volumes:
-      - .:/usr/src/app
+      - .:/usr/src/app:delegated
       # use the container's node_modules folder (don't override)
       - /usr/src/app/node_modules/
     container_name: webpack_watcher
