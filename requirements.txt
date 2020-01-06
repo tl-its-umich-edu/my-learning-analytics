@@ -13,6 +13,9 @@ django-settings-export>=1.2.1,<1.2.99
 django-macros>=0.4.0,<0.4.99
 django-debug-toolbar>=2.0,<2.0.99
 
+# Force this version of promise because the newest version doesn't support dict
+promise==2.2.1
+
 # graphql
 graphene-django>=2.4.0,<2.4.99
 django-filter>=2.2.0,<2.2.99
