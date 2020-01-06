@@ -38,6 +38,10 @@ NO_GRADE_STRING = "NO_GRADE"
 # string for resource type
 RESOURCE_TYPE_STRING = "resource_type"
 RESOURCE_VALUES = settings.RESOURCE_VALUES
+INVERSE = {}
+for key, value in RESOURCE_VALUES.items():
+    for resource_type in value['types']:
+        INVERSE[resource_type] = key
 
 # Is courses_enabled api enabled/disabled?
 COURSES_ENABLED = settings.COURSES_ENABLED
@@ -129,9 +133,9 @@ def get_course_info(request, course_id=0):
         resource_list = Resource.objects.get_course_resource_type(course_id)
         if resource_list is not None:
             logger.info(f"Course {course_id} resources data type are: {resource_list}")
-            resource_defaults = settings.RESOURCE_VALUES
+            resource_defaults = RESOURCE_VALUES
             for item in resource_list:
-                result = utils.look_up_key_for_value(resource_defaults, item)
+                result = utils.search_key_for_resource_value(resource_defaults, item)
                 if result is not None:
                     course_resource_list.append(result.capitalize())
             logger.info(f"Mapped generic resource types in a course {course_id}: {course_resource_list}")
@@ -189,7 +193,7 @@ def resource_access_within_week(request, course_id=0):
     filter_list = []
     for filter_value in filter_values:
         if filter_value != '':
-            filter_list.extend(RESOURCE_VALUES[filter_value.lower()])
+            filter_list.extend(RESOURCE_VALUES[filter_value.lower()]['types'])
 
     # json for eventlog
     data = {
@@ -324,7 +328,15 @@ def resource_access_within_week(request, course_id=0):
 
     output_df['resource_id_part'], output_df['resource_name_part'] = output_df['resource_id_name'].str.split(';', 1).str
 
-    output_df['resource_name'] = output_df.apply(lambda row: RESOURCE_URLS[row.resource_type]["prefix"] + row.resource_id_part + RESOURCE_URLS[row.resource_type]["postfix"] + CANVAS_FILE_ID_NAME_SEPARATOR + row.resource_name_part, axis=1)
+    output_df['resource_name'] = output_df.apply(
+        lambda row:
+            RESOURCE_URLS[row.resource_type]["prefix"] +
+            row.resource_id_part +
+            RESOURCE_URLS[row.resource_type]["postfix"] +
+            CANVAS_FILE_ID_NAME_SEPARATOR +
+            row.resource_name_part + CANVAS_FILE_ID_NAME_SEPARATOR +
+            RESOURCE_VALUES[INVERSE[row.resource_type]]['icon'],
+        axis=1)
     output_df.drop(columns=['resource_id_part', 'resource_name_part', 'resource_id_name'], inplace=True)
 
     logger.debug(output_df.to_json(orient='records'))
