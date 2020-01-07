@@ -8,7 +8,8 @@ import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import ProgressBarV2 from './ProgressBarV2'
-import AssignmentTablePopover from './AssignmentTablePopover'
+import Popover from '@material-ui/core/Popover'
+import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
 import { roundToOneDecimal } from '../util/math'
 import StyledTextField from './StyledTextField'
@@ -50,7 +51,7 @@ const styles = theme => ({
 function AssignmentTable (props) {
   const { classes, assignments, assignmentGroups, dateStart, setGoalGrade } = props
 
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
 
   const tableRef = useRef(null)
   const currentWeekRow = useRef(null)
@@ -188,8 +189,8 @@ function AssignmentTable (props) {
                         </div>
                       }
                       <div
-                        onMouseEnter={event => setAnchorEl(event.currentTarget)}
-                        onMouseLeave={() => setAnchorEl(null)}
+                        onMouseEnter={event => setPopoverEl({ popoverId: key, anchorEl: event.currentTarget })}
+                        onMouseLeave={() => setPopoverEl({ popoverId: null, anchorEl: null })}
                       >
                         <ProgressBarV2
                           score={a.currentUserSubmission ? a.currentUserSubmission.score : 0}
@@ -203,13 +204,24 @@ function AssignmentTable (props) {
                               : []
                           }
                         />
-                        <AssignmentTablePopover
-                          anchorEl={anchorEl}
-                          assignmentGroup={assignmentGroups}
-                          a={a}
-                          setAnchorEl={setAnchorEl}
-                          {...props}
-                        />
+                        <Popover
+                          className={classes.popover}
+                          classes={{ paper: classes.paper }}
+                          anchorEl={popoverEl.anchorEl}
+                          open={popoverEl.popoverId === key}
+                          onClose={() => setPopoverEl({ popoverId: null, anchorEl: null })}
+                          anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left'
+                          }}
+                          transformOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left'
+                          }}
+                          disableRestoreFocus
+                        >
+                          <PopupMessage a={a} assignmentGroups={assignmentGroups} />
+                        </Popover>
                       </div>
                     </TableCell>
                   </TableRow>
