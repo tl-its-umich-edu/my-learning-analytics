@@ -7,7 +7,6 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
 import Popover from '@material-ui/core/Popover'
 import ProgressBarV2 from './ProgressBarV2'
@@ -59,6 +58,8 @@ function AssignmentTable (props) {
     handleAssignmentGoalGrade,
     handleAssignmentLock
   } = props
+
+  console.log(assignments)
 
   const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
 
@@ -236,6 +237,7 @@ function AssignmentTable (props) {
                     </TableCell>
                     <TableCell>
                       <Checkbox
+                        disabled={a.graded}
                         checked={!!a.goalGradeSetByUser}
                         onChange={event => handleAssignmentLock(key, event.target.checked)}
                         color='primary'
