@@ -82,7 +82,7 @@ function AssignmentPlanningV2 (props) {
     )
   }, [JSON.stringify(userSetting), settingChanged])
 
-  const setHandleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
+  const handleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setSettingChanged(true)
     setAssignments([
       ...assignments.slice(0, key),
@@ -106,6 +106,17 @@ function AssignmentPlanningV2 (props) {
     setGoalGrade(null)
     setUserSetting({})
     setSettingChanged(true)
+  }
+
+  const handleAssignmentLock = (key, checkboxState) => {
+    setAssignments([
+      ...assignments.slice(0, key),
+      {
+        ...assignments[key],
+        goalGradeSetByUser: checkboxState
+      },
+      ...assignments.slice(key + 1)
+    ])
   }
 
   if (error) return (<WarningBanner />)
@@ -166,7 +177,8 @@ function AssignmentPlanningV2 (props) {
                       assignments={assignments}
                       assignmentGroups={assignmentGroups}
                       dateStart={data.course.dateStart}
-                      setGoalGrade={setHandleAssignmentGoalGrade}
+                      handleAssignmentGoalGrade={handleAssignmentGoalGrade}
+                      handleAssignmentLock={handleAssignmentLock}
                     />
                   </>
                 )

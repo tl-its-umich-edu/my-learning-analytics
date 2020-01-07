@@ -7,8 +7,10 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
-import ProgressBarV2 from './ProgressBarV2'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Checkbox from '@material-ui/core/Checkbox'
 import Popover from '@material-ui/core/Popover'
+import ProgressBarV2 from './ProgressBarV2'
 import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
 import { roundToOneDecimal } from '../util/math'
@@ -49,7 +51,14 @@ const styles = theme => ({
 })
 
 function AssignmentTable (props) {
-  const { classes, assignments, assignmentGroups, dateStart, setGoalGrade } = props
+  const {
+    classes,
+    assignments,
+    assignmentGroups,
+    dateStart,
+    handleAssignmentGoalGrade,
+    handleAssignmentLock
+  } = props
 
   const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
 
@@ -98,7 +107,8 @@ function AssignmentTable (props) {
                   'Due',
                   'Assignment Name',
                   'Percent of Final Grade',
-                  'Score / Out of'
+                  'Score / Out of',
+                  'Lock Grade'
                 ].map((heading, key) => (
                   <TableCell
                     className={classes.tableCell + ' ' + classes.tableHeadCell}
@@ -176,7 +186,7 @@ function AssignmentTable (props) {
                                   ? 'Over 100%'
                                   : 'Set a goal'
                               }
-                              onChange={event => setGoalGrade(key, event.target.value)}
+                              onChange={event => handleAssignmentGoalGrade(key, event.target.value)}
                               type='number'
                               className={classes.goalGradeInput}
                               style={{ marginBottom: '10px' }}
@@ -223,6 +233,13 @@ function AssignmentTable (props) {
                           <PopupMessage a={a} assignmentGroups={assignmentGroups} />
                         </Popover>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <Checkbox
+                        checked={!!a.goalGradeSetByUser}
+                        onChange={event => handleAssignmentLock(key, event.target.checked)}
+                        color='primary'
+                      />
                     </TableCell>
                   </TableRow>
                 </ConditionalWrapper>
