@@ -59,8 +59,6 @@ function AssignmentTable (props) {
     handleAssignmentLock
   } = props
 
-  console.log(assignments)
-
   const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
 
   const tableRef = useRef(null)
