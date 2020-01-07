@@ -20,7 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.static import static
-from django.urls import path
+from django.urls import path, re_path
 
 from django.views.decorators.cache import cache_page
 
@@ -36,7 +36,7 @@ urlpatterns = [
     path('admin', admin.site.urls),
 
     # This is the courses catch-all
-    path('courses/', login_required(views.get_home_template,), name="courses"),
+    re_path(r'^courses/', login_required(views.get_home_template,), name="courses"),
     path('courses/<int:course_id>', login_required(views.get_course_template,), name="courses"),
 
 

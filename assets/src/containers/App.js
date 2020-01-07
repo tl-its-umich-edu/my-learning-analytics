@@ -1,4 +1,3 @@
-/* global myla_globals */
 import React from 'react'
 import { Route, withRouter } from 'react-router-dom'
 import { matchPath } from 'react-router'
@@ -7,6 +6,8 @@ import CourseList from './CourseList'
 import Course from './Course'
 import { ThemeProvider } from '@material-ui/core/styles'
 import siteTheme from '../siteTheme'
+
+const myla_globals = JSON.parse(document.getElementById("myla_globals").textContent)
 
 /*
 Frozen to prevent unintentional changes to this object. This object is strictly readonly.
