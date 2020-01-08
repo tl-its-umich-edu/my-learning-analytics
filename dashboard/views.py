@@ -61,12 +61,6 @@ def get_home_template(request):
     return render(request, 'frontend/index.html')
 
 
-@permission_required('dashboard.get_course_template',
-    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
-def get_course_template(request, course_id=0):
-    return render(request, 'frontend/index.html', {'course_id': course_id})
-
-
 @permission_required('dashboard.get_course_info',
     fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
 def get_course_info(request, course_id=0):

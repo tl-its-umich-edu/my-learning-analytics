@@ -36,7 +36,5 @@ rules.add_perm('dashboard.update_user_default_selection_for_views', is_admin_or_
 rules.add_perm('dashboard.get_user_default_selection', is_admin_or_enrolled_in_course)
 rules.add_perm('dashboard.assignments', is_admin_or_enrolled_in_course)
 
-# templates
-rules.add_perm('dashboard.get_course_template', is_admin_or_enrolled_in_course)
 
 
