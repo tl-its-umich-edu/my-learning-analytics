@@ -329,7 +329,7 @@ def resource_access_within_week(request, course_id=0):
             CANVAS_FILE_ID_NAME_SEPARATOR +
             row.resource_name_part + CANVAS_FILE_ID_NAME_SEPARATOR +
             RESOURCE_VALUES.get(RESOURCE_VALUES_MAP.get(row.resource_type)).get('icon')
-            )
+            ),
         axis=1)
     output_df.drop(columns=['resource_id_part', 'resource_name_part', 'resource_id_name'], inplace=True)
 
