@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 from model_utils import Choices
 
 from typing import Union
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse
 
 class AcademicTerms(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Term Id")

@@ -10,7 +10,7 @@ import pandas as pd
 from django.conf import settings
 from django.contrib import auth
 from django.db import connection as conn
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
@@ -24,7 +24,6 @@ from dashboard.settings import RESOURCE_VALUES, RESOURCE_VALUES_MAP, RESOURCE_AC
 from dashboard.settings import COURSES_ENABLED
 
 from typing import Union
-from django.http import HttpRequest, HttpResponse
 
 logger = logging.getLogger(__name__)
 # strings for construct resource download url
@@ -114,14 +113,12 @@ def get_course_info(request: HttpRequest, course_id: 0) -> HttpResponse:
 
     # Have a fixed maximum number of weeks
     if total_weeks > settings.MAX_DEFAULT_WEEKS:
-        logger.debug(
-            f'{total_weeks} is greater than {settings.MAX_DEFAULT_WEEKS} setting total weeks to default.')
+        logger.debug(f'{total_weeks} is greater than {settings.MAX_DEFAULT_WEEKS} setting total weeks to default.')
         total_weeks = settings.MAX_DEFAULT_WEEKS
 
     resp['current_week_number'] = current_week_number
     resp['total_weeks'] = total_weeks
-    resp['course_view_options'] = CourseViewOption.objects.get(
-        course=course).json(include_id=False)
+    resp['course_view_options'] = CourseViewOption.objects.get(course=course).json(include_id=False)
     resp['resource_types'] = course_resource_list
 
     return HttpResponse(json.dumps(resp, default=str))
@@ -174,13 +171,11 @@ def resource_access_within_week(request: HttpRequest,
     elif (grade == GRADE_C):
         total_number_student_sql += " and current_grade >= 70 and current_grade < 80"
 
-    total_number_student_df = pd.read_sql(total_number_student_sql, conn,
-                                          params={"course_id": course_id})
+    total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": course_id})
     total_number_student = total_number_student_df.iloc[0, 0]
     logger.info(f"course_id {course_id} total student={total_number_student}")
     if total_number_student == 0:
-        logger.info(
-            f"There are no students in the percent grade range {grade} for course {course_id}")
+        logger.info(f"There are no students in the percent grade range {grade} for course {course_id}")
         return HttpResponse("{}")
 
     course_date_start = get_course_date_start(course_id)
@@ -205,8 +200,7 @@ def resource_access_within_week(request: HttpRequest,
     startTimeString = start.strftime('%Y%m%d') + "000000"
     endTimeString = end.strftime('%Y%m%d') + "000000"
     logger.debug(sqlString)
-    logger.debug(
-        "start time=" + startTimeString + " end_time=" + endTimeString)
+    logger.debug("start time=" + startTimeString + " end_time=" + endTimeString)
     df = pd.read_sql(sqlString, conn, params={"start_time": startTimeString,
                                               "end_time": endTimeString,
                                               "course_id": course_id})
@@ -218,8 +212,7 @@ def resource_access_within_week(request: HttpRequest,
 
     # group by resource_id, and resource_name
     # reformat for output
-    df['resource_id_name'] = df['resource_id'].astype(str).str.cat(
-        df['resource_name'], sep=';')
+    df['resource_id_name'] = df['resource_id'].astype(str).str.cat(df['resource_name'], sep=';')
 
     df = df.drop(['resource_id', 'resource_name'], axis=1)
     df.set_index(['resource_id_name'])
@@ -230,9 +223,7 @@ def resource_access_within_week(request: HttpRequest,
     df['grade'] = df['current_grade'].map(gpa_map)
 
     # calculate the percentage
-    df['percent'] = round(df.groupby(['resource_id_name', 'grade'])[
-                              'resource_id_name'].transform(
-        'count') / total_number_student, 2)
+    df['percent'] = round(df.groupby(['resource_id_name', 'grade'])['resource_id_name'].transform('count') / total_number_student, 2)
 
     df = df.drop(['current_grade', 'user_id'], axis=1)
     # now only keep the resource access stats by grade level
@@ -252,8 +243,7 @@ def resource_access_within_week(request: HttpRequest,
     for index, row in df.iterrows():
         # set value
         output_df.at[row['resource_id_name'], row['grade']] = row['percent']
-        output_df.at[row['resource_id_name'], RESOURCE_TYPE_STRING] = row[
-            RESOURCE_TYPE_STRING]
+        output_df.at[row['resource_id_name'], RESOURCE_TYPE_STRING] = row[RESOURCE_TYPE_STRING]
     output_df.reset_index(inplace=True)
 
     # now insert person's own viewing records: what resources the user has viewed, and the last access timestamp
@@ -267,14 +257,11 @@ def resource_access_within_week(request: HttpRequest,
     logger.debug(selfSqlString)
     logger.debug("current_user=" + current_user)
 
-    selfDf = pd.read_sql(selfSqlString, conn,
-                         params={"current_user": current_user})
+    selfDf = pd.read_sql(selfSqlString, conn, params={"current_user": current_user})
 
-    output_df = output_df.join(selfDf.set_index('resource_id_name'),
-                               on='resource_id_name', how='left')
+    output_df = output_df.join(selfDf.set_index('resource_id_name'), on='resource_id_name', how='left')
     output_df["total_count"] = output_df.apply(
-        lambda row: row["90-100"] + row["80-89"] + row["70-79"] + row[
-            "low_grade"] + row.NO_GRADE, axis=1)
+        lambda row: row["90-100"] + row["80-89"] + row["70-79"] + row["low_grade"] + row.NO_GRADE, axis=1)
 
     if (grade != "all"):
         # drop all other grades
@@ -391,8 +378,7 @@ def update_user_default_selection_for_views(request, course_id=0):
     logger.info(default_selection)
     default_type = list(default_selection.keys())[0]
     default_type_value = default_selection.get(default_type)
-    logger.info(
-        f"request to set default for type: {default_type} and default_type value: {default_type_value}")
+    logger.info(f"request to set default for type: {default_type} and default_type value: {default_type_value}")
     # json for eventlog
     data = {
         "course_id": course_id,
@@ -412,8 +398,7 @@ def update_user_default_selection_for_views(request, course_id=0):
                         for user {current_user} in course {course_id} """)
         value = 'success'
     except (ObjectDoesNotExist, Exception) as e:
-        logger.info(
-            f"updating default failed due to {e} for user {current_user} in course: {course_id} ")
+        logger.info(f"updating default failed due to {e} for user {current_user} in course: {course_id} ")
         value = 'fail'
     return HttpResponse(json.dumps({key: value}),
                         content_type='application/json')
@@ -430,21 +415,17 @@ def get_user_default_selection(request: HttpRequest,
     default_view_type = request.GET.get('default_type')
     key = 'default'
     no_user_default_response = json.dumps({key: ''})
-    logger.info(
-        f"the default option request from user {user_sis_name} in course {course_id} of type: {default_view_type}")
+    logger.info(f"the default option request from user {user_sis_name} in course {course_id} of type: {default_view_type}")
     default_value = UserDefaultSelection.objects.get_user_defaults(
         int(course_id), user_sis_name, default_view_type)
-    logger.info(
-        f"""default option check returned from DB for user: {user_sis_name} course {course_id} and type:
+    logger.info(f"""default option check returned from DB for user: {user_sis_name} course {course_id} and type:
                     {default_view_type} is {default_value}""")
     if not default_value:
-        logger.info(
-            f"user {user_sis_name} in course {course_id} don't have any defaults values set type {default_view_type}")
+        logger.info(f"user {user_sis_name} in course {course_id} don't have any defaults values set type {default_view_type}")
         return HttpResponse(no_user_default_response,
                             content_type='application/json')
     result = json.dumps({key: default_value})
-    logger.info(
-        f"user {user_sis_name} in course {course_id} for type {default_view_type} defaults: {result}")
+    logger.info(f"user {user_sis_name} in course {course_id} for type {default_view_type} defaults: {result}")
     return HttpResponse(result, content_type='application/json')
 
 
@@ -466,27 +447,20 @@ def assignments(request: HttpRequest, course_id: 0) -> HttpResponse:
         "course_id": course_id,
         "percent_selection": percent_selection
     }
-    eventlog(request.user, EventLogTypes.EVENT_VIEW_ASSIGNMENT_PLANNING.value,
-             extra=data)
+    eventlog(request.user, EventLogTypes.EVENT_VIEW_ASSIGNMENT_PLANNING.value, extra=data)
 
-    logger.info(
-        'selection from assignment Planning {}'.format(percent_selection))
+    logger.info('selection from assignment Planning {}'.format(percent_selection))
 
     assignments_in_course = get_course_assignments(course_id)
 
     if assignments_in_course.empty:
         return HttpResponse(json.dumps([]), content_type='application/json')
 
-    assignment_submissions = get_user_assignment_submission(current_user,
-                                                            assignments_in_course,
-                                                            course_id)
+    assignment_submissions = get_user_assignment_submission(current_user, assignments_in_course, course_id)
 
-    df = pd.merge(assignments_in_course, assignment_submissions,
-                  on='assignment_id', how='left')
+    df = pd.merge(assignments_in_course, assignment_submissions, on='assignment_id', how='left')
     if df.empty:
-        logger.info(
-            'There are no assignment data in the course %s for user %s ' % (
-            course_id, current_user))
+        logger.info('There are no assignment data in the course %s for user %s ' % (course_id, current_user))
         return HttpResponse(json.dumps([]), content_type='application/json')
 
     df.sort_values(by='due_date', inplace=True)
@@ -495,8 +469,7 @@ def assignments(request: HttpRequest, course_id: 0) -> HttpResponse:
 
     # instructor might not ever see the avg score as he don't have grade in assignment. we don't have role described in the flow to open the gates for him
     if not request.user.is_superuser:
-        df['avg_score'] = df.apply(no_show_avg_score_for_ungraded_assignments,
-                                   axis=1)
+        df['avg_score'] = df.apply(no_show_avg_score_for_ungraded_assignments, axis=1)
     df['avg_score'] = df['avg_score'].fillna('Not available')
 
     df3 = df[df['towards_final_grade'] > 0.0]
@@ -504,8 +477,7 @@ def assignments(request: HttpRequest, course_id: 0) -> HttpResponse:
     df3['graded'] = df3['graded'].fillna(False)
     df3[['score']] = df3[['score']].astype(float)
     df3['percent_gotten'] = df3.apply(lambda x: user_percent(x), axis=1)
-    df3.sort_values(by=['graded', 'due_date_mod'], ascending=[False, True],
-                    inplace=True)
+    df3.sort_values(by=['graded', 'due_date_mod'], ascending=[False, True], inplace=True)
     df3.reset_index(inplace=True)
     df3.drop(columns=['index'], inplace=True)
 
@@ -547,65 +519,45 @@ def assignments(request: HttpRequest, course_id: 0) -> HttpResponse:
                 dd_items.append(assignment_due_date_grp)
         full.append(data)
     assignment_data['plan'] = json.loads(json.dumps(full))
-    return HttpResponse(json.dumps(assignment_data),
-                        content_type='application/json')
+    return HttpResponse(json.dumps(assignment_data), content_type='application/json')
 
 
 def get_course_assignments(course_id: int) -> dict:
-    sql = f"""select assign.*,sub.avg_score from
+    sql=f"""select assign.*,sub.avg_score from
             (select ifnull(assignment_id, 0) as assignment_id ,name,assign_grp_name,grp_id,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from
             (select a.id as assignment_id,a.assignment_group_id, a.local_date as due_date,a.name,a.points_possible from assignment as a  where a.course_id =%(course_id)s) as app right join
             (select id, name as assign_grp_name, id as grp_id, group_points, weight,drop_lowest,drop_highest from assignment_groups where course_id=%(course_id)s) as ag on ag.id=app.assignment_group_id) as assign left join
             (select distinct assignment_id,avg_score from submission where course_id=%(course_id)s) as sub on sub.assignment_id = assign.assignment_id
             """
 
-    assignments_in_course = pd.read_sql(sql, conn,
-                                        params={'course_id': course_id},
-                                        parse_dates={'due_date': '%Y-%m-%d'})
+    assignments_in_course = pd.read_sql(sql,conn,params={'course_id': course_id}, parse_dates={'due_date': '%Y-%m-%d'})
     # No assignments found in the course
     if assignments_in_course.empty:
-        logger.info(
-            'The course %s don\'t seems to have assignment data' % course_id)
+        logger.info('The course %s don\'t seems to have assignment data' % course_id)
         return assignments_in_course
 
-    assignments_in_course['due_date'] = pd.to_datetime(
-        assignments_in_course['due_date'], unit='ms')
-    assignments_in_course[['points_possible', 'group_points']] = \
-    assignments_in_course[['points_possible', 'group_points']].fillna(0)
-    assignments_in_course[['points_possible', 'group_points', 'weight']] = \
-    assignments_in_course[
-        ['points_possible', 'group_points', 'weight']].astype(float)
-    consider_weight = is_weight_considered(course_id)
-    df2 = assignments_in_course[
-        ['weight', 'group_points', 'grp_id']].drop_duplicates()
+    assignments_in_course['due_date'] = pd.to_datetime(assignments_in_course['due_date'],unit='ms')
+    assignments_in_course[['points_possible','group_points']]=assignments_in_course[['points_possible','group_points']].fillna(0)
+    assignments_in_course[['points_possible', 'group_points','weight']] = assignments_in_course[['points_possible', 'group_points','weight']].astype(float)
+    consider_weight=is_weight_considered(course_id)
+    df2 = assignments_in_course[['weight','group_points','grp_id']].drop_duplicates()
     hidden_assignments = are_weighted_assignments_hidden(course_id, df2)
-    total_points = assignments_in_course['points_possible'].sum()
+    total_points=assignments_in_course['points_possible'].sum()
     # if assignment group is weighted and no assignments added yet then assignment name will be nothing so situation is specific to that
     if hidden_assignments:
-        assignments_in_course['name'] = assignments_in_course['name'].fillna(
-            assignments_in_course[
-                'assign_grp_name'] + ' Group Unavailable Assignments')
-    assignments_in_course['towards_final_grade'] = assignments_in_course.apply(
-        lambda x: percent_calculation(consider_weight, total_points,
-                                      hidden_assignments, x), axis=1)
-    assignments_in_course['calender_week'] = assignments_in_course[
-        'due_date'].dt.week
-    assignments_in_course['calender_week'] = assignments_in_course[
-        'calender_week'].fillna(0).astype(int)
-    min_week = find_min_week(course_id)
-    max_week = assignments_in_course['calender_week'].max()
-    week_list = [x for x in range(min_week, max_week + 1)]
-    assignments_in_course['week'] = assignments_in_course[
-        'calender_week'].apply(
-        lambda x: 0 if x == 0 else week_list.index(x) + 1)
-    assignments_in_course.sort_values(by='due_date', inplace=True)
-    assignments_in_course['current_week'] = assignments_in_course[
-        'calender_week'].apply(lambda x: find_current_week(x))
-    assignments_in_course['due_date_mod'] = assignments_in_course[
-        'due_date'].astype(str).apply(lambda x: x.split()[0])
-    assignments_in_course['due_dates'] = pd.to_datetime(
-        assignments_in_course['due_date_mod']).dt.strftime('%m/%d')
-    assignments_in_course['due_dates'].replace('NaT', 'N/A', inplace=True)
+        assignments_in_course['name'] = assignments_in_course['name'].fillna(assignments_in_course['assign_grp_name']+' Group Unavailable Assignments')
+    assignments_in_course['towards_final_grade']=assignments_in_course.apply(lambda x: percent_calculation(consider_weight, total_points,hidden_assignments, x), axis=1)
+    assignments_in_course['calender_week']=assignments_in_course['due_date'].dt.week
+    assignments_in_course['calender_week']=assignments_in_course['calender_week'].fillna(0).astype(int)
+    min_week=find_min_week(course_id)
+    max_week=assignments_in_course['calender_week'].max()
+    week_list = [x for x in range(min_week,max_week+1)]
+    assignments_in_course['week']=assignments_in_course['calender_week'].apply(lambda x: 0 if x == 0 else week_list.index(x)+1)
+    assignments_in_course.sort_values(by='due_date', inplace = True)
+    assignments_in_course['current_week']=assignments_in_course['calender_week'].apply(lambda x: find_current_week(x))
+    assignments_in_course['due_date_mod'] =assignments_in_course['due_date'].astype(str).apply(lambda x:x.split()[0])
+    assignments_in_course['due_dates']= pd.to_datetime(assignments_in_course['due_date_mod']).dt.strftime('%m/%d')
+    assignments_in_course['due_dates'].replace('NaT','N/A',inplace=True)
     return assignments_in_course
 
 
@@ -618,17 +570,14 @@ def get_user_assignment_submission(current_user: str,
                                          params={'course_id': course_id,
                                                  "current_user": current_user})
     if assignment_submissions.empty:
-        logger.info(
-            'The user %s seems to be a not student in the course.' % current_user)
+        logger.info('The user %s seems to be a not student in the course.' % current_user)
         # manually adding the columns for display in UI
         assignment_submissions = pd.DataFrame()
-        assignment_submissions['assignment_id'] = assignments_in_course_df[
-            'assignment_id']
+        assignment_submissions['assignment_id'] = assignments_in_course_df['assignment_id']
         assignment_submissions['score'] = None
         assignment_submissions['graded'] = False
     else:
-        assignment_submissions['graded'] = assignment_submissions[
-            'graded_date'].notnull()
+        assignment_submissions['graded'] = assignment_submissions['graded_date'].notnull()
         assignment_submissions.drop(columns=['graded_date'], inplace=True)
     return assignment_submissions
 
@@ -643,8 +592,7 @@ def no_show_avg_score_for_ungraded_assignments(row: dict) -> Union[str, float]:
 
 def user_percent(row: dict) -> int:
     if row['graded']:
-        s = round((row['score'] / row['points_possible']) * row[
-            'towards_final_grade'], 2)
+        s = round((row['score'] / row['points_possible']) * row['towards_final_grade'], 2)
         return s
     else:
         return row['towards_final_grade']
@@ -668,11 +616,9 @@ def percent_calculation(consider_weight: bool,
     if hidden_assignments and consider_weight and row['group_points'] == 0:
         return round(row['weight'], 2)
     if hidden_assignments and consider_weight and row['group_points'] != 0:
-        return round(
-            (row['points_possible'] / row['group_points']) * row['weight'], 2)
+        return round((row['points_possible'] / row['group_points']) * row['weight'], 2)
     if consider_weight and row['group_points'] != 0:
-        return round(
-            (row['points_possible'] / row['group_points']) * row['weight'], 2)
+        return round((row['points_possible'] / row['group_points']) * row['weight'], 2)
     if not consider_weight:
         return round((row['points_possible'] / total_points) * 100, 2)
 
@@ -702,8 +648,7 @@ def is_weight_considered(course_id: int) -> bool:
 
 def get_course_date_start(course_id: int) -> int:
     logger.info(get_course_date_start.__name__)
-    course_date_start = Course.objects.get(
-        id=course_id).get_course_date_range().start
+    course_date_start = Course.objects.get(id=course_id).get_course_date_range().start
 
     return course_date_start
 
@@ -726,15 +671,12 @@ def are_weighted_assignments_hidden(course_id: int, df: dict) -> bool:
         df.loc[0, 'hidden'] = df.loc[0, 'weight']
         for i in range(1, len(df)):
             if df.loc[i, 'group_points']:
-                df.loc[i, 'hidden'] = df.loc[i - 1, 'hidden'] + df.loc[
-                    i, 'weight']
+                df.loc[i, 'hidden'] = df.loc[i - 1, 'hidden'] + df.loc[i, 'weight']
         if df['hidden'].max() == 100:
-            logger.info(
-                f"weighted assignments in course {course_id} are not hidden")
+            logger.info(f"weighted assignments in course {course_id} are not hidden")
             return False
         else:
-            logger.info(
-                f"few weighted assignments in course {course_id} are hidden")
+            logger.info(f"few weighted assignments in course {course_id} are hidden")
             return True
 
 
@@ -834,11 +776,9 @@ def courses_enabled(request: HttpRequest) -> Union[HttpResponse, HttpResponseFor
         callback = request.GET.get('callback')
         # Return json
         if callback is None:
-            return HttpResponse(json.dumps(data),
-                                content_type='application/json')
+            return HttpResponse(json.dumps(data), content_type='application/json')
         # Return json
         else:
-            return HttpResponse("{0}({1})".format(callback, json.dumps(data)),
-                                content_type='application/json')
+            return HttpResponse("{0}({1})".format(callback, json.dumps(data)), content_type='application/json')
     else:
         return HttpResponseForbidden()

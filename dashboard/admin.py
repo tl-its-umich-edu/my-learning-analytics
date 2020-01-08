@@ -11,7 +11,7 @@ from .models import CourseViewOption, Course
 from django.forms.models import ModelForm
 
 from typing import Union
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest
 
 # Always save the OneToOne Fields
 # https://stackoverflow.com/a/3734700/3708872
@@ -57,11 +57,13 @@ class CourseAdmin(admin.ModelAdmin):
     readonly_fields = ('term',)
 
     # Need this method to correctly display the line breaks
-    def _courseviewoption(self, obj: Course) -> mark_safe:
+    @staticmethod
+    def _courseviewoption(obj: Course) -> mark_safe:
         return mark_safe(linebreaksbr(obj.courseviewoption))
     _courseviewoption.short_description = "Course View Option(s)"
 
-    def course_link(self, obj: Course) -> format_html:
+    @staticmethod
+    def course_link(obj: Course) -> format_html:
         return format_html('<a href="{}">Link</a>', obj.get_absolute_url())
 
     # When saving the course, update the id based on canvas id
