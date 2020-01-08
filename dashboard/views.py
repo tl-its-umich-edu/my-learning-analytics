@@ -21,7 +21,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from collections import namedtuple
 
 from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
-from dashboard.settings import RESOURCE_VALUES, COURSES_ENABLED
+from dashboard.settings import RESOURCE_VALUES, RESOURCE_VALUES_MAP, RESOURCE_ACCESS_CONFIG
+from dashboard.settings import COURSES_ENABLED
 
 logger = logging.getLogger(__name__)
 # strings for construct resource download url
@@ -37,12 +38,6 @@ NO_GRADE_STRING = "NO_GRADE"
 
 # string for resource type
 RESOURCE_TYPE_STRING = "resource_type"
-RESOURCE_VALUES = settings.RESOURCE_VALUES
-RESOURCE_VALUES_MAP = settings.RESOURCE_VALUES_MAP
-RESOURCE_ACCESS_CONFIG = settings.RESOURCE_ACCESS_CONFIG
-
-# Is courses_enabled api enabled/disabled?
-COURSES_ENABLED = settings.COURSES_ENABLED
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
@@ -328,13 +323,14 @@ def resource_access_within_week(request, course_id=0):
 
     output_df['resource_name'] = output_df.apply(
         lambda row:
-            RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("prefix") +
+            (RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("prefix") +
             row.resource_id_part +
             RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("postfix") +
             CANVAS_FILE_ID_NAME_SEPARATOR +
             row.resource_name_part + CANVAS_FILE_ID_NAME_SEPARATOR +
-            RESOURCE_VALUES.get(RESOURCE_VALUES_MAP.get(row.resource_type)).get('icon'),
-            axis=1)
+            RESOURCE_VALUES.get(RESOURCE_VALUES_MAP.get(row.resource_type)).get('icon')
+            )
+        axis=1)
     output_df.drop(columns=['resource_id_part', 'resource_name_part', 'resource_id_name'], inplace=True)
 
     logger.debug(output_df.to_json(orient='records'))

@@ -47,9 +47,10 @@ GA_ID = ENV.get('GA_ID', '')
 RESOURCE_VALUES = ENV.get("RESOURCE_VALUES", {"files": {"types": ["canvas"], "icon": "fas fa-file fa-lg"}})
 
 # Convience map to be able to get from types
-RESOURCE_VALUES_MAP = {type : value
-    for value in RESOURCE_VALUES
-    for type in RESOURCE_VALUES.get(value).get('types')
+RESOURCE_VALUES_MAP = {
+    resource_type : resource_value
+    for resource_value in RESOURCE_VALUES
+    for resource_type in RESOURCE_VALUES.get(resource_value).get('types')
 }
 
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
