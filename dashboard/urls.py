@@ -35,10 +35,11 @@ urlpatterns = [
 
     path('admin', admin.site.urls),
 
-    # This is the courses catch-all
+    # This is the courses catch-all. The regular expression will match most requests, and the frontend will handle
+    # additional routing.
     re_path(r'^courses/', login_required(views.get_home_template,), name="courses"),
+    # This path, and the corresponding view, is used by Course.get_absolute_url().
     path('courses/<int:course_id>', login_required(views.get_course_template,), name="courses"),
-
 
     # These URL's are data patterns
     # GET access patterns

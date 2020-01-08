@@ -41,6 +41,7 @@ RESOURCE_TYPE_STRING = "resource_type"
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
 
+
 def gpa_map(grade):
     if grade is None:
         return NO_GRADE_STRING
