@@ -7,26 +7,26 @@ import Course from './Course'
 import { ThemeProvider } from '@material-ui/core/styles'
 import siteTheme from '../siteTheme'
 
-const myla_globals = JSON.parse(document.getElementById("myla_globals").textContent)
+const mylaGlobals = JSON.parse(document.getElementById("myla_globals").textContent)
 
 /*
 Frozen to prevent unintentional changes to this object. This object is strictly readonly.
-myla_globals should ONLY be accessed in App.js, and nowhere else.
+mylaGlobals should ONLY be accessed in App.js, and nowhere else.
 */
 const user = Object.freeze({
-  username: myla_globals.username,
-  admin: myla_globals.is_superuser,
-  relatedCourses: myla_globals.user_courses_info,
-  isSuperuser: myla_globals.is_superuser,
-  isLoggedIn: !!myla_globals.username,
-  helpURL: myla_globals.help_url
+  username: mylaGlobals.username,
+  admin: mylaGlobals.is_superuser,
+  relatedCourses: mylaGlobals.user_courses_info,
+  isSuperuser: mylaGlobals.is_superuser,
+  isLoggedIn: !!mylaGlobals.username,
+  helpURL: mylaGlobals.help_url
 })
 
 function App (props) {
   const { location } = props
 
   if (!user.isLoggedIn) {
-    return (window.location.href = myla_globals.login)
+    return (window.location.href = mylaGlobals.login)
   }
 
   const coursePageMatch = matchPath(location.pathname, '/courses/:courseId/')
@@ -34,7 +34,7 @@ function App (props) {
 
   return (
     <ThemeProvider theme={siteTheme}>
-      <GoogleAnalyticsTracking gaId={myla_globals.google_analytics_id} />
+      <GoogleAnalyticsTracking gaId={mylaGlobals.google_analytics_id} />
       <Route path='/' exact render={props => <CourseList {...props} user={user} />} />
       <Route path='/courses' exact render={props => <CourseList {...props} user={user} />} />
       {courseId ? <Course user={user} courseId={courseId} {...props} /> : null}
