@@ -2,7 +2,7 @@
     "python.formatting.provider": "autopep8",
     "python.formatting.autopep8Args": ["--ignore=E501", "--max-line-length=120"],
     "python.linting.pycodestyleArgs": ["--ignore=E501", "--max-line-length=120"],
-    "python.linting.pylintArgs": ["--load-plugins=pylint_django"]
+    "python.linting.pylintArgs": ["--load-plugins=pylint_django"],
     "[javascript]": {
         "editor.tabSize": 2
     }
