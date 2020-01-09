@@ -469,6 +469,7 @@ if CSRF_COOKIE_SECURE:
     SESSION_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# For use in iFrames (LTI), this needs to be set to None (although future versions of Chrome will likely break this).
 SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", None)
 
 # IMPORT LOCAL ENV
