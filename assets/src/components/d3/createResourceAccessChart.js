@@ -231,7 +231,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     gBrush.call(brush.move, [center - size / 2, center + size / 2])
   }
 
-  const truncate = (text) => text.length > 10 ? `${text.substring(0, 7)}...` : text
+  const truncate = (text) => text.length > 23 ? `${text.substring(0, 23)}...` : text
 
   // Main chart group
   const mainGroup = svg.append('g')
