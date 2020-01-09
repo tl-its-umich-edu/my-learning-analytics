@@ -41,7 +41,7 @@ urlpatterns = [
     # This path is used by Course.get_absolute_url() to generate course links for the Admin interface.
     path('courses/<int:course_id>', login_required(views.get_home_template,), name="courses"),
 
-    # These URL's are data patterns
+    # These URLs are data patterns
     # GET access patterns
     path('api/v1/courses/<int:course_id>/grade_distribution',
         login_required(views.grade_distribution), name='grade_distribution'),
@@ -97,6 +97,4 @@ if settings.DEBUG:
     import debug_toolbar
     urlpatterns += (
         path('__debug__/', include(debug_toolbar.urls)),
-        # For django versions after 2.0:
-        #path('__debug__/', include(debug_toolbar.urls)),
     )
