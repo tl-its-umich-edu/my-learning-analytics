@@ -5,5 +5,8 @@
     "python.linting.pylintArgs": ["--load-plugins=pylint_django"],
     "[javascript]": {
         "editor.tabSize": 2
-    }
+    },
+    "python.linting.pylintEnabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.enabled": true
 }

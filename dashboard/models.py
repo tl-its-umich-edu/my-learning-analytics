@@ -5,16 +5,14 @@
 #   * Make sure each ForeignKey has `on_delete` set to the desired behavior.
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
-from __future__ import unicode_literals
-
 from django.db import models
 from django.db.models import Q
+from django.db.models.query import QuerySet
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 
-from collections import namedtuple
 from datetime import datetime, timedelta
 import pytz
 
@@ -23,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 from model_utils import Choices
 
-from typing import Union
+from typing import Union, Optional, NamedTuple
 from django.http import HttpResponse, JsonResponse
 
 class AcademicTerms(models.Model):
@@ -55,7 +53,7 @@ class UserDefaultQuerySet(models.QuerySet):
     def get_user_defaults(self,
                           course_id: models.BigIntegerField,
                           sis_user_name: models.CharField,
-                          default_view_type: models.CharField) -> Union[tuple, None]:
+                          default_view_type: models.CharField) -> Optional[tuple]:
         try:
             return self.get(course_id=course_id,
                             user_sis_name=str(sis_user_name),
@@ -86,7 +84,7 @@ class UserDefaultManager(models.Manager):
     def get_user_defaults(self,
                           course_id: models.BigIntegerField,
                           sis_user_name: models.CharField,
-                          default_view_type: models.CharField) -> Union[tuple, None]:
+                          default_view_type: models.CharField) -> Optional[tuple]:
         return self.get_queryset().get_user_defaults(course_id, sis_user_name, default_view_type)
 
     def set_user_defaults(self,
@@ -174,6 +172,10 @@ class CourseManager(models.Manager):
         return self.get_queryset().get_supported_courses()
 
 
+class DateRange(NamedTuple):
+    start: datetime
+    end: datetime
+
 class Course(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Course Id", db_column='id', editable=False)
     canvas_id = models.BigIntegerField(verbose_name="Canvas Course Id", db_column='canvas_id')
@@ -192,7 +194,7 @@ class Course(models.Model):
     def __str__(self) -> models.CharField:
         return self.name
 
-    def get_course_date_range(self) -> namedtuple:
+    def get_course_date_range(self) -> DateRange:
         if self.date_start is not None:
             start = self.date_start
         elif self.term is not None and self.term.date_start is not None:
@@ -207,7 +209,6 @@ class Course(models.Model):
         else:
             logger.warning("No date_end value was found for course or term; setting to two weeks from now")
             end = start + timedelta(weeks=2)
-        DateRange = namedtuple("DateRange", ["start", "end"])
         return DateRange(start, end)
 
     def get_absolute_url(self) -> HttpResponse:
@@ -262,7 +263,7 @@ class CourseViewOption(models.Model):
 
 
 class ResourceQuerySet(models.QuerySet):
-    def get_course_resource_type(self, course_id: models.BigIntegerField) -> Union[list, None]:
+    def get_course_resource_type(self, course_id: models.BigIntegerField) -> Optional[list]:
         """
         Return a list of resources type data collected in the course
         :return:
@@ -278,7 +279,7 @@ class ResourceManager(models.Manager):
     def get_queryset(self) -> ResourceQuerySet:
         return ResourceQuerySet(self.model, using=self._db)
 
-    def get_course_resource_type(self, course_id: models.BigIntegerField) -> Union[list, None]:
+    def get_course_resource_type(self, course_id: models.BigIntegerField) -> Optional[list]:
         return self.get_queryset().get_course_resource_type(course_id)
 
 
@@ -308,7 +309,7 @@ class Submission(models.Model):
     grade_posted_local_date = models.CharField(max_length=255,blank=True, null=True, verbose_name="Posted Grade in local DateTime")
     avg_score = models.FloatField(blank=True, null=True, verbose_name="Average Grade")
 
-    def __str__(self) -> unicode_literals:
+    def __str__(self) -> str:
         return f"Submission Id {self.id} for assignment id {self.assignment_id} for course id {self.course_id} for user id {self.user_id}"
 
     class Meta:
@@ -326,7 +327,7 @@ class UnizinMetadata(models.Model):
 class UserQuerySet(models.query.QuerySet):
     def get_user_in_course(self,
                            user: models.CharField,
-                           course: models.CharField) -> filter:
+                           course: models.CharField) -> QuerySet:
         return self.filter(
             Q(sis_name=user.get_username()) | Q(sis_id=user.get_username()),
             course_id=course.id
@@ -368,7 +369,7 @@ class ResourceAccess(models.Model):
     user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id')
     access_time = models.DateTimeField(verbose_name="Access Time")
 
-    def __str__(self) -> unicode_literals:
+    def __str__(self) -> str:
         return f"Resource {self.resource_id} accessed by {self.user_id}"
 
     class Meta:

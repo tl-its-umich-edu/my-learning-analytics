@@ -41,3 +41,6 @@ django-ptvsd-debug==1.0.3
 django-lti-auth==1.0.0
 django-webpack-loader==0.6.0
 django-csp==3.5
+
+# Remove this when upgrading to Python 3.7
+typing_extensions==3.7.4.1

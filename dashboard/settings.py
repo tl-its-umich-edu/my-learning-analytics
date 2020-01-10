@@ -14,6 +14,7 @@ import os
 import json
 
 from debug_toolbar import settings as dt_settings
+from typing import Tuple
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,7 +27,7 @@ PROJECT_ROOT = os.path.abspath(
 
 if os.getenv("ENV_JSON"):
     # optionally load settings from an environment variable
-    ENV = json.loads(os.getenv("ENV_JSON"))
+    ENV = json.loads(str(os.getenv("ENV_JSON")))
 else:
     # else try loading settings from the json config file
     try:
@@ -279,7 +280,7 @@ try:
 except ImportError:
     pass
 
-AUTHENTICATION_BACKENDS = (
+AUTHENTICATION_BACKENDS: Tuple[str, ...] = (
     'rules.permissions.ObjectPermissionBackend',
     'django_su.backends.SuBackend',
 )

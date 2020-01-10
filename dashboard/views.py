@@ -2,7 +2,7 @@ from django.forms.models import model_to_dict
 from rules.contrib.views import permission_required, objectgetter
 
 import math, json, logging
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.utils import timezone
 
 import numpy as np
@@ -17,13 +17,13 @@ from dashboard.event_logs_types.event_logs_types import EventLogTypes
 from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
-from collections import namedtuple
 
 from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
 from dashboard.settings import RESOURCE_VALUES, RESOURCE_VALUES_MAP, RESOURCE_ACCESS_CONFIG
 from dashboard.settings import COURSES_ENABLED
 
-from typing import Union
+from typing import Union, Optional, NamedTuple, List, Dict
+from typing_extensions import TypedDict
 
 logger = logging.getLogger(__name__)
 # strings for construct resource download url
@@ -44,7 +44,7 @@ RESOURCE_TYPE_STRING = "resource_type"
 DECIMAL_ROUND_DIGIT = 1
 
 
-def gpa_map(grade: Union[None, str]) -> str:
+def gpa_map(grade: Optional[str]) -> str:
     if grade is None:
         return NO_GRADE_STRING
     # convert to float
@@ -66,7 +66,7 @@ def get_home_template(request: HttpRequest) -> HttpResponse:
 @permission_required('dashboard.get_course_info',
                      fn=objectgetter(Course, 'course_id', 'canvas_id'),
                      raise_exception=True)
-def get_course_info(request: HttpRequest, course_id: 0) -> HttpResponse:
+def get_course_info(request: HttpRequest, course_id: int = 0) -> HttpResponse:
     """Returns JSON data about a course
     :param request: HTTP Request
     :type request: Request
@@ -129,7 +129,7 @@ def get_course_info(request: HttpRequest, course_id: 0) -> HttpResponse:
                      fn=objectgetter(Course, 'course_id', 'canvas_id'),
                      raise_exception=True)
 def resource_access_within_week(request: HttpRequest,
-                                course_id: 0) -> HttpResponse:
+                                course_id: int = 0) -> HttpResponse:
     course_id = canvas_id_to_incremented_id(course_id)
 
     current_user = request.user.get_username()
@@ -146,7 +146,7 @@ def resource_access_within_week(request: HttpRequest,
     filter_values = request.GET.get(RESOURCE_TYPE_STRING, ['files', 'videos'])
     filter_values = filter_values.split(",")
 
-    filter_list = []
+    filter_list: List[str] = []
     for filter_value in filter_values:
         if filter_value != '':
             filter_list.extend(RESOURCE_VALUES[filter_value.lower()]['types'])
@@ -345,7 +345,7 @@ def grade_distribution(request, course_id=0):
     logger.debug(f"Grades distribution: {grades}")
     BinningGrade = find_binning_grade_value(grades)
     if BinningGrade is not None and not BinningGrade.binning_all:
-        df['current_grade'] = df['current_grade'].replace(df['current_grade'].head(BinningGrade.index),
+        df['current_grade'] = df['current_grade'].replace(df['current_grade'].head(BinningGrade.bin_index),
                                                       BinningGrade.value)
     summary['show_dash_line'] = show_dashed_line(df['current_grade'].iloc[0], BinningGrade)
     
@@ -408,7 +408,7 @@ def update_user_default_selection_for_views(request, course_id=0):
                      fn=objectgetter(Course, 'course_id', 'canvas_id'),
                      raise_exception=True)
 def get_user_default_selection(request: HttpRequest,
-                               course_id: 0) -> HttpResponse:
+                               course_id:int = 0) -> HttpResponse:
     logger.info(get_user_default_selection.__name__)
     course_id = canvas_id_to_incremented_id(course_id)
     user_sis_name = request.user.get_username()
@@ -432,7 +432,7 @@ def get_user_default_selection(request: HttpRequest,
 @permission_required('dashboard.assignments',
                      fn=objectgetter(Course, 'course_id', 'canvas_id'),
                      raise_exception=True)
-def assignments(request: HttpRequest, course_id: 0) -> HttpResponse:
+def assignments(request: HttpRequest, course_id:int = 0) -> HttpResponse:
     logger.info(assignments.__name__)
 
     course_id = canvas_id_to_incremented_id(course_id)
@@ -443,11 +443,11 @@ def assignments(request: HttpRequest, course_id: 0) -> HttpResponse:
     percent_selection = float(request.GET.get('percent', '0.0'))
 
     # json for eventlog
-    data = {
+    event_data = {
         "course_id": course_id,
         "percent_selection": percent_selection
     }
-    eventlog(request.user, EventLogTypes.EVENT_VIEW_ASSIGNMENT_PLANNING.value, extra=data)
+    eventlog(request.user, EventLogTypes.EVENT_VIEW_ASSIGNMENT_PLANNING.value, extra=event_data)
 
     logger.info('selection from assignment Planning {}'.format(percent_selection))
 
@@ -507,22 +507,23 @@ def assignments(request: HttpRequest, course_id: 0) -> HttpResponse:
     weeks = sorted(week_list)
     full = []
     for i, week in enumerate(weeks):
-        data = {}
-        data["week"] = np.uint64(week).item()
-        data["id"] = i + 1
-        dd_items = data["due_date_items"] = []
+
+        week_data: Dict = {}
+        week_data["week"] = np.uint64(week).item()
+        week_data["id"] = i + 1
+        week_data["due_date_items"] = []
         for item in assignment_list:
             assignment_due_date_grp = {}
             if item['week'] == week:
                 assignment_due_date_grp['due_date'] = item['due_date']
                 assignment_due_date_grp['assignment_items'] = item['assign']
-                dd_items.append(assignment_due_date_grp)
-        full.append(data)
+                week_data["due_date_items"].append(assignment_due_date_grp)
+        full.append(week_data)
     assignment_data['plan'] = json.loads(json.dumps(full))
     return HttpResponse(json.dumps(assignment_data), content_type='application/json')
 
 
-def get_course_assignments(course_id: int) -> dict:
+def get_course_assignments(course_id: int) -> pd.DataFrame:
     sql=f"""select assign.*,sub.avg_score from
             (select ifnull(assignment_id, 0) as assignment_id ,name,assign_grp_name,grp_id,due_date,points_possible,group_points,weight,drop_lowest,drop_highest from
             (select a.id as assignment_id,a.assignment_group_id, a.local_date as due_date,a.name,a.points_possible from assignment as a  where a.course_id =%(course_id)s) as app right join
@@ -562,7 +563,7 @@ def get_course_assignments(course_id: int) -> dict:
 
 
 def get_user_assignment_submission(current_user: str,
-                                   assignments_in_course_df: dict,
+                                   assignments_in_course_df: pd.DataFrame,
                                    course_id: int) -> dict:
     sql = "select assignment_id, score, graded_date from submission where " \
           "user_id=(select user_id from user where sis_name = %(current_user)s and course_id = %(course_id)s ) and course_id = %(course_id)s"
@@ -570,7 +571,7 @@ def get_user_assignment_submission(current_user: str,
                                          params={'course_id': course_id,
                                                  "current_user": current_user})
     if assignment_submissions.empty:
-        logger.info('The user %s seems to be a not student in the course.' % current_user)
+        logger.info('The user %s seems to not not be a student in the course.' % current_user)
         # manually adding the columns for display in UI
         assignment_submissions = pd.DataFrame()
         assignment_submissions['assignment_id'] = assignments_in_course_df['assignment_id']
@@ -619,8 +620,7 @@ def percent_calculation(consider_weight: bool,
         return round((row['points_possible'] / row['group_points']) * row['weight'], 2)
     if consider_weight and row['group_points'] != 0:
         return round((row['points_possible'] / row['group_points']) * row['weight'], 2)
-    if not consider_weight:
-        return round((row['points_possible'] / total_points) * 100, 2)
+    return round((row['points_possible'] / total_points) * 100, 2)
 
 
 def find_min_week(course_id: int) -> int:
@@ -646,14 +646,14 @@ def is_weight_considered(course_id: int) -> bool:
     return value
 
 
-def get_course_date_start(course_id: int) -> int:
+def get_course_date_start(course_id: int) -> datetime:
     logger.info(get_course_date_start.__name__)
     course_date_start = Course.objects.get(id=course_id).get_course_date_range().start
 
     return course_date_start
 
 
-def are_weighted_assignments_hidden(course_id: int, df: dict) -> bool:
+def are_weighted_assignments_hidden(course_id: int, df: pd.DataFrame) -> bool:
     """
     if assignments are weighted then assignment groups weight totals =100% . The code is checking if assignment groups
     has group points corresponding to group weight and if not assignments are hidden
@@ -678,14 +678,18 @@ def are_weighted_assignments_hidden(course_id: int, df: dict) -> bool:
         else:
             logger.info(f"few weighted assignments in course {course_id} are hidden")
             return True
+    return False 
 
+class BinningGrade(NamedTuple):
+    value: int
+    bin_index: int
+    binning_all: bool
 
-def find_binning_grade_value(grades: list) -> namedtuple:
+def find_binning_grade_value(grades: list) -> BinningGrade:
     fifth_item = grades[4]
     next_to_fifth_item = grades[5]
     if next_to_fifth_item - fifth_item > 2:
-        BinningGrade = get_binning_grade()
-        return BinningGrade(value=fifth_item, index=4, binning_all=False)
+        return BinningGrade(value=fifth_item, bin_index=4, binning_all=False)
     else:
         return binning_logic(grades, fifth_item)
 
@@ -697,14 +701,14 @@ def is_odd(num: int) -> bool:
         return True
 
 
-def show_dashed_line(grade: int, BinningGrade: namedtuple) -> bool:
+def show_dashed_line(grade: int, binning_grade: BinningGrade) -> bool:
     """
     logic determine to show dashed line or not.
     :param grade:
     :param BinningGrade:
     :return:
     """
-    if BinningGrade.binning_all or grade > 96 or grade < 2:
+    if binning_grade.binning_all or grade > 96 or grade < 2:
         return False
     else:
         return True
@@ -721,9 +725,10 @@ def check_if_grade_qualifies_for_binning(grade: int,
     # case 95.89, 94.76
     if is_odd(int(grade)):
         return True
+    return False
 
 
-def binning_logic(grades: int, fifth_item_in_list: str) -> namedtuple:
+def binning_logic(grades: List[int], fifth_item_in_list: str) -> BinningGrade:
     """
     Histogram binning is by 2 [ [0,2], [2,4], [4,6], …..] each item in the list starting number is inclusive and second
     is exclusive.
@@ -738,18 +743,12 @@ def binning_logic(grades: int, fifth_item_in_list: str) -> namedtuple:
     :return: max grade in the binned list, length of binned grades, bool value indicating whether all grades are being binned
     """
     binning_list = grades[:5]
-    BinningGrade = get_binning_grade()
     for grade in grades[5:]:
         if check_if_grade_qualifies_for_binning(grade, fifth_item_in_list):
             binning_list.append(grade)
         else:
             return BinningGrade(max(binning_list), len(binning_list), False)
     return BinningGrade(max(binning_list), len(binning_list), True)
-
-
-def get_binning_grade() -> namedtuple:
-    return namedtuple('BinningGrade', ['value', 'index', 'binning_all'])
-
 
 def df_default_display_settings():
     pd.set_option('display.max_column', None)
@@ -769,7 +768,7 @@ def courses_enabled(request: HttpRequest) -> Union[HttpResponse, HttpResponseFor
     """ Returns json for all courses we currently support and are enabled """
 
     if COURSES_ENABLED:
-        data = {}
+        data: Dict = {}
         for cvo in CourseViewOption.objects.all():
             data.update(cvo.json())
 

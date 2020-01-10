@@ -9,16 +9,25 @@ from dashboard.common.db_util import canvas_id_to_incremented_id
 from .models import CourseViewOption, Course
 
 from django.forms.models import ModelForm
+from typing import Tuple, Any
+from typing_extensions import Protocol
 
-from typing import Union
 from django.http import HttpRequest
 
 # Always save the OneToOne Fields
 # https://stackoverflow.com/a/3734700/3708872
 
 
+# These two classes are needed for typing issues in admin
+# https://github.com/python/mypy/issues/2087
+class AdminAttributes(Protocol):
+    short_description: str
+
+def admin_attr_decorator(func: Any) -> AdminAttributes:
+    return func
+
 class AlwaysChangedModelForm(ModelForm):
-    def has_changed(self) -> Union[bool, super]:
+    def has_changed(self) -> bool:
         if not self.instance.pk:
             return True
         return super(AlwaysChangedModelForm, self).has_changed()
@@ -28,7 +37,7 @@ class CourseViewOptionInline(admin.StackedInline):
     model = CourseViewOption
     form = AlwaysChangedModelForm
 
-    exclude = ()
+    exclude: Tuple[str, ...] = ()
 
     # exclude disabled views
     for view in CourseViewOption.VIEWS:
@@ -58,6 +67,7 @@ class CourseAdmin(admin.ModelAdmin):
 
     # Need this method to correctly display the line breaks
     @staticmethod
+    @admin_attr_decorator
     def _courseviewoption(obj: Course) -> mark_safe:
         return mark_safe(linebreaksbr(obj.courseviewoption))
     _courseviewoption.short_description = "Course View Option(s)"
