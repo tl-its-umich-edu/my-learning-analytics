@@ -167,7 +167,7 @@ function AssignmentTable (props) {
                       {a.name}
                     </TableCell>
                     <TableCell className={classes.narrowCell}>
-                      {`${a.percentOfFinalGrade}%`}
+                      {`${roundToOneDecimal(a.percentOfFinalGrade)}%`}
                     </TableCell>
                     <TableCell style={{ width: '30%' }}>
                       {
