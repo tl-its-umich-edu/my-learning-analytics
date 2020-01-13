@@ -62,5 +62,17 @@ Then you can edit your files! (Probably in /code/dashboard)
 ## Running front-end tests
 `docker exec -it webpack_watcher npm test` will run the test suite for the front-end React application. [Jest](https://jestjs.io/) is the testing framework used. More tests (including back-end tests) are planned for the future.
 
+## Running static type checking
+Static type checking has been added. VSCode should check this by default with the settings. You need Python 3.7.x to run these checks. 
+
+You can check this on the command line locally with:
+`pip install mypy`
+`mypy --ignore-missing-imports -p dashboard`
+
+Or you can check after you start the running container with:
+`docker exec -it student_dashboard /bin/bash -c "mypy --ignore-missing-imports -p dashboard"`
+
+[See the mypy docs for more info](https://mypy.readthedocs.io/en/stable/getting_started.html#installing-and-running-mypy)
+
 ## Code Review
 All contributions will be code reviewed and you may need to make some changes to your contribution. We really appreciate tests as well, so if at all possible please try to add tests.
