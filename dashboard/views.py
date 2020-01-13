@@ -9,13 +9,12 @@ import numpy as np
 import pandas as pd
 from django.conf import settings
 from django.contrib import auth
-from django.contrib.flatpages.models import FlatPage
 from django.db import connection as conn
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
-from dashboard.common.db_util import canvas_id_to_incremented_id, get_user_courses_info
+from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
 from collections import namedtuple
@@ -42,6 +41,7 @@ RESOURCE_TYPE_STRING = "resource_type"
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
 
+
 def gpa_map(grade):
     if grade is None:
         return NO_GRADE_STRING
@@ -58,47 +58,7 @@ def gpa_map(grade):
 
 
 def get_home_template(request):
-    username = ""
-    user_courses_info = []
-    login_url = ""
-    logout_url = ""
-    google_analytics_id = ""
-
-    current_user = request.user
-    is_superuser = current_user.is_superuser
-    if current_user.is_authenticated:
-        username = current_user.get_username()
-        user_courses_info = get_user_courses_info(username)
-
-    if settings.LOGIN_URL:
-        login_url = settings.LOGIN_URL
-    if settings.LOGOUT_URL:
-        logout_url = settings.LOGOUT_URL
-    if settings.GA_ID:
-        google_analytics_id = settings.GA_ID
-    flatpages = FlatPage.objects.all()
-    if flatpages:
-        help_url = flatpages[0].content
-    else:
-        help_url = "https://sites.google.com/umich.edu/my-learning-analytics-help/home"
-
-    myla_globals = {
-        "username" : username,
-        "is_superuser": is_superuser,
-        "user_courses_info": user_courses_info,
-        "login": login_url,
-        "logout": logout_url,
-        "google_analytics_id": google_analytics_id,
-        "help_url": help_url
-    }
-
-    return render(request, 'frontend/index.html', context={'myla_globals': json.dumps(myla_globals)})
-
-
-@permission_required('dashboard.get_course_template',
-    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
-def get_course_template(request, course_id=0):
-    return render(request, 'frontend/index.html', {'course_id': course_id})
+    return render(request, 'frontend/index.html')
 
 
 @permission_required('dashboard.get_course_info',
