@@ -2,7 +2,7 @@ import React from 'react'
 import 'rc-slider/assets/index.css'
 import 'rc-tooltip/assets/bootstrap.css'
 import { Range } from 'rc-slider'
-import siteTheme from '../siteTheme'
+import { siteTheme } from '../globals'
 
 const rangeSlider = props => {
   const activeDotStyle = {
