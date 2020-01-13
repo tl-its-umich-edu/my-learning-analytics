@@ -31,9 +31,7 @@
             z-index: 5000;
         }
     </style>
-    <script>
-        const myla_globals = {{ myla_globals | safe }};
-    </script>
+    {{ myla_globals|json_script:"myla_globals" }}
 </head>
 <body>
     {% include "su/is_su.html" %}
