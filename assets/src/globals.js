@@ -16,7 +16,7 @@ const user = Object.freeze({
   helpURL: mylaGlobals.help_url
 })
 
-let palette = Object.assign({}, defaultPalette)
+const palette = Object.assign({}, defaultPalette)
 if (mylaGlobals.primary_ui_color !== null) {
   palette.primary.main = mylaGlobals.primary_ui_color
 }

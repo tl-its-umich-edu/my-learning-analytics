@@ -1,4 +1,4 @@
-let defaultPalette = {
+const defaultPalette = {
   /* The 'primary' color is used for structural components like the AppBar and SelectCard.
      Different institutions using this application are encouraged to modify the provided value. */
   primary: {

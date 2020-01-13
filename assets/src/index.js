@@ -7,7 +7,6 @@ import App from './containers/App'
 import { user, siteTheme, gaId, loginURL } from './globals'
 // import * as serviceWorker from './serviceWorker'
 
-
 ReactDOM.render(
   <Router basename='/'>
     <ThemeProvider theme={siteTheme}>
