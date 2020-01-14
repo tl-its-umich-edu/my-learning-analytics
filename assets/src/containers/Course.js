@@ -74,7 +74,7 @@ function Course (props) {
               render={props =>
                 <AssignmentPlanningV2
                   {...props}
-                  disabled={!courseInfo.course_view_options.ap}
+                  disabled={!courseInfo.course_view_options.apv2}
                   courseId={courseId}
                 />}
             />

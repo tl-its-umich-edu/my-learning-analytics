@@ -56,6 +56,7 @@ class Command(BaseCommand):
                 course_id=prefixed_course_id,
                 show_resources_accessed=True,
                 show_assignment_planning=True,
+                show_assignment_planning_v2=True,
                 show_grade_distribution=True
             )
             course_view_obj.save()
