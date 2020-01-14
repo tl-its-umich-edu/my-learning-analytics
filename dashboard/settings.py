@@ -45,7 +45,13 @@ GA_ID = ENV.get('GA_ID', '')
 
 # Resource values from env
 RESOURCE_VALUES = ENV.get("RESOURCE_VALUES", {"files": {"types": ["canvas"], "icon": "fas fa-file fa-lg"}})
-RESOURCE_URLS = ENV.get("RESOURCE_URLS", {"canvas": {"prefix": "https://demo.instructure.com/files/", "postfix": "/download?download_frd=1"}})
+
+# Convience map to be able to get from types
+RESOURCE_VALUES_MAP = {
+    resource_type : resource_value
+    for resource_value in RESOURCE_VALUES
+    for resource_type in RESOURCE_VALUES.get(resource_value).get('types')
+}
 
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
 SITE_ID = 1
@@ -110,7 +116,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -136,8 +141,9 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django_su.context_processors.is_su',
                 'django_settings_export.settings_export',
-                'dashboard.context_processors.last_updated',
                 'dashboard.context_processors.get_git_version_info',
+                'dashboard.context_processors.get_myla_globals',
+                'dashboard.context_processors.last_updated'
             ],
         },
     },
@@ -467,6 +473,11 @@ if CSRF_COOKIE_SECURE:
     CSRF_TRUSTED_ORIGINS = ENV.get("CSRF_TRUSTED_ORIGINS", [])
     SESSION_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# When using the application with iframes (e.g. with LTI), these need to be set to None. However, we'll need to update
+# this when new browser versions expect (and the Django version allows) the string "None".
+SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", None)
+CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", None)
 
 # IMPORT LOCAL ENV
 # =====================

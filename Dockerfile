@@ -27,7 +27,7 @@ RUN npm prune --production && \
     find /usr/src/app/node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
 
 # FROM directive instructing base image to build upon
-FROM python:3.6 AS app
+FROM python:3.7 AS app
 
 # EXPOSE port 5000 to allow communication to/from server
 EXPOSE 5000

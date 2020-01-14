@@ -9,23 +9,23 @@ import numpy as np
 import pandas as pd
 from django.conf import settings
 from django.contrib import auth
-from django.contrib.flatpages.models import FlatPage
 from django.db import connection as conn
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
-from dashboard.common.db_util import canvas_id_to_incremented_id, get_user_courses_info
+from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
 from collections import namedtuple
 
 from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
-from dashboard.settings import RESOURCE_VALUES, COURSES_ENABLED
+from dashboard.settings import RESOURCE_VALUES, RESOURCE_VALUES_MAP, RESOURCE_ACCESS_CONFIG
+from dashboard.settings import COURSES_ENABLED
 
 logger = logging.getLogger(__name__)
 # strings for construct resource download url
-RESOURCE_URLS = settings.RESOURCE_URLS
+
 CANVAS_FILE_ID_NAME_SEPARATOR = "|"
 
 # string for no grade
@@ -37,17 +37,10 @@ NO_GRADE_STRING = "NO_GRADE"
 
 # string for resource type
 RESOURCE_TYPE_STRING = "resource_type"
-RESOURCE_VALUES = settings.RESOURCE_VALUES
-INVERSE = {}
-for key, value in RESOURCE_VALUES.items():
-    for resource_type in value['types']:
-        INVERSE[resource_type] = key
-
-# Is courses_enabled api enabled/disabled?
-COURSES_ENABLED = settings.COURSES_ENABLED
 
 # how many decimal digits to keep
 DECIMAL_ROUND_DIGIT = 1
+
 
 def gpa_map(grade):
     if grade is None:
@@ -65,47 +58,7 @@ def gpa_map(grade):
 
 
 def get_home_template(request):
-    username = ""
-    user_courses_info = []
-    login_url = ""
-    logout_url = ""
-    google_analytics_id = ""
-
-    current_user = request.user
-    is_superuser = current_user.is_superuser
-    if current_user.is_authenticated:
-        username = current_user.get_username()
-        user_courses_info = get_user_courses_info(username)
-
-    if settings.LOGIN_URL:
-        login_url = settings.LOGIN_URL
-    if settings.LOGOUT_URL:
-        logout_url = settings.LOGOUT_URL
-    if settings.GA_ID:
-        google_analytics_id = settings.GA_ID
-    flatpages = FlatPage.objects.all()
-    if flatpages:
-        help_url = flatpages[0].content
-    else:
-        help_url = "https://sites.google.com/umich.edu/my-learning-analytics-help/home"
-
-    myla_globals = {
-        "username" : username,
-        "is_superuser": is_superuser,
-        "user_courses_info": user_courses_info,
-        "login": login_url,
-        "logout": logout_url,
-        "google_analytics_id": google_analytics_id,
-        "help_url": help_url
-    }
-
-    return render(request, 'frontend/index.html', context={'myla_globals': json.dumps(myla_globals)})
-
-
-@permission_required('dashboard.get_course_template',
-    fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
-def get_course_template(request, course_id=0):
-    return render(request, 'frontend/index.html', {'course_id': course_id})
+    return render(request, 'frontend/index.html')
 
 
 @permission_required('dashboard.get_course_info',
@@ -330,12 +283,13 @@ def resource_access_within_week(request, course_id=0):
 
     output_df['resource_name'] = output_df.apply(
         lambda row:
-            RESOURCE_URLS[row.resource_type]["prefix"] +
+            (RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("prefix") +
             row.resource_id_part +
-            RESOURCE_URLS[row.resource_type]["postfix"] +
+            RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("postfix") +
             CANVAS_FILE_ID_NAME_SEPARATOR +
             row.resource_name_part + CANVAS_FILE_ID_NAME_SEPARATOR +
-            RESOURCE_VALUES[INVERSE[row.resource_type]]['icon'],
+            RESOURCE_VALUES.get(RESOURCE_VALUES_MAP.get(row.resource_type)).get('icon')
+            ),
         axis=1)
     output_df.drop(columns=['resource_id_part', 'resource_name_part', 'resource_id_name'], inplace=True)
 

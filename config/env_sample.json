@@ -41,6 +41,9 @@
     "/*  Enable secure cookies, also set your trusted origin (example of instructure.com)": "*/",
     "CSRF_COOKIE_SECURE": false,
     "CSRF_TRUSTED_ORIGINS": ["instructure.com"],
+    "/*  SameSite settings for Session and CSRF (defaults in settings.py should work)": "*/",
+    "SESSION_COOKIE_SAMESITE": null,
+    "CSRF_COOKIE_SAMESITE": null,
     "/*  ID for your Google Analytics, defaults to nothing/disabled": "*/",
     "GA_ID": "",
     "/*  Any logs that django outputs, turn these off for production": "*/",
@@ -168,22 +171,20 @@
         "videos": {"types": ["leccap"], "icon": "fas fa-video fa-lg"}
     },
     "/* Institute specific urls add or remove to your needs, will be used for Resources view": "*/",
-    "RESOURCE_URLS": {
-        "canvas": {"prefix": "https://example.instructure.com/files/", "postfix": "/download?download_frd=1"},
-        "leccap": {"prefix": "https://leccap.engin.umich.edu/leccap/viewer/r/", "postfix": ""}
-    },
     "/*cron queries to pull the data from various caliper data sources replace if not relevant with your institution": "*/",
     "RESOURCE_ACCESS_CONFIG": {
-        "canvas_data": {
+        "canvas": {
             "query": "SELECT 'canvas' AS resource_type, CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS resource_id, CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS INT64) AS user_id, CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.group.id'),31) AS INT64) AS course_id, COALESCE(JSON_EXTRACT_SCALAR(event, '$.object.extensions[\\'com.instructure.canvas\\'].asset_name'), JSON_EXTRACT_SCALAR(event, '$.object.extensions[\\'com.instructure.canvas\\'].filename'), JSON_EXTRACT_SCALAR(event, '$.object.name'), 'attachment') as name, datetime(EVENT_TIME) as access_time FROM event_store.events where JSON_EXTRACT_SCALAR(event, '$.edApp.id') IN UNNEST(['http://m.canvas.umich.edu/' , 'http://umich.instructure.com/' ]) and type = 'NavigationEvent' and SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'),24,10) = 'attachment' and JSON_EXTRACT_SCALAR(event, '$.action') = 'NavigatedTo' and JSON_EXTRACT_SCALAR(event, '$.membership.member.id') is not null and SUBSTR(JSON_EXTRACT_SCALAR(event, '$.group.id'),31) IN UNNEST(@course_ids)",
             "app_display_name": "Canvas Files",
-            "canvas_course_id_format": "LONG"
+            "canvas_course_id_format": "LONG",
+            "urls": {"prefix": "https://example.instructure.com/files/", "postfix": "/download?download_frd=1"}
         },
         "leccap": {
             "query": "select 'leccap' AS resource_type, CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 48) AS STRING) AS resource_id, @canvas_data_id_increment + CAST(JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_user_id') AS INT64) AS user_id, @canvas_data_id_increment + CAST(JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_course_id') AS INT64) AS course_id, JSON_EXTRACT_SCALAR(event, '$.object.name') as name, datetime(EVENT_TIME) as access_time FROM event_store.events where JSON_EXTRACT_SCALAR(event, '$.edApp') = 'https://leccap.engin.umich.edu/#applicationName=Lecture+Capture' and type = 'MediaEvent' and JSON_EXTRACT_SCALAR(event, '$.action') = 'Started' and JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_course_id') is not null and JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_course_id') IN UNNEST(@course_ids_short)",
             "app_display_name": "Lecture Capture",
             "/* mention if the caliper event data is providing long or short canvas id and change the query to store long id as in this case": "*/",
-            "canvas_course_id_format": "SHORT"
+            "canvas_course_id_format": "SHORT",
+            "urls": {"prefix": "https://leccap.engin.umich.edu/leccap/viewer/r/", "postfix": ""}
         }
     },
     "/* Disable/Enable courses_enabled api": "*/",
