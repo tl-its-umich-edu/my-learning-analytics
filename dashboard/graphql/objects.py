@@ -79,8 +79,7 @@ class AssignmentGroupType(DjangoObjectType):
     class Meta:
         model = AssignmentGroups
         only_fields = (
-            'id', 'course_id', 'name', 'weight'
-            'group_points', 'drop_lowest', 'drop_highest'
+            'id', 'course_id', 'name', 'weight', 'group_points', 'drop_lowest', 'drop_highest'
         )
 
 
@@ -144,8 +143,7 @@ class AssignmentType(DjangoObjectType):
     class Meta:
         model = Assignment
         only_fields = (
-            'id', 'name', 'due_date', 'local_date', 'points_possible'
-            'course_id', 'assignment_group_id', 'average_grade', 'median_grade'
+            'id', 'name', 'due_date', 'local_date', 'points_possible', 'course_id', 'assignment_group_id'
         )
 AssignmentGroupType.assignments = graphene.List(AssignmentType)
 AssignmentGroupType.assignments = graphene.List(AssignmentType)
@@ -217,6 +215,5 @@ class CourseType(DjangoObjectType):
     class Meta:
         model = Course
         only_fields = (
-            'id', 'canvas_id', 'name', 'assignment_weight_consideration'
-            'date_start', 'date_end', 'term_id'
+            'id', 'canvas_id', 'name', 'date_start', 'date_end', 'term'
         )
