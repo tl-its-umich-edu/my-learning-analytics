@@ -17,7 +17,7 @@ django-debug-toolbar>=2.0,<2.0.99
 promise==2.2.1
 
 # graphql
-graphene-django>=2.0
+graphene-django>=2.8.0,<2.8.99
 django-filter>=2.2.0,<2.2.99
 
 # object-level permissions
