@@ -13,6 +13,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% use_macro title %}</title>
+    <link rel="stylesheet" type="text/css" href="/static/@fortawesome/fontawesome-free/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/static/@fortawesome/fontawesome-free/css/fontawesome.css">
+    <link rel="stylesheet" type="text/css" href="/static/@fortawesome/fontawesome-free/css/fontawesome.min.css">
     <style>
         .django-su-warning {
             position: fixed;
@@ -28,9 +31,7 @@
             z-index: 5000;
         }
     </style>
-    <script>
-        const myla_globals = {{ myla_globals | safe }};
-    </script>
+    {{ myla_globals|json_script:"myla_globals" }}
 </head>
 <body>
     {% include "su/is_su.html" %}

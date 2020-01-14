@@ -1,5 +1,10 @@
 import logging, os
-from dashboard.settings import SHA_ABBREV_LENGTH
+
+from django.conf import settings
+from django.contrib.flatpages.models import FlatPage
+
+from dashboard.common.db_util import get_user_courses_info
+
 logger = logging.getLogger(__name__)
 
 
@@ -17,7 +22,7 @@ def get_git_version_info():
 
     commit = os.getenv("GIT_COMMIT", "")
     if commit != "":
-        commit_abbrev = commit[:SHA_ABBREV_LENGTH]
+        commit_abbrev = commit[:settings.SHA_ABBREV_LENGTH]
     else:
         commit_abbrev = ""
 
@@ -33,9 +38,45 @@ def get_git_version_info():
     return git_version
 
 
-def look_up_key_for_value(myDict, searchFor):
-    for key, value in myDict.items():
-        for v in value:
-            if searchFor in v:
+def search_key_for_resource_value(my_dict, search_for):
+    for key, value in my_dict.items():
+        for resource_types in value["types"]:
+            if search_for in resource_types:
                 return key
     return None
+
+
+def get_myla_globals(current_user):
+    username = ""
+    user_courses_info = []
+    login_url = ""
+    logout_url = ""
+    google_analytics_id = ""
+
+    is_superuser = current_user.is_superuser
+    if current_user.is_authenticated:
+        username = current_user.get_username()
+        user_courses_info = get_user_courses_info(username)
+
+    if settings.LOGIN_URL:
+        login_url = settings.LOGIN_URL
+    if settings.LOGOUT_URL:
+        logout_url = settings.LOGOUT_URL
+    if settings.GA_ID:
+        google_analytics_id = settings.GA_ID
+    flatpages = FlatPage.objects.all()
+    if flatpages:
+        help_url = flatpages[0].content
+    else:
+        help_url = "https://sites.google.com/umich.edu/my-learning-analytics-help/home"
+
+    myla_globals = {
+        "username" : username,
+        "is_superuser": is_superuser,
+        "user_courses_info": user_courses_info,
+        "login": login_url,
+        "logout": logout_url,
+        "google_analytics_id": google_analytics_id,
+        "help_url": help_url
+    }
+    return myla_globals
