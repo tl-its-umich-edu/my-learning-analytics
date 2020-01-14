@@ -1,14 +1,16 @@
-import logging, os
+import logging, os, HttpRequest
 
 from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
 
 from dashboard.common.db_util import get_user_courses_info
 
+from typing import Dict, Optional
+
 logger = logging.getLogger(__name__)
 
 
-def format_github_url_using_https(github_url):
+def format_github_url_using_https(github_url: str) -> str:
     ssh_base = "git@"
     https_base = "https://"
     # If the URL is formatted for SSH, convert, otherwise, do nothing
@@ -17,7 +19,7 @@ def format_github_url_using_https(github_url):
     return github_url
 
 
-def get_git_version_info():
+def get_git_version_info() -> Dict[str, str]:
     logger.debug(get_git_version_info.__name__)
 
     commit = os.getenv("GIT_COMMIT", "")
@@ -38,7 +40,7 @@ def get_git_version_info():
     return git_version
 
 
-def search_key_for_resource_value(my_dict, search_for):
+def search_key_for_resource_value(my_dict: Dict, search_for:str) -> Optional[str]:
     for key, value in my_dict.items():
         for resource_types in value["types"]:
             if search_for in resource_types:
@@ -46,7 +48,7 @@ def search_key_for_resource_value(my_dict, search_for):
     return None
 
 
-def get_myla_globals(current_user):
+def get_myla_globals(current_user: HttpRequest.user) -> Dict[str, str] :
     username = ""
     user_courses_info = []
     login_url = ""

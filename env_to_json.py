@@ -4,6 +4,8 @@ import json
 import sys
 import csv
 
+from typing import Any
+
 _BOOLEANS = {'1': True, 'yes': True, 'true': True, 'on': True,
              '0': False, 'no': False, 'false': False, 'off': False}
 
@@ -28,16 +30,17 @@ with open(dotenv, 'r') as f:
 newcontent = []
 
 # removes whitespace chars like '\n' at the end of each line
+y: Any
 for x in content:
     if '#' in x:
         y = x.strip().replace("'","\'").replace('#','')
         newcontent.append(['/* '+y,"*/"])  
     elif '=' in x:
         y = x.strip().replace("'","\'")
-        y = y.split('=', 1)
+        y_split: Any = y.split('=', 1)
         # If value is a csv split it to a list
-        if ',' in y[1]:
-           y[1] = list(csv.reader([y[1]]))[0]
+        if ',' in y_split[1]:
+           y_split[1] = list(csv.reader([y_split[1]]))[0]
         else:
            y[1] = y[1].strip() 
            # Try to convert to integer
@@ -50,5 +53,5 @@ for x in content:
 
 #print('My list:', *newcontent, sep='\n- ')
 
-print(json.dumps(dict(newcontent), indent=4, separators=(',', ': ')))
+print(json.dumps(newcontent, indent=4, separators=(',', ': ')))
 

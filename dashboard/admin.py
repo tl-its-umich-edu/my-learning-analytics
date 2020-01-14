@@ -1,18 +1,18 @@
 from django.contrib import admin
 from django import forms
 from django.conf import settings
+from django.http import HttpRequest
+from django.forms.models import ModelForm
 from django.utils.html import format_html
-from django.utils.safestring import mark_safe
+from django.utils.safestring import mark_safe, SafeText
 from django.template.defaultfilters import linebreaksbr
 
 from dashboard.common.db_util import canvas_id_to_incremented_id
 from .models import CourseViewOption, Course
 
-from django.forms.models import ModelForm
-from typing import Tuple, Any
+from typing import Tuple, Any, Dict
 from typing_extensions import Protocol
 
-from django.http import HttpRequest
 
 # Always save the OneToOne Fields
 # https://stackoverflow.com/a/3734700/3708872
@@ -50,7 +50,7 @@ class CourseForm(forms.ModelForm):
         model = Course
         exclude = ()
 
-    def clean(self) -> str:
+    def clean(self) -> Dict:
         canvas_id = self.cleaned_data.get('canvas_id')
         if not canvas_id or not str(canvas_id).isdigit():
             raise forms.ValidationError(
@@ -73,13 +73,13 @@ class CourseAdmin(admin.ModelAdmin):
     _courseviewoption.short_description = "Course View Option(s)"
 
     @staticmethod
-    def course_link(obj: Course) -> format_html:
+    def course_link(obj: Course) -> SafeText:
         return format_html('<a href="{}">Link</a>', obj.get_absolute_url())
 
     # When saving the course, update the id based on canvas id
-    def save_model(self, request: HttpRequest, obj: Course, form: ModelForm, change: AlwaysChangedModelForm) -> super:
+    def save_model(self, request: HttpRequest, obj: Course, form: ModelForm, change: AlwaysChangedModelForm):
         obj.id = canvas_id_to_incremented_id(obj.canvas_id)
-        return super(CourseAdmin, self).save_model(request, obj, form, change)
+        super(CourseAdmin, self).save_model(request, obj, form, change)
 
 
 admin.site.register(Course, CourseAdmin)

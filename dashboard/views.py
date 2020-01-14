@@ -22,7 +22,7 @@ from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSele
 from dashboard.settings import RESOURCE_VALUES, RESOURCE_VALUES_MAP, RESOURCE_ACCESS_CONFIG
 from dashboard.settings import COURSES_ENABLED
 
-from typing import Union, Optional, NamedTuple, List, Dict
+from typing import Union, Optional, NamedTuple, List, Dict, Any
 from typing_extensions import TypedDict
 
 logger = logging.getLogger(__name__)
@@ -564,7 +564,7 @@ def get_course_assignments(course_id: int) -> pd.DataFrame:
 
 def get_user_assignment_submission(current_user: str,
                                    assignments_in_course_df: pd.DataFrame,
-                                   course_id: int) -> dict:
+                                   course_id: int) -> Dict[str, Any]:
     sql = "select assignment_id, score, graded_date from submission where " \
           "user_id=(select user_id from user where sis_name = %(current_user)s and course_id = %(course_id)s ) and course_id = %(course_id)s"
     assignment_submissions = pd.read_sql(sql, conn,
@@ -584,14 +584,14 @@ def get_user_assignment_submission(current_user: str,
 
 
 # don't show the avg scores for student when individual assignment is not graded as canvas currently don't show it
-def no_show_avg_score_for_ungraded_assignments(row: dict) -> Union[str, float]:
+def no_show_avg_score_for_ungraded_assignments(row: Dict) -> Union[str, float]:
     if row['score'] is None:
         return 'Not available'
     else:
         return row['avg_score']
 
 
-def user_percent(row: dict) -> int:
+def user_percent(row: Dict) -> int:
     if row['graded']:
         s = round((row['score'] / row['points_possible']) * row['towards_final_grade'], 2)
         return s
@@ -602,7 +602,7 @@ def user_percent(row: dict) -> int:
 def percent_calculation(consider_weight: bool,
                         total_points: bool,
                         hidden_assignments: bool,
-                        row: dict) -> int:
+                        row: Dict) -> int:
     """
     This function handles how much % an assignment worth in a course. The cases
     includes 1. assignments groups has weights and no hidden assignments in them
@@ -629,7 +629,7 @@ def find_min_week(course_id: int) -> int:
     return week
 
 
-def find_current_week(row: dict) -> bool:
+def find_current_week(row: Dict) -> bool:
     # this needs to be local timezone
     current_date = timezone.localtime(timezone.now())
     year, week, dow = current_date.isocalendar()  # dow = day of week

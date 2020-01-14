@@ -42,5 +42,9 @@ django-lti-auth==1.0.0
 django-webpack-loader==0.6.0
 django-csp==3.5
 
+# TypingDict and Protocol are not available until Python 3.8 (PEP 589)
+typing-extensions==3.7.4.1
+
 # For running the type checking in the container
 mypy==0.761
+
