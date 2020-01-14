@@ -28,7 +28,7 @@ class UserDefaultSelectionMutation(graphene.Mutation):
     def mutate(self, info, data=None):
         user = info.context.user
         # permissions checks
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             raise GraphQLError('You must be logged in to update this resource!')
 
         course_id = data.course_id
