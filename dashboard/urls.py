@@ -34,7 +34,6 @@ urlpatterns = [
     path('', views.get_home_template, name = 'home'),
     path('status/', include('watchman.urls')),
     path('status/bare_status', watchman.views.bare_status),
-
     path('admin', admin.site.urls),
 
     # graphql access
