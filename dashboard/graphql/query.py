@@ -16,7 +16,7 @@ class Query(graphene.ObjectType):
     @staticmethod
     def resolve_course(parent, info, course_id=None, canvas_id=None):
         user = info.context.user
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             raise GraphQLError('You must be logged in to access this resource!')
 
         course = None
@@ -33,7 +33,7 @@ class Query(graphene.ObjectType):
     @staticmethod
     def resolve_courses(parent, info):
         user = info.context.user
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             raise GraphQLError('You must be logged in to access these resource!')
 
         if is_admin.test(user):
