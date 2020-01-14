@@ -65,7 +65,7 @@ function Course (props) {
               render={props =>
                 <AssignmentPlanning
                   {...props}
-                  disabled={!courseInfo.course_view_options.ap}
+                  disabled={!courseInfo.course_view_options.apv1}
                   courseId={courseId}
                 />}
             />
@@ -74,7 +74,7 @@ function Course (props) {
               render={props =>
                 <AssignmentPlanningV2
                   {...props}
-                  disabled={!courseInfo.course_view_options.apv2}
+                  disabled={!courseInfo.course_view_options.ap}
                   courseId={courseId}
                 />}
             />
