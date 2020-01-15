@@ -148,18 +148,11 @@ function AssignmentTable (props) {
                       }
                     </TableCell>
                     <TableCell
-                      style={
-                        isNextWeekTheSame(a.week, key)
-                          ? { borderBottom: 'none' }
-                          : {}
-                      }
                       className={classes.narrowCell}
                     >
                       {
                         a.week
-                          ? isPreviousWeekTheSame(a.week, key)
-                            ? ''
-                            : a.dueDateMonthDay
+                          ? a.dueDateMonthDay
                           : ''
                       }
                     </TableCell>
