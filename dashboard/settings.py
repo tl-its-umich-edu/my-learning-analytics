@@ -14,7 +14,7 @@ import os
 import json
 
 from debug_toolbar import settings as dt_settings
-from typing import Tuple
+from typing import Tuple, Dict, Any, Union, List
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -45,14 +45,20 @@ LOGIN_URL = '/accounts/login'
 GA_ID = ENV.get('GA_ID', '')
 
 # Resource values from env
-RESOURCE_VALUES = ENV.get("RESOURCE_VALUES", {"files": {"types": ["canvas"], "icon": "fas fa-file fa-lg"}})
+RESOURCE_VALUES: Dict[str, Any] = ENV.get("RESOURCE_VALUES", {"files": {"types": ["canvas"], "icon": "fas fa-file fa-lg"}})
 
 # Convience map to be able to get from types
-RESOURCE_VALUES_MAP = {
+RESOURCE_VALUES_MAP: Dict[str, str] = {
     resource_type : resource_value
-    for resource_value in RESOURCE_VALUES
-    for resource_type in RESOURCE_VALUES.get(resource_value).get('types')
+    for resource_key, resource_value in RESOURCE_VALUES.items()
+    for resource_type in resource_value.get('types')
 }
+
+def get_resource_icon(resource_type: str) -> str:
+    resource_value = RESOURCE_VALUES.get(str(RESOURCE_VALUES_MAP.get(resource_type)))
+    if resource_value:
+        return resource_value.get('icon')
+    return ''
 
 # This is required by flatpages flow. For Example Copyright information in the footer populated from flatpages
 SITE_ID = 1

@@ -20,7 +20,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
 from dashboard.settings import RESOURCE_VALUES, RESOURCE_VALUES_MAP, RESOURCE_ACCESS_CONFIG
-from dashboard.settings import COURSES_ENABLED
+from dashboard.settings import COURSES_ENABLED, get_resource_icon
 
 from typing import Union, Optional, NamedTuple, List, Dict
 
@@ -299,7 +299,7 @@ def resource_access_within_week(request: HttpRequest,
             RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("postfix") +
             CANVAS_FILE_ID_NAME_SEPARATOR +
             row.resource_name_part + CANVAS_FILE_ID_NAME_SEPARATOR +
-            RESOURCE_VALUES.get(RESOURCE_VALUES_MAP.get(row.resource_type)).get('icon')
+            get_resource_icon(row.resource_type)
             ),
         axis=1)
     output_df.drop(columns=['resource_id_part', 'resource_name_part', 'resource_id_name'], inplace=True)
