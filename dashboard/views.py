@@ -22,8 +22,7 @@ from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSele
 from dashboard.settings import RESOURCE_VALUES, RESOURCE_VALUES_MAP, RESOURCE_ACCESS_CONFIG
 from dashboard.settings import COURSES_ENABLED
 
-from typing import Union, Optional, NamedTuple, List, Dict, Any
-from typing_extensions import TypedDict
+from typing import Union, Optional, NamedTuple, List, Dict
 
 logger = logging.getLogger(__name__)
 # strings for construct resource download url
@@ -66,7 +65,7 @@ def get_home_template(request: HttpRequest) -> HttpResponse:
 @permission_required('dashboard.get_course_info',
                      fn=objectgetter(Course, 'course_id', 'canvas_id'),
                      raise_exception=True)
-def get_course_info(request: HttpRequest, course_id: int = 0) -> HttpResponse:
+def get_course_info(request: HttpRequest, canvas_id: int = 0) -> HttpResponse:
     """Returns JSON data about a course
     :param request: HTTP Request
     :type request: Request
@@ -75,7 +74,7 @@ def get_course_info(request: HttpRequest, course_id: int = 0) -> HttpResponse:
     :return: JSON to be used
     :rtype: str
     """
-    course_id = canvas_id_to_incremented_id(course_id)
+    course_id = canvas_id_to_incremented_id(canvas_id)
     today = timezone.now()
 
     try:
@@ -126,11 +125,14 @@ def get_course_info(request: HttpRequest, course_id: int = 0) -> HttpResponse:
 
 # show percentage of users who read the resource within prior n weeks
 @permission_required('dashboard.resource_access_within_week',
-                     fn=objectgetter(Course, 'course_id', 'canvas_id'),
+                     fn=objectgetter(Course, 'canvas_id', 'canvas_id'),
                      raise_exception=True)
 def resource_access_within_week(request: HttpRequest,
-                                course_id: int = 0) -> HttpResponse:
-    course_id = canvas_id_to_incremented_id(course_id)
+                                canvas_id: int = 0) -> HttpResponse:
+    course_id = canvas_id_to_incremented_id(canvas_id)
+    if not course_id:
+        logger.info(f"Invalid Course ID of {course_id} from {canvas_id}")
+        return HttpResponse("{}", content_Type='application/json')
 
     current_user = request.user.get_username()
 
@@ -308,11 +310,11 @@ def resource_access_within_week(request: HttpRequest,
 
 
 @permission_required('dashboard.grade_distribution',
-    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
-def grade_distribution(request, course_id=0):
+    fn=objectgetter(Course, 'canvas_id','canvas_id'), raise_exception=True)
+def grade_distribution(request, canvas_id=0):
     logger.info(grade_distribution.__name__)
 
-    course_id = canvas_id_to_incremented_id(course_id)
+    course_id = canvas_id_to_incremented_id(canvas_id)
 
     current_user = request.user.get_username()
 
@@ -369,10 +371,10 @@ def grade_distribution(request, course_id=0):
 
 
 @permission_required('dashboard.update_user_default_selection_for_views',
-    fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
-def update_user_default_selection_for_views(request, course_id=0):
+    fn=objectgetter(Course, 'canvas_id','canvas_id'), raise_exception=True)
+def update_user_default_selection_for_views(request, canvas_id=0):
     logger.info(update_user_default_selection_for_views.__name__)
-    course_id = canvas_id_to_incremented_id(course_id)
+    course_id = canvas_id_to_incremented_id(canvas_id)
     current_user = request.user.get_username()
     default_selection = json.loads(request.body.decode("utf-8"))
     logger.info(default_selection)
@@ -405,12 +407,16 @@ def update_user_default_selection_for_views(request, course_id=0):
 
 
 @permission_required('dashboard.get_user_default_selection',
-                     fn=objectgetter(Course, 'course_id', 'canvas_id'),
+                     fn=objectgetter(Course, 'canvas_id', 'canvas_id'),
                      raise_exception=True)
 def get_user_default_selection(request: HttpRequest,
-                               course_id:int = 0) -> HttpResponse:
+                               canvas_id:int = 0) -> HttpResponse:
     logger.info(get_user_default_selection.__name__)
-    course_id = canvas_id_to_incremented_id(course_id)
+    course_id = canvas_id_to_incremented_id(canvas_id)
+    if not course_id:
+        logger.info(f"Invalid Course ID of {course_id} from {canvas_id}")
+        return HttpResponse("{}", content_Type='application/json')
+
     user_sis_name = request.user.get_username()
     default_view_type = request.GET.get('default_type')
     key = 'default'
@@ -430,12 +436,15 @@ def get_user_default_selection(request: HttpRequest,
 
 
 @permission_required('dashboard.assignments',
-                     fn=objectgetter(Course, 'course_id', 'canvas_id'),
+                     fn=objectgetter(Course, 'canvas_id', 'canvas_id'),
                      raise_exception=True)
-def assignments(request: HttpRequest, course_id:int = 0) -> HttpResponse:
+def assignments(request: HttpRequest, canvas_id:int = 0) -> HttpResponse:
     logger.info(assignments.__name__)
 
-    course_id = canvas_id_to_incremented_id(course_id)
+    course_id = canvas_id_to_incremented_id(canvas_id)
+    if not course_id:
+        logger.info(f"Invalid Course ID of {course_id} from {canvas_id}")
+        return HttpResponse("{}", content_Type='application/json')
 
     current_user = request.user.get_username()
     df_default_display_settings()
@@ -564,7 +573,7 @@ def get_course_assignments(course_id: int) -> pd.DataFrame:
 
 def get_user_assignment_submission(current_user: str,
                                    assignments_in_course_df: pd.DataFrame,
-                                   course_id: int) -> Dict[str, Any]:
+                                   course_id: int) -> Dict:
     sql = "select assignment_id, score, graded_date from submission where " \
           "user_id=(select user_id from user where sis_name = %(current_user)s and course_id = %(course_id)s ) and course_id = %(course_id)s"
     assignment_submissions = pd.read_sql(sql, conn,
@@ -678,7 +687,7 @@ def are_weighted_assignments_hidden(course_id: int, df: pd.DataFrame) -> bool:
         else:
             logger.info(f"few weighted assignments in course {course_id} are hidden")
             return True
-    return False 
+    return False
 
 class BinningGrade(NamedTuple):
     value: int

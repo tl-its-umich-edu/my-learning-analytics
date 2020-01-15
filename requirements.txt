@@ -12,6 +12,7 @@ django-su>=0.8.0,<0.8.99
 django-settings-export>=1.2.1,<1.2.99
 django-macros>=0.4.0,<0.4.99
 django-debug-toolbar>=2.0,<2.0.99
+django_hint==0.1.5
 
 # object-level permissions
 rules>=2.1,<2.1.99

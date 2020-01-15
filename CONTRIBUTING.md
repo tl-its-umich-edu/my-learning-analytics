@@ -67,12 +67,14 @@ Static type checking has been added. VSCode should check this by default with th
 
 You can check this on the command line locally with:
 `pip install mypy`
-`mypy --ignore-missing-imports -p dashboard`
+`mypy -p dashboard`
 
 Or you can check after you start the running container with:
-`docker exec -it student_dashboard /bin/bash -c "mypy --ignore-missing-imports -p dashboard"`
+`docker exec -it student_dashboard /bin/bash -c "mypy -p dashboard"`
 
 [See the mypy docs for more info](https://mypy.readthedocs.io/en/stable/getting_started.html#installing-and-running-mypy)
+
+Note that if you add any modules you may need to add them to the mypy.ini or run mypy with --ignore-missing-imports.
 
 ## Code Review
 All contributions will be code reviewed and you may need to make some changes to your contribution. We really appreciate tests as well, so if at all possible please try to add tests.

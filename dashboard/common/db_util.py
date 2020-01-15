@@ -9,10 +9,12 @@ from django_cron.models import CronJobLog
 import pandas as pd
 from django.conf import settings
 
+from typing import Optional, List, Any, Union
+
 logger = logging.getLogger(__name__)
 
 
-def canvas_id_to_incremented_id(canvas_id):
+def canvas_id_to_incremented_id(canvas_id: Union[int, str]) -> Optional[int]:
     try:
         int(canvas_id)
     except ValueError:
@@ -21,16 +23,16 @@ def canvas_id_to_incremented_id(canvas_id):
     return int(canvas_id) + settings.CANVAS_DATA_ID_INCREMENT
 
 
-def incremented_id_to_canvas_id(incremented_id):
+def incremented_id_to_canvas_id(incremented_id: Union[int, str]) -> Optional[int]:
     try:
         int(incremented_id)
     except ValueError:
         return None
 
-    return str(int(incremented_id) - settings.CANVAS_DATA_ID_INCREMENT)
+    return int(incremented_id) - settings.CANVAS_DATA_ID_INCREMENT
 
 
-def get_course_name_from_id(course_id):
+def get_course_name_from_id(course_id: Union[int, str]) -> str:
     """[Get the long course name from the id]
 
     :param course_id: [Canvas course ID without the Canvas Data increment]
@@ -39,11 +41,11 @@ def get_course_name_from_id(course_id):
     :rtype: [str]
     """
     logger.debug(get_course_name_from_id.__name__)
-    course_id = canvas_id_to_incremented_id(course_id)
+    inc_id = canvas_id_to_incremented_id(course_id)
     course_name = ""
-    if (course_id):
+    if (inc_id):
         with django.db.connection.cursor() as cursor:
-            cursor.execute("SELECT name FROM course WHERE id = %s", [course_id])
+            cursor.execute("SELECT name FROM course WHERE id = %s", [inc_id])
             row = cursor.fetchone()
             if (row != None):
                 course_name = row[0]
@@ -67,7 +69,7 @@ def get_course_view_options (course_id):
     return course_view_option
 
 
-def get_default_user_course_id(user_id):
+def get_default_user_course_id(user_id: str) -> Optional[int]:
     """[Get the default course id for the user id from the user table]
     :param user_id: [SIS User ID of the user]
     :type user_id: [str]
@@ -79,22 +81,23 @@ def get_default_user_course_id(user_id):
     with django.db.connection.cursor() as cursor:
         cursor.execute("SELECT course_id FROM user WHERE sis_name= %s ORDER BY course_id DESC LIMIT 1", [user_id])
         row = cursor.fetchone()
+        inc_id = None
         if (row != None):
-            course_id = canvas_id_to_incremented_id(row[0])
-    return course_id
+            inc_id = canvas_id_to_incremented_id(row[0])
+    return inc_id
 
 
-def get_user_courses_info(username):
+def get_user_courses_info(username: str) -> List[Any]:
     logger.info(get_user_courses_info.__name__)
-    course_list = []
-    course_info = []
+    course_list: List[Union[int, None]] = []
+    course_info: List[Any] = []
     with django.db.connection.cursor() as cursor:
         cursor.execute("SELECT course_id FROM user WHERE sis_name= %s", [username])
         courses = cursor.fetchall()
         if courses is not None:
             for course in courses:
                 course_id = incremented_id_to_canvas_id(course[0])
-                course_list.append(int(course_id))
+                course_list.append(course_id)
     if course_list:
         course_tuple = tuple(course_list)
         with django.db.connection.cursor() as cursor:
@@ -107,7 +110,7 @@ def get_user_courses_info(username):
     return course_info
 
 
-def get_last_cron_run():
+def get_last_cron_run() -> datetime:
     try:
         c = CronJobLog.objects.filter(is_success=1).latest('end_time')
         end_time = c.end_time
@@ -117,7 +120,7 @@ def get_last_cron_run():
     return datetime.min
 
 
-def get_canvas_data_date():
+def get_canvas_data_date() -> datetime:
     if not settings.DATA_WAREHOUSE_IS_UNIZIN:
         return get_last_cron_run()
 

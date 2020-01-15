@@ -68,7 +68,7 @@ class CourseAdmin(admin.ModelAdmin):
     # Need this method to correctly display the line breaks
     @staticmethod
     @admin_attr_decorator
-    def _courseviewoption(obj: Course) -> mark_safe:
+    def _courseviewoption(obj: Course) -> SafeText:
         return mark_safe(linebreaksbr(obj.courseviewoption))
     _courseviewoption.short_description = "Course View Option(s)"
 

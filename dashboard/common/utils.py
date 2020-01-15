@@ -1,11 +1,13 @@
-import logging, os, HttpRequest
+import logging, os
 
 from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
+from django.http import HttpRequest
+from django_hint import RequestType
 
 from dashboard.common.db_util import get_user_courses_info
 
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +42,7 @@ def get_git_version_info() -> Dict[str, str]:
     return git_version
 
 
-def search_key_for_resource_value(my_dict: Dict, search_for:str) -> Optional[str]:
+def search_key_for_resource_value(my_dict: Dict, search_for: str) -> Optional[str]:
     for key, value in my_dict.items():
         for resource_types in value["types"]:
             if search_for in resource_types:
@@ -48,12 +50,13 @@ def search_key_for_resource_value(my_dict: Dict, search_for:str) -> Optional[str
     return None
 
 
-def get_myla_globals(current_user: HttpRequest.user) -> Dict[str, str] :
+def get_myla_globals(request: RequestType) -> Dict[str, Any] :
     username = ""
     user_courses_info = []
     login_url = ""
     logout_url = ""
     google_analytics_id = ""
+    current_user = request.user
 
     is_superuser = current_user.is_superuser
     if current_user.is_authenticated:
