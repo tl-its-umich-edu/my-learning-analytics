@@ -31,27 +31,6 @@ def incremented_id_to_canvas_id(incremented_id: Union[int, str]) -> Optional[int
 
     return int(incremented_id) - settings.CANVAS_DATA_ID_INCREMENT
 
-
-def get_course_name_from_id(course_id: Union[int, str]) -> str:
-    """[Get the long course name from the id]
-
-    :param course_id: [Canvas course ID without the Canvas Data increment]
-    :type course_id: [str]
-    :return: [Course Name of course or blank not found]
-    :rtype: [str]
-    """
-    logger.debug(get_course_name_from_id.__name__)
-    inc_id = canvas_id_to_incremented_id(course_id)
-    course_name = ""
-    if (inc_id):
-        with django.db.connection.cursor() as cursor:
-            cursor.execute("SELECT name FROM course WHERE id = %s", [inc_id])
-            row = cursor.fetchone()
-            if (row != None):
-                course_name = row[0]
-    return course_name
-
-
 def get_course_view_options (course_id):
     logger.info(get_course_view_options.__name__)
     course_id = canvas_id_to_incremented_id(course_id)

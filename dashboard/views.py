@@ -690,11 +690,11 @@ def are_weighted_assignments_hidden(course_id: int, df: pd.DataFrame) -> bool:
     return False
 
 class BinningGrade(NamedTuple):
-    value: int
+    value: float
     bin_index: int
     binning_all: bool
 
-def find_binning_grade_value(grades: list) -> BinningGrade:
+def find_binning_grade_value(grades: List[float]) -> BinningGrade:
     fifth_item = grades[4]
     next_to_fifth_item = grades[5]
     if next_to_fifth_item - fifth_item > 2:
@@ -723,8 +723,8 @@ def show_dashed_line(grade: int, binning_grade: BinningGrade) -> bool:
         return True
 
 
-def check_if_grade_qualifies_for_binning(grade: int,
-                                         fifthElement: str) -> bool:
+def check_if_grade_qualifies_for_binning(grade: float,
+                                         fifthElement: Union[float, int]) -> bool:
     # case: 96.7, 94.76,
     if int(grade) - int(fifthElement) > 1:
         return False
@@ -737,7 +737,7 @@ def check_if_grade_qualifies_for_binning(grade: int,
     return False
 
 
-def binning_logic(grades: List[int], fifth_item_in_list: str) -> BinningGrade:
+def binning_logic(grades: List[float], fifth_item_in_list: Union[float, int]) -> BinningGrade:
     """
     Histogram binning is by 2 [ [0,2], [2,4], [4,6], …..] each item in the list starting number is inclusive and second
     is exclusive.

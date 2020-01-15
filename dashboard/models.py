@@ -212,7 +212,7 @@ class Course(models.Model):
         return DateRange(start, end)
 
     def get_absolute_url(self) -> HttpResponse:
-        return reverse('courses', kwargs={'course_id': self.canvas_id})
+        return reverse('courses', kwargs={'canvas_id': self.canvas_id})
 
     class Meta:
         db_table = "course"
