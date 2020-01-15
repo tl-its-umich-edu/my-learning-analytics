@@ -63,14 +63,14 @@ def get_home_template(request: HttpRequest) -> HttpResponse:
 
 
 @permission_required('dashboard.get_course_info',
-                     fn=objectgetter(Course, 'course_id', 'canvas_id'),
+                     fn=objectgetter(Course, 'canvas_id', 'canvas_id'),
                      raise_exception=True)
 def get_course_info(request: HttpRequest, canvas_id: int = 0) -> HttpResponse:
     """Returns JSON data about a course
     :param request: HTTP Request
     :type request: Request
-    :param course_id: Unizin Course ID, defaults to 0
-    :param course_id: int, optional
+    :param canvas_id: Canvas Course ID, defaults to 0
+    :param canvas_id: int, optional
     :return: JSON to be used
     :rtype: str
     """

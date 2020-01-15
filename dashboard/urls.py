@@ -39,26 +39,26 @@ urlpatterns = [
     # front-end will manage any additional routing.
     re_path(r'^courses/', login_required(views.get_home_template,), name="courses"),
     # This path is used by Course.get_absolute_url() to generate course links for the Admin interface.
-    path('courses/<int:course_id>', login_required(views.get_home_template,), name="courses"),
+    path('courses/<int:canvas_id>', login_required(views.get_home_template,), name="courses"),
 
     # These URLs are data patterns
     # GET access patterns
-    path('api/v1/courses/<int:course_id>/grade_distribution',
+    path('api/v1/courses/<int:canvas_id>/grade_distribution',
         login_required(views.grade_distribution), name='grade_distribution'),
-    path('api/v1/courses/<int:course_id>/resource_access_within_week',
+    path('api/v1/courses/<int:canvas_id>/resource_access_within_week',
         login_required(views.resource_access_within_week), name='resource_access_within_week'),
-    path('api/v1/courses/<int:course_id>/assignments',
+    path('api/v1/courses/<int:canvas_id>/assignments',
         login_required(views.assignments), name='assignments'),
-    path('api/v1/courses/<int:course_id>/get_user_default_selection',
+    path('api/v1/courses/<int:canvas_id>/get_user_default_selection',
         login_required(views.get_user_default_selection), name='get_user_default_selection'),
-    path('api/v1/courses/<int:course_id>/info',
+    path('api/v1/courses/<int:canvas_id>/info',
         login_required(views.get_course_info), name='get_course_info'),
     # This is a public view of the courses we have enabled
     path('api/v1/courses_enabled',
         cache_page(settings.CLIENT_CACHE_TIME)(views.courses_enabled), name='courses_enabled'),
 
     # PUT/POST access patterns
-    path('api/v1/courses/<int:course_id>/set_user_default_selection',
+    path('api/v1/courses/<int:canvas_id>/set_user_default_selection',
         login_required(views.update_user_default_selection_for_views), name='update_user_default_selection_for_views'),
 
     path('su/', include('django_su.urls')),
