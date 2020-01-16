@@ -80,6 +80,11 @@ View options can be controlled at the global and course level. If a view is disa
 
 Note that by default all views are enabled when a course is added.
 
+### Control the primary user interface color
+MyLA allows you to configure the primary color of the user interface (i.e., the color used for the top toolbar, or DashboardAppBar, and other structural components of the application). You can set this color by defining a key-value pair in `env.json`, with the key being `"PRIMARY_UI_COLOR"` and the value being a valid hex value. See `env_sample.json` for an example.
+
+Other colors from the user interface are currently fixed and included in version control, as they are intentional design choices. You can see where color values are set in `assets/src/defaultPalette.js`.
+
 ### LTI v1.1.1 Configuration
 Only basic LTI launches are supported at the moment (automatic account creation and redirection to the correct course). New courses are not added nor are course view options modified.
 

@@ -9,6 +9,8 @@
         "127.0.0.1",
         "localhost"
     ],
+    "/* # The hex value to be used in the front end for the primary color of the palette and theme": "*/",
+    "PRIMARY_UI_COLOR": "#40658F",
     "/* Configuration of CSP see https://django-csp.readthedocs.io/en/latest/configuration.html": "*/",
     "/* To enable this at all you must set have the CSP key set": "*/",
     "/* and REPORT_ONLY should be be false, otherwise it will just console Warn": "*/",
