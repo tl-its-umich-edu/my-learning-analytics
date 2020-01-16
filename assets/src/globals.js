@@ -1,5 +1,5 @@
-import defaultPalette from './defaultPalette'
 import { createMuiTheme } from '@material-ui/core/styles'
+import defaultPalette from './defaultPalette'
 
 const mylaGlobals = JSON.parse(document.getElementById('myla_globals').textContent)
 
@@ -16,7 +16,7 @@ const user = Object.freeze({
   helpURL: mylaGlobals.help_url
 })
 
-const palette = Object.assign({}, defaultPalette)
+const palette = JSON.parse(JSON.stringify(defaultPalette))
 if (mylaGlobals.primary_ui_color !== null) {
   palette.primary.main = mylaGlobals.primary_ui_color
 }
