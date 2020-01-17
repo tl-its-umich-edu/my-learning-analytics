@@ -231,6 +231,9 @@ STATICFILES_FINDERS = (
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
+# The hex value to be used in the front end for the "primary" color of the palette and theme.
+PRIMARY_UI_COLOR = ENV.get("PRIMARY_UI_COLOR", None)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

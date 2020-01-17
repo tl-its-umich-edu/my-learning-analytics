@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import { roundToOneDecimal } from '../../util/math'
-import siteTheme from '../../siteTheme'
+import { siteTheme } from '../../globals'
 
 function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100,
   showNumberOnBars = false, showDashedLine = true }) {
