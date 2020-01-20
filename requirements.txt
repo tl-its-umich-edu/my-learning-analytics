@@ -1,13 +1,13 @@
 gunicorn>=19.9.0,<19.9.99
 
-# Not sure if Django 2 will work yet, hold back to LTS
-Django>=1.11,<1.11.99
-whitenoise>=3.3.1,<3.3.99
+# We're waiting on Django 3 until it's further into the lifecycle.
+Django>=2.2.9,<2.2.9.99
+whitenoise>=4.1.4,<4.1.499
 
 django-registration>=3.0,<3.0.99
 django-cron>=0.5.1,<0.5.99
 django-npm>=1.0.0,<1.0.99
-django-watchman>=0.15.0,<0.15.99
+django-watchman>=0.18.0,<0.18.99
 django-su>=0.8.0,<0.8.99
 django-settings-export>=1.2.1,<1.2.99
 django-macros>=0.4.0,<0.4.99
@@ -17,30 +17,30 @@ django-debug-toolbar>=2.0,<2.0.99
 promise==2.2.1
 
 # graphql
-graphene-django>=2.4.0,<2.4.99
+graphene-django>=2.8.0,<2.8.99
 django-filter>=2.2.0,<2.2.99
 
 # object-level permissions
-rules>=2.0.1,<2.0.99
-django-model-utils>=3.1.2,<3.1.99
+rules>=2.1,<2.1.99
+django-model-utils>=3.2.0,<3.2.99
 
 # These should be okay to update minors
-numpy>=1.14,<1.14.99
-pandas>=0.23,<0.23.99
+numpy>=1.17,<1.17.99
+pandas>=0.25.1,<0.25.99
 
-requests>=2.20,<2.20.99
-pyOpenSSL>=18.0,<18.0.99
+requests>=2.22,<2.22.99
+pyOpenSSL>=19.0,<19.0.99
 canvasapi>=0.10,<0.10.99
-protobuf>=3.6,<3.6.99
+protobuf>=3.10.0,<3.10.99
 
 # These caused problems in the past so test when updating
 djangosaml2==0.17.2
-pysaml2==4.6.2
+pysaml2==4.8.0
 
-SQLAlchemy>=1.2.7,<1.2.99
-psycopg2>=2.7.5,<2.8 --no-binary psycopg2
-mysqlclient>=1.3.13,<1.3.99
-google-cloud-bigquery>=1.5.0,<1.5.99
+SQLAlchemy>=1.3.10,<1.3.199
+psycopg2>=2.8.4,<2.8.499 --no-binary psycopg2
+mysqlclient>=1.4.4,<1.4.499
+google-cloud-bigquery>=1.21.0,<1.21.99
 
 pinax-eventlog>=2.0.3,<2.99
 ptvsd>=4.3.2,<4.3.99

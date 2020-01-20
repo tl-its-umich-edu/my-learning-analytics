@@ -35,10 +35,10 @@ const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignme
 
 const calculateWeight = (pointsPossible, assignmentGroupId, assignmentGroups) => {
   const assignmentGroup = assignmentGroups.find(aGroup => aGroup.id === assignmentGroupId)
-  const assignmentGrade = assignmentGroup.groupPoints > 0
+  const assignmentWeight = assignmentGroup.groupPoints > 0
     ? assignmentGroup.weight * (pointsPossible / assignmentGroup.groupPoints)
     : 0
-  return assignmentGrade
+  return assignmentWeight
 }
 
 const calculateMaxGrade = (assignments, assignmentGroups, assignmentWeightConsideration) => {
@@ -85,32 +85,37 @@ const sortAssignmentsByWeek = assignments => {
   return [...assignmentsWithDueDates, ...assignmentsWithoutDueDates]
 }
 
-const createAssignmentFields = (assignments, assignmentGroups, courseStartDate) => sortAssignmentsByWeek(
-  assignments.map(a => {
-    const {
-      dueDate,
-      pointsPossible,
-      assignmentGroupId,
-      currentUserSubmission
-    } = a
+const createAssignmentFields = (assignments, assignmentGroups, courseStartDate, assignmentWeightConsideration) => {
+  const totalPointsPossible = calculateTotalPointsPossible(assignments, assignmentGroups, assignmentWeightConsideration)
+  return sortAssignmentsByWeek(
+    assignments.map(a => {
+      const {
+        dueDate,
+        pointsPossible,
+        assignmentGroupId,
+        currentUserSubmission
+      } = a
 
-    a.week = calculateWeekOffset(courseStartDate, dueDate)
-    a.percentOfFinalGrade = calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
-    a.outOf = pointsPossible
-    a.graded = !!currentUserSubmission && !!currentUserSubmission.gradedDate
-    a.dueDateMonthDay = dateToMonthDay(dueDate)
-    a.goalGrade = null
-    a.goalGradeSetByUser = null
+      a.week = calculateWeekOffset(courseStartDate, dueDate)
+      a.percentOfFinalGrade = assignmentWeightConsideration
+        ? calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
+        : pointsPossible / totalPointsPossible * 100
+      a.outOf = pointsPossible
+      a.graded = !!currentUserSubmission && !!currentUserSubmission.gradedDate
+      a.dueDateMonthDay = dateToMonthDay(dueDate)
+      a.goalGrade = null
+      a.goalGradeSetByUser = null
 
-    return a
-  })
-)
+      return a
+    })
+  )
+}
 
 const createUserSettings = (courseId, viewName, setting) => {
   const mutation = {
     variables: {
       input: {
-        canvasCourseId: courseId,
+        canvasCourseId: courseId,  
         defaultViewType: viewName,
         defaultViewValue: JSON.stringify(setting)
       }

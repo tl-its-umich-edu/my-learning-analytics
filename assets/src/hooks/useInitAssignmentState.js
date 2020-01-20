@@ -28,7 +28,7 @@ const useInitAssignmentState =
           currentUserDefaultSelection
         } = data.course
         setAssignments(
-          createAssignmentFields(assignments, assignmentGroups, dateStart)
+          createAssignmentFields(assignments, assignmentGroups, dateStart, assignmentWeightConsideration)
         )
         setAssignmentGroups(assignmentGroups)
         setCurrentGrade(

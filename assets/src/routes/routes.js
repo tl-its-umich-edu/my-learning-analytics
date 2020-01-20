@@ -16,7 +16,7 @@ const routes = (courseId, activeViews) => {
       icon: Grade,
       description: 'See what assignments have the greatest impact on your grade.',
       image: '/static/images/assignments_planning_icon.png',
-      viewCode: 'ap'
+      viewCode: 'apv1'
     },
     {
       path: `/courses/${courseId}/assignmentsv2`,
