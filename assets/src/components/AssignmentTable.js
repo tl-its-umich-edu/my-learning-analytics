@@ -92,7 +92,7 @@ function AssignmentTable (props) {
         behavior: 'smooth'
       })
     }
-  })
+  }, [currentWeekRow.current])
 
   return (
     <RootRef rootRef={tableRef}>
