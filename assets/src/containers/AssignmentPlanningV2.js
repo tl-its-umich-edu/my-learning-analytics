@@ -17,6 +17,7 @@ import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrad
 import useUserAssignmentSetting from '../hooks/useUserAssignmentSetting'
 import useSetUserSettingGQL from '../hooks/useSetUserSettingGQL'
 import useMathWarning from '../hooks/useMathWarning'
+import isEqual from 'lodash.isequal'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
 
@@ -38,7 +39,7 @@ const styles = theme => ({
   }
 })
 
-function AssignmentPlanningV2 (props) {
+function AssignmentPlanningV2(props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<AlertBanner>Assignment Planning view is hidden for this course.</AlertBanner>)
 
@@ -77,9 +78,13 @@ function AssignmentPlanningV2 (props) {
 
   // this effect saves the user setting
   useEffect(() => {
-    debouncedUpdateUserSetting(
-      createUserSettings(courseId, 'assignment', userSetting)
-    )
+    if (!loading && !error) {
+      if (!isEqual(userSetting, JSON.parse(data.course.currentUserDefaultSelection.defaultViewValue))) {
+        debouncedUpdateUserSetting(
+          createUserSettings(courseId, 'assignment', userSetting)
+        )
+      }
+    }
   }, [JSON.stringify(userSetting), settingChanged])
 
   const handleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
