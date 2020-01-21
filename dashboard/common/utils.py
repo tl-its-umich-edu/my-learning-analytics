@@ -1,7 +1,6 @@
 import logging, os
 
 from django.conf import settings
-from django.contrib.flatpages.models import FlatPage
 
 from dashboard.common.db_util import get_user_courses_info
 
@@ -65,12 +64,7 @@ def get_myla_globals(current_user):
     if settings.GA_ID:
         google_analytics_id = settings.GA_ID
     primary_ui_color = settings.PRIMARY_UI_COLOR
-
-    flatpages = FlatPage.objects.all()
-    if flatpages:
-        help_url = flatpages[0].content
-    else:
-        help_url = "https://sites.google.com/umich.edu/my-learning-analytics-help/home"
+    help_url = settings.HELP_URL
 
     myla_globals = {
         "username" : username,
