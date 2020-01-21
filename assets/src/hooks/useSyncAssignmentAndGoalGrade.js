@@ -4,13 +4,13 @@ import { calculateAssignmentGoalsFromCourseGoal, sumAssignmentGoalGrade } from '
 // this effect is used to keep the goal of the course and assignments "in sync"
 // run if goalGrade changes, or if the sum of goal grades set by user changes
 const useSyncAssignmentAndGoalGrade =
-  (
+  ({
     data,
     assignments,
     goalGrade,
     setAssignments,
     setUserSetting
-  ) => {
+  }) => {
     useEffect(() => {
       if (goalGrade) {
         setAssignments(

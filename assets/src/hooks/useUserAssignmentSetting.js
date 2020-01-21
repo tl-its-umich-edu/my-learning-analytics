@@ -1,17 +1,18 @@
 import { useEffect } from 'react'
+import { loadedWithoutError } from '../util/data'
 
 // this effect runs exactly once, if there is a previously saved user setting
 const useUserAssignmentSetting =
-  (
+  ({
     loading,
     error,
     assignments,
     userSetting,
     setGoalGrade,
     setAssignments
-  ) => {
+  }) => {
     useEffect(() => {
-      if (!loading && !error) {
+      if (loadedWithoutError(loading, error)) {
         if (userSetting) {
           setGoalGrade(userSetting.goalGrade)
           if (userSetting.assignments) {

@@ -48,31 +48,37 @@ function AssignmentPlanningV2 (props) {
 
   const { loading, error, data } = useAssignmentData(courseId)
 
-  const [assignmentGroups, currentGrade, maxPossibleGrade] = useInitAssignmentState(
+  const [assignmentGroups, currentGrade, maxPossibleGrade] = useInitAssignmentState({
     loading,
     error,
     data,
     setAssignments,
     setUserSetting
-  )
-  useUserAssignmentSetting(
+  })
+  useUserAssignmentSetting({
     loading,
     error,
     assignments,
     userSetting,
     setGoalGrade,
     setAssignments
-  )
-  useSyncAssignmentAndGoalGrade(
+  })
+  useSyncAssignmentAndGoalGrade({
     data,
     assignments,
     goalGrade,
     setAssignments,
     setUserSetting
-  )
+  })
   const showMathWarning = useMathWarning(assignments)
   // this effect saves the user setting
-  const [mutationLoading, mutationError] = useSaveUserSetting(loading, error, courseId, userSetting, data)
+  const [mutationLoading, mutationError] = useSaveUserSetting({
+    loading,
+    error,
+    courseId,
+    userSetting,
+    data
+  })
 
   const handleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setSettingChanged(true)

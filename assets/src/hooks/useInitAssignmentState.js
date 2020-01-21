@@ -7,13 +7,13 @@ import {
 
 // initialize the state
 const useInitAssignmentState =
-  (
+  ({
     loading,
     error,
     data,
     setAssignments,
     setUserSetting
-  ) => {
+  }) => {
     const [assignmentGroups, setAssignmentGroups] = useState([])
     const [currentGrade, setCurrentGrade] = useState(0)
     const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
