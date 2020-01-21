@@ -94,8 +94,6 @@ function AssignmentTable (props) {
       : false
   }
 
-  console.log(assignments)
-
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
     if (currentWeekRow.current) {
