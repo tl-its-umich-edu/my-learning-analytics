@@ -25,7 +25,7 @@ const GET_ASSIGNMENT_PLANNING_DATA = courseId => gql`
       dropLowest
       dropHighest
     }
-    currentUserDefaultSelection (defaultViewType: "assignment") {
+    currentUserDefaultSelection (defaultViewType: "assignmentv2") {
       defaultViewType,
       defaultViewValue
     }

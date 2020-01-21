@@ -10,11 +10,11 @@ const useSaveUserSetting = (loading, error, courseId, userSetting, data) => {
     if (!loading && !error) {
       if (!data.course.currentUserDefaultSelection) {
         debouncedUpdateUserSetting(
-          createUserSettings(courseId, 'assignment', userSetting)
+          createUserSettings(courseId, 'assignmentv2', userSetting)
         )
       } else if (!isEqual(userSetting, JSON.parse(data.course.currentUserDefaultSelection.defaultViewValue))) {
         debouncedUpdateUserSetting(
-          createUserSettings(courseId, 'assignment', userSetting)
+          createUserSettings(courseId, 'assignmentv2', userSetting)
         )
       }
     }
