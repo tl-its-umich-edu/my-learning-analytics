@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
@@ -9,15 +9,13 @@ import AlertBanner from '../components/AlertBanner'
 import WarningBanner from '../components/WarningBanner'
 import AssignmentTable from '../components/AssignmentTable'
 import Typography from '@material-ui/core/Typography'
-import { createUserSettings } from '../util/assignment'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
 import useAssignmentData from '../hooks/useAssignmentData'
 import useInitAssignmentState from '../hooks/useInitAssignmentState'
 import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrade'
 import useUserAssignmentSetting from '../hooks/useUserAssignmentSetting'
-import useSetUserSettingGQL from '../hooks/useSetUserSettingGQL'
 import useMathWarning from '../hooks/useMathWarning'
-import isEqual from 'lodash.isequal'
+import useSaveUserSetting from '../hooks/useSaveUserSetting'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
 
@@ -39,7 +37,7 @@ const styles = theme => ({
   }
 })
 
-function AssignmentPlanningV2(props) {
+function AssignmentPlanningV2 (props) {
   const { classes, disabled, courseId } = props
   if (disabled) return (<AlertBanner>Assignment Planning view is hidden for this course.</AlertBanner>)
 
@@ -49,7 +47,6 @@ function AssignmentPlanningV2(props) {
   const [settingChanged, setSettingChanged] = useState(false)
 
   const { loading, error, data } = useAssignmentData(courseId)
-  const { debouncedUpdateUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
 
   const [assignmentGroups, currentGrade, maxPossibleGrade] = useInitAssignmentState(
     loading,
@@ -73,19 +70,9 @@ function AssignmentPlanningV2(props) {
     setAssignments,
     setUserSetting
   )
-
   const showMathWarning = useMathWarning(assignments)
-
   // this effect saves the user setting
-  useEffect(() => {
-    if (!loading && !error) {
-      if (!isEqual(userSetting, JSON.parse(data.course.currentUserDefaultSelection.defaultViewValue))) {
-        debouncedUpdateUserSetting(
-          createUserSettings(courseId, 'assignment', userSetting)
-        )
-      }
-    }
-  }, [JSON.stringify(userSetting), settingChanged])
+  const [mutationLoading, mutationError] = useSaveUserSetting(loading, error, courseId, userSetting, data)
 
   const handleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setSettingChanged(true)
