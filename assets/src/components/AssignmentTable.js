@@ -83,6 +83,19 @@ function AssignmentTable (props) {
       : false
   }
 
+  const isNextDayTheSame = (dueDateMonthDay, key) => {
+    return assignments[key + 1]
+      ? assignments[key + 1].dueDateMonthDay === dueDateMonthDay
+      : false
+  }
+  const isPreviousDayTheSame = (dueDateMonthDay, key) => {
+    return key >= 1
+      ? assignments[key - 1].dueDateMonthDay === dueDateMonthDay
+      : false
+  }
+
+  console.log(assignments)
+
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
     if (currentWeekRow.current) {
@@ -149,7 +162,7 @@ function AssignmentTable (props) {
                     </TableCell>
                     <TableCell
                       style={{
-                        ...isNextWeekTheSame(a.week, key)
+                        ...isNextDayTheSame(a.dueDateMonthDay, key)
                           ? { borderBottom: 'none' }
                           : {}
                       }}
@@ -157,7 +170,7 @@ function AssignmentTable (props) {
                     >
                       {
                         a.week
-                          ? isPreviousWeekTheSame(a.week, key)
+                          ? isPreviousDayTheSame(a.dueDateMonthDay, key)
                             ? ''
                             : a.dueDateMonthDay
                           : ''
