@@ -8,8 +8,11 @@ const useSaveUserSetting = (loading, error, courseId, userSetting, data) => {
 
   useEffect(() => {
     if (!loading && !error) {
-      const defaultViewValue = JSON.parse(data.course.currentUserDefaultSelection.defaultViewValue)
-      if (!isEqual(userSetting, defaultViewValue)) {
+      if (!data.course.currentUserDefaultSelection) {
+        debouncedUpdateUserSetting(
+          createUserSettings(courseId, 'assignment', userSetting)
+        )
+      } else if (!isEqual(userSetting, JSON.parse(data.course.currentUserDefaultSelection.defaultViewValue))) {
         debouncedUpdateUserSetting(
           createUserSettings(courseId, 'assignment', userSetting)
         )
