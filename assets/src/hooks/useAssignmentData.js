@@ -7,7 +7,7 @@ const GET_ASSIGNMENT_PLANNING_DATA = courseId => gql`
     assignments {
       id
       name
-      dueDate
+      localDate
       pointsPossible
       averageGrade
       assignmentGroupId

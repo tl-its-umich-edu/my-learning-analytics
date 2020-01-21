@@ -90,19 +90,19 @@ const createAssignmentFields = (assignments, assignmentGroups, courseStartDate, 
   return sortAssignmentsByWeek(
     assignments.map(a => {
       const {
-        dueDate,
+        localDate,
         pointsPossible,
         assignmentGroupId,
         currentUserSubmission
       } = a
 
-      a.week = calculateWeekOffset(courseStartDate, dueDate)
+      a.week = calculateWeekOffset(courseStartDate, localDate)
       a.percentOfFinalGrade = assignmentWeightConsideration
         ? calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
         : pointsPossible / totalPointsPossible * 100
       a.outOf = pointsPossible
       a.graded = !!currentUserSubmission && !!currentUserSubmission.gradedDate
-      a.dueDateMonthDay = dateToMonthDay(dueDate)
+      a.dueDateMonthDay = dateToMonthDay(localDate)
       a.goalGrade = null
       a.goalGradeSetByUser = null
 
@@ -115,7 +115,7 @@ const createUserSettings = (courseId, viewName, setting) => {
   const mutation = {
     variables: {
       input: {
-        canvasCourseId: courseId,  
+        canvasCourseId: courseId,
         defaultViewType: viewName,
         defaultViewValue: JSON.stringify(setting)
       }
