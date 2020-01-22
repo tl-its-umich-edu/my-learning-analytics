@@ -4,6 +4,7 @@ import {
   calculateMaxGrade,
   createAssignmentFields
 } from '../util/assignment'
+import { loadedWithoutError } from '../util/data'
 
 // initialize the state
 const useInitAssignmentState =
@@ -19,7 +20,7 @@ const useInitAssignmentState =
     const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
 
     useEffect(() => {
-      if (!loading && !error) {
+      if (loadedWithoutError(loading, error)) {
         const {
           assignments,
           assignmentGroups,

@@ -16,6 +16,11 @@ import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrad
 import useUserAssignmentSetting from '../hooks/useUserAssignmentSetting'
 import useMathWarning from '../hooks/useMathWarning'
 import useSaveUserSetting from '../hooks/useSaveUserSetting'
+import {
+  clearGoals,
+  setAssignmentGoalGrade,
+  setAssignmentGoalGradeState
+} from '../util/assignment'
 // import { DndProvider } from 'react-dnd'
 // import HTML5Backend from 'react-dnd-html5-backend'
 
@@ -82,39 +87,22 @@ function AssignmentPlanningV2 (props) {
 
   const handleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
     setSettingChanged(true)
-    setAssignments([
-      ...assignments.slice(0, key),
-      {
-        ...assignments[key],
-        goalGrade: Number(assignmentGoalGrade),
-        goalGradeSetByUser: true
-      },
-      ...assignments.slice(key + 1)
-    ])
+    setAssignments(
+      setAssignmentGoalGrade(key, assignments, assignmentGoalGrade)
+    )
   }
 
   const handleClearGoalGrades = () => {
-    setAssignments(
-      assignments.map(a => {
-        a.goalGrade = ''
-        a.goalGradeSetByUser = null
-        return a
-      })
-    )
+    setAssignments(clearGoals(assignments))
     setGoalGrade(null)
     setUserSetting({})
     setSettingChanged(true)
   }
 
   const handleAssignmentLock = (key, checkboxState) => {
-    setAssignments([
-      ...assignments.slice(0, key),
-      {
-        ...assignments[key],
-        goalGradeSetByUser: checkboxState
-      },
-      ...assignments.slice(key + 1)
-    ])
+    setAssignments(
+      setAssignmentGoalGradeState(key, assignments, checkboxState)
+    )
   }
 
   if (error) return (<WarningBanner />)

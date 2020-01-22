@@ -1,6 +1,39 @@
 import { calculateWeekOffset, dateToMonthDay } from './date'
 import { sum } from './math'
 
+const clearGoals = assignments => assignments
+  .map(a => {
+    a.goalGrade = ''
+    a.goalGradeSetByUser = null
+    return a
+  })
+
+const setAssignmentGoalGrade = (key, assignments, assignmentGoalGrade) => {
+  return [
+    ...assignments.slice(0, key),
+    {
+      ...assignments[key],
+      goalGrade: Number(assignmentGoalGrade),
+      goalGradeSetByUser: true
+    },
+    ...assignments.slice(key + 1)
+  ]
+}
+
+const setAssignmentGoalGradeState = (key, assignments, checkboxState) => {
+  return [
+    ...assignments.slice(0, key),
+    {
+      ...assignments[key],
+      goalGradeSetByUser: checkboxState
+    },
+    ...assignments.slice(key + 1)
+  ]
+}
+
+const gradedOrGoalGradeSetByUser = a => a.graded || a.goalGradeSetByUser
+const notGradedOrGoalGradeSetByUser = a => !(a.graded || a.goalGradeSetByUser)
+
 const calculateTotalPointsPossible = (assignments, assignmentGroups, assignmentWeightConsideration) => sum(
   assignments.map(
     a => assignmentWeightConsideration
@@ -11,9 +44,9 @@ const calculateTotalPointsPossible = (assignments, assignmentGroups, assignmentW
 
 const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignmentGroups, assignmentWeightConsideration) => {
   const gradedAssignments = assignments
-    .filter(a => a.graded || a.goalGradeSetByUser)
+    .filter(gradedOrGoalGradeSetByUser)
   const ungradedAssigmments = assignments
-    .filter(a => !(a.graded || a.goalGradeSetByUser))
+    .filter(notGradedOrGoalGradeSetByUser)
 
   const currentGrade = calculateMaxGrade(gradedAssignments, assignmentGroups, assignmentWeightConsideration)
   const totalGradedAssignmentPoints = calculateTotalPointsPossible(gradedAssignments, assignmentGroups, assignmentWeightConsideration)
@@ -26,7 +59,7 @@ const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignme
     (percentageOfCourseUngraded * 100)
 
   return assignments.map(a => {
-    if (!(a.graded || a.goalGradeSetByUser)) {
+    if (notGradedOrGoalGradeSetByUser(a)) {
       a.goalGrade = requiredGrade * a.pointsPossible
     }
     return a
@@ -131,5 +164,8 @@ export {
   calculateMaxGrade,
   sumAssignmentGoalGrade,
   createAssignmentFields,
-  createUserSettings
+  createUserSettings,
+  clearGoals,
+  setAssignmentGoalGrade,
+  setAssignmentGoalGradeState
 }
