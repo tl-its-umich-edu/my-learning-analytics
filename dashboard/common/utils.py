@@ -64,6 +64,8 @@ def get_myla_globals(current_user):
         logout_url = settings.LOGOUT_URL
     if settings.GA_ID:
         google_analytics_id = settings.GA_ID
+    primary_ui_color = settings.PRIMARY_UI_COLOR
+
     flatpages = FlatPage.objects.all()
     if flatpages:
         help_url = flatpages[0].content
@@ -76,6 +78,7 @@ def get_myla_globals(current_user):
         "user_courses_info": user_courses_info,
         "login": login_url,
         "logout": logout_url,
+        "primary_ui_color": primary_ui_color,
         "google_analytics_id": google_analytics_id,
         "help_url": help_url
     }

@@ -3,7 +3,7 @@ import { adjustViewport } from '../../util/chart'
 import d3tip from 'd3-tip'
 import './createResourceAccessChart.css'
 import '@fortawesome/fontawesome-free'
-import siteTheme from '../../siteTheme'
+import { siteTheme } from '../../globals'
 
 /*
   References:
