@@ -15,7 +15,7 @@ def find_earliest_start_datetime_of_courses():
         course_start_datetimes.append(course.get_course_date_range().start)
     logger.debug(course_start_datetimes)
     earliest_start = sorted(course_start_datetimes)[0]
-    logger.info(f"Earliest start datetime for a course: {earliest_start.isoformat()}")
+    logger.info(f"Earliest start datetime for all courses: {earliest_start.isoformat()}")
     return earliest_start
 
 
