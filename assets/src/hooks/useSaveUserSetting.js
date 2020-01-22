@@ -13,11 +13,11 @@ const isUserSettingChanged = (userSetting, data) => {
   )
 }
 
-const useSaveUserSetting = ({ loading, error, courseId, userSetting, data }) => {
+const useSaveUserSetting = ({ loading, error, courseId, userSetting, data, settingChanged }) => {
   const { saveUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
 
   useEffect(() => {
-    if (loadedWithoutError(loading, error)) {
+    if (loadedWithoutError(loading, error) && settingChanged) {
       if (noUserSetting(data) || isUserSettingChanged(userSetting, data)) {
         saveUserSetting(
           createUserSettings(courseId, 'assignmentv2', userSetting)
