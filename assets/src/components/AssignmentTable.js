@@ -180,7 +180,7 @@ function AssignmentTable (props) {
                     <TableCell className={classes.narrowCell}>
                       {`${roundToOneDecimal(a.percentOfFinalGrade)}%`}
                     </TableCell>
-                    <TableCell style={{ width: '30%' }}>
+                    <TableCell style={{ width: '20%' }}>
                       {
                         a.graded || a.outOf === 0
                           ? a.outOf === 0
