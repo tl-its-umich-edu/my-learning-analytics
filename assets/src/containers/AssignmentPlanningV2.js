@@ -53,8 +53,6 @@ function AssignmentPlanningV2 (props) {
 
   const { loading, error, data } = useAssignmentData(courseId)
 
-  console.log(settingChanged, userSetting)
-
   const [assignmentGroups, currentGrade, maxPossibleGrade] = useInitAssignmentState({
     loading,
     error,
