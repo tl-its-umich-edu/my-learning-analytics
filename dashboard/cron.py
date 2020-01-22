@@ -1,7 +1,7 @@
 
 from django.db import connections as conns
 
-from dashboard.common import db_util
+from dashboard.common import db_util, utils
 
 import logging
 import datetime
@@ -261,7 +261,8 @@ class DashboardCronJob(CronJobBase):
             query_params = [
                 bigquery.ArrayQueryParameter('course_ids', 'STRING', data_warehouse_course_ids),
                 bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
-                bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT)
+                bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT),
+                bigquery.ScalarQueryParameter('course_start_time', 'TIMESTAMP', utils.find_earliest_start_datetime_of_courses())
             ]
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
