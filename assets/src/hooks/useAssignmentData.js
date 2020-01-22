@@ -34,7 +34,7 @@ const GET_ASSIGNMENT_PLANNING_DATA = courseId => gql`
 `
 
 const useAssignmentData = courseId => {
-  return useQuery(GET_ASSIGNMENT_PLANNING_DATA(courseId))
+  return useQuery(GET_ASSIGNMENT_PLANNING_DATA(courseId), { fetchPolicy: 'network-only' })
 }
 
 export default useAssignmentData
