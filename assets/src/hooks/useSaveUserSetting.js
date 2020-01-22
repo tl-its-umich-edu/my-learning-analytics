@@ -20,7 +20,7 @@ const useSaveUserSetting = ({ loading, error, courseId, userSetting, data, setti
     if (loadedWithoutError(loading, error) && settingChanged) {
       if (noUserSetting(data) || isUserSettingChanged(userSetting, data)) {
         saveUserSetting(
-          createUserSettings(courseId, 'assignmentv2', userSetting)
+          createUserSettings(courseId, 'assignment', userSetting)
         )
       }
     }
