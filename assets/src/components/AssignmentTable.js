@@ -118,7 +118,7 @@ function AssignmentTable (props) {
                   'Assignment Name',
                   'Percent of Final Grade',
                   'Score / Out of',
-                  'Lock Grade'
+                  'Lock Goal'
                 ].map((heading, key) => (
                   <TableCell
                     className={classes.tableCell + ' ' + classes.tableHeadCell}
