@@ -4,7 +4,9 @@ import isEqual from 'lodash.isequal'
 import { createUserSettings } from '../util/assignment'
 import { loadedWithoutError } from '../util/data'
 
-const userSettingChanged = (userSetting, data) => {
+const noUserSetting = data => !data.course.currentUserDefaultSelection
+
+const isUserSettingChanged = (userSetting, data) => {
   return !isEqual(
     userSetting,
     JSON.parse(data.course.currentUserDefaultSelection.defaultViewValue)
@@ -12,16 +14,12 @@ const userSettingChanged = (userSetting, data) => {
 }
 
 const useSaveUserSetting = ({ loading, error, courseId, userSetting, data }) => {
-  const { debouncedUpdateUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
+  const { saveUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
 
   useEffect(() => {
     if (loadedWithoutError(loading, error)) {
-      if (!data.course.currentUserDefaultSelection) {
-        debouncedUpdateUserSetting(
-          createUserSettings(courseId, 'assignmentv2', userSetting)
-        )
-      } else if (userSettingChanged(userSetting, data)) {
-        debouncedUpdateUserSetting(
+      if (noUserSetting(data) || isUserSettingChanged(userSetting, data)) {
+        saveUserSetting(
           createUserSettings(courseId, 'assignmentv2', userSetting)
         )
       }

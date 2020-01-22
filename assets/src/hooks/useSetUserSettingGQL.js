@@ -20,12 +20,12 @@ const useSetUserSettingGQL = () => {
     { loading: mutationLoading, error: mutationError }
   ] = useMutation(UPDATE_USER_SETTING)
 
-  const debouncedUpdateUserSetting = debounce(updateUserSetting, 500, {
+  const saveUserSetting = debounce(updateUserSetting, 500, {
     leading: false,
     trailing: true
   })
 
-  return { debouncedUpdateUserSetting, mutationLoading, mutationError }
+  return { saveUserSetting, mutationLoading, mutationError }
 }
 
 export default useSetUserSettingGQL
