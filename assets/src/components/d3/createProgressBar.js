@@ -86,6 +86,7 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
       return displayable
     })
     .style('font-size', '0.875rem')
+    .style('fill', d => d.graded ? 'white' : 'black')
     .style('text-overflow', 'ellipsis')
 
   const xAxis = g => g
