@@ -326,7 +326,7 @@ def grade_distribution(request, course_id=0):
     summary['median_grade'] = df['current_grade'].median().round(2)
     summary['show_number_on_bars'] = False
     if df['show_number_on_bars'].values[0] == 1:
-        summary['show_number_on_bar'] = True
+        summary['show_number_on_bars'] = True
 
     df.sort_values(by=['current_grade'], inplace=True)
     df.reset_index(drop=True, inplace=True)
