@@ -1,4 +1,6 @@
 from graphene_django.views import GraphQLView
+import json
+from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.graphql.loaders import AssignmentsByCourseIdLoader, \
     SubmissionsByAssignmentIdLoader, SubmissionByAssignmentIdAndUserIdLoader, \
     AssignmentByCourseIdAndIdLoader, AssignmentsByAssignmentGroupIdLoader, \
@@ -9,6 +11,11 @@ from dashboard.graphql.loaders import AssignmentsByCourseIdLoader, \
 
 from django.db.models import Q
 from dashboard.models import User
+from pinax.eventlog.models import log as eventlog
+from dashboard.event_logs_types.event_logs_types import EventLogTypes
+import logging
+logger = logging.getLogger(__name__)
+
 
 class DashboardGraphQLView(GraphQLView):
     def get_context(self, request):
@@ -40,3 +47,15 @@ class DashboardGraphQLView(GraphQLView):
                 setattr(request, 'canvas_user_id', result.user_id)
 
         return request
+
+    def execute_graphql_request(self, request, data, query, variables, operation_name, show_graphiql=False):
+        if operation_name == 'Assignment':
+            event_data = {
+                "course_id": canvas_id_to_incremented_id(variables['courseId']),
+            }
+            eventlog(request.user, EventLogTypes.EVENT_VIEW_ASSIGNMENT_PLANNING_WITH_GOAL_SETTING.value, extra=event_data)
+
+
+        return super(DashboardGraphQLView, self).execute_graphql_request(
+            request, data, query, variables, operation_name, show_graphiql
+        )

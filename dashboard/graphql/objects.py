@@ -3,6 +3,8 @@ import graphene
 import numpy as np
 import json
 
+from graphql import GraphQLError
+
 from dashboard.rules import is_admin_or_instructor_in_course_id
 from dashboard.models import Course, User, Assignment, Submission, \
     AssignmentGroups, UserDefaultSelection, AcademicTerms

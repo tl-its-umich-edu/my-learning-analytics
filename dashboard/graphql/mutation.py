@@ -8,6 +8,8 @@ from graphql import GraphQLError
 from dashboard.graphql.objects import UserDefaultSelectionType
 from dashboard.rules import is_admin_or_enrolled_in_course_id
 from dashboard.models import UserDefaultSelection, Course
+from pinax.eventlog.models import log as eventlog
+from dashboard.event_logs_types.event_logs_types import EventLogTypes
 
 import logging
 logger = logging.getLogger(__name__)
@@ -52,6 +54,13 @@ class UserDefaultSelectionMutation(graphene.Mutation):
         )
         user_default_selection.default_view_value = json.dumps(data.default_view_value)
         user_default_selection.save()
+        event_log_data = {
+            "course_id": course_id,
+            "default_type": data.default_view_type,
+            "default_value": data.default_view_value
+        }
+        eventlog(user, EventLogTypes.EVENT_VIEW_SET_DEFAULT.value, extra=event_log_data)
+
 
         # Notice we return an instance of this mutation
         return UserDefaultSelectionMutation(user_default_selection=user_default_selection)
