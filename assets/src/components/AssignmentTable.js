@@ -196,7 +196,13 @@ function AssignmentTable (props) {
                                   ? 'Over 100%'
                                   : 'Set a goal'
                               }
-                              onChange={event => handleAssignmentGoalGrade(key, event.target.value)}
+                              onChange={event => {
+                                // if user clears assignment goal, unlock goal
+                                if (event.target.value === '') {
+                                  handleAssignmentLock(key, false)
+                                }
+                                handleAssignmentGoalGrade(key, event.target.value)
+                              }}
                               type='number'
                               className={classes.goalGradeInput}
                               style={{ marginBottom: '10px' }}

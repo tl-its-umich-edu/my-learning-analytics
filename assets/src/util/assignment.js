@@ -14,7 +14,7 @@ const setAssignmentGoalGrade = (key, assignments, assignmentGoalGrade) => {
     {
       ...assignments[key],
       goalGrade: Number(assignmentGoalGrade),
-      goalGradeSetByUser: true
+      goalGradeSetByUser: assignmentGoalGrade !== ''
     },
     ...assignments.slice(key + 1)
   ]
