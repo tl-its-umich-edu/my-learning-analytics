@@ -251,7 +251,11 @@ class DashboardCronJob(CronJobBase):
 
             final_bq_query = []
             for k, query_obj in settings.RESOURCE_ACCESS_CONFIG.items():
-                final_bq_query.append(query_obj['query'])
+                # concatenate the multi-line presentation of query into one single string
+                query = " ".join(query_obj['query'])
+                # join the time parameter
+                query = query + " and event_time > @course_start_time"
+                final_bq_query.append(query)
             final_bq_query = "  UNION ALL   ".join(final_bq_query)
 
             data_warehouse_course_ids_short = [db_util.incremented_id_to_canvas_id(id) for id in data_warehouse_course_ids]
@@ -268,7 +272,7 @@ class DashboardCronJob(CronJobBase):
             job_config.query_parameters = query_params
 
             # Location must match that of the dataset(s) referenced in the query.
-            logger.info(final_bq_query)
+            logger.debug(final_bq_query)
             bq_query = bigquery_client.query(final_bq_query, location='US', job_config=job_config)
             #bq_query.result()
             resource_access_df = bq_query.to_dataframe()
