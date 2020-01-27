@@ -21,7 +21,7 @@ const toolTip = d3tip().attr('class', 'd3-tip')
   .direction('n').offset([-5, 5])
   .html(d => {
     if (d.self_access_count === 0) {
-      return `<b>You haven't accessed this resource. </b>`
+      return '<b>You haven\'t accessed this resource. </b>'
     } else if (d.self_access_count === 1) {
       return `You accessed this resource once on ${new Date(d.self_access_last_time).toDateString()}.`
     } else {
@@ -37,13 +37,13 @@ function appendLegend (svg) {
   const legendY = -50
 
   const legendLabels = [
-    [`Resources I haven't viewed`, notAccessedResourceColor],
-    [`Resources I've viewed`, accessedResourceColor]
+    ['Resources I haven\'t viewed', notAccessedResourceColor],
+    ['Resources I\'ve viewed', accessedResourceColor]
   ]
 
   const legend = svg.select('.mainGroupWrapper').append('g')
     .attr('class', 'legend')
-    .attr('transform', `translate(-550, 0)`)
+    .attr('transform', 'translate(-550, 0)')
 
   legend.selectAll('text')
     .data(legendLabels)
@@ -212,7 +212,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
     // Update the label size
     d3.selectAll('.axis--y text')
-      .attr('x', -150)
+      .attr('x', -160)
       .style('font-size', textScale(selected.length))
 
     update()
@@ -325,7 +325,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   mainGroup.append('g')
     .attr('class', 'axis axis--y')
-    .attr('transform', 'translate(145,0)')
+    .attr('transform', 'translate(150,0)')
     .call(mainYAxis)
 
   // Draw mini bars
@@ -357,8 +357,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   d3.selectAll('.axis--y .tick').each(function (d) {
     // Have to use ES5 function to correctly use `this` keyword
-    let link = d.split('|')[0]
-    let name = d.split('|')[1]
+    const link = d.split('|')[0]
+    const name = d.split('|')[1]
     const a = d3.select(this.parentNode).append('a')
       .attr('xlink:title', name)
       .attr('xlink:target', '_blank')
@@ -366,7 +366,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('text-anchor', 'start')
     a.node().appendChild(this)
 
-    let icon = d.split('|')[2]
+    const icon = d.split('|')[2]
     d3.select(this).insert('foreignObject')
       .attr('x', -180)
       .attr('y', -6)
