@@ -12,7 +12,6 @@ import Popover from '@material-ui/core/Popover'
 import ProgressBarV2 from './ProgressBarV2'
 import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
-import { roundToOneDecimal } from '../util/math'
 import StyledTextField from './StyledTextField'
 import { calculateWeekOffset } from '../util/date'
 
@@ -178,7 +177,7 @@ function AssignmentTable (props) {
                       {a.name}
                     </TableCell>
                     <TableCell className={classes.narrowCell}>
-                      {`${roundToOneDecimal(a.percentOfFinalGrade)}%`}
+                      {`${a.percentOfFinalGrade}%`}
                     </TableCell>
                     <TableCell style={{ width: '20%' }}>
                       {
@@ -190,7 +189,7 @@ function AssignmentTable (props) {
                             <StyledTextField
                               error={(a.goalGrade / a.pointsPossible) > 1}
                               id='standard-number'
-                              value={roundToOneDecimal(a.goalGrade)}
+                              value={a.goalGrade}
                               label={
                                 (a.goalGrade / a.pointsPossible) > 1
                                   ? 'Over 100%'

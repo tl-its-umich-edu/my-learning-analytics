@@ -1,5 +1,5 @@
 import { calculateWeekOffset, dateToMonthDay } from './date'
-import { sum } from './math'
+import { sum, roundToOneDecimal } from './math'
 
 const clearGoals = assignments => assignments
   .map(a => {
@@ -13,7 +13,7 @@ const setAssignmentGoalGrade = (key, assignments, assignmentGoalGrade) => {
     ...assignments.slice(0, key),
     {
       ...assignments[key],
-      goalGrade: Number(assignmentGoalGrade),
+      goalGrade: roundToOneDecimal(Number(assignmentGoalGrade)),
       goalGradeSetByUser: assignmentGoalGrade !== ''
     },
     ...assignments.slice(key + 1)
@@ -60,7 +60,7 @@ const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignme
 
   return assignments.map(a => {
     if (notGradedOrGoalGradeSetByUser(a)) {
-      a.goalGrade = requiredGrade * a.pointsPossible
+      a.goalGrade = roundToOneDecimal(requiredGrade * a.pointsPossible) || ''
     }
     return a
   })
@@ -130,9 +130,11 @@ const createAssignmentFields = (assignments, assignmentGroups, courseStartDate, 
       } = a
 
       a.week = calculateWeekOffset(courseStartDate, localDate)
-      a.percentOfFinalGrade = assignmentWeightConsideration
-        ? calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
-        : pointsPossible / totalPointsPossible * 100
+      a.percentOfFinalGrade = roundToOneDecimal(
+        assignmentWeightConsideration
+          ? calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
+          : pointsPossible / totalPointsPossible * 100
+      )
       a.outOf = pointsPossible
       a.graded = !!currentUserSubmission && !!currentUserSubmission.gradedDate
       a.dueDateMonthDay = dateToMonthDay(localDate)
