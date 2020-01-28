@@ -16,7 +16,9 @@ const useUserAssignmentSetting =
         if (userSetting) {
           if (userSetting.goalGrade || userSetting.goalGrade !== '') {
             setGoalGrade(
-              userSetting.goalGrade
+              typeof userSetting.goalGrade === 'undefined'
+                ? ''
+                : userSetting.goalGrade
             )
           }
           if (userSetting.assignments) {
