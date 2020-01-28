@@ -14,7 +14,11 @@ const useUserAssignmentSetting =
     useEffect(() => {
       if (loadedWithoutError(loading, error)) {
         if (userSetting) {
-          setGoalGrade(userSetting.goalGrade)
+          if (userSetting.goalGrade || userSetting.goalGrade !== '') {
+            setGoalGrade(
+              userSetting.goalGrade
+            )
+          }
           if (userSetting.assignments) {
             const assignmentsWithUserSetting = assignments.map(a => {
               const assignmentSetting = userSetting.assignments

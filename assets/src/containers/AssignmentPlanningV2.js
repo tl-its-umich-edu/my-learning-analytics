@@ -47,7 +47,7 @@ function AssignmentPlanningV2 (props) {
   if (disabled) return (<AlertBanner>Assignment Planning view is hidden for this course.</AlertBanner>)
 
   const [assignments, setAssignments] = useState([])
-  const [goalGrade, setGoalGrade] = useState(null)
+  const [goalGrade, setGoalGrade] = useState('')
   const [userSetting, setUserSetting] = useState({})
   const [settingChanged, setSettingChanged] = useState(false)
 
@@ -95,7 +95,7 @@ function AssignmentPlanningV2 (props) {
 
   const handleClearGoalGrades = () => {
     setAssignments(clearGoals(assignments))
-    setGoalGrade(null)
+    setGoalGrade('')
     setUserSetting({})
     setSettingChanged(true)
   }

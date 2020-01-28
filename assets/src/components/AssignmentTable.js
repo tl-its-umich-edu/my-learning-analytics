@@ -190,7 +190,7 @@ function AssignmentTable (props) {
                             <StyledTextField
                               error={(a.goalGrade / a.pointsPossible) > 1}
                               id='standard-number'
-                              value={roundToOneDecimal(a.goalGrade) || ''}
+                              value={roundToOneDecimal(a.goalGrade)}
                               label={
                                 (a.goalGrade / a.pointsPossible) > 1
                                   ? 'Over 100%'
@@ -208,6 +208,7 @@ function AssignmentTable (props) {
                               style={{ marginBottom: '10px' }}
                             />
                           )
+
                       }
                       {
                         <div style={{ margin: 'auto', display: 'inline' }}>
@@ -225,7 +226,7 @@ function AssignmentTable (props) {
                           percentWidth={a.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
                           displayLabel
                           lines={
-                            a.goalGrade
+                            a.goalGrade !== ''
                               ? [{ color: 'green', value: a.goalGrade, draggable: true }]
                               : []
                           }

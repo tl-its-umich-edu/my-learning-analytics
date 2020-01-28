@@ -12,7 +12,7 @@ const useSyncAssignmentAndGoalGrade =
     setUserSetting
   }) => {
     useEffect(() => {
-      if (goalGrade) {
+      if (goalGrade !== '') {
         setAssignments(
           calculateAssignmentGoalsFromCourseGoal(
             goalGrade,

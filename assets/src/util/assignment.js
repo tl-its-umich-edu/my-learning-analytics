@@ -136,7 +136,7 @@ const createAssignmentFields = (assignments, assignmentGroups, courseStartDate, 
       a.outOf = pointsPossible
       a.graded = !!currentUserSubmission && !!currentUserSubmission.gradedDate
       a.dueDateMonthDay = dateToMonthDay(localDate)
-      a.goalGrade = null
+      a.goalGrade = ''
       a.goalGradeSetByUser = null
 
       return a

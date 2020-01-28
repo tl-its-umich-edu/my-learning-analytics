@@ -51,7 +51,7 @@ function ProgressBarV2 (props) {
         >
           {
             lines.length > 0
-              ? lines.filter(line => line.value) // filter any lines without value
+              ? lines.filter(line => line.value || line.value === 0) // filter any lines without value
                 .map((line, key) => (
                   <div key={key}>
                     <Line

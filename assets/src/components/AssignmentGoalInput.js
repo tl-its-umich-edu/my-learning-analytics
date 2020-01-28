@@ -29,7 +29,7 @@ function AssignmentGoalInput (props) {
         <StyledTextField
           error={goalGrade > 100 || mathWarning || goalGrade > maxPossibleGrade}
           id='standard-number'
-          value={goalGrade || ''}
+          value={goalGrade}
           label={
             mathWarning
               ? 'Math may no longer add up'
@@ -39,7 +39,16 @@ function AssignmentGoalInput (props) {
                   ? 'Greater than max possible grade'
                   : 'Set a goal'
           }
-          onChange={event => setGoalGrade(Number(event.target.value))}
+          onChange={event => {
+            const goalGrade = Number(event.target.value)
+            if (goalGrade <= 0) {
+              setGoalGrade(0)
+            } else if (goalGrade > 125) {
+              setGoalGrade(125)
+            } else {
+              setGoalGrade(goalGrade)
+            }
+          }}
           type='number'
           className={classes.goalGradeInput}
           InputLabelProps={{
@@ -50,7 +59,7 @@ function AssignmentGoalInput (props) {
           style={{ marginRight: '10px' }}
         />
         {
-          goalGrade
+          goalGrade !== ''
             ? (
               <Button
                 variant='contained'
