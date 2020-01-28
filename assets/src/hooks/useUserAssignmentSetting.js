@@ -14,7 +14,7 @@ const useUserAssignmentSetting =
     useEffect(() => {
       if (loadedWithoutError(loading, error)) {
         if (userSetting) {
-          if (userSetting.goalGrade || userSetting.goalGrade !== '') {
+          if (userSetting.goalGrade !== '') {
             setGoalGrade(
               typeof userSetting.goalGrade === 'undefined'
                 ? ''
