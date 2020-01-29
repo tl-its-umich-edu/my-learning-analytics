@@ -243,6 +243,9 @@ class DashboardCronJob(CronJobBase):
         # BQ Total Bytes Billed to report to status
         total_bytes_billed = 0
 
+        # the earliest start date of all courses
+        course_start_time = utils.find_earliest_start_datetime_of_courses()
+
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
         for data_warehouse_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
@@ -253,8 +256,11 @@ class DashboardCronJob(CronJobBase):
             for k, query_obj in settings.RESOURCE_ACCESS_CONFIG.items():
                 # concatenate the multi-line presentation of query into one single string
                 query = " ".join(query_obj['query'])
-                # join the time parameter
-                query = query + " and event_time > @course_start_time"
+
+                if (course_start_time is not None):
+                    # insert the start time parameter for query
+                    query = query + " and event_time > @course_start_time"
+
                 final_bq_query.append(query)
             final_bq_query = "  UNION ALL   ".join(final_bq_query)
 
@@ -265,9 +271,12 @@ class DashboardCronJob(CronJobBase):
             query_params = [
                 bigquery.ArrayQueryParameter('course_ids', 'STRING', data_warehouse_course_ids),
                 bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
-                bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT),
-                bigquery.ScalarQueryParameter('course_start_time', 'TIMESTAMP', utils.find_earliest_start_datetime_of_courses())
+                bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT)
             ]
+            if (course_start_time is not None):
+                # insert the start time parameter for query
+                query_params.append(bigquery.ScalarQueryParameter('course_start_time', 'TIMESTAMP', course_start_time))
+
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
 
