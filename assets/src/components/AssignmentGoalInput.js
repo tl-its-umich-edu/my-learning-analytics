@@ -3,7 +3,6 @@ import { withStyles, Typography } from '@material-ui/core'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import StyledTextField from './StyledTextField'
-import LayersClearIcon from '@material-ui/icons/LayersClear'
 
 const styles = ({
   goalGradeInput: {
@@ -68,7 +67,6 @@ function AssignmentGoalInput (props) {
                 aria-label='clear'
               >
                 Clear
-                <LayersClearIcon />
               </Button>
             )
             : null
