@@ -11,6 +11,14 @@ const useSyncAssignmentAndGoalGrade =
     setAssignments,
     setUserSetting
   }) => {
+    const assignmentInputBlurChange = assignments
+      .map(a => a.inputBlur).every(Boolean)
+
+    const assignmentCheckboxStateChange = assignments
+      .map(a => a.goalGradeSetByUser).filter(Boolean).length
+
+    const assignmentGoalGradeChange = sumAssignmentGoalGrade(assignments)
+
     useEffect(() => {
       const assignmentsSetByUser = assignments
         .filter(a => a.goalGradeSetByUser)
@@ -37,7 +45,12 @@ const useSyncAssignmentAndGoalGrade =
           )
         )
       }
-    }, [goalGrade, sumAssignmentGoalGrade(assignments)])
+    }, [
+      goalGrade,
+      assignmentGoalGradeChange,
+      assignmentInputBlurChange,
+      assignmentCheckboxStateChange
+    ])
   }
 
 export default useSyncAssignmentAndGoalGrade

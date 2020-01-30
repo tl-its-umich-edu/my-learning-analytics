@@ -55,7 +55,9 @@ function AssignmentTable (props) {
     assignmentGroups,
     dateStart,
     handleAssignmentGoalGrade,
-    handleAssignmentLock
+    handleAssignmentLock,
+    handleInputFocus,
+    handleInputBlur
   } = props
 
   const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
@@ -196,18 +198,16 @@ function AssignmentTable (props) {
                                   : 'Set a goal'
                               }
                               onChange={event => {
-                                // if user clears assignment goal, unlock goal
-                                if (event.target.value === '') {
-                                  handleAssignmentLock(key, false)
-                                }
-                                handleAssignmentGoalGrade(key, event.target.value)
+                                const assignmentGoalGrade = event.target.value
+                                handleAssignmentGoalGrade(key, assignmentGoalGrade)
                               }}
                               type='number'
                               className={classes.goalGradeInput}
                               style={{ marginBottom: '10px' }}
+                              onFocus={() => handleInputFocus(key)}
+                              onBlur={() => handleInputBlur(key)}
                             />
                           )
-
                       }
                       {
                         <div style={{ margin: 'auto', display: 'inline' }}>

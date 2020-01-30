@@ -19,7 +19,8 @@ import useSaveUserSetting from '../hooks/useSaveUserSetting'
 import {
   clearGoals,
   setAssignmentGoalGrade,
-  setAssignmentGoalGradeState
+  setAssignmentGoalLockState,
+  setAssigmentGoalInputState
 } from '../util/assignment'
 
 const styles = theme => ({
@@ -102,7 +103,19 @@ function AssignmentPlanningV2 (props) {
 
   const handleAssignmentLock = (key, checkboxState) => {
     setAssignments(
-      setAssignmentGoalGradeState(key, assignments, checkboxState)
+      setAssignmentGoalLockState(key, assignments, checkboxState)
+    )
+  }
+
+  const handleInputFocus = key => {
+    setAssignments(
+      setAssigmentGoalInputState(key, assignments, true)
+    )
+  }
+
+  const handleInputBlur = key => {
+    setAssignments(
+      setAssigmentGoalInputState(key, assignments, false)
     )
   }
 
@@ -165,6 +178,8 @@ function AssignmentPlanningV2 (props) {
                       dateStart={data.course.dateStart}
                       handleAssignmentGoalGrade={handleAssignmentGoalGrade}
                       handleAssignmentLock={handleAssignmentLock}
+                      handleInputFocus={handleInputFocus}
+                      handleInputBlur={handleInputBlur}
                     />
                   </>
                 )

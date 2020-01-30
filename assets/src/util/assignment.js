@@ -8,19 +8,34 @@ const clearGoals = assignments => assignments
     return a
   })
 
-const setAssignmentGoalGrade = (key, assignments, assignmentGoalGrade) => {
+const setAssigmentGoalInputState = (key, assignments, inputFocus) => {
+  const goalGrade = assignments[key].goalGrade
+  const goalGradeSetByUser = inputFocus || goalGrade !== ''
   return [
     ...assignments.slice(0, key),
     {
       ...assignments[key],
-      goalGrade: roundToOneDecimal(Number(assignmentGoalGrade)),
-      goalGradeSetByUser: assignmentGoalGrade !== ''
+      inputFocus,
+      inputBlur: !inputFocus,
+      goalGradeSetByUser
     },
     ...assignments.slice(key + 1)
   ]
 }
 
-const setAssignmentGoalGradeState = (key, assignments, checkboxState) => {
+const setAssignmentGoalGrade = (key, assignments, goalGrade) => {
+  return [
+    ...assignments.slice(0, key),
+    {
+      ...assignments[key],
+      goalGrade: goalGrade === '' ? '' : roundToOneDecimal(Number(goalGrade)),
+      goalGradeSetByUser: goalGrade || assignments[key].inputFocus
+    },
+    ...assignments.slice(key + 1)
+  ]
+}
+
+const setAssignmentGoalLockState = (key, assignments, checkboxState) => {
   return [
     ...assignments.slice(0, key),
     {
@@ -31,9 +46,6 @@ const setAssignmentGoalGradeState = (key, assignments, checkboxState) => {
   ]
 }
 
-const gradedOrGoalGradeSetByUser = a => a.graded || a.goalGradeSetByUser
-const notGradedOrGoalGradeSetByUser = a => !(a.graded || a.goalGradeSetByUser)
-
 const calculateTotalPointsPossible = (assignments, assignmentGroups, assignmentWeightConsideration) => sum(
   assignments.map(
     a => assignmentWeightConsideration
@@ -42,15 +54,37 @@ const calculateTotalPointsPossible = (assignments, assignmentGroups, assignmentW
   )
 )
 
-const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignmentGroups, assignmentWeightConsideration) => {
+const gradedOrGoalGradeSetByUser = a => a.graded || a.goalGradeSetByUser
+const notGradedOrGoalGradeSetByUser = a => !(a.graded || a.goalGradeSetByUser)
+
+const calculateAssignmentGoalsFromCourseGoal = (
+  goalGrade,
+  assignments,
+  assignmentGroups,
+  assignmentWeightConsideration
+) => {
   const gradedAssignments = assignments
     .filter(gradedOrGoalGradeSetByUser)
   const ungradedAssigmments = assignments
     .filter(notGradedOrGoalGradeSetByUser)
 
-  const currentGrade = calculateMaxGrade(gradedAssignments, assignmentGroups, assignmentWeightConsideration)
-  const totalGradedAssignmentPoints = calculateTotalPointsPossible(gradedAssignments, assignmentGroups, assignmentWeightConsideration)
-  const totalUngradedAssignmentPoints = calculateTotalPointsPossible(ungradedAssigmments, assignmentGroups, assignmentWeightConsideration)
+  const currentGrade = calculateMaxGrade(
+    gradedAssignments,
+    assignmentGroups,
+    assignmentWeightConsideration
+  )
+
+  const totalGradedAssignmentPoints = calculateTotalPointsPossible(
+    gradedAssignments,
+    assignmentGroups,
+    assignmentWeightConsideration
+  )
+
+  const totalUngradedAssignmentPoints = calculateTotalPointsPossible(
+    ungradedAssigmments,
+    assignmentGroups,
+    assignmentWeightConsideration
+  )
 
   const percentageOfCourseUngraded = totalUngradedAssignmentPoints /
     (totalUngradedAssignmentPoints + totalGradedAssignmentPoints)
@@ -59,7 +93,7 @@ const calculateAssignmentGoalsFromCourseGoal = (goalGrade, assignments, assignme
     (percentageOfCourseUngraded * 100)
 
   return assignments.map(a => {
-    if (notGradedOrGoalGradeSetByUser(a)) {
+    if (notGradedOrGoalGradeSetByUser(a) && a.inputBlur) {
       a.goalGrade = roundToOneDecimal(requiredGrade * a.pointsPossible) || ''
     }
     return a
@@ -79,9 +113,11 @@ const calculateMaxGrade = (assignments, assignmentGroups, assignmentWeightConsid
     .reduce((acc, a) => {
       const assignmentGrade = a.graded
         ? a.currentUserSubmission.score / a.pointsPossible
-        : a.goalGradeSetByUser // if user sets assignment goal, use the set goal as part of grade calc.
+        // if user sets assignment goal, use the set goal as part of grade calc.
+        : a.goalGradeSetByUser
           ? a.goalGrade / a.pointsPossible
-          : 1 // give a perfect score if assignment is not graded to calculate the max grade possible.
+          // give a perfect score if assignment is not graded to calculate the max grade possible.
+          : 1
 
       const weightOfAssignment = assignmentWeightConsideration
         ? calculateWeight(a.pointsPossible, a.assignmentGroupId, assignmentGroups)
@@ -101,7 +137,12 @@ const calculateMaxGrade = (assignments, assignmentGroups, assignmentWeightConsid
 
 // calculateCurrentGrade ignores any ungraded assignments
 const calculateCurrentGrade = (assignments, assignmentGroups, assignmentWeightConsideration) =>
-  calculateMaxGrade(assignments.filter(a => a.graded), assignmentGroups, assignmentWeightConsideration)
+  calculateMaxGrade(
+    assignments
+      .filter(a => a.graded),
+    assignmentGroups,
+    assignmentWeightConsideration
+  )
 
 const sumAssignmentGoalGrade = assignments => sum(
   assignments.map(a => a.goalGrade || 0)
@@ -118,8 +159,17 @@ const sortAssignmentsByWeek = assignments => {
   return [...assignmentsWithDueDates, ...assignmentsWithoutDueDates]
 }
 
-const createAssignmentFields = (assignments, assignmentGroups, courseStartDate, assignmentWeightConsideration) => {
-  const totalPointsPossible = calculateTotalPointsPossible(assignments, assignmentGroups, assignmentWeightConsideration)
+const createAssignmentFields = (
+  assignments,
+  assignmentGroups,
+  courseStartDate,
+  assignmentWeightConsideration
+) => {
+  const totalPointsPossible = calculateTotalPointsPossible(
+    assignments,
+    assignmentGroups,
+    assignmentWeightConsideration
+  )
   return sortAssignmentsByWeek(
     assignments.map(a => {
       const {
@@ -140,6 +190,8 @@ const createAssignmentFields = (assignments, assignmentGroups, courseStartDate, 
       a.dueDateMonthDay = dateToMonthDay(localDate)
       a.goalGrade = ''
       a.goalGradeSetByUser = null
+      a.inputFocus = false
+      a.inputBlur = true
 
       return a
     })
@@ -169,5 +221,6 @@ export {
   createUserSettings,
   clearGoals,
   setAssignmentGoalGrade,
-  setAssignmentGoalGradeState
+  setAssignmentGoalLockState,
+  setAssigmentGoalInputState
 }
