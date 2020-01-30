@@ -21,8 +21,6 @@ import {
   setAssignmentGoalGrade,
   setAssignmentGoalGradeState
 } from '../util/assignment'
-// import { DndProvider } from 'react-dnd'
-// import HTML5Backend from 'react-dnd-html5-backend'
 
 const styles = theme => ({
   root: {
@@ -60,6 +58,7 @@ function AssignmentPlanningV2 (props) {
     setAssignments,
     setUserSetting
   })
+
   useUserAssignmentSetting({
     loading,
     error,
@@ -68,6 +67,7 @@ function AssignmentPlanningV2 (props) {
     setGoalGrade,
     setAssignments
   })
+
   useSyncAssignmentAndGoalGrade({
     data,
     assignments,
@@ -75,8 +75,9 @@ function AssignmentPlanningV2 (props) {
     setAssignments,
     setUserSetting
   })
+
   const showMathWarning = useMathWarning(assignments)
-  // this effect saves the user setting
+
   const [mutationLoading, mutationError] = useSaveUserSetting({
     loading,
     error,
@@ -108,7 +109,6 @@ function AssignmentPlanningV2 (props) {
   if (error) return (<WarningBanner />)
 
   return (
-    // <DndProvider backend={HTML5Backend}>
     <div className={classes.root}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -177,7 +177,6 @@ function AssignmentPlanningV2 (props) {
         </Grid>
       </Grid>
     </div>
-    // </DndProvider>
   )
 }
 

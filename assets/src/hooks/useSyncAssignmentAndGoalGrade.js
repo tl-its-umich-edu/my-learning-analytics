@@ -22,6 +22,11 @@ const useSyncAssignmentAndGoalGrade =
           }
         ))
 
+      setUserSetting({
+        goalGrade,
+        assignments: assignmentsSetByUser
+      })
+
       if (goalGrade !== '') {
         setAssignments(
           calculateAssignmentGoalsFromCourseGoal(
@@ -31,15 +36,6 @@ const useSyncAssignmentAndGoalGrade =
             data.course.assignmentWeightConsideration
           )
         )
-        setUserSetting({
-          goalGrade,
-          assignments: assignmentsSetByUser
-        })
-      } else {
-        setUserSetting({
-          goalGrade,
-          assignments: assignmentsSetByUser
-        })
       }
     }, [goalGrade, sumAssignmentGoalGrade(assignments)])
   }
