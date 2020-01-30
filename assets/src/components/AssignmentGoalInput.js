@@ -39,8 +39,10 @@ function AssignmentGoalInput (props) {
                   : 'Set a goal'
           }
           onChange={event => {
-            const goalGrade = Number(event.target.value)
-            if (goalGrade <= 0) {
+            const goalGrade = event.target.value
+            if (goalGrade === '') {
+              setGoalGrade('')
+            } else if (goalGrade <= 0) {
               setGoalGrade(0)
             } else if (goalGrade > 125) {
               setGoalGrade(125)
@@ -58,18 +60,14 @@ function AssignmentGoalInput (props) {
           style={{ marginRight: '10px' }}
         />
         {
-          goalGrade !== ''
-            ? (
-              <Button
-                variant='contained'
-                className={classes.clearButton}
-                onClick={handleClearGoalGrades}
-                aria-label='clear'
-              >
-                Clear
-              </Button>
-            )
-            : null
+          <Button
+            variant='contained'
+            className={classes.clearButton}
+            onClick={handleClearGoalGrades}
+            aria-label='clear'
+          >
+            Clear
+          </Button>
         }
       </Grid>
     </Grid>

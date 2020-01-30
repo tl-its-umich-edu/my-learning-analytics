@@ -82,7 +82,6 @@ function AssignmentPlanningV2 (props) {
     error,
     courseId,
     userSetting,
-    data,
     settingChanged
   })
 

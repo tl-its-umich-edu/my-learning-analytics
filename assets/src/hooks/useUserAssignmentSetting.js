@@ -14,13 +14,11 @@ const useUserAssignmentSetting =
     useEffect(() => {
       if (loadedWithoutError(loading, error)) {
         if (userSetting) {
-          if (userSetting.goalGrade !== '') {
-            setGoalGrade(
-              typeof userSetting.goalGrade === 'undefined'
-                ? ''
-                : userSetting.goalGrade
-            )
-          }
+          setGoalGrade(
+            typeof userSetting.goalGrade === 'undefined'
+              ? ''
+              : userSetting.goalGrade
+          )
           if (userSetting.assignments) {
             const assignmentsWithUserSetting = assignments.map(a => {
               const assignmentSetting = userSetting.assignments

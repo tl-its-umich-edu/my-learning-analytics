@@ -12,6 +12,16 @@ const useSyncAssignmentAndGoalGrade =
     setUserSetting
   }) => {
     useEffect(() => {
+      const assignmentsSetByUser = assignments
+        .filter(a => a.goalGradeSetByUser)
+        .map(({ id, goalGradeSetByUser, goalGrade }) => (
+          {
+            assignmentId: id,
+            goalGradeSetByUser,
+            goalGrade
+          }
+        ))
+
       if (goalGrade !== '') {
         setAssignments(
           calculateAssignmentGoalsFromCourseGoal(
@@ -21,15 +31,11 @@ const useSyncAssignmentAndGoalGrade =
             data.course.assignmentWeightConsideration
           )
         )
-        const assignmentsSetByUser = assignments
-          .filter(a => a.goalGradeSetByUser)
-          .map(({ id, goalGradeSetByUser, goalGrade }) => (
-            {
-              assignmentId: id,
-              goalGradeSetByUser,
-              goalGrade
-            }
-          ))
+        setUserSetting({
+          goalGrade,
+          assignments: assignmentsSetByUser
+        })
+      } else {
         setUserSetting({
           goalGrade,
           assignments: assignmentsSetByUser

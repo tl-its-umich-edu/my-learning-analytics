@@ -3,7 +3,7 @@ import useSetUserSettingGQL from './useSetUserSettingGQL'
 import { createUserSettings } from '../util/assignment'
 import { loadedWithoutError } from '../util/data'
 
-const useSaveUserSetting = ({ loading, error, courseId, userSetting, data, settingChanged }) => {
+const useSaveUserSetting = ({ loading, error, courseId, userSetting, settingChanged }) => {
   const { saveUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
 
   useEffect(() => {
