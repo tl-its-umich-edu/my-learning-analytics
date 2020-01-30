@@ -32,7 +32,7 @@ const styles = theme => ({
   },
   goalGradeInput: {
     marginTop: 0,
-    width: 85
+    width: 100
   },
   tableCell: {
     border: 'none'
@@ -51,6 +51,7 @@ const styles = theme => ({
 function AssignmentTable (props) {
   const {
     classes,
+    courseGoalGradeSet,
     assignments,
     assignmentGroups,
     dateStart,
@@ -190,12 +191,15 @@ function AssignmentTable (props) {
                           : (
                             <StyledTextField
                               error={(a.goalGrade / a.pointsPossible) > 1}
+                              disabled={!courseGoalGradeSet}
                               id='standard-number'
                               value={a.goalGrade}
                               label={
-                                (a.goalGrade / a.pointsPossible) > 1
-                                  ? 'Over 100%'
-                                  : 'Set a goal'
+                                !courseGoalGradeSet
+                                  ? 'Set course goal'
+                                  : (a.goalGrade / a.pointsPossible) > 1
+                                    ? 'Over 100%'
+                                    : 'Set a goal'
                               }
                               onChange={event => {
                                 const assignmentGoalGrade = event.target.value
@@ -252,7 +256,7 @@ function AssignmentTable (props) {
                     </TableCell>
                     <TableCell>
                       <Checkbox
-                        disabled={a.graded}
+                        disabled={a.graded || !courseGoalGradeSet}
                         checked={!!a.goalGradeSetByUser}
                         onChange={event => handleAssignmentLock(key, event.target.checked)}
                         color='primary'

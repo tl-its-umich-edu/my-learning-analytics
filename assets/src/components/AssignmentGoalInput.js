@@ -36,7 +36,7 @@ function AssignmentGoalInput (props) {
                 ? 'Over 100%'
                 : goalGrade > maxPossibleGrade
                   ? 'Greater than max possible grade'
-                  : 'Set a goal'
+                  : 'Set course goal'
           }
           onChange={event => {
             const goalGrade = event.target.value

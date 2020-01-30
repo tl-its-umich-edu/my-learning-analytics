@@ -173,6 +173,7 @@ function AssignmentPlanningV2 (props) {
                     />
                     <Typography variant='h6'>Assignments by Due Date</Typography>
                     <AssignmentTable
+                      courseGoalGradeSet={goalGrade !== ''}
                       assignments={assignments}
                       assignmentGroups={assignmentGroups}
                       dateStart={data.course.dateStart}
