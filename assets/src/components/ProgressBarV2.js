@@ -2,7 +2,7 @@ import React from 'react'
 import Line from './Line'
 import Label from './Label'
 import { withStyles } from '@material-ui/core/styles'
-import { roundToOneDecimal } from '../util/math'
+import { roundToXDecimals } from '../util/math'
 // import { DropTarget } from 'react-dnd'
 
 const styles = ({
@@ -66,7 +66,7 @@ function ProgressBarV2 (props) {
                           <Label
                             left={`${calculateLineLeftOffset(line.value, outOf) + 0.5}%`}
                             color={line.color}
-                            labelText={`${line.label}: ${roundToOneDecimal(line.value)}%`}
+                            labelText={`${line.label}: ${roundToXDecimals(line.value, 1)}%`}
                             labelPlacement={line.labelPlacement}
                           />
                         )

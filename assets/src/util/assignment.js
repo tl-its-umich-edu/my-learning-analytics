@@ -1,5 +1,5 @@
 import { calculateWeekOffset, dateToMonthDay } from './date'
-import { sum, roundToOneDecimal } from './math'
+import { sum, roundToXDecimals, getDecimalPlaceOfFloat } from './math'
 
 const clearGoals = assignments => assignments
   .map(a => {
@@ -24,11 +24,15 @@ const setAssigmentGoalInputState = (key, assignments, inputFocus) => {
 }
 
 const setAssignmentGoalGrade = (key, assignments, goalGrade) => {
+  // Use decimal place of pointsPossible if it's a decimal; otherwise, round to nearest tenth
+  const placeToRoundTo = (String(assignments[key].pointsPossible).includes('.'))
+    ? getDecimalPlaceOfFloat(assignments[key].pointsPossible) : 1
+
   return [
     ...assignments.slice(0, key),
     {
       ...assignments[key],
-      goalGrade: goalGrade === '' ? '' : roundToOneDecimal(Number(goalGrade)),
+      goalGrade: goalGrade === '' ? '' : roundToXDecimals(Number(goalGrade), placeToRoundTo),
       goalGradeSetByUser: goalGrade || assignments[key].inputFocus
     },
     ...assignments.slice(key + 1)
@@ -94,7 +98,7 @@ const calculateAssignmentGoalsFromCourseGoal = (
 
   return assignments.map(a => {
     if (notGradedOrGoalGradeSetByUser(a) && a.inputBlur) {
-      a.goalGrade = roundToOneDecimal(requiredGrade * a.pointsPossible) || ''
+      a.goalGrade = roundToXDecimals(requiredGrade * a.pointsPossible, 1) || ''
     }
     return a
   })
@@ -180,10 +184,12 @@ const createAssignmentFields = (
       } = a
 
       a.week = calculateWeekOffset(courseStartDate, localDate)
-      a.percentOfFinalGrade = roundToOneDecimal(
-        assignmentWeightConsideration
-          ? calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
-          : pointsPossible / totalPointsPossible * 100
+      a.percentOfFinalGrade = roundToXDecimals(
+        (
+          assignmentWeightConsideration
+            ? calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
+            : pointsPossible / totalPointsPossible * 100
+        ), 1
       )
       a.outOf = pointsPossible
       a.graded = !!currentUserSubmission && !!currentUserSubmission.gradedDate
