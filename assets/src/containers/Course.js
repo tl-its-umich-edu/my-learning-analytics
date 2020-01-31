@@ -61,7 +61,7 @@ function Course (props) {
                 />}
             />
             <Route
-              path='/courses/:courseId/assignments'
+              path='/courses/:courseId/assignmentsv1'
               render={props =>
                 <AssignmentPlanning
                   {...props}
@@ -70,7 +70,7 @@ function Course (props) {
                 />}
             />
             <Route
-              path='/courses/:courseId/assignmentsv2'
+              path='/courses/:courseId/assignments'
               render={props =>
                 <AssignmentPlanningV2
                   {...props}
