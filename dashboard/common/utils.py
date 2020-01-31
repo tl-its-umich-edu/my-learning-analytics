@@ -3,8 +3,24 @@ import logging, os
 from django.conf import settings
 
 from dashboard.common.db_util import get_user_courses_info
+from dashboard.models import Course
 
 logger = logging.getLogger(__name__)
+
+
+def find_earliest_start_datetime_of_courses():
+    course_start_datetimes = []
+    for course in Course.objects.all():
+        course_start_datetimes.append(course.get_course_date_range().start)
+    logger.debug(course_start_datetimes)
+
+    earliest_start = None
+    if len(course_start_datetimes) > 0:
+        earliest_start = sorted(course_start_datetimes)[0]
+        logger.info(f"Earliest start datetime for all courses: {earliest_start.isoformat()}")
+    else:
+        logger.info(f"No course listed. Return None as the earliest_start_datetime_of_course. ")
+    return earliest_start
 
 
 def format_github_url_using_https(github_url):

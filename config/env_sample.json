@@ -178,13 +178,45 @@
     "/*cron queries to pull the data from various caliper data sources replace if not relevant with your institution": "*/",
     "RESOURCE_ACCESS_CONFIG": {
         "canvas": {
-            "query": "SELECT 'canvas' AS resource_type, CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS resource_id, CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS INT64) AS user_id, CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.group.id'),31) AS INT64) AS course_id, COALESCE(JSON_EXTRACT_SCALAR(event, '$.object.extensions[\\'com.instructure.canvas\\'].asset_name'), JSON_EXTRACT_SCALAR(event, '$.object.extensions[\\'com.instructure.canvas\\'].filename'), JSON_EXTRACT_SCALAR(event, '$.object.name'), 'attachment') as name, datetime(EVENT_TIME) as access_time FROM event_store.events where JSON_EXTRACT_SCALAR(event, '$.edApp.id') IN UNNEST(['http://m.canvas.umich.edu/' , 'http://umich.instructure.com/' ]) and type = 'NavigationEvent' and SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'),24,10) = 'attachment' and JSON_EXTRACT_SCALAR(event, '$.action') = 'NavigatedTo' and JSON_EXTRACT_SCALAR(event, '$.membership.member.id') is not null and SUBSTR(JSON_EXTRACT_SCALAR(event, '$.group.id'),31) IN UNNEST(@course_ids)",
+            "query": [
+                "SELECT 'canvas' AS resource_type, ",
+                "CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 35) AS STRING) AS resource_id, ",
+                "CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.membership.member.id'), 29) AS INT64) AS user_id, ",
+                "CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.group.id'), 31) AS INT64) AS course_id, ",
+                "COALESCE(",
+                "JSON_EXTRACT_SCALAR(event, '$.object.extensions[\\'com.instructure.canvas\\'].asset_name'), ",
+                "JSON_EXTRACT_SCALAR(event, '$.object.extensions[\\'com.instructure.canvas\\'].filename'), ",
+                "JSON_EXTRACT_SCALAR(event, '$.object.name'), ",
+                "'attachment'",
+                ") as name, ",
+                "datetime(EVENT_TIME) as access_time ",
+                "FROM event_store.events ",
+                "where JSON_EXTRACT_SCALAR(event, '$.edApp.id') IN ",
+                "UNNEST(['http://m.canvas.umich.edu/' , 'http://umich.instructure.com/' ]) ",
+                "and type = 'NavigationEvent' ",
+                "and SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 24, 10) = 'attachment' ",
+                "and JSON_EXTRACT_SCALAR(event, '$.action') = 'NavigatedTo' ",
+                "and JSON_EXTRACT_SCALAR(event, '$.membership.member.id') is not null ",
+                "and SUBSTR(JSON_EXTRACT_SCALAR(event, '$.group.id'), 31) IN UNNEST(@course_ids) "
+            ],
             "app_display_name": "Canvas Files",
             "canvas_course_id_format": "LONG",
             "urls": {"prefix": "https://example.instructure.com/files/", "postfix": "/download?download_frd=1"}
         },
         "leccap": {
-            "query": "select 'leccap' AS resource_type, CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 48) AS STRING) AS resource_id, @canvas_data_id_increment + CAST(JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_user_id') AS INT64) AS user_id, @canvas_data_id_increment + CAST(JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_course_id') AS INT64) AS course_id, JSON_EXTRACT_SCALAR(event, '$.object.name') as name, datetime(EVENT_TIME) as access_time FROM event_store.events where JSON_EXTRACT_SCALAR(event, '$.edApp') = 'https://leccap.engin.umich.edu/#applicationName=Lecture+Capture' and type = 'MediaEvent' and JSON_EXTRACT_SCALAR(event, '$.action') = 'Started' and JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_course_id') is not null and JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_course_id') IN UNNEST(@course_ids_short)",
+            "query": [
+                "select 'leccap' AS resource_type, ",
+                "CAST(SUBSTR(JSON_EXTRACT_SCALAR(event, '$.object.id'), 48) AS STRING) AS resource_id, ",
+                "@canvas_data_id_increment + CAST(JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_user_id') AS INT64) AS user_id, ",
+                "@canvas_data_id_increment + CAST(JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_course_id') AS INT64) AS course_id, ",
+                "JSON_EXTRACT_SCALAR(event, '$.object.name') as name, ",
+                "datetime(EVENT_TIME) as access_time ",
+                "FROM event_store.events ",
+                "where JSON_EXTRACT_SCALAR(event, '$.edApp') = 'https://leccap.engin.umich.edu/#applicationName=Lecture+Capture' ",
+                "and type = 'MediaEvent' and JSON_EXTRACT_SCALAR(event, '$.action') = 'Started' ",
+                "and JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_course_id') is not null ",
+                "and JSON_EXTRACT_SCALAR(event, '$.federatedSession.messageParameters.custom_canvas_course_id') IN UNNEST(@course_ids_short) "
+            ],
             "app_display_name": "Lecture Capture",
             "/* mention if the caliper event data is providing long or short canvas id and change the query to store long id as in this case": "*/",
             "canvas_course_id_format": "SHORT",

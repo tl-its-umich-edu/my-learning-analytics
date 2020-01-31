@@ -1,7 +1,7 @@
 
 from django.db import connections as conns
 
-from dashboard.common import db_util
+from dashboard.common import db_util, utils
 
 import logging
 import datetime
@@ -243,6 +243,9 @@ class DashboardCronJob(CronJobBase):
         # BQ Total Bytes Billed to report to status
         total_bytes_billed = 0
 
+        # the earliest start date of all courses
+        course_start_time = utils.find_earliest_start_datetime_of_courses()
+
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
         for data_warehouse_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
@@ -251,7 +254,14 @@ class DashboardCronJob(CronJobBase):
 
             final_bq_query = []
             for k, query_obj in settings.RESOURCE_ACCESS_CONFIG.items():
-                final_bq_query.append(query_obj['query'])
+                # concatenate the multi-line presentation of query into one single string
+                query = " ".join(query_obj['query'])
+
+                if (course_start_time is not None):
+                    # insert the start time parameter for query
+                    query += " and event_time > @course_start_time"
+
+                final_bq_query.append(query)
             final_bq_query = "  UNION ALL   ".join(final_bq_query)
 
             data_warehouse_course_ids_short = [db_util.incremented_id_to_canvas_id(id) for id in data_warehouse_course_ids]
@@ -263,6 +273,10 @@ class DashboardCronJob(CronJobBase):
                 bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
                 bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT)
             ]
+            if (course_start_time is not None):
+                # insert the start time parameter for query
+                query_params.append(bigquery.ScalarQueryParameter('course_start_time', 'TIMESTAMP', course_start_time))
+
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
 
