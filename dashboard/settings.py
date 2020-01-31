@@ -39,6 +39,7 @@ else:
 
 LOGOUT_URL = '/accounts/logout'
 LOGIN_URL = '/accounts/login'
+HELP_URL = ENV.get("HELP_URL", "https://sites.google.com/umich.edu/my-learning-analytics-help/home")
 
 # Google Analytics ID
 GA_ID = ENV.get('GA_ID', '')
