@@ -33,23 +33,27 @@ function SideDrawer (props) {
     courseInfo
   } = props
 
-  const [selectedIndex, setSelectedIndex] = useState(false)
+  //const [selectedIndex, setSelectedIndex] = useState(false)
 
   const sideList = (
-    <div className={classes.list}>
+    <div 
+      className={classes.list}
+      role="Presentation"
+      onClick={toggleDrawer(false)}
+      onKeyDown={toggleDrawer(false)}
+    >
       <List>
         {routes(courseId, courseInfo.course_view_options).map((props, key) => (
-          <Link to={props.path} className={classes.sideDrawerLinks} key={key}>
             <ListItem
               button
+              component='a'
+              href={props.path}
+              className={classes.sideDrawerLinks}
               key={props.title}
-              selected={selectedIndex === key}
-              onClick={() => setSelectedIndex(key)}
             >
               <ListItemIcon><props.icon /></ListItemIcon>
               <ListItemText primary={props.title} className={classes.text} />
             </ListItem>
-          </Link>
         ))}
       </List>
     </div>
@@ -57,17 +61,10 @@ function SideDrawer (props) {
 
   return (
     <div>
-      <Drawer open={props.sideDrawerState} onClose={() => toggleDrawer(!sideDrawerState)}>
-        <div
-          tabIndex={0}
-          role='button'
-          onClick={() => toggleDrawer(!sideDrawerState)}
-          onKeyDown={() => toggleDrawer(!sideDrawerState)}
-        >
-          {courseInfo
-            ? sideList
-            : <Spinner />}
-        </div>
+      <Drawer open={sideDrawerState} onClose={toggleDrawer(false)}>
+        {courseInfo
+          ? sideList
+          : <Spinner />}
       </Drawer>
     </div>
   )
