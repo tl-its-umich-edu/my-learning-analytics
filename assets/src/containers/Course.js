@@ -17,10 +17,15 @@ function Course (props) {
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
   const toggleDrawer = (open) => event => {
-    if (event.type === 'keydown' && event.key === 'Tab') {
-      return;
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      console.log('tab was pressed')
+      return
     }
-    setSideDrawerState(open);
+    else if (event.type === 'keydown' && event.key === 'Enter') {
+      console.log('enter was clicked')
+      document.activeElement.click()
+    }
+    setSideDrawerState(open)
   };
 
   if (error.message === 'Not Found') return (<WarningBanner>Course {courseId} does not exist.</WarningBanner>)
