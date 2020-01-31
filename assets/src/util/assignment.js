@@ -9,15 +9,12 @@ const clearGoals = assignments => assignments
   })
 
 const setAssigmentGoalInputState = (key, assignments, inputFocus) => {
-  const goalGrade = assignments[key].goalGrade
-  const goalGradeSetByUser = inputFocus || goalGrade !== ''
   return [
     ...assignments.slice(0, key),
     {
       ...assignments[key],
       inputFocus,
-      inputBlur: !inputFocus,
-      goalGradeSetByUser
+      inputBlur: !inputFocus
     },
     ...assignments.slice(key + 1)
   ]
@@ -33,7 +30,7 @@ const setAssignmentGoalGrade = (key, assignments, goalGrade) => {
     {
       ...assignments[key],
       goalGrade: goalGrade === '' ? '' : roundToXDecimals(Number(goalGrade), placeToRoundTo),
-      goalGradeSetByUser: goalGrade || assignments[key].inputFocus
+      goalGradeSetByUser: goalGrade
     },
     ...assignments.slice(key + 1)
   ]
