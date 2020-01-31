@@ -192,9 +192,7 @@ function AssignmentTable (props) {
                     <TableCell style={{ width: '20%' }}>
                       {
                         a.graded || a.outOf === 0
-                          ? a.outOf === 0
-                            ? '0'
-                            : `${a.currentUserSubmission.score}`
+                          ? <><div className={classes.possiblePointsText}>{a.outOf === 0 ? '0' : `${a.currentUserSubmission.score}`}</div>{' '}</>
                           : (
                             <StyledTextField
                               error={(a.goalGrade / a.pointsPossible) > 1}
