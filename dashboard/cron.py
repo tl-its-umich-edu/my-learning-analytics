@@ -259,7 +259,7 @@ class DashboardCronJob(CronJobBase):
 
                 if (course_start_time is not None):
                     # insert the start time parameter for query
-                    query = query + " and event_time > @course_start_time"
+                    query += " and event_time > @course_start_time"
 
                 final_bq_query.append(query)
             final_bq_query = "  UNION ALL   ".join(final_bq_query)
@@ -281,7 +281,6 @@ class DashboardCronJob(CronJobBase):
             job_config.query_parameters = query_params
 
             # Location must match that of the dataset(s) referenced in the query.
-            logger.debug(final_bq_query)
             bq_query = bigquery_client.query(final_bq_query, location='US', job_config=job_config)
             #bq_query.result()
             resource_access_df = bq_query.to_dataframe()
