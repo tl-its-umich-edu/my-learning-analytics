@@ -32,7 +32,8 @@ const styles = theme => ({
   },
   goalGradeInput: {
     marginTop: 0,
-    width: 100
+    width: 100,
+    marginBottom: '10px'
   },
   tableCell: {
     border: 'none'
@@ -45,6 +46,12 @@ const styles = theme => ({
   },
   narrowCell: {
     width: '120px'
+  },
+  possiblePointsText: {
+    margin: 'auto',
+    display: 'inline-block',
+    paddingTop: '22px',
+    verticalAlign: 'middle'
   }
 })
 
@@ -195,8 +202,7 @@ function AssignmentTable (props) {
                               id='standard-number'
                               value={a.goalGrade}
                               label={
-                                !courseGoalGradeSet
-                                  ? 'Set course goal'
+                                !courseGoalGradeSet ? 'Set a goal'
                                   : (a.goalGrade / a.pointsPossible) > 1
                                     ? 'Over 100%'
                                     : 'Set a goal'
@@ -207,14 +213,13 @@ function AssignmentTable (props) {
                               }}
                               type='number'
                               className={classes.goalGradeInput}
-                              style={{ marginBottom: '10px' }}
                               onFocus={() => handleInputFocus(key)}
                               onBlur={() => handleInputBlur(key)}
                             />
                           )
                       }
                       {
-                        <div style={{ margin: 'auto', display: 'inline' }}>
+                        <div className={classes.possiblePointsText}>
                           {` / ${a.outOf}`}
                         </div>
                       }
