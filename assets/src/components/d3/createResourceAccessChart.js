@@ -365,17 +365,17 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('xlink:target', '_blank')
       .attr('xlink:href', link)
       .attr('text-anchor', 'start')
-      .attr('fill', null)
     a.node().appendChild(this)
 
-    const iconClasses = d.split('|')[2]
+    const icon = d.split('|')[2]
     d3.select(this).insert('foreignObject')
       .attr('x', -180)
       .attr('y', -6)
       .attr('width', 32)
       .attr('height', 32)
+      .attr('color', '#0000EE')
       .append('xhtml:i')
-      .attr('class', 'resourceIcon ' + iconClasses)
+      .attr('class', icon)
   })
 }
 
