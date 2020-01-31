@@ -18,11 +18,9 @@ function Course (props) {
 
   const toggleDrawer = (open) => event => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      console.log('tab was pressed')
       return
     }
     else if (event.type === 'keydown' && event.key === 'Enter') {
-      console.log('enter was clicked')
       document.activeElement.click()
     }
     setSideDrawerState(open)
