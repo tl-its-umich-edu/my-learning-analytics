@@ -51,6 +51,7 @@ const styles = theme => ({
     margin: 'auto',
     display: 'inline-block',
     paddingTop: '22px',
+    paddingLeft: '5px',
     verticalAlign: 'middle'
   }
 })
@@ -192,7 +193,7 @@ function AssignmentTable (props) {
                     <TableCell style={{ width: '20%' }}>
                       {
                         a.graded || a.outOf === 0
-                          ? <><div className={classes.possiblePointsText}>{a.outOf === 0 ? '0' : `${a.currentUserSubmission.score}`}</div>{' '}</>
+                          ? <div className={classes.possiblePointsText}>{a.outOf === 0 ? '0' : `${a.currentUserSubmission.score}`}</div>
                           : (
                             <StyledTextField
                               error={(a.goalGrade / a.pointsPossible) > 1}
