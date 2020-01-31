@@ -367,7 +367,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('text-anchor', 'start')
     a.node().appendChild(this)
 
-    const icon = d.split('|')[2]
+    let icon = d.split('|')[2]
     d3.select(this).insert('foreignObject')
       .attr('x', -180)
       .attr('y', -6)
