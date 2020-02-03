@@ -532,7 +532,7 @@ class DashboardCronJob(CronJobBase):
                     status += self.update_with_bq_access()
                     status += self.update_canvas_resource()
                 except Exception as e:
-                    logger.info(e)
+                    logger.exception("Exception running BigQuery update")
 
         if settings.DATA_WAREHOUSE_IS_UNIZIN:
             logger.info("** informational")

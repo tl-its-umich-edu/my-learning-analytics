@@ -241,7 +241,7 @@ LOGGING = {
     # Gunicorns logging format https://github.com/benoitc/gunicorn/blob/19.x/gunicorn/glogging.py
     'formatters': {
         "generic": {
-            "format": "%(asctime)s [%(process)d] [%(levelname)s] %(message)s",
+            "format": "%(asctime)s [%(levelname)s] [%(filename)s:%(lineno)d] %(message)s",
             "datefmt": "[%Y-%m-%d %H:%M:%S %z]",
             "class": "logging.Formatter",
         }
