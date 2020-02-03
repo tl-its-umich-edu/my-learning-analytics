@@ -280,7 +280,6 @@ class DashboardCronJob(CronJobBase):
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
 
-            logger.debug(final_bq_query)
             # Location must match that of the dataset(s) referenced in the query.
             bq_query = bigquery_client.query(final_bq_query, location='US', job_config=job_config)
             #bq_query.result()
