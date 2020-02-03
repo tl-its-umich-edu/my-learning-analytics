@@ -280,6 +280,7 @@ class DashboardCronJob(CronJobBase):
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
 
+            logger.debug(final_bq_query)
             # Location must match that of the dataset(s) referenced in the query.
             bq_query = bigquery_client.query(final_bq_query, location='US', job_config=job_config)
             #bq_query.result()
@@ -532,7 +533,7 @@ class DashboardCronJob(CronJobBase):
                     status += self.update_with_bq_access()
                     status += self.update_canvas_resource()
                 except Exception as e:
-                    logger.info(e)
+                    logger.exception("Exception running BigQuery update")
 
         if settings.DATA_WAREHOUSE_IS_UNIZIN:
             logger.info("** informational")
