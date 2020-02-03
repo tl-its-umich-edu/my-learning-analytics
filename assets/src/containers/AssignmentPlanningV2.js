@@ -96,7 +96,7 @@ function AssignmentPlanningV2 (props) {
 
   const handleClearGoalGrades = () => {
     setAssignments(clearGoals(assignments))
-    setUserSetting({})
+    setGoalGrade('')
     setSettingChanged(true)
   }
 
