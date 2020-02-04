@@ -117,10 +117,11 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         for course_id in Course.objects.get_supported_courses():
             # select course based on course id
-            course_sql = f"""select *
-                        from course_dim c
-                        where c.id = '{course_id}'
-                        """
+            course_sql = f"""
+                select id, canvas_id, enrollment_term_id, name, start_at, conclude_at
+                from course_dim c
+                where c.id = '{course_id}'
+            """
             logger.debug(course_sql)
             course_df = pd.read_sql(course_sql, conns['DATA_WAREHOUSE'])
 
@@ -458,7 +459,7 @@ class DashboardCronJob(CronJobBase):
         status = ""
         logger.debug("while using verify_course_ids data to update course table")
 
-        logger.debug(warehouse_courses_data.to_json())
+        logger.debug(warehouse_courses_data.to_json(orient='records'))
         courses = Course.objects.all()
         courses_string = ", ".join([str(x) for x in Course.objects.get_supported_courses()])
         status += f"{str(len(courses))} course(s): {courses_string}\n"
