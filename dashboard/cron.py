@@ -91,7 +91,7 @@ def update_datetime_field(course_obj, course_field_name, warehouse_dataframe, wa
         logger.info(f"Update of {course_field_name} skipped; existing value was found.")
     else:
         warehouse_field_value = warehouse_dataframe[warehouse_field_name].iloc[0]
-        if not pd.isnull(warehouse_field_value):
+        if pd.notna(warehouse_field_value):
             warehouse_field_value = warehouse_field_value.replace(tzinfo=pytz.UTC)
             setattr(course_obj, course_field_name, warehouse_field_value)
             logger.info(f"{course_field_name} for {course_obj.id} has been updated.")
