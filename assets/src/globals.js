@@ -3,7 +3,7 @@ import defaultPalette from './defaultPalette'
 
 // The fallback to an empty object is needed to not break tests using siteTheme.
 const mylaGlobalsEl = document.getElementById('myla_globals')
-const mylaGlobals = mylaGlobalsEl !== null ? JSON.parse(mylaGlobalsEl.textContent) : {}
+const mylaGlobals = mylaGlobalsEl ? JSON.parse(mylaGlobalsEl.textContent) : {}
 
 /*
 Frozen to prevent unintentional changes to this object. This object is strictly readonly.
@@ -19,7 +19,8 @@ const user = Object.freeze({
 })
 
 const palette = JSON.parse(JSON.stringify(defaultPalette))
-if (mylaGlobals.primary_ui_color !== null && mylaGlobals.primary_ui_color !== undefined) {
+// Don't update the palette if mylaGlobals.primary_ui_color is null or undefined
+if (mylaGlobals.primary_ui_color != null) {
   palette.primary.main = mylaGlobals.primary_ui_color
 }
 
