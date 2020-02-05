@@ -1,9 +1,9 @@
 import { createMuiTheme } from '@material-ui/core/styles'
 import defaultPalette from './defaultPalette'
 
-// The fallback to an empty object is needed to not break createHitogram.test.js.
-const mylaGlobalsEl = JSON.parse(document.getElementById('myla_globals'))
-const mylaGlobals = mylaGlobalsEl !== null ? mylaGlobalsEl.textContent : {}
+// The fallback to an empty object is needed to not break tests using siteTheme.
+const mylaGlobalsEl = document.getElementById('myla_globals')
+const mylaGlobals = mylaGlobalsEl !== null ? JSON.parse(mylaGlobalsEl.textContent) : {}
 
 /*
 Frozen to prevent unintentional changes to this object. This object is strictly readonly.
