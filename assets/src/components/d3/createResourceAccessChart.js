@@ -137,6 +137,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('dx', -10)
       .attr('dy', '.35em')
       .style('font-size', 10)
+      .style('fill', d => d.self_access_count > 0 ? 'white' : 'black')
       .attr('text-anchor', 'end')
       .text(d => (
         ((mainYScale(d.resource_name) + mainYScale.bandwidth() / 2) < miniHeight) &&
@@ -210,9 +211,10 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
         : 0.5
       )
 
-    // Update the label size
+    // Update the resource labels
     d3.selectAll('.axis--y text')
       .attr('x', -160)
+      .attr('fill', '#0000EE')
       .style('font-size', textScale(selected.length))
 
     update()
@@ -372,8 +374,10 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('y', -6)
       .attr('width', 32)
       .attr('height', 32)
+      .attr('color', '#0000EE')
       .append('xhtml:i')
       .attr('class', icon)
   })
 }
+
 export default createResourceAccessChart
