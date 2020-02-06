@@ -13,9 +13,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% use_macro title %}</title>
-    <link rel="stylesheet" type="text/css" href="/static/@fortawesome/fontawesome-free/css/all.css">
-    <link rel="stylesheet" type="text/css" href="/static/@fortawesome/fontawesome-free/css/fontawesome.css">
-    <link rel="stylesheet" type="text/css" href="/static/@fortawesome/fontawesome-free/css/fontawesome.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static '@fortawesome/fontawesome-free/css/all.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '@fortawesome/fontawesome-free/css/fontawesome.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '@fortawesome/fontawesome-free/css/fontawesome.min.css' %}">
+    <link rel="shortcut icon" href="{% static '/images/favicon.ico' %}"/>
     <style>
         .django-su-warning {
             position: fixed;
