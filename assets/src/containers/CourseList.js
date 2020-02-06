@@ -17,20 +17,6 @@ const styles = theme => ({
   root: {
     flexGrow: 1
   },
-  content: {
-    flexGrow: 1,
-    padding: 8
-  },
-  container: {
-    display: 'flex',
-    justifyContent: 'center'
-  },
-  wrapper: {
-    maxWidth: 1023,
-    margin: theme.spacing(2) + 'px auto',
-    flexDirection: 'row',
-    justifyContent: 'flex-start'
-  },
   paper: {
     padding: theme.spacing(2),
     color: theme.palette.text.secondary,
@@ -43,6 +29,19 @@ const styles = theme => ({
 
 function CourseList (props) {
   const { classes, user } = props
+
+  const testCourse = [
+    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
+    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
+    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
+    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
+    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
+    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
+    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
+    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
+    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
+    { course_id: 235420, course_name: "SI 813 006 FA 2010" }
+  ]
 
   if (!user.relatedCourses && !user.isSuperuser) {
     return (<WarningBanner>You are not enrolled in any courses with My Learning Analytics enabled.</WarningBanner>)
@@ -84,27 +83,31 @@ function CourseList (props) {
           </Popover>
         </Toolbar>
       </AppBar>
-      <div className={classes.content}>
-        {
-          user.isSuperuser
-            ? <Grid container spacing={2}>
+      {
+        user.isSuperuser
+          ? (
+            <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Paper className={classes.paper}>
                   <Typography variant='h5' gutterBottom>Select a course of your choice</Typography>
                 </Paper>
               </Grid>
             </Grid>
-            : <Grid container spacing={2}>
-              <Grid item xs={12} className={classes.container}>
-                {user.relatedCourses.map((course, key) =>
-                  <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
-                    <SelectCard cardData={{ title: course.course_name }} />
-                  </Link>
-                )}
-              </Grid>
+          )
+          : (
+            <Grid container spacing={2}>
+              {
+                testCourse.map((course, key) => (
+                  <Grid item xs={12} sm={6} lg={4} key={key}>
+                    <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`}>
+                      <SelectCard cardData={{ title: course.course_name }} />
+                    </Link>
+                  </Grid>
+                ))
+              }
             </Grid>
-        }
-      </div>
+          )
+      }
     </>
   )
 }

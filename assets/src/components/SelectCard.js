@@ -8,9 +8,7 @@ import Typography from '@material-ui/core/Typography'
 
 const styles = theme => ({
   card: {
-    width: 325,
-    display: 'flex',
-    margin: theme.spacing(1)
+    margin: '20px'
   },
   media: {
     height: 140,
@@ -40,12 +38,13 @@ const SelectCard = props => {
       <CardActionArea>
         {
           cardData.image
-            ? <CardMedia
-              className={classes.media}
-              image={cardData.image}
-              title={cardData.title}
-            />
-            : null
+            ? (
+              <CardMedia
+                className={classes.media}
+                image={cardData.image}
+                title={cardData.title}
+              />
+            ) : null
         }
         <CardContent className={classes.content}>
           <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
