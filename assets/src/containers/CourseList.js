@@ -30,19 +30,6 @@ const styles = theme => ({
 function CourseList (props) {
   const { classes, user } = props
 
-  const testCourse = [
-    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
-    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
-    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
-    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
-    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
-    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
-    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
-    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
-    { course_id: 235420, course_name: "SI 813 006 FA 2010" },
-    { course_id: 235420, course_name: "SI 813 006 FA 2010" }
-  ]
-
   if (!user.relatedCourses && !user.isSuperuser) {
     return (<WarningBanner>You are not enrolled in any courses with My Learning Analytics enabled.</WarningBanner>)
   }
@@ -97,7 +84,7 @@ function CourseList (props) {
           : (
             <Grid container spacing={2}>
               {
-                testCourse.map((course, key) => (
+                user.relatedCourses.map((course, key) => (
                   <Grid item xs={12} sm={6} lg={4} key={key}>
                     <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`}>
                       <SelectCard cardData={{ title: course.course_name }} />
