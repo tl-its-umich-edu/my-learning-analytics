@@ -313,7 +313,8 @@ def grade_distribution(request, course_id=0):
         from user where course_id=%(course_id)s and enrollment_type='StudentEnrollment';
                     """
     df = pd.read_sql(grade_score_sql, conn, params={"current_user": current_user, 'course_id': course_id})
-    if df.empty or df['current_grade'].isnull().all():
+    if df.empty or df.count().current_grade < 6:
+        logger.info(f"Not enough students grades (only {df.count().current_grade}) in a course {course_id} to show the view")
         return HttpResponse(json.dumps({}), content_type='application/json')
 
     grade_view_data = dict()
@@ -326,7 +327,7 @@ def grade_distribution(request, course_id=0):
     summary['median_grade'] = df['current_grade'].median().round(2)
     summary['show_number_on_bars'] = False
     if df['show_number_on_bars'].values[0] == 1:
-        summary['show_number_on_bar'] = True
+        summary['show_number_on_bars'] = True
 
     df.sort_values(by=['current_grade'], inplace=True)
     df.reset_index(drop=True, inplace=True)

@@ -64,7 +64,7 @@ function GradeDistribution (props) {
     const tableRows = [
       ['Average grade', <strong key={0}>{gradeData.summary.grade_avg}%</strong>],
       ['Median grade', <strong key={1}>{gradeData.summary.median_grade}%</strong>],
-      ['Number of students', <strong key={2}>{gradeData.summary.tot_students}</strong>],
+      ['Class Size', <strong key={2}>{gradeData.summary.tot_students}</strong>],
       !user.admin && showGrade
         ? ([
           'My grade',
