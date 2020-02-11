@@ -16,12 +16,14 @@ function Course (props) {
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
-  const toggleDrawer = (open) => event => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return
-    }
-    else if (event.type === 'keydown' && event.key === 'Enter') {
-      document.activeElement.click()
+  const toggleDrawer = open => event => {
+    if (event.type === 'keydown') {
+      if (event.key === 'Tab' || event.key === 'Shift') {
+        return
+      }
+      else if (event.key === 'Enter') {
+        document.activeElement.click()
+      }
     }
     setSideDrawerState(open)
   };
