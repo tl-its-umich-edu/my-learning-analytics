@@ -54,7 +54,7 @@ urlpatterns = [
     path('api/v1/courses/<int:course_id>/info',
         login_required(views.get_course_info), name='get_course_info'),
     # This is a public view of the courses we have enabled
-    path('api/v1/courses_enabled',
+    path('api/v1/courses_enabled/',
         cache_page(settings.CLIENT_CACHE_TIME)(views.courses_enabled), name='courses_enabled'),
 
     # PUT/POST access patterns
