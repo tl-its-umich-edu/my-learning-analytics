@@ -18,15 +18,15 @@ function Course (props) {
 
   const toggleDrawer = open => event => {
     if (event.type === 'keydown') {
-      if (event.key === 'Tab' || event.key === 'Shift') {
-        return
-      }
-      else if (event.key === 'Enter') {
+      if (event.key === 'Enter') {
         document.activeElement.click()
+      }
+      else {
+        return
       }
     }
     setSideDrawerState(open)
-  };
+  }
 
   if (error.message === 'Not Found') return (<WarningBanner>Course {courseId} does not exist.</WarningBanner>)
   else if (error.message === 'Forbidden') return (<WarningBanner>You do not have access to course {courseId}.</WarningBanner>)
