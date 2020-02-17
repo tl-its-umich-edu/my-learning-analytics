@@ -21,10 +21,10 @@ Before sending a pull request, please create an [issue](https://github.com/tl-it
 
 ## Tips for working with Git
 
-When working with branches it's [advisable](https://randyfay.com/content/simpler-rebasing-avoiding-unintentional-merge-commits) to use the option
-`git config --global branch.autosetuprebase always`
+When working with branches it's [advisable](https://randyfay.com/content/simpler-rebasing-avoiding-unintentional-merge-commits) to use the options
+`git config --global branch.autosetuprebase always` and `git config --global pull.rebase true`
 
-To always do a `git pull --rebase` when merging back changes from master. This avoids unintentional merge commits, keeps your branch clean and makes it easier to rebase in the future. 
+To always do a `git pull --rebase` when merging back changes from master. This avoids unintentional merge commits, keeps your branch clean and makes it easier to rebase your branch in the future. These options can be changed at any time if you find they aren't working well for you.
 
 Another great option that will save you some time is
 `git config --global push.default current` 
