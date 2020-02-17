@@ -99,6 +99,7 @@ INSTALLED_APPS = [
     'django.contrib.flatpages',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
+    'graphene_django',
     'django_cron',
     'watchman',
     'macros',
@@ -152,6 +153,10 @@ TEMPLATES = [
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'assets'),
 )
+
+GRAPHENE = {
+    'SCHEMA': 'dashboard.graphql.schema.schema'
+}
 
 WEBPACK_LOADER = {
     'DEFAULT': {

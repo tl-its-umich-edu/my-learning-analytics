@@ -1,6 +1,6 @@
 /* global describe, test, expect */
-import createHistogram from '../../components/d3/createHistogram'
-import { histogramDataWithBinning } from '../testData/d3TestData'
+import createHistogram from '../../../components/d3/createHistogram'
+import { histogramDataWithBinning } from '../../testData/d3TestData'
 
 describe('createHistogram', () => {
   test('should build a histogram bar chart binning last five grades with MyGrade line', () => {
