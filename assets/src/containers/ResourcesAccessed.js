@@ -16,11 +16,13 @@ import AlertBanner from '../components/AlertBanner'
 import RangeSlider from '../components/RangeSlider'
 import ResourceAccessChart from '../components/ResourceAccessChart'
 import Spinner from '../components/Spinner'
+import IconLabel from "../components/IconLabel"
 
 import useSetUserSetting from '../hooks/useSetUserSetting'
 import { isObjectEmpty } from '../util/object'
 import useUserSetting from '../hooks/useUserSetting'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
+
 
 const styles = theme => ({
   root: {
@@ -54,8 +56,10 @@ function ResourcesAccessed (props) {
   const { classes, courseInfo, courseId, disabled } = props
   if (disabled) return (<AlertBanner>The Resources Accessed view is hidden for this course.</AlertBanner>)
   const resourceTypes = courseInfo.resource_types.length === 0
-    ? ['Files']
+    ? [{label: 'Files', icon: 'fas fa-file fa-lg'}]
     : courseInfo.resource_types
+  const filterValues = resourceTypes.map((el) => el.label)
+
   const [showSaveSetting, setShowSaveSetting] = useState(false)
   const [saveSettingClicked, setSaveSettingClicked] = useState(false)
 
@@ -63,7 +67,7 @@ function ResourcesAccessed (props) {
   const [curWeek, setCurWeek] = useState(0) // Should be updated from info
   const [weekRange, setWeekRange] = useState([]) // Should be depend on curWeek
   const [resourceGradeFilter, setResourceGradeFilter] = useState('') // Should be fetched from default
-  const [resourceTypeFilter, setResourceTypeFilter] = useState(resourceTypes)
+  const [resourceTypeFilter, setResourceTypeFilter] = useState(filterValues)
   // this is the filter setting last saved by the user
   const [userSavedFilterSetting, setUserSavedFilterSetting] = useState(resourceGradeFilter)
   const [resourceAccessData, setResourceAccessData] = useState('')
@@ -90,14 +94,14 @@ function ResourcesAccessed (props) {
               <FormGroup row>
                 <p className={classes.controlText}>Select resource types to be viewed:</p>
                 {
-                  resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='secondary' defaultChecked onChange={onChangeResourceTypeHandler} value={el} />} label={el} />))
+                  resourceTypes.map((el, i) => (<FormControlLabel key={i} control={<Checkbox color='secondary' defaultChecked onChange={onChangeResourceTypeHandler} value={el} />} label={<IconLabel label={el.label} icon={el.icon}></IconLabel>}/>))
                 }
               </FormGroup>
             </FormControl>
           </div>
         )
       } else if (resourceTypes.length === 1) {
-        const message = 'You are viewing ' + resourceTypes[0] + ' data'
+        const message = 'You are viewing ' + resourceTypes[0].label + ' data'
         return (
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontWeight: 'bold' }}>{message}</p>

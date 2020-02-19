@@ -43,7 +43,7 @@ function appendLegend (svg) {
 
   const legend = svg.select('.mainGroupWrapper').append('g')
     .attr('class', 'legend')
-    .attr('transform', 'translate(-550, 0)')
+    .attr('transform', 'translate(-620, 0)')
 
   legend.selectAll('text')
     .data(legendLabels)

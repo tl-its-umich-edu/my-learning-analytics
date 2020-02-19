@@ -95,7 +95,19 @@ def get_course_info(request, course_id=0):
     except(ObjectDoesNotExist,Exception) as e:
         logger.info(f"getting the course {course_id} resources types has errors due to:{e}")
 
+    course_resource_list = list(dict.fromkeys(course_resource_list))
+
     course_resource_list.sort()
+
+    temp_list = list()
+
+    for resource in course_resource_list:
+        course_resource_dict = dict()
+        course_resource_dict['label'] = resource
+        course_resource_dict['icon'] = RESOURCE_VALUES[resource.lower()]['icon']
+        temp_list.append(course_resource_dict)
+
+    course_resource_list = temp_list
 
     resp = model_to_dict(course)
 
