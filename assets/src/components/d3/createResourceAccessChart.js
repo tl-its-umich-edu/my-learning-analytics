@@ -15,6 +15,7 @@ import { siteTheme } from '../../globals'
 
 const accessedResourceColor = siteTheme.palette.secondary.main
 const notAccessedResourceColor = siteTheme.palette.negative.main
+const linkColor = siteTheme.palette.link.main
 const mainMargin = { top: 50, right: 10, bottom: 50, left: 200 }
 
 const toolTip = d3tip().attr('class', 'd3-tip')
@@ -214,7 +215,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     // Update the resource labels
     d3.selectAll('.axis--y text')
       .attr('x', -160)
-      .attr('fill', '#0000EE')
+      .attr('fill', linkColor)
       .style('font-size', textScale(selected.length))
 
     update()
@@ -374,7 +375,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('y', -6)
       .attr('width', 32)
       .attr('height', 32)
-      .attr('color', '#0000EE')
+      .attr('color', linkColor)
       .append('xhtml:i')
       .attr('class', icon)
   })

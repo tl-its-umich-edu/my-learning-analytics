@@ -1,5 +1,9 @@
-const roundToTwoDecimal = int => Math.round(int * 100) / 100
-const roundToOneDecimal = int => Math.round(int * 10) / 10
+const roundToXDecimals = (num, x) => {
+  const tenToTheX = 10 ** x
+  return Math.round(num * tenToTheX) / tenToTheX
+}
+
+const getDecimalPlaceOfFloat = (floatNum) => (floatNum.toString().split('.')[1]).length
 
 const average = arr => arr.reduce((acc, cur) => acc + cur, 0) / arr.length
 
@@ -56,7 +60,7 @@ const standardDeviation = values => {
   const avgSquareDiff = squareDiffs.reduce((acc, cur) => (acc + cur), 0) / squareDiffs.length
 
   const stdDev = Math.sqrt(avgSquareDiff)
-  return roundToTwoDecimal(stdDev)
+  return roundToXDecimals(stdDev, 2)
 }
 
 const median = arr => {
@@ -68,11 +72,14 @@ const median = arr => {
     : sorted[middle]
 }
 
+const sum = arr => arr.reduce((acc, cur) => (acc += cur), 0)
+
 export {
   average,
+  getDecimalPlaceOfFloat,
+  median,
   pearsonCorrelation,
+  roundToXDecimals,
   standardDeviation,
-  roundToOneDecimal,
-  roundToTwoDecimal,
-  median
+  sum
 }

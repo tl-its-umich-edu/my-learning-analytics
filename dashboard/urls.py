@@ -18,9 +18,11 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
-from django.conf.urls import include
+from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.urls import path, re_path
+
+from dashboard.graphql.view import DashboardGraphQLView
 
 from django.views.decorators.cache import cache_page
 
@@ -34,6 +36,9 @@ urlpatterns = [
     path('status/bare_status/', watchman.views.bare_status),
 
     path('admin/', admin.site.urls),
+
+    # graphql access
+    path('graphql', DashboardGraphQLView.as_view(graphiql=True)),
 
     # This is the courses catch-all. Most user-initiated requests will match the regular expression; then the React
     # front-end will manage any additional routing.
