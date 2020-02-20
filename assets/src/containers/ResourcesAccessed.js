@@ -36,8 +36,9 @@ const styles = theme => ({
   formController: {
     alignItems: 'center',
     display: 'flex',
-    justifyContent: 'center',
-    marginTop: theme.spacing(2)
+    marginTop: theme.spacing(2),
+    position: 'relative',
+    left: '162px'
   },
   controlText: {
     paddingLeft: 8,
@@ -89,7 +90,7 @@ function ResourcesAccessed (props) {
     if (resourceAccessData) {
       if (resourceTypes.length > 1) {
         return (
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ position: 'relative', left: '162px' }}>
             <FormControl>
               <FormGroup row>
                 <p className={classes.controlText}>Select resource types to be viewed:</p>

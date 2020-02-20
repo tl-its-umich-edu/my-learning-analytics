@@ -1,9 +1,6 @@
 import React from 'react'
+import Typography from '@material-ui/core/Typography'
 import '@fortawesome/fontawesome-free'
-
-const styles = theme => {
-
-}
 
 function IconLabel(props) {
   const {
@@ -12,7 +9,7 @@ function IconLabel(props) {
   } = props
 
   return (
-    <i class={icon}>{'   ' + label}</i>
+    <Typography><i style={{fontSize: '1em', padding:'5px 10px 5px 5px'}} class={icon}></i>{label}</Typography>
   )
 }
 
