@@ -142,7 +142,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .text(d => (
         ((mainYScale(d.resource_name) + mainYScale.bandwidth() / 2) < miniHeight) &&
         ((mainYScale(d.resource_name) + mainYScale.bandwidth() / 2) > 0))
-        ? d.total_count
+        ? d.total_count + '%'
         : ''
       )
 
