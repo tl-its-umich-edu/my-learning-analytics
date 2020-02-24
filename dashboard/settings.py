@@ -37,7 +37,7 @@ else:
         # Set ENV so collectstatic will still run in the build
         ENV = os.environ
 
-LOGOUT_URL = '/accounts/logout/'
+LOGOUT_URL = '/accounts/logout'
 LOGIN_URL = '/accounts/login/'
 HELP_URL = ENV.get("HELP_URL", "https://sites.google.com/umich.edu/my-learning-analytics-help/home")
 

@@ -77,7 +77,7 @@ if apps.is_installed('djangosaml2'):
         path('accounts/', include('djangosaml2.urls')),
         path('samltest/', login_required(echo_attributes)),
         # Override auth_logout from djangosaml2 and registration for consistency
-        path('accounts/logout/', views.logout, name='auth_logout')
+        path('accounts/logout', views.logout, name='auth_logout')
     )
 else:
     from django.contrib.auth import views as auth_views
