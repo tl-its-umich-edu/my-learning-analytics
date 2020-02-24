@@ -15,6 +15,8 @@ const user = Object.freeze({
   relatedCourses: mylaGlobals.user_courses_info,
   isSuperuser: mylaGlobals.is_superuser,
   isLoggedIn: !!mylaGlobals.username,
+  loginURL: mylaGlobals.login,
+  logoutURL: mylaGlobals.logout,
   helpURL: mylaGlobals.help_url
 })
 
@@ -26,6 +28,5 @@ if (mylaGlobals.primary_ui_color != null) {
 
 const siteTheme = createMuiTheme({ palette })
 const gaId = mylaGlobals.google_analytics_id
-const loginURL = mylaGlobals.login
 
-export { user, siteTheme, gaId, loginURL }
+export { user, siteTheme, gaId }
