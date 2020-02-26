@@ -79,23 +79,23 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   // Pixel fallback is to ensure the legend and X axis label do not disappear
   const verticalChartMargin = (availHeight * 0.15) > 50 ? (availHeight * 0.15) : 50
 
+  const mainWidth = availWidth * 0.55
+  const mainHeight = availHeight * 0.7
   const mainMargin = {
     top: verticalChartMargin,
     right: 0,
     bottom: verticalChartMargin,
     left: availWidth * 0.225
   }
-  const mainWidth = availWidth * 0.55
-  const mainHeight = availHeight * 0.7
 
+  const miniWidth = availWidth * 0.20
+  const miniHeight = mainHeight
   const miniMargin = {
     top: verticalChartMargin,
     right: 0,
     bottom: verticalChartMargin,
     left: availWidth * 0.025
   }
-  const miniWidth = availWidth * 0.20
-  const miniHeight = mainHeight
 
   const defaultNumberOfResources = 7
   const selectionWindowHeight = resourceData.length < defaultNumberOfResources
@@ -254,7 +254,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     gBrush.call(brush.move, [center - size / 2, center + size / 2])
   }
 
-  const truncate = (text) => text.length > 30 ? `${text.substring(0, 30)}...` : text
+  const truncate = (text) => text.length > 32 ? `${text.substring(0, 32)}...` : text
 
   // Main chart group
   const mainGroup = svg.append('g')
