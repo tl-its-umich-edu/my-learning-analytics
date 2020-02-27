@@ -71,7 +71,7 @@ function appendLegend (svg) {
 function createResourceAccessChart ({ data, width, height, domElement }) {
   const resourceData = data.sort((a, b) => b.total_percent - a.total_percent)
 
-  const sideMarginSize = width * 0.05
+  const sideMarginSize = width * 0.075
   const margin = { top: 0, right: sideMarginSize, bottom: 0, left: sideMarginSize }
 
   const [availWidth, availHeight] = adjustViewport(width, height, margin)
@@ -115,8 +115,9 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   // Build the chart
   const svg = d3.select(domElement).append('svg')
     .attr('class', 'svgWrapper')
-    .attr('width', mainMargin.left + mainWidth + mainMargin.right + miniMargin.left + miniWidth + miniMargin.right)
-    .attr('height', mainMargin.top + mainHeight + mainMargin.bottom)
+    .attr('width', availWidth)
+    .attr('height', availHeight)
+    .attr('transform', `translate(${margin.left}, ${margin.top})`)
     .on('wheel.zoom', scroll)
     .on('mousedown.zoom', null) // Override the center selection
     .on('touchstart.zoom', null)
@@ -153,11 +154,10 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .enter()
       .append('text')
       .attr('class', 'label')
-      .attr('x', d => mainXScale(d.total_percent) + 3 + margin.left + mainMargin.left)
-      .attr('y', d => mainYScale(d.resource_name) + mainYScale.bandwidth() / 2 + margin.top + mainMargin.top)
+      .attr('x', d => mainXScale(d.total_percent) + 3 + mainMargin.left)
+      .attr('y', d => mainYScale(d.resource_name) + mainYScale.bandwidth() / 2 + mainMargin.top)
       .attr('dx', -10)
       .attr('dy', '.35em')
-      .style('font-size', 10)
       .style('fill', d => d.self_access_count > 0 ? 'white' : 'black')
       .attr('text-anchor', 'end')
       .text(d => (
@@ -259,7 +259,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   // Main chart group
   const mainGroup = svg.append('g')
     .attr('class', 'mainGroupWrapper')
-    .attr('transform', `translate(${margin.left + mainMargin.left}, ${margin.top + mainMargin.top})`)
+    .attr('transform', `translate(${mainMargin.left}, ${mainMargin.top})`)
     .append('g')
     .attr('clip-path', 'url(#clip)')
     .style('clip-path', 'url(#clip)')
@@ -267,8 +267,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   // Mini chart group
 
-  const miniTopLeftX = margin.left + mainMargin.left + mainWidth + mainMargin.right + miniMargin.left
-  const miniTopLeftY = margin.top + miniMargin.top
+  const miniTopLeftX = mainMargin.left + mainWidth + mainMargin.right + miniMargin.left
+  const miniTopLeftY = miniMargin.top
 
   const miniGroup = svg.append('g')
     .attr('class', 'miniGroup')
