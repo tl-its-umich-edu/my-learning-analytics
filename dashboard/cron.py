@@ -1,7 +1,7 @@
 
 from django.db import connections as conns
 
-from dashboard.common import db_util
+from dashboard.common import db_util, utils
 
 import logging
 import datetime
@@ -91,7 +91,7 @@ def update_datetime_field(course_obj, course_field_name, warehouse_dataframe, wa
         logger.info(f"Update of {course_field_name} skipped; existing value was found.")
     else:
         warehouse_field_value = warehouse_dataframe[warehouse_field_name].iloc[0]
-        if warehouse_field_value is not None:
+        if pd.notna(warehouse_field_value):
             warehouse_field_value = warehouse_field_value.replace(tzinfo=pytz.UTC)
             setattr(course_obj, course_field_name, warehouse_field_value)
             logger.info(f"{course_field_name} for {course_obj.id} has been updated.")
@@ -117,10 +117,11 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         for course_id in Course.objects.get_supported_courses():
             # select course based on course id
-            course_sql = f"""select *
-                        from course_dim c
-                        where c.id = '{course_id}'
-                        """
+            course_sql = f"""
+                select id, canvas_id, enrollment_term_id, name, start_at, conclude_at
+                from course_dim c
+                where c.id = '{course_id}'
+            """
             logger.debug(course_sql)
             course_df = pd.read_sql(course_sql, conns['DATA_WAREHOUSE'])
 
@@ -243,6 +244,9 @@ class DashboardCronJob(CronJobBase):
         # BQ Total Bytes Billed to report to status
         total_bytes_billed = 0
 
+        # the earliest start date of all courses
+        course_start_time = utils.find_earliest_start_datetime_of_courses()
+
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
         for data_warehouse_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
@@ -251,7 +255,14 @@ class DashboardCronJob(CronJobBase):
 
             final_bq_query = []
             for k, query_obj in settings.RESOURCE_ACCESS_CONFIG.items():
-                final_bq_query.append(query_obj['query'])
+                # concatenate the multi-line presentation of query into one single string
+                query = " ".join(query_obj['query'])
+
+                if (course_start_time is not None):
+                    # insert the start time parameter for query
+                    query += " and event_time > @course_start_time"
+
+                final_bq_query.append(query)
             final_bq_query = "  UNION ALL   ".join(final_bq_query)
 
             data_warehouse_course_ids_short = [db_util.incremented_id_to_canvas_id(id) for id in data_warehouse_course_ids]
@@ -263,6 +274,10 @@ class DashboardCronJob(CronJobBase):
                 bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
                 bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT)
             ]
+            if (course_start_time is not None):
+                # insert the start time parameter for query
+                query_params.append(bigquery.ScalarQueryParameter('course_start_time', 'TIMESTAMP', course_start_time))
+
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
 
@@ -444,7 +459,7 @@ class DashboardCronJob(CronJobBase):
         status = ""
         logger.debug("while using verify_course_ids data to update course table")
 
-        logger.debug(warehouse_courses_data.to_json())
+        logger.debug(warehouse_courses_data.to_json(orient='records'))
         courses = Course.objects.all()
         courses_string = ", ".join([str(x) for x in Course.objects.get_supported_courses()])
         status += f"{str(len(courses))} course(s): {courses_string}\n"
@@ -518,7 +533,7 @@ class DashboardCronJob(CronJobBase):
                     status += self.update_with_bq_access()
                     status += self.update_canvas_resource()
                 except Exception as e:
-                    logger.info(e)
+                    logger.exception("Exception running BigQuery update")
 
         if settings.DATA_WAREHOUSE_IS_UNIZIN:
             logger.info("** informational")

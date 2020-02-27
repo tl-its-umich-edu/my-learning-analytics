@@ -22,8 +22,11 @@ const getCurrentWeek = assignmentData => {
     : null
 }
 
+const loadedWithoutError = (loading, error) => !loading && !error
+
 export {
   handleError,
   defaultFetchOptions,
-  getCurrentWeek
+  getCurrentWeek,
+  loadedWithoutError
 }

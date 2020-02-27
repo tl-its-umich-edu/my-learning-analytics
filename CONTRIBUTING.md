@@ -19,6 +19,21 @@ More info of various institutions infrastructure set up is [here](https://github
 ## Create an issue
 Before sending a pull request, please create an [issue](https://github.com/tl-its-umich-edu/my-learning-analytics/issues/new) describing either a problem (i.e. bug) in MyLA or a feature you would like to contribute. We'll do our best to review the issue in a timely manner to discuss before starting work to address the issue.
 
+## Tips for working with Git
+
+When working with branches it's [advisable](https://randyfay.com/content/simpler-rebasing-avoiding-unintentional-merge-commits) to use the options
+`git config --global branch.autosetuprebase always` and `git config --global pull.rebase true`
+
+To always do a `git pull --rebase` when merging back changes from master. This avoids unintentional merge commits, keeps your branch clean and makes it easier to rebase your branch in the future. These options can be changed at any time if you find they aren't working well for you.
+
+Another great option that will save you some time is
+`git config --global push.default current` 
+
+This avoids you having to [set an upstream everytime](https://www.jvt.me/posts/2019/09/22/git-push-matching/) and just lets you run `git push`
+
+Reference these github guides on [Forking Projects](https://guides.github.com/activities/forking/) and [Understanding the Github flow](https://guides.github.com/introduction/flow/) for further information. 
+
+
 ## Making a pull request
 Once you have had a chance to discuss the issue with one of the project maintainers, please follow these steps for making a [pull request](https://github.com/tl-its-umich-edu/my-learning-analytics/pulls).
 
@@ -27,7 +42,6 @@ Once you have had a chance to discuss the issue with one of the project maintain
 1. Try to create local branches to keep your contributions organized - generally one branch for each issue.
 1. Once you've pushed your changes to your fork, you should see a button on Github to create a pull request from your forked repository to the main project repository.
 
-Reference these github guides on [Forking Projects](https://guides.github.com/activities/forking/) and [Understanding the Github flow](https://guides.github.com/introduction/flow/) for further information. 
 
 ## Testing tips!
 

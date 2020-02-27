@@ -1,0 +1,120 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div
+  className="ProgressBarV2-outOfBar-2"
+  style={
+    Object {
+      "height": "10px",
+      "margin": "0px",
+      "position": "relative",
+      "width": "90%",
+    }
+  }
+>
+  <div>
+    <div
+      style={
+        Object {
+          "backgroundColor": "steelblue",
+          "display": "inline-block",
+          "height": "30px",
+          "left": "80%",
+          "marginBottom": "-20px",
+          "marginTop": 0,
+          "position": "absolute",
+          "width": "2px",
+          "zIndex": 1,
+        }
+      }
+    />
+    <div
+      style={
+        Object {
+          "color": "steelblue",
+          "display": "inline-block",
+          "left": "80.5%",
+          "position": "absolute",
+          "top": "50px",
+          "zIndex": 1,
+        }
+      }
+    >
+      Current
+    </div>
+  </div>
+  <div>
+    <div
+      style={
+        Object {
+          "backgroundColor": "green",
+          "display": "inline-block",
+          "height": "30px",
+          "left": "40%",
+          "marginBottom": 0,
+          "marginTop": "-20px",
+          "position": "absolute",
+          "width": "2px",
+          "zIndex": 1,
+        }
+      }
+    />
+    <div
+      style={
+        Object {
+          "color": "green",
+          "display": "inline-block",
+          "left": "40.5%",
+          "position": "absolute",
+          "top": "-20px",
+          "zIndex": 1,
+        }
+      }
+    >
+      Goal
+    </div>
+  </div>
+  <div>
+    <div
+      style={
+        Object {
+          "backgroundColor": "grey",
+          "display": "inline-block",
+          "height": "60px",
+          "left": "23%",
+          "marginBottom": "-20px",
+          "marginTop": 0,
+          "position": "absolute",
+          "width": "2px",
+          "zIndex": 1,
+        }
+      }
+    />
+    <div
+      style={
+        Object {
+          "color": "grey",
+          "display": "inline-block",
+          "left": "23.5%",
+          "position": "absolute",
+          "top": "75px",
+          "zIndex": 1,
+        }
+      }
+    >
+      Max Possible
+    </div>
+  </div>
+  <div
+    className="ProgressBarV2-gradedBar-1"
+    style={
+      Object {
+        "display": "inline-block",
+        "height": "10px",
+        "position": "absolute",
+        "width": "85%",
+      }
+    }
+  />
+</div>
+`;
