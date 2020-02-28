@@ -39,7 +39,7 @@ NO_GRADE_STRING = "NO_GRADE"
 RESOURCE_TYPE_STRING = "resource_type"
 
 # how many decimal digits to keep
-DECIMAL_ROUND_DIGIT = 1
+DECIMAL_ROUND_DIGIT = 0
 
 
 def gpa_map(grade):
