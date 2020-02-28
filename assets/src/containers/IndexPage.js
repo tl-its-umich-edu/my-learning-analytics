@@ -43,7 +43,7 @@ function IndexPage (props) {
           spacing={8}
         >
           {routes(courseId, views).map((props, key) =>
-            <Link style={{ textDecoration: 'none' }} to={props.path} key={key}>
+            <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={props.path} key={key}>
               <SelectCard cardData={props} />
             </Link>
           )}
