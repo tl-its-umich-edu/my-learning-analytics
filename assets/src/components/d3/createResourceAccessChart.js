@@ -76,24 +76,21 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   const [availWidth, availHeight] = adjustViewport(width, height, margin)
 
-  // Pixel fallback is to ensure the legend and X axis label do not disappear
-  const verticalChartMargin = (availHeight * 0.15) > 50 ? (availHeight * 0.15) : 50
-
   const mainWidth = availWidth * 0.55
   const mainHeight = availHeight * 0.7
   const mainMargin = {
-    top: verticalChartMargin,
+    top: availHeight * 0.15,
     right: 0,
-    bottom: verticalChartMargin,
+    bottom: availHeight * 0.15,
     left: availWidth * 0.225
   }
 
   const miniWidth = availWidth * 0.20
   const miniHeight = mainHeight
   const miniMargin = {
-    top: verticalChartMargin,
+    top: availHeight * 0.15,
     right: 0,
-    bottom: verticalChartMargin,
+    bottom: availHeight * 0.15,
     left: availWidth * 0.025
   }
 
