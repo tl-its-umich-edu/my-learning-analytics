@@ -217,7 +217,7 @@ def resource_access_within_week(request, course_id=0):
     df['grade'] = df['current_grade'].map(gpa_map)
 
     # calculate the percentage
-    df['percent'] = round(df.groupby(['resource_id_name', 'grade'])['resource_id_name'].transform('count')/total_number_student, 2)
+    df['percent'] = df.groupby(['resource_id_name', 'grade'])['resource_id_name'].transform('count') / total_number_student
 
     df=df.drop(['current_grade', 'user_id'], axis=1)
     # now only keep the resource access stats by grade level
@@ -252,14 +252,14 @@ def resource_access_within_week(request, course_id=0):
     selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user})
 
     output_df = output_df.join(selfDf.set_index('resource_id_name'), on='resource_id_name', how='left')
-    output_df["total_count"] = output_df.apply(lambda row: row["90-100"]+row["80-89"]+row["70-79"] + row["low_grade"]+row.NO_GRADE, axis=1)
+    output_df["total_percent"] = output_df.apply(lambda row: row[GRADE_A] + row[GRADE_B] + row[GRADE_C] + row[GRADE_LOW] + row.NO_GRADE, axis=1)
 
     if (grade != "all"):
         # drop all other grades
         grades = [GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING]
         for i_grade in grades:
             if (i_grade==grade):
-                output_df["total_count"] = output_df[i_grade]
+                output_df["total_percent"] = output_df[i_grade]
             else:
                 output_df=output_df.drop([i_grade], axis=1)
 
@@ -269,11 +269,11 @@ def resource_access_within_week(request, course_id=0):
     if (output_df.empty):
         return HttpResponse("{}")
 
-    # only keep rows where total_count > 0
-    output_df = output_df[output_df.total_count > 0]
+    # only keep rows where total_percent > 0
+    output_df = output_df[output_df.total_percent > 0]
 
     # time 100 to show the percentage
-    output_df["total_count"] = output_df["total_count"] * 100
+    output_df["total_percent"] *= 100
     # round all numbers to one decimal point
     output_df = output_df.round(DECIMAL_ROUND_DIGIT)
 
@@ -313,7 +313,8 @@ def grade_distribution(request, course_id=0):
         from user where course_id=%(course_id)s and enrollment_type='StudentEnrollment';
                     """
     df = pd.read_sql(grade_score_sql, conn, params={"current_user": current_user, 'course_id': course_id})
-    if df.empty or df['current_grade'].isnull().all():
+    if df.empty or df.count().current_grade < 6:
+        logger.info(f"Not enough students grades (only {df.count().current_grade}) in a course {course_id} to show the view")
         return HttpResponse(json.dumps({}), content_type='application/json')
 
     grade_view_data = dict()

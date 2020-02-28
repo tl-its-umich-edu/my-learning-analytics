@@ -39,6 +39,7 @@ else:
 
 LOGOUT_URL = '/accounts/logout'
 LOGIN_URL = '/accounts/login'
+HELP_URL = ENV.get("HELP_URL", "https://sites.google.com/umich.edu/my-learning-analytics-help/home")
 
 # Google Analytics ID
 GA_ID = ENV.get('GA_ID', '')
@@ -98,6 +99,7 @@ INSTALLED_APPS = [
     'django.contrib.flatpages',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
+    'graphene_django',
     'django_cron',
     'watchman',
     'macros',
@@ -151,6 +153,10 @@ TEMPLATES = [
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'assets'),
 )
+
+GRAPHENE = {
+    'SCHEMA': 'dashboard.graphql.schema.schema'
+}
 
 WEBPACK_LOADER = {
     'DEFAULT': {
@@ -240,7 +246,7 @@ LOGGING = {
     # Gunicorns logging format https://github.com/benoitc/gunicorn/blob/19.x/gunicorn/glogging.py
     'formatters': {
         "generic": {
-            "format": "%(asctime)s [%(process)d] [%(levelname)s] %(message)s",
+            "format": "%(asctime)s [%(levelname)s] [%(filename)s:%(lineno)d] %(message)s",
             "datefmt": "[%Y-%m-%d %H:%M:%S %z]",
             "class": "logging.Formatter",
         }
