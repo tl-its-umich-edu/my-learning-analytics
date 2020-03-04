@@ -16,7 +16,7 @@ import { siteTheme } from '../../globals'
 const accessedResourceColor = siteTheme.palette.secondary.main
 const notAccessedResourceColor = siteTheme.palette.negative.main
 const linkColor = siteTheme.palette.link.main
-const iconSize = 24
+const foriegnObjSide = 24
 
 const toolTip = d3tip().attr('class', 'd3-tip')
   .direction('n').offset([-5, 5])
@@ -92,6 +92,11 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   const [availWidth, availHeight] = adjustViewport(width, height, margin)
 
+  /*
+  The decimal multipliers for mainMargin.left, mainWidth, mainMargin.right, miniMargin.left,
+  miniWidth, and miniMargin.right should add up to 1.0. In other words, the sum of those values
+  should be equal to the availWidth.
+  */
   const mainWidth = availWidth * 0.55
   const mainHeight = availHeight * 0.7
   const mainMargin = {
@@ -100,7 +105,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     bottom: availHeight * 0.15,
     left: availWidth * 0.225
   }
-  const labelWidth = mainMargin.left * 0.889 - iconSize
+  const resourcelabelWidth = mainMargin.left * 0.889 - foriegnObjSide
 
   const miniWidth = availWidth * 0.20
   const miniHeight = mainHeight
@@ -160,8 +165,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .on('mouseover', toolTip.show)
       .on('mouseout', toolTip.hide)
 
-    // Append text to bars
-    // Seems like this could be rewritten to use the bars?
+    // Append percentage value text to bars
     svg.selectAll('.label').remove()
     svg.selectAll('.label')
       .data(resourceData)
@@ -248,10 +252,10 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
     // Update the resource labels on Y axis
     d3.selectAll('.axis--y .tick text')
-      .attr('x', (mainMargin.left - iconSize) * -1)
+      .attr('x', (mainMargin.left - foriegnObjSide) * -1)
       .attr('fill', linkColor)
       .style('font-size', textScale(selected.length))
-      .call(truncate, labelWidth)
+      .call(truncate, resourcelabelWidth)
 
     update()
   }
@@ -279,7 +283,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('class', 'mainGroup')
 
   // Mini chart group
-
   const miniTopLeftX = mainMargin.left + mainWidth + mainMargin.right + miniMargin.left
   const miniTopLeftY = miniMargin.top
 
@@ -398,7 +401,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   // Truncate resource label name on Y axis
   d3.selectAll('.axis--y .tick text')
-    .call(truncate, labelWidth)
+    .call(truncate, resourcelabelWidth)
 
   // Add links and icons to Y axis
   d3.selectAll('.axis--y .tick').each(function (d) {
@@ -416,8 +419,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     d3.select(this).insert('foreignObject')
       .attr('x', mainMargin.left * -1)
       .attr('y', -6)
-      .attr('width', iconSize)
-      .attr('height', iconSize)
+      .attr('width', foriegnObjSide)
+      .attr('height', foriegnObjSide)
       .attr('color', linkColor)
       .append('xhtml:i')
       .attr('class', icon)
