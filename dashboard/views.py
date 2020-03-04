@@ -38,9 +38,6 @@ NO_GRADE_STRING = "NO_GRADE"
 # string for resource type
 RESOURCE_TYPE_STRING = "resource_type"
 
-# how many decimal digits to keep
-DECIMAL_ROUND_DIGIT = 0
-
 
 def gpa_map(grade):
     if grade is None:
@@ -275,7 +272,7 @@ def resource_access_within_week(request, course_id=0):
     # time 100 to show the percentage
     output_df["total_percent"] *= 100
     # round all numbers to one decimal point
-    output_df = output_df.round(DECIMAL_ROUND_DIGIT)
+    output_df = output_df.round(0)
 
     output_df.fillna(0, inplace=True) #replace null value with 0
 
