@@ -105,7 +105,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     bottom: availHeight * 0.15,
     left: availWidth * 0.225
   }
-  const resourcelabelWidth = mainMargin.left * 0.889 - foreignObjSide
+  const resourceLabelWidth = mainMargin.left * 0.889 - foreignObjSide
 
   const miniWidth = availWidth * 0.20
   const miniHeight = mainHeight
@@ -255,7 +255,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('x', (mainMargin.left - foreignObjSide) * -1)
       .attr('fill', linkColor)
       .style('font-size', textScale(selected.length))
-      .call(truncate, resourcelabelWidth)
+      .call(truncate, resourceLabelWidth)
 
     update()
   }
@@ -401,7 +401,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   // Truncate resource label names on Y axis
   d3.selectAll('.axis--y .tick text')
-    .call(truncate, resourcelabelWidth)
+    .call(truncate, resourceLabelWidth)
 
   // Add links and icons to Y axis
   d3.selectAll('.axis--y .tick').each(function (d) {
