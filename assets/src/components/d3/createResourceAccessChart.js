@@ -16,7 +16,7 @@ import { siteTheme } from '../../globals'
 const accessedResourceColor = siteTheme.palette.secondary.main
 const notAccessedResourceColor = siteTheme.palette.negative.main
 const linkColor = siteTheme.palette.link.main
-const foriegnObjSide = 24
+const foreignObjSide = 24
 
 const toolTip = d3tip().attr('class', 'd3-tip')
   .direction('n').offset([-5, 5])
@@ -105,7 +105,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     bottom: availHeight * 0.15,
     left: availWidth * 0.225
   }
-  const resourcelabelWidth = mainMargin.left * 0.889 - foriegnObjSide
+  const resourcelabelWidth = mainMargin.left * 0.889 - foreignObjSide
 
   const miniWidth = availWidth * 0.20
   const miniHeight = mainHeight
@@ -250,9 +250,9 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
         : 0.5
       )
 
-    // Update the resource labels on Y axis
+    // Update the resource label names on Y axis
     d3.selectAll('.axis--y .tick text')
-      .attr('x', (mainMargin.left - foriegnObjSide) * -1)
+      .attr('x', (mainMargin.left - foreignObjSide) * -1)
       .attr('fill', linkColor)
       .style('font-size', textScale(selected.length))
       .call(truncate, resourcelabelWidth)
@@ -399,7 +399,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   brushmove()
 
-  // Truncate resource label name on Y axis
+  // Truncate resource label names on Y axis
   d3.selectAll('.axis--y .tick text')
     .call(truncate, resourcelabelWidth)
 
@@ -419,8 +419,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     d3.select(this).insert('foreignObject')
       .attr('x', mainMargin.left * -1)
       .attr('y', -6)
-      .attr('width', foriegnObjSide)
-      .attr('height', foriegnObjSide)
+      .attr('width', foreignObjSide)
+      .attr('height', foreignObjSide)
       .attr('color', linkColor)
       .append('xhtml:i')
       .attr('class', icon)
