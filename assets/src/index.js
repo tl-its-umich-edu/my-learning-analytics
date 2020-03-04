@@ -6,14 +6,14 @@ import './index.css'
 import App from './containers/App'
 import client from './service/client'
 import { ApolloProvider } from '@apollo/react-hooks'
-import { user, siteTheme, gaId, loginURL } from './globals'
+import { user, siteTheme, gaId } from './globals'
 // import * as serviceWorker from './serviceWorker'
 
 ReactDOM.render(
   <Router basename='/'>
     <ApolloProvider client={client}>
       <ThemeProvider theme={siteTheme}>
-        <App user={user} gaId={gaId} loginURL={loginURL} />
+        <App user={user} gaId={gaId} />
       </ThemeProvider>
     </ApolloProvider>
   </Router>
