@@ -217,7 +217,7 @@ function ResourcesAccessed (props) {
         <ResourceAccessChart
           data={resourceData}
           aspectRatio={0.3}
-          minHeight={400}
+          minHeight={350}
         />
       )
     }
