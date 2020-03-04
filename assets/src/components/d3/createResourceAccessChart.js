@@ -16,6 +16,7 @@ import { siteTheme } from '../../globals'
 const accessedResourceColor = siteTheme.palette.secondary.main
 const notAccessedResourceColor = siteTheme.palette.negative.main
 const linkColor = siteTheme.palette.link.main
+const iconSize = 24
 
 const toolTip = d3tip().attr('class', 'd3-tip')
   .direction('n').offset([-5, 5])
@@ -68,6 +69,21 @@ function appendLegend (svg) {
     .style('fill', d => d[1])
 }
 
+function truncate (selection, labelWidth) {
+  selection.each(function (d) {
+    const textEl = d3.select(this)
+    const textString = d.split('|')[1]
+    textEl.text(textString)
+    const textPixelLength = textEl.node().getComputedTextLength()
+    if (textPixelLength > labelWidth) {
+      const numChars = Math.floor(labelWidth / textPixelLength * textString.length) - 3
+      textEl.text(`${textString.substring(0, numChars - 1)}...`)
+    } else {
+      textEl.text(textString)
+    }
+  })
+}
+
 function createResourceAccessChart ({ data, width, height, domElement }) {
   const resourceData = data.sort((a, b) => b.total_percent - a.total_percent)
 
@@ -84,6 +100,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     bottom: availHeight * 0.15,
     left: availWidth * 0.225
   }
+  const labelWidth = mainMargin.left * 0.889 - iconSize
 
   const miniWidth = availWidth * 0.20
   const miniHeight = mainHeight
@@ -211,7 +228,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     const mainYAxis = d3
       .axisLeft(mainYScale)
       .tickSize(0)
-      .tickFormat(d => truncate(d.split('|')[1]))
+      .tickFormat(d => d.split('|')[1])
 
     mainGroup.select('.axis--y').call(mainYAxis)
 
@@ -229,11 +246,12 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
         : 0.5
       )
 
-    // Update the resource labels
-    d3.selectAll('.axis--y text')
-      .attr('x', (mainMargin.left - 24) * -1)
+    // Update the resource labels on Y axis
+    d3.selectAll('.axis--y .tick text')
+      .attr('x', (mainMargin.left - iconSize) * -1)
       .attr('fill', linkColor)
       .style('font-size', textScale(selected.length))
+      .call(truncate, labelWidth)
 
     update()
   }
@@ -250,8 +268,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     d3.event.stopPropagation()
     gBrush.call(brush.move, [center - size / 2, center + size / 2])
   }
-
-  const truncate = (text) => text.length > 32 ? `${text.substring(0, 32)}...` : text
 
   // Main chart group
   const mainGroup = svg.append('g')
@@ -286,7 +302,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   const mainYAxis = d3.axisLeft(mainYScale)
     .tickSize(0)
-    .tickFormat(d => truncate(d.split('|')[1]))
+    .tickFormat(d => d.split('|')[1])
 
   // Brush
   const brush = d3.brushY()
@@ -380,6 +396,11 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   brushmove()
 
+  // Truncate resource label name on Y axis
+  d3.selectAll('.axis--y .tick text')
+    .call(truncate, labelWidth)
+
+  // Add links and icons to Y axis
   d3.selectAll('.axis--y .tick').each(function (d) {
     // Have to use ES5 function to correctly use `this` keyword
     const link = d.split('|')[0]
@@ -395,8 +416,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     d3.select(this).insert('foreignObject')
       .attr('x', mainMargin.left * -1)
       .attr('y', -6)
-      .attr('width', 24)
-      .attr('height', 24)
+      .attr('width', iconSize)
+      .attr('height', iconSize)
       .attr('color', linkColor)
       .append('xhtml:i')
       .attr('class', icon)
