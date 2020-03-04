@@ -271,7 +271,7 @@ def resource_access_within_week(request, course_id=0):
 
     # time 100 to show the percentage
     output_df["total_percent"] *= 100
-    # round all numbers to one decimal point
+    # round all numbers to whole numbers
     output_df = output_df.round(0)
 
     output_df.fillna(0, inplace=True) #replace null value with 0
