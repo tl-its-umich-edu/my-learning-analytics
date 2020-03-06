@@ -159,6 +159,12 @@ After about 30-60 seconds the crons should have completed and you should have da
 3. The url for configuring copyright info must be `/copyright/` since that is used in the `base.html` for pulling the info. [Read more here](https://simpleisbetterthancomplex.com/tutorial/2016/10/04/how-to-use-django-flatpages-app.html)
 
 
+## Accessibility
+
+### Keyboard Navigation
+Users that use Safari or Firefox on macOS that would like to enable keyboard navigation in MyLA will have to follow the steps [here](https://github.com/tl-its-umich-edu/my-learning-analytics/wiki/Accessibility).
+
+
 ## Contributing to MyLA
 * [Contribution Guide](CONTRIBUTING.md)
 
