@@ -49,10 +49,14 @@ function SideDrawer (props) {
             to={props.path}
             key={key}
             className={classes.sideDrawerLinks}
-            selected={selectedIndex === key}
             onClick={() => setSelectedIndex(key)}
           >
-            <ListItemIcon><props.icon /></ListItemIcon>
+            <ListItemIcon>
+              {selectedIndex === key
+                ? <props.icon color='secondary' />
+                : <props.icon style={{color: '#E1E1E1'}}/>
+              }
+            </ListItemIcon>
             <ListItemText primary={props.title} className={classes.text} />
           </ListItem>
         ))}
