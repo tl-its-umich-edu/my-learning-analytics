@@ -29,6 +29,9 @@ const styles = theme => ({
   container: {
     display: 'flex',
     justifyContent: 'center'
+  },
+  grow: {
+    flexGrow: 1
   }
 })
 
