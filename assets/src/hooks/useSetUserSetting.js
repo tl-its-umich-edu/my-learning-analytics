@@ -11,7 +11,7 @@ const useSetUserSetting = (courseId, userSetting, settingChanged, conditionalArr
   useEffect(() => {
     if (settingChanged) {
       setLoaded(false)
-      fetch(`/api/v1/courses/${courseId}/set_user_default_selection`, {
+      fetch(`/api/v1/courses/${courseId}/set_user_default_selection/`, {
         headers: {
           Accept: 'application/json',
           'X-Requested-With': 'XMLHttpRequest',

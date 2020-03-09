@@ -15,6 +15,7 @@ import { siteTheme } from '../../globals'
 
 const accessedResourceColor = siteTheme.palette.secondary.main
 const notAccessedResourceColor = siteTheme.palette.negative.main
+const linkColor = siteTheme.palette.link.main
 const mainMargin = { top: 50, right: 10, bottom: 50, left: 200 }
 
 const toolTip = d3tip().attr('class', 'd3-tip')
@@ -70,7 +71,7 @@ function appendLegend (svg) {
 }
 
 function createResourceAccessChart ({ data, width, height, domElement }) {
-  const resourceData = data.sort((a, b) => b.total_count - a.total_count)
+  const resourceData = data.sort((a, b) => b.total_percent - a.total_percent)
 
   const [mainWidth, miniHeight] = adjustViewport(width, height, mainMargin)
 
@@ -108,14 +109,14 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     // Initialize
     bar.attr('x', 150)
       .attr('y', d => mainYScale(d.resource_name))
-      .attr('width', d => mainXScale(d.total_count) - 150)
+      .attr('width', d => mainXScale(d.total_percent) - 150)
       .attr('height', mainYScale.bandwidth())
 
     bar.enter()
       .append('rect')
       .attr('x', 150)
       .attr('y', d => mainYScale(d.resource_name))
-      .attr('width', d => mainXScale(d.total_count) - 150)
+      .attr('width', d => mainXScale(d.total_percent) - 150)
       .attr('height', mainYScale.bandwidth())
       .attr('class', 'bar')
       .attr('fill', d => d.self_access_count > 0
@@ -132,7 +133,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .enter()
       .append('text')
       .attr('class', 'label')
-      .attr('x', d => mainXScale(d.total_count) + 3 + mainMargin.left)
+      .attr('x', d => mainXScale(d.total_percent) + 3 + mainMargin.left)
       .attr('y', d => mainYScale(d.resource_name) + mainYScale.bandwidth() / 2 + mainMargin.top)
       .attr('dx', -10)
       .attr('dy', '.35em')
@@ -142,7 +143,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .text(d => (
         ((mainYScale(d.resource_name) + mainYScale.bandwidth() / 2) < miniHeight) &&
         ((mainYScale(d.resource_name) + mainYScale.bandwidth() / 2) > 0))
-        ? d.total_count
+        ? d.total_percent + '%'
         : ''
       )
 
@@ -214,7 +215,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     // Update the resource labels
     d3.selectAll('.axis--y text')
       .attr('x', -160)
-      .attr('fill', '#0000EE')
+      .attr('fill', linkColor)
       .style('font-size', textScale(selected.length))
 
     update()
@@ -302,8 +303,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   // Inject data
   // Domain
-  mainXScale.domain([0, d3.max(resourceData, d => d.total_count)])
-  miniXScale.domain([0, d3.max(resourceData, d => d.total_count)])
+  mainXScale.domain([0, d3.max(resourceData, d => d.total_percent)])
+  miniXScale.domain([0, d3.max(resourceData, d => d.total_percent)])
   mainYScale.domain(resourceData.map(d => d.resource_name))
     .paddingInner(0.4)
     .paddingOuter(0)
@@ -337,7 +338,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .append('rect')
     .attr('x', 0)
     .attr('y', d => miniYScale(d.resource_name))
-    .attr('width', d => miniXScale(d.total_count))
+    .attr('width', d => miniXScale(d.total_percent))
     .attr('height', miniYScale.bandwidth())
     .attr('class', 'bar')
     .attr('fill', d => d.self_access_count > 0
@@ -374,7 +375,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('y', -6)
       .attr('width', 32)
       .attr('height', 32)
-      .attr('color', '#0000EE')
+      .attr('color', linkColor)
       .append('xhtml:i')
       .attr('class', icon)
   })

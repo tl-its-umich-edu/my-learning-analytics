@@ -10,7 +10,7 @@ import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
-import { roundToOneDecimal } from '../util/math'
+import { roundToXDecimals } from '../util/math'
 import { useGradeData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 import useSetUserSetting from '../hooks/useSetUserSetting'
@@ -71,7 +71,7 @@ function GradeDistribution (props) {
           <strong key={0}>
             {
               gradeData.summary.current_user_grade
-                ? `${roundToOneDecimal(gradeData.summary.current_user_grade)}%`
+                ? `${roundToXDecimals(gradeData.summary.current_user_grade, 1)}%`
                 : 'There are no grades yet for you in this course'
             }
           </strong>

@@ -56,7 +56,7 @@ function DashboardAppBar (props) {
       <AppBar className={classes.root} position='static'>
         <Toolbar>
           <IconButton
-            onClick={() => onMenuBarClick(!sideDrawerState)}
+            onClick={onMenuBarClick(true)}
             className={classes.menuButton}
             color='inherit'
             aria-label='Menu'>
