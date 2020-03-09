@@ -30,6 +30,15 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'center'
   },
+<<<<<<< HEAD
+=======
+  wrapper: {
+    maxWidth: 1023,
+    margin: theme.spacing(2) + 'px auto',
+    flexDirection: 'row',
+    justifyContent: 'flex-start'
+  },
+>>>>>>> master
   grow: {
     flexGrow: 1
   }
@@ -80,12 +89,17 @@ function CourseList (props) {
           !user.relatedCourses.length
             ? (
               <AlertBanner>
+<<<<<<< HEAD
                 You are not enrolled in any courses with My Learning Analytics enabled.
+=======
+                You are not enrolled in any courses with My Learning Analytics enabled. 
+>>>>>>> master
                 Visit the <MuiLink href={user.helpURL} color='link'>Help site</MuiLink> for more information about this tool.
               </AlertBanner>
             )
             : (
               <Grid container spacing={2}>
+<<<<<<< HEAD
                 {
                   user.relatedCourses.map((course, key) => (
                     <Grid item xs={12} sm={6} lg={4} key={key}>
@@ -95,6 +109,15 @@ function CourseList (props) {
                     </Grid>
                   ))
                 }
+=======
+                <Grid item xs={12} className={classes.container}>
+                  {user.relatedCourses.map((course, key) =>
+                    <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
+                      <SelectCard cardData={{ title: course.course_name }} />
+                    </Link>
+                  )}
+                </Grid>
+>>>>>>> master
               </Grid>
             )
         }
