@@ -16,6 +16,9 @@ import { siteTheme } from '../../globals'
 const accessedResourceColor = siteTheme.palette.secondary.main
 const notAccessedResourceColor = siteTheme.palette.negative.main
 const linkColor = siteTheme.palette.link.main
+
+// foreignObjSide specifies the length of one side of the square foreign object element that contains the
+// resource icon and padding to its right; this value is also used to calculate the resourceLabelWidth.
 const foreignObjSide = 24
 
 const toolTip = d3tip().attr('class', 'd3-tip')
@@ -93,10 +96,21 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   const [availWidth, availHeight] = adjustViewport(width, height, margin)
 
   /*
-  The decimal multipliers for mainMargin.left, mainWidth, mainMargin.right, miniMargin.left,
-  miniWidth, and miniMargin.right should add up to 1.0. In other words, the sum of those values
-  should be equal to the availWidth.
+  The decimal multipliers for values along the horizontal axis should add up to 1.0. In other words,
+  the sum of the horizontal values should be equal to the availWidth. Specifically,
+
+  availWidth = mainMargin.left + mainWidth + mainMargin.right + miniMargin.left + miniWidth + miniMargin.right
+
+  Because the main and mini charts share horizontal space, the decimal multipliers for
+  values along the vertical axis for each chart should add up to 1.0. In other words, the sum of the
+  vertical values for one chart should be equal to the availHeight. To keep the charts aligned,
+  the corresponding segment values from each chart should be equal. Specifically,
+
+  availHeight = mainMargin.top + mainHeight + mainMargin.bottom
+  availHeight = miniMargin.top + miniHeight + miniMargin.top
+  mainMargin.top = miniMargin.top, mainHeight = miniHeight, mainMargin.bottom = miniMargin.bottom
   */
+
   const mainWidth = availWidth * 0.55
   const mainHeight = availHeight * 0.7
   const mainMargin = {
@@ -105,7 +119,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     bottom: availHeight * 0.15,
     left: availWidth * 0.225
   }
-  const resourceLabelWidth = mainMargin.left * 0.889 - foreignObjSide
 
   const miniWidth = availWidth * 0.20
   const miniHeight = mainHeight
@@ -115,6 +128,10 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     bottom: availHeight * 0.15,
     left: availWidth * 0.025
   }
+
+  // The space available for a resource label should be mainMargin.left minus the margin between
+  // the main and mini charts, minus the horizontal length of the foreign object element.
+  const resourceLabelWidth = mainMargin.left - miniMargin.left - foreignObjSide
 
   const defaultNumberOfResources = 7
   const selectionWindowHeight = resourceData.length < defaultNumberOfResources
