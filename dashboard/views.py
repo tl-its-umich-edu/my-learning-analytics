@@ -96,7 +96,7 @@ def get_course_info(request, course_id=0):
 
     resp = model_to_dict(course)
 
-    course_start, course_end = course.get_course_date_range()
+    course_start, course_end = course.course_date_range
 
     current_week_number = math.ceil((today - course_start).days/7)
     total_weeks = math.ceil((course_end - course_start).days/7)
@@ -622,7 +622,7 @@ def is_weight_considered(course_id):
 
 def get_course_date_start(course_id):
     logger.info(get_course_date_start.__name__)
-    course_date_start = Course.objects.get(id=course_id).get_course_date_range().start
+    course_date_start = Course.objects.get(id=course_id).course_date_range.start
     return course_date_start
 
 

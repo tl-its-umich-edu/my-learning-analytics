@@ -43,7 +43,7 @@ urlpatterns = [
     # This is the courses catch-all. Most user-initiated requests will match the regular expression; then the React
     # front-end will manage any additional routing.
     re_path(r'^courses/', login_required(views.get_home_template,), name="courses"),
-    # This path is used by Course.get_absolute_url() to generate course links for the Admin interface.
+    # This path is used by Course.absolute_url to generate course links for the Admin interface.
     path('courses/<int:course_id>/', login_required(views.get_home_template,), name="courses"),
 
     # These URLs are data patterns
