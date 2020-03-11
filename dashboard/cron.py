@@ -489,7 +489,7 @@ class DashboardCronJob(CronJobBase):
 
 
     def do(self):
-        logger.info("** dashboard cron tab")
+        logger.info("** MyLA cron tab")
 
         status = ""
 
