@@ -7,16 +7,10 @@ import { isObjectEmpty, getObjectValues } from '../util/object'
 import WarningBanner from '../components/WarningBanner'
 import routes from '../routes/routes'
 
-const styles = theme => ({
-  root: {
-    flexGrow: 1
-  }
-})
-
 const objectValuesAreAllZero = obj => getObjectValues(obj).every(x => x === 0)
 
 function IndexPage (props) {
-  const { classes, courseInfo, courseId } = props
+  const { courseInfo, courseId } = props
 
   const views = courseInfo.course_view_options
 
@@ -25,7 +19,7 @@ function IndexPage (props) {
   }
 
   return (
-    <Grid container spacing={2}>
+    <Grid container>
       {
         routes(courseId, views).map((props, key) => (
           <Grid item xs={12} sm={6} lg={4} key={key}>
@@ -39,4 +33,4 @@ function IndexPage (props) {
   )
 }
 
-export default withStyles(styles)(IndexPage)
+export default IndexPage
