@@ -59,7 +59,7 @@ class CourseAdmin(admin.ModelAdmin):
     _courseviewoption.short_description = "Course View Option(s)"
 
     def course_link(self, obj):
-        return format_html('<a href="{}">Link</a>', obj.get_absolute_url())
+        return format_html('<a href="{}">Link</a>', obj.absolute_url)
 
     # When saving the course, update the id based on canvas id
     def save_model(self, request, obj, form, change):

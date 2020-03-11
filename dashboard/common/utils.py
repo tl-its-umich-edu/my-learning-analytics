@@ -9,15 +9,13 @@ logger = logging.getLogger(__name__)
 
 
 def find_earliest_start_datetime_of_courses():
-    course_start_datetimes = []
-    for course in Course.objects.all():
-        course_start_datetimes.append(course.get_course_date_range().start)
-    logger.debug(course_start_datetimes)
+    sorted_courses = sorted(Course.objects.all(), key=lambda course: course.course_date_range.start)
 
-    earliest_start = None
-    if len(course_start_datetimes) > 0:
-        earliest_start = sorted(course_start_datetimes)[0]
-        logger.info(f"Earliest start datetime for all courses: {earliest_start.isoformat()}")
+    earliest_course = None
+    if len(sorted_courses) > 0:
+        earliest_course = sorted_courses[0]
+        earliest_start = earliest_course.course_date_range.start
+        logger.info(f"Earliest start datetime for all courses: {earliest_start.isoformat()} found in course {earliest_course.canvas_id}")
     else:
         logger.info(f"No course listed. Return None as the earliest_start_datetime_of_course. ")
     return earliest_start

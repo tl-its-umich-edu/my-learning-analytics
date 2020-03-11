@@ -177,7 +177,8 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
-    def get_course_date_range(self):
+    @property
+    def course_date_range(self):
         if self.date_start is not None:
             start = self.date_start
         elif self.term is not None and self.term.date_start is not None:
@@ -195,7 +196,8 @@ class Course(models.Model):
         DateRange = namedtuple("DateRange", ["start", "end"])
         return DateRange(start, end)
 
-    def get_absolute_url(self):
+    @property
+    def absolute_url(self):
         return reverse('courses', kwargs={'course_id': self.canvas_id})
 
     class Meta:
