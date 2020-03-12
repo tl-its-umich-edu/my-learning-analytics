@@ -217,10 +217,10 @@ class DashboardCronJob(CronJobBase):
         # Remove any rows where file_state is not available!
         for row in df_attach.itertuples(index=False):
             if row.file_state == 'available':
-                Resource.objects.filter(id=row.id).update(name=row.display_name)
+                Resource.objects.filter(resource_id=row.id).update(name=row.display_name)
                 status += f"Row {row.id} updated to {row.display_name}\n"
             else:
-                Resource.objects.filter(id=row.id).delete()
+                Resource.objects.filter(resource_id=row.id).delete()
                 status += f"Row {row.id} removed as it is not available\n"
         return status
 
@@ -302,8 +302,6 @@ class DashboardCronJob(CronJobBase):
             resource_df.drop(["user_id", "access_time"], axis=1, inplace=True)
             # Drop out the duplicates
             resource_df.drop_duplicates(["resource_id", "course_id"], inplace=True)
-            # Rename the column resource_id to id
-            resource_df.rename(columns={"resource_id": "id"}, inplace=True)
 
             # Drop out the columns resource_type, course_id, name from the resource_access
             resource_access_df.drop(["resource_type","name", "course_id"], axis=1, inplace=True)
