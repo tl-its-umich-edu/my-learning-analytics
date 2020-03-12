@@ -1,10 +1,10 @@
 """
-    These were manually generated migrations to get a new primary key field
-    into resources.
+    These were manually generated migrations to get a new auto primary field
+    into the resources table.
 
-    First:id was altered to add an index and drop the primary key
-    Second: id is renamed to resource_id
-    Third: a new id AutoField is added as the primary key
+    1: id was altered to add an index and drop the primary key
+    2: id is renamed to resource_id
+    3: a new id AutoField is added as the primary key
 
 """
 
