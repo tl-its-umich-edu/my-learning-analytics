@@ -38,9 +38,6 @@ NO_GRADE_STRING = "NO_GRADE"
 # string for resource type
 RESOURCE_TYPE_STRING = "resource_type"
 
-# how many decimal digits to keep
-DECIMAL_ROUND_DIGIT = 1
-
 
 def gpa_map(grade):
     if grade is None:
@@ -99,7 +96,7 @@ def get_course_info(request, course_id=0):
 
     resp = model_to_dict(course)
 
-    course_start, course_end = course.get_course_date_range()
+    course_start, course_end = course.course_date_range
 
     current_week_number = math.ceil((today - course_start).days/7)
     total_weeks = math.ceil((course_end - course_start).days/7)
@@ -274,8 +271,8 @@ def resource_access_within_week(request, course_id=0):
 
     # time 100 to show the percentage
     output_df["total_percent"] *= 100
-    # round all numbers to one decimal point
-    output_df = output_df.round(DECIMAL_ROUND_DIGIT)
+    # round all numbers to whole numbers
+    output_df = output_df.round(0)
 
     output_df.fillna(0, inplace=True) #replace null value with 0
 
@@ -625,7 +622,7 @@ def is_weight_considered(course_id):
 
 def get_course_date_start(course_id):
     logger.info(get_course_date_start.__name__)
-    course_date_start = Course.objects.get(id=course_id).get_course_date_range().start
+    course_date_start = Course.objects.get(id=course_id).course_date_range.start
     return course_date_start
 
 

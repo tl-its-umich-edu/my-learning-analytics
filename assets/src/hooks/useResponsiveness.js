@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { createResize } from '../util/chart'
 
 const useResponsiveness = props => {
-  const { domElement, aspectRatio = 0.75 } = props
+  const { domElement, aspectRatio = 0.75, minHeight = null } = props
   const [width, setWidth] = useState(null)
 
   const setContainer = () => {
@@ -18,7 +18,11 @@ const useResponsiveness = props => {
     return optimizedResize.remove
   })
 
-  return [width, width * aspectRatio]
+  const height = (minHeight) && (width * aspectRatio < minHeight)
+    ? minHeight
+    : (width * aspectRatio)
+
+  return [width, height]
 }
 
 export default useResponsiveness
