@@ -217,10 +217,10 @@ class DashboardCronJob(CronJobBase):
         # Remove any rows where file_state is not available!
         for row in df_attach.itertuples(index=False):
             if row.file_state == 'available':
-                Resource.objects.filter(id=row.id).update(name=row.display_name)
+                Resource.objects.filter(resource_id=row.id).update(name=row.display_name)
                 status += f"Row {row.id} updated to {row.display_name}\n"
             else:
-                Resource.objects.filter(id=row.id).delete()
+                Resource.objects.filter(resource_id=row.id).delete()
                 status += f"Row {row.id} removed as it is not available\n"
         return status
 
