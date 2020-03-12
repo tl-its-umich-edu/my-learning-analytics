@@ -185,7 +185,7 @@ def resource_access_within_week(request, course_id=0):
 
     sqlString = f"""SELECT a.resource_id as resource_id, r.resource_type as resource_type, r.name as resource_name, u.current_grade as current_grade, a.user_id as user_id
                     FROM resource r, resource_access a, user u, course c, academic_terms t
-                    WHERE a.resource_id = r.id and a.user_id = u.user_id
+                    WHERE a.resource_id = r.resource_id and a.user_id = u.user_id
                     and r.course_id = c.id and c.term_id = t.id
                     and a.access_time > %(start_time)s
                     and a.access_time < %(end_time)s
@@ -240,12 +240,12 @@ def resource_access_within_week(request, course_id=0):
 
     # now insert person's own viewing records: what resources the user has viewed, and the last access timestamp
     # now insert person's own viewing records: what resources the user has viewed, and the last access timestamp
-    selfSqlString = "select CONCAT(r.id, ';', r.name) as resource_id_name, count(*) as self_access_count, max(a.access_time) as self_access_last_time " \
+    selfSqlString = "select CONCAT(r.resource_id, ';', r.name) as resource_id_name, count(*) as self_access_count, max(a.access_time) as self_access_last_time " \
                     "from resource_access a, user u, resource r " \
                     "where a.user_id = u.user_id " \
-                    "and a.resource_id = r.ID " \
+                    "and a.resource_id = r.resource_id " \
                     "and u.sis_name=%(current_user)s " \
-                    "group by CONCAT(r.id, ';', r.name)"
+                    "group by CONCAT(r.resource_id, ';', r.name)"
     logger.debug(selfSqlString)
     logger.debug("current_user=" + current_user)
 
