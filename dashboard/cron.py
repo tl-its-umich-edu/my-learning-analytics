@@ -302,8 +302,6 @@ class DashboardCronJob(CronJobBase):
             resource_df.drop(["user_id", "access_time"], axis=1, inplace=True)
             # Drop out the duplicates
             resource_df.drop_duplicates(["resource_id", "course_id"], inplace=True)
-            # Rename the column resource_id to id
-            resource_df.rename(columns={"resource_id": "id"}, inplace=True)
 
             # Drop out the columns resource_type, course_id, name from the resource_access
             resource_access_df.drop(["resource_type","name", "course_id"], axis=1, inplace=True)

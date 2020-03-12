@@ -273,10 +273,10 @@ class ResourceManager(models.Manager):
     def get_course_resource_type(self, course_id):
         return self.get_queryset().get_course_resource_type(course_id)
 
-
 class Resource(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name="Table Id")
     resource_type = models.CharField(max_length=255, verbose_name="Resource Type")
-    id = models.CharField(primary_key=True, max_length=255, verbose_name="Resource Id")
+    resource_id = models.CharField(blank=True, max_length=255, null=False, verbose_name="Resource Id")
     name = models.TextField(verbose_name="Resource Name")
     course_id = models.BigIntegerField(verbose_name="Course Id")
 
