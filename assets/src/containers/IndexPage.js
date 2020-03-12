@@ -29,7 +29,7 @@ function IndexPage (props) {
       {
         routes(courseId, views).map((props, key) => (
           <Grid item xs={12} sm={6} lg={4} key={key}>
-            <Link style={{ textDecoration: 'none' }} to={props.path}>
+            <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={props.path}>
               <SelectCard cardData={props} />
             </Link>
           </Grid>
