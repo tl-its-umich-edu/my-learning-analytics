@@ -46,11 +46,7 @@ function appendLegend (svg) {
 
   const legend = svg.select('.mainGroupWrapper').append('g')
     .attr('class', 'legend')
-<<<<<<< HEAD
-    .attr('transform', 'translate(-620, 0)')
-=======
     .attr('transform', 'translate(0,0)')
->>>>>>> master
 
   legend.selectAll('text')
     .data(legendLabels)
