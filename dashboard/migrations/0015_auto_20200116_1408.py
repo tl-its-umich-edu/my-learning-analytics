@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0013_course_show_grade_type'),
+        ('dashboard', '0014_add_auto_field_to_resources'),
     ]
 
     operations = [
