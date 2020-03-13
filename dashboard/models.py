@@ -86,7 +86,7 @@ class UserDefaultSelection(models.Model):
     course_id = models.BigIntegerField(blank=True, null=True, verbose_name="Course Id")
     user_sis_name = models.CharField(max_length=255,blank=True, null=True, verbose_name="User Id")
     default_view_type = models.CharField(max_length=255, blank=True, null=True, verbose_name="Default Type")
-    default_view_value = models.CharField(max_length=255, blank=True, null=True, verbose_name="Default Value")
+    default_view_value = models.TextField(blank=True, null=True, verbose_name="Default Value")
 
     objects = UserDefaultManager()
 
@@ -177,7 +177,8 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
-    def get_course_date_range(self):
+    @property
+    def course_date_range(self):
         if self.date_start is not None:
             start = self.date_start
         elif self.term is not None and self.term.date_start is not None:
@@ -195,7 +196,8 @@ class Course(models.Model):
         DateRange = namedtuple("DateRange", ["start", "end"])
         return DateRange(start, end)
 
-    def get_absolute_url(self):
+    @property
+    def absolute_url(self):
         return reverse('courses', kwargs={'course_id': self.canvas_id})
 
     class Meta:
@@ -206,14 +208,16 @@ class Course(models.Model):
 class CourseViewOption(models.Model):
     course = models.OneToOneField(Course, on_delete=models.CASCADE, primary_key=True, verbose_name="Course View Option Id")
     show_resources_accessed = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Resources Accessed View")
+    show_assignment_planning_v1 = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Assignment Planning v1 View")
     show_assignment_planning = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Assignment Planning View")
     show_grade_distribution = models.BooleanField(blank=False, null=False, default=True, verbose_name="Show Grade Distribution View")
 
-    VIEWS = ['show_resources_accessed', 'show_assignment_planning', 'show_grade_distribution']
+    VIEWS = ['show_resources_accessed', 'show_assignment_planning_v1', 'show_assignment_planning', 'show_grade_distribution']
 
     def __str__(self):
         retval = ""
         if self.show_resources_accessed and 'show_resources_accessed' not in settings.VIEWS_DISABLED: retval += "Resources Accessed\n"
+        if self.show_assignment_planning_v1 and 'show_assignment_planning_v1' not in settings.VIEWS_DISABLED: retval += "Assignment Planning v1\n"
         if self.show_assignment_planning and 'show_assignment_planning' not in settings.VIEWS_DISABLED: retval += "Assignment Planning\n"
         if self.show_grade_distribution and 'show_grade_distribution' not in settings.VIEWS_DISABLED: retval += "Grade Distribution\n"
         return retval
@@ -233,6 +237,8 @@ class CourseViewOption(models.Model):
 
         try:
             options = {'ra': int(self.show_resources_accessed and 'show_resources_accessed'
+                                 not in settings.VIEWS_DISABLED),
+                       'apv1': int(self.show_assignment_planning_v1 and 'show_assignment_planning_v1'
                                  not in settings.VIEWS_DISABLED),
                        'ap': int(self.show_assignment_planning and 'show_assignment_planning'
                                  not in settings.VIEWS_DISABLED),
@@ -269,8 +275,9 @@ class ResourceManager(models.Manager):
 
 
 class Resource(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name="Table Id")
     resource_type = models.CharField(max_length=255, verbose_name="Resource Type")
-    id = models.CharField(primary_key=True, max_length=255, verbose_name="Resource Id")
+    resource_id = models.CharField(blank=True, db_index=True, max_length=255, null=False, verbose_name="Resource Id")
     name = models.TextField(verbose_name="Resource Name")
     course_id = models.BigIntegerField(verbose_name="Course Id")
 
@@ -311,9 +318,12 @@ class UnizinMetadata(models.Model):
 
 class UserQuerySet(models.query.QuerySet):
     def get_user_in_course(self, user, course):
+        return self.get_user_in_course_id(user, course.id)
+
+    def get_user_in_course_id(self, user, course_id):
         return self.filter(
             Q(sis_name=user.get_username()) | Q(sis_id=user.get_username()),
-            course_id=course.id
+            course_id=course_id
         )
 
 class User(models.Model):

@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div
+  style={
+    Object {
+      "backgroundColor": "blue",
+      "display": "inline-block",
+      "height": "30px",
+      "left": 5,
+      "marginBottom": 0,
+      "marginTop": "-20px",
+      "position": "absolute",
+      "width": "2px",
+      "zIndex": 1,
+    }
+  }
+/>
+`;

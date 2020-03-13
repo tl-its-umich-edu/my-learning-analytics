@@ -10,16 +10,6 @@ import routes from '../routes/routes'
 const styles = theme => ({
   root: {
     flexGrow: 1
-  },
-  container: {
-    display: 'flex',
-    justifyContent: 'center'
-  },
-  wrapper: {
-    maxWidth: 1023,
-    margin: theme.spacing(2) + 'px auto',
-    flexDirection: 'row',
-    justifyContent: 'flex-start'
   }
 })
 
@@ -35,20 +25,16 @@ function IndexPage (props) {
   }
 
   return (
-    <Grid container className={classes.root}>
-      <Grid item xs={12} className={classes.container}>
-        <Grid
-          container
-          className={classes.wrapper}
-          spacing={8}
-        >
-          {routes(courseId, views).map((props, key) =>
-            <Link style={{ textDecoration: 'none' }} to={props.path} key={key}>
+    <Grid container spacing={2}>
+      {
+        routes(courseId, views).map((props, key) => (
+          <Grid item xs={12} sm={6} lg={4} key={key}>
+            <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={props.path}>
               <SelectCard cardData={props} />
             </Link>
-          )}
-        </Grid>
-      </Grid>
+          </Grid>
+        ))
+      }
     </Grid>
   )
 }

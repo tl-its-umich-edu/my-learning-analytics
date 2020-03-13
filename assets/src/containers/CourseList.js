@@ -1,21 +1,26 @@
 import React, { useState } from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import Grid from '@material-ui/core/Grid'
-import SelectCard from '../components/SelectCard'
-import Typography from '@material-ui/core/Typography'
 import { Link } from 'react-router-dom'
-import Paper from '@material-ui/core/Paper'
+import { withStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import IconButton from '@material-ui/core/IconButton'
 import Avatar from '@material-ui/core/Avatar'
+import Grid from '@material-ui/core/Grid'
+import IconButton from '@material-ui/core/IconButton'
+import MuiLink from '@material-ui/core/Link'
 import Popover from '@material-ui/core/Popover'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
+import AlertBanner from '../components/AlertBanner'
 import AvatarModal from '../components/AvatarModal'
-import WarningBanner from '../components/WarningBanner'
+import SelectCard from '../components/SelectCard'
 
 const styles = theme => ({
   root: {
     flexGrow: 1
+  },
+  paper: {
+    padding: theme.spacing(2),
+    color: theme.palette.text.secondary,
+    display: 'flex'
   },
   content: {
     flexGrow: 1,
@@ -25,17 +30,6 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'center'
   },
-  wrapper: {
-    maxWidth: 1023,
-    margin: theme.spacing(2) + 'px auto',
-    flexDirection: 'row',
-    justifyContent: 'flex-start'
-  },
-  paper: {
-    padding: theme.spacing(2),
-    color: theme.palette.text.secondary,
-    display: 'flex'
-  },
   grow: {
     flexGrow: 1
   }
@@ -43,10 +37,6 @@ const styles = theme => ({
 
 function CourseList (props) {
   const { classes, user } = props
-
-  if (!user.relatedCourses && !user.isSuperuser) {
-    return (<WarningBanner>You are not enrolled in any courses with My Learning Analytics enabled.</WarningBanner>)
-  }
 
   const [avatarEl, setAvatarEl] = useState(null)
   const avatarOpen = Boolean(avatarEl)
@@ -64,7 +54,8 @@ function CourseList (props) {
             onClick={event => setAvatarEl(event.currentTarget)}
             color='inherit'
             aria-haspopup='true'
-            variant='contained'>
+            variant='contained'
+          >
             <Avatar>{user.username.slice(0, 1)}</Avatar>
           </IconButton>
           <Popover
@@ -86,23 +77,26 @@ function CourseList (props) {
       </AppBar>
       <div className={classes.content}>
         {
-          user.isSuperuser
-            ? <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Paper className={classes.paper}>
-                  <Typography variant='h5' gutterBottom>Select a course of your choice</Typography>
-                </Paper>
+          !user.relatedCourses.length
+            ? (
+              <AlertBanner>
+                You are not enrolled in any courses with My Learning Analytics enabled.
+                Visit the <MuiLink href={user.helpURL} color='link'>Help site</MuiLink> for more information about this tool.
+              </AlertBanner>
+            )
+            : (
+              <Grid container spacing={2}>
+                {
+                  user.relatedCourses.map((course, key) => (
+                    <Grid item xs={12} sm={6} lg={4} key={key}>
+                      <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`}>
+                        <SelectCard cardData={{ title: course.course_name }} />
+                      </Link>
+                    </Grid>
+                  ))
+                }
               </Grid>
-            </Grid>
-            : <Grid container spacing={2}>
-              <Grid item xs={12} className={classes.container}>
-                {user.relatedCourses.map((course, key) =>
-                  <Link style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`} key={key}>
-                    <SelectCard cardData={{ title: course.course_name }} />
-                  </Link>
-                )}
-              </Grid>
-            </Grid>
+            )
         }
       </div>
     </>

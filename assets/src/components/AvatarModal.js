@@ -44,7 +44,6 @@ function AvatarModal (props) {
   const { classes, user } = props
 
   const url = window.location.href
-  const logoutURL = '/accounts/logout'
 
   const [helpURL, setHelpURL] = useState(user.helpURL)
   const [openChangeCourseDialog, setOpenChangeCourseDialog] = useState(false)
@@ -147,7 +146,7 @@ function AvatarModal (props) {
                 ? SwitchCourses()
                 : null
             }
-            <Link style={{ textDecoration: 'none' }} href={logoutURL}>
+            <Link style={{ textDecoration: 'none' }} href={user.logoutURL}>
               <ListItem button>
                 <ListItemIcon>
                   <LogoutIcon />

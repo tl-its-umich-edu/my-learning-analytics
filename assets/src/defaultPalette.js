@@ -13,6 +13,10 @@ const defaultPalette = {
      This value was arrived at through research and design work; use caution when modifying. */
   negative: {
     main: '#B5B5B5'
+  },
+  /* The 'link' color is used to identify text and icons in views that link to external resources. */
+  link: {
+    main: '#0000EE'
   }
 }
 

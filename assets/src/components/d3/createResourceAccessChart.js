@@ -15,7 +15,11 @@ import { siteTheme } from '../../globals'
 
 const accessedResourceColor = siteTheme.palette.secondary.main
 const notAccessedResourceColor = siteTheme.palette.negative.main
-const mainMargin = { top: 50, right: 10, bottom: 50, left: 200 }
+const linkColor = siteTheme.palette.link.main
+
+// foreignObjSide specifies the length of one side of the square foreign object element that contains the
+// resource icon and padding to its right; this value is also used to calculate the resourceLabelWidth.
+const foreignObjSide = 24
 
 const toolTip = d3tip().attr('class', 'd3-tip')
   .direction('n').offset([-5, 5])
@@ -30,7 +34,6 @@ const toolTip = d3tip().attr('class', 'd3-tip')
   })
 
 function appendLegend (svg) {
-  const w = 800 - mainMargin.left - mainMargin.right
   const legendBoxLength = 10
   const legendBoxTextInterval = 15
   const legendInterval = 20
@@ -43,7 +46,11 @@ function appendLegend (svg) {
 
   const legend = svg.select('.mainGroupWrapper').append('g')
     .attr('class', 'legend')
+<<<<<<< HEAD
     .attr('transform', 'translate(-620, 0)')
+=======
+    .attr('transform', 'translate(0,0)')
+>>>>>>> master
 
   legend.selectAll('text')
     .data(legendLabels)
@@ -52,7 +59,7 @@ function appendLegend (svg) {
     .attr('font-family', 'sans-serif')
     .attr('font-size', '14px')
     .attr('y', (_, i) => legendY + i * legendInterval + legendBoxLength)
-    .attr('x', w + legendBoxTextInterval)
+    .attr('x', legendBoxTextInterval)
     .text(d => d[0])
 
   const legendRect = legend.selectAll('rect')
@@ -65,36 +72,92 @@ function appendLegend (svg) {
 
   legendRect
     .attr('y', (_, i) => legendY + i * legendInterval)
-    .attr('x', w)
+    .attr('x', 0)
     .style('fill', d => d[1])
 }
 
-function createResourceAccessChart ({ data, width, height, domElement }) {
-  const resourceData = data.sort((a, b) => b.total_count - a.total_count)
+function truncate (selection, labelWidth) {
+  selection.each(function (d) {
+    const textEl = d3.select(this)
+    const textString = d.split('|')[1]
+    textEl.text(textString)
+    const textPixelLength = textEl.node().getComputedTextLength()
+    if (textPixelLength > labelWidth) {
+      const numChars = Math.floor(labelWidth / textPixelLength * textString.length) - 3
+      textEl.text(`${textString.substring(0, numChars - 1)}...`)
+    } else {
+      textEl.text(textString)
+    }
+  })
+}
 
-  const [mainWidth, miniHeight] = adjustViewport(width, height, mainMargin)
+function createResourceAccessChart ({ data, width, height, domElement }) {
+  const resourceData = data.sort((a, b) => b.total_percent - a.total_percent)
+
+  const sideMarginSize = width * 0.075
+  const margin = { top: 0, right: sideMarginSize, bottom: 0, left: sideMarginSize }
+
+  const [availWidth, availHeight] = adjustViewport(width, height, margin)
+
+  /*
+  The decimal multipliers for values along the horizontal axis should add up to 1.0. In other words,
+  the sum of the horizontal values should be equal to the availWidth. Specifically,
+
+  availWidth = mainMargin.left + mainWidth + mainMargin.right + miniMargin.left + miniWidth + miniMargin.right
+
+  Because the main and mini charts share horizontal space, the decimal multipliers for
+  values along the vertical axis for each chart should add up to 1.0. In other words, the sum of the
+  vertical values for one chart should be equal to the availHeight. To keep the charts aligned,
+  the corresponding segment values from each chart should be equal. Specifically,
+
+  availHeight = mainMargin.top + mainHeight + mainMargin.bottom
+  availHeight = miniMargin.top + miniHeight + miniMargin.top
+  mainMargin.top = miniMargin.top, mainHeight = miniHeight, mainMargin.bottom = miniMargin.bottom
+  */
+
+  const mainWidth = availWidth * 0.55
+  const mainHeight = availHeight * 0.7
+  const mainMargin = {
+    top: availHeight * 0.15,
+    right: 0,
+    bottom: availHeight * 0.15,
+    left: availWidth * 0.225
+  }
+
+  const miniWidth = availWidth * 0.20
+  const miniHeight = mainHeight
+  const miniMargin = {
+    top: availHeight * 0.15,
+    right: 0,
+    bottom: availHeight * 0.15,
+    left: availWidth * 0.025
+  }
+
+  // The space available for a resource label should be mainMargin.left minus the margin between
+  // the main and mini charts, minus the horizontal length of the foreign object element.
+  const resourceLabelWidth = mainMargin.left - miniMargin.left - foreignObjSide
 
   const defaultNumberOfResources = 7
   const selectionWindowHeight = resourceData.length < defaultNumberOfResources
-    ? miniHeight
-    : miniHeight / resourceData.length * defaultNumberOfResources
+    ? mainHeight
+    : mainHeight / resourceData.length * defaultNumberOfResources
 
   const defaultSelection = [0, selectionWindowHeight]
 
-  const miniMargin = { top: 50, right: 10, bottom: 50, left: 10 }
-  const miniWidth = 100 - miniMargin.left - miniMargin.right
+  const mainXScale = d3.scaleLinear().range([0, mainWidth])
+  let mainYScale = d3.scaleBand().range([0, mainHeight])
 
-  const mainXScale = d3.scaleLinear().range([150, mainWidth])
   const miniXScale = d3.scaleLinear().range([0, miniWidth])
-  let mainYScale = d3.scaleBand().range([0, miniHeight])
   const miniYScale = d3.scaleBand().range([0, miniHeight])
+
   const textScale = d3.scaleLinear().range([12, 6]).domain([15, 50]).clamp(true)
 
   // Build the chart
   const svg = d3.select(domElement).append('svg')
     .attr('class', 'svgWrapper')
-    .attr('width', mainWidth + mainMargin.left + mainMargin.right + miniWidth + miniMargin.left + miniMargin.right)
-    .attr('height', miniHeight + mainMargin.top + mainMargin.bottom)
+    .attr('width', availWidth)
+    .attr('height', availHeight)
+    .attr('transform', `translate(${margin.left}, ${margin.top})`)
     .on('wheel.zoom', scroll)
     .on('mousedown.zoom', null) // Override the center selection
     .on('touchstart.zoom', null)
@@ -106,16 +169,14 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .data(resourceData, d => d.resource_name)
 
     // Initialize
-    bar.attr('x', 150)
-      .attr('y', d => mainYScale(d.resource_name))
-      .attr('width', d => mainXScale(d.total_count) - 150)
+    bar.attr('y', d => mainYScale(d.resource_name))
+      .attr('width', d => mainXScale(d.total_percent))
       .attr('height', mainYScale.bandwidth())
 
     bar.enter()
       .append('rect')
-      .attr('x', 150)
       .attr('y', d => mainYScale(d.resource_name))
-      .attr('width', d => mainXScale(d.total_count) - 150)
+      .attr('width', d => mainXScale(d.total_percent))
       .attr('height', mainYScale.bandwidth())
       .attr('class', 'bar')
       .attr('fill', d => d.self_access_count > 0
@@ -125,24 +186,23 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .on('mouseover', toolTip.show)
       .on('mouseout', toolTip.hide)
 
-    // Append text to bars
+    // Append percentage value text to bars
     svg.selectAll('.label').remove()
     svg.selectAll('.label')
       .data(resourceData)
       .enter()
       .append('text')
       .attr('class', 'label')
-      .attr('x', d => mainXScale(d.total_count) + 3 + mainMargin.left)
+      .attr('x', d => mainXScale(d.total_percent) + 3 + mainMargin.left)
       .attr('y', d => mainYScale(d.resource_name) + mainYScale.bandwidth() / 2 + mainMargin.top)
       .attr('dx', -10)
       .attr('dy', '.35em')
-      .style('font-size', 10)
       .style('fill', d => d.self_access_count > 0 ? 'white' : 'black')
       .attr('text-anchor', 'end')
       .text(d => (
-        ((mainYScale(d.resource_name) + mainYScale.bandwidth() / 2) < miniHeight) &&
+        ((mainYScale(d.resource_name) + mainYScale.bandwidth() / 2) < mainHeight) &&
         ((mainYScale(d.resource_name) + mainYScale.bandwidth() / 2) > 0))
-        ? d.total_count
+        ? d.total_percent + '%'
         : ''
       )
 
@@ -193,7 +253,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     const mainYAxis = d3
       .axisLeft(mainYScale)
       .tickSize(0)
-      .tickFormat(d => truncate(d.split('|')[1]))
+      .tickFormat(d => d.split('|')[1])
 
     mainGroup.select('.axis--y').call(mainYAxis)
 
@@ -211,11 +271,12 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
         : 0.5
       )
 
-    // Update the resource labels
-    d3.selectAll('.axis--y text')
-      .attr('x', -160)
-      .attr('fill', '#0000EE')
+    // Update the resource label names on Y axis
+    d3.selectAll('.axis--y .tick text')
+      .attr('x', (mainMargin.left - foreignObjSide) * -1)
+      .attr('fill', linkColor)
       .style('font-size', textScale(selected.length))
+      .call(truncate, resourceLabelWidth)
 
     update()
   }
@@ -233,8 +294,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     gBrush.call(brush.move, [center - size / 2, center + size / 2])
   }
 
-  const truncate = (text) => text.length > 23 ? `${text.substring(0, 23)}...` : text
-
   // Main chart group
   const mainGroup = svg.append('g')
     .attr('class', 'mainGroupWrapper')
@@ -245,17 +304,20 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('class', 'mainGroup')
 
   // Mini chart group
+  const miniTopLeftX = mainMargin.left + mainWidth + mainMargin.right + miniMargin.left
+  const miniTopLeftY = miniMargin.top
+
   const miniGroup = svg.append('g')
     .attr('class', 'miniGroup')
-    .attr('transform', `translate(${(mainMargin.left + mainWidth + mainMargin.right + miniMargin.left)}, ${miniMargin.top})`)
+    .attr('transform', `translate(${miniTopLeftX}, ${miniTopLeftY})`)
 
   const brushGroup = svg.append('g')
     .attr('class', 'brushGroup')
-    .attr('transform', `translate(${(mainMargin.left + mainWidth + mainMargin.right + miniMargin.left)}, ${miniMargin.top})`)
+    .attr('transform', `translate(${(miniTopLeftX)}, ${miniTopLeftY})`)
 
   // Scales
-  const mainYZoom = d3.scaleLinear().range([0, miniHeight])
-    .domain([0, miniHeight])
+  const mainYZoom = d3.scaleLinear().range([0, mainHeight])
+    .domain([0, mainHeight])
 
   // Axis
   const mainXAxis = d3.axisBottom(mainXScale)
@@ -264,7 +326,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   const mainYAxis = d3.axisLeft(mainYScale)
     .tickSize(0)
-    .tickFormat(d => truncate(d.split('|')[1]))
+    .tickFormat(d => d.split('|')[1])
 
   // Brush
   const brush = d3.brushY()
@@ -298,12 +360,12 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .append('rect')
     .attr('x', -mainMargin.left)
     .attr('width', mainWidth + mainMargin.left)
-    .attr('height', miniHeight)
+    .attr('height', mainHeight)
 
   // Inject data
   // Domain
-  mainXScale.domain([0, d3.max(resourceData, d => d.total_count)])
-  miniXScale.domain([0, d3.max(resourceData, d => d.total_count)])
+  mainXScale.domain([0, d3.max(resourceData, d => d.total_percent)])
+  miniXScale.domain([0, d3.max(resourceData, d => d.total_percent)])
   mainYScale.domain(resourceData.map(d => d.resource_name))
     .paddingInner(0.4)
     .paddingOuter(0)
@@ -312,13 +374,14 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .paddingOuter(0)
 
   // Append axis to main chart
-  const xLabel = d3.select('.mainGroupWrapper')
+  const xAxis = d3.select('.mainGroupWrapper')
     .append('g')
     .attr('class', 'axis axis--x')
-    .attr('transform', 'translate(' + 0 + ',' + (miniHeight + 5) + ')')
+    .attr('transform', `translate(0,${mainHeight})`)
     .call(mainXAxis.tickFormat(d => d + '%'))
 
-  xLabel.append('text')
+  // Append label to X axis
+  xAxis.append('text')
     .attr('fill', 'black')
     .attr('text-anchor', 'middle')
     .attr('transform', `translate(${mainWidth / 2}, 40)`)
@@ -327,7 +390,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   mainGroup.append('g')
     .attr('class', 'axis axis--y')
-    .attr('transform', 'translate(150,0)')
+    .attr('transform', 'translate(0,0)')
     .call(mainYAxis)
 
   // Draw mini bars
@@ -337,7 +400,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .append('rect')
     .attr('x', 0)
     .attr('y', d => miniYScale(d.resource_name))
-    .attr('width', d => miniXScale(d.total_count))
+    .attr('width', d => miniXScale(d.total_percent))
     .attr('height', miniYScale.bandwidth())
     .attr('class', 'bar')
     .attr('fill', d => d.self_access_count > 0
@@ -357,6 +420,11 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   brushmove()
 
+  // Truncate resource label names on Y axis
+  d3.selectAll('.axis--y .tick text')
+    .call(truncate, resourceLabelWidth)
+
+  // Add links and icons to Y axis
   d3.selectAll('.axis--y .tick').each(function (d) {
     // Have to use ES5 function to correctly use `this` keyword
     const link = d.split('|')[0]
@@ -370,11 +438,11 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
     const icon = d.split('|')[2]
     d3.select(this).insert('foreignObject')
-      .attr('x', -180)
+      .attr('x', mainMargin.left * -1)
       .attr('y', -6)
-      .attr('width', 32)
-      .attr('height', 32)
-      .attr('color', '#0000EE')
+      .attr('width', foreignObjSide)
+      .attr('height', foreignObjSide)
+      .attr('color', linkColor)
       .append('xhtml:i')
       .attr('class', icon)
   })

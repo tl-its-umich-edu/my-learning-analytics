@@ -219,12 +219,11 @@ function ResourcesAccessed (props) {
       return (<AlertBanner>Resource data for your selections is not available.</AlertBanner>)
     } else {
       return (
-        <Grid item xs={12} lg={10}>
-          <ResourceAccessChart
-            data={resourceData}
-            aspectRatio={0.3}
-          />
-        </Grid>
+        <ResourceAccessChart
+          data={resourceData}
+          aspectRatio={0.3}
+          minHeight={350}
+        />
       )
     }
   }

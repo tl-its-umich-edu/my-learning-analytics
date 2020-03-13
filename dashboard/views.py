@@ -38,9 +38,6 @@ NO_GRADE_STRING = "NO_GRADE"
 # string for resource type
 RESOURCE_TYPE_STRING = "resource_type"
 
-# how many decimal digits to keep
-DECIMAL_ROUND_DIGIT = 1
-
 
 def gpa_map(grade):
     if grade is None:
@@ -111,7 +108,7 @@ def get_course_info(request, course_id=0):
 
     resp = model_to_dict(course)
 
-    course_start, course_end = course.get_course_date_range()
+    course_start, course_end = course.course_date_range
 
     current_week_number = math.ceil((today - course_start).days/7)
     total_weeks = math.ceil((course_end - course_start).days/7)
@@ -197,7 +194,7 @@ def resource_access_within_week(request, course_id=0):
 
     sqlString = f"""SELECT a.resource_id as resource_id, r.resource_type as resource_type, r.name as resource_name, u.current_grade as current_grade, a.user_id as user_id
                     FROM resource r, resource_access a, user u, course c, academic_terms t
-                    WHERE a.resource_id = r.id and a.user_id = u.user_id
+                    WHERE a.resource_id = r.resource_id and a.user_id = u.user_id
                     and r.course_id = c.id and c.term_id = t.id
                     and a.access_time > %(start_time)s
                     and a.access_time < %(end_time)s
@@ -229,7 +226,7 @@ def resource_access_within_week(request, course_id=0):
     df['grade'] = df['current_grade'].map(gpa_map)
 
     # calculate the percentage
-    df['percent'] = round(df.groupby(['resource_id_name', 'grade'])['resource_id_name'].transform('count')/total_number_student, 2)
+    df['percent'] = df.groupby(['resource_id_name', 'grade'])['resource_id_name'].transform('count') / total_number_student
 
     df=df.drop(['current_grade', 'user_id'], axis=1)
     # now only keep the resource access stats by grade level
@@ -252,26 +249,26 @@ def resource_access_within_week(request, course_id=0):
 
     # now insert person's own viewing records: what resources the user has viewed, and the last access timestamp
     # now insert person's own viewing records: what resources the user has viewed, and the last access timestamp
-    selfSqlString = "select CONCAT(r.id, ';', r.name) as resource_id_name, count(*) as self_access_count, max(a.access_time) as self_access_last_time " \
+    selfSqlString = "select CONCAT(r.resource_id, ';', r.name) as resource_id_name, count(*) as self_access_count, max(a.access_time) as self_access_last_time " \
                     "from resource_access a, user u, resource r " \
                     "where a.user_id = u.user_id " \
-                    "and a.resource_id = r.ID " \
+                    "and a.resource_id = r.resource_id " \
                     "and u.sis_name=%(current_user)s " \
-                    "group by CONCAT(r.id, ';', r.name)"
+                    "group by CONCAT(r.resource_id, ';', r.name)"
     logger.debug(selfSqlString)
     logger.debug("current_user=" + current_user)
 
     selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user})
 
     output_df = output_df.join(selfDf.set_index('resource_id_name'), on='resource_id_name', how='left')
-    output_df["total_count"] = output_df.apply(lambda row: row["90-100"]+row["80-89"]+row["70-79"] + row["low_grade"]+row.NO_GRADE, axis=1)
+    output_df["total_percent"] = output_df.apply(lambda row: row[GRADE_A] + row[GRADE_B] + row[GRADE_C] + row[GRADE_LOW] + row.NO_GRADE, axis=1)
 
     if (grade != "all"):
         # drop all other grades
         grades = [GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING]
         for i_grade in grades:
             if (i_grade==grade):
-                output_df["total_count"] = output_df[i_grade]
+                output_df["total_percent"] = output_df[i_grade]
             else:
                 output_df=output_df.drop([i_grade], axis=1)
 
@@ -281,13 +278,13 @@ def resource_access_within_week(request, course_id=0):
     if (output_df.empty):
         return HttpResponse("{}")
 
-    # only keep rows where total_count > 0
-    output_df = output_df[output_df.total_count > 0]
+    # only keep rows where total_percent > 0
+    output_df = output_df[output_df.total_percent > 0]
 
     # time 100 to show the percentage
-    output_df["total_count"] = output_df["total_count"] * 100
-    # round all numbers to one decimal point
-    output_df = output_df.round(DECIMAL_ROUND_DIGIT)
+    output_df["total_percent"] *= 100
+    # round all numbers to whole numbers
+    output_df = output_df.round(0)
 
     output_df.fillna(0, inplace=True) #replace null value with 0
 
@@ -637,7 +634,7 @@ def is_weight_considered(course_id):
 
 def get_course_date_start(course_id):
     logger.info(get_course_date_start.__name__)
-    course_date_start = Course.objects.get(id=course_id).get_course_date_range().start
+    course_date_start = Course.objects.get(id=course_id).course_date_range.start
     return course_date_start
 
 

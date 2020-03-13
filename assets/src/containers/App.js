@@ -6,10 +6,10 @@ import CourseList from './CourseList'
 import Course from './Course'
 
 function App (props) {
-  const { location, user, gaId, loginURL } = props
+  const { location, user, gaId } = props
 
   if (!user.isLoggedIn) {
-    return (window.location.href = loginURL)
+    return (window.location.href = user.loginURL)
   }
 
   const coursePageMatch = matchPath(location.pathname, '/courses/:courseId/')
