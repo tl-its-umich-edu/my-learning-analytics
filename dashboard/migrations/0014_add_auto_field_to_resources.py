@@ -14,7 +14,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0014_auto_20200116_1408'),
+        ('dashboard', '0013_course_show_grade_type'),
     ]
 
     operations = [
