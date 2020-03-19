@@ -54,7 +54,7 @@ function SideDrawer (props) {
             <ListItemIcon>
               {selectedIndex === key
                 ? <props.icon color='secondary' />
-                : <props.icon style={{color: '#E1E1E1'}}/>
+                : <props.icon color='negative'/>
               }
             </ListItemIcon>
             <ListItemText primary={props.title} className={classes.text} />
