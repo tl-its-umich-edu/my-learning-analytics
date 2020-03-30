@@ -153,6 +153,9 @@ For local testing, make sure your secrets are added and your VPN is active. Then
 
 After about 30-60 seconds the crons should have completed and you should have data! In the admin interface there is a table where you can check the status of the cron job runs.
 
+## Additional Resources
+[Video guide](https://www.youtube.com/watch?v=CSQmQtLe594&feature=youtu.be) to setting up courses in the My Learning Analytics admin tool.
+
 ## Populating Copyright information in footer
 1. Since MyLA can be used by multiple institution, copyright information needs to be entitled to institutions needs.
 2. Django Flatpages serves the purpose. The display of the copyright content can be controlled from the Django Admin view.
