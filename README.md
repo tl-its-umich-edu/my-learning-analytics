@@ -153,10 +153,19 @@ For local testing, make sure your secrets are added and your VPN is active. Then
 
 After about 30-60 seconds the crons should have completed and you should have data! In the admin interface there is a table where you can check the status of the cron job runs.
 
+## Additional Resources
+[Video guide](https://www.youtube.com/watch?v=CSQmQtLe594&feature=youtu.be) to setting up courses in the My Learning Analytics admin tool.
+
 ## Populating Copyright information in footer
 1. Since MyLA can be used by multiple institution, copyright information needs to be entitled to institutions needs.
 2. Django Flatpages serves the purpose. The display of the copyright content can be controlled from the Django Admin view.
 3. The url for configuring copyright info must be `/copyright/` since that is used in the `base.html` for pulling the info. [Read more here](https://simpleisbetterthancomplex.com/tutorial/2016/10/04/how-to-use-django-flatpages-app.html)
+
+
+## Accessibility
+
+### Keyboard Navigation
+Users that use Safari or Firefox on macOS that would like to enable keyboard navigation in MyLA will have to follow the steps [here](https://github.com/tl-its-umich-edu/my-learning-analytics/wiki/Accessibility).
 
 
 ## Contributing to MyLA
