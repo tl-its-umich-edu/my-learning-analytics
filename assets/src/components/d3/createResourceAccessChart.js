@@ -52,7 +52,6 @@ function appendLegend (svg) {
     .data(legendLabels)
     .enter()
     .append('text')
-    .attr('font-family', 'sans-serif')
     .attr('font-size', '14px')
     .attr('y', (_, i) => legendY + i * legendInterval + legendBoxLength)
     .attr('x', legendBoxTextInterval)
@@ -193,6 +192,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('y', d => mainYScale(d.resource_name) + mainYScale.bandwidth() / 2 + mainMargin.top)
       .attr('dx', -10)
       .attr('dy', '.35em')
+      .attr('font-size', '12px')
       .style('fill', d => d.self_access_count > 0 ? 'white' : 'black')
       .attr('text-anchor', 'end')
       .text(d => (
@@ -442,6 +442,9 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .append('xhtml:i')
       .attr('class', icon)
   })
+
+  svg.selectAll('text')
+    .attr('font-family', '"Roboto", "Helvetica", "Arial", sans-serif')
 }
 
 export default createResourceAccessChart

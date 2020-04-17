@@ -23,7 +23,6 @@ import { isObjectEmpty } from '../util/object'
 import useUserSetting from '../hooks/useUserSetting'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
 
-
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -36,9 +35,8 @@ const styles = theme => ({
   formController: {
     alignItems: 'center',
     display: 'flex',
-    marginTop: theme.spacing(2),
-    position: 'relative',
-    left: '162px'
+    justifyContent: 'center',
+    marginTop: theme.spacing(2)
   },
   controlText: {
     paddingLeft: 8,
@@ -90,7 +88,7 @@ function ResourcesAccessed (props) {
     if (resourceAccessData) {
       if (resourceTypes.length > 1) {
         return (
-          <div style={{ position: 'relative', left: '162px' }}>
+          <div style={{ textAlign: 'center' }}>
             <FormControl>
               <FormGroup row>
                 <p className={classes.controlText}>Select resource types to be viewed:</p>
