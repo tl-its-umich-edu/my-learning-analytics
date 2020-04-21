@@ -205,7 +205,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     bar.exit().remove()
   }
 
-  function scroll (e) {
+  function scroll () {
     // Mouse scroll on the chart
     const selection = d3.brushSelection(gBrush.node())
     const size = selection[1] - selection[0]
