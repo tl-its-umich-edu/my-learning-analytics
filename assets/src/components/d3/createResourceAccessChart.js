@@ -205,14 +205,18 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     bar.exit().remove()
   }
 
-  function scroll () {
+  function scroll (e) {
     // Mouse scroll on the chart
     const selection = d3.brushSelection(gBrush.node())
     const size = selection[1] - selection[0]
     const range = miniYScale.range()
     const y0 = d3.min(range)
     const y1 = d3.max(range) + miniYScale.bandwidth()
-    const dy = d3.event.deltaY * -1
+    const direction = event.webkitDirectionInvertedFromDevice
+    const dy = -d3.event.deltaY
+    if (direction < 0) {
+      dy *= -1
+    }
     const topSection = selection[0] - dy < y0
       ? y0
       : selection[1] - dy > y1
