@@ -212,7 +212,11 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     const range = miniYScale.range()
     const y0 = d3.min(range)
     const y1 = d3.max(range) + miniYScale.bandwidth()
-    const dy = d3.event.deltaY
+    const direction = event.webkitDirectionInvertedFromDevice
+    const dy = -d3.event.deltaY
+    if (direction < 0) {
+      dy *= -1
+    }
     const topSection = selection[0] - dy < y0
       ? y0
       : selection[1] - dy > y1
