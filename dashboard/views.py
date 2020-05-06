@@ -96,15 +96,15 @@ def get_course_info(request, course_id=0):
 
     course_resource_list.sort()
 
-    temp_list = list()
+    temp_append_resource_icon_list = list()
 
     for resource in course_resource_list:
         course_resource_dict = dict()
         course_resource_dict['label'] = resource
         course_resource_dict['icon'] = RESOURCE_VALUES[resource.lower()]['icon']
-        temp_list.append(course_resource_dict)
+        temp_append_resource_icon_list.append(course_resource_dict)
 
-    course_resource_list = temp_list
+    course_resource_list = temp_append_resource_icon_list
 
     resp = model_to_dict(course)
 
