@@ -9,6 +9,7 @@ import MuiLink from '@material-ui/core/Link'
 import Popover from '@material-ui/core/Popover'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
+import { siteTheme } from '../globals'
 import AlertBanner from '../components/AlertBanner'
 import AvatarModal from '../components/AvatarModal'
 import SelectCard from '../components/SelectCard'
@@ -81,7 +82,8 @@ function CourseList (props) {
             ? (
               <AlertBanner>
                 You are not enrolled in any courses with My Learning Analytics enabled.
-                Visit the <MuiLink href={user.helpURL} color='link'>Help site</MuiLink> for more information about this tool.
+                Visit the <MuiLink href={user.helpURL} style={{ color: siteTheme.palette.link.main }}>Help site</MuiLink> for
+                more information about this tool.
               </AlertBanner>
             )
             : (
