@@ -84,6 +84,16 @@ function ResourcesAccessed (props) {
     [saveSettingClicked]
   )
 
+  const onChangeResourceTypeHandler = event => {
+    setDataLoaded(false)
+    const value = event.target.value
+    if (event.target.checked && !resourceTypeFilter.includes(value)) {
+      setResourceTypeFilter([...resourceTypeFilter, value])
+    } else if (!event.target.checked) {
+      setResourceTypeFilter(resourceTypeFilter.filter(val => val !== value))
+    }
+  }
+
   function filterCheckbox () {
     if (resourceAccessData) {
       if (resourceTypes.length > 1) {
@@ -202,16 +212,6 @@ function ResourcesAccessed (props) {
       setShowSaveSetting(true)
     } else {
       setShowSaveSetting(false)
-    }
-  }
-
-  const onChangeResourceTypeHandler = event => {
-    setDataLoaded(false)
-    const value = event.target.value
-    if (event.target.checked && !resourceTypeFilter.includes(value)) {
-      setResourceTypeFilter([...resourceTypeFilter, value])
-    } else if (!event.target.checked) {
-      setResourceTypeFilter(resourceTypeFilter.filter(val => val !== value))
     }
   }
 
