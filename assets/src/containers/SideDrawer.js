@@ -6,6 +6,7 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import { Link, withRouter } from 'react-router-dom'
+import { siteTheme } from '../globals'
 import routes from '../routes/routes'
 import Spinner from '../components/Spinner'
 
@@ -52,9 +53,10 @@ function SideDrawer (props) {
             onClick={() => setSelectedIndex(key)}
           >
             <ListItemIcon>
-              {selectedIndex === key
-                ? <props.icon color='secondary' />
-                : <props.icon color='negative'/>
+              {
+                selectedIndex === key
+                  ? <props.icon color='secondary' />
+                  : <props.icon style={{ color: siteTheme.palette.negative.main }} />
               }
             </ListItemIcon>
             <ListItemText primary={props.title} className={classes.text} />
