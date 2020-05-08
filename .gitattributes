@@ -207,3 +207,6 @@ Procfile          text
 # Executables
 *.exe             binary
 *.pyc             binary
+
+# JS Snapshot test
+*.snap            binary
