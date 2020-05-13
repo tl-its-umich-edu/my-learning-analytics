@@ -184,7 +184,7 @@ After about 30-60 seconds the crons should have completed and you should have da
  When running tests do not use the All Tests button due to unsolved issues. 
  Run the cypress test if UI change are there as part of the work.
  If a snapshot fails due to change in the UI, try update the snapshot from the failed test from cypress controlled 
- browser 'compare snapshot' and a pop up appears saying that `Upadate Shanpshot` 
+ browser 'compare snapshot' and a pop up appears to `Update Snapshot` 
 
 ## Accessibility
 
