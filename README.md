@@ -10,7 +10,7 @@ These instructions will get a copy of MyLA up and running on your local machine 
 1. **Install [Docker](https://www.docker.com/)**.
 1. **Install [Git](https://git-scm.com/downloads)**.
 
-### Installation & Setup
+### Installation and Setup
 1. Clone this repo. `git clone https://github.com/tl-its-umich-edu/my-learning-analytics.git`
 1. Then cd into the repo. `cd my-learning-analytics`
 1. Create a directory in your home directory called "mylasecrets". `mkdir ~/mylasecrets`. This directory is mapped by docker-compose.yml into the container as /secrets/
@@ -164,7 +164,12 @@ After about 30-60 seconds the crons should have completed and you should have da
 ## Testing
 
 ### Cypress Testing
- For running cypress tests locally, install cypress with 
+
+ For running cypress tests locally, it is essential that you have Myla instance running locally. Launch Myla from the
+ browser go to the admin view and add user called `donald7` with password `root`. Get the latest depersonalized datadump
+ as described from the Step 9 in [installation and setup](#installation-and-setup).
+ 
+ Install cypress 
  
  `npm install cypress`
  
@@ -176,7 +181,10 @@ After about 30-60 seconds the crons should have completed and you should have da
  
  `npm run cypress:open`
  
- When running tests do not use the All Tests button due to unsolved issues.
+ When running tests do not use the All Tests button due to unsolved issues. 
+ Run the cypress test if UI change are there as part of the work.
+ If a snapshot fails due to change in the UI, try updating the snapshot from the failed test from cypress controlled 
+ browser 'compare snapshot' and a pop up appears to `Update Snapshot` 
 
 ## Accessibility
 
