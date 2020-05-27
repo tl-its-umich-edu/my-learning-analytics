@@ -1,5 +1,6 @@
 import React from 'react'
 import { Typography } from '@material-ui/core'
+import { roundToXDecimals } from '../util/math'
 
 function PopupMessage ({ a, assignmentGroups }) {
   const getAssignmentRules = (a, assignmentGroups) => {
@@ -38,7 +39,7 @@ function PopupMessage ({ a, assignmentGroups }) {
     return (
       <Typography>
         <p>Previous goal(s)?</p>
-        <p>Class Average: {a.averageGrade}</p>
+        <p>Class average: {roundToXDecimals(a.averageGrade, 2)}</p>
         <p>Rules: {rulesMessage}</p>
       </Typography>
     )
