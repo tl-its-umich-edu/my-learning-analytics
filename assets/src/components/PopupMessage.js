@@ -17,37 +17,32 @@ function PopupMessage ({ a, assignmentGroups }) {
   const dropHighest = getAssignmentRules(a, assignmentGroups).dropHighest
   const dropLowest = getAssignmentRules(a, assignmentGroups).dropLowest
 
+  let rulesMessage
   if (dropHighest !== 0 && dropLowest !== 0) {
+    rulesMessage = `Both the highest ${dropHighest} scores and the lowest ${dropLowest} scores will be dropped from this assignment group`
+  } else if (dropHighest !== 0) {
+    rulesMessage = `The highest ${dropHighest} scores will be dropped from this assignment group`
+  } else if (dropLowest !== 0) {
+    rulesMessage = `The lowest ${dropLowest} scores will be dropped from this assignment group`
+  } else {
+    rulesMessage = 'There are no rules for this assignment'
+  }
+
+  if (!a.graded) {
     return (
       <Typography>
-        {
-          `The highest ${dropHighest} scores will be dropped from this assignment group
-              The lowest ${dropLowest} scores will be dropped from this assignment group`
-        }
+        <p>Rules: {rulesMessage}</p>
+      </Typography>
+    )
+  } else {
+    return (
+      <Typography>
+        <p>Previous goal(s)?</p>
+        <p>Class Average: {a.averageGrade}</p>
+        <p>Rules: {rulesMessage}</p>
       </Typography>
     )
   }
-  if (dropHighest !== 0) {
-    return (
-      <Typography>
-        {
-          `The highest ${dropHighest} scores will be dropped from this assignment group`
-        }
-      </Typography>
-    )
-  }
-  if (dropLowest !== 0) {
-    return (
-      <Typography>
-        {
-          `The lowest ${dropLowest} scores will be dropped from this assignment group`
-        }
-      </Typography>
-    )
-  }
-  return (
-    <Typography>There are no rules for this assignment</Typography>
-  )
 }
 
 export default PopupMessage
