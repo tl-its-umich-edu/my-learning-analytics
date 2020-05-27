@@ -14,6 +14,7 @@ import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
 import StyledTextField from './StyledTextField'
 import { calculateWeekOffset } from '../util/date'
+import { roundToXDecimals } from '../util/math'
 
 const styles = theme => ({
   root: {
@@ -188,7 +189,7 @@ function AssignmentTable (props) {
                       {a.name}
                     </TableCell>
                     <TableCell className={classes.narrowCell}>
-                      {`${a.percentOfFinalGrade}%`}
+                      {`${roundToXDecimals(a.percentOfFinalGrade, 1)}%`}
                     </TableCell>
                     <TableCell style={{ width: '20%' }}>
                       {
@@ -199,7 +200,7 @@ function AssignmentTable (props) {
                               error={(a.goalGrade / a.pointsPossible) > 1}
                               disabled={!courseGoalGradeSet}
                               id='standard-number'
-                              value={a.goalGrade}
+                              value={roundToXDecimals(a.goalGrade, 1)}
                               label={
                                 !courseGoalGradeSet ? 'Set a goal'
                                   : (a.goalGrade / a.pointsPossible) > 1
