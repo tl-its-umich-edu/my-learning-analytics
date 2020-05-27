@@ -37,11 +37,11 @@ function PopupMessage ({ a, assignmentGroups }) {
     )
   } else {
     return (
-      <Typography>
-        <p>Previous goal(s)?</p>
-        <p>Class average: {roundToXDecimals(a.averageGrade, 2)}</p>
-        <p>Rules: {rulesMessage}</p>
-      </Typography>
+      <div>
+        <Typography>Previously set goal: {a.goalGradeSetByUser ? a.goalGrade : 'None'}</Typography>
+        <Typography>Class average: {roundToXDecimals(a.averageGrade, 2)}</Typography>
+        <Typography>Rules: {rulesMessage}</Typography>
+      </div>
     )
   }
 }
