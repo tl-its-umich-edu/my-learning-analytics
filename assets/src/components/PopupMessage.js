@@ -20,7 +20,7 @@ function PopupMessage ({ a, assignmentGroups }) {
 
   let rulesMessage
   if (dropHighest !== 0 && dropLowest !== 0) {
-    rulesMessage = `Both the highest ${dropHighest} scores and the lowest ${dropLowest} scores will be dropped from this assignment group`
+    rulesMessage = `Both the highest ${dropHighest} scores and lowest ${dropLowest} scores will be dropped from this assignment group`
   } else if (dropHighest !== 0) {
     rulesMessage = `The highest ${dropHighest} scores will be dropped from this assignment group`
   } else if (dropLowest !== 0) {
