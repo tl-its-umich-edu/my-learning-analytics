@@ -57,7 +57,7 @@ function AssignmentGoalInput (props) {
           }}
           margin='normal'
           variant='outlined'
-          style={{ marginRight: '10px', width:'25ch' }}
+          style={{ marginRight: '10px', width: '25ch' }}
         />
         {
           <Button
