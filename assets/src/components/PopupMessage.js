@@ -29,21 +29,22 @@ function PopupMessage ({ a, assignmentGroups }) {
     rulesMessage = 'There are no rules for this assignment'
   }
 
-  if (!a.graded) {
-    return (
-      <Typography>
-        <p>Rules: {rulesMessage}</p>
-      </Typography>
-    )
-  } else {
-    return (
+  let goalAndAverage
+  if (a.graded) {
+    goalAndAverage = (
       <div>
-        <Typography>Previously set goal: {a.goalGradeSetByUser ? a.goalGrade : 'None'}</Typography>
-        <Typography>Class average: {roundToXDecimals(a.averageGrade, 2)}</Typography>
-        <Typography>Rules: {rulesMessage}</Typography>
+        <Typography>Previously set goal: <b>{a.goalGradeSetByUser ? a.goalGrade : 'None'}</b></Typography>
+        <Typography>Class average: <b>{roundToXDecimals(a.averageGrade, 2)}</b></Typography>
       </div>
     )
   }
+
+  return (
+    <div>
+      {goalAndAverage}
+      <Typography>Rules: <b>{rulesMessage}</b></Typography>
+    </div>
+  )
 }
 
 export default PopupMessage
