@@ -29,11 +29,11 @@ function PopupMessage ({ a, assignmentGroups }) {
     rulesMessage = 'There are no rules for this assignment'
   }
 
-  let goalAndAverage
+  let gradeAndAverage
   if (a.graded) {
-    goalAndAverage = (
+    gradeAndAverage = (
       <div>
-        <Typography>Previously set goal: <b>{a.goalGradeSetByUser ? a.goalGrade : 'None'}</b></Typography>
+        <Typography>Your grade: <b>{roundToXDecimals(a.currentUserSubmission.score, 2)}</b></Typography>
         <Typography>Class average: <b>{roundToXDecimals(a.averageGrade, 2)}</b></Typography>
       </div>
     )
@@ -41,7 +41,9 @@ function PopupMessage ({ a, assignmentGroups }) {
 
   return (
     <div>
-      {goalAndAverage}
+      <Typography>Your goal: <b>{a.goalGradeSetByUser ? a.goalGrade : 'None'}</b></Typography>
+      <Typography>Points possible: <b>{a.outOf}</b></Typography>
+      {gradeAndAverage}
       <Typography>Rules: <b>{rulesMessage}</b></Typography>
     </div>
   )
