@@ -8,13 +8,13 @@ const getDecimalPlaceOfFloat = (floatNum) => (floatNum.toString().split('.')[1])
 const average = arr => arr.reduce((acc, cur) => acc + cur, 0) / arr.length
 
 const pearsonCorrelation = (prefs, p1, p2) => {
-  let si = []
+  const si = []
 
-  for (let key in prefs[p1]) {
+  for (const key in prefs[p1]) {
     if (prefs[p2][key]) si.push(key)
   }
 
-  let n = si.length
+  const n = si.length
 
   if (n === 0) return 0
 
@@ -39,8 +39,8 @@ const pearsonCorrelation = (prefs, p1, p2) => {
     pSum += prefs[p1][si[i]] * prefs[p2][si[i]]
   }
 
-  let num = pSum - (sum1 * sum2 / n)
-  let den = Math.sqrt((sum1Sq - Math.pow(sum1, 2) / n) *
+  const num = pSum - (sum1 * sum2 / n)
+  const den = Math.sqrt((sum1Sq - Math.pow(sum1, 2) / n) *
     (sum2Sq - Math.pow(sum2, 2) / n))
 
   if (den === 0) return 0
