@@ -5,124 +5,97 @@ exports[`renders correctly 1`] = `
   className="MuiGrid-root MuiGrid-container"
 >
   <div
-    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-2"
-  >
-    <h5
-      className="MuiTypography-root MuiTypography-h5"
-    >
-      Current Grade
-    </h5>
-    <h4
-      className="MuiTypography-root MuiTypography-h4"
-      style={
-        Object {
-          "color": "steelblue",
-        }
+    className="MuiGrid-root MuiGrid-item"
+    style={
+      Object {
+        "display": "inline-block",
       }
-    >
-      85%
-    </h4>
-  </div>
-  <div
-    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-2"
+    }
   >
-    <h5
-      className="MuiTypography-root MuiTypography-h5"
-    >
-      Max Possible Grade
-    </h5>
-    <h4
-      className="MuiTypography-root MuiTypography-h4"
-      style={
-        Object {
-          "color": "grey",
-        }
-      }
-    >
-      95%
-    </h4>
-  </div>
-  <div
-    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-4"
-  >
-    <h5
-      className="MuiTypography-root MuiTypography-h5"
-    >
-      Goal
-    </h5>
-    <div
+    <h6
+      className="MuiTypography-root MuiTypography-h6"
       style={
         Object {
           "display": "inline-block",
+          "marginRight": "10px",
         }
       }
     >
+      Goal
+    </h6>
+    <div
+      className="MuiFormControl-root MuiTextField-root WithStyles(ForwardRef(TextField))-root-2 AssignmentGoalInput-goalGradeInput-1 MuiFormControl-marginNormal"
+      style={
+        Object {
+          "marginRight": "10px",
+          "width": "25ch",
+        }
+      }
+    >
+      <label
+        className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-filled"
+        data-shrink={true}
+        htmlFor="standard-number"
+        id="standard-number-label"
+      >
+        Set course goal
+      </label>
       <div
-        className="MuiFormControl-root MuiTextField-root WithStyles(ForwardRef(TextField))-root-135 AssignmentGoalInput-goalGradeInput-1 MuiFormControl-marginNormal"
+        className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-formControl"
+        onClick={[Function]}
       >
-        <label
-          className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiFormLabel-filled"
-          data-shrink={true}
-          htmlFor="standard-number"
-          id="standard-number-label"
+        <input
+          aria-invalid={false}
+          autoFocus={false}
+          className="MuiInputBase-input MuiOutlinedInput-input"
+          disabled={false}
+          id="standard-number"
+          onAnimationStart={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          required={false}
+          type="number"
+          value={90}
+        />
+        <fieldset
+          aria-hidden={true}
+          className="PrivateNotchedOutline-root-3 MuiOutlinedInput-notchedOutline"
         >
-          Set a goal
-        </label>
-        <div
-          className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-formControl MuiInput-formControl"
-          onClick={[Function]}
-        >
-          <input
-            aria-invalid={false}
-            autoFocus={false}
-            className="MuiInputBase-input MuiInput-input"
-            disabled={false}
-            id="standard-number"
-            onAnimationStart={[Function]}
-            onBlur={[Function]}
-            onChange={[Function]}
-            onFocus={[Function]}
-            required={false}
-            type="number"
-            value={90}
-          />
-        </div>
-      </div>
-      <button
-        className="MuiButtonBase-root MuiButton-root MuiButton-contained"
-        disabled={false}
-        onBlur={[Function]}
-        onDragLeave={[Function]}
-        onFocus={[Function]}
-        onKeyDown={[Function]}
-        onKeyUp={[Function]}
-        onMouseDown={[Function]}
-        onMouseLeave={[Function]}
-        onMouseUp={[Function]}
-        onTouchEnd={[Function]}
-        onTouchMove={[Function]}
-        onTouchStart={[Function]}
-        tabIndex={0}
-        type="button"
-      >
-        <span
-          className="MuiButton-label"
-        >
-          <svg
-            aria-hidden="true"
-            className="MuiSvgIcon-root"
-            focusable="false"
-            role="presentation"
-            viewBox="0 0 24 24"
+          <legend
+            className="PrivateNotchedOutline-legendLabelled-5 PrivateNotchedOutline-legendNotched-6"
           >
-            <path
-              d="M19.81 14.99l1.19-.92-1.43-1.43-1.19.92 1.43 1.43zm-.45-4.72L21 9l-9-7-2.91 2.27 7.87 7.88 2.4-1.88zM3.27 1L2 2.27l4.22 4.22L3 9l1.63 1.27L12 16l2.1-1.63 1.43 1.43L12 18.54l-7.37-5.73L3 14.07l9 7 4.95-3.85L20.73 21 22 19.73 3.27 1z"
-            />
-          </svg>
-           Clear goals
-        </span>
-      </button>
+            <span>
+              Set course goal
+            </span>
+          </legend>
+        </fieldset>
+      </div>
     </div>
+    <button
+      aria-label="clear"
+      className="MuiButtonBase-root MuiButton-root MuiButton-contained"
+      disabled={false}
+      onBlur={[Function]}
+      onDragLeave={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      onMouseLeave={[Function]}
+      onMouseUp={[Function]}
+      onTouchEnd={[Function]}
+      onTouchMove={[Function]}
+      onTouchStart={[Function]}
+      tabIndex={0}
+      type="button"
+    >
+      <span
+        className="MuiButton-label"
+      >
+        Clear
+      </span>
+    </button>
   </div>
 </div>
 `;
