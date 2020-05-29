@@ -200,6 +200,9 @@ class Course(models.Model):
     def absolute_url(self):
         return reverse('courses', kwargs={'course_id': self.canvas_id})
 
+    def get_absolute_url(self):
+        return self.absolute_url
+
     class Meta:
         db_table = "course"
         verbose_name = "Course"
