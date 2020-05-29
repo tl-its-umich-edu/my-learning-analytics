@@ -40,7 +40,7 @@ function Banner (props) {
         <Grid item xs={12}>
           <Paper className={classes.paper} style={paperStyle}>
             <Typography style={typographyStyle} gutterBottom>
-              {children}
+              {children  }
             </Typography>
           </Paper>
         </Grid>
