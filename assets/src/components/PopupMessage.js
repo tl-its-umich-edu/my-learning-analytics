@@ -4,12 +4,12 @@ import { roundToXDecimals } from '../util/math'
 
 function PopupMessage ({ a, assignmentGroups }) {
   const getAssignmentRules = (a, assignmentGroups) => {
-    const assignmenGroup = assignmentGroups.find(ag => ag.id === a.assignmentGroupId)
-    return assignmenGroup
+    const assignmentGroup = assignmentGroups.find(ag => ag.id === a.assignmentGroupId)
+    return assignmentGroup
       ? (
         {
-          dropLowest: assignmenGroup.dropLowest,
-          dropHighest: assignmenGroup.dropHighest
+          dropLowest: assignmentGroup.dropLowest,
+          dropHighest: assignmentGroup.dropHighest
         }
       )
       : false
@@ -20,7 +20,10 @@ function PopupMessage ({ a, assignmentGroups }) {
 
   let rulesMessage
   if (dropHighest !== 0 && dropLowest !== 0) {
-    rulesMessage = `Both the highest ${dropHighest} scores and lowest ${dropLowest} scores will be dropped from this assignment group`
+    rulesMessage = (
+      `Both the highest ${dropHighest} scores and lowest ${dropLowest} scores` +
+      'will be dropped from this assignment group'
+    )
   } else if (dropHighest !== 0) {
     rulesMessage = `The highest ${dropHighest} scores will be dropped from this assignment group`
   } else if (dropLowest !== 0) {
