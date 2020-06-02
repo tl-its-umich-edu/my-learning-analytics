@@ -18,9 +18,9 @@ exports[`renders correctly 1`] = `
         Object {
           "backgroundColor": "steelblue",
           "display": "inline-block",
-          "height": "30px",
+          "height": "35px",
           "left": "80%",
-          "marginBottom": "-20px",
+          "marginBottom": "-25px",
           "marginTop": 0,
           "position": "absolute",
           "width": "2px",
@@ -33,14 +33,14 @@ exports[`renders correctly 1`] = `
         Object {
           "color": "steelblue",
           "display": "inline-block",
-          "left": "80.5%",
+          "left": "calc(80.5% - 115px)",
           "position": "absolute",
-          "top": "50px",
+          "top": "55px",
           "zIndex": 1,
         }
       }
     >
-      Current
+      Current: 80%
     </div>
   </div>
   <div>
@@ -49,10 +49,10 @@ exports[`renders correctly 1`] = `
         Object {
           "backgroundColor": "green",
           "display": "inline-block",
-          "height": "30px",
+          "height": "35px",
           "left": "40%",
           "marginBottom": 0,
-          "marginTop": "-20px",
+          "marginTop": "-25px",
           "position": "absolute",
           "width": "2px",
           "zIndex": 1,
@@ -66,12 +66,12 @@ exports[`renders correctly 1`] = `
           "display": "inline-block",
           "left": "40.5%",
           "position": "absolute",
-          "top": "-20px",
+          "top": "-25px",
           "zIndex": 1,
         }
       }
     >
-      Goal
+      Goal: 40%
     </div>
   </div>
   <div>
@@ -80,9 +80,9 @@ exports[`renders correctly 1`] = `
         Object {
           "backgroundColor": "grey",
           "display": "inline-block",
-          "height": "60px",
+          "height": "52px",
           "left": "23%",
-          "marginBottom": "-20px",
+          "marginBottom": "-25px",
           "marginTop": 0,
           "position": "absolute",
           "width": "2px",
@@ -102,7 +102,7 @@ exports[`renders correctly 1`] = `
         }
       }
     >
-      Max Possible
+      Max Possible: 23%
     </div>
   </div>
   <div
