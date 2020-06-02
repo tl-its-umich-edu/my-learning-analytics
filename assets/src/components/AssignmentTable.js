@@ -14,6 +14,7 @@ import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
 import StyledTextField from './StyledTextField'
 import { calculateWeekOffset } from '../util/date'
+import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
 
 const styles = theme => ({
   root: {
@@ -104,6 +105,10 @@ function AssignmentTable (props) {
       : false
   }
 
+  // Use decimal place of pointsPossible if it's a decimal; otherwise, round to nearest tenth
+  const placeToRoundTo = pointsPossible => (String(pointsPossible).includes('.'))
+    ? getDecimalPlaceOfFloat(pointsPossible) : 1
+
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
     if (currentWeekRow.current) {
@@ -188,7 +193,7 @@ function AssignmentTable (props) {
                       {a.name}
                     </TableCell>
                     <TableCell className={classes.narrowCell}>
-                      {`${a.percentOfFinalGrade}%`}
+                      {`${roundToXDecimals(a.percentOfFinalGrade, 1)}%`}
                     </TableCell>
                     <TableCell style={{ width: '20%' }}>
                       {
@@ -199,7 +204,7 @@ function AssignmentTable (props) {
                               error={(a.goalGrade / a.pointsPossible) > 1}
                               disabled={!courseGoalGradeSet}
                               id='standard-number'
-                              value={a.goalGrade}
+                              value={roundToXDecimals(a.goalGrade, placeToRoundTo(a.pointsPossible))}
                               label={
                                 !courseGoalGradeSet ? 'Set a goal'
                                   : (a.goalGrade / a.pointsPossible) > 1
