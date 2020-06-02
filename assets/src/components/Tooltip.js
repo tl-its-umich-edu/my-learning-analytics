@@ -16,17 +16,19 @@ export const AssignmentPlanningTooltip = classes => createToolTip(d => renderToS
     </Typography>
     {
       parseInt(d.drop_lowest) !== 0
-        ? <Typography component='p'>
+        ? (
+          <Typography component='p'>
           The lowest <strong>{d.drop_lowest}</strong> scores will dropped from this assigment group
-        </Typography>
-        : ''
+          </Typography>
+        ) : ''
     }
     {
       parseInt(d.drop_highest) !== 0
-        ? <Typography component='p'>
+        ? (
+          <Typography component='p'>
           The highest <strong>{d.drop_highest}</strong> scores will dropped from this assigment group
-        </Typography>
-        : ''
+          </Typography>
+        ) : ''
     }
   </Paper>
 ))

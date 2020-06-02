@@ -26,7 +26,7 @@
     "watch": "BABEL_ENV=development webpack --config webpack.config.js --watch --mode development --display-error-details",
     "test": "jest",
     "test:watch": "jest --watchAll",
-	"cypress:open": "cypress open",
+    "cypress:open": "cypress open",
     "update-snapshot": "jest --updateSnapshot"
   },
   "eslintConfig": {

@@ -63,7 +63,8 @@ function CustomTable (props) {
                     <TableCell
                       className={classes.tableCell}
                       key={key}
-                      style={noBorder ? { borderBottom: 'none' } : null}>
+                      style={noBorder ? { borderBottom: 'none' } : null}
+                    >
                       {prop}
                     </TableCell>
                   )

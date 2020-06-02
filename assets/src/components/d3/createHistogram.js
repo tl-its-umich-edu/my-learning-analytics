@@ -3,8 +3,10 @@ import { adjustViewport } from '../../util/chart'
 import { roundToXDecimals } from '../../util/math'
 import { siteTheme } from '../../globals'
 
-function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100,
-  showNumberOnBars = false, showDashedLine = true }) {
+function createHistogram ({
+  data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100,
+  showNumberOnBars = false, showDashedLine = true
+}) {
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
   const barColor = siteTheme.palette.secondary.main
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
@@ -31,7 +33,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
 
   // getting the first bin that has some grades in them, accessing the x1(higher bin) value
   const dashLine = () => {
-    for (let bin in bins) {
+    for (const bin in bins) {
       if (bins[bin].length > 0) {
         return bins[bin].x1
       }
@@ -68,7 +70,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   }
 
   const xAxis = g => g
-    .attr(`transform`, `translate(0, ${aHeight - margin.bottom})`)
+    .attr('transform', `translate(0, ${aHeight - margin.bottom})`)
     .call(d3
       .axisBottom(x)
       .tickSizeOuter(0)
@@ -110,7 +112,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
 
   if (myGrade) {
     svg.append('line')
-      .attr(`transform`, `translate(0, ${aHeight - margin.bottom})`)
+      .attr('transform', `translate(0, ${aHeight - margin.bottom})`)
       .attr('x1', x(myGrade))
       .attr('y1', -aHeight + 75)
       .attr('x2', x(myGrade))
@@ -129,7 +131,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   // Dashed line to show difference b/w binned and normal distribution
   if (showDashedLine) {
     svg.append('line')
-      .attr(`transform`, `translate(0, ${aHeight - margin.bottom})`)
+      .attr('transform', `translate(0, ${aHeight - margin.bottom})`)
       .attr('x1', x(dashLine()))
       .attr('y1', -aHeight)
       .attr('x2', x(dashLine()))
