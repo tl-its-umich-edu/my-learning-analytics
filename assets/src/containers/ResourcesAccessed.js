@@ -13,10 +13,11 @@ import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import { handleError, defaultFetchOptions } from '../util/data'
 import AlertBanner from '../components/AlertBanner'
+import IconLabel from '../components/IconLabel'
 import RangeSlider from '../components/RangeSlider'
 import ResourceAccessChart from '../components/ResourceAccessChart'
 import Spinner from '../components/Spinner'
-import IconLabel from '../components/IconLabel'
+import ViewHeader from '../components/ViewHeader'
 
 import useSetUserSetting from '../hooks/useSetUserSetting'
 import { isObjectEmpty } from '../util/object'
@@ -236,7 +237,7 @@ function ResourcesAccessed (props) {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Typography variant='h5' gutterBottom className='title'>Resources Accessed</Typography>
+            <ViewHeader>Resources Accessed</ViewHeader>
             {
               dataControllerLoad === 2
                 ? (
