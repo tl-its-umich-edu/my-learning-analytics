@@ -166,7 +166,7 @@ After about 30-60 seconds the crons should have completed and you should have da
 ### Cypress Testing
 
  For running cypress tests locally, it is essential that you have Myla instance running locally. Launch Myla from the
- browser go to the admin view and add user called `donald7` with password `root`. Get the latest depersonalized datadump
+ browser go to the admin view and add user called `donald07` with password `root`. Get the latest depersonalized datadump
  as described from the Step 9 in [installation and setup](#installation-and-setup).
  
  Install cypress 

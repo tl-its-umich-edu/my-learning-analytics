@@ -29,7 +29,6 @@ function SideDrawer (props) {
   const {
     classes,
     toggleDrawer,
-    sideDrawerState,
     courseId,
     courseInfo
   } = props

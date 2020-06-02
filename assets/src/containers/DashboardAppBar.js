@@ -42,7 +42,6 @@ function DashboardAppBar (props) {
   const {
     classes,
     onMenuBarClick,
-    sideDrawerState,
     user,
     courseId,
     courseName
@@ -59,7 +58,8 @@ function DashboardAppBar (props) {
             onClick={onMenuBarClick(true)}
             className={classes.menuButton}
             color='inherit'
-            aria-label='Menu'>
+            aria-label='Menu'
+          >
             <MenuIcon />
           </IconButton>
           <Button href='/courses/' className={classes.homeButton}>
@@ -74,7 +74,8 @@ function DashboardAppBar (props) {
             onClick={event => setAvatarEl(event.currentTarget)}
             color='inherit'
             aria-haspopup='true'
-            variant='contained'>
+            variant='contained'
+          >
             <Avatar>{user.username.slice(0, 1)}</Avatar>
           </IconButton>
           <Popover
@@ -94,7 +95,7 @@ function DashboardAppBar (props) {
           </Popover>
         </Toolbar>
       </AppBar>
-    </div >
+    </div>
   )
 }
 

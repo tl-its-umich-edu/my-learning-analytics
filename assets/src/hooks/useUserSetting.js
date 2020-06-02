@@ -11,7 +11,7 @@ const useUserSetting = (courseId, view, conditionalArray = []) => {
     fetch(`/api/v1/courses/${courseId}/get_user_default_selection?default_type=${view}`, {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
         'X-CSRFToken': Cookie.get('csrftoken')
       },

@@ -13,7 +13,7 @@ function WarningBanner (props) {
 
   return (
     <Banner settings={bannerSettings}>
-            <>{(children === undefined ? defaultMessage : children)}</>
+      <>{(children === undefined ? defaultMessage : children)}</>
     </Banner>
   )
 }

@@ -7,7 +7,10 @@ The front end of MyLA is written in JavaScript using [React](https://reactjs.org
 
 The code for the front-end is located under `/assets/src/`. MyLA uses functional components instead of class-based components and uses [React hooks](https://reactjs.org/docs/hooks-intro.html) for state and side-effects.
 
-[Standard](https://standardjs.com/) is the JavaScript linter. Please ensure that your code is Standard-complaint by running the linter manually. It is installed as a dev-dependency and you should be able to run it by simply typing `standard`.
+[Standard](https://standardjs.com/) is the JavaScript linter. Please ensure that your code is Standard-complaint by 
+running the linter manually. It is installed as a dev-dependency. 
+1. you should be able to run it by simply typing `standard` too see any problems.
+2. To fix this you should do `standard --fix`.
 
 ### Back-end
 MyLA Backend is build using [Django](https://www.djangoproject.com/) Framework, [MySQL](https://www.mysql.com/) DataBase,

@@ -16,7 +16,7 @@ const withPopover = Component => props => {
         variant='contained'
         onClick={event => setAnchorEl(event.currentTarget)}
       >
-        { popoverText }
+        {popoverText}
       </Button>
       <Popover
         open={open}

@@ -67,8 +67,7 @@ describe('calculateAssignmentGradeFromCourseGrade', () => {
         currentUserSubmission: {
           score: 0
         },
-        graded: false,
-        goalGrade: 40
+        graded: false
       },
       {
         pointsPossible: 40,
@@ -76,8 +75,7 @@ describe('calculateAssignmentGradeFromCourseGrade', () => {
         currentUserSubmission: {
           score: 0
         },
-        graded: false,
-        goalGrade: 40
+        graded: false
       }
     ]
     expect(calculateAssignmentGoalsFromCourseGoal(90, assignments, assignmentGroups, true)).toEqual(result)

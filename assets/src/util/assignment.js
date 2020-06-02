@@ -1,5 +1,5 @@
 import { calculateWeekOffset, dateToMonthDay } from './date'
-import { sum, roundToXDecimals, getDecimalPlaceOfFloat } from './math'
+import { sum, roundToXDecimals } from './math'
 
 const clearGoals = assignments => assignments
   .map(a => {
@@ -21,15 +21,11 @@ const setAssigmentGoalInputState = (key, assignments, inputFocus) => {
 }
 
 const setAssignmentGoalGrade = (key, assignments, goalGrade) => {
-  // Use decimal place of pointsPossible if it's a decimal; otherwise, round to nearest tenth
-  const placeToRoundTo = (String(assignments[key].pointsPossible).includes('.'))
-    ? getDecimalPlaceOfFloat(assignments[key].pointsPossible) : 1
-
   return [
     ...assignments.slice(0, key),
     {
       ...assignments[key],
-      goalGrade: goalGrade === '' ? '' : roundToXDecimals(Number(goalGrade), placeToRoundTo),
+      goalGrade: goalGrade === '' ? '' : roundToXDecimals(Number(goalGrade), 3),
       goalGradeSetByUser: goalGrade
     },
     ...assignments.slice(key + 1)
@@ -95,7 +91,7 @@ const calculateAssignmentGoalsFromCourseGoal = (
 
   return assignments.map(a => {
     if (notGradedOrGoalGradeSetByUser(a) && a.inputBlur) {
-      a.goalGrade = roundToXDecimals(requiredGrade * a.pointsPossible, 1) || ''
+      a.goalGrade = roundToXDecimals(requiredGrade * a.pointsPossible, 3) || ''
     }
     return a
   })

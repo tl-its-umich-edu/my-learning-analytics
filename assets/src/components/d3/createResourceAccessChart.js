@@ -212,8 +212,9 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     const range = miniYScale.range()
     const y0 = d3.min(range)
     const y1 = d3.max(range) + miniYScale.bandwidth()
+    // eslint-disable-next-line no-undef
     const direction = event.webkitDirectionInvertedFromDevice
-    const dy = -d3.event.deltaY
+    let dy = -d3.event.deltaY
     if (direction < 0) {
       dy *= -1
     }

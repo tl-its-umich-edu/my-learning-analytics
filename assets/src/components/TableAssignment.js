@@ -153,40 +153,44 @@ function CustomAssignmentTable (props) {
           if (j === 0 && data[i][0] === `Week ${currentWeek}`) {
             isCurrentWeek = true
           }
-          let borderAndCurrentWeekStyle = {}
+          const borderAndCurrentWeekStyle = {}
           if (!displayBorder) {
-            borderAndCurrentWeekStyle['borderBottom'] = 'none'
+            borderAndCurrentWeekStyle.borderBottom = 'none'
           }
           if (isCurrentWeek) {
-            borderAndCurrentWeekStyle['color'] = 'orange'
+            borderAndCurrentWeekStyle.color = 'orange'
           }
           // styling for assignment title column
           if (j === 2) {
-            borderAndCurrentWeekStyle['width'] = '30%'
-            borderAndCurrentWeekStyle['maxWidth'] = 0
-            borderAndCurrentWeekStyle['overflow'] = 'hidden'
-            borderAndCurrentWeekStyle['textOverflow'] = 'ellipsis'
-            borderAndCurrentWeekStyle['whiteSpace'] = 'nowrap'
-            borderAndCurrentWeekStyle['borderRight'] = '0.1em solid rgba(224, 224, 224, 1)'
+            borderAndCurrentWeekStyle.width = '30%'
+            borderAndCurrentWeekStyle.maxWidth = 0
+            borderAndCurrentWeekStyle.overflow = 'hidden'
+            borderAndCurrentWeekStyle.textOverflow = 'ellipsis'
+            borderAndCurrentWeekStyle.whiteSpace = 'nowrap'
+            borderAndCurrentWeekStyle.borderRight = '0.1em solid rgba(224, 224, 224, 1)'
           }
           // for week/due_date column don't need much space as the text length is fixed
           if (j < 1) {
-            borderAndCurrentWeekStyle['width'] = '10%'
+            borderAndCurrentWeekStyle.width = '10%'
           }
           // for the horizontal bar we want the bar touching the line
           if (j === 3) {
-            borderAndCurrentWeekStyle['paddingLeft'] = 0
+            borderAndCurrentWeekStyle.paddingLeft = 0
           }
           return (
             j === 2
-              ? <TableCell title={displayProp ? prop : null} className={classes.tableCell} key={j}
-                style={borderAndCurrentWeekStyle}>
-                {displayProp ? prop : null}
-              </TableCell>
-              : <TableCell className={classes.tableCell} key={j} style={borderAndCurrentWeekStyle}>
-                {displayProp ? prop : null}
-              </TableCell>
-
+              ? (
+                <TableCell
+                  title={displayProp ? prop : null} className={classes.tableCell} key={j}
+                  style={borderAndCurrentWeekStyle}
+                >
+                  {displayProp ? prop : null}
+                </TableCell>
+              ) : (
+                <TableCell className={classes.tableCell} key={j} style={borderAndCurrentWeekStyle}>
+                  {displayProp ? prop : null}
+                </TableCell>
+              )
           )
         })
       }
@@ -222,7 +226,8 @@ function CustomAssignmentTable (props) {
                   return (
                     <TableCell
                       className={classes.tableCell + ' ' + classes.tableHeadCell}
-                      key={key}>
+                      key={key}
+                    >
                       {prop}
                     </TableCell>)
                 })}
@@ -235,7 +240,8 @@ function CustomAssignmentTable (props) {
                 return isItFirstCurrentWeekIndicator(i)
                   ? <RootRef rootRef={currentWeekRow} key={i}>{tableRow(row, i)}</RootRef>
                   : tableRow(row, i)
-              })}
+              })
+            }
           </TableBody>
         </Table>
       </RootRef>

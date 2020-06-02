@@ -8,7 +8,7 @@ exports[`renders correctly 1`] = `
       "display": "inline-block",
       "left": 5,
       "position": "absolute",
-      "top": "-20px",
+      "top": "-25px",
       "zIndex": 1,
     }
   }
