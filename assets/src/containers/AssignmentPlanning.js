@@ -139,7 +139,7 @@ function AssignmentPlanning (props) {
           <Paper className={classes.paper}>
             <ViewHeader>Assignment Planning</ViewHeader>
             <div className={classes.section}>
-              <Typography variant='h6' gutterTop gutterBottom>Progress toward Final Grade</Typography>
+              <Typography variant='h6' gutterBottom>Progress toward Final Grade</Typography>
               {
                 assignmentData
                   ? (
