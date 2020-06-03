@@ -15,7 +15,6 @@ function ViewHeader (props) {
 
   return (
     <Typography
-      className='title'
       variant='h5'
       gutterBottom
       tabIndex={-1}
