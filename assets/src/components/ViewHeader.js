@@ -14,11 +14,15 @@ function ViewHeader (props) {
   }, [domElement])
 
   return (
-    <div tabIndex={0} ref={domElement => setDomElement(domElement)}>
-      <Typography className='title' variant='h5' gutterBottom>
-        {children}
-      </Typography>
-    </div>
+    <Typography
+      className='title'
+      variant='h5'
+      gutterBottom
+      tabIndex={-1}
+      ref={domElement => setDomElement(domElement)}
+    >
+      {children}
+    </Typography>
   )
 }
 
