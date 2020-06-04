@@ -17,9 +17,11 @@ function ViewHeader (props) {
   }, [domElement])
 
   const headerProps = {
+    className: 'view-header',
     variant: 'h5',
-    gutterBottom: true,
-    ref: domElement => setDomElement(domElement)
+    display: 'inline',
+    ref: domElement => setDomElement(domElement),
+    onBlur: handleBlur
   }
   // Let the header be focus-able only until it has finished being announced (i.e. the focus moves)
   if (!announced) {
@@ -27,7 +29,7 @@ function ViewHeader (props) {
   }
 
   return (
-    <Typography {...headerProps} onBlur={handleBlur}>
+    <Typography {...headerProps}>
       {children}
     </Typography>
   )

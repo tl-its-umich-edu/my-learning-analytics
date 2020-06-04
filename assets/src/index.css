@@ -26,6 +26,11 @@ code {
   animation: sk-scaleout 1.0s infinite ease-in-out;
 }
 
+/* Modifies default focus style for h1 tags in ViewHeader component */
+.view-header:focus {
+  outline-offset: 5px;
+}
+
 @-webkit-keyframes sk-scaleout {
   0% { -webkit-transform: scale(0) }
   100% {
