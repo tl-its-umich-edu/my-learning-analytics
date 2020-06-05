@@ -26,7 +26,7 @@ code {
   animation: sk-scaleout 1.0s infinite ease-in-out;
 }
 
-/* Modifies default focus style for h1 tags in ViewHeader component */
+/* Modifies default focus style for header tag in ViewHeader component */
 .view-header:focus {
   outline-offset: 5px;
 }
