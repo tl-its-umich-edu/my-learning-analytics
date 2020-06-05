@@ -28,7 +28,7 @@ code {
 
 /* Modifies default focus style for header tag in ViewHeader component */
 .view-header:focus {
-  outline: 2px solid #2C6496;
+  outline: 2px solid #2c6496;
   outline-offset: 5px;
 }
 
