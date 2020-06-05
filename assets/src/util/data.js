@@ -7,7 +7,7 @@ const handleError = res => {
 
 const defaultFetchOptions = {
   headers: {
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
     'X-CSRFToken': Cookie.get('csrftoken')
   },

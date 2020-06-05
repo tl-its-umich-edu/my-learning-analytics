@@ -135,10 +135,13 @@ function AssignmentPlanning (props) {
             <>
               <Typography variant='h5' gutterBottom>Progress toward Final Grade</Typography>
               {assignmentData
-                ? <ProgressBar
-                  data={assignmentData.progress}
-                  aspectRatio={0.12}
-                  tip={AssignmentPlanningTooltip(classes)} />
+                ? (
+                  <ProgressBar
+                    data={assignmentData.progress}
+                    aspectRatio={0.12}
+                    tip={AssignmentPlanningTooltip(classes)}
+                  />
+                )
                 : <Spinner />}
             </ >
           </Paper>
@@ -175,22 +178,23 @@ function AssignmentPlanning (props) {
                   <MenuItem value={75}>75%</MenuItem>
                 </Select>
                 {showSaveSetting
-                  ? <Checkbox
-                    checked={saveSettingClicked}
-                    onChange={() => setSaveSettingClicked(!saveSettingClicked)}
-                    value='checked'
-                    color='secondary'
-                  />
-                  : null
-                }
+                  ? (
+                    <Checkbox
+                      checked={saveSettingClicked}
+                      onChange={() => setSaveSettingClicked(!saveSettingClicked)}
+                      value='checked'
+                      color='secondary'
+                    />
+                  ) : null}
                 <div style={{ padding: '15px 2px' }}>{saveLabel}</div>
               </div>
             </FormControl>
             <UserSettingSnackbar
               saved={userSettingSaved}
               response={userSettingResponse}
-              successMessage={'Assignment filter setting saved!'} />
-            { /* in case of no data empty list is sent */}
+              successMessage='Assignment filter setting saved!'
+            />
+            {/* in case of no data empty list is sent */}
             {assignmentLoaded ? assignmentTable(assignmentData.plan) : <Spinner />}
           </Paper>
         </Grid>
