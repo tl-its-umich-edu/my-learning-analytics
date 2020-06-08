@@ -1,6 +1,6 @@
 import React from 'react'
 import { Typography } from '@material-ui/core'
-import { roundToXDecimals } from '../util/math'
+import { getDecimalPlaceOfFloat, roundToXDecimals } from '../util/math'
 
 function PopupMessage ({ a, assignmentGroups }) {
   const getAssignmentRules = (a, assignmentGroups) => {
@@ -32,19 +32,28 @@ function PopupMessage ({ a, assignmentGroups }) {
     rulesMessage = 'There are no rules for this assignment'
   }
 
+  // Use decimal place of outOf if it's a decimal; otherwise, round to nearest tenth
+  const placeToRoundTo = String(a.outOf).includes('.') ? getDecimalPlaceOfFloat(a.outOf) : 1
+
   let gradeAndAverage
   if (a.graded) {
     gradeAndAverage = (
       <div>
-        <Typography>Your grade: <b>{roundToXDecimals(a.currentUserSubmission.score, 2)}</b></Typography>
-        <Typography>Class average: <b>{roundToXDecimals(a.averageGrade, 2)}</b></Typography>
+        <Typography>
+          Your grade: <b>{roundToXDecimals(a.currentUserSubmission.score, placeToRoundTo)}</b>
+        </Typography>
+        <Typography>
+          Class average: <b>{roundToXDecimals(a.averageGrade, placeToRoundTo)}</b>
+        </Typography>
       </div>
     )
   }
 
   return (
     <div>
-      <Typography>Your goal: <b>{a.goalGradeSetByUser ? a.goalGrade : 'None'}</b></Typography>
+      <Typography>
+        Your goal: <b>{a.goalGradeSetByUser ? roundToXDecimals(a.goalGrade, placeToRoundTo) : 'None'}</b>
+      </Typography>
       <Typography>Points possible: <b>{a.outOf}</b></Typography>
       {gradeAndAverage}
       <Typography>Rules: <b>{rulesMessage}</b></Typography>
