@@ -33,10 +33,10 @@ exports[`renders correctly 1`] = `
         Object {
           "color": "steelblue",
           "display": "inline-block",
-          "left": "calc(80.5% - 115px)",
+          "left": "80.5%",
           "position": "absolute",
           "top": "55px",
-          "zIndex": 1,
+          "zIndex": "2",
         }
       }
     >
@@ -67,7 +67,7 @@ exports[`renders correctly 1`] = `
           "left": "40.5%",
           "position": "absolute",
           "top": "-25px",
-          "zIndex": 1,
+          "zIndex": "3",
         }
       }
     >
@@ -98,7 +98,7 @@ exports[`renders correctly 1`] = `
           "left": "23.5%",
           "position": "absolute",
           "top": "75px",
-          "zIndex": 1,
+          "zIndex": "1",
         }
       }
     >

@@ -1822,7 +1822,7 @@ exports[`Basic My-Learning-Analytics Testing > donald07 is 100% complete with th
       style="position: absolute; display: inline-block; width: 2px; background-color: steelblue; height: 75px; left: 100%; z-index: 1; margin-top: 0px; margin-bottom: -25px;"
     ></div>
     <div
-      style="position: absolute; display: inline-block; color: steelblue; left: calc(100.5% - 115px); z-index: 1; top: 55px;"
+      style="position: absolute; display: inline-block; color: steelblue; left: 100.5%; z-index: 2; top: 55px;"
     >
       Current: 193.8%
     </div>
@@ -1832,7 +1832,7 @@ exports[`Basic My-Learning-Analytics Testing > donald07 is 100% complete with th
       style="position: absolute; display: inline-block; width: 2px; background-color: green; height: 75px; left: 100%; z-index: 1; margin-top: -25px; margin-bottom: 0px;"
     ></div>
     <div
-      style="position: absolute; display: inline-block; color: green; left: 100.5%; z-index: 1; top: -25px;"
+      style="position: absolute; display: inline-block; color: green; left: 100.5%; z-index: 3; top: -25px;"
     >
       Goal: 100%
     </div>
@@ -1842,7 +1842,7 @@ exports[`Basic My-Learning-Analytics Testing > donald07 is 100% complete with th
       style="position: absolute; display: inline-block; width: 2px; background-color: grey; height: 92px; left: 100%; z-index: 1; margin-top: 0px; margin-bottom: -25px;"
     ></div>
     <div
-      style="position: absolute; display: inline-block; color: grey; left: 100.5%; z-index: 1; top: 75px;"
+      style="position: absolute; display: inline-block; color: grey; left: 100.5%; z-index: 1; top: 95px;"
     >
       Max Possible: 175%
     </div>

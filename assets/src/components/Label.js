@@ -5,7 +5,8 @@ function Label (props) {
     left,
     color,
     labelPlacement,
-    labelText
+    labelText,
+    extraLineHeight
   } = props
 
   return (
@@ -14,14 +15,18 @@ function Label (props) {
         position: 'absolute',
         display: 'inline-block',
         color,
-        left: labelPlacement === 'down'
-          ? `calc(${left} - 115px)`
-          : left,
-        zIndex: 1,
+        left,
+        zIndex: labelPlacement === 'down'
+          ? '2'
+          : labelPlacement === 'downLower'
+            ? '1'
+            : labelPlacement === 'up'
+              ? '3'
+              : 0,
         top: labelPlacement === 'down'
           ? '55px'
           : labelPlacement === 'downLower'
-            ? '75px'
+            ? 75 + +extraLineHeight + 'px'
             : labelPlacement === 'up'
               ? '-25px'
               : 0

@@ -9,7 +9,7 @@ exports[`renders correctly 1`] = `
       "left": 5,
       "position": "absolute",
       "top": "-25px",
-      "zIndex": 1,
+      "zIndex": "3",
     }
   }
 >

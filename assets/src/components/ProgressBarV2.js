@@ -68,6 +68,7 @@ function ProgressBarV2 (props) {
                             color={line.color}
                             labelText={`${line.label}: ${roundToXDecimals(line.value, 1)}%`}
                             labelPlacement={line.labelPlacement}
+                            extraLineHeight={line.value > 75 ? '20' : '0'}
                           />
                         )
                         : null
