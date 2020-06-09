@@ -6,7 +6,7 @@ exports[`renders correctly 1`] = `
     Object {
       "color": "blue",
       "display": "inline-block",
-      "left": "undefined%",
+      "left": "5%",
       "position": "absolute",
       "right": "",
       "textAlign": "left",

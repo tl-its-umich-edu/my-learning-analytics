@@ -8,7 +8,7 @@ it('renders correctly', () => {
   const tree = renderer
     .create(
       <Label
-        left={5}
+        value={5}
         color='blue'
         labelPlacement='up'
         labelText='Hello world'
