@@ -10,13 +10,6 @@ function Line (props) {
     labelPlacement
   } = props
 
-  // const [{ isDragging }, drag] = useDrag({
-  //   item: { id: key, type: 'line' },
-  //   collect: monitor => ({
-  //     isDragging: !!monitor.isDragging()
-  //   })
-  // })
-
   const lineHeight = labelPlacement === 'up1' || labelPlacement === 'down1'
     ? height + 25
     : labelPlacement === 'down2'
