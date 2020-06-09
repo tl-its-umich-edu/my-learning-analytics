@@ -1,12 +1,31 @@
 import React from 'react'
 
+const alignThreshold = 25
+
+const getLeft = (value) => {
+  const left = value > alignThreshold ? '0' : value + '%'
+  return left
+}
+
+const getRight = (value) => {
+  const right = value > alignThreshold ? value + '%' : ''
+  return right
+}
+
+const getWidth = (value) => {
+  return value > alignThreshold ? value + '%' : ''
+}
+
+const getTextAlign = (value) => {
+  return value > alignThreshold ? 'right' : 'left'
+}
+
 function Label (props) {
   const {
-    left,
+    value,
     color,
     labelPlacement,
-    labelText,
-    extraLineHeight
+    labelText
   } = props
 
   return (
@@ -15,24 +34,27 @@ function Label (props) {
         position: 'absolute',
         display: 'inline-block',
         color,
-        left,
-        zIndex: labelPlacement === 'down'
-          ? '2'
-          : labelPlacement === 'downLower'
-            ? '1'
-            : labelPlacement === 'up'
-              ? '3'
-              : 0,
-        top: labelPlacement === 'down'
-          ? '55px'
-          : labelPlacement === 'downLower'
-            ? 75 + +extraLineHeight + 'px'
-            : labelPlacement === 'up'
-              ? '-25px'
+        width: `${getWidth(value)}`,
+        textAlign: `${getTextAlign(value)}`,
+        left: `${getLeft(value)}`,
+        right: `${getRight(value)}`,
+        zIndex: labelPlacement === 'up1'
+          ? '3'
+          : labelPlacement === 'down1'
+            ? '2'
+            : labelPlacement === 'down2'
+              ? '1'
+              : '0',
+        top: labelPlacement === 'up1'
+          ? '-25px'
+          : labelPlacement === 'down1'
+            ? '55px'
+            : labelPlacement === 'down2'
+              ? '75px'
               : 0
       }}
     >
-      {labelText}
+      &nbsp;{labelText}&nbsp;
     </div>
   )
 }

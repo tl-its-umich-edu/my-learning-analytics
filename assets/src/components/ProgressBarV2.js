@@ -37,6 +37,12 @@ function ProgressBarV2 (props) {
     return value / maxValue * 100
   }
 
+  const calculateLableValue = (value, maxValue) => {
+    if (value > maxValue) return 100
+    if (value < 0) return 0
+    return value
+  }
+
   return (
     <>
       {
@@ -64,7 +70,7 @@ function ProgressBarV2 (props) {
                       line.label
                         ? (
                           <Label
-                            left={`${calculateLineLeftOffset(line.value, outOf) + 0.5}%`}
+                            value={`${calculateLableValue(line.value, outOf)}`}
                             color={line.color}
                             labelText={`${line.label}: ${roundToXDecimals(line.value, 1)}%`}
                             labelPlacement={line.labelPlacement}
