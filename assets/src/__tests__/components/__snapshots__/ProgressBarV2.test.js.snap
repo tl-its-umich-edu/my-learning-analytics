@@ -18,9 +18,9 @@ exports[`renders correctly 1`] = `
         Object {
           "backgroundColor": "steelblue",
           "display": "inline-block",
-          "height": "35px",
+          "height": "12px",
           "left": "80%",
-          "marginBottom": "-25px",
+          "marginBottom": 0,
           "marginTop": 0,
           "position": "absolute",
           "width": "2px",
@@ -33,14 +33,19 @@ exports[`renders correctly 1`] = `
         Object {
           "color": "steelblue",
           "display": "inline-block",
-          "left": "80.5%",
+          "left": "0",
           "position": "absolute",
-          "top": "55px",
-          "zIndex": "2",
+          "right": "80%",
+          "textAlign": "right",
+          "top": 0,
+          "width": "80%",
+          "zIndex": "0",
         }
       }
     >
+       
       Current: 80%
+       
     </div>
   </div>
   <div>
@@ -49,10 +54,10 @@ exports[`renders correctly 1`] = `
         Object {
           "backgroundColor": "green",
           "display": "inline-block",
-          "height": "35px",
+          "height": "12px",
           "left": "40%",
           "marginBottom": 0,
-          "marginTop": "-25px",
+          "marginTop": 0,
           "position": "absolute",
           "width": "2px",
           "zIndex": 1,
@@ -64,14 +69,19 @@ exports[`renders correctly 1`] = `
         Object {
           "color": "green",
           "display": "inline-block",
-          "left": "40.5%",
+          "left": "0",
           "position": "absolute",
-          "top": "-25px",
-          "zIndex": "3",
+          "right": "40%",
+          "textAlign": "right",
+          "top": 0,
+          "width": "40%",
+          "zIndex": "0",
         }
       }
     >
+       
       Goal: 40%
+       
     </div>
   </div>
   <div>
@@ -80,9 +90,9 @@ exports[`renders correctly 1`] = `
         Object {
           "backgroundColor": "grey",
           "display": "inline-block",
-          "height": "52px",
+          "height": "12px",
           "left": "23%",
-          "marginBottom": "-25px",
+          "marginBottom": 0,
           "marginTop": 0,
           "position": "absolute",
           "width": "2px",
@@ -95,14 +105,19 @@ exports[`renders correctly 1`] = `
         Object {
           "color": "grey",
           "display": "inline-block",
-          "left": "23.5%",
+          "left": "23%",
           "position": "absolute",
-          "top": "75px",
-          "zIndex": "1",
+          "right": "",
+          "textAlign": "left",
+          "top": 0,
+          "width": "",
+          "zIndex": "0",
         }
       }
     >
+       
       Max Possible: 23%
+       
     </div>
   </div>
   <div

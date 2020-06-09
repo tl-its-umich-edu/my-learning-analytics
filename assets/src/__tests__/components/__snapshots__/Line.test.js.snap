@@ -6,10 +6,10 @@ exports[`renders correctly 1`] = `
     Object {
       "backgroundColor": "blue",
       "display": "inline-block",
-      "height": "35px",
+      "height": "12px",
       "left": 5,
       "marginBottom": 0,
-      "marginTop": "-25px",
+      "marginTop": 0,
       "position": "absolute",
       "width": "2px",
       "zIndex": 1,
