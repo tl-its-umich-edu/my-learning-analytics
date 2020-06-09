@@ -163,7 +163,11 @@ After about 30-60 seconds the crons should have completed and you should have da
 
 ## Testing
 
+The application currently uses two frameworks for front-end testing: [Cypress](https://www.cypress.io/) and [Jest](https://jestjs.io/). There are plans to implement back-end tests in the future.
+
 ### Cypress Testing
+
+Some front end  tests are implemented using the [Cypress framework](https://www.cypress.io/). 
 
  For running cypress tests locally, it is essential that you have Myla instance running locally. Launch Myla from the
  browser go to the admin view and add user called `donald07` with password `root`. Get the latest depersonalized datadump
@@ -187,7 +191,11 @@ After about 30-60 seconds the crons should have completed and you should have da
  browser 'compare snapshot' and a pop up appears to `Update Snapshot` 
 
 ## Jest Testing
-`docker exec -it webpack_watcher npm test` will run the test suite for the front-end React application. [Jest](https://jestjs.io/) is the testing framework used. More tests (including back-end tests) are planned for the future.
+Other front-end tests leverage the [Jest framework](https://jestjs.io/). 
+
+To run the Jest test suite, execute the command `docker exec -it webpack_watcher npm test`
+
+To update snapshots, execute `docker exec -it webpack_watcher npm update-snapshot`
 
 ## Accessibility
 
