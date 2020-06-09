@@ -163,7 +163,11 @@ After about 30-60 seconds the crons should have completed and you should have da
 
 ## Testing
 
+The application currently uses two frameworks for front-end testing: [Cypress](https://www.cypress.io/) and [Jest](https://jestjs.io/). There are plans to implement back-end tests in the future.
+
 ### Cypress Testing
+
+Some front-end tests are implemented using the [Cypress framework](https://www.cypress.io/). 
 
  For running cypress tests locally, it is essential that you have Myla instance running locally. Launch Myla from the
  browser go to the admin view and add user called `donald07` with password `root`. Get the latest depersonalized datadump
@@ -185,6 +189,13 @@ After about 30-60 seconds the crons should have completed and you should have da
  Run the cypress test if UI change are there as part of the work.
  If a snapshot fails due to change in the UI, try updating the snapshot from the failed test from cypress controlled 
  browser 'compare snapshot' and a pop up appears to `Update Snapshot` 
+
+## Jest Testing
+Other front-end tests leverage the [Jest framework](https://jestjs.io/). 
+
+To run the Jest test suite, execute the command `docker exec -it webpack_watcher npm test`
+
+To update snapshots, execute `docker exec -it webpack_watcher npm run-script update-snapshot`
 
 ## Accessibility
 
