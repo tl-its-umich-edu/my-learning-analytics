@@ -195,7 +195,7 @@ Other front-end tests leverage the [Jest framework](https://jestjs.io/).
 
 To run the Jest test suite, execute the command `docker exec -it webpack_watcher npm test`
 
-To update snapshots, execute `docker exec -it webpack_watcher npm update-snapshot`
+To update snapshots, execute `docker exec -it webpack_watcher npm run-script update-snapshot`
 
 ## Accessibility
 
