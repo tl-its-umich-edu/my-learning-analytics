@@ -7,7 +7,7 @@ function Line (props) {
     left,
     color,
     width = 2,
-    labelPlacement // Value should be one of 'up1', 'down1', and 'down2'.  1 or 2 represents an aproximation of lines of text of offset up or down.
+    labelPlacement // Value should be one of 'up1', 'down1', and 'down2'.  1 or 2 represents an approximation of lines of text of offset up or down.
   } = props
 
   const lineHeight = labelPlacement === 'up1' || labelPlacement === 'down1'
