@@ -186,6 +186,9 @@ After about 30-60 seconds the crons should have completed and you should have da
  If a snapshot fails due to change in the UI, try updating the snapshot from the failed test from cypress controlled 
  browser 'compare snapshot' and a pop up appears to `Update Snapshot` 
 
+## Jest Testing
+`docker exec -it webpack_watcher npm test` will run the test suite for the front-end React application. [Jest](https://jestjs.io/) is the testing framework used. More tests (including back-end tests) are planned for the future.
+
 ## Accessibility
 
 ### Keyboard Navigation
