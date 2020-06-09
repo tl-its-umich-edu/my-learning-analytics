@@ -167,7 +167,7 @@ The application currently uses two frameworks for front-end testing: [Cypress](h
 
 ### Cypress Testing
 
-Some front end  tests are implemented using the [Cypress framework](https://www.cypress.io/). 
+Some front-end tests are implemented using the [Cypress framework](https://www.cypress.io/). 
 
  For running cypress tests locally, it is essential that you have Myla instance running locally. Launch Myla from the
  browser go to the admin view and add user called `donald07` with password `root`. Get the latest depersonalized datadump
