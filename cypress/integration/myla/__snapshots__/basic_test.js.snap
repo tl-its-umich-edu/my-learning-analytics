@@ -1814,7 +1814,7 @@ exports[`Basic My-Learning-Analytics Testing > Grade for donald07 is 70% and cha
 
 exports[`Basic My-Learning-Analytics Testing > donald07 is 100% complete with their assignments. #0`] = `
 <div
-  class="ProgressBarV2-outOfBar-31"
+  class="ProgressBarV2-outOfBar-32"
   style="width: 90%; height: 50px; position: relative; margin: 50px;"
 >
   <div>
@@ -1848,7 +1848,7 @@ exports[`Basic My-Learning-Analytics Testing > donald07 is 100% complete with th
     </div>
   </div>
   <div
-    class="ProgressBarV2-gradedBar-30"
+    class="ProgressBarV2-gradedBar-31"
     style="position: absolute; display: inline-block; width: 100%; height: 50px;"
   ></div>
 </div>

@@ -13,6 +13,7 @@ import ProgressBar from '../components/ProgressBar'
 import Spinner from '../components/Spinner'
 import TableAssignment from '../components/TableAssignment'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
+import ViewHeader from '../components/ViewHeader'
 import WarningBanner from '../components/WarningBanner'
 import useSetUserSetting from '../hooks/useSetUserSetting'
 import useUserSetting from '../hooks/useUserSetting'
@@ -28,6 +29,10 @@ const styles = theme => ({
   paper: {
     padding: theme.spacing(2),
     color: theme.palette.text.secondary
+  },
+  section: {
+    paddingBottom: 10,
+    paddingTop: 10
   },
   graded: {
     width: '10px',
@@ -132,70 +137,74 @@ function AssignmentPlanning (props) {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <>
-              <Typography variant='h5' gutterBottom>Progress toward Final Grade</Typography>
-              {assignmentData
-                ? (
-                  <ProgressBar
-                    data={assignmentData.progress}
-                    aspectRatio={0.12}
-                    tip={AssignmentPlanningTooltip(classes)}
-                  />
-                )
-                : <Spinner />}
-            </ >
-          </Paper>
-        </Grid>
-        <Grid item xs={12}>
-          <Paper className={classes.paper}>
-            <Grid container>
-              <Grid item xs={12} md={10}>
-                <Typography variant='h5' gutterBottom>Assignments Due by Date</Typography>
-              </Grid>
-              <Grid item xs={12} md={2}>
-                <Typography variant='h6'>Assignment Status</Typography>
-                <div className={classes.graded} />
-                <Typography style={{ display: 'inline' }}> Graded</Typography>
-                <br />
-                <div className={classes.ungraded} />
-                <Typography style={{ display: 'inline' }}> Not Yet Graded</Typography>
-                <br />
-              </Grid>
-            </Grid>
-            <FormControl>
-              <Typography>Show assignments that weigh at least</Typography>
-              <div style={{ display: 'flex' }}>
-                <Select
-                  value={assignmentGradeFilter}
-                  onChange={handleAssignmentFilter}
-                >
-                  <MenuItem value={0}>0% (all)</MenuItem>
-                  <MenuItem value={2}>2%</MenuItem>
-                  <MenuItem value={5}>5%</MenuItem>
-                  <MenuItem value={10}>10%</MenuItem>
-                  <MenuItem value={20}>20%</MenuItem>
-                  <MenuItem value={50}>50%</MenuItem>
-                  <MenuItem value={75}>75%</MenuItem>
-                </Select>
-                {showSaveSetting
+            <ViewHeader>Assignment Planning</ViewHeader>
+            <div className={classes.section}>
+              <Typography variant='h6' gutterBottom>Progress toward Final Grade</Typography>
+              {
+                assignmentData
                   ? (
-                    <Checkbox
-                      checked={saveSettingClicked}
-                      onChange={() => setSaveSettingClicked(!saveSettingClicked)}
-                      value='checked'
-                      color='secondary'
+                    <ProgressBar
+                      data={assignmentData.progress}
+                      aspectRatio={0.12}
+                      tip={AssignmentPlanningTooltip(classes)}
                     />
-                  ) : null}
-                <div style={{ padding: '15px 2px' }}>{saveLabel}</div>
-              </div>
-            </FormControl>
-            <UserSettingSnackbar
-              saved={userSettingSaved}
-              response={userSettingResponse}
-              successMessage='Assignment filter setting saved!'
-            />
-            {/* in case of no data empty list is sent */}
-            {assignmentLoaded ? assignmentTable(assignmentData.plan) : <Spinner />}
+                  )
+                  : <Spinner />
+              }
+            </div>
+            <div className={classes.section}>
+              <Grid container>
+                <Grid item xs={12} md={10}>
+                  <Typography variant='h6' gutterBottom>Assignments Due by Date</Typography>
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  <Typography variant='h6'>Assignment Status</Typography>
+                  <div className={classes.graded} />
+                  <Typography style={{ display: 'inline' }}> Graded</Typography>
+                  <br />
+                  <div className={classes.ungraded} />
+                  <Typography style={{ display: 'inline' }}> Not Yet Graded</Typography>
+                  <br />
+                </Grid>
+              </Grid>
+              <FormControl>
+                <Typography>Show assignments that weigh at least</Typography>
+                <div style={{ display: 'flex' }}>
+                  <Select
+                    value={assignmentGradeFilter}
+                    onChange={handleAssignmentFilter}
+                  >
+                    <MenuItem value={0}>0% (all)</MenuItem>
+                    <MenuItem value={2}>2%</MenuItem>
+                    <MenuItem value={5}>5%</MenuItem>
+                    <MenuItem value={10}>10%</MenuItem>
+                    <MenuItem value={20}>20%</MenuItem>
+                    <MenuItem value={50}>50%</MenuItem>
+                    <MenuItem value={75}>75%</MenuItem>
+                  </Select>
+                  {
+                    showSaveSetting
+                      ? (
+                        <Checkbox
+                          checked={saveSettingClicked}
+                          onChange={() => setSaveSettingClicked(!saveSettingClicked)}
+                          value='checked'
+                          color='secondary'
+                        />
+                      )
+                      : null
+                  }
+                  <div style={{ padding: '15px 2px' }}>{saveLabel}</div>
+                </div>
+              </FormControl>
+              <UserSettingSnackbar
+                saved={userSettingSaved}
+                response={userSettingResponse}
+                successMessage='Assignment filter setting saved!'
+              />
+              {/* in case of no data empty list is sent */}
+              {assignmentLoaded ? assignmentTable(assignmentData.plan) : <Spinner />}
+            </div>
           </Paper>
         </Grid>
       </Grid>

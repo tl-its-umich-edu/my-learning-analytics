@@ -10,6 +10,7 @@ import Histogram from '../components/Histogram'
 import Spinner from '../components/Spinner'
 import Table from '../components/Table'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
+import ViewHeader from '../components/ViewHeader'
 import { roundToXDecimals } from '../util/math'
 import { useGradeData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
@@ -118,8 +119,13 @@ function GradeDistribution (props) {
     )
   }
 
+  let gradeContent
   if (gradeLoaded && isObjectEmpty(gradeData)) {
-    return <AlertBanner>Grade data is not available.</AlertBanner>
+    gradeContent = (<AlertBanner>Grade data is not available.</AlertBanner>)
+  } else {
+    gradeContent = gradeLoaded
+      ? (<BuildGradeView />)
+      : (<Spinner />)
   }
 
   return (
@@ -127,12 +133,8 @@ function GradeDistribution (props) {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Typography variant='h5' gutterBottom>Grade Distribution</Typography>
-            {
-              gradeLoaded
-                ? <BuildGradeView />
-                : <Spinner />
-            }
+            <ViewHeader>Grade Distribution</ViewHeader>
+            {gradeContent}
             <UserSettingSnackbar
               saved={userSettingSaved}
               response={userSettingResponse}

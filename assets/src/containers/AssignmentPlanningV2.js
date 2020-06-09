@@ -1,21 +1,22 @@
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
-import Spinner from '../components/Spinner'
-import ProgressBarV2 from '../components/ProgressBarV2'
-import AssignmentGoalInput from '../components/AssignmentGoalInput'
-import AlertBanner from '../components/AlertBanner'
-import WarningBanner from '../components/WarningBanner'
-import AssignmentTable from '../components/AssignmentTable'
+import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
+import AlertBanner from '../components/AlertBanner'
+import AssignmentGoalInput from '../components/AssignmentGoalInput'
+import AssignmentTable from '../components/AssignmentTable'
+import ProgressBarV2 from '../components/ProgressBarV2'
+import Spinner from '../components/Spinner'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
+import ViewHeader from '../components/ViewHeader'
+import WarningBanner from '../components/WarningBanner'
 import useAssignmentData from '../hooks/useAssignmentData'
 import useInitAssignmentState from '../hooks/useInitAssignmentState'
-import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrade'
-import useUserAssignmentSetting from '../hooks/useUserAssignmentSetting'
 import useMathWarning from '../hooks/useMathWarning'
 import useSaveUserSetting from '../hooks/useSaveUserSetting'
+import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrade'
+import useUserAssignmentSetting from '../hooks/useUserAssignmentSetting'
 import {
   clearGoals,
   setAssignmentGoalGrade,
@@ -31,6 +32,10 @@ const styles = theme => ({
   paper: {
     padding: theme.spacing(2),
     color: theme.palette.text.secondary
+  },
+  section: {
+    paddingBottom: 10,
+    paddingTop: 10
   },
   clearButton: {
     float: 'right',
@@ -125,63 +130,67 @@ function AssignmentPlanningV2 (props) {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Typography variant='h5' gutterBottom>Assignment Planning</Typography>
+            <ViewHeader>Assignment Planning</ViewHeader>
             {
               loading
                 ? <Spinner />
                 : (
-                  <>
-                    <Typography variant='h6'>Grade Progress</Typography>
-                    <ProgressBarV2
-                      score={currentGrade}
-                      lines={[
-                        {
-                          label: 'Current',
-                          value: currentGrade,
-                          color: 'steelblue',
-                          labelPlacement: 'down1'
-                        },
-                        {
-                          label: 'Goal',
-                          value: goalGrade,
-                          color: 'green',
-                          labelPlacement: 'up1'
-                        },
-                        {
-                          label: 'Max Possible',
-                          value: maxPossibleGrade,
-                          color: 'grey',
-                          labelPlacement: 'down2'
-                        }
-                      ]}
-                      outOf={100}
-                      percentWidth={90}
-                      height={50}
-                      margin={50}
-                    />
-                    <AssignmentGoalInput
-                      currentGrade={currentGrade}
-                      goalGrade={goalGrade}
-                      maxPossibleGrade={maxPossibleGrade}
-                      setGoalGrade={grade => {
-                        setSettingChanged(true)
-                        setGoalGrade(grade)
-                      }}
-                      handleClearGoalGrades={handleClearGoalGrades}
-                      mathWarning={showMathWarning}
-                    />
-                    <Typography variant='h6'>Assignments by Due Date</Typography>
-                    <AssignmentTable
-                      courseGoalGradeSet={goalGrade !== ''}
-                      assignments={assignments}
-                      assignmentGroups={assignmentGroups}
-                      dateStart={data.course.dateStart}
-                      handleAssignmentGoalGrade={handleAssignmentGoalGrade}
-                      handleAssignmentLock={handleAssignmentLock}
-                      handleInputFocus={handleInputFocus}
-                      handleInputBlur={handleInputBlur}
-                    />
-                  </>
+                  <div>
+                    <div className={classes.section}>
+                      <Typography variant='h6' gutterBottom>Grade Progress</Typography>
+                      <ProgressBarV2
+                        score={currentGrade}
+                        lines={[
+                          {
+                            label: 'Current',
+                            value: currentGrade,
+                            color: 'steelblue',
+                            labelPlacement: 'down1'
+                          },
+                          {
+                            label: 'Goal',
+                            value: goalGrade,
+                            color: 'green',
+                            labelPlacement: 'up1'
+                          },
+                          {
+                            label: 'Max Possible',
+                            value: maxPossibleGrade,
+                            color: 'grey',
+                            labelPlacement: 'down2'
+                          }
+                        ]}
+                        outOf={100}
+                        percentWidth={90}
+                        height={50}
+                        margin={50}
+                      />
+                      <AssignmentGoalInput
+                        currentGrade={currentGrade}
+                        goalGrade={goalGrade}
+                        maxPossibleGrade={maxPossibleGrade}
+                        setGoalGrade={grade => {
+                          setSettingChanged(true)
+                          setGoalGrade(grade)
+                        }}
+                        handleClearGoalGrades={handleClearGoalGrades}
+                        mathWarning={showMathWarning}
+                      />
+                    </div>
+                    <div className={classes.section}>
+                      <Typography variant='h6' gutterBottom>Assignments by Due Date</Typography>
+                      <AssignmentTable
+                        courseGoalGradeSet={goalGrade !== ''}
+                        assignments={assignments}
+                        assignmentGroups={assignmentGroups}
+                        dateStart={data.course.dateStart}
+                        handleAssignmentGoalGrade={handleAssignmentGoalGrade}
+                        handleAssignmentLock={handleAssignmentLock}
+                        handleInputFocus={handleInputFocus}
+                        handleInputBlur={handleInputBlur}
+                      />
+                    </div>
+                  </div>
                 )
             }
             <UserSettingSnackbar

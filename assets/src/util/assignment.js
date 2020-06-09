@@ -4,7 +4,7 @@ import { sum, roundToXDecimals } from './math'
 const clearGoals = assignments => assignments
   .map(a => {
     a.goalGrade = ''
-    a.goalGradeSetByUser = null
+    a.goalGradeSetByUser = false
     return a
   })
 
@@ -26,7 +26,7 @@ const setAssignmentGoalGrade = (key, assignments, goalGrade) => {
     {
       ...assignments[key],
       goalGrade: goalGrade === '' ? '' : roundToXDecimals(Number(goalGrade), 3),
-      goalGradeSetByUser: goalGrade
+      goalGradeSetByUser: !!goalGrade
     },
     ...assignments.slice(key + 1)
   ]
@@ -37,7 +37,7 @@ const setAssignmentGoalLockState = (key, assignments, checkboxState) => {
     ...assignments.slice(0, key),
     {
       ...assignments[key],
-      goalGradeSetByUser: checkboxState
+      goalGradeSetByUser: !!checkboxState
     },
     ...assignments.slice(key + 1)
   ]
@@ -188,7 +188,7 @@ const createAssignmentFields = (
       a.graded = !!currentUserSubmission && !!currentUserSubmission.gradedDate
       a.dueDateMonthDay = dateToMonthDay(localDate)
       a.goalGrade = ''
-      a.goalGradeSetByUser = null
+      a.goalGradeSetByUser = false
       a.inputFocus = false
       a.inputBlur = true
 
