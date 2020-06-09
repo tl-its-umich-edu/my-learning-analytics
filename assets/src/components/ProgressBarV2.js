@@ -3,7 +3,6 @@ import Line from './Line'
 import Label from './Label'
 import { withStyles } from '@material-ui/core/styles'
 import { roundToXDecimals } from '../util/math'
-// import { DropTarget } from 'react-dnd'
 
 const styles = ({
   gradedBar: {
