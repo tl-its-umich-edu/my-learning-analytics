@@ -24,7 +24,7 @@ function Label (props) {
   const {
     value,
     color,
-    labelPlacement,
+    labelPlacement, // Value should be one of 'up1', 'down1', and 'down2'.  1 or 2 represents an aproximation of lines of text of offset up or down.
     labelText
   } = props
 
