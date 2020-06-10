@@ -1814,7 +1814,7 @@ exports[`Basic My-Learning-Analytics Testing > Grade for donald07 is 70% and cha
 
 exports[`Basic My-Learning-Analytics Testing > donald07 is 100% complete with their assignments. #0`] = `
 <div
-  class="ProgressBarV2-outOfBar-515"
+  class="ProgressBarV2-outOfBar-32"
   style="width: 90%; height: 50px; position: relative; margin: 50px;"
 >
   <div>
@@ -1822,9 +1822,9 @@ exports[`Basic My-Learning-Analytics Testing > donald07 is 100% complete with th
       style="position: absolute; display: inline-block; width: 2px; background-color: steelblue; height: 75px; left: 100%; z-index: 1; margin-top: 0px; margin-bottom: -25px;"
     ></div>
     <div
-      style="position: absolute; display: inline-block; color: steelblue; left: calc(100.5% - 115px); z-index: 1; top: 55px;"
+      style="position: absolute; display: inline-block; color: steelblue; text-align: right; left: 0px; z-index: 2; top: 55px; width: 100%; right: 100%;"
     >
-      Current: 193.8%
+      &nbsp;Current: 193.8%&nbsp;
     </div>
   </div>
   <div>
@@ -1832,9 +1832,9 @@ exports[`Basic My-Learning-Analytics Testing > donald07 is 100% complete with th
       style="position: absolute; display: inline-block; width: 2px; background-color: green; height: 75px; left: 100%; z-index: 1; margin-top: -25px; margin-bottom: 0px;"
     ></div>
     <div
-      style="position: absolute; display: inline-block; color: green; left: 100.5%; z-index: 1; top: -25px;"
+      style="position: absolute; display: inline-block; color: green; text-align: right; left: 0px; z-index: 3; top: -25px; width: 100%; right: 100%;"
     >
-      Goal: 100%
+      &nbsp;Goal: 100%&nbsp;
     </div>
   </div>
   <div>
@@ -1842,13 +1842,13 @@ exports[`Basic My-Learning-Analytics Testing > donald07 is 100% complete with th
       style="position: absolute; display: inline-block; width: 2px; background-color: grey; height: 92px; left: 100%; z-index: 1; margin-top: 0px; margin-bottom: -25px;"
     ></div>
     <div
-      style="position: absolute; display: inline-block; color: grey; left: 100.5%; z-index: 1; top: 75px;"
+      style="position: absolute; display: inline-block; color: grey; width: 100%; text-align: right; left: 0px; right: 100%; z-index: 1; top: 75px;"
     >
-      Max Possible: 175%
+      &nbsp;Max Possible: 175%&nbsp;
     </div>
   </div>
   <div
-    class="ProgressBarV2-gradedBar-514"
+    class="ProgressBarV2-gradedBar-31"
     style="position: absolute; display: inline-block; width: 100%; height: 50px;"
   ></div>
 </div>

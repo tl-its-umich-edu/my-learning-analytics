@@ -7,19 +7,12 @@ function Line (props) {
     left,
     color,
     width = 2,
-    labelPlacement
+    labelPlacement // Value should be one of 'up1', 'down1', and 'down2'.  1 or 2 represents an approximation of lines of text of offset up or down.
   } = props
 
-  // const [{ isDragging }, drag] = useDrag({
-  //   item: { id: key, type: 'line' },
-  //   collect: monitor => ({
-  //     isDragging: !!monitor.isDragging()
-  //   })
-  // })
-
-  const lineHeight = labelPlacement === 'up' || labelPlacement === 'down'
+  const lineHeight = labelPlacement === 'up1' || labelPlacement === 'down1'
     ? height + 25
-    : labelPlacement === 'downLower'
+    : labelPlacement === 'down2'
       ? height + 42
       : height + 2
 
@@ -33,9 +26,9 @@ function Line (props) {
         height: `${lineHeight}px`,
         left,
         zIndex: 1,
-        marginTop: labelPlacement === 'up' ? '-25px' : 0,
-        marginBottom: labelPlacement === 'down' ||
-          labelPlacement === 'downLower' ? '-25px' : 0
+        marginTop: labelPlacement === 'up1' ? '-25px' : 0,
+        marginBottom: labelPlacement === 'down1' ||
+          labelPlacement === 'down2' ? '-25px' : 0
       }}
       // ref={drag}
     />
