@@ -1,16 +1,21 @@
 import TextField from '@material-ui/core/TextField'
 import { withStyles } from '@material-ui/core/styles'
 
+const orange = '#ffae42'
+
 const StyledTextField = withStyles({
   root: {
     '& .MuiFormLabel-root.Mui-error': {
-      color: '#ffae42'
+      color: orange
     },
     '& .MuiInput-underline.Mui-error:after': {
-      borderBottomColor: '#ffae42'
+      borderBottomColor: orange
     },
     '& .MuiInputBase-input': {
       color: 'green'
+    },
+    '& .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline': {
+      borderColor: orange
     }
   }
 })(TextField)
