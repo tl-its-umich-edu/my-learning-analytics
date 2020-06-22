@@ -12,6 +12,7 @@ from django.contrib import auth
 from django.db import connection as conn
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
+from django.core.exceptions import MultipleObjectsReturned
 from pinax.eventlog.models import log as eventlog
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
 from dashboard.common.db_util import canvas_id_to_incremented_id
@@ -19,7 +20,7 @@ from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
 from collections import namedtuple
 
-from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
+from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection, User
 from dashboard.settings import RESOURCE_VALUES, RESOURCE_VALUES_MAP, RESOURCE_ACCESS_CONFIG
 from dashboard.settings import COURSES_ENABLED
 
@@ -77,7 +78,7 @@ def get_course_info(request, course_id=0):
         course = Course.objects.get(id=course_id)
     except ObjectDoesNotExist:
         return HttpResponse("{}")
-
+    
     course_resource_list = []
     try:
         resource_list = Resource.objects.get_course_resource_type(course_id)
@@ -127,6 +128,17 @@ def get_course_info(request, course_id=0):
     resp['total_weeks'] = total_weeks
     resp['course_view_options'] = CourseViewOption.objects.get(course=course).json(include_id=False)
     resp['resource_types'] = course_resource_list
+
+    try:
+        course_users = User.objects.get(course_id=course_id)
+        resp['course_user_exist'] = 1
+    except ObjectDoesNotExist:
+        logger.info("no user for this course")
+        resp['course_user_exist'] = 0
+    except MultipleObjectsReturned:
+        # more than one user exist
+        resp['course_user_exist'] = 1
+
 
     return HttpResponse(json.dumps(resp, default=str))
 
