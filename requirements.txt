@@ -1,13 +1,13 @@
 gunicorn>=19.9.0,<19.9.99
 
 # We're waiting on Django 3 until it's further into the lifecycle.
-Django>=2.2.10,<2.2.99
+Django==3.0.7
 whitenoise>=4.1.4,<4.1.99
 
 django-registration>=3.0,<3.0.99
 django-cron>=0.5.1,<0.5.99
 django-npm>=1.0.0,<1.0.99
-django-watchman>=0.18.0,<0.18.99
+django-watchman==1.1.1
 django-su>=0.8.0,<0.8.99
 django-settings-export>=1.2.1,<1.2.99
 django-macros>=0.4.0,<0.4.99
@@ -21,7 +21,7 @@ graphene-django>=2.8.0,<2.8.99
 django-filter>=2.2.0,<2.2.99
 
 # object-level permissions
-rules>=2.1,<2.1.99
+rules==2.2
 django-model-utils>=3.2.0,<3.2.99
 
 # These should be okay to update minors
@@ -47,6 +47,7 @@ pinax-eventlog>=2.0.3,<2.0.99
 ptvsd>=4.3.2,<4.3.99
 django-ptvsd-debug==1.0.3
 django-lti-auth==1.0.0
+PyLTI1p3==1.7.0
 django-webpack-loader==0.6.0
 django-csp==3.5
 

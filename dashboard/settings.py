@@ -115,6 +115,7 @@ INSTALLED_APPS = [
 # The order of this is important. It says DebugToolbar should be on top but
 # The tips has it on the bottom
 MIDDLEWARE = [
+    'dashboard.middleware.middleware.SameSiteMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -168,6 +169,8 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
     }
 }
+print("WEBPACK_LOADER")
+print(WEBPACK_LOADER)
 
 NPM_FILE_PATTERNS = {
     'bootstrap': ['dist/css/*'],
@@ -395,20 +398,25 @@ else:
     LOGIN_REDIRECT_URL = '/'
     LOGOUT_REDIRECT_URL='/'
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+
 # Give an opportunity to disable LTI
 if ENV.get('STUDENT_DASHBOARD_LTI', False):
-    INSTALLED_APPS += ('django_lti_auth',)
     if not 'django.contrib.auth.backends.ModelBackend' in AUTHENTICATION_BACKENDS:
         AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
 
-    PYLTI_CONFIG = {
-        "consumers": ENV.get("PYLTI_CONFIG_CONSUMERS", {}),
-        "method_hooks":{
-            "valid_lti_request": "dashboard.lti.valid_lti_request",
-            "invalid_lti_request": "dashboard.lti.invalid_lti_request"
-        },
-        "next_url": "home"
-    }
+    # PYLTI_CONFIG = {
+    #     "consumers": ENV.get("PYLTI_CONFIG_CONSUMERS", {}),
+    #     "method_hooks":{
+    #         "valid_lti_request": "dashboard.lti.valid_lti_request",
+    #         "invalid_lti_request": "dashboard.lti.invalid_lti_request"
+    #     },
+    #     "next_url": "home"
+    # }
     LTI_PERSON_SOURCED_ID_FIELD = ENV.get('LTI_PERSON_SOURCED_ID_FIELD',
         "custom_canvas_user_login_id")
     LTI_EMAIL_FIELD = ENV.get('LTI_EMAIL_FIELD',
@@ -465,27 +473,32 @@ RESOURCE_ACCESS_CONFIG = ENV.get("RESOURCE_ACCESS_CONFIG", {})
 SHA_ABBREV_LENGTH = 7
 
 # Django CSP Settings, load up from file if set
-if "CSP" in ENV:
-    MIDDLEWARE += ['csp.middleware.CSPMiddleware',]
-    for csp_key, csp_val in ENV.get("CSP").items():
-        # If there's a value set for this CSP config, set it as a global
-        if (csp_val):
-            globals()["CSP_"+csp_key] = csp_val
-# If CSP not set, add in XFrameOptionsMiddleware
-else:
-    MIDDLEWARE += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
+# if "CSP" in ENV:
+#     print("CSP BLOCKsss")
+#     MIDDLEWARE += ['csp.middleware.CSPMiddleware',]
+#     for csp_key, csp_val in ENV.get("CSP").items():
+#         # If there's a value set for this CSP config, set it as a global
+#         if (csp_val):
+#             globals()["CSP_"+csp_key] = csp_val
+# # If CSP not set, add in XFrameOptionsMiddleware
+# else:
+#     print("NON-CSP BLOCK")
+#     MIDDLEWARE += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
 
 # These are mostly needed by Canvas but it should also be in on general 
 CSRF_COOKIE_SECURE = ENV.get("CSRF_COOKIE_SECURE", False)
 if CSRF_COOKIE_SECURE:
+    print("CSRF BLOCKsCS")
     CSRF_TRUSTED_ORIGINS = ENV.get("CSRF_TRUSTED_ORIGINS", [])
     SESSION_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# When using the application with iframes (e.g. with LTI), these need to be set to None. However, we'll need to update
-# this when new browser versions expect (and the Django version allows) the string "None".
+#
+# # When using the application with iframes (e.g. with LTI), these need to be set to None. However, we'll need to update
+# # this when new browser versions expect (and the Django version allows) the string "None".
 SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", None)
 CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", None)
+
+SESSION_COOKIE_NAME = 'sessionid'
 
 # IMPORT LOCAL ENV
 # =====================

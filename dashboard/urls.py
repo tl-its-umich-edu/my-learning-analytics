@@ -29,13 +29,16 @@ from django.views.decorators.cache import cache_page
 from . import views
 
 import watchman.views
-
 urlpatterns = [
     path('', views.get_home_template, name = 'home'),
     path('status/', include('watchman.urls')),
     path('status/bare_status/', watchman.views.bare_status),
 
+
     path('admin/', admin.site.urls),
+    path('login/', views.login, name="login"),
+    path('launch/', views.launch, name="launch"),
+    path('jwks/', views.get_jwks, name="get_jwks"),
 
     # Note the absence of a trailing slash; adding one breaks the GraphQL implementation.
     path('graphql', DashboardGraphQLView.as_view(graphiql=True)),
@@ -62,6 +65,7 @@ urlpatterns = [
     path('api/v1/courses_enabled/',
         cache_page(settings.CLIENT_CACHE_TIME)(views.courses_enabled), name='courses_enabled'),
 
+
     # PUT/POST access patterns
     path('api/v1/courses/<int:course_id>/set_user_default_selection/',
         login_required(views.update_user_default_selection_for_views), name='update_user_default_selection_for_views'),
@@ -71,6 +75,7 @@ urlpatterns = [
     path('su/', include('django_su.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
 
 if apps.is_installed('djangosaml2'):
     from djangosaml2.views import echo_attributes
@@ -90,10 +95,10 @@ else:
         path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
      )
 
-if apps.is_installed('django_lti_auth'):
-    urlpatterns += (
-        path('lti/', include('django_lti_auth.urls')),
-    )
+# if apps.is_installed('django_lti_auth'):
+#     urlpatterns += (
+#         path('lti/', include('django_lti_auth.urls')),
+#     )
 
 if apps.is_installed('registration'):
     urlpatterns += (
