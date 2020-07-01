@@ -27,7 +27,7 @@ RUN npm prune --production && \
     find /usr/src/app/node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
 
 # FROM directive instructing base image to build upon
-FROM python:3.7 AS app
+FROM python:3.8-slim AS app
 
 # EXPOSE port 5000 to allow communication to/from server
 EXPOSE 5000
@@ -36,7 +36,8 @@ WORKDIR /code
 # NOTE: requirements.txt not likely to change between dev builds
 COPY requirements.txt .
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends netcat vim-tiny jq python3-dev xmlsec1 cron && \
+    apt-get install -y --no-install-recommends \
+    build-essential default-libmysqlclient-dev  libpq-dev netcat vim-tiny jq python3-dev xmlsec1 cron && \
     apt-get upgrade -y && \
     apt-get clean -y && \
     pip install -r requirements.txt
