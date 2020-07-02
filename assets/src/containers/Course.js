@@ -11,6 +11,7 @@ import Spinner from '../components/Spinner'
 import { isObjectEmpty } from '../util/object'
 import { useCourseInfo } from '../service/api'
 import WarningBanner from '../components/WarningBanner'
+import AlertBanner from '../components/AlertBanner'
 
 function Course (props) {
   const { courseId, user } = props
@@ -29,8 +30,34 @@ function Course (props) {
   if (loaded && isObjectEmpty(courseInfo)) return (<WarningBanner>My Learning Analytics is not enabled for this course.</WarningBanner>)
   
   // not data has been retrieved yet for the course. Wait for next cron job
-  if (loaded && (courseInfo.course_user_exist === 0)) return (<WarningBanner>No data is available for {courseInfo.name} yet. Please wait for next system data load.  </WarningBanner>)
-
+  if (loaded && (courseInfo.course_user_exist === 0)) {
+    return (
+      <>
+        {loaded
+          ? (
+            <>
+              <DashboardAppBar
+                onMenuBarClick={toggleDrawer}
+                sideDrawerState={sideDrawerState}
+                user={user}
+                courseName={courseInfo.name}
+                courseId={courseId}
+              />
+              <SideDrawer
+                toggleDrawer={toggleDrawer}
+                sideDrawerState={sideDrawerState}
+                courseId={courseId}
+                courseInfo={courseInfo}
+              />
+              <WarningBanner>
+                No data is available for {courseInfo.name} yet. Please wait for next system data load.
+              </WarningBanner>
+            </>
+          ) : <Spinner />}
+      </>
+    )
+  }
+  
   return (
     <>
       {loaded
