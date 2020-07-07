@@ -4,6 +4,12 @@ from typing import Dict, List, Union
 
 import pandas as pd
 import pytz
+<<<<<<< HEAD
+=======
+
+from sqlalchemy import create_engine, types
+
+>>>>>>> Initial work toward adding an upsert against the
 from django.conf import settings
 from django.db import connections as conns, models
 from django.db.models import QuerySet
@@ -11,9 +17,21 @@ from django_cron import CronJobBase, Schedule
 from google.cloud import bigquery
 from sqlalchemy import create_engine
 
+<<<<<<< HEAD
 from dashboard.common import db_util, utils
 from dashboard.models import Course, Resource, AcademicTerms
 
+=======
+from dashboard.models import Course, Resource, AcademicTerms, ResourceAccess
+
+import pandas as pd
+import pangres
+
+# Imports the Google Cloud client library
+from google.cloud import bigquery
+
+from django_cron import CronJobBase, Schedule
+>>>>>>> Initial work toward adding an upsert against the
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +66,7 @@ def util_function(data_warehouse_course_id, sql_string, mysql_table, table_ident
         df.columns = ['consider_weight', 'course_id']
 
     # drop duplicates
-    df.drop_duplicates(keep='first', inplace=True)
+    df = df.drop_duplicates(keep='first')
 
     logger.debug(" table: " + mysql_table + " insert size: " + str(df.shape[0]))
 
@@ -231,10 +249,6 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
-        # delete all records in resource and resource_access table
-        status += deleteAllRecordInTable("resource")
-        status += deleteAllRecordInTable("resource_access")
-
         # return string with concatenated SQL insert result
         return_string = ""
 
@@ -247,6 +261,15 @@ class DashboardCronJob(CronJobBase):
         # the earliest start date of all courses
         course_start_time = utils.find_earliest_start_datetime_of_courses()
 
+        # the earliest latest date of all resources_accessed
+        try:
+            latest_resource = ResourceAccess.objects.latest('access_time')
+            latest_resource_time = latest_resource.access_time
+        except ResourceAccess.DoesNotExist:
+            latest_resource_time = course_start_time
+
+        logger.info(f"Earliest Start: {course_start_time} Latest resource: {latest_resource_time}")
+
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
         for data_warehouse_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
@@ -258,9 +281,9 @@ class DashboardCronJob(CronJobBase):
                 # concatenate the multi-line presentation of query into one single string
                 query = " ".join(query_obj['query'])
 
-                if (course_start_time is not None):
+                if (latest_resource_time is not None):
                     # insert the start time parameter for query
-                    query += " and event_time > @course_start_time"
+                    query += " and event_time > @latest_resource_time"
 
                 final_bq_query.append(query)
             final_bq_query = "  UNION ALL   ".join(final_bq_query)
@@ -274,9 +297,9 @@ class DashboardCronJob(CronJobBase):
                 bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
                 bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT)
             ]
-            if (course_start_time is not None):
+            if (latest_resource_time is not None):
                 # insert the start time parameter for query
-                query_params.append(bigquery.ScalarQueryParameter('course_start_time', 'TIMESTAMP', course_start_time))
+                query_params.append(bigquery.ScalarQueryParameter('latest_resource_time', 'TIMESTAMP', latest_resource_time))
 
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
@@ -289,7 +312,7 @@ class DashboardCronJob(CronJobBase):
 
             logger.debug("df row number=" + str(resource_access_df.shape[0]))
             # drop duplicates
-            resource_access_df.drop_duplicates(["resource_id", "user_id", "access_time"], keep='first', inplace=True)
+            resource_access_df = resource_access_df.drop_duplicates(["resource_id", "user_id", "access_time"], keep='first')
 
             logger.debug("after drop duplicates, df row number=" + str(resource_access_df.shape[0]))
 
@@ -299,12 +322,15 @@ class DashboardCronJob(CronJobBase):
             # Make a copy of the access dataframe
             resource_df = resource_access_df.copy(deep=True)
             # Drop out the columns user and access time from resource data frame
-            resource_df.drop(["user_id", "access_time"], axis=1, inplace=True)
+            resource_df = resource_df.drop(["user_id", "access_time"], axis=1)
             # Drop out the duplicates
-            resource_df.drop_duplicates(["resource_id", "course_id"], inplace=True)
+            resource_df = resource_df.drop_duplicates(["resource_id", "course_id"])
+
+            # Set a dual index for upsert
+            resource_df = resource_df.set_index(["resource_id", "course_id"])
 
             # Drop out the columns resource_type, course_id, name from the resource_access
-            resource_access_df.drop(["resource_type","name", "course_id"], axis=1, inplace=True)
+            resource_access_df = resource_access_df.drop(["resource_type","name", "course_id"], axis=1)
 
             # Drop the columns where there is a Na value
             resource_access_df_drop_na = resource_access_df.dropna()
@@ -314,7 +340,8 @@ class DashboardCronJob(CronJobBase):
             # First update the resource table
             # write to MySQL
             try:
-                resource_df.to_sql(con=engine, name='resource', if_exists='append', index=False)
+                dtype = {'resource_id': types.VARCHAR(255), 'course_id': types.BIGINT}
+                pangres.upsert(engine=engine, df=resource_df, table_name='resource', if_row_exists='update', dtype=dtype)
             except Exception as e:
                 logger.exception("Error running to_sql on table resource")
                 raise

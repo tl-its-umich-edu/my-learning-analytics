@@ -280,9 +280,9 @@ class ResourceManager(models.Manager):
 class Resource(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
     resource_type = models.CharField(max_length=255, verbose_name="Resource Type")
-    resource_id = models.CharField(blank=True, db_index=True, max_length=255, null=False, verbose_name="Resource Id")
+    resource_id = models.CharField(unique=True, blank=True, db_index=True, max_length=255, null=False, verbose_name="Resource Id")
     name = models.TextField(verbose_name="Resource Name")
-    course_id = models.BigIntegerField(verbose_name="Course Id")
+    course_id = models.ForeignKey(Course, on_delete=models.CASCADE, db_column='course_id')
 
     objects = ResourceManager()
 
@@ -291,6 +291,7 @@ class Resource(models.Model):
 
     class Meta:
         db_table = 'resource'
+        unique_together = ('resource_id', 'course_id',)
 
 
 class Submission(models.Model):
@@ -361,7 +362,7 @@ class User(models.Model):
 
 class ResourceAccess(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
-    resource_id = models.CharField(blank=True, max_length=255, null=False, verbose_name='Resource Id')
+    resource_id = models.ForeignKey(Resource, to_field='resource_id', on_delete=models.CASCADE, db_column='resource_id')
     user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id')
     access_time = models.DateTimeField(verbose_name="Access Time")
 

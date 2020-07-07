@@ -27,11 +27,13 @@ django-model-utils>=3.2.0,<3.2.99
 # These should be okay to update minors
 numpy>=1.17,<1.17.99
 pandas>=0.25.1,<0.25.99
+pangres>=2.1,<2.99
 
 requests>=2.22,<2.22.99
 pyOpenSSL>=19.0,<19.0.99
 canvasapi>=0.10,<0.10.99
 protobuf>=3.10.0,<3.10.99
+
 
 # These caused problems in the past so test when updating
 djangosaml2==0.19.1
