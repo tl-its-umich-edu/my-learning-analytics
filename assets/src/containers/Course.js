@@ -51,7 +51,7 @@ function Course (props) {
               ? (
                 <>
                   <AlertBanner>
-                    No data is available for {courseInfo.name} yet. Please wait for next system data load.
+                    No data is available for {courseInfo.name} yet. Please wait for the next system data load.
                   </AlertBanner>
                 </>
               ) : (
