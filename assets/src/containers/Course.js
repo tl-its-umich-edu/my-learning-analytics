@@ -28,8 +28,6 @@ function Course (props) {
   else if (error.message === 'Forbidden') return (<WarningBanner>You do not have access to course {courseId}.</WarningBanner>)
   else if (error) return (<WarningBanner />)
   if (loaded && isObjectEmpty(courseInfo)) return (<WarningBanner>My Learning Analytics is not enabled for this course.</WarningBanner>)
-  
-  // not data has been retrieved yet for the course. Wait for next cron job
 
   return (
     <>
@@ -50,15 +48,13 @@ function Course (props) {
               courseInfo={courseInfo}
             />
             {courseInfo.course_user_exist === 0
-             ? (
+              ? (
                 <>
-                  <WarningBanner>
+                  <AlertBanner>
                     No data is available for {courseInfo.name} yet. Please wait for next system data load.
-                  </WarningBanner>
+                  </AlertBanner>
                 </>
-              )
-              :
-              (
+              ) : (
                 <>
                   <Route
                     path='/courses/:courseId/'
@@ -109,8 +105,7 @@ function Course (props) {
                       />}
                   />
                 </>
-              )
-            }
+              )}
           </>
         ) : <Spinner />}
     </>
