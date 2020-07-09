@@ -85,7 +85,7 @@ def soft_update_datetime_field(
     warehouse_field_name: str
 ) -> List[str]:
     """
-    Use Django ORM to compare warehouse and existing course data and, if necessary, update DateTime field of model instance.
+    Use Django ORM to compare warehouse and existing course data and, if null, update DateTime field of model instance.
     """
     course_field_value = getattr(course_obj, course_field_name)
     # Skipping update if the field already has a value, provided by a previous cron run or administrator
@@ -435,7 +435,7 @@ class DashboardCronJob(CronJobBase):
         return status
 
 
-    def update_term(self) -> None:
+    def update_term(self) -> str:
         """
         Searches for new terms in data from warehouse, leaves existing terms as they are.
         """
