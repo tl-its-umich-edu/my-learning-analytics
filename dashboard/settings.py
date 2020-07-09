@@ -169,8 +169,6 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
     }
 }
-print("WEBPACK_LOADER")
-print(WEBPACK_LOADER)
 
 NPM_FILE_PATTERNS = {
     'bootstrap': ['dist/css/*'],
@@ -398,16 +396,12 @@ else:
     LOGIN_REDIRECT_URL = '/'
     LOGOUT_REDIRECT_URL='/'
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    }
-}
-
 # Give an opportunity to disable LTI
 if ENV.get('STUDENT_DASHBOARD_LTI', False):
     if not 'django.contrib.auth.backends.ModelBackend' in AUTHENTICATION_BACKENDS:
         AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
+    LTIV1P3 = ENV.get('LTIV1P3')
+    print(LTIV1P3)
 
     # PYLTI_CONFIG = {
     #     "consumers": ENV.get("PYLTI_CONFIG_CONSUMERS", {}),
@@ -473,22 +467,19 @@ RESOURCE_ACCESS_CONFIG = ENV.get("RESOURCE_ACCESS_CONFIG", {})
 SHA_ABBREV_LENGTH = 7
 
 # Django CSP Settings, load up from file if set
-# if "CSP" in ENV:
-#     print("CSP BLOCKsss")
-#     MIDDLEWARE += ['csp.middleware.CSPMiddleware',]
-#     for csp_key, csp_val in ENV.get("CSP").items():
-#         # If there's a value set for this CSP config, set it as a global
-#         if (csp_val):
-#             globals()["CSP_"+csp_key] = csp_val
-# # If CSP not set, add in XFrameOptionsMiddleware
-# else:
-#     print("NON-CSP BLOCK")
-#     MIDDLEWARE += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
+if "CSP" in ENV:
+    MIDDLEWARE += ['csp.middleware.CSPMiddleware',]
+    for csp_key, csp_val in ENV.get("CSP").items():
+        # If there's a value set for this CSP config, set it as a global
+        if (csp_val):
+            globals()["CSP_"+csp_key] = csp_val
+# If CSP not set, add in XFrameOptionsMiddleware
+else:
+    MIDDLEWARE += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
 
 # These are mostly needed by Canvas but it should also be in on general 
 CSRF_COOKIE_SECURE = ENV.get("CSRF_COOKIE_SECURE", False)
 if CSRF_COOKIE_SECURE:
-    print("CSRF BLOCKsCS")
     CSRF_TRUSTED_ORIGINS = ENV.get("CSRF_TRUSTED_ORIGINS", [])
     SESSION_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -498,7 +489,6 @@ if CSRF_COOKIE_SECURE:
 SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", None)
 CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", None)
 
-SESSION_COOKIE_NAME = 'sessionid'
 
 # IMPORT LOCAL ENV
 # =====================

@@ -1,8 +1,8 @@
-gunicorn>=19.9.0,<19.9.99
+gunicorn==20.0.4
 
 # We're waiting on Django 3 until it's further into the lifecycle.
 Django==3.0.7
-whitenoise>=4.1.4,<4.1.99
+whitenoise==5.1.0
 
 django-registration>=3.0,<3.0.99
 django-cron>=0.5.1,<0.5.99
@@ -49,6 +49,5 @@ django-ptvsd-debug==1.0.3
 django-lti-auth==1.0.0
 PyLTI1p3==1.7.0
 django-webpack-loader==0.6.0
-django-csp==3.5
-
 jsonschema==3.2.0
+django-csp==3.6
