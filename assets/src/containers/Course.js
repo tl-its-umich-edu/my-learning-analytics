@@ -11,6 +11,7 @@ import Spinner from '../components/Spinner'
 import { isObjectEmpty } from '../util/object'
 import { useCourseInfo } from '../service/api'
 import WarningBanner from '../components/WarningBanner'
+import AlertBanner from '../components/AlertBanner'
 
 function Course (props) {
   const { courseId, user } = props
@@ -23,7 +24,7 @@ function Course (props) {
     }
     setSideDrawerState(open)
   }
-
+  
   if (error.message === 'Not Found') return (<WarningBanner>Course {courseId} does not exist.</WarningBanner>)
   else if (error.message === 'Forbidden') return (<WarningBanner>You do not have access to course {courseId}.</WarningBanner>)
   else if (error) return (<WarningBanner />)
@@ -47,54 +48,65 @@ function Course (props) {
               courseId={courseId}
               courseInfo={courseInfo}
             />
-            <Route
-              path='/courses/:courseId/'
-              exact
-              render={props =>
-                <IndexPage
-                  {...props}
-                  courseInfo={courseInfo}
-                  courseId={courseId}
-                />}
-            />
-            <Route
-              path='/courses/:courseId/grades'
-              render={props =>
-                <GradeDistribution
-                  {...props}
-                  disabled={!courseInfo.course_view_options.gd}
-                  courseId={courseId}
-                  user={user}
-                />}
-            />
-            <Route
-              path='/courses/:courseId/assignmentsv1'
-              render={props =>
-                <AssignmentPlanning
-                  {...props}
-                  disabled={!courseInfo.course_view_options.apv1}
-                  courseId={courseId}
-                />}
-            />
-            <Route
-              path='/courses/:courseId/assignments'
-              render={props =>
-                <AssignmentPlanningV2
-                  {...props}
-                  disabled={!courseInfo.course_view_options.ap}
-                  courseId={courseId}
-                />}
-            />
-            <Route
-              path='/courses/:courseId/resources'
-              render={props =>
-                <ResourcesAccessed
-                  {...props}
-                  disabled={!courseInfo.course_view_options.ra}
-                  courseInfo={courseInfo}
-                  courseId={courseId}
-                />}
-            />
+            {courseInfo.course_user_exist === 0
+              ? (
+                <>
+                  <AlertBanner>
+                    No data is available for {courseInfo.name} yet. Please wait for the next system data load.
+                  </AlertBanner>
+                </>
+              ) : (
+                <>
+                  <Route
+                    path='/courses/:courseId/'
+                    exact
+                    render={props =>
+                      <IndexPage
+                        {...props}
+                        courseInfo={courseInfo}
+                        courseId={courseId}
+                      />}
+                  />
+                  <Route
+                    path='/courses/:courseId/grades'
+                    render={props =>
+                      <GradeDistribution
+                        {...props}
+                        disabled={!courseInfo.course_view_options.gd}
+                        courseId={courseId}
+                        user={user}
+                      />}
+                  />
+                  <Route
+                    path='/courses/:courseId/assignmentsv1'
+                    render={props =>
+                      <AssignmentPlanning
+                        {...props}
+                        disabled={!courseInfo.course_view_options.apv1}
+                        courseId={courseId}
+                      />}
+                  />
+                  <Route
+                    path='/courses/:courseId/assignments'
+                    render={props =>
+                      <AssignmentPlanningV2
+                        {...props}
+                        disabled={!courseInfo.course_view_options.ap}
+                        courseId={courseId}
+                      />}
+                  />
+                  <Route
+                    path='/courses/:courseId/resources'
+                    render={props =>
+                      <ResourcesAccessed
+                        {...props}
+                        disabled={!courseInfo.course_view_options.ra}
+                        courseInfo={courseInfo}
+                        courseId={courseId}
+                      />}
+                  />
+                </>
+              )}
           </>
         ) : <Spinner />}
     </>

@@ -19,7 +19,7 @@ from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
 from collections import namedtuple
 
-from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
+from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection, User
 from dashboard.settings import RESOURCE_VALUES, RESOURCE_VALUES_MAP, RESOURCE_ACCESS_CONFIG
 from dashboard.settings import COURSES_ENABLED
 
@@ -127,6 +127,9 @@ def get_course_info(request, course_id=0):
     resp['total_weeks'] = total_weeks
     resp['course_view_options'] = CourseViewOption.objects.get(course=course).json(include_id=False)
     resp['resource_types'] = course_resource_list
+
+    course_users_list = User.objects.filter(course_id=course_id)
+    resp['course_user_exist'] = 1 if len(course_users_list) > 0 else 0
 
     return HttpResponse(json.dumps(resp, default=str))
 
