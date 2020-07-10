@@ -110,6 +110,7 @@ INSTALLED_APPS = [
     'pinax.eventlog',
     'webpack_loader',
     'rules.apps.AutodiscoverRulesConfig',
+    'django_mysql',
 ]
 
 # The order of this is important. It says DebugToolbar should be on top but
@@ -284,7 +285,18 @@ LOGGING = {
         'handlers': ['console']
     },
 }
-
+CACHES = {
+    'default': {
+        'BACKEND': 'django_mysql.cache.MySQLCache',
+        'LOCATION': 'django_myla_cache',
+        'OPTIONS': {
+           'COMPRESS_MIN_LENGTH':5000,
+           'COMPRESS_LEVEL': 6
+        },
+        "KEY_PREFIX": "myla",
+        "TIMEOUT": 7200
+    }
+}
 
 # IMPORT LOCAL ENV
 # =====================

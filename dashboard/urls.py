@@ -48,6 +48,8 @@ urlpatterns = [
     re_path(r'^courses/', login_required(views.get_home_template,), name="courses"),
     # This path is used by Course.absolute_url to generate course links for the Admin interface.
     path('courses/<int:course_id>/', login_required(views.get_home_template,), name="courses"),
+    path('courses/<course_id>/<launch_id>/', login_required(views.get_home_template,), name="courses"),
+    # re_path(r'^courses/(?P<course-id>[0-9])/(?:lti1p3-launch-(?P<launch-id>[a-zA-Z0-9-]*)/)?$', login_required(views.get_home_template,), name="courses"),
 
     # These URLs are data patterns
     # GET access patterns
