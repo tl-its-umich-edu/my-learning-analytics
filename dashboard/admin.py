@@ -1,14 +1,14 @@
+from django.contrib import admin
 from django import forms
 from django.conf import settings
-from django.contrib import admin
-from django.forms.models import ModelForm
-from django.template.defaultfilters import linebreaksbr
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from django.template.defaultfilters import linebreaksbr
 
 from dashboard.common.db_util import canvas_id_to_incremented_id
-from dashboard.models import AcademicTerms, Course, CourseViewOption
+from .models import CourseViewOption, Course
 
+from django.forms.models import ModelForm
 
 # Always save the OneToOne Fields
 # https://stackoverflow.com/a/3734700/3708872
@@ -46,12 +46,6 @@ class CourseForm(forms.ModelForm):
         return self.cleaned_data
 
 
-class TermAdmin(admin.ModelAdmin):
-    exclude = ('id',)
-    list_display = ('canvas_id', 'name', 'date_start', 'date_end')
-    readonly_fields = ('canvas_id', 'name')
-
-
 class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseViewOptionInline, ]
     form = CourseForm
@@ -72,5 +66,5 @@ class CourseAdmin(admin.ModelAdmin):
         obj.id = canvas_id_to_incremented_id(obj.canvas_id)
         return super(CourseAdmin, self).save_model(request, obj, form, change)
 
-admin.site.register(AcademicTerms, TermAdmin)
+
 admin.site.register(Course, CourseAdmin)
