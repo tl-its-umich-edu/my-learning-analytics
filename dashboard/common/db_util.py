@@ -102,9 +102,13 @@ def get_user_courses_info(username):
             cursor.execute("select canvas_id, name from course where canvas_id in %s",[course_tuple])
             course_names = cursor.fetchall()
             df = pd.DataFrame(list(course_names))
-            df.columns = ["course_id", "course_name"]
-            course_info = df.to_dict(orient='records')
-            logger.info(f"User {username} is enrolled in these courses: {course_info}")
+
+            # create an empty dict
+            course_info = dict()
+            if df.size > 0:
+                df.columns = ["course_id", "course_name"]
+                course_info = df.to_dict(orient='records')
+                logger.info(f"User {username} is enrolled in these courses: {course_info}")
     return course_info
 
 
