@@ -60,6 +60,12 @@ def gpa_map(grade):
 def get_home_template(request):
     return render(request, 'frontend/index.html')
 
+# @permission_required('dashboard.course_admin',
+#     fn=objectgetter(Course, 'course_id'), raise_exception=True)
+# def coureseAdmin(request, course_id=0):
+#     return "foo"
+#     #return render(request, 'frontend/index.html') 
+
 
 @permission_required('dashboard.get_course_info',
     fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)

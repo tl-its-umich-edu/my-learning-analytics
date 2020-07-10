@@ -14,6 +14,7 @@ import AlertBanner from '../components/AlertBanner'
 import AvatarModal from '../components/AvatarModal'
 import SelectCard from '../components/SelectCard'
 
+
 const styles = theme => ({
   root: {
     flexGrow: 1
@@ -41,6 +42,12 @@ function CourseList (props) {
 
   const [avatarEl, setAvatarEl] = useState(null)
   const avatarOpen = Boolean(avatarEl)
+
+  
+  const enrolledCourses = JSON.parse(user.enrolledCourses)
+
+  const teacherEnrollment = enrolledCourses.filter(function(c) { return c.enrollment_type==='TeacherEnrollment'});
+  const studentEnrollment = enrolledCourses.filter(function(c) { return c.enrollment_type==='StudentEnrollment'});
 
   return (
     <>
@@ -78,7 +85,37 @@ function CourseList (props) {
       </AppBar>
       <div className={classes.content}>
         {
-          !user.relatedCourses.length
+          !teacherEnrollment.length
+            ? (
+              <AlertBanner>
+                You are not enrolled in any courses with My Learning Analytics enabled.
+                Visit the <MuiLink href={user.helpURL} style={{ color: siteTheme.palette.link.main }}>Help site</MuiLink> for
+                more information about this tool.
+              </AlertBanner>
+            )
+            : (
+              
+              <Grid container spacing={2}>
+                <Grid item xs={12}><h4>Teacher</h4></Grid>
+                {
+                  teacherEnrollment.map((course, key) => (
+                    
+                    <Grid item xs={12} sm={6} lg={4} key={key}>
+                    {/* {JSON.stringify(course)} */}
+                      <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}/admin/`}>
+                        <SelectCard cardData={{ title: course.course_name, description: 'Description' }} />
+                      </Link>
+                    </Grid>
+                    
+                  ))
+                }
+              </Grid>
+            )
+        }
+      </div>
+      <div className={classes.content}>
+        {
+          !studentEnrollment.length
             ? (
               <AlertBanner>
                 You are not enrolled in any courses with My Learning Analytics enabled.
@@ -88,13 +125,17 @@ function CourseList (props) {
             )
             : (
               <Grid container spacing={2}>
+                <Grid item xs={12}><h4>Student</h4></Grid>
                 {
-                  user.relatedCourses.map((course, key) => (
+                  studentEnrollment.map((course, key) => (
+                    
                     <Grid item xs={12} sm={6} lg={4} key={key}>
+                    {/* {JSON.stringify(course)} */}
                       <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`}>
-                        <SelectCard cardData={{ title: course.course_name }} />
+                        <SelectCard cardData={{ title: course.course_name, description: 'Description' }} />
                       </Link>
                     </Grid>
+                    
                   ))
                 }
               </Grid>

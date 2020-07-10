@@ -6,6 +6,7 @@ import GradeDistribution from './GradeDistribution'
 import AssignmentPlanning from './AssignmentPlanning'
 import AssignmentPlanningV2 from './AssignmentPlanningV2'
 import ResourcesAccessed from './ResourcesAccessed'
+import CourseAdmin from '../components/CourseAdmin/CourseAdmin'
 import IndexPage from './IndexPage'
 import Spinner from '../components/Spinner'
 import { isObjectEmpty } from '../util/object'
@@ -103,6 +104,15 @@ function Course (props) {
                         disabled={!courseInfo.course_view_options.ra}
                         courseInfo={courseInfo}
                         courseId={courseId}
+                      />}
+                  />
+                  <Route
+                    path='/courses/:courseId/admin'
+                    render={props =>
+                      <CourseAdmin
+                        {...props}
+                        courseId={courseId}
+                        user={user}
                       />}
                   />
                 </>

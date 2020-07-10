@@ -13,6 +13,7 @@ const user = Object.freeze({
   username: mylaGlobals.username,
   admin: mylaGlobals.is_superuser,
   relatedCourses: mylaGlobals.user_courses_info,
+  enrolledCourses: mylaGlobals.user_course_enrollment_info,
   isSuperuser: mylaGlobals.is_superuser,
   isLoggedIn: !!mylaGlobals.username,
   loginURL: mylaGlobals.login,
