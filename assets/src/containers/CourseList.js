@@ -48,6 +48,7 @@ function CourseList (props) {
 
   const teacherEnrollment = enrolledCourses.filter(function(c) { return c.enrollment_type==='TeacherEnrollment'});
   const studentEnrollment = enrolledCourses.filter(function(c) { return c.enrollment_type==='StudentEnrollment'});
+  const allEnrollments = teacherEnrollment.concat(studentEnrollment);
 
   return (
     <>
@@ -88,7 +89,7 @@ function CourseList (props) {
           !teacherEnrollment.length
             ? (
               <AlertBanner>
-                You are not enrolled in any courses with My Learning Analytics enabled.
+                You are not teaching in any courses with My Learning Analytics enabled.
                 Visit the <MuiLink href={user.helpURL} style={{ color: siteTheme.palette.link.main }}>Help site</MuiLink> for
                 more information about this tool.
               </AlertBanner>
@@ -115,7 +116,7 @@ function CourseList (props) {
       </div>
       <div className={classes.content}>
         {
-          !studentEnrollment.length
+          !allEnrollments.length
             ? (
               <AlertBanner>
                 You are not enrolled in any courses with My Learning Analytics enabled.
@@ -127,7 +128,7 @@ function CourseList (props) {
               <Grid container spacing={2}>
                 <Grid item xs={12}><h4>Student</h4></Grid>
                 {
-                  studentEnrollment.map((course, key) => (
+                  allEnrollments.map((course, key) => (
                     
                     <Grid item xs={12} sm={6} lg={4} key={key}>
                     {/* {JSON.stringify(course)} */}
