@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, withRouter } from 'react-router-dom'
+import { Route, withRouter, Redirect } from 'react-router-dom'
 import { matchPath } from 'react-router'
 import GoogleAnalyticsTracking from '../components/GoogleAnalyticsTracking'
 import CourseList from './CourseList'
@@ -20,7 +20,7 @@ function App (props) {
       <GoogleAnalyticsTracking gaId={gaId} />
       <Route path='/' exact render={props => <CourseList {...props} user={user} />} />
       <Route path='/courses' exact render={props => <CourseList {...props} user={user} />} />
-      <Route path='/launch/' exact render={props => <CourseList {...props} user={user} />} />
+      <Route exact path='/launch/'><Redirect to={`/courses/${user.relatedCourses.course_id}`} /></Route>
       {courseId ? <Course user={user} courseId={courseId} {...props} /> : null}
     </>
   )

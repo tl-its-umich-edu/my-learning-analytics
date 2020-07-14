@@ -65,6 +65,24 @@ def check_if_instructor(roles, username, course_id):
         return True
 
 
+def role_check(roles):
+    course_roles = [role for role in roles if "membership" in role]
+    logger.info(course_roles)
+    user_roles = []
+    if len(course_roles) == 0:
+        institute_roles = [role for role in roles if "institution" in role]
+        logger.info(f"user don't seems to have role in Course must be admin {institute_roles}")
+        return user_roles
+
+    for role in course_roles:
+        split_ = role.split('#')
+        user_roles.append(split_[1])
+    logger.info(f"User role in course {user_roles}")
+    # this step eliminates duplicates of multiple same roles in the course Like TA can be instructor in multiple sections
+    user_roles = list(dict.fromkeys(user_roles))
+    return user_roles
+
+
 def validate_lti_1_3_request(request, message_launch):
     launch_id = message_launch.get_launch_id()
     launch_data = message_launch.get_launch_data()
@@ -89,6 +107,7 @@ def validate_lti_1_3_request(request, message_launch):
     django.contrib.auth.login(request, user_obj)
 
     is_instructor = check_if_instructor(roles, username, course_id)
+    user_role = role_check(roles)
 
     try:
         course_details = Course.objects.get(canvas_id=course_id)
@@ -104,6 +123,7 @@ def validate_lti_1_3_request(request, message_launch):
         "username": username,
         "launch_id": launch_id,
         "user_courses_info": {"course_id": course_id, "course_name": course_name},
+        "role": user_role,
         "is_superuser": user_obj.is_superuser,
         "login": settings.LOGIN_URL,
         "logout": settings.LOGOUT_URL,
