@@ -10,7 +10,10 @@ def get_git_version_info(request):
 
 
 def get_myla_globals(request):
-    return {'myla_globals': utils.get_myla_globals(request.user)}
+    pass
+    # myla_globals = utils.get_myla_globals(request.user)
+    # logger.info({'myla_globals': myla_globals})
+    # return {'myla_globals': myla_globals}
 
 
 def last_updated(request):

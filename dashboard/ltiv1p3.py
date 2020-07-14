@@ -1,8 +1,7 @@
 import logging, string, random
 import django.contrib.auth
 
-from django.http import JsonResponse, HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.http import JsonResponse
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
@@ -15,6 +14,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from dashboard.models import Course, CourseViewOption
 from django.utils.decorators import method_decorator
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.template import loader
+from django.http import HttpResponse
+from django.conf import settings
 
 
 logger = logging.getLogger(__name__)
@@ -63,16 +65,18 @@ def check_if_instructor(roles, username, course_id):
         return True
 
 
-def validate_lti_1_3_request(request, message_launch_data):
-    url = reverse('home')
-    custom_params = message_launch_data['https://purl.imsglobal.org/spec/lti/claim/custom']
-    course_name = message_launch_data['https://purl.imsglobal.org/spec/lti/claim/context']['title']
-    roles = message_launch_data['https://purl.imsglobal.org/spec/lti/claim/roles']
+def validate_lti_1_3_request(request, message_launch):
+    launch_id = message_launch.get_launch_id()
+    launch_data = message_launch.get_launch_data()
+    custom_params = launch_data['https://purl.imsglobal.org/spec/lti/claim/custom']
+    course_name = launch_data['https://purl.imsglobal.org/spec/lti/claim/context']['title']
+    roles = launch_data['https://purl.imsglobal.org/spec/lti/claim/roles']
     username = custom_params['user_username']
     course_id = custom_params['canvas_course_id']
-    email = message_launch_data['email']
-    first_name = message_launch_data['given_name']
-    last_name = message_launch_data['family_name']
+    email = launch_data['email']
+    first_name = launch_data['given_name']
+    last_name = launch_data['family_name']
+    user_img = launch_data['picture']
     RANDOM_PASSWORD_DEFAULT_LENGTH = 32
 
     # Logging the user regardless course exits or not otherwise Django will show default login page
@@ -96,11 +100,19 @@ def validate_lti_1_3_request(request, message_launch_data):
 
     if course_details.term_id is None:
         logger.info(f"Course {course_id} don't have a cron run yet")
-
-    if course_id:
-        url = reverse('courses', kwargs={'course_id': course_id})
-        logger.info(f"Course URL for LTI launch {url}")
-    return url
+    lti_globals = {
+        "username": username,
+        "launch_id": launch_id,
+        "user_courses_info": {"course_id": course_id, "course_name": course_name},
+        "is_superuser": user_obj.is_superuser,
+        "login": settings.LOGIN_URL,
+        "logout": settings.LOGOUT_URL,
+        "user_image": user_img,
+        "primary_ui_color": settings.PRIMARY_UI_COLOR,
+        "help_url": settings.HELP_URL,
+        "google_analytics_id": settings.GA_ID
+    }
+    return lti_globals
 
 
 @csrf_exempt
@@ -121,8 +133,12 @@ def launch(request):
     tool_conf = get_tool_conf()
     launch_data_storage = DjangoCacheDataStorage(cache_name='default')
     message_launch = DjangoMessageLaunch(request, tool_conf, launch_data_storage=launch_data_storage)
-    message_launch_data = message_launch.get_launch_data()
-    launch_id = message_launch.get_launch_id()
-    logger.info(f"Launch_id: {launch_id}")
-    url = validate_lti_1_3_request(request, message_launch_data)
-    return redirect(url)
+    lti_globals = validate_lti_1_3_request(request, message_launch)
+    template = loader.get_template('frontend/index.html')
+    context = {
+        'lti_globals': lti_globals
+    }
+    # return redirect(url)
+    logger.info({'lti_globals': lti_globals })
+    return HttpResponse(template.render(context, request))
+    # return render(request, 'frontend/index.html', context

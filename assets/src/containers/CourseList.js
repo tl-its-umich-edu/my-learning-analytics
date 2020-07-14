@@ -38,6 +38,7 @@ const styles = theme => ({
 
 function CourseList (props) {
   const { classes, user } = props
+  const course = user.relatedCourses
 
   const [avatarEl, setAvatarEl] = useState(null)
   const avatarOpen = Boolean(avatarEl)
@@ -78,7 +79,7 @@ function CourseList (props) {
       </AppBar>
       <div className={classes.content}>
         {
-          !user.relatedCourses.length
+          !user.relatedCourses
             ? (
               <AlertBanner>
                 You are not enrolled in any courses with My Learning Analytics enabled.
@@ -88,15 +89,11 @@ function CourseList (props) {
             )
             : (
               <Grid container spacing={2}>
-                {
-                  user.relatedCourses.map((course, key) => (
-                    <Grid item xs={12} sm={6} lg={4} key={key}>
-                      <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`}>
-                        <SelectCard cardData={{ title: course.course_name }} />
-                      </Link>
-                    </Grid>
-                  ))
-                }
+                <Grid item xs={12} sm={6} lg={4}>
+                  <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`}>
+                    <SelectCard cardData={{ title: course.course_name }} />
+                  </Link>
+                </Grid>
               </Grid>
             )
         }
