@@ -65,6 +65,8 @@ urlpatterns = [
     # PUT/POST access patterns
     path('api/v1/courses/<int:course_id>/set_user_default_selection/',
         login_required(views.update_user_default_selection_for_views), name='update_user_default_selection_for_views'),
+    path('api/v1/courses/<int:course_id>/update_info/',
+        login_required(views.update_course_info), name='update_course_info'),
 
     path('su/', include('django_su.urls')),
 

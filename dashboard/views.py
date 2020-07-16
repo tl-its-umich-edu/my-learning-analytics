@@ -1,27 +1,29 @@
-from django.forms.models import model_to_dict
-from rules.contrib.views import permission_required, objectgetter
-
-import math, json, logging
+import json
+import logging
+from collections import namedtuple
 from datetime import timedelta
-from django.utils import timezone
+from json import JSONDecodeError
 
+import math
 import numpy as np
 import pandas as pd
 from django.conf import settings
 from django.contrib import auth
-from django.db import connection as conn
-from django.http import HttpResponse, HttpResponseForbidden
-from django.shortcuts import redirect, render
-from pinax.eventlog.models import log as eventlog
-from dashboard.event_logs_types.event_logs_types import EventLogTypes
-from dashboard.common.db_util import canvas_id_to_incremented_id
-from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
-from collections import namedtuple
+from django.db import connection as conn
+from django.forms.models import model_to_dict
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
+from django.shortcuts import redirect, render
+from django.utils import timezone
+from pinax.eventlog.models import log as eventlog
+from rules.contrib.views import permission_required, objectgetter
 
+from dashboard.common import utils
+from dashboard.common.db_util import canvas_id_to_incremented_id
+from dashboard.event_logs_types.event_logs_types import EventLogTypes
 from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection, User
-from dashboard.settings import RESOURCE_VALUES, RESOURCE_VALUES_MAP, RESOURCE_ACCESS_CONFIG
 from dashboard.settings import COURSES_ENABLED
+from dashboard.settings import RESOURCE_VALUES, RESOURCE_VALUES_MAP, RESOURCE_ACCESS_CONFIG
 
 logger = logging.getLogger(__name__)
 # strings for construct resource download url
@@ -132,6 +134,77 @@ def get_course_info(request, course_id=0):
     resp['course_user_exist'] = 1 if len(course_users_list) > 0 else 0
 
     return HttpResponse(json.dumps(resp, default=str))
+
+
+@permission_required('dashboard.update_course_info',
+                     fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
+def update_course_info(request, course_id=0):
+    """
+
+    :param request: HTTP `PUT` req.; body should contain the JSON body…
+    :param course_id: Integer Canvas course ID number, typically six digits or less.
+    :return: HttpResponse containing `{"default": "success"}` or `{"default": "fail"}`
+    """
+    logger.info(update_course_info.__name__)
+
+    if (request.method != 'PUT'):
+        return HttpResponseBadRequest(JsonResponse({'error': 'Invalid request method.'}))
+
+    course_id = canvas_id_to_incremented_id(course_id)
+    current_user = request.user.get_username()
+
+    bad_json_response = HttpResponseBadRequest(JsonResponse({'error': 'Request JSON malformed.'}))
+
+    try:
+        request_data = json.loads(request.body.decode('utf-8'))
+    except JSONDecodeError:
+        return bad_json_response
+
+    logger.info(request_data)
+
+    # validate root key names
+    valid_root_keys = ['course_view_options', 'show_grade_counts']
+    request_root_keys = request_data.keys()
+    invalid_root_keys = set(request_root_keys) - set(valid_root_keys)
+    if (invalid_root_keys):
+        return bad_json_response
+
+    # validate root key types
+    if (type(request_data.get('course_view_options', {})) is not dict) or \
+            (type(request_data.get('show_grade_counts', False)) is not bool):
+        return bad_json_response
+
+    # everything is valid, now OK to use request data
+
+    ############################
+    return JsonResponse({'fubar': 'tarfu'})
+    ############################
+
+    default_type = list(request_data.keys())[0]
+    default_type_value = request_data.get(default_type)
+    logger.info(
+        f'request to set default for type: {default_type} and default_type value: {default_type_value}')
+    # json for eventlog
+    data = {
+        'course_id': course_id,
+        'default_type': default_type,
+        'default_value': default_type_value
+    }
+    eventlog(request.user, EventLogTypes.EVENT_VIEW_SET_DEFAULT.value, extra=data)
+    key = 'default'
+    try:
+        obj, create_or_update_bool = UserDefaultSelection.objects. \
+            set_user_defaults(int(course_id), current_user, default_type, default_type_value)
+        logger.info(
+            f'''setting default returns with success with response {obj.__dict__} and entry created or Updated: {create_or_update_bool}
+                        for user {current_user} in course {course_id}''')
+        value = 'success'
+    except (ObjectDoesNotExist, Exception) as e:
+        logger.info(
+            f'updating default failed due to {e} for user {current_user} in course: {course_id}')
+        value = 'fail'
+    return HttpResponse(json.dumps({key: value}), content_type='application/json')
+
 
 
 # show percentage of users who read the resource within prior n weeks
@@ -373,7 +446,14 @@ def grade_distribution(request, course_id=0):
 @permission_required('dashboard.update_user_default_selection_for_views',
     fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def update_user_default_selection_for_views(request, course_id=0):
+    """
+
+    :param request: HTTP `PUT` req.; body should contain a single JSON pair, `{"key": value}`
+    :param course_id: Integer Canvas course ID number, typically six digits or less.
+    :return: HttpResponse containing `{"default": "success"}` or `{"default": "fail"}`
+    """
     logger.info(update_user_default_selection_for_views.__name__)
+    logger.info(request)
     course_id = canvas_id_to_incremented_id(course_id)
     current_user = request.user.get_username()
     default_selection = json.loads(request.body.decode("utf-8"))
@@ -390,9 +470,8 @@ def update_user_default_selection_for_views(request, course_id=0):
     eventlog(request.user, EventLogTypes.EVENT_VIEW_SET_DEFAULT.value, extra=data)
     key = 'default'
     try:
-        obj, create_or_update_bool = UserDefaultSelection.objects.set_user_defaults(int(course_id), current_user,
-                                                                                    default_type,
-                                                                                    default_type_value)
+        obj, create_or_update_bool = UserDefaultSelection.objects. \
+            set_user_defaults(int(course_id), current_user, default_type, default_type_value)
         logger.info(
             f"""setting default returns with success with response {obj.__dict__} and entry created or Updated: {create_or_update_bool}
                         for user {current_user} in course {course_id} """)
