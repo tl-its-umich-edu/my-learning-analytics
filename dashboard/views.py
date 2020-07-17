@@ -157,62 +157,68 @@ def update_course_info(request, course_id=0):
     bad_json_response = HttpResponseBadRequest(JsonResponse({'error': 'Request JSON malformed.'}))
 
     try:
-        request_data = json.loads(request.body.decode('utf-8'))
+        request_data: dict = json.loads(request.body.decode('utf-8'))
     except JSONDecodeError:
         return bad_json_response
 
     schema = {'$schema': 'http://json-schema.org/draft-07/schema',
               'type': 'object',
-              'minProperties': 1,
               'additionalProperties': False,
               'properties': {
-                  'course_view_options': {
+                  'ap': {
                       'type': 'object',
-                      'minProperties': 1,
+                      'required': ['enabled'],
                       'additionalProperties': False,
-                      'properties': {
-                          'ra': {'type': 'boolean'},
-                          'apv1': {'type': 'boolean'},
-                          'ap': {'type': 'boolean'},
-                          'gd': {'type': 'boolean'}}},
-                  'show_grade_counts': {'type': 'boolean'}}}
+                      'properties': {'enabled': {'type': 'boolean'}}},
+                  'apv1': {
+                      'type': 'object',
+                      'required': ['enabled'],
+                      'additionalProperties': False,
+                      'properties': {'enabled': {'type': 'boolean'}}},
+                  'gd': {
+                      'type': 'object',
+                      'required': ['enabled'],
+                      'additionalProperties': False,
+                      'properties': {'enabled': {'type': 'boolean'},
+                                     'show_grade_counts': {'type': 'boolean'}}},
+                  'ra': {
+                      'type': 'object',
+                      'required': ['enabled'],
+                      'additionalProperties': False,
+                      'properties': {'enabled': {'type': 'boolean'}}}},
+              'minProperties': 1}
 
     try:
         jsonschema.validate(request_data, schema)
     except jsonschema.ValidationError:
         return bad_json_response
 
-    # request data valid; now safe to use
-
-    ############################
-    return JsonResponse({'fubar': 'tarfu'})
-    ############################
-
-    default_type = list(request_data.keys())[0]
-    default_type_value = request_data.get(default_type)
-    logger.info(
-        f'request to set default for type: {default_type} and default_type value: {default_type_value}')
-    # json for eventlog
-    data = {
-        'course_id': course_id,
-        'default_type': default_type,
-        'default_value': default_type_value
+    # to translate short names returned by model back to original column names
+    view_column_names: dict = {
+        'ap': CourseViewOption.show_assignment_planning.field_name,
+        'apv1': CourseViewOption.show_assignment_planning_v1.field_name,
+        'gd': CourseViewOption.show_grade_distribution.field_name,
+        'ra': CourseViewOption.show_resources_accessed.field_name
     }
-    eventlog(request.user, EventLogTypes.EVENT_VIEW_SET_DEFAULT.value, extra=data)
-    key = 'default'
+
+    view_settings: dict
+    view_data: dict = {}
+    success: bool = True  # always look on the bright side of life
+
     try:
-        obj, create_or_update_bool = UserDefaultSelection.objects. \
-            set_user_defaults(int(course_id), current_user, default_type, default_type_value)
-        logger.info(
-            f'''setting default returns with success with response {obj.__dict__} and entry created or Updated: {create_or_update_bool}
-                        for user {current_user} in course {course_id}''')
-        value = 'success'
+        for (view_key, view_settings) in request_data.items():
+            view_data[view_column_names[view_key]] = view_settings['enabled']
+            if (view_key == 'gd' and 'show_grade_counts' in view_settings.keys()):
+                Course.objects.filter(pk=course_id).update(
+                    show_grade_counts=view_settings['show_grade_counts'])
+
+        CourseViewOption.objects.filter(pk=course_id).update(**view_data)
     except (ObjectDoesNotExist, Exception) as e:
         logger.info(
-            f'updating default failed due to {e} for user {current_user} in course: {course_id}')
-        value = 'fail'
-    return HttpResponse(json.dumps({key: value}), content_type='application/json')
+            f'updating course visualization options failed due to {e} for user {current_user} in course: {course_id}')
+        success = False
 
+    return JsonResponse({'default': 'success' if success else 'fail'})
 
 
 # show percentage of users who read the resource within prior n weeks
