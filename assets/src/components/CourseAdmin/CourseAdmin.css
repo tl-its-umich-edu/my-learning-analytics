@@ -1,1 +1,17 @@
-.CourseAdmin {}
+.CourseAdmin {
+
+
+}
+
+.course-options {
+    margin:15px;
+}
+
+.course-options Button {
+    margin:15px;
+}
+
+.course-options ul{
+    margin-top:15px;
+    padding-left:25px;
+}

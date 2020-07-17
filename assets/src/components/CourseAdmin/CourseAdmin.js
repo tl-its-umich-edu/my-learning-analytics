@@ -1,75 +1,78 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import './CourseAdmin.css';
-import Checkbox from './Checkbox';
+import React, { useState} from 'react';
+import { withStyles } from '@material-ui/core/styles'
+
+import { Button, Checkbox, FormControl, FormGroup, FormControlLabel, Grid} from '@material-ui/core'
+import { Link } from 'react-router-dom';
+import SelectCard from '../SelectCard';
+import routes from '../../routes/routes'
+
+const styles = theme => ({
+  li: {
+    listStyleType: 'none'
+  },
+  courseoptions: {
+    margin:'15px'
+  }
+})
+
+function CourseAdmin(props) {
+
+  const { courseInfo, courseId } = props
+  const views = courseInfo.course_view_options
+  const { classes } = props;
+  const courseName = 'Course Name Goes Here'
 
 
-class CourseAdmin extends React.Component {
-  constructor(props) {
-    super(props);
-        this.options = [  
-                      { 'name':'Assignment Planning V1',  'enabled':false, 'options' : [] },
-                      { 'name': 'Assignment Planning V2', 'enabled':true, 'options' : [] },
-                      { 'name': 'Grade Distribution',     'enabled':true, 'options' : [ {'name':'Show Grade Counts', 'enabled':true, 'options':[ {'name':'Embellished Grade Counts', 'enabled':true} ]}]},
-                      { 'name': 'Resources Accessed',     'enabled':true, 'options' : [] },
-    ]
+  const [options, setOptions] = useState({
+    "apv1": { 'enabled':!!views.apv1},
+    "ap": { 'enabled':!!views.ap},
+    "gd": { 'enabled':!!views.gd, "show_grade_counts":true},
+    "ra": { 'enabled':!!views.ra}
+  })
+  
+  const save = () =>{
 
-    this.booleans = [ 'show_assignment_planning', 'show_grade_distribution', 'show_resources_accessed', 'show_assignment_planning_v1' ]
-    this.selectedCheckboxes = new Set();
   }
 
-  toggleCheckbox = label => {
-    if (this.selectedCheckboxes.has(label)) {
-      this.selectedCheckboxes.delete(label);
-    } else {
-      this.selectedCheckboxes.add(label);
-    }
+  const handleChange = (event, viewCode) => {
+    options[viewCode].enabled=event.target.checked
+    setOptions({
+      "apv1": { 'enabled':options['apv1'].enabled},
+      "ap": { 'enabled':options['ap'].enabled},
+      "gd": { 'enabled':options['gd'].enabled, "show_grade_counts":options['gd'].show_grade_counts},
+      "ra": { 'enabled':options['ra'].enabled}
+    })
   }
 
-  handleOption = (option) =>{
-    var result = this.createCheckbox(option.name, option.enabled)
-    
-    if ( option.options && option.options.length>0) {
-      return <li key={option.name+'subs'}>{result}<ul>{option.options.map(this.handleOption)}</ul></li>
-    } else {
-      return <li key={option.name}>{result}</li>
-    }
-  }
+  return (
+    <FormControl onSubmit={save()}>
+      <Grid container>
+        {
+          routes(courseId, views).map((props, key) => (
 
-  createCheckbox = (label,checked) => {
-    if (checked){
-      this.selectedCheckboxes.add(label)
-    }
-    return <Checkbox
-            label={label}
-            handleCheckboxChange={this.toggleCheckbox}
-            isChecked={checked}
-            key={label}
-        />
-  }
+            <Grid item xs={12} sm={6} lg={4} key={key}>
+              <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={props.path}>
+                <SelectCard cardData={props} />
+              </Link>
+              <Grid container>
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    value='Enable'
+                    control={<Checkbox id={props.viewCode} color="primary" checked={options[props.viewCode].enabled} onChange={()=>handleChange(event, props.viewCode)}/>}
+                    label='Enable'
+                    labelPlacement="end"
+                  />
 
-  createCheckboxes = (options) => {
-    var result = options.map(this.handleOption)
-    return <ul> {result} </ul>;
-  }
-
-  handleFormSubmit = formSubmitEvent => {
-    formSubmitEvent.preventDefault();
-
-    for (const checkbox of this.selectedCheckboxes) {
-      console.log(checkbox, 'is selected.');
-    }
-  }
-
-  render() {
-    return (
-      <form onSubmit={this.handleFormSubmit}>
-        {this.createCheckboxes(this.options)}
-
-        <button className="btn btn-default" type="submit">Save</button>
-      </form>
-    );
-  }
+                </Grid>              
+              </Grid>
+              
+            </Grid>
+            
+          ))
+        }
+      </Grid>
+    </FormControl>
+  )
 }
 
-export default CourseAdmin;
+export default withStyles(styles)(CourseAdmin);

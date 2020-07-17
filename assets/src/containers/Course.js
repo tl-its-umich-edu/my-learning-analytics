@@ -112,6 +112,7 @@ function Course (props) {
                       <CourseAdmin
                         {...props}
                         courseId={courseId}
+                        courseInfo={courseInfo}
                         user={user}
                       />}
                   />
