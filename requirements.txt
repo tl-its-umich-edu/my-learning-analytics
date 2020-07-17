@@ -34,7 +34,6 @@ pyOpenSSL>=19.0,<19.0.99
 canvasapi>=0.10,<0.10.99
 protobuf>=3.10.0,<3.10.99
 
-
 # These caused problems in the past so test when updating
 djangosaml2==0.19.1
 pysaml2==5.1.0
