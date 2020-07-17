@@ -48,3 +48,5 @@ django-ptvsd-debug==1.0.3
 django-lti-auth==1.0.0
 django-webpack-loader==0.6.0
 django-csp==3.5
+
+jsonschema==3.2.0

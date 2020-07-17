@@ -4,6 +4,7 @@ from collections import namedtuple
 from datetime import timedelta
 from json import JSONDecodeError
 
+import jsonschema
 import math
 import numpy as np
 import pandas as pd
@@ -160,21 +161,28 @@ def update_course_info(request, course_id=0):
     except JSONDecodeError:
         return bad_json_response
 
-    logger.info(request_data)
+    schema = {'$schema': 'http://json-schema.org/draft-07/schema',
+              'type': 'object',
+              'minProperties': 1,
+              'additionalProperties': False,
+              'properties': {
+                  'course_view_options': {
+                      'type': 'object',
+                      'minProperties': 1,
+                      'additionalProperties': False,
+                      'properties': {
+                          'ra': {'type': 'boolean'},
+                          'apv1': {'type': 'boolean'},
+                          'ap': {'type': 'boolean'},
+                          'gd': {'type': 'boolean'}}},
+                  'show_grade_counts': {'type': 'boolean'}}}
 
-    # validate root key names
-    valid_root_keys = ['course_view_options', 'show_grade_counts']
-    request_root_keys = request_data.keys()
-    invalid_root_keys = set(request_root_keys) - set(valid_root_keys)
-    if (invalid_root_keys):
+    try:
+        jsonschema.validate(request_data, schema)
+    except jsonschema.ValidationError:
         return bad_json_response
 
-    # validate root key types
-    if (type(request_data.get('course_view_options', {})) is not dict) or \
-            (type(request_data.get('show_grade_counts', False)) is not bool):
-        return bad_json_response
-
-    # everything is valid, now OK to use request data
+    # request data valid; now safe to use
 
     ############################
     return JsonResponse({'fubar': 'tarfu'})
