@@ -445,7 +445,6 @@ class DashboardCronJob(CronJobBase):
 
         existing_terms_ids: List[int] = [term.id for term in list(AcademicTerms.objects.all())]
         new_term_ids: List[int] = [int(id) for id in warehouse_term_df['id'].to_list() if int(id) not in existing_terms_ids]
-        logger.debug(new_term_ids)
         new_term_df: pd.DataFrame = warehouse_term_df.loc[warehouse_term_df['id'].isin(new_term_ids)]
 
         if len(new_term_ids) == 0:
@@ -453,7 +452,7 @@ class DashboardCronJob(CronJobBase):
         else:
             try:
                 new_term_df.to_sql(con=engine, name='academic_terms', if_exists='append', index=False)
-                term_message: str = f'Added {len(new_term_df)} new records to academic_terms table.'
+                term_message: str = f'Added {len(new_term_df)} new records to academic_terms table: {new_term_ids}'
                 logger.info(term_message)
                 status += term_message + '\n'
             except Exception as e:
