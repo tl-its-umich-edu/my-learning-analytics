@@ -285,16 +285,15 @@ LOGGING = {
         'handlers': ['console']
     },
 }
+DB_CACHE_CONFIGS = ENV.get('DB_CACHE_CONFIGS', {})
+
 CACHES = {
     'default': {
-        'BACKEND': 'django_mysql.cache.MySQLCache',
-        'LOCATION': 'django_myla_cache',
-        'OPTIONS': {
-           'COMPRESS_MIN_LENGTH':5000,
-           'COMPRESS_LEVEL': 6
-        },
-        "KEY_PREFIX": "myla",
-        "TIMEOUT": 7200
+        'BACKEND': DB_CACHE_CONFIGS['BACKEND'],
+        'LOCATION': DB_CACHE_CONFIGS['LOCATION'],
+        'OPTIONS': DB_CACHE_CONFIGS['CACHE_OPTIONS'],
+        "KEY_PREFIX": DB_CACHE_CONFIGS['CACHE_KEY_PREFIX'],
+        "TIMEOUT": DB_CACHE_CONFIGS['CACHE_TTL']
     }
 }
 
@@ -412,8 +411,8 @@ else:
 if ENV.get('STUDENT_DASHBOARD_LTI', False):
     if not 'django.contrib.auth.backends.ModelBackend' in AUTHENTICATION_BACKENDS:
         AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
-    LTIV1P3 = ENV.get('LTIV1P3')
-    print(LTIV1P3)
+
+    LTIV1P3 = ENV.get('LTIV1P3',{})
 
     # PYLTI_CONFIG = {
     #     "consumers": ENV.get("PYLTI_CONFIG_CONSUMERS", {}),
