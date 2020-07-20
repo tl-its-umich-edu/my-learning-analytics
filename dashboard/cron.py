@@ -321,16 +321,16 @@ class DashboardCronJob(CronJobBase):
             # Because we're pulling all the data down into one query we need to manipulate it a little bit
             # Make a copy of the access dataframe
             resource_df = resource_access_df.copy(deep=True)
-            # Drop out the columns user and access time from resource data frame
-            resource_df = resource_df.drop(["user_id", "access_time"], axis=1)
+            # Drop out the columns user course_id and access time from resource data frame
+            resource_df = resource_df.drop(["user_id", "course_id", "access_time"], axis=1)
             # Drop out the duplicates
-            resource_df = resource_df.drop_duplicates(["resource_id", "course_id"])
+            resource_df = resource_df.drop_duplicates(["resource_id",])
 
             # Set a dual index for upsert
             resource_df = resource_df.set_index(["resource_id", "course_id"])
 
-            # Drop out the columns resource_type, course_id, name from the resource_access
-            resource_access_df = resource_access_df.drop(["resource_type","name", "course_id"], axis=1)
+            # Drop out the columns resource_type, name from the resource_access
+            resource_access_df = resource_access_df.drop(["resource_type","name"], axis=1)
 
             # Drop the columns where there is a Na value
             resource_access_df_drop_na = resource_access_df.dropna()
