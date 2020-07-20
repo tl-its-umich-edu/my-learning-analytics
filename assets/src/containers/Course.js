@@ -103,7 +103,6 @@ function Course (props) {
                         disabled={!courseInfo.course_view_options.ra}
                         courseInfo={courseInfo}
                         courseId={courseId}
-                        launchId={user.launchID}
                       />}
                   />
                 </>
