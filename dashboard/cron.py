@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Union
 import pandas as pd
 import pytz
 from django.conf import settings
-from django.db import connections as conns
+from django.db import connections as conns, models
 from django.db.models import QuerySet
 from django_cron import CronJobBase, Schedule
 from google.cloud import bigquery
@@ -79,25 +79,24 @@ def deleteAllRecordInTable(tableName):
 
 
 def soft_update_datetime_field(
-    course_obj: Course,
-    course_field_name: str,
-    warehouse_dict: Dict[str, Any],
-    warehouse_field_name: str
+    model_inst: models.Model,
+    field_name: str,
+    warehouse_field_value: Union[datetime.datetime, None],
 ) -> List[str]:
     """
-    Use Django ORM to compare warehouse and existing course data and, if null, update DateTime field of model instance.
+    Use Django ORM to compare warehouse and existing data and, if null, update DateTime field of model instance.
     """
-    course_field_value = getattr(course_obj, course_field_name)
+    model_name: str = model_inst.__class__.__name__
+    current_field_value: Union[datetime.datetime, None] = getattr(model_inst, field_name)
     # Skipping update if the field already has a value, provided by a previous cron run or administrator
-    if course_field_value is not None:
-        logger.info(f"Update of {course_field_name} skipped; existing value was found.")
+    if current_field_value is not None:
+        logger.info(f'Skipped update of {field_name} for {model_name} instance ({model_inst.id}); existing value was found.')
     else:
-        warehouse_field_value: pd.Timestamp = warehouse_dict[warehouse_field_name]
-        if pd.notna(warehouse_field_value):
+        if warehouse_field_value:
             warehouse_field_value = warehouse_field_value.replace(tzinfo=pytz.UTC)
-            setattr(course_obj, course_field_name, warehouse_field_value)
-            logger.info(f"{course_field_name} for {course_obj.id} has been updated on model instance.")
-            return [course_field_name]
+            setattr(model_inst, field_name, warehouse_field_value)
+            logger.info(f'Updated {field_name} for {model_name} instance ({model_inst.id})')
+            return [field_name]
     return []
 
 
@@ -491,8 +490,14 @@ class DashboardCronJob(CronJobBase):
                 logger.info(f'Term for {course.id} has been updated.')
                 updated_fields.append('term')
 
-            updated_fields += soft_update_datetime_field(course, 'date_start', warehouse_course_dict, 'start_at')
-            updated_fields += soft_update_datetime_field(course, 'date_end', warehouse_course_dict, 'conclude_at')
+            warehouse_date_start: Union[datetime.datetime, None] = (
+                warehouse_course_dict['start_at'].to_pydatetime() if warehouse_course_dict['start_at'] is not None else None
+            )
+            updated_fields += soft_update_datetime_field(course, 'date_start', warehouse_date_start)
+            warehouse_date_end: Union[datetime.datetime, None] = (
+                warehouse_course_dict['conclude_at'].to_pydatetime() if warehouse_course_dict['conclude_at'] is not None else None
+            )
+            updated_fields += soft_update_datetime_field(course, 'date_end', warehouse_date_end)
 
             if len(updated_fields) > 0:
                 course.save()
