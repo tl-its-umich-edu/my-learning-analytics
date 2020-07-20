@@ -435,7 +435,7 @@ class DashboardCronJob(CronJobBase):
 
     def update_term(self) -> str:
         """
-        Searches for new terms in data from warehouse, leaves existing terms as they are.
+        Searches warehouse data for new terms and adds them while leaving existing terms as they are.
         """
         status: str = ''
         logger.info('update_term()')
