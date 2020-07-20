@@ -453,8 +453,9 @@ class DashboardCronJob(CronJobBase):
         else:
             try:
                 new_term_df.to_sql(con=engine, name='academic_terms', if_exists='append', index=False)
-                logger.info(f'Added {len(new_term_df)} new records to academic_terms table.')
-                status += f'Added {len(new_term_df)} new records to academic_terms table.\n'
+                term_message: str = f'Added {len(new_term_df)} new records to academic_terms table.'
+                logger.info(term_message)
+                status += term_message + '\n'
             except Exception as e:
                 logger.error(f'Error running to_sql on term table: {e}')
                 raise
