@@ -51,6 +51,9 @@ class TermAdmin(admin.ModelAdmin):
     list_display = ('canvas_id', 'name', 'date_start', 'date_end')
     readonly_fields = ('canvas_id', 'name')
 
+    def has_add_permission(self, request, obj=None):
+        return False
+
 
 class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseViewOptionInline, ]
