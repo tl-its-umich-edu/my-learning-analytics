@@ -90,7 +90,7 @@ def soft_update_datetime_field(
     current_field_value: Union[datetime.datetime, None] = getattr(model_inst, field_name)
     # Skipping update if the field already has a value, provided by a previous cron run or administrator
     if current_field_value is not None:
-        logger.info(f'Skipped update of {field_name} for {model_name} instance ({model_inst.id}); existing value was found.')
+        logger.info(f'Skipped update of {field_name} for {model_name} instance ({model_inst.id}); existing value was found')
     else:
         if warehouse_field_value:
             warehouse_field_value = warehouse_field_value.replace(tzinfo=pytz.UTC)
@@ -433,7 +433,6 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
-
     def update_term(self) -> str:
         """
         Searches for new terms in data from warehouse, leaves existing terms as they are.
@@ -460,7 +459,6 @@ class DashboardCronJob(CronJobBase):
                 logger.error(f'Error running to_sql on term table: {e}')
                 raise
         return status
-
 
     def update_course(self, warehouse_courses_data: pd.DataFrame) -> str:
         """
