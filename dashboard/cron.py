@@ -84,7 +84,7 @@ def soft_update_datetime_field(
     warehouse_field_value: Union[datetime.datetime, None],
 ) -> List[str]:
     """
-    Use Django ORM to compare warehouse and existing data and, if null, update DateTime field of model instance.
+    Uses Django ORM to update DateTime field of model instance if the field value is null and the warehouse data is non-null.
     """
     model_name: str = model_inst.__class__.__name__
     current_field_value: Union[datetime.datetime, None] = getattr(model_inst, field_name)
