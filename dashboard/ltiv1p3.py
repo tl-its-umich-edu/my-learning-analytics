@@ -178,6 +178,10 @@ def launch(request):
         return JsonResponse(error_message)
     launch_data_storage = DjangoCacheDataStorage(cache_name='default')
     message_launch = DjangoMessageLaunch(request, tool_conf, launch_data_storage=launch_data_storage)
+    # fetch platform's public key from cache instead of everytime calling the API will speep up the launch process
+    cache_ttl = settings.DB_CACHE_CONFIGS['CACHE_TTL']
+    cache_lifetime = cache_ttl if cache_ttl else 7200
+    message_launch.set_public_key_caching(launch_data_storage, cache_lifetime=cache_lifetime)
     lti_globals = extracting_launch_variables_for_tool_use(request, message_launch)
     context = {
         'lti_globals': lti_globals
