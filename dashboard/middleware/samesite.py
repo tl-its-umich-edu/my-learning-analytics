@@ -1,14 +1,19 @@
 import django, logging
 from django.conf import settings
-from django.utils.deprecation import MiddlewareMixin
 logger = logging.getLogger(__name__)
 
+# https://docs.djangoproject.com/en/1.10/topics/http/middleware/#writing-your-own-middleware
 
-class SameSiteMiddleware(MiddlewareMixin):
 
-    def process_response(self, request, response):
+class SameSiteMiddleware(object):
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
         django_support_samesite_none = django.VERSION[0] > 3 \
                                        or (django.VERSION[0] == 3 and django.VERSION[1] >= 1)
+        response = self.get_response(request)
         if request.is_secure() and not django_support_samesite_none:
             session_cookie_samesite = getattr(settings, 'SESSION_COOKIE_SAMESITE', None)
             csrf_cookie_samesite = getattr(settings, 'CSRF_COOKIE_SAMESITE', None)
@@ -19,3 +24,5 @@ class SameSiteMiddleware(MiddlewareMixin):
             if csrf_cookie_samesite is None and csrf_cookie_name in response.cookies:
                 response.cookies[csrf_cookie_name]['samesite'] = 'None'
         return response
+
+

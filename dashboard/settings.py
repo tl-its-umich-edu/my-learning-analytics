@@ -116,7 +116,7 @@ INSTALLED_APPS = [
 # The order of this is important. It says DebugToolbar should be on top but
 # The tips has it on the bottom
 MIDDLEWARE = [
-    'dashboard.middleware.middleware.SameSiteMiddleware',
+    'dashboard.middleware.samesite.SameSiteMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
