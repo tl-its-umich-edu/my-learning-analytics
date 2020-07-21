@@ -11,6 +11,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # We have to remove all rows from resource and resource access before performing this migration
+        # As there is no way of knowing which course_id a resource access was linked to
+        # This is the current process for the cron anyway
+        migrations.RunSQL("DELETE FROM resource_access;"),
+        migrations.RunSQL("DELETE FROM resource;"),
         migrations.RemoveField(
             model_name='resource',
             name='course_id',
@@ -20,21 +25,10 @@ class Migration(migrations.Migration):
             name='course_id',
             field=models.ForeignKey(db_column='course_id', default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='dashboard.Course'),
         ),
-        # Need to run this manual SQL to clean up the duplicates before making field unique
-        migrations.RunSQL("""
-            DELETE r1 FROM resource r1 INNER JOIN resource r2 WHERE 
-            r1.id < r2.id AND r1.resource_id = r2.resource_id;
-            """
-        ),
         migrations.AlterField(
             model_name='resource',
             name='resource_id',
             field=models.CharField(db_index=True, max_length=255, unique=True, verbose_name='Resource Id'),
-        ),
-        # Clean up old rows before adding the foreign key
-        migrations.RunSQL("""
-            DELETE FROM resource_access WHERE resource_id NOT IN (SELECT resource_id FROM resource);
-            """
         ),
         migrations.AlterField(
             model_name='resourceaccess',
