@@ -1,6 +1,6 @@
 # Migration to convert all tables and text columns as of 2020-07-22 to utf8mb4
 
-from django.db import migrations, models
+from django.db import migrations
 
 
 class Migration(migrations.Migration):
