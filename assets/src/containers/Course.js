@@ -6,7 +6,6 @@ import GradeDistribution from './GradeDistribution'
 import AssignmentPlanning from './AssignmentPlanning'
 import AssignmentPlanningV2 from './AssignmentPlanningV2'
 import ResourcesAccessed from './ResourcesAccessed'
-import CourseAdmin from '../components/CourseAdmin/CourseAdmin'
 import IndexPage from './IndexPage'
 import Spinner from '../components/Spinner'
 import { isObjectEmpty } from '../util/object'
@@ -19,6 +18,7 @@ function Course (props) {
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
+  const enrollmentType = JSON.parse(user.enrolledCourses).filter(c=>c.course_id===props.courseId)[0].enrollment_type
   const toggleDrawer = open => event => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
@@ -66,6 +66,8 @@ function Course (props) {
                         {...props}
                         courseInfo={courseInfo}
                         courseId={courseId}
+                        enrollment_type={enrollmentType}
+                        isAdmin={user.admin}
                       />}
                   />
                   <Route
@@ -104,16 +106,6 @@ function Course (props) {
                         disabled={!courseInfo.course_view_options.ra}
                         courseInfo={courseInfo}
                         courseId={courseId}
-                      />}
-                  />
-                  <Route
-                    path='/courses/:courseId/admin'
-                    render={props =>
-                      <CourseAdmin
-                        {...props}
-                        courseId={courseId}
-                        courseInfo={courseInfo}
-                        user={user}
                       />}
                   />
                 </>

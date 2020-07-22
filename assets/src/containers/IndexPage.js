@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 import Grid from '@material-ui/core/Grid'
 import SelectCard from '../components/SelectCard'
 import { Link } from 'react-router-dom'
@@ -20,11 +20,9 @@ function IndexPage (props) {
   return (
     <Grid container>
       {
-        routes(courseId, views).map((props, key) => (
+        routes(courseId, views).map((p, key) => (
           <Grid item xs={12} sm={6} lg={4} key={key}>
-            <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={props.path}>
-              <SelectCard cardData={props} />
-            </Link>
+              <SelectCard {...props} cardData={p}/>
           </Grid>
         ))
       }

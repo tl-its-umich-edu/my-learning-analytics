@@ -86,36 +86,6 @@ function CourseList (props) {
       </AppBar>
       <div className={classes.content}>
         {
-          !teacherEnrollment.length
-            ? (
-              <AlertBanner>
-                You are not teaching in any courses with My Learning Analytics enabled.
-                Visit the <MuiLink href={user.helpURL} style={{ color: siteTheme.palette.link.main }}>Help site</MuiLink> for
-                more information about this tool.
-              </AlertBanner>
-            )
-            : (
-              
-              <Grid container spacing={2}>
-                <Grid item xs={12}><h4>Teacher</h4></Grid>
-                {
-                  teacherEnrollment.map((course, key) => (
-                    
-                    <Grid item xs={12} sm={6} lg={4} key={key}>
-                    {/* {JSON.stringify(course)} */}
-                      <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}/admin/`}>
-                        <SelectCard cardData={{ title: course.course_name, description: 'Description' }} />
-                      </Link>
-                    </Grid>
-                    
-                  ))
-                }
-              </Grid>
-            )
-        }
-      </div>
-      <div className={classes.content}>
-        {
           !allEnrollments.length
             ? (
               <AlertBanner>
@@ -126,17 +96,12 @@ function CourseList (props) {
             )
             : (
               <Grid container spacing={2}>
-                <Grid item xs={12}><h4>Student</h4></Grid>
+                <Grid item xs={12}></Grid>
                 {
                   allEnrollments.map((course, key) => (
-                    
                     <Grid item xs={12} sm={6} lg={4} key={key}>
-                    {/* {JSON.stringify(course)} */}
-                      <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`}>
-                        <SelectCard cardData={{ title: course.course_name, description: 'Description' }} />
-                      </Link>
-                    </Grid>
-                    
+                      <SelectCard cardData={{ title: course.course_name, description: 'Description', path:`/courses/${course.course_id}`, enrollment_type:JSON.parse(user.enrolledCourses).filter(c=>c.course_id===course.course_id)[0].enrollment_type, isAdmin:props.user.admin }} />
+                    </Grid>                    
                   ))
                 }
               </Grid>
