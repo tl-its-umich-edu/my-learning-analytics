@@ -191,6 +191,7 @@ DATABASES = {
         'PASSWORD': ENV.get('MYSQL_PASSWORD', 'student_dashboard_password'), # password for user
         'HOST': ENV.get('MYSQL_HOST', 'localhost'),
         'PORT': ENV.get('MYSQL_PORT', 3306),
+        'OPTIONS': {'charset': 'utf8mb4'},
     },
     'DATA_WAREHOUSE': {
         'ENGINE': ENV.get('DATA_WAREHOUSE_ENGINE', 'django.db.backends.postgresql'),
