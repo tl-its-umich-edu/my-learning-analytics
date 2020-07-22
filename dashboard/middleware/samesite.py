@@ -2,7 +2,8 @@ import django, logging
 from django.conf import settings
 logger = logging.getLogger(__name__)
 
-# https://docs.djangoproject.com/en/1.10/topics/http/middleware/#writing-your-own-middleware
+# https://docs.djangoproject.com/en/3.0/topics/http/middleware/#writing-your-own-middleware
+# https://github.com/dmitry-viskov/pylti1.3-django-example/blob/master/game/game/middleware.py
 
 
 class SameSiteMiddleware(object):
@@ -11,8 +12,7 @@ class SameSiteMiddleware(object):
         self.get_response = get_response
 
     def __call__(self, request):
-        django_support_samesite_none = django.VERSION[0] > 3 \
-                                       or (django.VERSION[0] == 3 and django.VERSION[1] >= 1)
+        django_support_samesite_none = float(f'{django.VERSION[0]}.{django.VERSION[1]}') >= 3.1
         response = self.get_response(request)
         if request.is_secure() and not django_support_samesite_none:
             session_cookie_samesite = getattr(settings, 'SESSION_COOKIE_SAMESITE', None)

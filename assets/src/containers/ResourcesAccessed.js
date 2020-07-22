@@ -51,8 +51,7 @@ const rememberSetting = 'Remember my setting'
 const settingNotUpdated = 'Setting not updated'
 
 function ResourcesAccessed (props) {
-  const { classes, courseInfo, courseId, disabled, launchId } = props
-  console.log(launchId)
+  const { classes, courseInfo, courseId, disabled } = props
   if (disabled) return (<AlertBanner>The Resources Accessed view is hidden for this course.</AlertBanner>)
   const resourceTypes = courseInfo.resource_types.length === 0
     ? [{ label: 'Files', icon: 'fas fa-file fa-lg' }]
@@ -181,7 +180,7 @@ function ResourcesAccessed (props) {
   useEffect(() => {
     // Fetch data once all the setting data is fetched
     if (dataControllerLoad === 2 && !(resourceTypeFilter.length === 0)) {
-      const dataURL = `/api/v1/courses/${courseId}/resource_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${resourceGradeFilter}&resource_type=${resourceTypeFilter}&launchId=${launchId}`
+      const dataURL = `/api/v1/courses/${courseId}/resource_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${resourceGradeFilter}&resource_type=${resourceTypeFilter}`
       const fetchOptions = { method: 'get', ...defaultFetchOptions }
       fetch(dataURL, fetchOptions)
         .then(handleError)

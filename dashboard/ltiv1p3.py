@@ -1,4 +1,4 @@
-import logging, string, random
+import logging, string, random, json
 
 import django.contrib.auth
 
@@ -115,34 +115,34 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
     user_role = role_check(roles)
 
     course_details = None
-    lti_launch_first_time = False
+    is_course_data_loaded = False
 
     try:
         course_details = Course.objects.get(canvas_id=course_id)
     except ObjectDoesNotExist:
         if is_instructor or user_obj.is_superuser:
-            lti_launch_first_time = True
             canvas_long_id = canvas_id_to_incremented_id(course_id)
             course_details = Course.objects.create(id=canvas_long_id, canvas_id=course_id, name=course_name)
             CourseViewOption.objects.create(course_id=canvas_long_id)
 
     if course_details is None or course_details.term_id is None:
+        is_course_data_loaded = True
         logger.info(f"Course {course_id} don't have a cron run yet")
-    lti_globals = {
+    myla_globals = {
         "username": username,
-        "launch_id": launch_id,
-        "user_courses_info": {"course_id": course_id, "course_name": course_name},
-        "role": user_role,
-        "lti_launch_first_time": lti_launch_first_time,
         "is_superuser": user_obj.is_superuser,
         "login": settings.LOGIN_URL,
         "logout": settings.LOGOUT_URL,
         "user_image": user_img,
         "primary_ui_color": settings.PRIMARY_UI_COLOR,
         "help_url": settings.HELP_URL,
-        "google_analytics_id": settings.GA_ID
+        "google_analytics_id": settings.GA_ID,
+        "user_courses_info": [{"course_id": course_id, "course_name": course_name}],
+        "lti_launch_id": launch_id,
+        "lti_role": user_role,
+        "lti_is_course_data_loaded": is_course_data_loaded,
     }
-    return lti_globals
+    return myla_globals
 
 
 @csrf_exempt
@@ -182,9 +182,9 @@ def launch(request):
     cache_ttl = settings.DB_CACHE_CONFIGS['CACHE_TTL']
     cache_lifetime = cache_ttl if cache_ttl else 7200
     message_launch.set_public_key_caching(launch_data_storage, cache_lifetime=cache_lifetime)
-    lti_globals = extracting_launch_variables_for_tool_use(request, message_launch)
+    myla_globals = extracting_launch_variables_for_tool_use(request, message_launch)
     context = {
-        'lti_globals': lti_globals
+        'myla_globals': myla_globals
     }
-    logger.info({'lti_globals': lti_globals })
+    logger.info(f'Myla Globals from LTI launch {context}')
     return render(request, 'frontend/index.html', context)

@@ -132,6 +132,18 @@ CRON_CLASSES = [
 ]
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+CONTEXT_PROCESSORS = [
+    'django.contrib.auth.context_processors.auth',
+    'django.template.context_processors.debug',
+    'django.template.context_processors.request',
+    'django.contrib.messages.context_processors.messages',
+    'django_su.context_processors.is_su',
+    'django_settings_export.settings_export',
+    'dashboard.context_processors.get_git_version_info',
+    'dashboard.context_processors.last_updated'
+]
+if not ENV.get('STUDENT_DASHBOARD_LTI', False):
+    CONTEXT_PROCESSORS += ['dashboard.context_processors.get_myla_globals']
 
 TEMPLATES = [
     {
@@ -140,17 +152,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'debug': ENV.get('DJANGO_TEMPLATE_DEBUG', DEBUG),
-            'context_processors': [
-                'django.contrib.auth.context_processors.auth',
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.messages.context_processors.messages',
-                'django_su.context_processors.is_su',
-                'django_settings_export.settings_export',
-                'dashboard.context_processors.get_git_version_info',
-                # 'dashboard.context_processors.get_myla_globals',
-                'dashboard.context_processors.last_updated'
-            ],
+            'context_processors': CONTEXT_PROCESSORS,
         },
     },
 ]
@@ -285,6 +287,7 @@ LOGGING = {
         'handlers': ['console']
     },
 }
+
 DB_CACHE_CONFIGS = ENV.get('DB_CACHE_CONFIGS', {})
 
 CACHES = {
