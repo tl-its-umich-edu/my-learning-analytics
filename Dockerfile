@@ -37,7 +37,7 @@ WORKDIR /code
 COPY requirements.txt .
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    build-essential default-libmysqlclient-dev  libpq-dev netcat vim-tiny jq python3-dev xmlsec1 cron && \
+    build-essential default-libmysqlclient-dev  libpq-dev netcat vim-tiny jq python3-dev xmlsec1 cron git && \
     apt-get upgrade -y && \
     apt-get clean -y && \
     pip install -r requirements.txt
