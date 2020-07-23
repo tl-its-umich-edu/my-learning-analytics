@@ -8,7 +8,8 @@ const routes = (courseId, activeViews, activeOnly=true) => {
       icon: Grade,
       description: 'See what resources you and your peers are viewing.',
       image: '/static/images/file_access_trends_icon.png',
-      viewCode: 'ra'
+      viewCode: 'ra',
+      enabled: activeViews['ra']
     },
     {
       path: `/courses/${courseId}/assignmentsv1`,
@@ -16,7 +17,8 @@ const routes = (courseId, activeViews, activeOnly=true) => {
       icon: Grade,
       description: 'See what assignments have the greatest impact on your grade.',
       image: '/static/images/assignments_planning_icon.png',
-      viewCode: 'apv1'
+      viewCode: 'apv1',
+      enabled: activeViews['apv1']
     },
     {
       path: `/courses/${courseId}/assignments`,
@@ -24,7 +26,8 @@ const routes = (courseId, activeViews, activeOnly=true) => {
       icon: Grade,
       description: 'See what assignments have the greatest impact on your grade.',
       image: '/static/images/assignments_planning_icon.png',
-      viewCode: 'ap'
+      viewCode: 'ap',
+      enabled: activeViews['ap']
     },
     {
       path: `/courses/${courseId}/grades`,
@@ -32,7 +35,8 @@ const routes = (courseId, activeViews, activeOnly=true) => {
       icon: Grade,
       description: 'See where your grade sits within the course grade distribution.',
       image: '/static/images/grade_distribution_icon.png',
-      viewCode: 'gd'
+      viewCode: 'gd',
+      enabled: activeViews['gd']
     }
   ]
   return !activeOnly?allViews:allViews.filter(view => activeViews[view.viewCode])

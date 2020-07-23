@@ -16,6 +16,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import { color } from 'd3';
 import { removeData } from 'jquery';
 import clsx from 'clsx';
+import { defaultFetchOptions,handleError } from '../util/data'
 
 const styles = theme => ({
   card: {
@@ -68,9 +69,9 @@ const styles = theme => ({
 })
 
 const SelectCard = props => {
-  const { classes, cardData } = props
-  // const { viewCode } = props.cardData.viewCode
-  const [ enabled, setEnabled] = useState(false)
+  const { classes, cardData, courseId } = props
+  const { viewCode } = cardData
+  const [ enabled, setEnabled] = useState(cardData.enabled)
   const [ snackbarMessage, setResponseMessage] = useState('Saved')
   const [ snackbarOpen, setSnackbarOpen] =  useState(false)
   const [ saving, setSaving] = useState(false)
@@ -86,17 +87,19 @@ const SelectCard = props => {
     setSnackbarOpen(false)
   }
 
-  const delay = (ms) =>{
-    return new Promise(resolve=>setTimeout(resolve,ms))
-  }
-
   const save = (isEnabled)=> {
 
     setSaving(true)
     saveAsync(isEnabled).then(x=>{
       setSaving(false)
-      setEnabled(x)
-      setResponseMessage('Setting saved')
+      
+      if ( x ) {
+        setResponseMessage('Setting saved')
+        setEnabled(isEnabled)
+      } else {
+        setResponseMessage('Error saving setting')
+      }
+
       setSnackbarOpen(true)
 
     }).catch(e=>{
@@ -109,15 +112,19 @@ const SelectCard = props => {
   }
 
   var saveAsync = function(isEnabled) {
-    return delay(2000).then(() => {
-    return new Promise(function(resolve, reject) {
-      if ( true ) {
-        resolve(isEnabled);
-      } else {
-        reject(Error("Unable to save changes"));
-      }
-    });
-  })
+    let payLoad = JSON.parse('{"'+viewCode+'":{"enabled":'+isEnabled+'}}')
+    
+      const dataURL = `/api/v1/courses/${courseId}/update_info/`
+    const fetchOptions = { method: 'PUT', ...defaultFetchOptions, body:JSON.stringify(payLoad) }
+    return fetch(dataURL, fetchOptions)
+      .then(handleError)
+      .then(res => res.json())
+      .then(data => {
+        return (data.default==="success")
+      })
+      .catch(_ => {
+        return false
+      })
   }
 
   const SlideTransition = (props) => {
