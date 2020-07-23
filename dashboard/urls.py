@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import include
 from django.conf.urls.static import static
 from django.urls import path, re_path
 
@@ -36,9 +36,9 @@ urlpatterns = [
 
 
     path('admin/', admin.site.urls),
-    path('login/', ltiv1p3.login, name="login"),
-    path('launch/', ltiv1p3.launch, name="launch"),
-    path('jwks/', ltiv1p3.get_jwks, name="get_jwks"),
+    path('login', ltiv1p3.login, name="login"),
+    path('launch', ltiv1p3.launch, name="launch"),
+    path('jwks', ltiv1p3.get_jwks, name="get_jwks"),
 
     # Note the absence of a trailing slash; adding one breaks the GraphQL implementation.
     path('graphql', DashboardGraphQLView.as_view(graphiql=True)),
@@ -94,11 +94,6 @@ else:
         path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
         path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
      )
-
-# if apps.is_installed('django_lti_auth'):
-#     urlpatterns += (
-#         path('lti/', include('django_lti_auth.urls')),
-#     )
 
 if apps.is_installed('registration'):
     urlpatterns += (

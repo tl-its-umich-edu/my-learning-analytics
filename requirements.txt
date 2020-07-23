@@ -46,7 +46,6 @@ google-cloud-bigquery>=1.21.0,<1.21.99
 pinax-eventlog>=2.0.3,<2.0.99
 ptvsd>=4.3.2,<4.3.99
 django-ptvsd-debug==1.0.3
-django-lti-auth==1.0.0
 PyLTI1p3==1.7.0
 django-webpack-loader==0.6.0
 jsonschema==3.2.0

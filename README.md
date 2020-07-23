@@ -85,29 +85,12 @@ MyLA allows you to configure the primary color of the user interface (i.e., the 
 
 Other colors from the user interface are currently fixed and included in version control, as they are intentional design choices. You can see where color values are set in `assets/src/defaultPalette.js`.
 
-### LTI v1.1.1 Configuration
-Only basic LTI launches are supported at the moment (automatic account creation and redirection to the correct course). New courses are not added nor are course view options modified.
-
-The relative LTI launch url is `/lti/auth/` (ex: `https://example.com/lti/auth/`). *NOTE* The trailing slash after `/auth/` is required! You'll get an error about CSRF if you have the wrong URL! :)
-
-#### Canvas Notes
-* When you configure the tool in Canvas the "Privacy" option must be changed from Anonymous to Public to pass along the user information required.
-
-* You should use the [XML builder](https://www.edu-apps.org/build_xml.html) to generate and paste the XML that rather than manually adding it. This will allow options like "Course Navigation" extension.
+### LTI v1.3 Configuration
+* Myla Supports LTI 1.3 and using [PYLTI1.3](https://github.com/dmitry-viskov/pylti1.3) library for LTI validation 
+* Instructions for LTI 1.3 configuration are in [Myla WIKI](https://github.com/tl-its-umich-edu/my-learning-analytics/wiki/Configuration-for-LTI-1.3)
 
 * You also need to configure CSP value in the environment, specifically the `FRAME_SRC.` (See next section) In addition you need to ensure you are using https and `CSRF_COOKIE_SECURE` is true with your domain (or instructure.com) in trusted origins.
 
-Environment variables:
-
-`STUDENT_DASHBOARD_LTI`: Set to True to enable LTI (default false).
-
-`PYLTI_CONFIG_CONSUMERS`: JSON string of supported LTI Consumers (default none). Formatted `{ "LTI_CONSUMER_KEY_1": { "secret": "LTI_CONSUMER_SECRET_1" } }`. These are the actual key and secret you put into your launch (like in Canvas).
-
-`LTI_PERSON_SOURCED_ID_FIELD`: LTI launch field containing the user's SIS ID (default: `lis_person_sourcedid`). Useful for retrieving SIS ID from custom LTI launch fields if `lis_person_sourcedid` is not available.
-
-`LTI_EMAIL_FIELD`: LTI launch field containing the user's email address (default: `lis_person_contact_email_primary`). Useful for retrieving email from custom LTI launch fields if `lis_person_contact_email_primary` is not available.
-
-`LTI_CANVAS_COURSE_ID_FIELD`: LTI launch field containing the course's canvas id (default: `custom_canvas_course_id`).
 
 ### Content Security Policy
 

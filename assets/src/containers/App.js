@@ -21,7 +21,7 @@ function App (props) {
       <GoogleAnalyticsTracking gaId={gaId} />
       <Route path='/' exact render={props => <CourseList {...props} user={user} />} />
       <Route path='/courses' exact render={props => <CourseList {...props} user={user} />} />
-      <Route exact path='/launch/'><Redirect to={ltiCourseId} /></Route>
+      <Route exact path='/launch'><Redirect to={ltiCourseId} /></Route>
       {courseId ? <Course user={user} courseId={courseId} {...props} /> : null}
     </>
   )

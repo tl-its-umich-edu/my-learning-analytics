@@ -419,27 +419,8 @@ if ENV.get('STUDENT_DASHBOARD_LTI', False):
     if not 'django.contrib.auth.backends.ModelBackend' in AUTHENTICATION_BACKENDS:
         AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
 
-    LTIV1P3 = ENV.get('LTIV1P3',{})
+    LTI_CONFIG = ENV.get('LTI_CONFIG', {})
 
-    # PYLTI_CONFIG = {
-    #     "consumers": ENV.get("PYLTI_CONFIG_CONSUMERS", {}),
-    #     "method_hooks":{
-    #         "valid_lti_request": "dashboard.lti.valid_lti_request",
-    #         "invalid_lti_request": "dashboard.lti.invalid_lti_request"
-    #     },
-    #     "next_url": "home"
-    # }
-    LTI_PERSON_SOURCED_ID_FIELD = ENV.get('LTI_PERSON_SOURCED_ID_FIELD',
-        "custom_canvas_user_login_id")
-    LTI_EMAIL_FIELD = ENV.get('LTI_EMAIL_FIELD',
-        "lis_person_contact_email_primary")
-    LTI_CANVAS_COURSE_ID_FIELD = ENV.get('LTI_CANVAS_COURSE_ID_FIELD',
-        "custom_canvas_course_id")
-    LTI_FIRST_NAME = ENV.get('LTI_FIRST_NAME',
-        "lis_person_name_given")
-    LTI_LAST_NAME = ENV.get('LTI_LAST_NAME',
-        "lis_person_name_family")
-    
 # controls whether Unizin specific features/data is available from the Canvas Data source
 DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)
 
@@ -501,12 +482,11 @@ if CSRF_COOKIE_SECURE:
     CSRF_TRUSTED_ORIGINS = ENV.get("CSRF_TRUSTED_ORIGINS", [])
     SESSION_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-#
-# # When using the application with iframes (e.g. with LTI), these need to be set to None. However, we'll need to update
-# # this when new browser versions expect (and the Django version allows) the string "None".
+
+# When using the application with iframes (e.g. with LTI), these need to be set to None. However, we'll need to update
+# this when new browser versions expect (and the Django version allows) the string "None".
 SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", None)
 CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", None)
-
 
 # IMPORT LOCAL ENV
 # =====================

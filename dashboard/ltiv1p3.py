@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_tool_conf():
-    ltiv1_p3 = settings.LTIV1P3
+    ltiv1_p3 = settings.LTI_CONFIG
     try:
         tool_config = ToolConfDict(ltiv1_p3)
     except Exception as e:
@@ -126,9 +126,9 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
             CourseViewOption.objects.create(course_id=canvas_long_id)
 
     if course_details is None:
-        logger.info(f"Course {course_id} don't have a cron run yet")
+        logger.info(f'Course {course_id} dont have a cron run yet')
     elif course_details.term_id is not None:
-        logger.info(f"Course {course_id} is ready with Data")
+        logger.info(f'Course {course_id} is ready with Data')
         is_course_data_loaded = True
 
 
