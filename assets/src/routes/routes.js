@@ -1,6 +1,6 @@
 import { Grade } from '@material-ui/icons'
 
-const routes = (courseId, activeViews) => {
+const routes = (courseId, activeViews, activeOnly=true) => {
   const allViews = [
     {
       path: `/courses/${courseId}/resources`,
@@ -35,7 +35,7 @@ const routes = (courseId, activeViews) => {
       viewCode: 'gd'
     }
   ]
-  return allViews.filter(view => activeViews[view.viewCode])
+  return !activeOnly?allViews:allViews.filter(view => activeViews[view.viewCode])
 }
 
 export default routes

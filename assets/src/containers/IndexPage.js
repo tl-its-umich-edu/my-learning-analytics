@@ -9,7 +9,7 @@ import routes from '../routes/routes'
 const objectValuesAreAllZero = obj => getObjectValues(obj).every(x => x === 0)
 
 function IndexPage (props) {
-  const { courseInfo, courseId } = props
+  const { courseInfo, courseId, isAdmin, enrollment_type } = props
 
   const views = courseInfo.course_view_options
 
@@ -20,7 +20,7 @@ function IndexPage (props) {
   return (
     <Grid container>
       {
-        routes(courseId, views).map((p, key) => (
+        routes(courseId, views, !(isAdmin || enrollment_type=='TeacherEnrollment')).map((p, key) => (
           <Grid item xs={12} sm={6} lg={4} key={key}>
               <SelectCard {...props} cardData={p}/>
           </Grid>
