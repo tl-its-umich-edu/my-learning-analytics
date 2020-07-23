@@ -13,14 +13,20 @@ function IndexPage (props) {
 
   const views = courseInfo.course_view_options
 
-  if (isObjectEmpty(views) || objectValuesAreAllZero(views)) {
-    return (<WarningBanner>No data visualizations have been added for this course.</WarningBanner>)
+  const isTeacherOrAdmin = () => {
+    return isAdmin || enrollment_type=='TeacherEnrollment'
+  }
+
+  if (!isTeacherOrAdmin()){
+    if (isObjectEmpty(views) || objectValuesAreAllZero(views)) {
+      return (<WarningBanner>No data visualizations have been added for this course.</WarningBanner>)
+    }
   }
 
   return (
     <Grid container>
       {
-        routes(courseId, views, !(isAdmin || enrollment_type=='TeacherEnrollment')).map((p, key) => (
+        routes(courseId, views, !isTeacherOrAdmin()).map((p, key) => (
           <Grid item xs={12} sm={6} lg={4} key={key}>
               <SelectCard {...props} cardData={p}/>
           </Grid>
