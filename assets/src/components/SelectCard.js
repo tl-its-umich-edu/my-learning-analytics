@@ -88,34 +88,30 @@ const SelectCard = props => {
   }
 
   const save = (isEnabled)=> {
-
     setSaving(true)
-    saveAsync(isEnabled).then(x=>{
-      setSaving(false)
-      
-      if ( x ) {
+    saveAsync(isEnabled).then(savedSuccessfully=>{      
+      if ( savedSuccessfully ) {
         setResponseMessage('Setting saved')
         setEnabled(isEnabled)
       } else {
         setResponseMessage('Error saving setting')
       }
-
       setSnackbarOpen(true)
-
     }).catch(e=>{
-      setSaving(false)
       setResponseMessage('Error saving setting')
       console.log("Save Error "+e)
       setSnackbarOpen(true)
-    })
+    }).finally(
+      setSaving(false)
+    )
     
   }
 
   var saveAsync = function(isEnabled) {
-    let payLoad = JSON.parse('{"'+viewCode+'":{"enabled":'+isEnabled+'}}')
+    let payload = JSON.parse('{"'+viewCode+'":{"enabled":'+isEnabled+'}}')
     
-      const dataURL = `/api/v1/courses/${courseId}/update_info/`
-    const fetchOptions = { method: 'PUT', ...defaultFetchOptions, body:JSON.stringify(payLoad) }
+    const dataURL = `/api/v1/courses/${courseId}/update_info/`
+    const fetchOptions = { method: 'PUT', ...defaultFetchOptions, body:JSON.stringify(payload) }
     return fetch(dataURL, fetchOptions)
       .then(handleError)
       .then(res => res.json())
