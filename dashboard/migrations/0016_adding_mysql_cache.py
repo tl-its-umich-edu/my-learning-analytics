@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             """
             CREATE TABLE `django_myla_cache` (
-                cache_key varchar(255) CHARACTER SET utf8 COLLATE utf8_bin
+                cache_key varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
                                        NOT NULL PRIMARY KEY,
                 value longblob NOT NULL,
                 value_type char(1) CHARACTER SET latin1 COLLATE latin1_bin

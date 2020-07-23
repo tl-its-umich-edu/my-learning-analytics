@@ -102,7 +102,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
     user_img = launch_data['picture']
     RANDOM_PASSWORD_DEFAULT_LENGTH = 32
 
-    # Logging the user regardless course exits or not otherwise Django will show default login page
+    # Logging the user regardless course exits or not otherwise Django redirect to login page
     try:
         user_obj = User.objects.get(username=username)
     except User.DoesNotExist:
@@ -125,9 +125,13 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
             course_details = Course.objects.create(id=canvas_long_id, canvas_id=course_id, name=course_name)
             CourseViewOption.objects.create(course_id=canvas_long_id)
 
-    if course_details is None or course_details.term_id is None:
-        is_course_data_loaded = True
+    if course_details is None:
         logger.info(f"Course {course_id} don't have a cron run yet")
+    elif course_details.term_id is not None:
+        logger.info(f"Course {course_id} is ready with Data")
+        is_course_data_loaded = True
+
+
     myla_globals = {
         "username": username,
         "is_superuser": user_obj.is_superuser,

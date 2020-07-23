@@ -288,7 +288,11 @@ LOGGING = {
     },
 }
 
-DB_CACHE_CONFIGS = ENV.get('DB_CACHE_CONFIGS', {})
+DB_CACHE_CONFIGS = ENV.get('DB_CACHE_CONFIGS', {"CACHE_TTL": 7200, "BACKEND": "django_mysql.cache.MySQLCache",
+                                                "LOCATION": "django_myla_cache",
+                                                "CACHE_KEY_PREFIX": "myla",
+                                                "CACHE_OPTIONS": {"COMPRESS_MIN_LENGTH": 5000, "COMPRESS_LEVEL": 6}
+                                                })
 
 CACHES = {
     'default': {
