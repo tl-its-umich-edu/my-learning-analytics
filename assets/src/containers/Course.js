@@ -48,6 +48,8 @@ function Course (props) {
               sideDrawerState={sideDrawerState}
               courseId={courseId}
               courseInfo={courseInfo}
+              enrollment_type={enrollmentType}
+              isAdmin={user.admin}
             />
             {courseInfo.course_user_exist === 0
               ? (

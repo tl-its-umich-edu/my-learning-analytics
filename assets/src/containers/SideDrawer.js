@@ -30,10 +30,16 @@ function SideDrawer (props) {
     classes,
     toggleDrawer,
     courseId,
-    courseInfo
+    courseInfo,
+    enrollment_type,
+    isAdmin
   } = props
 
   const [selectedIndex, setSelectedIndex] = useState(false)
+
+  const isTeacherOrAdmin = () => {
+    return isAdmin || enrollment_type=='TeacherEnrollment'
+  }
 
   const sideList = (
     <div
@@ -42,7 +48,7 @@ function SideDrawer (props) {
       role='button'
     >
       <List>
-        {routes(courseId, courseInfo.course_view_options).map((props, key) => (
+        {routes(courseId, courseInfo.course_view_options, !isTeacherOrAdmin()).map((props, key) => (
           <ListItem
             button
             component={Link}
