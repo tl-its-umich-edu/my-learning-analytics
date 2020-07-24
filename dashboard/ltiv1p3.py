@@ -61,10 +61,10 @@ def check_if_instructor(roles, username, course_id):
 
     ta = [teach_role for teach_role in teaching_roles if 'membership/Instructor#TeachingAssistant' in teach_role]
     if len(ta) != 0:
-        logger.info(f'user {username} is not a instructor of course {course_id}')
+        logger.info(f'user {username} is not an instructor of course {course_id}')
         return False
     else:
-        logger.info(f'user {username} is instructor in course {course_id}')
+        logger.info(f'user {username} is an instructor in course {course_id}')
         return True
 
 

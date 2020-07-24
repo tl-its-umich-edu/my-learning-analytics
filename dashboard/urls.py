@@ -36,9 +36,9 @@ urlpatterns = [
 
 
     path('admin/', admin.site.urls),
-    path('login', ltiv1p3.login, name="login"),
-    path('launch', ltiv1p3.launch, name="launch"),
-    path('jwks', ltiv1p3.get_jwks, name="get_jwks"),
+    path('login/', ltiv1p3.login, name="login"),
+    path('launch/', ltiv1p3.launch, name="launch"),
+    path('jwks/', ltiv1p3.get_jwks, name="get_jwks"),
 
     # Note the absence of a trailing slash; adding one breaks the GraphQL implementation.
     path('graphql', DashboardGraphQLView.as_view(graphiql=True)),
