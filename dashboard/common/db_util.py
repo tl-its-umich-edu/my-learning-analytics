@@ -103,8 +103,6 @@ def get_user_courses_info(username):
             course_names = cursor.fetchall()
             df = pd.DataFrame(list(course_names))
 
-            # create an empty dict
-            course_info = dict()
             if df.size > 0:
                 df.columns = ["course_id", "course_name"]
                 course_info = df.to_dict(orient='records')
