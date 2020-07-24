@@ -44,6 +44,8 @@
         "BLOCK_ALL_MIXED_CONTENT": false,
         "INCLUDE_NONCE_IN": []
     },
+    "/*  default password length indicator incase of creating user from command line or LTI auto login": "*/",
+    "RANDOM_PASSWORD_DEFAULT_LENGTH": 32,
     "/*  Enable secure cookies, also set your trusted origin (example of instructure.com)": "*/",
     "CSRF_COOKIE_SECURE": false,
     "CSRF_TRUSTED_ORIGINS": ["instructure.com"],

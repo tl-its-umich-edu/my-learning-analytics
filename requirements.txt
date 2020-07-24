@@ -1,7 +1,7 @@
 gunicorn==20.0.4
 
 # We're waiting on Django 3 until it's further into the lifecycle.
-Django==3.0.7
+Django==3.0.8
 whitenoise==5.1.0
 
 django-registration>=3.0,<3.0.99

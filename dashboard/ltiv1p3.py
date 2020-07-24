@@ -104,13 +104,12 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
     first_name = launch_data['given_name']
     last_name = launch_data['family_name']
     user_img = launch_data['picture']
-    RANDOM_PASSWORD_DEFAULT_LENGTH = 32
 
     # Logging the user regardless course exits or not otherwise Django redirect to login page
     try:
         user_obj = User.objects.get(username=username)
     except User.DoesNotExist:
-        password = ''.join(random.sample(string.ascii_letters, RANDOM_PASSWORD_DEFAULT_LENGTH))
+        password = ''.join(random.sample(string.ascii_letters, settings.RANDOM_PASSWORD_DEFAULT_LENGTH))
         user_obj = User.objects.create_user(username=username, email=email, password=password, first_name=first_name,
                                             last_name=last_name)
     user_obj.backend = 'django.contrib.auth.backends.ModelBackend'
@@ -125,7 +124,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
     try:
         course_details = Course.objects.get(canvas_id=course_id)
     except ObjectDoesNotExist:
-        if is_instructor or user_obj.is_superuser:
+        if is_instructor or user_obj.is_staff:
             canvas_long_id = canvas_id_to_incremented_id(course_id)
             course_details = Course.objects.create(id=canvas_long_id, canvas_id=course_id, name=course_name)
             CourseViewOption.objects.create(course_id=canvas_long_id)
@@ -138,7 +137,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
 
     myla_globals = {
         "username": username,
-        "is_superuser": user_obj.is_superuser,
+        "is_superuser": user_obj.is_staff,
         "login": settings.LOGIN_URL,
         "logout": settings.LOGOUT_URL,
         "user_image": user_img,
