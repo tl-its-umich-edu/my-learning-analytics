@@ -467,7 +467,6 @@ def update_user_default_selection_for_views(request, course_id=0):
     :return: HttpResponse containing `{"default": "success"}` or `{"default": "fail"}`
     """
     logger.info(update_user_default_selection_for_views.__name__)
-    logger.info(request)
     course_id = canvas_id_to_incremented_id(course_id)
     current_user = request.user.get_username()
     default_selection = json.loads(request.body.decode("utf-8"))
