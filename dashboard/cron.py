@@ -489,11 +489,11 @@ class DashboardCronJob(CronJobBase):
                 updated_fields.append('term')
 
             warehouse_date_start: Union[datetime.datetime, None] = (
-                warehouse_course_dict['start_at'].to_pydatetime() if warehouse_course_dict['start_at'] is not None else None
+                warehouse_course_dict['start_at'].to_pydatetime() if pd.notna(warehouse_course_dict['start_at']) else None
             )
             updated_fields += soft_update_datetime_field(course, 'date_start', warehouse_date_start)
             warehouse_date_end: Union[datetime.datetime, None] = (
-                warehouse_course_dict['conclude_at'].to_pydatetime() if warehouse_course_dict['conclude_at'] is not None else None
+                warehouse_course_dict['conclude_at'].to_pydatetime() if pd.notna(warehouse_course_dict['conclude_at']) else None
             )
             updated_fields += soft_update_datetime_field(course, 'date_end', warehouse_date_end)
 
