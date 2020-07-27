@@ -1,6 +1,6 @@
 import datetime, logging
 from collections import namedtuple
-from typing import Any, Dict, List, Union
+from typing import Dict, List, Union
 
 import pandas as pd
 import pytz
