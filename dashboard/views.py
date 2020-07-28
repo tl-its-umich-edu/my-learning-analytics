@@ -218,7 +218,8 @@ def update_course_info(request, course_id=0):
             f'updating course visualization options failed due to {e} for user {current_user} in course {course_id}')
         success = False
 
-    return JsonResponse({'default': 'success' if success else 'fail'})
+    return JsonResponse({'default': 'success' if success else 'fail'},
+                        status=200 if success else 500)
 
 
 # show percentage of users who read the resource within prior n weeks
