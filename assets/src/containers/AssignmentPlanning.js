@@ -43,6 +43,12 @@ const styles = theme => ({
   ungraded: {
     width: '10px',
     height: '10px',
+    background: theme.palette.info.main,
+    display: 'inline-block'
+  },
+  unsubmitted: {
+    width: '10px',
+    height: '10px',
     background: theme.palette.negative.main,
     display: 'inline-block'
   }
@@ -163,7 +169,10 @@ function AssignmentPlanning (props) {
                   <Typography style={{ display: 'inline' }}> Graded</Typography>
                   <br />
                   <div className={classes.ungraded} />
-                  <Typography style={{ display: 'inline' }}> Not Yet Graded</Typography>
+                  <Typography style={{ display: 'inline' }}> Submitted and ungraded</Typography>
+                  <br />
+                  <div className={classes.unsubmitted} />
+                  <Typography style={{ display: 'inline' }}> Unsubmitted</Typography>
                   <br />
                 </Grid>
               </Grid>

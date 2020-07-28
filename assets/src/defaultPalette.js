@@ -21,6 +21,10 @@ const defaultPalette = {
      (i.e. color='link'), which isn't fully supported. */
   link: {
     main: '#0000EE'
+  },
+  /*  */
+  info: {
+    main: '#ffb74d'
   }
 }
 

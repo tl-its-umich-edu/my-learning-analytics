@@ -5,7 +5,8 @@ import { siteTheme } from '../../globals'
 function createProgressBar ({ data, width, height, domElement, tip }) {
   const margin = { top: 20, right: 20, bottom: 20, left: 50 }
   const gradedColor = siteTheme.palette.secondary.main
-  const ungradedColor = siteTheme.palette.negative.main
+  const ungradedColor = siteTheme.palette.info.main
+  const unsubmittedColor = siteTheme.palette.negative.main
   let [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   // prevent height from being too tall or too short
