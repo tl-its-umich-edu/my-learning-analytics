@@ -199,5 +199,5 @@ def launch(request):
     context = {
         'myla_globals': myla_globals
     }
-    logger.info(f'Myla Globals from LTI launch {context}')
+    logger.info(f'MyLA Globals from LTI launch {context}')
     return render(request, 'frontend/index.html', context)
