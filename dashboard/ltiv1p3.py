@@ -195,7 +195,7 @@ def launch(request):
         error_message = {
             'lti_error_message': f'LTI Launch failed due to {e}'
         }
-        return JsonResponse(error_message)
+        return JsonResponse(error_message, status=500)
     context = {
         'myla_globals': myla_globals
     }
