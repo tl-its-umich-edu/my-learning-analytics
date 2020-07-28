@@ -132,7 +132,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
     if course_details is None:
         logger.info(f'Course {course_id} dont have a cron run yet')
     elif course_details.term_id is not None:
-        logger.info(f'Course {course_id} is ready with Data')
+        logger.info(f'Course {course_id} data is ready')
         is_course_data_loaded = True
 
     myla_globals = {
