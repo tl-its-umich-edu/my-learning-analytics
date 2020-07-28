@@ -66,6 +66,7 @@ is_admin_or_instructor_in_course_id = is_admin | is_instructor_in_course_id
 
 # api
 rules.add_perm('dashboard.get_course_info', is_admin_or_enrolled_in_course)
+rules.add_perm('dashboard.update_course_info', is_admin_or_instructor_in_course)
 rules.add_perm('dashboard.resource_access_within_week', is_admin_or_enrolled_in_course)
 rules.add_perm('dashboard.grade_distribution', is_admin_or_enrolled_in_course)
 rules.add_perm('dashboard.update_user_default_selection_for_views', is_admin_or_enrolled_in_course)
