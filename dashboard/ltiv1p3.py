@@ -105,7 +105,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
     last_name = launch_data['family_name']
     user_img = launch_data['picture']
 
-    # Logging the user regardless course exits or not otherwise Django redirect to login page
+    # Add user to DB if not there; avoids Django redirection to login page
     try:
         user_obj = User.objects.get(username=username)
     except User.DoesNotExist:
