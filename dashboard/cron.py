@@ -445,11 +445,11 @@ class DashboardCronJob(CronJobBase):
 
         existing_terms_ids: List[int] = [term.id for term in list(AcademicTerms.objects.all())]
         new_term_ids: List[int] = [int(id) for id in warehouse_term_df['id'].to_list() if id not in existing_terms_ids]
-        new_term_df: pd.DataFrame = warehouse_term_df.loc[warehouse_term_df['id'].isin(new_term_ids)]
 
-        if len(new_term_ids) == 0:
+        if not new_term_ids:
             logger.info('No new terms were found to add to the academic_terms table.')
         else:
+            new_term_df: pd.DataFrame = warehouse_term_df.loc[warehouse_term_df['id'].isin(new_term_ids)]
             try:
                 new_term_df.to_sql(con=engine, name='academic_terms', if_exists='append', index=False)
                 term_message: str = f'Added {len(new_term_df)} new records to academic_terms table: {new_term_ids}'
@@ -497,7 +497,7 @@ class DashboardCronJob(CronJobBase):
             )
             updated_fields += soft_update_datetime_field(course, 'date_end', warehouse_date_end)
 
-            if len(updated_fields) > 0:
+            if updated_fields:
                 course.save()
                 status += f'Course {course.id}: updated {", ".join(updated_fields)}\n'
         return status
