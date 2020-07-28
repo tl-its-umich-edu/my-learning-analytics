@@ -1,5 +1,6 @@
 const path = require('path')
 const BundleTracker = require('webpack-bundle-tracker')
+const CompressionPlugin = require('compression-webpack-plugin')
 
 module.exports = {
   entry: path.join(__dirname, 'assets/src/index'),
@@ -27,10 +28,28 @@ module.exports = {
       }
     ]
   },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          name: 'vendors',
+          test: /[\\/]node_modules[\\/]/,
+          chunks: 'all'
+        }
+      }
+    }
+  },
   plugins: [
     new BundleTracker({
       path: __dirname,
       filename: 'webpack-stats.json'
+    }),
+    new CompressionPlugin({
+      filename: '[path].gz[query]',
+      algorithm: 'gzip',
+      test: /\.js(\?.*)?$/i,
+      threshold: 10240,
+      minRatio: 0.8
     })
   ]
 }
