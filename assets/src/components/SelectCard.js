@@ -155,7 +155,7 @@ const SelectCard = props => {
                         onClick={() => { save(!enabled) }}
                         disabled={saving}
                       >
-                        {saving ? <SaveIcon /> : enabled ? <CheckBoxIcon className={classes.checkbox} /> : <CheckBoxOutlineBlankIcon className={classes.checkbox}/>}
+                        {saving ? <SaveIcon /> : enabled ? <CheckBoxIcon className={classes.checkbox} /> : <CheckBoxOutlineBlankIcon className={classes.checkbox} />}
                       </Fab>
                       {saving && <CircularProgress size={52} className={classes.fabProgress} />}
                     </div>

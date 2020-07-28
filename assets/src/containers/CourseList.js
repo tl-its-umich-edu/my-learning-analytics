@@ -93,7 +93,7 @@ function CourseList (props) {
                 {
                   enrolledCourses.map((course, key) => (
                     <Grid item xs={12} sm={6} lg={4} key={key}>
-                      <SelectCard cardData={{ title: course.course_name, description: course.description, path: `/courses/${course.course_id}`, enrollment_type:JSON.parse(user.enrolledCourses).filter(c=>c.course_id===course.course_id)[0].enrollment_type, isAdmin:props.user.admin }} />
+                      <SelectCard cardData={{ title: course.course_name, description: course.description, path: `/courses/${course.course_id}`, enrollment_type: JSON.parse(user.enrolledCourses).filter(c => c.course_id === course.course_id)[0].enrollment_type, isAdmin: props.user.admin }} />
                     </Grid>
                   ))
                 }
