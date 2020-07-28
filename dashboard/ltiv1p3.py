@@ -48,7 +48,7 @@ def get_jwks(request):
         error_message = {
             'lti_error_message': f'Fetching JWKS failed due to {e}'
         }
-        return JsonResponse(error_message)
+        return JsonResponse(error_message, status=500)
     return JsonResponse(tool_conf.get_jwks())
 
 
