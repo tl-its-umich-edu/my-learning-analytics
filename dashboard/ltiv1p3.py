@@ -167,7 +167,7 @@ def login(request):
         error_message = {
             'lti_error_message': 'LTI Login failed due to missing "target_link_uri" param'
         }
-        return JsonResponse(error_message)
+        return JsonResponse(error_message, status=500)
     launch_data_storage = DjangoCacheDataStorage(cache_name='default')
     oidc_login = DjangoOIDCLogin(request, tool_conf, launch_data_storage=launch_data_storage)
     return oidc_login.enable_check_cookies().redirect(target_link_uri)
