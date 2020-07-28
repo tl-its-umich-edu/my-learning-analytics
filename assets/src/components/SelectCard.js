@@ -1,27 +1,23 @@
-import React, { useState} from 'react';
+/* global fetch */
+import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Card from '@material-ui/core/Card'
-import CardActionArea from '@material-ui/core/CardActionArea'
 import CardContent from '@material-ui/core/CardContent'
 import CardMedia from '@material-ui/core/CardMedia'
 import Typography from '@material-ui/core/Typography'
-import { CardActions, IconButton, Button, Snackbar, Slide, CircularProgress, Divider, Fab } from '@material-ui/core'
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
-import CheckBoxIcon from '@material-ui/icons/CheckBox';
-import CloseIcon from '@material-ui/icons/Close';
+import { CardActions, IconButton, Snackbar, CircularProgress, Divider, Fab } from '@material-ui/core'
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank'
+import CheckBoxIcon from '@material-ui/icons/CheckBox'
+import CloseIcon from '@material-ui/icons/Close'
 import { Link } from 'react-router-dom'
-import { Save } from '@material-ui/icons';
-import { yellow, grey } from '@material-ui/core/colors';
-import SaveIcon from '@material-ui/icons/Save';
-import { color } from 'd3';
-import { removeData } from 'jquery';
-import clsx from 'clsx';
-import { defaultFetchOptions,handleError } from '../util/data'
+import { yellow, grey } from '@material-ui/core/colors'
+import SaveIcon from '@material-ui/icons/Save'
+import clsx from 'clsx'
+import { defaultFetchOptions, handleError } from '../util/data'
 
 const styles = theme => ({
   card: {
     margin: theme.spacing(3)
-    
   },
   media: {
     height: 140,
@@ -45,14 +41,14 @@ const styles = theme => ({
 
   wrapper: {
     margin: theme.spacing(1),
-    position: 'relative',
+    position: 'relative'
   },
   fabProgress: {
     color: yellow[500],
     position: 'absolute',
     top: -6,
     left: -6,
-    zIndex: 1,
+    zIndex: 1
   },
   buttonEnabled: {
 
@@ -60,132 +56,121 @@ const styles = theme => ({
   buttonDisabled: {
     backgroundColor: grey[500],
     '&:hover': {
-      backgroundColor: grey[700],
-    },
+      backgroundColor: grey[700]
+    }
   },
-  checkbox:{
-    backgroundColor:'transparent'
+  checkbox: {
+    backgroundColor: 'transparent'
   }
 })
 
 const SelectCard = props => {
   const { classes, cardData, courseId } = props
   const { viewCode } = cardData
-  const [ enabled, setEnabled] = useState(cardData.enabled)
-  const [ snackbarMessage, setResponseMessage] = useState('Saved')
-  const [ snackbarOpen, setSnackbarOpen] =  useState(false)
-  const [ saving, setSaving] = useState(false)
-  const timer = React.useRef();
+  const [enabled, setEnabled] = useState(cardData.enabled)
+  const [snackbarMessage, setResponseMessage] = useState('Saved')
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
   const buttonClassname = clsx({
     [classes.buttonEnabled]: enabled,
-    [classes.buttonDisabled]: !enabled,
-  });
+    [classes.buttonDisabled]: !enabled
+  })
 
-
-
-  const handleSnackbarClose = () =>{
+  const handleSnackbarClose = () => {
     setSnackbarOpen(false)
   }
 
-  const save = (isEnabled)=> {
+  const save = (isEnabled) => {
     setSaving(true)
-    saveAsync(isEnabled).then(savedSuccessfully=>{      
-      if ( savedSuccessfully ) {
+    saveAsync(isEnabled).then(savedSuccessfully => {
+      if (savedSuccessfully) {
         setResponseMessage('Setting saved')
         setEnabled(isEnabled)
       } else {
         setResponseMessage('Error saving setting')
       }
       setSnackbarOpen(true)
-    }).catch(e=>{
+    }).catch(e => {
       setResponseMessage('Error saving setting')
-      console.log("Save Error "+e)
+      console.log('Save Error ' + e)
       setSnackbarOpen(true)
     }).finally(
       setSaving(false)
     )
-    
   }
 
-  var saveAsync = function(isEnabled) {
-    let payload = JSON.parse('{"'+viewCode+'":{"enabled":'+isEnabled+'}}')
-    
+  var saveAsync = function (isEnabled) {
+    const payload = JSON.parse('{"' + viewCode + '":{"enabled":' + isEnabled + '}}')
     const dataURL = `/api/v1/courses/${courseId}/update_info/`
-    const fetchOptions = { method: 'PUT', ...defaultFetchOptions, body:JSON.stringify(payload) }
+    const fetchOptions = { method: 'PUT', ...defaultFetchOptions, body: JSON.stringify(payload) }
     return fetch(dataURL, fetchOptions)
       .then(handleError)
       .then(res => res.json())
       .then(data => {
-        return (data.default==="success")
+        return (data.default === 'success')
       })
       .catch(_ => {
         return false
       })
   }
 
-  const SlideTransition = (props) => {
-    return <Slide {...props} direction='up' />
-  }
-
   const snackbarDuration = Math.max(snackbarMessage.length * 200, 4000)
 
   return (
     <>
-    <Card className={classes.card} elevation={2}>
-      <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
+      <Card className={classes.card} elevation={2}>
+        <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
+          {
+            cardData.image
+              ? (
+                <CardMedia
+                  className={classes.media}
+                  image={cardData.image}
+                  title={cardData.title}
+                />
+              ) : null
+          }
+          <CardContent className={classes.content}>
+            <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
+              {cardData.title}
+            </Typography>
+            <Typography component='p' className={classes.description}>
+              {cardData.description}
+            </Typography>
+          </CardContent>
+        </Link>
         {
-          cardData.image
+          props.isAdmin || props.enrollment_type === 'TeacherEnrollment'
             ? (
-              <CardMedia
-                className={classes.media}
-                image={cardData.image}
-                title={cardData.title}
-              />
+              <>
+                <Divider />
+                <CardActions>
+                  <div className={classes.root}>
+                    <div className={classes.wrapper}>
+                      <Fab
+                        size='small'
+                        aria-label='save'
+                        color='primary'
+                        className={buttonClassname}
+                        onClick={() => { save(!enabled) }}
+                        disabled={saving}
+                      >
+                        {saving ? <SaveIcon /> : enabled ? <CheckBoxIcon className={classes.checkbox} /> : <CheckBoxOutlineBlankIcon className={classes.checkbox}/>}
+                      </Fab>
+                      {saving && <CircularProgress size={52} className={classes.fabProgress} />}
+                    </div>
+                  </div>
+                  {enabled ? 'Enabled' : 'Disabled'}
+                </CardActions>
+              </>
             ) : null
         }
-        
-        <CardContent className={classes.content}>
-          <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
-            {cardData.title}
-          </Typography>
-          <Typography component='p' className={classes.description}>
-            {cardData.description}
-          </Typography>
-          
-        </CardContent>
-      </Link>
-      {
-          props.isAdmin || props.enrollment_type==="TeacherEnrollment"
-          ? (
-            <>
-            <Divider/>
-            <CardActions>
-              <div className={classes.root}>
-                <div className={classes.wrapper}>
-                  <Fab
-                    size="small"
-                    aria-label="save"
-                    color="primary"
-                    className={buttonClassname}
-                    onClick={()=>{save(!enabled)}}
-                    disabled={saving}
-                  >
-                    {saving ? <SaveIcon/> : enabled ? <CheckBoxIcon className={classes.checkbox} /> : <CheckBoxOutlineBlankIcon className={classes.checkbox}/>}
-                  </Fab>
-                  {saving && <CircularProgress size={52} className={classes.fabProgress} />}
-                </div>
-              </div>
-              {enabled?'Enabled':'Disabled'}
-            </CardActions>
-          </>
-          ) : null
-        }
-    </Card>
+      </Card>
 
-    <Snackbar
+      <Snackbar
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'left',
+          horizontal: 'left'
         }}
         open={snackbarOpen}
         autoHideDuration={snackbarDuration}

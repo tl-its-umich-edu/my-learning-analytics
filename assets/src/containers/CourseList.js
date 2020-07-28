@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { withStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Avatar from '@material-ui/core/Avatar'
@@ -13,7 +12,6 @@ import { siteTheme } from '../globals'
 import AlertBanner from '../components/AlertBanner'
 import AvatarModal from '../components/AvatarModal'
 import SelectCard from '../components/SelectCard'
-
 
 const styles = theme => ({
   root: {
@@ -43,7 +41,6 @@ function CourseList (props) {
   const [avatarEl, setAvatarEl] = useState(null)
   const avatarOpen = Boolean(avatarEl)
 
-  
   const enrolledCourses = JSON.parse(user.enrolledCourses)
 
   return (
@@ -92,12 +89,12 @@ function CourseList (props) {
             )
             : (
               <Grid container spacing={2}>
-                <Grid item xs={12}></Grid>
+                <Grid item xs={12} />
                 {
                   enrolledCourses.map((course, key) => (
                     <Grid item xs={12} sm={6} lg={4} key={key}>
-                      <SelectCard cardData={{ title: course.course_name, description: 'Description', path:`/courses/${course.course_id}`, enrollment_type:JSON.parse(user.enrolledCourses).filter(c=>c.course_id===course.course_id)[0].enrollment_type, isAdmin:props.user.admin }} />
-                    </Grid>                    
+                      <SelectCard cardData={{ title: course.course_name, description: 'Description', path: `/courses/${course.course_id}`, enrollment_type:JSON.parse(user.enrolledCourses).filter(c=>c.course_id===course.course_id)[0].enrollment_type, isAdmin:props.user.admin }} />
+                    </Grid>
                   ))
                 }
               </Grid>

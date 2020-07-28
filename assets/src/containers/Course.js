@@ -18,14 +18,14 @@ function Course (props) {
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
-  const enrollmentType = JSON.parse(user.enrolledCourses).filter(c=>c.course_id===props.courseId)[0].enrollment_type
+  const enrollmentType = JSON.parse(user.enrolledCourses).filter(c => c.course_id === props.courseId)[0].enrollment_type
   const toggleDrawer = open => event => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
     setSideDrawerState(open)
   }
-  
+
   if (error.message === 'Not Found') return (<WarningBanner>Course {courseId} does not exist.</WarningBanner>)
   else if (error.message === 'Forbidden') return (<WarningBanner>You do not have access to course {courseId}.</WarningBanner>)
   else if (error) return (<WarningBanner />)

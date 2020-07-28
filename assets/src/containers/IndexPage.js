@@ -1,7 +1,6 @@
 import React from 'react'
 import Grid from '@material-ui/core/Grid'
 import SelectCard from '../components/SelectCard'
-import { Link } from 'react-router-dom'
 import { isObjectEmpty, getObjectValues } from '../util/object'
 import WarningBanner from '../components/WarningBanner'
 import routes from '../routes/routes'
@@ -14,10 +13,10 @@ function IndexPage (props) {
   const views = courseInfo.course_view_options
 
   const isTeacherOrAdmin = () => {
-    return isAdmin || enrollment_type=='TeacherEnrollment'
+    return isAdmin || enrollment_type === 'TeacherEnrollment'
   }
 
-  if (!isTeacherOrAdmin()){
+  if (!isTeacherOrAdmin()) {
     if (isObjectEmpty(views) || objectValuesAreAllZero(views)) {
       return (<WarningBanner>No data visualizations have been added for this course.</WarningBanner>)
     }
@@ -28,7 +27,7 @@ function IndexPage (props) {
       {
         routes(courseId, views, !isTeacherOrAdmin()).map((p, key) => (
           <Grid item xs={12} sm={6} lg={4} key={key}>
-              <SelectCard {...props} cardData={p}/>
+            <SelectCard {...props} cardData={p} />
           </Grid>
         ))
       }

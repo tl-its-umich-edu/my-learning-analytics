@@ -8,11 +8,8 @@ from dashboard.models import Course
 from typing import List
 
 import json
-from json import JSONEncoder
 
 from dashboard.common.db_util import CourseEnrollmentEncoder
-
-import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +77,6 @@ def get_myla_globals(current_user):
     if current_user.is_authenticated:
         username = current_user.get_username()
         user_courses_info = get_user_courses_info(username)
-        # user_course_enrollment_info = get_course_enrollment_info(username)
         user_course_enrollment_info = json.dumps(get_course_enrollment_info(username), cls=CourseEnrollmentEncoder)
 
     if settings.LOGIN_URL:

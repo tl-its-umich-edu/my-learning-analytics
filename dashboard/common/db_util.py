@@ -168,15 +168,14 @@ def get_course_enrollment_info(username) -> List[CourseEnrollment]:
             if courses is not None:
                 for course in courses:
                     name=course[0]
-                    id=incremented_id_to_canvas_id(course[1])
+                    course_id=incremented_id_to_canvas_id(course[1])
                     enrollment_type=course[2]
                     current_grade = course[3]
                     final_grade = course[4]
-                    enrollment = CourseEnrollment(name, id, None, enrollment_type, current_grade, final_grade)
+                    enrollment = CourseEnrollment(name, course_id, None, enrollment_type, current_grade, final_grade)
                     logger.info("APPENDING "+str(enrollment))
                     course_enrollment.append(enrollment)
     except Exception as err:
         logger.info("Error in get_course_enrollment_info: "+str(err), exc_info = True)
     return course_enrollment
-            
 

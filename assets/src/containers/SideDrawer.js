@@ -38,7 +38,7 @@ function SideDrawer (props) {
   const [selectedIndex, setSelectedIndex] = useState(false)
 
   const isTeacherOrAdmin = () => {
-    return isAdmin || enrollment_type=='TeacherEnrollment'
+    return isAdmin || enrollment_type === 'TeacherEnrollment'
   }
 
   const sideList = (
