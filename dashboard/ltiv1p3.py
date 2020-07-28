@@ -160,7 +160,7 @@ def login(request):
         error_message = {
             'lti_error_message': f'LTI Login failed due to {e}'
         }
-        return JsonResponse(error_message)
+        return JsonResponse(error_message, status=500)
 
     target_link_uri = request.POST.get('target_link_uri', request.GET.get('target_link_uri'))
     if not target_link_uri:
