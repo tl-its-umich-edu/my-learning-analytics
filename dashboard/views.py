@@ -1,11 +1,11 @@
 import json
 import logging
+import math
 from collections import namedtuple
 from datetime import timedelta
 from json import JSONDecodeError
 
 import jsonschema
-import math
 import numpy as np
 import pandas as pd
 from django.conf import settings
@@ -13,7 +13,7 @@ from django.contrib import auth
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection as conn
 from django.forms.models import model_to_dict
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from pinax.eventlog.models import log as eventlog
@@ -23,8 +23,8 @@ from dashboard.common import utils
 from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
 from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection, User
-from dashboard.settings import COURSES_ENABLED
-from dashboard.settings import RESOURCE_VALUES, RESOURCE_VALUES_MAP, RESOURCE_ACCESS_CONFIG
+from dashboard.settings import COURSES_ENABLED, RESOURCE_VALUES, RESOURCE_VALUES_MAP, \
+    RESOURCE_ACCESS_CONFIG
 
 logger = logging.getLogger(__name__)
 # strings for construct resource download url
@@ -144,17 +144,17 @@ def update_course_info(request, course_id=0):
 
     :param request: HTTP `PUT` req.; body should contain the JSON body…
     :param course_id: Integer Canvas course ID number, typically six digits or less.
-    :return: HttpResponse containing `{"default": "success"}` or `{"default": "fail"}`
+    :return: JsonResponse containing `{"default": "success"}` or `{"default": "fail"}`
     """
     logger.info(update_course_info.__name__)
 
     if (request.method != 'PUT'):
-        return HttpResponseBadRequest(JsonResponse({'error': 'Invalid request method.'}))
+        return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
     course_id = canvas_id_to_incremented_id(course_id)
     current_user = request.user.get_username()
 
-    bad_json_response = HttpResponseBadRequest(JsonResponse({'error': 'Request JSON malformed.'}))
+    bad_json_response = JsonResponse({'error': 'Request JSON malformed.'}, status=400)
 
     try:
         request_data: dict = json.loads(request.body.decode('utf-8'))
