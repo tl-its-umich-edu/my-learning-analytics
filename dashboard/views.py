@@ -215,7 +215,7 @@ def update_course_info(request, course_id=0):
         CourseViewOption.objects.filter(pk=course_id).update(**view_data)
     except (ObjectDoesNotExist, Exception) as e:
         logger.info(
-            f'updating course visualization options failed due to {e} for user {current_user} in course: {course_id}')
+            f'updating course visualization options failed due to {e} for user {current_user} in course {course_id}')
         success = False
 
     return JsonResponse({'default': 'success' if success else 'fail'})
