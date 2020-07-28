@@ -73,8 +73,8 @@ def role_check(roles):
     logger.info(course_roles)
     user_roles = []
     if len(course_roles) == 0:
-        institute_roles = [role for role in roles if "institution" in role]
-        logger.info(f'user dont seems to have role in Course must be admin {institute_roles}')
+        institute_roles = [role for role in roles if 'institution' in role]
+        logger.info(f"User doesn't have course membership role, must be admin {institute_roles}")
         return user_roles
 
     for role in course_roles:
