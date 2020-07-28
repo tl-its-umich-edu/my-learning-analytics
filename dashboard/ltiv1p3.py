@@ -182,7 +182,7 @@ def launch(request):
         error_message = {
             'lti_error_message': f'LTI Launch failed due to {e}'
         }
-        return JsonResponse(error_message)
+        return JsonResponse(error_message, status=500)
     launch_data_storage = DjangoCacheDataStorage(cache_name='default')
     message_launch = DjangoMessageLaunch(request, tool_conf, launch_data_storage=launch_data_storage)
     # fetch platform's public key from cache instead of calling the API will speed up the launch process
