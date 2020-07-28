@@ -130,7 +130,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
             CourseViewOption.objects.create(course_id=canvas_long_id)
 
     if course_details is None:
-        logger.info(f'Course {course_id} dont have a cron run yet')
+        logger.info(f'Course {course_id} data has not yet been loaded')
     elif course_details.term_id is not None:
         logger.info(f'Course {course_id} data is ready')
         is_course_data_loaded = True
