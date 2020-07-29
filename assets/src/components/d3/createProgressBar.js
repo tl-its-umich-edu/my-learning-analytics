@@ -51,7 +51,7 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
     .attr('x', (_, i) => x(calculatePercentSoFar(i)))
     .attr('height', y.bandwidth())
     .attr('y', margin.top)
-    .attr('fill', d => d.graded ? gradedColor : ungradedColor)
+    .attr('fill', d => d.graded ? gradedColor : d.submitted_at ? ungradedColor : unsubmittedColor)
     .style('border', '1px solid transparent')
     .style('outline-color', 'rgb(255, 255, 255)')
     .style('outline-style', 'solid')

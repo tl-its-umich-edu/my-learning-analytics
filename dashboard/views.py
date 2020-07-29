@@ -652,7 +652,7 @@ def get_course_assignments(course_id):
 
 
 def get_user_assignment_submission(current_user,assignments_in_course_df, course_id):
-    sql = "select assignment_id, score, graded_date from submission where " \
+    sql = "select assignment_id, submitted_at, score, graded_date from submission where " \
           "user_id=(select user_id from user where sis_name = %(current_user)s and course_id = %(course_id)s ) and course_id = %(course_id)s"
     assignment_submissions = pd.read_sql(sql, conn, params={'course_id': course_id, "current_user": current_user})
     if assignment_submissions.empty:
