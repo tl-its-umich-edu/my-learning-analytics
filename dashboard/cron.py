@@ -552,7 +552,7 @@ class DashboardCronJob(CronJobBase):
             status += self.submission()
             status += self.weight_consideration()
 
-            logger.info("** file")
+            logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
                 try:
                     status += self.update_with_bq_access()
