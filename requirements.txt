@@ -49,9 +49,5 @@ django-ptvsd-debug==1.0.3
 django-lti-auth==1.0.0
 django-webpack-loader==0.6.0
 django-csp==3.5
-<<<<<<< HEAD
 
 jsonschema==3.2.0
-=======
-django-composite-foreignkey==1.1.0
->>>>>>> Changes to the migrations and models to support the new

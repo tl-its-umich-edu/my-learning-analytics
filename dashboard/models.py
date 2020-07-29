@@ -13,8 +13,6 @@ from django.db.models import Q
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
-from compositefk.fields import CompositeForeignKey
-
 
 from collections import namedtuple
 from datetime import datetime, timedelta
@@ -282,7 +280,7 @@ class ResourceManager(models.Manager):
 class Resource(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
     resource_type = models.CharField(max_length=255, verbose_name="Resource Type")
-    resource_id = models.CharField(unique=True, blank=False, db_index=True, max_length=255, null=False, verbose_name="Resource Id")
+    resource_id = models.CharField(unique=True, db_index=True, max_length=255, verbose_name="Resource Id")
     name = models.TextField(verbose_name="Resource Name")
 
     objects = ResourceManager()
