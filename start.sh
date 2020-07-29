@@ -7,7 +7,7 @@ if [ -z "${ENV_FILE}" ]; then
     ENV_FILE="/secrets/env.json"
 fi
 
-echo $DJANGO_SETTINGS_MODULE
+echo "$DJANGO_SETTINGS_MODULE"
 
 if [ -z "${GUNICORN_WORKERS}" ]; then
     GUNICORN_WORKERS=4
@@ -47,22 +47,26 @@ else
     DOMAIN=$(echo "${ENV_JSON}" | jq -r -c "${DOMAIN_JQ} | values")
 fi
 
+echo "$PTVSD_ENABLE"
 echo "Waiting for DB"
-while ! nc -z ${MYSQL_HOST} ${MYSQL_PORT}; do   
+while ! nc -z "${MYSQL_HOST}" "${MYSQL_PORT}"; do   
   sleep 1 # wait 1 second before check again
 done
 
 echo "Setting Git info variables"
-export GIT_REPO="$(git config --local remote.origin.url)"
-export GIT_COMMIT="$(git rev-parse HEAD)"
-export GIT_BRANCH="$(git name-rev $GIT_COMMIT --name-only)"
+GIT_REPO="$(git config --local remote.origin.url)"
+export GIT_REPO
+GIT_COMMIT="$(git rev-parse HEAD)"
+export GIT_COMMIT
+GIT_BRANCH="$(git name-rev "$GIT_COMMIT" --name-only)"
+export GIT_BRANCH
 
 echo Running python startups
 python manage.py migrate
 
 echo "Setting domain of default site record"
 # The value for LOCALHOST_PORT is set in docker-compose.yml
-if [ ${DOMAIN} == "localhost" ]; then
+if [ "${DOMAIN}" == "localhost" ]; then
   python manage.py site --domain="${DOMAIN}:${LOCALHOST_PORT}" --name="${DOMAIN}"
 else
   python manage.py site --domain="${DOMAIN}" --name="${DOMAIN}"
@@ -72,22 +76,18 @@ fi
 # This syntax substitutes False if null or unset
 if [ "${IS_CRON_POD:-"false",,}" == "false" ]; then
     if [ "${PTVSD_ENABLE:-"false",,}" == "false" ]; then
-        # Start Gunicorn processes
-        echo Starting Gunicorn for production
-
-        # application pod
+        echo "Starting Gunicorn for production"
         exec gunicorn dashboard.wsgi:application \
             --bind 0.0.0.0:${GUNICORN_PORT} \
             --workers="${GUNICORN_WORKERS}" \
             ${GUNICORN_RELOAD}
     else
-        # Currently ptvsd doesn't work with gunicorn
-        # https://github.com/Microsoft/vscode-python/issues/2138
-        echo Starting Runserver for development
-        export PYTHONPATH="/code:$PYTHONPATH"
-        export DJANGO_SETTINGS_MODULE=dashboard.settings
-        exec django-admin runserver --ptvsd 0.0.0.0:${GUNICORN_PORT}
-
+        echo "Starting Gunicorn for PTVSD debugging"
+        # Workers need to be set to 1 for PTVSD
+        exec gunicorn dashboard.wsgi:application \
+            --bind 0.0.0.0:${GUNICORN_PORT} \
+            --workers=1 \
+            ${GUNICORN_RELOAD}
     fi
 else
     if [ -z "${CRONTAB_SCHEDULE}" ]; then
@@ -102,7 +102,7 @@ else
 
         # Get the environment from docker saved
         # https://ypereirareis.github.io/blog/2016/02/29/docker-crontab-environment-variables/
-        printenv | sed "s/^\([a-zA-Z0-9_]*\)=\(.*\)$/export \1='\2'/g" >> $HOME/.profile
+        printenv | sed "s/^\([a-zA-Z0-9_]*\)=\(.*\)$/export \1='\2'/g" >> "$HOME/.profile"
 
         echo "${CRONTAB_SCHEDULE} . $HOME/.profile; python /code/manage.py runcrons >> /var/log/cron.log 2>&1" | crontab
         crontab -l && cron -L 15 && tail -f /var/log/cron.log

@@ -10,7 +10,10 @@ https://docs.djangoproject.com/en/1.9/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
+from dashboard.ptvsd_util import check_and_enable_ptvsd
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dashboard.settings")
+
+check_and_enable_ptvsd()
 
 application = get_wsgi_application()
