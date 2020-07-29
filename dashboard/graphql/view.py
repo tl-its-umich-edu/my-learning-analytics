@@ -20,18 +20,42 @@ logger = logging.getLogger(__name__)
 class DashboardGraphQLView(GraphQLView):
     def get_context(self, request):
         loaders = {
-            'assignment_weight_consideration_by_course_id_loader': AssignmentWeightConsiderationByCourseIdLoader(),
-            'assignment_by_course_id_and_id_loader': AssignmentByCourseIdAndIdLoader(),
-            'assignments_by_course_id_loader': AssignmentsByCourseIdLoader(),
-            'assignment_by_assignment_group_id_and_id_loader': AssignmentByAssignmentGroupIdAndIdLoader(),
-            'assignments_by_assignment_group_id_loader': AssignmentsByAssignmentGroupIdLoader(),
-            'submissions_by_assignment_id_loader': SubmissionsByAssignmentIdLoader(),
-            'submission_by_assignment_id_and_user_id_loader': SubmissionByAssignmentIdAndUserIdLoader(),
-            'assignment_groups_by_course_id_loader': AssignmentGroupsByCourseIdLoader(),
-            'assignment_group_by_course_id_and_id_loader': AssignmentGroupByCourseIdAndIdLoader(),
-            'user_default_selections_by_course_id_and_user_loader': UserDefaultSelectionsByCourseIdAndUserLoader(),
-            'user_default_selection_by_course_id_and_user_and_view_type_loader': UserDefaultSelectionByCourseIdAndUserAndViewTypeLoader(),
-            'academic_term_by_id_loader': AcademicTermByIdLoader(),
+            'assignment_weight_consideration_by_course_id_loader': AssignmentWeightConsiderationByCourseIdLoader(
+                 get_cache_key=(lambda key: key)
+            ),
+            'assignment_by_course_id_and_id_loader': AssignmentByCourseIdAndIdLoader(
+                get_cache_key=(lambda key: f"course_id:{key.get('course_id')}|id:{key.get('id')}")
+            ),
+            'assignments_by_course_id_loader': AssignmentsByCourseIdLoader(
+                get_cache_key=(lambda key: key)
+            ),
+            'assignment_by_assignment_group_id_and_id_loader': AssignmentByAssignmentGroupIdAndIdLoader(
+                get_cache_key=(lambda key: f"assignment_group_id:{key.get('assignment_group_id')}|id:{key.get('id')}")
+            ),
+            'assignments_by_assignment_group_id_loader': AssignmentsByAssignmentGroupIdLoader(
+                get_cache_key=(lambda key: key)
+            ),
+            'submissions_by_assignment_id_loader': SubmissionsByAssignmentIdLoader(
+                get_cache_key=(lambda key: key)
+            ),
+            'submission_by_assignment_id_and_user_id_loader': SubmissionByAssignmentIdAndUserIdLoader(
+                get_cache_key=(lambda key: f"assignment_id:{key.get('assignment_id')}|user_id:{key.get('user_id')}")
+            ),
+            'assignment_groups_by_course_id_loader': AssignmentGroupsByCourseIdLoader(
+                get_cache_key=(lambda key: key)
+            ),
+            'assignment_group_by_course_id_and_id_loader': AssignmentGroupByCourseIdAndIdLoader(
+                get_cache_key=(lambda key: f"course_id:{key.get('course_id')}|id:{key.get('id')}")
+            ),
+            'user_default_selections_by_course_id_and_user_loader': UserDefaultSelectionsByCourseIdAndUserLoader(
+                get_cache_key=(lambda key: f"course_id:{key.get('course_id')}|user_sis_name:{key.get('user_sis_name')}")
+            ),
+            'user_default_selection_by_course_id_and_user_and_view_type_loader': UserDefaultSelectionByCourseIdAndUserAndViewTypeLoader(
+                get_cache_key=(lambda key: f"course_id:{key.get('course_id')}|user_sis_name:{key.get('user_sis_name')}|default_view_type:{key.get('default_view_type')}")
+            ),
+            'academic_term_by_id_loader': AcademicTermByIdLoader(
+                get_cache_key=(lambda key: key)
+            ),
         }
         for method_, instance in loaders.items():
             setattr(request, method_, instance)
