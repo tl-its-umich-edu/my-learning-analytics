@@ -140,7 +140,7 @@ const SelectCard = props => {
           </CardContent>
         </Link>
         {
-          props.isAdmin || props.enrollment_type === 'TeacherEnrollment'
+          props.isAdmin || props.enrollmentType === 'TeacherEnrollment'
             ? (
               <>
                 <Divider />

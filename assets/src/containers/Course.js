@@ -48,7 +48,7 @@ function Course (props) {
               sideDrawerState={sideDrawerState}
               courseId={courseId}
               courseInfo={courseInfo}
-              enrollment_type={enrollmentType}
+              enrollmentType={enrollmentType}
               isAdmin={user.admin}
             />
             {courseInfo.course_user_exist === 0
@@ -68,7 +68,7 @@ function Course (props) {
                         {...props}
                         courseInfo={courseInfo}
                         courseId={courseId}
-                        enrollment_type={enrollmentType}
+                        enrollmentType={enrollmentType}
                         isAdmin={user.admin}
                       />}
                   />

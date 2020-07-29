@@ -8,12 +8,12 @@ import routes from '../routes/routes'
 const objectValuesAreAllZero = obj => getObjectValues(obj).every(x => x === 0)
 
 function IndexPage (props) {
-  const { courseInfo, courseId, isAdmin, enrollment_type } = props
+  const { courseInfo, courseId, isAdmin, enrollmentType } = props
 
   const views = courseInfo.course_view_options
 
   const isTeacherOrAdmin = () => {
-    return isAdmin || enrollment_type === 'TeacherEnrollment'
+    return isAdmin || enrollmentType === 'TeacherEnrollment'
   }
 
   if (!isTeacherOrAdmin()) {

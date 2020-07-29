@@ -31,14 +31,14 @@ function SideDrawer (props) {
     toggleDrawer,
     courseId,
     courseInfo,
-    enrollment_type,
+    enrollmentType,
     isAdmin
   } = props
 
   const [selectedIndex, setSelectedIndex] = useState(false)
 
   const isTeacherOrAdmin = () => {
-    return isAdmin || enrollment_type === 'TeacherEnrollment'
+    return isAdmin || enrollmentType === 'TeacherEnrollment'
   }
 
   const sideList = (
