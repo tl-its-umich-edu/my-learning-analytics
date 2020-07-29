@@ -11,10 +11,10 @@ from django.db import connections as conns, models
 from django.db.models import QuerySet
 from django_cron import CronJobBase, Schedule
 from google.cloud import bigquery
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, types
 
 from dashboard.common import db_util, utils
-from dashboard.models import Course, Resource, AcademicTerms
+from dashboard.models import Course, Resource, AcademicTerms, ResourceAccess
 
 
 logger = logging.getLogger(__name__)
@@ -308,10 +308,10 @@ class DashboardCronJob(CronJobBase):
             # Drop out the columns user and access time from resource data frame
             resource_df = resource_df.drop(["user_id", "access_time"], axis=1)
             # Drop out the duplicates
-            resource_df = resource_df.drop_duplicates(["resource_id", "course_id"])
+            resource_df = resource_df.drop_duplicates(["resource_id"])
 
             # Set a dual index for upsert
-            resource_df = resource_df.set_index(["resource_id", "course_id"])
+            resource_df = resource_df.set_index(["resource_id",])
 
             # Drop out the columns resource_type, course_id, name from the resource_access
             resource_access_df = resource_access_df.drop(["resource_type","name", "course_id"], axis=1)
@@ -324,10 +324,10 @@ class DashboardCronJob(CronJobBase):
             # First update the resource table
             # write to MySQL
             try:
-                dtype = {'resource_id': types.VARCHAR(255), 'course_id': types.BIGINT}
+                dtype = {'resource_id': types.VARCHAR(255)}
                 pangres.upsert(engine=engine, df=resource_df, table_name='resource', if_row_exists='update', dtype=dtype)
             except Exception as e:
-                logger.exception("Error running to_sql on table resource")
+                logger.exception("Error running upsert on table resource")
                 raise
 
             try:
