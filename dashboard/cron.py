@@ -329,8 +329,8 @@ class DashboardCronJob(CronJobBase):
             # Set a dual index for upsert
             resource_df = resource_df.set_index(["resource_id", "course_id"])
 
-            # Drop out the columns resource_type, name from the resource_access
-            resource_access_df = resource_access_df.drop(["resource_type","name"], axis=1)
+            # Drop out the columns resource_type and name from the resource_access
+            resource_access_df = resource_access_df.drop(["resource_type", "name"], axis=1)
 
             # Drop the columns where there is a Na value
             resource_access_df_drop_na = resource_access_df.dropna()
