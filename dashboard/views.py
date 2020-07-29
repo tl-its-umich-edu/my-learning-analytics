@@ -1,27 +1,30 @@
-from django.forms.models import model_to_dict
-from rules.contrib.views import permission_required, objectgetter
-
-import math, json, logging
+import json
+import logging
+import math
+from collections import namedtuple
 from datetime import timedelta
-from django.utils import timezone
+from json import JSONDecodeError
 
+import jsonschema
 import numpy as np
 import pandas as pd
 from django.conf import settings
 from django.contrib import auth
-from django.db import connection as conn
-from django.http import HttpResponse, HttpResponseForbidden
-from django.shortcuts import redirect, render
-from pinax.eventlog.models import log as eventlog
-from dashboard.event_logs_types.event_logs_types import EventLogTypes
-from dashboard.common.db_util import canvas_id_to_incremented_id
-from dashboard.common import utils
 from django.core.exceptions import ObjectDoesNotExist
-from collections import namedtuple
+from django.db import connection as conn
+from django.forms.models import model_to_dict
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.shortcuts import redirect, render
+from django.utils import timezone
+from pinax.eventlog.models import log as eventlog
+from rules.contrib.views import permission_required, objectgetter
 
+from dashboard.common import utils
+from dashboard.common.db_util import canvas_id_to_incremented_id
+from dashboard.event_logs_types.event_logs_types import EventLogTypes
 from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection, User
-from dashboard.settings import RESOURCE_VALUES, RESOURCE_VALUES_MAP, RESOURCE_ACCESS_CONFIG
-from dashboard.settings import COURSES_ENABLED
+from dashboard.settings import COURSES_ENABLED, RESOURCE_VALUES, RESOURCE_VALUES_MAP, \
+    RESOURCE_ACCESS_CONFIG
 
 logger = logging.getLogger(__name__)
 # strings for construct resource download url
@@ -132,6 +135,91 @@ def get_course_info(request, course_id=0):
     resp['course_user_exist'] = 1 if len(course_users_list) > 0 else 0
 
     return HttpResponse(json.dumps(resp, default=str))
+
+
+@permission_required('dashboard.update_course_info',
+                     fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
+def update_course_info(request, course_id=0):
+    """
+
+    :param request: HTTP `PUT` req.; body should contain the JSON body…
+    :param course_id: Integer Canvas course ID number, typically six digits or less.
+    :return: JsonResponse containing `{"default": "success"}` or `{"default": "fail"}`
+    """
+    logger.info(update_course_info.__name__)
+
+    if (request.method != 'PUT'):
+        return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
+    course_id = canvas_id_to_incremented_id(course_id)
+    current_user = request.user.get_username()
+
+    bad_json_response = JsonResponse({'error': 'Request JSON malformed.'}, status=400)
+
+    try:
+        request_data: dict = json.loads(request.body.decode('utf-8'))
+    except JSONDecodeError:
+        return bad_json_response
+
+    schema = {'$schema': 'http://json-schema.org/draft-07/schema',
+              'type': 'object',
+              'additionalProperties': False,
+              'properties': {
+                  'ap': {
+                      'type': 'object',
+                      'required': ['enabled'],
+                      'additionalProperties': False,
+                      'properties': {'enabled': {'type': 'boolean'}}},
+                  'apv1': {
+                      'type': 'object',
+                      'required': ['enabled'],
+                      'additionalProperties': False,
+                      'properties': {'enabled': {'type': 'boolean'}}},
+                  'gd': {
+                      'type': 'object',
+                      'required': ['enabled'],
+                      'additionalProperties': False,
+                      'properties': {'enabled': {'type': 'boolean'},
+                                     'show_grade_counts': {'type': 'boolean'}}},
+                  'ra': {
+                      'type': 'object',
+                      'required': ['enabled'],
+                      'additionalProperties': False,
+                      'properties': {'enabled': {'type': 'boolean'}}}},
+              'minProperties': 1}
+
+    try:
+        jsonschema.validate(request_data, schema)
+    except jsonschema.ValidationError:
+        return bad_json_response
+
+    # to translate short names returned by model back to original column names
+    view_column_names: dict = {
+        'ap': CourseViewOption.show_assignment_planning.field_name,
+        'apv1': CourseViewOption.show_assignment_planning_v1.field_name,
+        'gd': CourseViewOption.show_grade_distribution.field_name,
+        'ra': CourseViewOption.show_resources_accessed.field_name
+    }
+
+    view_settings: dict
+    view_data: dict = {}
+    success: bool = True  # always look on the bright side of life
+
+    try:
+        for (view_key, view_settings) in request_data.items():
+            view_data[view_column_names[view_key]] = view_settings['enabled']
+            if (view_key == 'gd' and 'show_grade_counts' in view_settings.keys()):
+                Course.objects.filter(pk=course_id).update(
+                    show_grade_counts=view_settings['show_grade_counts'])
+
+        CourseViewOption.objects.filter(pk=course_id).update(**view_data)
+    except (ObjectDoesNotExist, Exception) as e:
+        logger.info(
+            f'updating course visualization options failed due to {e} for user {current_user} in course {course_id}')
+        success = False
+
+    return JsonResponse({'default': 'success' if success else 'fail'},
+                        status=200 if success else 500)
 
 
 # show percentage of users who read the resource within prior n weeks
@@ -373,6 +461,12 @@ def grade_distribution(request, course_id=0):
 @permission_required('dashboard.update_user_default_selection_for_views',
     fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def update_user_default_selection_for_views(request, course_id=0):
+    """
+
+    :param request: HTTP `PUT` req.; body should contain a single JSON pair, `{"key": value}`
+    :param course_id: Integer Canvas course ID number, typically six digits or less.
+    :return: HttpResponse containing `{"default": "success"}` or `{"default": "fail"}`
+    """
     logger.info(update_user_default_selection_for_views.__name__)
     course_id = canvas_id_to_incremented_id(course_id)
     current_user = request.user.get_username()
@@ -390,9 +484,8 @@ def update_user_default_selection_for_views(request, course_id=0):
     eventlog(request.user, EventLogTypes.EVENT_VIEW_SET_DEFAULT.value, extra=data)
     key = 'default'
     try:
-        obj, create_or_update_bool = UserDefaultSelection.objects.set_user_defaults(int(course_id), current_user,
-                                                                                    default_type,
-                                                                                    default_type_value)
+        obj, create_or_update_bool = UserDefaultSelection.objects. \
+            set_user_defaults(int(course_id), current_user, default_type, default_type_value)
         logger.info(
             f"""setting default returns with success with response {obj.__dict__} and entry created or Updated: {create_or_update_bool}
                         for user {current_user} in course {course_id} """)
