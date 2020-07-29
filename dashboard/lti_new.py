@@ -16,19 +16,22 @@ from django.conf import settings
 
 
 logger = logging.getLogger(__name__)
+INSTRUCTOR = 'Instructor'
+TA = 'TeachingAssistant'
+COURSE_MEMBERSHIP = 'membership'
 
 
 def get_tool_conf():
-    ltiv1_p3 = settings.LTI_CONFIG
+    lti_config = settings.LTI_CONFIG
     try:
-        tool_config = ToolConfDict(ltiv1_p3)
+        tool_config = ToolConfDict(lti_config)
     except Exception as e:
         raise e
     # There should be one key per platform and the name relay on platforms generic domain not institution specific
-    platform_domain = list(ltiv1_p3.keys())[0]
-    client_id = ltiv1_p3[platform_domain][0]['client_id']
-    private_key_file_path = ltiv1_p3[platform_domain][0]['private_key_file']
-    public_key_file_path = ltiv1_p3[platform_domain][0]['public_key_file']
+    platform_domain = list(lti_config.keys())[0]
+    client_id = lti_config[platform_domain][0]['client_id']
+    private_key_file_path = lti_config[platform_domain][0]['private_key_file']
+    public_key_file_path = lti_config[platform_domain][0]['public_key_file']
     public_key = public_key_file_path if public_key_file_path else '/secret/public.key'
     private_key = private_key_file_path if private_key_file_path else '/secret/private.key'
     try:
@@ -53,39 +56,24 @@ def get_jwks(request):
 
 
 def check_if_instructor(roles, username, course_id):
-    teaching_roles = [role for role in roles if 'membership#Instructor' in role or
-                      'membership/Instructor#TeachingAssistant' in role]
-    if len(teaching_roles) == 0:
-        logger.info(f"user {username} is not instructor in course {course_id}")
-        return False
-
-    ta = [teach_role for teach_role in teaching_roles if 'membership/Instructor#TeachingAssistant' in teach_role]
-    if len(ta) != 0:
-        logger.info(f'user {username} is not an instructor of course {course_id}')
-        return False
-    else:
-        logger.info(f'user {username} is an instructor in course {course_id}')
+    if INSTRUCTOR in roles:
+        logger.info(f'user {username} is Instructor in the course {course_id}')
         return True
+    return False
 
 
-def role_check(roles):
-    course_roles = [role for role in roles if 'membership' in role]
-    logger.info(course_roles)
-    user_roles = []
-    if len(course_roles) == 0:
-        institute_roles = [role for role in roles if 'institution' in role]
-        logger.info(f"User doesn't have course membership role, must be admin {institute_roles}")
-        return user_roles
-
-    for role in course_roles:
-        split_ = role.split('#')
-        user_roles.append(split_[1])
-    logger.info(f'User role in course {user_roles}')
-    # this step eliminates duplicates of multiple same roles in the course Like TA can be instructor in multiple sections
-    user_roles = list(dict.fromkeys(user_roles))
-    # A TA can be instructor in other sections of the course but not in Lecture course so default to single role
-    user_roles = ['TeachingAssistant'] if not 'TeachingAssistant' else user_roles
-    return user_roles
+def course_user_roles(roles, username):
+    user_roles_in_course = [role for role in roles if COURSE_MEMBERSHIP in role]
+    if len(user_roles_in_course) == 0:
+        logger.info(f'User {username} do not have course membership role, must be admin {roles}')
+        return list()
+    short_role_str_list = set()
+    for role in user_roles_in_course:
+        short_role_str_list.add(role.split('#')[1])
+    if INSTRUCTOR in short_role_str_list and TA in short_role_str_list:
+        logger.info(f'User {username} is a {TA} in the course')
+        short_role_str_list.remove(INSTRUCTOR)
+    return list(short_role_str_list)
 
 
 def extracting_launch_variables_for_tool_use(request, message_launch):
@@ -114,9 +102,8 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
                                             last_name=last_name)
     user_obj.backend = 'django.contrib.auth.backends.ModelBackend'
     django.contrib.auth.login(request, user_obj)
-
-    is_instructor = check_if_instructor(roles, username, course_id)
-    user_role = role_check(roles)
+    user_roles = course_user_roles(roles, username)
+    is_instructor = check_if_instructor(user_roles, username, course_id)
 
     course_details = None
     is_course_data_loaded = False
@@ -146,7 +133,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
         "google_analytics_id": settings.GA_ID,
         "user_courses_info": [{"course_id": course_id, "course_name": course_name}],
         "lti_launch_id": launch_id,
-        "lti_role": user_role,
+        "lti_role": user_roles,
         "lti_is_course_data_loaded": is_course_data_loaded,
     }
     return myla_globals

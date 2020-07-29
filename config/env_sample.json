@@ -89,7 +89,7 @@
     "STUDENT_DASHBOARD_LTI": false,
     "/*LTI 1.3 configuration":"*/",
     "LTI_CONFIG": {
-        "/*canvas LMS domain nanme":"*/",
+        "/*canvas LMS domain name":"*/",
         "https://canvas.test.instructure.com": [
             {
                 "/*The default set of variables for LTI validation":"*/",
@@ -97,9 +97,9 @@
                 "/*LTI Dev Key from Canvas":"*/",
                 "client_id": "17700000000000111",
                 "/*Platform specific URLS for LTI validation":"*/",
-                "auth_login_url": "https://michedu.test.instructure.com/api/lti/authorize_redirect",
-                "auth_token_url": "https://michedu.test.instructure.com/login/oauth2/token",
-                "key_set_url": "https://michedu.test.instructure.com/api/lti/security/jwks",
+                "auth_login_url": "https://umich.test.instructure.com/api/lti/authorize_redirect",
+                "auth_token_url": "https://umich.test.instructure.com/login/oauth2/token",
+                "key_set_url": "https://umich.test.instructure.com/api/lti/security/jwks",
                 "key_set":null,
                 "/*Tools private key for LTI validation":"*/",
                 "private_key_file": "/secrets/private.key",

@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.conf import settings
 import random, string
 
-RANDOM_PASSWORD_DEFAULT_LENGTH = 8
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
