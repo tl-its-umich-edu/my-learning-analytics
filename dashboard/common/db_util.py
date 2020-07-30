@@ -97,14 +97,14 @@ def get_user_courses_info(username):
                 ON u.course_id=c.id
             WHERE u.sis_name= %s;
         ''', [username])
-    courses = cursor.fetchall()
-    if courses is not None:
-        for course in courses:
-            course_info.append({
-                'course_id': incremented_id_to_canvas_id(course[0]),
-                'course_name': course[1],
-                'enrollment_type': course[2]
-            })
+        courses = cursor.fetchall()
+        if courses is not None:
+            for course in courses:
+                course_info.append({
+                    'course_id': incremented_id_to_canvas_id(course[0]),
+                    'course_name': course[1],
+                    'enrollment_type': course[2]
+                })
     logger.info(f"User {username} is enrolled in these courses: {course_info}")
     return course_info
 
