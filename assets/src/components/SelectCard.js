@@ -1,11 +1,7 @@
 /* global fetch */
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import Card from '@material-ui/core/Card'
-import CardContent from '@material-ui/core/CardContent'
-import CardMedia from '@material-ui/core/CardMedia'
-import Typography from '@material-ui/core/Typography'
-import { CardActions, IconButton, Snackbar, CircularProgress, Divider, Fab, Link as MUILink } from '@material-ui/core'
+import { Card, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Link as MUILink, Snackbar, Typography } from '@material-ui/core'
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank'
 import CheckBoxIcon from '@material-ui/icons/CheckBox'
 import CloseIcon from '@material-ui/icons/Close'
