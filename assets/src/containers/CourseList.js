@@ -41,8 +41,6 @@ function CourseList (props) {
   const [avatarEl, setAvatarEl] = useState(null)
   const avatarOpen = Boolean(avatarEl)
 
-  const enrolledCourses = JSON.parse(user.enrolledCourses)
-
   return (
     <>
       <AppBar className={classes.root} position='static'>
@@ -79,7 +77,7 @@ function CourseList (props) {
       </AppBar>
       <div className={classes.content}>
         {
-          !enrolledCourses.length
+          !user.relatedCourses.length
             ? (
               <AlertBanner>
                 You are not enrolled in any courses with My Learning Analytics enabled.
@@ -91,7 +89,7 @@ function CourseList (props) {
               <Grid container spacing={2}>
                 <Grid item xs={12} />
                 {
-                  enrolledCourses.map((course, key) => (
+                  user.relatedCourses.map((course, key) => (
                     <Grid item xs={12} sm={6} lg={4} key={key}>
                       <SelectCard cardData={{ title: course.course_name, description: course.description, path: `/courses/${course.course_id}`, enrollmentType: JSON.parse(user.enrolledCourses).filter(c => c.course_id === course.course_id)[0].enrollment_type, isAdmin: props.user.admin }} />
                     </Grid>
