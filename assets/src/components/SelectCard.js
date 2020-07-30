@@ -5,11 +5,11 @@ import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
 import CardMedia from '@material-ui/core/CardMedia'
 import Typography from '@material-ui/core/Typography'
-import { CardActions, IconButton, Snackbar, CircularProgress, Divider, Fab } from '@material-ui/core'
+import { CardActions, IconButton, Snackbar, CircularProgress, Divider, Fab, Link as MUILink } from '@material-ui/core'
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank'
 import CheckBoxIcon from '@material-ui/icons/CheckBox'
 import CloseIcon from '@material-ui/icons/Close'
-import { Link } from 'react-router-dom'
+import { Link as ReactLink } from 'react-router-dom'
 import { yellow, grey } from '@material-ui/core/colors'
 import SaveIcon from '@material-ui/icons/Save'
 import clsx from 'clsx'
@@ -71,10 +71,13 @@ const SelectCard = props => {
   const [snackbarMessage, setResponseMessage] = useState('Saved')
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  // const [link, setLink] = useState(<ReactLink tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>)
   const buttonClassname = clsx({
     [classes.buttonEnabled]: enabled,
     [classes.buttonDisabled]: !enabled
   })
+
+  const [enabledStateChanged, setEnabledStateChanged] = useState(cardData.enabled && (enabled !== cardData.enabled))
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false)
@@ -86,6 +89,7 @@ const SelectCard = props => {
       if (savedSuccessfully) {
         setResponseMessage('Setting saved')
         setEnabled(isEnabled)
+        setEnabledStateChanged(!((isEnabled && cardData.enabled) || (!isEnabled && !cardData.enabled)))
       } else {
         setResponseMessage('Error saving setting')
       }
@@ -116,29 +120,43 @@ const SelectCard = props => {
 
   const snackbarDuration = Math.max(snackbarMessage.length * 200, 4000)
 
+  function getCardImage (cardData) {
+    if (cardData && cardData.image) {
+      return <CardMedia className={classes.media} image={cardData.image} title={cardData.title} />
+    } else {
+      return null
+    }
+  }
+
+  function getLinkContents (cardData) {
+
+    const cardImage = getCardImage(cardData)
+
+    const cardContent =
+      <CardContent className={classes.content}>
+        <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
+          {cardData.title}
+        </Typography>
+        <Typography component='p' className={classes.description}>
+          {cardData.description}
+        </Typography>
+      </CardContent>
+
+    return <>{cardImage}{cardContent}</>
+  }
+
   return (
     <>
       <Card className={classes.card} elevation={2}>
-        <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
-          {
-            cardData.image
-              ? (
-                <CardMedia
-                  className={classes.media}
-                  image={cardData.image}
-                  title={cardData.title}
-                />
-              ) : null
-          }
-          <CardContent className={classes.content}>
-            <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
-              {cardData.title}
-            </Typography>
-            <Typography component='p' className={classes.description}>
-              {cardData.description}
-            </Typography>
-          </CardContent>
-        </Link>
+        {/* {getLink(cardData)} */}
+        {!enabledStateChanged
+          ? <ReactLink tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
+            {getLinkContents(cardData)}
+          </ReactLink>
+          : <MUILink tabIndex={-1} style={{ textDecoration: 'none' }} href={cardData.path}>
+            {getLinkContents(cardData)}
+          </MUILink>
+        }
         {
           props.isAdmin || props.enrollmentType === 'TeacherEnrollment'
             ? (
