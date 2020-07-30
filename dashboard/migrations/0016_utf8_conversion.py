@@ -6,7 +6,15 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
+        # Go after this converstion in MyLA
         ('dashboard', '0015_auto_20200116_1408'),
+        # Django dependencies
+        ('sites', '0001_initial'),
+        ('sessions', '0001_initial'),
+        # Contrib dependencies
+        ('django_cron', '0001_initial'),
+        ('flatpages', '0001_initial'),
+        ('eventlog', '0001_initial'),
     ]
 
     operations = [
