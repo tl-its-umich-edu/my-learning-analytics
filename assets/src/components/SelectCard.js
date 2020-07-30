@@ -67,7 +67,6 @@ const SelectCard = props => {
   const [snackbarMessage, setResponseMessage] = useState('Saved')
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  // const [link, setLink] = useState(<ReactLink tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>)
   const buttonClassname = clsx({
     [classes.buttonEnabled]: enabled,
     [classes.buttonDisabled]: !enabled
