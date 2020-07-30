@@ -16,8 +16,8 @@ from django.conf import settings
 
 
 logger = logging.getLogger(__name__)
-INSTRUCTOR = 'Instructor'
-TA = 'TeachingAssistant'
+INSTRUCTOR = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
+TA = 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant'
 COURSE_MEMBERSHIP = 'membership'
 
 
@@ -69,11 +69,18 @@ def course_user_roles(roles, username):
         return list()
     short_role_str_list = set()
     for role in user_roles_in_course:
-        short_role_str_list.add(role.split('#')[1])
+        short_role_str_list.add(role)
     if INSTRUCTOR in short_role_str_list and TA in short_role_str_list:
         logger.info(f'User {username} is a {TA} in the course')
         short_role_str_list.remove(INSTRUCTOR)
     return list(short_role_str_list)
+
+
+def short_user_role_list(roles):
+    short_role = []
+    for role in roles:
+        short_role.append(role.split('#')[1])
+    return short_role
 
 
 def extracting_launch_variables_for_tool_use(request, message_launch):
@@ -104,6 +111,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
     django.contrib.auth.login(request, user_obj)
     user_roles = course_user_roles(roles, username)
     is_instructor = check_if_instructor(user_roles, username, course_id)
+    short_roles_list = short_user_role_list(user_roles)
 
     course_details = None
     is_course_data_loaded = False
@@ -133,7 +141,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
         "google_analytics_id": settings.GA_ID,
         "user_courses_info": [{"course_id": course_id, "course_name": course_name}],
         "lti_launch_id": launch_id,
-        "lti_role": user_roles,
+        "lti_role": short_roles_list,
         "lti_is_course_data_loaded": is_course_data_loaded,
     }
     return myla_globals

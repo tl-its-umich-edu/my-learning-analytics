@@ -14,6 +14,7 @@ import os
 import json
 
 from debug_toolbar import settings as dt_settings
+from django.utils.module_loading import import_string
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -288,11 +289,12 @@ LOGGING = {
     },
 }
 RANDOM_PASSWORD_DEFAULT_LENGTH = ENV.get('RANDOM_PASSWORD_DEFAULT_LENGTH', 32)
-DB_CACHE_CONFIGS = ENV.get('DB_CACHE_CONFIGS', {'CACHE_TTL': 7200, 'BACKEND': 'django_mysql.cache.MySQLCach',
-                                                'LOCATION': 'django_myla_cache',
-                                                'CACHE_KEY_PREFIX': 'myla',
-                                                'CACHE_OPTIONS': {'COMPRESS_MIN_LENGTH': 5000, 'COMPRESS_LEVEL': 6}
-                                                })
+DB_CACHE_CONFIGS = ENV.get('DB_CACHE_CONFIGS',
+                           {'CACHE_TTL': 7200, 'BACKEND': import_string('django_mysql.cache.MySQLCache'),
+                            'LOCATION': 'django_myla_cache',
+                            'CACHE_KEY_PREFIX': 'myla',
+                            'CACHE_OPTIONS': {'COMPRESS_MIN_LENGTH': 5000, 'COMPRESS_LEVEL': 6}
+                            })
 
 CACHES = {
     'default': {
