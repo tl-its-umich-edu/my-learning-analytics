@@ -9,9 +9,6 @@ from django_cron.models import CronJobLog
 import pandas as pd
 from django.conf import settings
 
-from typing import List
-
-from json import JSONEncoder
 
 logger = logging.getLogger(__name__)
 
@@ -91,24 +88,24 @@ def get_default_user_course_id(user_id):
 
 def get_user_courses_info(username):
     logger.info(get_user_courses_info.__name__)
-    course_list = []
     course_info = []
     with django.db.connection.cursor() as cursor:
-        cursor.execute("SELECT course_id FROM user WHERE sis_name= %s", [username])
-        courses = cursor.fetchall()
-        if courses is not None:
-            for course in courses:
-                course_id = incremented_id_to_canvas_id(course[0])
-                course_list.append(int(course_id))
-    if course_list:
-        course_tuple = tuple(course_list)
-        with django.db.connection.cursor() as cursor:
-            cursor.execute("select canvas_id, name from course where canvas_id in %s",[course_tuple])
-            course_names = cursor.fetchall()
-            df = pd.DataFrame(list(course_names))
-            df.columns = ["course_id", "course_name"]
-            course_info = df.to_dict(orient='records')
-            logger.info(f"User {username} is enrolled in these courses: {course_info}")
+        cursor.execute('''
+            SELECT c.id, c.name, u.enrollment_type
+            FROM user u
+            JOIN course c
+                ON u.course_id=c.id
+            WHERE u.sis_name= %s;
+        ''', [username])
+    courses = cursor.fetchall()
+    if courses is not None:
+        for course in courses:
+            course_info.append({
+                'course_id': incremented_id_to_canvas_id(course[0]),
+                'course_name': course[1],
+                'enrollment_type': course[2]
+            })
+    logger.info(f"User {username} is enrolled in these courses: {course_info}")
     return course_info
 
 
@@ -136,46 +133,3 @@ def get_canvas_data_date():
     except Exception:
         logger.info("Value could not be found from metadata", exc_info = True)
     return datetime.min
-
-class CourseEnrollment:
-
-    def __init__(self, course_name:str, course_id:int, course_description:str, enrollment_type:str, current_grade:float, final_grade:float) -> None:
-        self.course_name = course_name
-        self.course_id = course_id
-        self.course_description = course_description
-        self.enrollment_type = enrollment_type
-        self.current_grade = current_grade
-        self.final_grade = final_grade
-
-    def __str__(self):
-        result = "{'course_name':'"+self.course_name+"','course_id':'"+str(self.course_id)+"','course_description':'"+str(self.course_description)+"','enrollment_type':'"+self.enrollment_type+"','current_grade':'"+str(self.current_grade)+"','final_grade':'"+str(self.final_grade)+"'}"
-        return result
-
-class CourseEnrollmentEncoder(JSONEncoder):
-    def default(self,o:CourseEnrollment):
-        return o.__dict__
-
-
-
-def get_course_enrollment_info(username) -> List[CourseEnrollment]:
-    logger.info(get_course_enrollment_info.__name__)
-    courses : []
-    course_enrollment : List[CourseEnrollment] = []
-    try:
-        with django.db.connection.cursor() as cursor:
-            cursor.execute("select c.name, c.id, u.enrollment_type, u.current_grade, u.final_grade FROM student_dashboard.`user` u, student_dashboard.course c where u.sis_name=%s and u.course_id =c.id", [username]);
-            courses = cursor.fetchall()
-            if courses is not None:
-                for course in courses:
-                    name=course[0]
-                    course_id=incremented_id_to_canvas_id(course[1])
-                    enrollment_type=course[2]
-                    current_grade = course[3]
-                    final_grade = course[4]
-                    enrollment = CourseEnrollment(name, course_id, None, enrollment_type, current_grade, final_grade)
-                    logger.info("APPENDING "+str(enrollment))
-                    course_enrollment.append(enrollment)
-    except Exception as err:
-        logger.info("Error in get_course_enrollment_info: "+str(err), exc_info = True)
-    return course_enrollment
-

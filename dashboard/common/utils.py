@@ -2,14 +2,9 @@ import logging, os
 
 from django.conf import settings
 
-from dashboard.common.db_util import get_user_courses_info, get_course_enrollment_info
+from dashboard.common.db_util import get_user_courses_info
 from dashboard.models import Course
 
-from typing import List
-
-import json
-
-from dashboard.common.db_util import CourseEnrollmentEncoder
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +63,6 @@ def search_key_for_resource_value(my_dict, search_for):
 def get_myla_globals(current_user):
     username = ""
     user_courses_info = []
-    user_course_enrollment_info : List[CourseEnrollment] = []
     login_url = ""
     logout_url = ""
     google_analytics_id = ""
@@ -77,7 +71,6 @@ def get_myla_globals(current_user):
     if current_user.is_authenticated:
         username = current_user.get_username()
         user_courses_info = get_user_courses_info(username)
-        user_course_enrollment_info = json.dumps(get_course_enrollment_info(username), cls=CourseEnrollmentEncoder)
 
     if settings.LOGIN_URL:
         login_url = settings.LOGIN_URL
@@ -92,7 +85,6 @@ def get_myla_globals(current_user):
         "username" : username,
         "is_superuser": is_superuser,
         "user_courses_info": user_courses_info,
-        "user_course_enrollment_info": user_course_enrollment_info,
         "login": login_url,
         "logout": logout_url,
         "primary_ui_color": primary_ui_color,
