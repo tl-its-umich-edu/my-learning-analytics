@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0015_auto_20200116_1408'),
+        ('dashboard', '0016_utf8_conversion'),
     ]
 
     operations = [
