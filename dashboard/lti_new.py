@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 INSTRUCTOR = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
 TA = 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant'
 COURSE_MEMBERSHIP = 'http://purl.imsglobal.org/vocab/lis/v2/membership'
+DUMMY_CACHE = 'DummyCache'
 
 
 def get_tool_conf():
@@ -74,10 +75,7 @@ def course_user_roles(roles, username):
 
 
 def short_user_role_list(roles):
-    short_role = []
-    for role in roles:
-        short_role.append(role.split('#')[1])
-    return short_role
+    return [role.split('#')[1] for role in roles]
 
 
 def extracting_launch_variables_for_tool_use(request, message_launch):
@@ -161,7 +159,8 @@ def login(request):
             'lti_error_message': 'LTI Login failed due to missing "target_link_uri" param'
         }
         return JsonResponse(error_message, status=500)
-    launch_data_storage = DjangoCacheDataStorage(cache_name='default')
+    dummy_cache = DUMMY_CACHE in settings.DB_CACHE_CONFIGS['BACKEND']
+    launch_data_storage = DjangoCacheDataStorage(cache_name='default') if not dummy_cache else None
     oidc_login = DjangoOIDCLogin(request, tool_conf, launch_data_storage=launch_data_storage)
     return oidc_login.enable_check_cookies().redirect(target_link_uri)
 
@@ -176,12 +175,14 @@ def launch(request):
             'lti_error_message': f'LTI Launch failed due to {e}'
         }
         return JsonResponse(error_message, status=500)
-    launch_data_storage = DjangoCacheDataStorage(cache_name='default')
+    dummy_cache = DUMMY_CACHE in settings.DB_CACHE_CONFIGS['BACKEND']
+    launch_data_storage = DjangoCacheDataStorage(cache_name='default') if not dummy_cache else None
     message_launch = DjangoMessageLaunch(request, tool_conf, launch_data_storage=launch_data_storage)
-    # fetch platform's public key from cache instead of calling the API will speed up the launch process
-    cache_ttl = settings.DB_CACHE_CONFIGS['CACHE_TTL']
-    cache_lifetime = cache_ttl if cache_ttl else 7200
-    message_launch.set_public_key_caching(launch_data_storage, cache_lifetime=cache_lifetime)
+    if not dummy_cache:
+        cache_ttl = settings.DB_CACHE_CONFIGS['CACHE_TTL']
+        cache_lifetime = cache_ttl if cache_ttl else 7200
+        # fetch platform's public key from cache instead of calling the API will speed up the launch process
+        message_launch.set_public_key_caching(launch_data_storage, cache_lifetime=cache_lifetime)
     try:
        myla_globals = extracting_launch_variables_for_tool_use(request, message_launch)
     except Exception as e:

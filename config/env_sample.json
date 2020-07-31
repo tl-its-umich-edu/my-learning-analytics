@@ -118,7 +118,7 @@
         "CACHE_TTL": 7200,
         "/*Cache type":"*/",
         "BACKEND": "django_mysql.cache.MySQLCache",
-        "/*cache tablename":"*/",
+        "/*cache tablename as stated in the 0018_adding_mysql_cache migration file":"*/",
         "LOCATION": "django_myla_cache",
         "CACHE_KEY_PREFIX": "myla",
         "CACHE_OPTIONS": {"COMPRESS_MIN_LENGTH": 5000, "COMPRESS_LEVEL": 6}

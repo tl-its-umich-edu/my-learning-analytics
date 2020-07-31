@@ -291,7 +291,7 @@ LOGGING = {
 }
 RANDOM_PASSWORD_DEFAULT_LENGTH = ENV.get('RANDOM_PASSWORD_DEFAULT_LENGTH', 32)
 DB_CACHE_CONFIGS = ENV.get('DB_CACHE_CONFIGS',
-                           {'CACHE_TTL': 7200, 'BACKEND': import_string('django_mysql.cache.MySQLCache'),
+                           {'CACHE_TTL': 600, 'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
                             'LOCATION': 'django_myla_cache',
                             'CACHE_KEY_PREFIX': 'myla',
                             'CACHE_OPTIONS': {'COMPRESS_MIN_LENGTH': 5000, 'COMPRESS_LEVEL': 6}

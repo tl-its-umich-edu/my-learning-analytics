@@ -3,7 +3,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('dashboard', '0016_utf8_conversion'),
+        ('dashboard', '0017_auto_20200720_1203'),
     ]
 
     operations = [
