@@ -81,6 +81,7 @@ WATCHMAN_DATABASES = ('default',)
 
 # courses_enabled api
 COURSES_ENABLED = ENV.get('COURSES_ENABLED', False)
+STUDENT_DASHBOARD_LTI = ENV.get('STUDENT_DASHBOARD_LTI', False)
 
 # Defaults for PTVSD
 PTVSD_ENABLE = ENV.get("PTVSD_ENABLE", False)

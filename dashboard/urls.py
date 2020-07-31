@@ -26,7 +26,7 @@ from dashboard.graphql.view import DashboardGraphQLView
 
 from django.views.decorators.cache import cache_page
 
-from . import views, lti_new
+from . import views
 
 import watchman.views
 urlpatterns = [
@@ -36,9 +36,6 @@ urlpatterns = [
 
 
     path('admin/', admin.site.urls),
-    path('login/', lti_new.login, name="login"),
-    path('launch/', lti_new.launch, name="launch"),
-    path('jwks/', lti_new.get_jwks, name="get_jwks"),
 
     # Note the absence of a trailing slash; adding one breaks the GraphQL implementation.
     path('graphql', DashboardGraphQLView.as_view(graphiql=True)),
@@ -93,7 +90,15 @@ else:
     urlpatterns += (
         path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
         path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
-     )
+             )
+
+if settings.STUDENT_DASHBOARD_LTI:
+    from . import lti_new
+    urlpatterns += (
+        path('lti/login/', lti_new.login, name="login"),
+        path('lti/launch/', lti_new.launch, name="launch"),
+        path('lti/jwks/', lti_new.get_jwks, name="get_jwks"),
+    )
 
 if apps.is_installed('registration'):
     urlpatterns += (
