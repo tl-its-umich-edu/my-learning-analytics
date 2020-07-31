@@ -108,7 +108,6 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
     django.contrib.auth.login(request, user_obj)
     user_roles = course_user_roles(roles, username)
     is_instructor = check_if_instructor(user_roles, username, course_id)
-    short_roles_list = short_user_role_list(user_roles)
 
     course_details = None
     is_course_data_loaded = False
@@ -136,7 +135,8 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
         "primary_ui_color": settings.PRIMARY_UI_COLOR,
         "help_url": settings.HELP_URL,
         "google_analytics_id": settings.GA_ID,
-        "user_courses_info": [{"course_id": course_id, "course_name": course_name, "enrollment_type": short_roles_list}],
+        "user_courses_info": [
+            {"course_id": course_id, "course_name": course_name, "enrollment_type": short_user_role_list(user_roles)}],
         "lti_launch_id": launch_id,
         "lti_is_course_data_loaded": is_course_data_loaded,
     }
