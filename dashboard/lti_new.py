@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from collections import namedtuple
 
 from pylti1p3.contrib.django import DjangoOIDCLogin, DjangoMessageLaunch, DjangoCacheDataStorage
 from pylti1p3.tool_config import ToolConfDict
@@ -55,6 +56,15 @@ def get_jwks(request):
         }
         return JsonResponse(error_message, status=500)
     return JsonResponse(tool_conf.get_jwks())
+
+
+def get_cache_config():
+    CacheConfig = namedtuple('CacheConfig', ['is_dummy_cache', 'launch_data_storage', 'cache_lifetime'])
+    is_dummy_cache = DUMMY_CACHE in settings.DB_CACHE_CONFIGS['BACKEND']
+    launch_data_storage = DjangoCacheDataStorage(cache_name='default') if not is_dummy_cache else None
+    cache_ttl = settings.DB_CACHE_CONFIGS['CACHE_TTL']
+    cache_lifetime = cache_ttl if cache_ttl else 7200
+    return CacheConfig(is_dummy_cache, launch_data_storage, cache_lifetime)
 
 
 def check_if_instructor(roles, username, course_id):
@@ -159,9 +169,8 @@ def login(request):
             'lti_error_message': 'LTI Login failed due to missing "target_link_uri" param'
         }
         return JsonResponse(error_message, status=500)
-    dummy_cache = DUMMY_CACHE in settings.DB_CACHE_CONFIGS['BACKEND']
-    launch_data_storage = DjangoCacheDataStorage(cache_name='default') if not dummy_cache else None
-    oidc_login = DjangoOIDCLogin(request, tool_conf, launch_data_storage=launch_data_storage)
+    CacheConfig = get_cache_config()
+    oidc_login = DjangoOIDCLogin(request, tool_conf, launch_data_storage=CacheConfig.launch_data_storage)
     return oidc_login.enable_check_cookies().redirect(target_link_uri)
 
 
@@ -175,14 +184,14 @@ def launch(request):
             'lti_error_message': f'LTI Launch failed due to {e}'
         }
         return JsonResponse(error_message, status=500)
-    dummy_cache = DUMMY_CACHE in settings.DB_CACHE_CONFIGS['BACKEND']
-    launch_data_storage = DjangoCacheDataStorage(cache_name='default') if not dummy_cache else None
-    message_launch = DjangoMessageLaunch(request, tool_conf, launch_data_storage=launch_data_storage)
-    if not dummy_cache:
-        cache_ttl = settings.DB_CACHE_CONFIGS['CACHE_TTL']
-        cache_lifetime = cache_ttl if cache_ttl else 7200
+    CacheConfig = get_cache_config()
+    message_launch = DjangoMessageLaunch(request, tool_conf, launch_data_storage=CacheConfig.launch_data_storage)
+    if not CacheConfig.is_dummy_cache:
         # fetch platform's public key from cache instead of calling the API will speed up the launch process
-        message_launch.set_public_key_caching(launch_data_storage, cache_lifetime=cache_lifetime)
+        message_launch.set_public_key_caching(CacheConfig.launch_data_storage, cache_lifetime=CacheConfig.cache_lifetime)
+    else:
+        logger.info('DummyCache is set up, recommended atleast to us Mysql DB cache for LTI advantage services')
+
     try:
        myla_globals = extracting_launch_variables_for_tool_use(request, message_launch)
     except Exception as e:
