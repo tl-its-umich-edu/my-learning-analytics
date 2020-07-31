@@ -286,10 +286,10 @@ def resource_access_within_week(request, course_id=0):
     sqlString = f"""SELECT a.resource_id as resource_id, r.resource_type as resource_type, r.name as resource_name, u.current_grade as current_grade, a.user_id as user_id
                     FROM resource r, resource_access a, user u, course c, academic_terms t
                     WHERE a.resource_id = r.resource_id and a.user_id = u.user_id
-                    and r.course_id = c.id and c.term_id = t.id
+                    and a.course_id = c.id and c.term_id = t.id
                     and a.access_time > %(start_time)s
                     and a.access_time < %(end_time)s
-                    and r.course_id = %(course_id)s
+                    and a.course_id = %(course_id)s
                     and u.course_id = %(course_id)s
                     and u.enrollment_type = 'StudentEnrollment' """
 

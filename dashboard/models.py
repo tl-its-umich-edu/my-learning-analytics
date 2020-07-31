@@ -280,9 +280,8 @@ class ResourceManager(models.Manager):
 class Resource(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
     resource_type = models.CharField(max_length=255, verbose_name="Resource Type")
-    resource_id = models.CharField(blank=True, db_index=True, max_length=255, null=False, verbose_name="Resource Id")
+    resource_id = models.CharField(unique=True, db_index=True, max_length=255, verbose_name="Resource Id")
     name = models.TextField(verbose_name="Resource Name")
-    course_id = models.BigIntegerField(verbose_name="Course Id")
 
     objects = ResourceManager()
 
@@ -292,6 +291,18 @@ class Resource(models.Model):
     class Meta:
         db_table = 'resource'
 
+class ResourceAccess(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name="Table Id")
+    resource_id = models.ForeignKey(Resource, on_delete=models.CASCADE, to_field='resource_id', db_column='resource_id')
+    course_id = models.ForeignKey(Course, null=True, default=None, on_delete=models.CASCADE, db_column='course_id')
+    user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id')
+    access_time = models.DateTimeField(verbose_name="Access Time")
+
+    def __str__(self):
+        return f"Resource {self.resource_id} accessed by {self.user_id}"
+
+    class Meta:
+        db_table = 'resource_access'
 
 class Submission(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Submission Id")
@@ -357,16 +368,3 @@ class User(models.Model):
     class Meta:
         db_table = 'user'
         unique_together = (('id', 'course_id'),)
-
-
-class ResourceAccess(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name="Table Id")
-    resource_id = models.CharField(blank=True, max_length=255, null=False, verbose_name='Resource Id')
-    user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id')
-    access_time = models.DateTimeField(verbose_name="Access Time")
-
-    def __str__(self):
-        return f"Resource {self.resource_id} accessed by {self.user_id}"
-
-    class Meta:
-        db_table = 'resource_access'
