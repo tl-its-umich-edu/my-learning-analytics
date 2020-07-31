@@ -64,17 +64,13 @@ def check_if_instructor(roles, username, course_id):
 
 
 def course_user_roles(roles, username):
-    user_roles_in_course = [role for role in roles if COURSE_MEMBERSHIP in role]
-    if len(user_roles_in_course) == 0:
-        logger.info(f'User {username} do not have course membership role, must be admin {roles}')
-        return list()
-    short_role_str_list = set()
-    for role in user_roles_in_course:
-        short_role_str_list.add(role)
-    if INSTRUCTOR in short_role_str_list and TA in short_role_str_list:
+    user_membership_roles = set([role for role in roles if role.find(COURSE_MEMBERSHIP) == 0])
+    if not user_membership_roles:
+        logger.info(f'User {username} does not have course membership roles, must be admin {roles}')
+    elif INSTRUCTOR in user_membership_roles and TA in user_membership_roles:
         logger.info(f'User {username} is a {TA} in the course')
-        short_role_str_list.remove(INSTRUCTOR)
-    return list(short_role_str_list)
+        user_membership_roles.remove(INSTRUCTOR)
+    return user_membership_roles
 
 
 def short_user_role_list(roles):
