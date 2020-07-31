@@ -1,24 +1,25 @@
 import logging, string, random
-
 import django.contrib.auth
 
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+
 from pylti1p3.contrib.django import DjangoOIDCLogin, DjangoMessageLaunch, DjangoCacheDataStorage
 from pylti1p3.tool_config import ToolConfDict
-from django.contrib.auth.models import User
-from dashboard.common.db_util import canvas_id_to_incremented_id
-from django.core.exceptions import ObjectDoesNotExist
+
 from dashboard.models import Course, CourseViewOption
-from django.conf import settings
+from dashboard.common.db_util import canvas_id_to_incremented_id
 
 
 logger = logging.getLogger(__name__)
 INSTRUCTOR = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
 TA = 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant'
-COURSE_MEMBERSHIP = 'membership'
+COURSE_MEMBERSHIP = 'http://purl.imsglobal.org/vocab/lis/v2/membership'
 
 
 def get_tool_conf():
@@ -86,10 +87,12 @@ def short_user_role_list(roles):
 def extracting_launch_variables_for_tool_use(request, message_launch):
     launch_id = message_launch.get_launch_id()
     launch_data = message_launch.get_launch_data()
+    logger.debug(f'lti launch data {launch_data}')
     custom_params = launch_data['https://purl.imsglobal.org/spec/lti/claim/custom']
+    logger.debug(f'lti_custom_param {custom_params}')
     if not custom_params:
         raise Exception(
-            f'Custom param LTI configuration [user_username=$User.username,canvas_course_id=$Canvas.course.id] not set'
+            f'You need have custom parameters configured on your LTI Launch. Please see the LTI installation guide on the Github Wiki for more information.'
         )
     course_name = launch_data['https://purl.imsglobal.org/spec/lti/claim/context']['title']
     roles = launch_data['https://purl.imsglobal.org/spec/lti/claim/roles']
