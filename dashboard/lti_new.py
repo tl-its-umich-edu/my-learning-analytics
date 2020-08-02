@@ -24,12 +24,23 @@ COURSE_MEMBERSHIP = 'http://purl.imsglobal.org/vocab/lis/v2/membership'
 DUMMY_CACHE = 'DummyCache'
 
 
+class LTIError:
+    def __init__(self, msg):
+        self.msg = msg
+
+    def response_json(self):
+        error_message = {
+            'lti_error': f'Launch failed due to {self.msg}'
+        }
+        return JsonResponse(error_message, status=500)
+
+
 def get_tool_conf():
     lti_config = settings.LTI_CONFIG
     try:
         tool_config = ToolConfDict(lti_config)
     except Exception as e:
-        raise e
+        return e
     # There should be one key per platform and the name relay on platforms generic domain not institution specific
     platform_domain = list(lti_config.keys())[0]
     client_id = lti_config[platform_domain][0]['client_id']
@@ -41,21 +52,26 @@ def get_tool_conf():
         private_key_content = open(private_key, 'r').read()
         public_key_content = open(public_key, 'r').read()
     except OSError as e:
-        raise e
+        return e
     tool_config.set_public_key(platform_domain, public_key_content, client_id=client_id)
     tool_config.set_private_key(platform_domain, private_key_content, client_id=client_id)
     return tool_config
 
 
+def check_if_success_getting_tool_config(tool_config):
+    if isinstance(tool_config, ToolConfDict):
+        logger.info('Success in fetching LTI tool configuration')
+        return True
+    else:
+        logger.error(tool_config)
+        return False
+
+
 def get_jwks(request):
-    try:
-        tool_conf = get_tool_conf()
-    except (OSError, Exception) as e:
-        error_message = {
-            'lti_error_message': f'Fetching JWKS failed due to {e}'
-        }
-        return JsonResponse(error_message, status=500)
-    return JsonResponse(tool_conf.get_jwks())
+    config = get_tool_conf()
+    if not check_if_success_getting_tool_config(config):
+        return LTIError(config).response_json()
+    return JsonResponse(config.get_jwks())
 
 
 def get_cache_config():
@@ -96,7 +112,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
     logger.debug(f'lti_custom_param {custom_params}')
     if not custom_params:
         raise Exception(
-            f'You need have custom parameters configured on your LTI Launch. Please see the LTI installation guide on the Github Wiki for more information.'
+            f'You need to have custom parameters configured on your LTI Launch. Please see the LTI installation guide on the Github Wiki for more information.'
         )
     course_name = launch_data['https://purl.imsglobal.org/spec/lti/claim/context']['title']
     roles = launch_data['https://purl.imsglobal.org/spec/lti/claim/roles']
@@ -155,37 +171,26 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
 
 @csrf_exempt
 def login(request):
-    try:
-        tool_conf = get_tool_conf()
-    except (OSError, Exception) as e:
-        error_message = {
-            'lti_error_message': f'LTI Login failed due to {e}'
-        }
-        return JsonResponse(error_message, status=500)
-
+    config = get_tool_conf()
+    if not check_if_success_getting_tool_config(config):
+        return LTIError(config).response_json()
     target_link_uri = request.POST.get('target_link_uri', request.GET.get('target_link_uri'))
     if not target_link_uri:
-        error_message = {
-            'lti_error_message': 'LTI Login failed due to missing "target_link_uri" param'
-        }
-        return JsonResponse(error_message, status=500)
+        error_message = 'LTI Login failed due to missing "target_link_uri" param'
+        return LTIError(error_message).response_json()
     CacheConfig = get_cache_config()
-    oidc_login = DjangoOIDCLogin(request, tool_conf, launch_data_storage=CacheConfig.launch_data_storage)
+    oidc_login = DjangoOIDCLogin(request, config, launch_data_storage=CacheConfig.launch_data_storage)
     return oidc_login.enable_check_cookies().redirect(target_link_uri)
 
 
 @require_POST
 @csrf_exempt
 def launch(request):
-    try:
-        tool_conf = get_tool_conf()
-    except (OSError, Exception) as e:
-        error_message = {
-            'lti_error_message': f'LTI Launch failed due to {e}'
-        }
-        return JsonResponse(error_message, status=500)
+    config = get_tool_conf()
+    if not check_if_success_getting_tool_config(config):
+        return LTIError(config).response_json()
     CacheConfig = get_cache_config()
-    message_launch = DjangoMessageLaunch(request, tool_conf, launch_data_storage=CacheConfig.launch_data_storage)
+    message_launch = DjangoMessageLaunch(request, config, launch_data_storage=CacheConfig.launch_data_storage)
     if not CacheConfig.is_dummy_cache:
         # fetch platform's public key from cache instead of calling the API will speed up the launch process
         message_launch.set_public_key_caching(CacheConfig.launch_data_storage, cache_lifetime=CacheConfig.cache_lifetime)
@@ -195,10 +200,7 @@ def launch(request):
     try:
        myla_globals = extracting_launch_variables_for_tool_use(request, message_launch)
     except Exception as e:
-        error_message = {
-            'lti_error_message': f'LTI Launch failed due to {e}'
-        }
-        return JsonResponse(error_message, status=500)
+        return LTIError(e).response_json()
     context = {
         'myla_globals': myla_globals
     }
