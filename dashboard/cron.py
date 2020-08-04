@@ -1,24 +1,21 @@
-
-from django.db import connections as conns
-
-from dashboard.common import db_util, utils
-
-import logging
-import datetime
-import pytz
-
-from sqlalchemy import create_engine
-from django.conf import settings
+import datetime, logging
 from collections import namedtuple
-
-from dashboard.models import Course, Resource, AcademicTerms
+from typing import Dict, List, Union
 
 import pandas as pd
+import pytz
+import pangres
 
-# Imports the Google Cloud client library
-from google.cloud import bigquery
-
+from django.conf import settings
+from django.db import connections as conns, models
+from django.db.models import QuerySet
 from django_cron import CronJobBase, Schedule
+from google.cloud import bigquery
+from sqlalchemy import create_engine, types
+
+from dashboard.common import db_util, utils
+from dashboard.models import Course, Resource, AcademicTerms, ResourceAccess
+
 
 logger = logging.getLogger(__name__)
 
@@ -49,11 +46,11 @@ def util_function(data_warehouse_course_id, sql_string, mysql_table, table_ident
 
     # Sql returns boolean value so grouping course info along with it so that this could be stored in the DB table.
     if table_identifier == 'weight' and data_warehouse_course_id:
-        df['course_id']=data_warehouse_course_id
-        df.columns=['consider_weight','course_id']
+        df['course_id'] = data_warehouse_course_id
+        df.columns = ['consider_weight', 'course_id']
 
     # drop duplicates
-    df.drop_duplicates(keep='first', inplace=True)
+    df = df.drop_duplicates(keep='first')
 
     logger.debug(" table: " + mysql_table + " insert size: " + str(df.shape[0]))
 
@@ -83,19 +80,25 @@ def deleteAllRecordInTable(tableName):
     return f"delete : {tableName}\n"
 
 
-# use Django ORM to compare warehouse and existing data and, if necessary, update DateTime field of model instance
-def update_datetime_field(course_obj, course_field_name, warehouse_dataframe, warehouse_field_name):
-    course_field_value = getattr(course_obj, course_field_name)
+def soft_update_datetime_field(
+    model_inst: models.Model,
+    field_name: str,
+    warehouse_field_value: Union[datetime.datetime, None],
+) -> List[str]:
+    """
+    Uses Django ORM to update DateTime field of model instance if the field value is null and the warehouse data is non-null.
+    """
+    model_name: str = model_inst.__class__.__name__
+    current_field_value: Union[datetime.datetime, None] = getattr(model_inst, field_name)
     # Skipping update if the field already has a value, provided by a previous cron run or administrator
-    if course_field_value is not None:
-        logger.info(f"Update of {course_field_name} skipped; existing value was found.")
+    if current_field_value is not None:
+        logger.info(f'Skipped update of {field_name} for {model_name} instance ({model_inst.id}); existing value was found')
     else:
-        warehouse_field_value = warehouse_dataframe[warehouse_field_name].iloc[0]
-        if pd.notna(warehouse_field_value):
+        if warehouse_field_value:
             warehouse_field_value = warehouse_field_value.replace(tzinfo=pytz.UTC)
-            setattr(course_obj, course_field_name, warehouse_field_value)
-            logger.info(f"{course_field_name} for {course_obj.id} has been updated.")
-            return [course_field_name]
+            setattr(model_inst, field_name, warehouse_field_value)
+            logger.info(f'Updated {field_name} for {model_name} instance ({model_inst.id})')
+            return [field_name]
     return []
 
 
@@ -104,7 +107,6 @@ class DashboardCronJob(CronJobBase):
 
     schedule = Schedule(run_at_times=settings.RUN_AT_TIMES)
     code = 'dashboard.DashboardCronJob'    # a unique code
-
 
     # verify whether course ids are valid
     def verify_course_ids(self):
@@ -231,10 +233,6 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
-        # delete all records in resource and resource_access table
-        status += deleteAllRecordInTable("resource")
-        status += deleteAllRecordInTable("resource_access")
-
         # return string with concatenated SQL insert result
         return_string = ""
 
@@ -247,6 +245,15 @@ class DashboardCronJob(CronJobBase):
         # the earliest start date of all courses
         course_start_time = utils.find_earliest_start_datetime_of_courses()
 
+        # the earliest latest date of all resources_accessed
+        try:
+            latest_resource = ResourceAccess.objects.latest('access_time')
+            latest_resource_time = latest_resource.access_time
+        except ResourceAccess.DoesNotExist:
+            latest_resource_time = course_start_time
+
+        logger.info(f"Earliest Start: {course_start_time} Latest resource: {latest_resource_time}")
+
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
         for data_warehouse_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
@@ -258,9 +265,9 @@ class DashboardCronJob(CronJobBase):
                 # concatenate the multi-line presentation of query into one single string
                 query = " ".join(query_obj['query'])
 
-                if (course_start_time is not None):
+                if (latest_resource_time is not None):
                     # insert the start time parameter for query
-                    query += " and event_time > @course_start_time"
+                    query += " and event_time > @latest_resource_time"
 
                 final_bq_query.append(query)
             final_bq_query = "  UNION ALL   ".join(final_bq_query)
@@ -274,9 +281,9 @@ class DashboardCronJob(CronJobBase):
                 bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
                 bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT)
             ]
-            if (course_start_time is not None):
+            if (latest_resource_time is not None):
                 # insert the start time parameter for query
-                query_params.append(bigquery.ScalarQueryParameter('course_start_time', 'TIMESTAMP', course_start_time))
+                query_params.append(bigquery.ScalarQueryParameter('latest_resource_time', 'TIMESTAMP', latest_resource_time))
 
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
@@ -289,7 +296,7 @@ class DashboardCronJob(CronJobBase):
 
             logger.debug("df row number=" + str(resource_access_df.shape[0]))
             # drop duplicates
-            resource_access_df.drop_duplicates(["resource_id", "user_id", "access_time"], keep='first', inplace=True)
+            resource_access_df = resource_access_df.drop_duplicates(["resource_id", "user_id", "access_time"], keep='first')
 
             logger.debug("after drop duplicates, df row number=" + str(resource_access_df.shape[0]))
 
@@ -299,12 +306,15 @@ class DashboardCronJob(CronJobBase):
             # Make a copy of the access dataframe
             resource_df = resource_access_df.copy(deep=True)
             # Drop out the columns user and access time from resource data frame
-            resource_df.drop(["user_id", "access_time"], axis=1, inplace=True)
+            resource_df = resource_df.drop(["user_id", "access_time"], axis=1)
             # Drop out the duplicates
-            resource_df.drop_duplicates(["resource_id", "course_id"], inplace=True)
+            resource_df = resource_df.drop_duplicates(["resource_id"])
 
-            # Drop out the columns resource_type, course_id, name from the resource_access
-            resource_access_df.drop(["resource_type","name", "course_id"], axis=1, inplace=True)
+            # Set a dual index for upsert
+            resource_df = resource_df.set_index(["resource_id",])
+
+            # Drop out the columns resource_type, name from the resource_access
+            resource_access_df = resource_access_df.drop(["resource_type","name"], axis=1)
 
             # Drop the columns where there is a Na value
             resource_access_df_drop_na = resource_access_df.dropna()
@@ -314,9 +324,10 @@ class DashboardCronJob(CronJobBase):
             # First update the resource table
             # write to MySQL
             try:
-                resource_df.to_sql(con=engine, name='resource', if_exists='append', index=False)
+                dtype = {'resource_id': types.VARCHAR(255)}
+                pangres.upsert(engine=engine, df=resource_df, table_name='resource', if_row_exists='update', dtype=dtype)
             except Exception as e:
-                logger.exception("Error running to_sql on table resource")
+                logger.exception("Error running upsert on table resource")
                 raise
 
             try:
@@ -423,68 +434,84 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids
         for data_warehouse_course_id in Course.objects.get_supported_courses():
-            is_weight_considered_url = f"""with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact
+            is_weight_considered_sql = f"""with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact
                                         where course_id = '{data_warehouse_course_id}' group by course_id having sum(group_weight)>1)
                                         (select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)
                                         """
-            status += util_function(data_warehouse_course_id, is_weight_considered_url,'assignment_weight_consideration', 'weight')
+            status += util_function(data_warehouse_course_id, is_weight_considered_sql, 'assignment_weight_consideration', 'weight')
 
-            logger.debug(status+"\n\n")
-
-        return status
-
-
-    def update_term(self):
-        # cron status
-        status = ""
-
-        logger.debug("in update with data warehouse term")
-
-        # delete all records in the table first
-        status += deleteAllRecordInTable("academic_terms")
-
-        # select term records from DATA_WAREHOUSE
-        term_sql = "SELECT id, canvas_id, name, date_start, date_end FROM enrollment_term_dim;"
-        logger.debug(term_sql)
-        status += util_function(None, term_sql, 'academic_terms')
+            logger.debug(status + "\n\n")
 
         return status
 
+    def update_term(self) -> str:
+        """
+        Searches warehouse data for new terms and adds them while leaving existing terms as they are.
+        """
+        status: str = ''
+        logger.info('update_term()')
 
-    # update course records with data returned from verify_course_ids, only making changes when necessary
-    def update_course(self, warehouse_courses_data):
-        # cron status
-        status = ""
-        logger.debug("while using verify_course_ids data to update course table")
+        term_sql: str = 'SELECT id, canvas_id, name, date_start, date_end FROM enrollment_term_dim;'
+        warehouse_term_df: pd.DataFrame = pd.read_sql(term_sql, conns['DATA_WAREHOUSE'])
+
+        existing_terms_ids: List[int] = [term.id for term in list(AcademicTerms.objects.all())]
+        new_term_ids: List[int] = [int(id) for id in warehouse_term_df['id'].to_list() if id not in existing_terms_ids]
+
+        if not new_term_ids:
+            logger.info('No new terms were found to add to the academic_terms table.')
+        else:
+            new_term_df: pd.DataFrame = warehouse_term_df.loc[warehouse_term_df['id'].isin(new_term_ids)]
+            try:
+                new_term_df.to_sql(con=engine, name='academic_terms', if_exists='append', index=False)
+                term_message: str = f'Added {len(new_term_df)} new records to academic_terms table: {new_term_ids}'
+                logger.info(term_message)
+                status += term_message + '\n'
+            except Exception as e:
+                logger.error(f'Error running to_sql on term table: {e}')
+                raise
+        return status
+
+    def update_course(self, warehouse_courses_data: pd.DataFrame) -> str:
+        """
+        Updates course records with data returned from verify_course_ids, only making changes when necessary.
+        """
+        status: str = ''
+        logger.debug('update_course()')
 
         logger.debug(warehouse_courses_data.to_json(orient='records'))
-        courses = Course.objects.all()
-        courses_string = ", ".join([str(x) for x in Course.objects.get_supported_courses()])
-        status += f"{str(len(courses))} course(s): {courses_string}\n"
+        courses: QuerySet = Course.objects.all()
+        courses_string: str = ', '.join([str(x) for x in Course.objects.get_supported_courses()])
+        status += f'{str(len(courses))} course(s): {courses_string}\n'
 
         for course in courses:
-            updated_fields = []
-            status += f"course {course.id}: updated "
-            warehouse_course_df = warehouse_courses_data.loc[warehouse_courses_data["id"] == course.id]
+            updated_fields: List[str] = []
+            warehouse_course_dict: Dict[str, any] = warehouse_courses_data.loc[warehouse_courses_data['id'] == course.id].iloc[0].to_dict()
 
-            warehouse_course_name = warehouse_course_df["name"].iloc[0]
+            warehouse_course_name: str = warehouse_course_dict['name']
             if course.name != warehouse_course_name:
                 course.name = warehouse_course_name
-                logger.info(f"Name for {course.id} has been updated.")
-                updated_fields.append("name")
+                logger.info(f'Name for {course.id} has been updated.')
+                updated_fields.append('name')
 
-            # term is always updated because the term records are deleted by the update_term method
-            course.term = AcademicTerms.objects.get(id=warehouse_course_df["enrollment_term_id"])
-            logger.info(f"Term for {course.id} has been updated.")
-            updated_fields.append("term")
+            warehouse_term_id: int = int(warehouse_course_dict['enrollment_term_id'])
+            if (course.term is None) or (course.term.id != warehouse_term_id):
+                course.term = AcademicTerms.objects.get(id=warehouse_term_id)
+                logger.info(f'Term for {course.id} has been updated.')
+                updated_fields.append('term')
 
-            updated_fields += update_datetime_field(course, "date_start", warehouse_course_df, "start_at")
-            updated_fields += update_datetime_field(course, "date_end", warehouse_course_df, "conclude_at")
+            warehouse_date_start: Union[datetime.datetime, None] = (
+                warehouse_course_dict['start_at'].to_pydatetime() if pd.notna(warehouse_course_dict['start_at']) else None
+            )
+            updated_fields += soft_update_datetime_field(course, 'date_start', warehouse_date_start)
+            warehouse_date_end: Union[datetime.datetime, None] = (
+                warehouse_course_dict['conclude_at'].to_pydatetime() if pd.notna(warehouse_course_dict['conclude_at']) else None
+            )
+            updated_fields += soft_update_datetime_field(course, 'date_end', warehouse_date_end)
 
-            course.save()
-            status += ", ".join(updated_fields) + "\n"
+            if updated_fields:
+                course.save()
+                status += f'Course {course.id}: updated {", ".join(updated_fields)}\n'
         return status
-
 
     def do(self):
         logger.info("** MyLA cron tab")
@@ -525,7 +552,7 @@ class DashboardCronJob(CronJobBase):
             status += self.submission()
             status += self.weight_consideration()
 
-            logger.info("** file")
+            logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
                 try:
                     status += self.update_with_bq_access()

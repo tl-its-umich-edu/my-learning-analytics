@@ -1,18 +1,18 @@
-gunicorn>=19.9.0,<19.9.99
+gunicorn==20.0.4
 
 # We're waiting on Django 3 until it's further into the lifecycle.
-Django>=2.2.10,<2.2.99
-whitenoise>=4.1.4,<4.1.99
+Django==3.0.8
+whitenoise==5.1.0
 
 django-registration>=3.0,<3.0.99
 django-cron>=0.5.1,<0.5.99
 django-npm>=1.0.0,<1.0.99
-django-watchman>=0.18.0,<0.18.99
+django-watchman==1.1.1
 django-su>=0.8.0,<0.8.99
 django-settings-export>=1.2.1,<1.2.99
 django-macros>=0.4.0,<0.4.99
 django-debug-toolbar>=2.0,<2.0.99
-
+django-mysql==3.7.1
 # Force this version of promise because the newest version doesn't support dict
 promise==2.2.1
 
@@ -21,12 +21,13 @@ graphene-django>=2.8.0,<2.8.99
 django-filter>=2.2.0,<2.2.99
 
 # object-level permissions
-rules>=2.1,<2.1.99
+rules==2.2
 django-model-utils>=3.2.0,<3.2.99
 
 # These should be okay to update minors
 numpy>=1.17,<1.17.99
 pandas>=0.25.1,<0.25.99
+pangres>=2.1,<2.99
 
 requests>=2.22,<2.22.99
 pyOpenSSL>=19.0,<19.0.99
@@ -45,8 +46,7 @@ google-cloud-bigquery>=1.21.0,<1.21.99
 pinax-eventlog>=2.0.3,<2.0.99
 ptvsd>=4.3.2,<4.3.99
 django-ptvsd-debug==1.0.3
-django-lti-auth==1.0.0
+PyLTI1p3==1.7.0
 django-webpack-loader==0.6.0
-django-csp==3.5
-
 jsonschema==3.2.0
+django-csp==3.6

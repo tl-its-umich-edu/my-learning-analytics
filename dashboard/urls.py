@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import include
 from django.conf.urls.static import static
 from django.urls import path, re_path
 
@@ -29,11 +29,11 @@ from django.views.decorators.cache import cache_page
 from . import views
 
 import watchman.views
-
 urlpatterns = [
     path('', views.get_home_template, name = 'home'),
     path('status/', include('watchman.urls')),
     path('status/bare_status/', watchman.views.bare_status),
+
 
     path('admin/', admin.site.urls),
 
@@ -62,6 +62,7 @@ urlpatterns = [
     path('api/v1/courses_enabled/',
         cache_page(settings.CLIENT_CACHE_TIME)(views.courses_enabled), name='courses_enabled'),
 
+
     # PUT/POST access patterns
     path('api/v1/courses/<int:course_id>/set_user_default_selection/',
         login_required(views.update_user_default_selection_for_views), name='update_user_default_selection_for_views'),
@@ -71,6 +72,7 @@ urlpatterns = [
     path('su/', include('django_su.urls')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
 
 if apps.is_installed('djangosaml2'):
     from djangosaml2.views import echo_attributes
@@ -88,11 +90,14 @@ else:
     urlpatterns += (
         path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
         path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
-     )
+             )
 
-if apps.is_installed('django_lti_auth'):
+if settings.STUDENT_DASHBOARD_LTI:
+    from . import lti_new
     urlpatterns += (
-        path('lti/', include('django_lti_auth.urls')),
+        path('lti/login/', lti_new.login, name="login"),
+        path('lti/launch/', lti_new.launch, name="launch"),
+        path('lti/jwks/', lti_new.get_jwks, name="get_jwks"),
     )
 
 if apps.is_installed('registration'):
