@@ -10,6 +10,7 @@ import { yellow, grey } from '@material-ui/core/colors'
 import SaveIcon from '@material-ui/icons/Save'
 import clsx from 'clsx'
 import { defaultFetchOptions, handleError } from '../util/data'
+import { isTeacherOrAdmin } from '../util/roles'
 
 const styles = theme => ({
   card: {
@@ -143,7 +144,6 @@ const SelectCard = props => {
   return (
     <>
       <Card className={classes.card} elevation={2}>
-        {/* {getLink(cardData)} */}
         {!enabledStateChanged
           ? <ReactLink tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
             {getLinkContents(cardData)}
@@ -153,7 +153,7 @@ const SelectCard = props => {
           </MUILink>
         }
         {
-          props.isAdmin || props.enrollmentType === 'TeacherEnrollment'
+          isTeacherOrAdmin(props.isAdmin, props.enrollmentType)
             ? (
               <>
                 <Divider />
