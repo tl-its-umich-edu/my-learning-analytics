@@ -1,52 +1,53 @@
-gunicorn==20.0.4
+gunicorn>=19.9.0,<19.9.99
 
-# We're waiting on Django 3 until it's further into the lifecycle.
 Django==3.0.8
 whitenoise==5.1.0
 
-django-registration>=3.0,<3.0.99
-django-cron>=0.5.1,<0.5.99
-django-npm>=1.0.0,<1.0.99
+django-registration==3.1
+# No update since 2018
+django-cron==0.5.1
+# No update since 2016
+django-npm==1.0.0
 django-watchman==1.1.1
-django-su>=0.8.0,<0.8.99
-django-settings-export>=1.2.1,<1.2.99
-django-macros>=0.4.0,<0.4.99
-django-debug-toolbar>=2.0,<2.0.99
+django-su==0.9.0
+# No update since 2016
+django-settings-export==1.2.1
+# No update since 2015
+django-macros==0.4.0
+django-debug-toolbar==2.2
 django-mysql==3.7.1
-# Force this version of promise because the newest version doesn't support dict
-promise==2.2.1
 
 # graphql
-graphene-django>=2.12.1,<2.12.99
-django-filter>=2.2.0,<2.2.99
+graphene-django==2.12.1
+django-filter==2.3.0
 
 # object-level permissions
 rules==2.2
-django-model-utils>=3.2.0,<3.2.99
+django-model-utils==4.0.0
 
 # These should be okay to update minors
-numpy>=1.17,<1.17.99
-pandas>=0.25.1,<0.25.99
-pangres>=2.1,<2.99
+numpy==1.19.1
+pandas==1.0.5
+pangres==2.1
 
-requests>=2.22,<2.22.99
-pyOpenSSL>=19.0,<19.0.99
-canvasapi>=0.10,<0.10.99
-protobuf>=3.10.0,<3.10.99
+pyOpenSSL==19.1.0
+protobuf==3.12.2
 
 # These caused problems in the past so test when updating
 djangosaml2==0.19.1
 pysaml2==5.1.0
 
-SQLAlchemy>=1.3.10,<1.3.99
+SQLAlchemy==1.3.18
 psycopg2==2.8.5
 mysqlclient==1.4.6
-google-cloud-bigquery>=1.21.0,<1.21.99
+google-cloud-bigquery==1.26.0
 
-pinax-eventlog>=2.0.3,<2.0.99
-ptvsd>=4.3.2,<4.3.99
+pinax-eventlog==2.0.3
+ptvsd==4.3.2
 django-ptvsd-debug==1.0.3
+django-lti-auth==1.0.0
 PyLTI1p3==1.7.0
 django-webpack-loader==0.6.0
+django-csp==3.5
+
 jsonschema==3.2.0
-django-csp==3.6
