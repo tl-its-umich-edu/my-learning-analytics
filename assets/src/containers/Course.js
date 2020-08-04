@@ -24,7 +24,7 @@ function Course (props) {
     }
     setSideDrawerState(open)
   }
-  
+
   if (error.message === 'Not Found') return (<WarningBanner>Course {courseId} does not exist.</WarningBanner>)
   else if (error.message === 'Forbidden') return (<WarningBanner>You do not have access to course {courseId}.</WarningBanner>)
   else if (error) return (<WarningBanner />)
