@@ -22,7 +22,7 @@ function App (props) {
       <Route path='/' exact render={props => <CourseList {...props} user={user} />} />
       <Route path='/courses' exact render={props => <CourseList {...props} user={user} />} />
       <Route exact path='/lti/launch'><Redirect to={ltiCourseId} /></Route>
-      {courseId ? <Course user={user} courseId={courseId} {...props} /> : null}
+      {courseId ? <Course user={user} courseId={parseInt(courseId)} {...props} /> : null}
     </>
   )
 }
