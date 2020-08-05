@@ -101,7 +101,7 @@ def get_user_courses_info(username):
         if courses is not None:
             for course in courses:
                 course_info.append({
-                    'course_id': incremented_id_to_canvas_id(course[0]),
+                    'course_id': int(incremented_id_to_canvas_id(course[0])),
                     'course_name': course[1],
                     'enrollment_type': course[2]
                 })

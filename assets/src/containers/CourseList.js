@@ -11,7 +11,8 @@ import Typography from '@material-ui/core/Typography'
 import { siteTheme } from '../globals'
 import AlertBanner from '../components/AlertBanner'
 import AvatarModal from '../components/AvatarModal'
-import SelectCard from '../components/SelectCard'
+// import SelectCard from '../components/SelectCard'
+import CourseListCard from '../components/CourseListCard/CourseListCard'
 
 const styles = theme => ({
   root: {
@@ -91,7 +92,7 @@ function CourseList (props) {
                 {
                   user.relatedCourses.map((course, key) => (
                     <Grid item xs={12} sm={6} lg={4} key={key}>
-                      <SelectCard cardData={{ title: course.course_name, path: `/courses/${course.course_id}` }} />
+                      <CourseListCard path={`/courses/${course.course_id}`} courseName={course.course_name} />
                     </Grid>
                   ))
                 }
