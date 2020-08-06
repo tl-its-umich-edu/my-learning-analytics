@@ -2,11 +2,18 @@ const path = require('path')
 const BundleTracker = require('webpack-bundle-tracker')
 const CompressionPlugin = require('compression-webpack-plugin')
 
+const isDevelopment = process.env.BABEL_ENV !== 'production'
 module.exports = {
+  mode: isDevelopment ? 'development' : 'production',
   entry: path.join(__dirname, 'assets/src/index'),
   output: {
     path: path.join(__dirname, 'assets/dist'),
-    filename: '[name]-[hash].js'
+    filename: '[name].[hash].js'
+  },
+  devtool: isDevelopment ? 'inline-source-map' : 'false',
+  watchOptions: {
+    ignored: /node_modules/,
+    aggregateTimeout: 600
   },
   module: {
     rules: [
@@ -47,7 +54,7 @@ module.exports = {
     new CompressionPlugin({
       filename: '[path].gz[query]',
       algorithm: 'gzip',
-      test: /\.js(\?.*)?$/i,
+      test: /\.js$|\.css$|\.html$/,
       threshold: 10240,
       minRatio: 0.8
     })

@@ -86,7 +86,7 @@ if [ "${IS_CRON_POD:-"false",,}" == "false" ]; then
         echo Starting Runserver for development
         export PYTHONPATH="/code:$PYTHONPATH"
         export DJANGO_SETTINGS_MODULE=dashboard.settings
-        exec django-admin runserver --ptvsd 0.0.0.0:${GUNICORN_PORT}
+        exec django-admin runserver --nostatic --ptvsd 0.0.0.0:${GUNICORN_PORT}
 
     fi
 else
