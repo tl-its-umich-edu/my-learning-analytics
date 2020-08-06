@@ -11,7 +11,6 @@ import Typography from '@material-ui/core/Typography'
 import { siteTheme } from '../globals'
 import AlertBanner from '../components/AlertBanner'
 import AvatarModal from '../components/AvatarModal'
-// import SelectCard from '../components/SelectCard'
 import CourseListCard from '../components/CourseListCard/CourseListCard'
 
 const styles = theme => ({

@@ -1,16 +1,17 @@
 /* global fetch */
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Card, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Link as MUILink, Snackbar, Typography } from '@material-ui/core'
+import { Card, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Snackbar, Typography } from '@material-ui/core'
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank'
 import CheckBoxIcon from '@material-ui/icons/CheckBox'
 import CloseIcon from '@material-ui/icons/Close'
-import { Link as ReactLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { yellow, grey } from '@material-ui/core/colors'
 import SaveIcon from '@material-ui/icons/Save'
 import clsx from 'clsx'
 import { defaultFetchOptions, handleError } from '../util/data'
 import { isTeacherOrAdmin } from '../util/roles'
+import PropTypes from 'prop-types'
 
 const styles = theme => ({
   card: {
@@ -64,7 +65,7 @@ const styles = theme => ({
 const SelectCard = props => {
   const { classes, cardData, courseId } = props
   const { viewCode } = cardData
-  const [enabled, setEnabled] = useState(cardData.enabled)
+  const [enabled, setEnabled] = useState(props.courseInfo.course_view_options[viewCode])
   const [snackbarMessage, setResponseMessage] = useState('Saved')
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -72,8 +73,6 @@ const SelectCard = props => {
     [classes.buttonEnabled]: enabled,
     [classes.buttonDisabled]: !enabled
   })
-
-  const [enabledStateChanged, setEnabledStateChanged] = useState(cardData.enabled && (enabled !== cardData.enabled))
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false)
@@ -85,7 +84,7 @@ const SelectCard = props => {
       if (savedSuccessfully) {
         setResponseMessage('Setting saved')
         setEnabled(isEnabled)
-        setEnabledStateChanged(!((isEnabled && cardData.enabled) || (!isEnabled && !cardData.enabled)))
+        props.courseInfo.course_view_options[viewCode] = isEnabled
       } else {
         setResponseMessage('Error saving setting')
       }
@@ -144,14 +143,9 @@ const SelectCard = props => {
   return (
     <>
       <Card className={classes.card} elevation={2}>
-        {!enabledStateChanged
-          ? <ReactLink tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
-            {getLinkContents(cardData)}
-          </ReactLink>
-          : <MUILink tabIndex={-1} style={{ textDecoration: 'none' }} href={cardData.path}>
-            {getLinkContents(cardData)}
-          </MUILink>
-        }
+        <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
+          {getLinkContents(cardData)}
+        </Link>
         {
           isTeacherOrAdmin(props.isAdmin, props.enrollmentType)
             ? (
@@ -204,5 +198,17 @@ const SelectCard = props => {
     </>
   )
 }
+
+SelectCard.propTypes = {
+  cardData: PropTypes.shape({
+    path: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    image: PropTypes.string
+  }).isRequired,
+  courseId: PropTypes.number.isRequired
+}
+
+SelectCard.defaultProps = {}
 
 export default withStyles(styles)(SelectCard)

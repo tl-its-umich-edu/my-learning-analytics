@@ -4,6 +4,7 @@ import SelectCard from '../components/SelectCard'
 import { isObjectEmpty, getObjectValues } from '../util/object'
 import WarningBanner from '../components/WarningBanner'
 import routes from '../routes/routes'
+import { isTeacherOrAdmin } from '../util/roles'
 
 const objectValuesAreAllZero = obj => getObjectValues(obj).every(x => x === 0)
 
@@ -12,11 +13,9 @@ function IndexPage (props) {
 
   const views = courseInfo.course_view_options
 
-  const isTeacherOrAdmin = () => {
-    return isAdmin || enrollmentType === 'TeacherEnrollment'
-  }
+  const teacherOrAdmin = isTeacherOrAdmin(isAdmin, enrollmentType)
 
-  if (!isTeacherOrAdmin()) {
+  if (!teacherOrAdmin) {
     if (isObjectEmpty(views) || objectValuesAreAllZero(views)) {
       return (<WarningBanner>No data visualizations have been added for this course.</WarningBanner>)
     }
@@ -25,7 +24,7 @@ function IndexPage (props) {
   return (
     <Grid container>
       {
-        routes(courseId, views, !isTeacherOrAdmin()).map((p, key) => (
+        routes(courseId, views, !teacherOrAdmin).map((p, key) => (
           <Grid item xs={12} sm={6} lg={4} key={key}>
             <SelectCard {...props} cardData={p} />
           </Grid>
