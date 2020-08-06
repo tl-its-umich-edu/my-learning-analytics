@@ -84,7 +84,7 @@ const SelectCard = props => {
       if (savedSuccessfully) {
         setResponseMessage('Setting saved')
         setEnabled(isEnabled)
-        props.courseInfo.course_view_options[viewCode] = isEnabled
+        props.courseInfo.course_view_options[viewCode] = isEnabled ? 1 : 0
       } else {
         setResponseMessage('Error saving setting')
       }
@@ -124,7 +124,6 @@ const SelectCard = props => {
   }
 
   function getLinkContents (cardData) {
-
     const cardImage = getCardImage(cardData)
 
     const cardContent =
