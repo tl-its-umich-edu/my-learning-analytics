@@ -99,7 +99,8 @@ const SelectCard = props => {
   }
 
   var saveAsync = function (isEnabled) {
-    const payload = JSON.parse('{"' + viewCode + '":{"enabled":' + isEnabled + '}}')
+    const payload = Object()
+    payload[viewCode] = { enabled: isEnabled }
     const dataURL = `/api/v1/courses/${courseId}/update_info/`
     const fetchOptions = { method: 'PUT', ...defaultFetchOptions, body: JSON.stringify(payload) }
     return fetch(dataURL, fetchOptions)
