@@ -126,7 +126,7 @@ const SelectCard = props => {
   function getLinkContents (cardData) {
     const cardImage = getCardImage(cardData)
 
-    const cardContent =
+    const cardContent = (
       <CardContent className={classes.content}>
         <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
           {cardData.title}
@@ -134,7 +134,7 @@ const SelectCard = props => {
         <Typography component='p' className={classes.description}>
           {cardData.description}
         </Typography>
-      </CardContent>
+      </CardContent>)
 
     return <>{cardImage}{cardContent}</>
   }
