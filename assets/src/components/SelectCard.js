@@ -1,12 +1,14 @@
 /* global fetch */
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Card, CardActionArea, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Snackbar, Typography } from '@material-ui/core'
+import { Card, CardActionArea, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Link as MUILink, Snackbar, Tooltip, Typography } from '@material-ui/core'
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank'
 import CheckBoxIcon from '@material-ui/icons/CheckBox'
 import CloseIcon from '@material-ui/icons/Close'
 import { Link } from 'react-router-dom'
-import { yellow, grey } from '@material-ui/core/colors'
+import InfoIcon from '@material-ui/icons/Info'
+import Grid from '@material-ui/core/Grid'
+import { yellow, grey, white } from '@material-ui/core/colors'
 import SaveIcon from '@material-ui/icons/Save'
 import clsx from 'clsx'
 import { defaultFetchOptions, handleError } from '../util/data'
@@ -28,13 +30,19 @@ const styles = theme => ({
   title: {
     boxSizing: 'border-box',
     padding: theme.spacing(1),
-    color: 'white',
+    color: white,
     marginBottom: 0,
     backgroundColor: theme.palette.primary.main
   },
   description: {
     padding: theme.spacing(1),
     color: 'black'
+  },
+  titleLink: {
+    color: 'white'
+  },
+  infoLink: {
+    color: 'white'
   },
   wrapper: {
     margin: theme.spacing(1),
@@ -117,7 +125,13 @@ const SelectCard = props => {
 
   function getCardImage (cardData) {
     if (cardData && cardData.image) {
-      return <CardMedia className={classes.media} image={cardData.image} title={cardData.title} />
+      return (
+        <>
+          <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
+            <CardMedia className={classes.media} image={cardData.image} title={cardData.title} />
+          </Link>
+        </>
+      )
     } else {
       return null
     }
@@ -129,7 +143,20 @@ const SelectCard = props => {
     const cardContent = (
       <CardContent className={classes.content}>
         <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
-          {cardData.title}
+          <Grid container>
+            <Grid item xs={11}>
+              <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path} className={classes.titleLink}>
+                {cardData.title}
+              </Link>
+            </Grid>
+            <Grid item xs={1}>
+              <Tooltip title={'About ' + cardData.title}>
+                <MUILink className={classes.infoLink} href='https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/resources-accessed' target='_blank' rel='noopener noreferrer'>
+                  <InfoIcon />
+                </MUILink>
+              </Tooltip>
+            </Grid>
+          </Grid>
         </Typography>
         <Typography component='p' className={classes.description}>
           {cardData.description}
@@ -143,9 +170,7 @@ const SelectCard = props => {
     <>
       <Card className={classes.card} elevation={2}>
         <CardActionArea>
-          <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
-            {getLinkContents(cardData)}
-          </Link>
+          {getLinkContents(cardData)}
         </CardActionArea>
         {
           isTeacherOrAdmin(props.isAdmin, props.enrollmentTypes)
