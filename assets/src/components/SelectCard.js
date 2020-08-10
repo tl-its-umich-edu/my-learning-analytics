@@ -1,7 +1,7 @@
 /* global fetch */
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Card, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Snackbar, Typography } from '@material-ui/core'
+import { Card, CardActionArea, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Snackbar, Typography } from '@material-ui/core'
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank'
 import CheckBoxIcon from '@material-ui/icons/CheckBox'
 import CloseIcon from '@material-ui/icons/Close'
@@ -143,9 +143,11 @@ const SelectCard = props => {
   return (
     <>
       <Card className={classes.card} elevation={2}>
-        <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
-          {getLinkContents(cardData)}
-        </Link>
+        <CardActionArea>
+          <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
+            {getLinkContents(cardData)}
+          </Link>
+        </CardActionArea>
         {
           isTeacherOrAdmin(props.isAdmin, props.enrollmentType)
             ? (
