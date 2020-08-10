@@ -1,16 +1,21 @@
-import logging, os, re
+import datetime, logging, os, re
+from typing import Optional, Union
 
 from django.conf import settings
 
-from dashboard.common.db_util import get_user_courses_info
-from dashboard.models import Course
-from typing import Union
+from dashboard.common import db_util
+from dashboard.models import Course, ResourceAccess
 
 
 logger = logging.getLogger(__name__)
 
 
-def find_earliest_start_datetime_of_courses():
+def find_earliest_start_datetime_of_courses() -> Optional[datetime.datetime]:
+    """Get the earliest start date of all courses
+
+    :return: Earliest start dat e of all courses, or None if no course dates found
+    :rtype: datetime
+    """
     sorted_courses = sorted(Course.objects.all(), key=lambda course: course.course_date_range.start)
 
     earliest_start = None
@@ -22,6 +27,34 @@ def find_earliest_start_datetime_of_courses():
         logger.info(f"No course listed. Return None as the earliest_start_datetime_of_course. ")
     return earliest_start
 
+def find_next_resource_run(any_course_new: bool) -> Optional[datetime.datetime]:
+    """ 1) Get the earliest start date of all courses. 
+        2) Check if there's any new courses since last run.
+        3) If there are new courses, return this date
+        4) Otherwise return the last run from big query
+
+    :param any_course_new: If there's new courses
+    :type any_course_new: bool
+    :return: Either the earliest date of the term (or if no courses the date defined) or lastest resource_access
+    :rtype: datetime
+    """
+
+    course_start_time = find_earliest_start_datetime_of_courses()
+
+    # If there was any new courses, return the start time because we have to run from the start
+    if any_course_new:
+        logger.info("New course has been found, setting date to course_start_time")
+        latest_resource_time = course_start_time
+    else:
+        # Otherwise try to find the last run date of all resources_accessed
+        try:
+            latest_resource = ResourceAccess.objects.latest('access_time')
+            latest_resource_time = latest_resource.access_time
+        except ResourceAccess.DoesNotExist:
+            logger.info("No resources found, defaulting to the earliest course start time")
+            latest_resource_time = course_start_time
+
+    return latest_resource_time
 
 def format_github_url_using_https(github_url):
     ssh_base = "git@"
@@ -84,7 +117,7 @@ def get_myla_globals(request):
     is_superuser = current_user.is_staff
     if current_user.is_authenticated:
         username = current_user.get_username()
-        user_courses_info = get_user_courses_info(username, course_id)
+        user_courses_info = db_util.get_user_courses_info(username, course_id)
 
     if settings.LOGIN_URL:
         login_url = settings.LOGIN_URL

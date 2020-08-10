@@ -12,6 +12,7 @@ from django.db.models import QuerySet
 from django_cron import CronJobBase, Schedule
 from google.cloud import bigquery
 from sqlalchemy import create_engine, types
+from sqlalchemy.engine import ResultProxy
 
 from dashboard.common import db_util, utils
 from dashboard.models import Course, Resource, AcademicTerms, ResourceAccess
@@ -66,18 +67,20 @@ def util_function(data_warehouse_course_id, sql_string, mysql_table, table_ident
 
 
 # execute database query
-def executeDbQuery(query):
+def executeDbQuery(query: str, params: List=None) -> ResultProxy:
     with engine.connect() as connection:
         connection.detach()
-        connection.execute(query)
+        if params:
+            return connection.execute(query, params)
+        else:
+            return connection.execute(query)
 
 
 # remove all records inside the specified table
-def deleteAllRecordInTable(tableName):
-    # delete all records in the table first
-    executeDbQuery(f"delete from {tableName}")
-
-    return f"delete : {tableName}\n"
+def deleteAllRecordInTable(table_name: str, where_clause: str="", where_params: List=None):
+    # delete all records in the table first, can have an optional where clause
+    result_proxy = executeDbQuery(f"delete from {table_name} {where_clause}", where_params)
+    return(f"{result_proxy.rowcount} rows deleted from {table_name}")
 
 
 def soft_update_datetime_field(
@@ -107,6 +110,7 @@ class DashboardCronJob(CronJobBase):
 
     schedule = Schedule(run_at_times=settings.RUN_AT_TIMES)
     code = 'dashboard.DashboardCronJob'    # a unique code
+    any_course_new = False
 
     def __init__(self) -> None:
         """Constructor to be used to declare valid_locked_course_ids instance variable."""
@@ -230,7 +234,6 @@ class DashboardCronJob(CronJobBase):
                 status += f"Row {row.id} removed as it is not available\n"
         return status
 
-
     # update RESOURCE_ACCESS records from BigQuery
     def update_with_bq_access(self):
 
@@ -246,18 +249,9 @@ class DashboardCronJob(CronJobBase):
         # BQ Total Bytes Billed to report to status
         total_bytes_billed = 0
 
-        # the earliest start date of all courses
-        course_start_time = utils.find_earliest_start_datetime_of_courses()
+        latest_resource_time = utils.find_next_resource_run(self.any_course_new)
 
-        # the earliest latest date of all resources_accessed
-        try:
-            latest_resource = ResourceAccess.objects.latest('access_time')
-            latest_resource_time = latest_resource.access_time
-        except ResourceAccess.DoesNotExist:
-            latest_resource_time = course_start_time
-
-        logger.info(f"Earliest Start: {course_start_time} Latest resource: {latest_resource_time}")
-
+        status += deleteAllRecordInTable("resource_access", f"WHERE access_time > %s", [latest_resource_time,])
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
         for data_warehouse_course_ids in split_list(self.valid_locked_course_ids, settings.CRON_BQ_IN_LIMIT):
@@ -620,6 +614,7 @@ class DashboardCronJob(CronJobBase):
 
         # continue cron tasks
 
+
         logger.info("** term")
         status += self.update_term()
 
@@ -629,6 +624,10 @@ class DashboardCronJob(CronJobBase):
         else:
             logger.info("** course")
             status += self.update_course(course_verification.course_data)
+        
+            # We need to check if any courses are new after updating the course table but before
+            # updating the users
+            self.any_course_new = db_util.is_any_course_new()
 
             logger.info("** user")
             status += self.update_user()
