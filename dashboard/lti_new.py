@@ -169,6 +169,12 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
         'user_image': user_img,
         'primary_ui_color': settings.PRIMARY_UI_COLOR,
         'help_url': settings.HELP_URL,
+        'view_help_urls': { 
+            'ra':settings.URL_VIEW_RESOURCES_ACCESSED,
+            'apv1':settings.URL_VIEW_ASSIGNMENT_PLANNING_V1,
+            'ap':settings.URL_VIEW_ASSIGNMENT_PLANNING_V2,
+            'gd':settings.URL_VIEW_GRADE_DISTRIBUTION 
+        }  ,
         'google_analytics_id': settings.GA_ID,
         'user_courses_info': [
             {'course_id': course_id, 'course_name': course_name, 'enrollment_types': short_user_role_list(user_roles)}],

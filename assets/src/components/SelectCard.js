@@ -8,7 +8,7 @@ import CloseIcon from '@material-ui/icons/Close'
 import { Link } from 'react-router-dom'
 import InfoIcon from '@material-ui/icons/Info'
 import Grid from '@material-ui/core/Grid'
-import { yellow, grey, white } from '@material-ui/core/colors'
+import { yellow, grey } from '@material-ui/core/colors'
 import SaveIcon from '@material-ui/icons/Save'
 import clsx from 'clsx'
 import { defaultFetchOptions, handleError } from '../util/data'
@@ -30,7 +30,7 @@ const styles = theme => ({
   title: {
     boxSizing: 'border-box',
     padding: theme.spacing(1),
-    color: white,
+    color: 'white',
     marginBottom: 0,
     backgroundColor: theme.palette.primary.main
   },
@@ -137,6 +137,18 @@ const SelectCard = props => {
     }
   }
 
+  function getHelpLink (cardData) {
+    if (cardData.helpUrl) {
+      return (
+        <Tooltip title={'About ' + cardData.title}>
+          <MUILink className={classes.infoLink} href={cardData.helpUrl} target='_blank' rel='noopener noreferrer'>
+            <InfoIcon />
+          </MUILink>
+        </Tooltip>
+      )
+    }
+  }
+
   function getLinkContents (cardData) {
     const cardImage = getCardImage(cardData)
 
@@ -150,11 +162,7 @@ const SelectCard = props => {
               </Link>
             </Grid>
             <Grid item xs={1}>
-              <Tooltip title={'About ' + cardData.title}>
-                <MUILink className={classes.infoLink} href='https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/resources-accessed' target='_blank' rel='noopener noreferrer'>
-                  <InfoIcon />
-                </MUILink>
-              </Tooltip>
+              {getHelpLink(cardData)}
             </Grid>
           </Grid>
         </Typography>
@@ -235,7 +243,8 @@ SelectCard.propTypes = {
     path: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
-    image: PropTypes.string
+    image: PropTypes.string,
+    helpUrl: PropTypes.string
   }).isRequired,
   courseId: PropTypes.number.isRequired,
   enrollmentTypes: PropTypes.array.isRequired

@@ -89,6 +89,13 @@ def get_myla_globals(current_user):
         "logout": logout_url,
         "primary_ui_color": primary_ui_color,
         "google_analytics_id": google_analytics_id,
-        "help_url": help_url
+        "help_url": help_url,
+        "view_help_urls": { 
+            'ra':settings.URL_VIEW_RESOURCES_ACCESSED,
+            'apv1':settings.URL_VIEW_ASSIGNMENT_PLANNING_V1,
+            'ap':settings.URL_VIEW_ASSIGNMENT_PLANNING_V2,
+            'gd':settings.URL_VIEW_GRADE_DISTRIBUTION 
+        }      
+
     }
     return myla_globals
