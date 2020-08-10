@@ -1,13 +1,12 @@
 # Some utility functions used by other classes in this project
 from datetime import datetime
 import logging
-from typing import Dict, List, Union
-
 from dateutil.parser import parse
 import django
-from django.conf import settings
 from django_cron.models import CronJobLog
-
+from typing import Dict, List, Union
+from django.conf import settings
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +84,7 @@ def get_default_user_course_id(user_id):
     return course_id
 
 
-def get_user_courses_info(username: str) -> List[Dict[str, Union[str, int, List[str]]]]:
+def get_user_courses_info(request, username: str) -> List[Dict[str, Union[str, int, List[str]]]]:
     logger.info(get_user_courses_info.__name__)
     user_courses_info: List[Dict[str, Union[str, int, List[str]]]] = []
     with django.db.connection.cursor() as cursor:
@@ -110,7 +109,25 @@ def get_user_courses_info(username: str) -> List[Dict[str, Union[str, int, List[
                 course_enrollments[course_id]['enrollment_types'].append(enrollment_type)
             user_courses_info = list(course_enrollments.values())
     logger.info(f'User {username} is enrolled in these courses: {user_courses_info}')
+
+    course_id_to_filter = get_course_id_from_request_url(request)
+    if course_id_to_filter is not None and len(user_courses_info) != 0:
+        for course in user_courses_info:
+            if course['course_id'] != course_id_to_filter:
+                user_courses_info.remove(course)
     return user_courses_info
+
+
+def get_course_id_from_request_url(request):
+    course_id_to_filter = None
+    if settings.STUDENT_DASHBOARD_LTI:
+        path = request.path
+        # Looking for an matching pattern like this /courses/123455
+        course_id_from_path = re.findall('/courses/(\d+)\/?', path)
+        if len(course_id_from_path) == 1:
+            course_id_to_filter = int(course_id_from_path[0])
+            logger.info(f'course_id from path: {course_id_to_filter}')
+    return course_id_to_filter
 
 
 def get_last_cron_run():

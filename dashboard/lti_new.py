@@ -2,7 +2,8 @@ import logging, string, random
 import django.contrib.auth
 
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
@@ -13,7 +14,7 @@ from collections import namedtuple
 from pylti1p3.contrib.django import DjangoOIDCLogin, DjangoMessageLaunch, DjangoCacheDataStorage
 from pylti1p3.tool_config import ToolConfDict
 
-from dashboard.models import Course, CourseViewOption, User as mylaUser
+from dashboard.models import Course, CourseViewOption, User as MylaUser
 from dashboard.common.db_util import canvas_id_to_incremented_id
 
 
@@ -105,7 +106,6 @@ def short_user_role_list(roles):
 
 
 def extracting_launch_variables_for_tool_use(request, message_launch):
-    launch_id = message_launch.get_launch_id()
     launch_data = message_launch.get_launch_data()
     logger.debug(f'lti launch data {launch_data}')
     custom_params = launch_data['https://purl.imsglobal.org/spec/lti/claim/custom']
@@ -124,8 +124,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
     email = launch_data['email']
     first_name = launch_data['given_name']
     last_name = launch_data['family_name']
-    user_name = launch_data['name']
-    user_img = launch_data['picture']
+    full_name = launch_data['name']
     user_sis_id = launch_data['https://purl.imsglobal.org/spec/lti/claim/lis']['person_sourcedid']
 
     # Add user to DB if not there; avoids Django redirection to login page
@@ -140,42 +139,18 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
     user_roles = course_user_roles(roles, username)
     is_instructor = check_if_instructor(user_roles, username, course_id)
 
-    course_details = None
-    is_course_data_loaded = False
-
     try:
-        course_details = Course.objects.get(canvas_id=course_id)
+        Course.objects.get(canvas_id=course_id)
     except ObjectDoesNotExist:
         if is_instructor or user_obj.is_staff:
-            course_details = Course.objects.create(id=canvas_course_long_id, canvas_id=course_id, name=course_name)
+            Course.objects.create(id=canvas_course_long_id, canvas_id=course_id, name=course_name)
             CourseViewOption.objects.create(course_id=canvas_course_long_id)
         if is_instructor:
-            mylaUser.objects.create(name=user_name, sis_name=username,
-                                                course_id=canvas_course_long_id,
-                                                user_id=canvas_user_long_id, sis_id=user_sis_id,
-                                                enrollment_type=mylaUser.ENROLLMENT_TYPES.TeacherEnrollment)
-
-    if course_details is None:
-        logger.info(f'Course {course_id} data has not yet been loaded')
-    elif course_details.term_id is not None:
-        logger.info(f'Course {course_id} data is ready')
-        is_course_data_loaded = True
-
-    myla_globals = {
-        'username': username,
-        'is_superuser': user_obj.is_staff,
-        'login': settings.LOGIN_URL,
-        'logout': settings.LOGOUT_URL,
-        'user_image': user_img,
-        'primary_ui_color': settings.PRIMARY_UI_COLOR,
-        'help_url': settings.HELP_URL,
-        'google_analytics_id': settings.GA_ID,
-        'user_courses_info': [
-            {'course_id': course_id, 'course_name': course_name, 'enrollment_types': short_user_role_list(user_roles)}],
-        'lti_launch_id': launch_id,
-        'lti_is_course_data_loaded': is_course_data_loaded,
-    }
-    return myla_globals
+            MylaUser.objects.create(name=full_name, sis_name=username,
+                                    course_id=canvas_course_long_id,
+                                    user_id=canvas_user_long_id, sis_id=user_sis_id,
+                                    enrollment_type=MylaUser.ENROLLMENT_TYPES.TeacherEnrollment)
+    return course_id
 
 
 @csrf_exempt
@@ -202,16 +177,16 @@ def launch(request):
     message_launch = DjangoMessageLaunch(request, config, launch_data_storage=CacheConfig.launch_data_storage)
     if not CacheConfig.is_dummy_cache:
         # fetch platform's public key from cache instead of calling the API will speed up the launch process
-        message_launch.set_public_key_caching(CacheConfig.launch_data_storage, cache_lifetime=CacheConfig.cache_lifetime)
+        message_launch.set_public_key_caching(CacheConfig.launch_data_storage,
+                                              cache_lifetime=CacheConfig.cache_lifetime)
     else:
         logger.info('DummyCache is set up, recommended atleast to us Mysql DB cache for LTI advantage services')
 
     try:
-       myla_globals = extracting_launch_variables_for_tool_use(request, message_launch)
+        course_id = extracting_launch_variables_for_tool_use(request, message_launch)
     except Exception as e:
         return LTIError(e).response_json()
-    context = {
-        'myla_globals': myla_globals
-    }
-    logger.info(f'MyLA Globals from LTI launch {context}')
-    return render(request, 'frontend/index.html', context)
+
+    url = reverse('courses', kwargs={'course_id': course_id})
+    return redirect(url)
+

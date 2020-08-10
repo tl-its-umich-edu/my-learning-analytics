@@ -17,9 +17,7 @@ const user = Object.freeze({
   isLoggedIn: !!mylaGlobals.username,
   loginURL: mylaGlobals.login,
   logoutURL: mylaGlobals.logout,
-  helpURL: mylaGlobals.help_url,
-  LTIlaunchID: mylaGlobals.lti_launch_id,
-  LTIIsCourseDataLoaded: mylaGlobals.lti_is_course_data_loaded
+  helpURL: mylaGlobals.help_url
 })
 
 const sitePalette = JSON.parse(JSON.stringify(defaultPalette))

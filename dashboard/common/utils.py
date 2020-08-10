@@ -60,7 +60,8 @@ def search_key_for_resource_value(my_dict, search_for):
     return None
 
 
-def get_myla_globals(current_user):
+def get_myla_globals(request):
+    current_user = request.user
     username = ""
     user_courses_info = []
     login_url = ""
@@ -70,7 +71,7 @@ def get_myla_globals(current_user):
     is_superuser = current_user.is_staff
     if current_user.is_authenticated:
         username = current_user.get_username()
-        user_courses_info = get_user_courses_info(username)
+        user_courses_info = get_user_courses_info(request, username)
 
     if settings.LOGIN_URL:
         login_url = settings.LOGIN_URL
