@@ -1,15 +1,17 @@
 /* global fetch */
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Card, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Link as MUILink, Snackbar, Typography } from '@material-ui/core'
+import { Card, CardActionArea, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Snackbar, Typography } from '@material-ui/core'
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank'
 import CheckBoxIcon from '@material-ui/icons/CheckBox'
 import CloseIcon from '@material-ui/icons/Close'
-import { Link as ReactLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { yellow, grey } from '@material-ui/core/colors'
 import SaveIcon from '@material-ui/icons/Save'
 import clsx from 'clsx'
 import { defaultFetchOptions, handleError } from '../util/data'
+import { isTeacherOrAdmin } from '../util/roles'
+import PropTypes from 'prop-types'
 
 const styles = theme => ({
   card: {
@@ -34,7 +36,6 @@ const styles = theme => ({
     padding: theme.spacing(1),
     color: 'black'
   },
-
   wrapper: {
     margin: theme.spacing(1),
     position: 'relative'
@@ -63,7 +64,7 @@ const styles = theme => ({
 const SelectCard = props => {
   const { classes, cardData, courseId } = props
   const { viewCode } = cardData
-  const [enabled, setEnabled] = useState(cardData.enabled)
+  const [enabled, setEnabled] = useState(props.courseInfo.course_view_options[viewCode])
   const [snackbarMessage, setResponseMessage] = useState('Saved')
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -71,8 +72,6 @@ const SelectCard = props => {
     [classes.buttonEnabled]: enabled,
     [classes.buttonDisabled]: !enabled
   })
-
-  const [enabledStateChanged, setEnabledStateChanged] = useState(cardData.enabled && (enabled !== cardData.enabled))
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false)
@@ -84,7 +83,7 @@ const SelectCard = props => {
       if (savedSuccessfully) {
         setResponseMessage('Setting saved')
         setEnabled(isEnabled)
-        setEnabledStateChanged(!((isEnabled && cardData.enabled) || (!isEnabled && !cardData.enabled)))
+        props.courseInfo.course_view_options[viewCode] = isEnabled ? 1 : 0
       } else {
         setResponseMessage('Error saving setting')
       }
@@ -99,7 +98,8 @@ const SelectCard = props => {
   }
 
   var saveAsync = function (isEnabled) {
-    const payload = JSON.parse('{"' + viewCode + '":{"enabled":' + isEnabled + '}}')
+    const payload = Object()
+    payload[viewCode] = { enabled: isEnabled }
     const dataURL = `/api/v1/courses/${courseId}/update_info/`
     const fetchOptions = { method: 'PUT', ...defaultFetchOptions, body: JSON.stringify(payload) }
     return fetch(dataURL, fetchOptions)
@@ -124,10 +124,9 @@ const SelectCard = props => {
   }
 
   function getLinkContents (cardData) {
-
     const cardImage = getCardImage(cardData)
 
-    const cardContent =
+    const cardContent = (
       <CardContent className={classes.content}>
         <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
           {cardData.title}
@@ -135,7 +134,7 @@ const SelectCard = props => {
         <Typography component='p' className={classes.description}>
           {cardData.description}
         </Typography>
-      </CardContent>
+      </CardContent>)
 
     return <>{cardImage}{cardContent}</>
   }
@@ -143,17 +142,13 @@ const SelectCard = props => {
   return (
     <>
       <Card className={classes.card} elevation={2}>
-        {/* {getLink(cardData)} */}
-        {!enabledStateChanged
-          ? <ReactLink tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
+        <CardActionArea>
+          <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
             {getLinkContents(cardData)}
-          </ReactLink>
-          : <MUILink tabIndex={-1} style={{ textDecoration: 'none' }} href={cardData.path}>
-            {getLinkContents(cardData)}
-          </MUILink>
-        }
+          </Link>
+        </CardActionArea>
         {
-          props.isAdmin || props.enrollmentType === 'TeacherEnrollment'
+          isTeacherOrAdmin(props.isAdmin, props.enrollmentType)
             ? (
               <>
                 <Divider />
@@ -200,9 +195,20 @@ const SelectCard = props => {
           </IconButton>
         ]}
       />
-
     </>
   )
 }
+
+SelectCard.propTypes = {
+  cardData: PropTypes.shape({
+    path: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    image: PropTypes.string
+  }).isRequired,
+  courseId: PropTypes.number.isRequired
+}
+
+SelectCard.defaultProps = {}
 
 export default withStyles(styles)(SelectCard)

@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
-import Button from '@material-ui/core/Button'
 import IconButton from '@material-ui/core/IconButton'
 import MenuIcon from '@material-ui/icons/Menu'
 import Avatar from '@material-ui/core/Avatar'
@@ -62,12 +61,12 @@ function DashboardAppBar (props) {
           >
             <MenuIcon />
           </IconButton>
-          <Button href='/courses/' className={classes.homeButton}>
+          <Link tabIndex={-1} to='/courses/' className={classes.homeButton}>
             My Learning Analytics:
-          </Button>
-          <Button href={`/courses/${courseId}`} className={classes.homeButton}>
+          </Link>
+          <Link tabIndex={-1} to={`/courses/${courseId}`} className={classes.homeButton}>
             {courseName}
-          </Button>
+          </Link>
           <div className={classes.grow} />
           <IconButton
             aria-owns={avatarOpen ? 'simple-popper' : undefined}

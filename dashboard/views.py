@@ -195,10 +195,10 @@ def update_course_info(request, course_id=0):
 
     # to translate short names returned by model back to original column names
     view_column_names: dict = {
-        'ap': CourseViewOption.show_assignment_planning.field_name,
-        'apv1': CourseViewOption.show_assignment_planning_v1.field_name,
-        'gd': CourseViewOption.show_grade_distribution.field_name,
-        'ra': CourseViewOption.show_resources_accessed.field_name
+        'ap': CourseViewOption.show_assignment_planning.field.column,
+        'apv1': CourseViewOption.show_assignment_planning_v1.field.column,
+        'gd': CourseViewOption.show_grade_distribution.field.column,
+        'ra': CourseViewOption.show_resources_accessed.field.column
     }
 
     view_settings: dict
@@ -286,10 +286,10 @@ def resource_access_within_week(request, course_id=0):
     sqlString = f"""SELECT a.resource_id as resource_id, r.resource_type as resource_type, r.name as resource_name, u.current_grade as current_grade, a.user_id as user_id
                     FROM resource r, resource_access a, user u, course c, academic_terms t
                     WHERE a.resource_id = r.resource_id and a.user_id = u.user_id
-                    and r.course_id = c.id and c.term_id = t.id
+                    and a.course_id = c.id and c.term_id = t.id
                     and a.access_time > %(start_time)s
                     and a.access_time < %(end_time)s
-                    and r.course_id = %(course_id)s
+                    and a.course_id = %(course_id)s
                     and u.course_id = %(course_id)s
                     and u.enrollment_type = 'StudentEnrollment' """
 

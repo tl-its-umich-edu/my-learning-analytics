@@ -14,6 +14,7 @@ import os
 import json
 
 from debug_toolbar import settings as dt_settings
+from django.utils.module_loading import import_string
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -80,6 +81,7 @@ WATCHMAN_DATABASES = ('default',)
 
 # courses_enabled api
 COURSES_ENABLED = ENV.get('COURSES_ENABLED', False)
+STUDENT_DASHBOARD_LTI = ENV.get('STUDENT_DASHBOARD_LTI', False)
 
 # Defaults for PTVSD
 PTVSD_ENABLE = ENV.get("PTVSD_ENABLE", False)
@@ -110,11 +112,13 @@ INSTALLED_APPS = [
     'pinax.eventlog',
     'webpack_loader',
     'rules.apps.AutodiscoverRulesConfig',
+    'django_mysql',
 ]
 
 # The order of this is important. It says DebugToolbar should be on top but
 # The tips has it on the bottom
 MIDDLEWARE = [
+    'dashboard.middleware.samesite.SameSiteMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -130,6 +134,18 @@ CRON_CLASSES = [
 ]
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+CONTEXT_PROCESSORS = [
+    'django.contrib.auth.context_processors.auth',
+    'django.template.context_processors.debug',
+    'django.template.context_processors.request',
+    'django.contrib.messages.context_processors.messages',
+    'django_su.context_processors.is_su',
+    'django_settings_export.settings_export',
+    'dashboard.context_processors.get_git_version_info',
+    'dashboard.context_processors.last_updated'
+]
+if not ENV.get('STUDENT_DASHBOARD_LTI', False):
+    CONTEXT_PROCESSORS += ['dashboard.context_processors.get_myla_globals']
 
 TEMPLATES = [
     {
@@ -138,17 +154,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'debug': ENV.get('DJANGO_TEMPLATE_DEBUG', DEBUG),
-            'context_processors': [
-                'django.contrib.auth.context_processors.auth',
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.messages.context_processors.messages',
-                'django_su.context_processors.is_su',
-                'django_settings_export.settings_export',
-                'dashboard.context_processors.get_git_version_info',
-                'dashboard.context_processors.get_myla_globals',
-                'dashboard.context_processors.last_updated'
-            ],
+            'context_processors': CONTEXT_PROCESSORS,
         },
     },
 ]
@@ -191,6 +197,7 @@ DATABASES = {
         'PASSWORD': ENV.get('MYSQL_PASSWORD', 'student_dashboard_password'), # password for user
         'HOST': ENV.get('MYSQL_HOST', 'localhost'),
         'PORT': ENV.get('MYSQL_PORT', 3306),
+        'OPTIONS': {'charset': 'utf8mb4'},
     },
     'DATA_WAREHOUSE': {
         'ENGINE': ENV.get('DATA_WAREHOUSE_ENGINE', 'django.db.backends.postgresql'),
@@ -282,7 +289,23 @@ LOGGING = {
         'handlers': ['console']
     },
 }
+RANDOM_PASSWORD_DEFAULT_LENGTH = ENV.get('RANDOM_PASSWORD_DEFAULT_LENGTH', 32)
+DB_CACHE_CONFIGS = ENV.get('DB_CACHE_CONFIGS',
+                           {'CACHE_TTL': 600, 'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+                            'LOCATION': 'django_myla_cache',
+                            'CACHE_KEY_PREFIX': 'myla',
+                            'CACHE_OPTIONS': {'COMPRESS_MIN_LENGTH': 5000, 'COMPRESS_LEVEL': 6}
+                            })
 
+CACHES = {
+    'default': {
+        'BACKEND': DB_CACHE_CONFIGS['BACKEND'],
+        'LOCATION': DB_CACHE_CONFIGS['LOCATION'],
+        'OPTIONS': DB_CACHE_CONFIGS['CACHE_OPTIONS'],
+        "KEY_PREFIX": DB_CACHE_CONFIGS['CACHE_KEY_PREFIX'],
+        "TIMEOUT": DB_CACHE_CONFIGS['CACHE_TTL']
+    }
+}
 
 # IMPORT LOCAL ENV
 # =====================
@@ -396,29 +419,11 @@ else:
 
 # Give an opportunity to disable LTI
 if ENV.get('STUDENT_DASHBOARD_LTI', False):
-    INSTALLED_APPS += ('django_lti_auth',)
     if not 'django.contrib.auth.backends.ModelBackend' in AUTHENTICATION_BACKENDS:
         AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
 
-    PYLTI_CONFIG = {
-        "consumers": ENV.get("PYLTI_CONFIG_CONSUMERS", {}),
-        "method_hooks":{
-            "valid_lti_request": "dashboard.lti.valid_lti_request",
-            "invalid_lti_request": "dashboard.lti.invalid_lti_request"
-        },
-        "next_url": "home"
-    }
-    LTI_PERSON_SOURCED_ID_FIELD = ENV.get('LTI_PERSON_SOURCED_ID_FIELD',
-        "custom_canvas_user_login_id")
-    LTI_EMAIL_FIELD = ENV.get('LTI_EMAIL_FIELD',
-        "lis_person_contact_email_primary")
-    LTI_CANVAS_COURSE_ID_FIELD = ENV.get('LTI_CANVAS_COURSE_ID_FIELD',
-        "custom_canvas_course_id")
-    LTI_FIRST_NAME = ENV.get('LTI_FIRST_NAME',
-        "lis_person_name_given")
-    LTI_LAST_NAME = ENV.get('LTI_LAST_NAME',
-        "lis_person_name_family")
-    
+    LTI_CONFIG = ENV.get('LTI_CONFIG', {})
+
 # controls whether Unizin specific features/data is available from the Canvas Data source
 DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)
 
