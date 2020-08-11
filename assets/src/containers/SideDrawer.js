@@ -9,6 +9,7 @@ import { Link, withRouter } from 'react-router-dom'
 import { siteTheme } from '../globals'
 import routes from '../routes/routes'
 import Spinner from '../components/Spinner'
+import { isTeacherOrAdmin } from '../util/roles'
 
 const styles = {
   list: {
@@ -37,10 +38,6 @@ function SideDrawer (props) {
 
   const [selectedIndex, setSelectedIndex] = useState(false)
 
-  const isTeacherOrAdmin = () => {
-    return isAdmin || enrollmentType === 'TeacherEnrollment'
-  }
-
   const sideList = (
     <div
       className={classes.list}
@@ -48,7 +45,7 @@ function SideDrawer (props) {
       role='button'
     >
       <List>
-        {routes(courseId, courseInfo.course_view_options, !isTeacherOrAdmin()).map((props, key) => (
+        {routes(courseId, courseInfo.course_view_options, !isTeacherOrAdmin(isAdmin, enrollmentType)).map((props, key) => (
           <ListItem
             button
             component={Link}
