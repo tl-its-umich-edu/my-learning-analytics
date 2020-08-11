@@ -11,7 +11,7 @@ const instructorRoles = [
 ]
 
 /**
- * Return true if the provided criteria represent the role of an a
+ * Return true if isAdmin or enrollmentTypes contains an instructor role
  * @param {boolean} isAdmin
  * @param {Array<string>} enrollmentTypes
  * @return {boolean} Is a teacher or administrator
