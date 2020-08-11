@@ -566,12 +566,12 @@ class DashboardCronJob(CronJobBase):
             logger.info("** user")
             status += self.update_user()
 
-            # logger.info("** assignment")
-            # status += self.update_groups()
-            # status += self.update_assignment()
-            #
-            # status += self.submission()
-            # status += self.weight_consideration()
+            logger.info("** assignment")
+            status += self.update_groups()
+            status += self.update_assignment()
+
+            status += self.submission()
+            status += self.weight_consideration()
 
             logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
