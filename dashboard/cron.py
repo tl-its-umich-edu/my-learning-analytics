@@ -295,7 +295,11 @@ class DashboardCronJob(CronJobBase):
             resource_access_df: DataFrame = bq_query.to_dataframe()
             total_bytes_billed += bq_query.total_bytes_billed
 
-            logger.debug("df row number=" + str(resource_access_df.shape[0]))
+            logger.debug(f'resource_access_df row count: ({len(resource_access_df)})')
+
+            if len(resource_access_df) == 0:
+                logger.info('No resource access data found.  Continuing...')
+                continue
 
             # for data which contains user login names, not IDs
             if (('user_login_name' in resource_access_df.columns)
@@ -315,7 +319,7 @@ class DashboardCronJob(CronJobBase):
             # drop duplicates
             resource_access_df = resource_access_df.drop_duplicates(["resource_id", "user_id", "access_time"], keep='first')
 
-            logger.debug("after drop duplicates, df row number=" + str(resource_access_df.shape[0]))
+            logger.debug(f'resource_access_df row count (de-duped): ({len(resource_access_df)})')
 
             logger.debug(resource_access_df)
 
