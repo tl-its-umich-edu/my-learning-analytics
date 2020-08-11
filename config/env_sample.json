@@ -246,6 +246,25 @@
             "/* mention if the caliper event data is providing long or short canvas id and change the query to store long id as in this case": "*/",
             "canvas_course_id_format": "SHORT",
             "urls": {"prefix": "https://leccap.engin.umich.edu/leccap/viewer/r/", "postfix": ""}
+        },
+        "mivideo": {
+            "query": [
+                "SELECT 'mivideo' AS resource_type,",
+                "replace(JSON_EXTRACT_SCALAR(event, '$.object.id'), 'https://aakaf.mivideo.it.umich.edu/caliper/info/media/', '') AS resource_id,",
+                "replace(JSON_EXTRACT_SCALAR(event, '$.actor.id'), 'https://aakaf.mivideo.it.umich.edu/caliper/info/user/', '') AS user_login_name,",
+                "@canvas_data_id_increment + CAST(JSON_EXTRACT_SCALAR(event, '$.object.extensions.kaf:course_id') AS INT64) AS course_id,",
+                "JSON_EXTRACT_SCALAR(event, '$.object.name') AS name,",
+                "datetime(EVENT_TIME) AS access_time",
+                "FROM event_store.events WHERE",
+                "(JSON_EXTRACT_SCALAR(event, '$.edApp') = 'https://aakaf.mivideo.it.umich.edu/caliper/info/app/KafEdApp' OR JSON_EXTRACT_SCALAR(event, '$.edApp.id') = 'https://aakaf.mivideo.it.umich.edu/caliper/info/app/KafEdApp')",
+                "AND TYPE = 'MediaEvent'",
+                "AND JSON_EXTRACT_SCALAR(event, '$.action') = 'Started'",
+                "AND JSON_EXTRACT_SCALAR(event, '$.object.extensions.kaf:course_id') IN UNNEST(@course_ids_short)"
+            ],
+            "app_display_name": "MiVideo",
+            "/* mention if the caliper event data is providing long or short canvas id and change the query to store long id as in this case": "*/",
+            "canvas_course_id_format": "SHORT",
+            "urls": {"prefix": "https://aakaf.mivideo.it.umich.edu/caliper/info/media/", "postfix": ""}
         }
     },
     "/* Disable/Enable courses_enabled api": "*/",

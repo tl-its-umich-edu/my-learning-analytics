@@ -11,6 +11,7 @@ from django.db import connections as conns, models
 from django.db.models import QuerySet
 from django_cron import CronJobBase, Schedule
 from google.cloud import bigquery
+from pandas import DataFrame
 from sqlalchemy import create_engine, types
 
 from dashboard.common import db_util, utils
@@ -291,10 +292,26 @@ class DashboardCronJob(CronJobBase):
             # Location must match that of the dataset(s) referenced in the query.
             bq_query = bigquery_client.query(final_bq_query, location='US', job_config=job_config)
             #bq_query.result()
-            resource_access_df = bq_query.to_dataframe()
+            resource_access_df: DataFrame = bq_query.to_dataframe()
             total_bytes_billed += bq_query.total_bytes_billed
 
             logger.debug("df row number=" + str(resource_access_df.shape[0]))
+
+            # for data which contains user login names, not IDs
+            if (('user_login_name' in resource_access_df.columns)
+                    and ('user_id' not in resource_access_df.columns)):
+                login_names = ','.join(
+                    map(repr, resource_access_df['user_login_name']
+                        .drop_duplicates().values))
+                user_id_df = pd.read_sql(
+                    'select sis_name as user_login_name, user_id '
+                    'from user where sis_name in ({})'
+                        .format(login_names),
+                    engine)
+                resource_access_df = pd.merge(
+                    resource_access_df, user_id_df, on='user_login_name') \
+                    .drop(columns='user_login_name')
+
             # drop duplicates
             resource_access_df = resource_access_df.drop_duplicates(["resource_id", "user_id", "access_time"], keep='first')
 
@@ -545,12 +562,12 @@ class DashboardCronJob(CronJobBase):
             logger.info("** user")
             status += self.update_user()
 
-            logger.info("** assignment")
-            status += self.update_groups()
-            status += self.update_assignment()
-
-            status += self.submission()
-            status += self.weight_consideration()
+            # logger.info("** assignment")
+            # status += self.update_groups()
+            # status += self.update_assignment()
+            #
+            # status += self.submission()
+            # status += self.weight_consideration()
 
             logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
