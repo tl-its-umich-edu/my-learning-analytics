@@ -153,7 +153,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
             mylaUser.objects.create(name=user_name, sis_name=username,
                                                 course_id=canvas_course_long_id,
                                                 user_id=canvas_user_long_id, sis_id=user_sis_id,
-                                                enrollment_type=mylaUser.ENROLLMENT_TYPES.TeacherEnrollment)
+                                                enrollment_types=mylaUser.ENROLLMENT_TYPES.TeacherEnrollment)
 
     if course_details is None:
         logger.info(f'Course {course_id} data has not yet been loaded')
