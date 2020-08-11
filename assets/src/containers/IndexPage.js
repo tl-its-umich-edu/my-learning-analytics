@@ -9,11 +9,11 @@ import { isTeacherOrAdmin } from '../util/roles'
 const objectValuesAreAllZero = obj => getObjectValues(obj).every(x => x === 0)
 
 function IndexPage (props) {
-  const { courseInfo, courseId, isAdmin, enrollmentType } = props
+  const { courseInfo, courseId, isAdmin, enrollmentTypes } = props
 
   const views = courseInfo.course_view_options
 
-  const teacherOrAdmin = isTeacherOrAdmin(isAdmin, enrollmentType)
+  const teacherOrAdmin = isTeacherOrAdmin(isAdmin, enrollmentTypes)
 
   if (!teacherOrAdmin) {
     if (isObjectEmpty(views) || objectValuesAreAllZero(views)) {

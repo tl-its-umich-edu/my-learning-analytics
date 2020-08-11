@@ -32,7 +32,7 @@ function SideDrawer (props) {
     toggleDrawer,
     courseId,
     courseInfo,
-    enrollmentType,
+    enrollmentTypes,
     isAdmin
   } = props
 
@@ -45,7 +45,7 @@ function SideDrawer (props) {
       role='button'
     >
       <List>
-        {routes(courseId, courseInfo.course_view_options, !isTeacherOrAdmin(isAdmin, enrollmentType)).map((props, key) => (
+        {routes(courseId, courseInfo.course_view_options, !isTeacherOrAdmin(isAdmin, enrollmentTypes)).map((props, key) => (
           <ListItem
             button
             component={Link}

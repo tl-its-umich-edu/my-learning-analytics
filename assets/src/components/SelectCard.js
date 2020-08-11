@@ -148,7 +148,7 @@ const SelectCard = props => {
           </Link>
         </CardActionArea>
         {
-          isTeacherOrAdmin(props.isAdmin, props.enrollmentType)
+          isTeacherOrAdmin(props.isAdmin, props.enrollmentTypes)
             ? (
               <>
                 <Divider />
@@ -163,7 +163,13 @@ const SelectCard = props => {
                         onClick={() => { save(!enabled) }}
                         disabled={saving}
                       >
-                        {saving ? <SaveIcon /> : enabled ? <CheckBoxIcon className={classes.checkbox} /> : <CheckBoxOutlineBlankIcon className={classes.checkbox} />}
+                        {
+                          saving
+                            ? <SaveIcon />
+                            : enabled
+                              ? <CheckBoxIcon className={classes.checkbox} />
+                              : <CheckBoxOutlineBlankIcon className={classes.checkbox} />
+                        }
                       </Fab>
                       {saving && <CircularProgress size={52} className={classes.fabProgress} />}
                     </div>
@@ -206,7 +212,8 @@ SelectCard.propTypes = {
     description: PropTypes.string,
     image: PropTypes.string
   }).isRequired,
-  courseId: PropTypes.number.isRequired
+  courseId: PropTypes.number.isRequired,
+  enrollmentTypes: PropTypes.array.isRequired
 }
 
 SelectCard.defaultProps = {}

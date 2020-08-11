@@ -19,7 +19,7 @@ function Course (props) {
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
   const matchingCourses = user.relatedCourses.length > 0 ? user.relatedCourses.filter(c => c.course_id === props.courseId) : undefined
-  const enrollmentType = matchingCourses.length === 1 ? matchingCourses[0].enrollment_type : undefined
+  const enrollmentTypes = matchingCourses.length === 1 ? matchingCourses[0].enrollment_types : undefined
 
   const toggleDrawer = open => event => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -50,7 +50,7 @@ function Course (props) {
               sideDrawerState={sideDrawerState}
               courseId={courseId}
               courseInfo={courseInfo}
-              enrollmentType={enrollmentType}
+              enrollmentTypes={enrollmentTypes}
               isAdmin={user.admin}
             />
             {courseInfo.course_user_exist === 0
@@ -70,7 +70,7 @@ function Course (props) {
                         {...props}
                         courseInfo={courseInfo}
                         courseId={courseId}
-                        enrollmentType={enrollmentType}
+                        enrollmentTypes={enrollmentTypes}
                         isAdmin={user.admin}
                       />}
                   />
