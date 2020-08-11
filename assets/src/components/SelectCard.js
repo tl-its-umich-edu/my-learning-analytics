@@ -36,7 +36,6 @@ const styles = theme => ({
     padding: theme.spacing(1),
     color: 'black'
   },
-
   wrapper: {
     margin: theme.spacing(1),
     position: 'relative'
