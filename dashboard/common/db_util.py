@@ -85,7 +85,6 @@ def get_default_user_course_id(user_id):
 
 def get_user_courses_info(request: WSGIRequest, username: str) -> List[Dict[str, Union[str, int, List[str]]]]:
     logger.info(get_user_courses_info.__name__)
-    logger.info(type(request))
     user_courses_info: List[Dict[str, Union[str, int, List[str]]]] = []
     with django.db.connection.cursor() as cursor:
         cursor.execute('''
