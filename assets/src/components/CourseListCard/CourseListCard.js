@@ -13,7 +13,6 @@ const styles = theme => ({
     color: theme.palette.text.secondary,
     display: 'flex'
   },
-
   container: {
     display: 'flex',
     justifyContent: 'center'

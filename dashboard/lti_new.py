@@ -177,7 +177,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
         }  ,
         'google_analytics_id': settings.GA_ID,
         'user_courses_info': [
-            {'course_id': course_id, 'course_name': course_name, 'enrollment_type': short_user_role_list(user_roles)}],
+            {'course_id': course_id, 'course_name': course_name, 'enrollment_types': short_user_role_list(user_roles)}],
         'lti_launch_id': launch_id,
         'lti_is_course_data_loaded': is_course_data_loaded,
     }

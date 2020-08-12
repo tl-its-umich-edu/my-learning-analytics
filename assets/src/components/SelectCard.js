@@ -38,10 +38,12 @@ const styles = theme => ({
     padding: theme.spacing(1),
     color: 'black'
   },
-  titleLink: {
+  infoLink: {
     color: 'white'
   },
-  infoLink: {
+  viewLink: {
+    outline: 'none',
+    textDecoration: 'none',
     color: 'white'
   },
   wrapper: {
@@ -127,7 +129,7 @@ const SelectCard = props => {
     if (cardData && cardData.image) {
       return (
         <>
-          <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
+          <Link className={classes.viewLink} tabIndex={-1} to={cardData.path}>
             <CardMedia className={classes.media} image={cardData.image} title={cardData.title} />
           </Link>
         </>
@@ -157,7 +159,7 @@ const SelectCard = props => {
         <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
           <Grid container>
             <Grid item xs={11}>
-              <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path} className={classes.titleLink}>
+              <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
                 {cardData.title}
               </Link>
             </Grid>
@@ -166,9 +168,11 @@ const SelectCard = props => {
             </Grid>
           </Grid>
         </Typography>
-        <Typography component='p' className={classes.description}>
-          {cardData.description}
-        </Typography>
+        <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
+          <Typography component='p' className={classes.description}>
+            {cardData.description}
+          </Typography>
+        </Link>
       </CardContent>)
 
     return <>{cardImage}{cardContent}</>
@@ -181,7 +185,7 @@ const SelectCard = props => {
           {getLinkContents(cardData)}
         </CardActionArea>
         {
-          isTeacherOrAdmin(props.isAdmin, props.enrollmentType)
+          isTeacherOrAdmin(props.isAdmin, props.enrollmentTypes)
             ? (
               <>
                 <Divider />
@@ -196,7 +200,13 @@ const SelectCard = props => {
                         onClick={() => { save(!enabled) }}
                         disabled={saving}
                       >
-                        {saving ? <SaveIcon /> : enabled ? <CheckBoxIcon className={classes.checkbox} /> : <CheckBoxOutlineBlankIcon className={classes.checkbox} />}
+                        {
+                          saving
+                            ? <SaveIcon />
+                            : enabled
+                              ? <CheckBoxIcon className={classes.checkbox} />
+                              : <CheckBoxOutlineBlankIcon className={classes.checkbox} />
+                        }
                       </Fab>
                       {saving && <CircularProgress size={52} className={classes.fabProgress} />}
                     </div>
@@ -240,7 +250,8 @@ SelectCard.propTypes = {
     image: PropTypes.string,
     helpUrl: PropTypes.string
   }).isRequired,
-  courseId: PropTypes.number.isRequired
+  courseId: PropTypes.number.isRequired,
+  enrollmentTypes: PropTypes.array.isRequired
 }
 
 SelectCard.defaultProps = {}
