@@ -1,12 +1,11 @@
 # Some utility functions used by other classes in this project
+import logging, django, re
 from datetime import datetime
-import logging
-from dateutil.parser import parse
-import django
-from django_cron.models import CronJobLog
 from typing import Dict, List, Union
+from dateutil.parser import parse
+from django.core.handlers.wsgi import WSGIRequest
+from django_cron.models import CronJobLog
 from django.conf import settings
-import re
 
 logger = logging.getLogger(__name__)
 
@@ -84,8 +83,9 @@ def get_default_user_course_id(user_id):
     return course_id
 
 
-def get_user_courses_info(request, username: str) -> List[Dict[str, Union[str, int, List[str]]]]:
+def get_user_courses_info(request: WSGIRequest, username: str) -> List[Dict[str, Union[str, int, List[str]]]]:
     logger.info(get_user_courses_info.__name__)
+    logger.info(type(request))
     user_courses_info: List[Dict[str, Union[str, int, List[str]]]] = []
     with django.db.connection.cursor() as cursor:
         cursor.execute('''
@@ -111,6 +111,11 @@ def get_user_courses_info(request, username: str) -> List[Dict[str, Union[str, i
     logger.info(f'User {username} is enrolled in these courses: {user_courses_info}')
 
     course_id_to_filter = get_course_id_from_request_url(request)
+    user_courses_info = filter_user_course_info(course_id_to_filter, user_courses_info)
+    return user_courses_info
+
+
+def filter_user_course_info(course_id_to_filter, user_courses_info):
     if course_id_to_filter is not None and len(user_courses_info) != 0:
         for course in user_courses_info:
             if course['course_id'] != course_id_to_filter:
