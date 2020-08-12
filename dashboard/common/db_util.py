@@ -1,13 +1,13 @@
 # Some utility functions used by other classes in this project
-
-import django
-import logging
 from datetime import datetime
-from dateutil.parser import parse
+import logging
+from typing import Dict, List, Union
 
-from django_cron.models import CronJobLog
-import pandas as pd
+from dateutil.parser import parse
+import django
 from django.conf import settings
+from django_cron.models import CronJobLog
+
 
 logger = logging.getLogger(__name__)
 
@@ -85,29 +85,32 @@ def get_default_user_course_id(user_id):
     return course_id
 
 
-def get_user_courses_info(username):
+def get_user_courses_info(username: str) -> List[Dict[str, Union[str, int, List[str]]]]:
     logger.info(get_user_courses_info.__name__)
-    course_list = []
-    course_info = []
+    user_courses_info: List[Dict[str, Union[str, int, List[str]]]] = []
     with django.db.connection.cursor() as cursor:
-        cursor.execute("SELECT course_id FROM user WHERE sis_name= %s", [username])
+        cursor.execute('''
+            SELECT c.canvas_id, c.name, u.enrollment_type
+            FROM user u
+            JOIN course c
+                ON u.course_id=c.id
+            WHERE u.sis_name= %s;
+        ''', [username])
         courses = cursor.fetchall()
         if courses is not None:
+            course_enrollments: Dict[int, Dict[str, Union[int, str, List[str]]]] = {}
             for course in courses:
-                course_id = incremented_id_to_canvas_id(course[0])
-                course_list.append(int(course_id))
-    if course_list:
-        course_tuple = tuple(course_list)
-        with django.db.connection.cursor() as cursor:
-            cursor.execute("select canvas_id, name from course where canvas_id in %s",[course_tuple])
-            course_names = cursor.fetchall()
-            df = pd.DataFrame(list(course_names))
-
-            if df.size > 0:
-                df.columns = ["course_id", "course_name"]
-                course_info = df.to_dict(orient='records')
-                logger.info(f"User {username} is enrolled in these courses: {course_info}")
-    return course_info
+                course_id, course_name, enrollment_type = course
+                if course_id not in course_enrollments.keys():
+                    course_enrollments[course_id] = {
+                        'course_id': course_id,
+                        'course_name': course_name,
+                        'enrollment_types': []
+                    }
+                course_enrollments[course_id]['enrollment_types'].append(enrollment_type)
+            user_courses_info = list(course_enrollments.values())
+    logger.info(f'User {username} is enrolled in these courses: {user_courses_info}')
+    return user_courses_info
 
 
 def get_last_cron_run():

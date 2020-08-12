@@ -5,6 +5,7 @@ from django.conf import settings
 from dashboard.common.db_util import get_user_courses_info
 from dashboard.models import Course
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -66,7 +67,7 @@ def get_myla_globals(current_user):
     logout_url = ""
     google_analytics_id = ""
 
-    is_superuser = current_user.is_superuser
+    is_superuser = current_user.is_staff
     if current_user.is_authenticated:
         username = current_user.get_username()
         user_courses_info = get_user_courses_info(username)

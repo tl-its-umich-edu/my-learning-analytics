@@ -18,6 +18,9 @@ function Course (props) {
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
+  const matchingCourses = user.relatedCourses.length > 0 ? user.relatedCourses.filter(c => c.course_id === props.courseId) : undefined
+  const enrollmentTypes = matchingCourses && matchingCourses.length === 1 ? matchingCourses[0].enrollment_types : []
+
   const toggleDrawer = open => event => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
@@ -47,6 +50,8 @@ function Course (props) {
               sideDrawerState={sideDrawerState}
               courseId={courseId}
               courseInfo={courseInfo}
+              enrollmentTypes={enrollmentTypes}
+              isAdmin={user.admin}
             />
             {courseInfo.course_user_exist === 0
               ? (
@@ -65,6 +70,8 @@ function Course (props) {
                         {...props}
                         courseInfo={courseInfo}
                         courseId={courseId}
+                        enrollmentTypes={enrollmentTypes}
+                        isAdmin={user.admin}
                       />}
                   />
                   <Route

@@ -13,7 +13,7 @@ from collections import namedtuple
 from pylti1p3.contrib.django import DjangoOIDCLogin, DjangoMessageLaunch, DjangoCacheDataStorage
 from pylti1p3.tool_config import ToolConfDict
 
-from dashboard.models import Course, CourseViewOption
+from dashboard.models import Course, CourseViewOption, User as mylaUser
 from dashboard.common.db_util import canvas_id_to_incremented_id
 
 
@@ -118,10 +118,15 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
     roles = launch_data['https://purl.imsglobal.org/spec/lti/claim/roles']
     username = custom_params['user_username']
     course_id = custom_params['canvas_course_id']
+    canvas_course_long_id = canvas_id_to_incremented_id(course_id)
+    canvas_user_id = custom_params['canvas_user_id']
+    canvas_user_long_id = canvas_id_to_incremented_id(canvas_user_id)
     email = launch_data['email']
     first_name = launch_data['given_name']
     last_name = launch_data['family_name']
+    user_name = launch_data['name']
     user_img = launch_data['picture']
+    user_sis_id = launch_data['https://purl.imsglobal.org/spec/lti/claim/lis']['person_sourcedid']
 
     # Add user to DB if not there; avoids Django redirection to login page
     try:
@@ -142,9 +147,13 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
         course_details = Course.objects.get(canvas_id=course_id)
     except ObjectDoesNotExist:
         if is_instructor or user_obj.is_staff:
-            canvas_long_id = canvas_id_to_incremented_id(course_id)
-            course_details = Course.objects.create(id=canvas_long_id, canvas_id=course_id, name=course_name)
-            CourseViewOption.objects.create(course_id=canvas_long_id)
+            course_details = Course.objects.create(id=canvas_course_long_id, canvas_id=course_id, name=course_name)
+            CourseViewOption.objects.create(course_id=canvas_course_long_id)
+        if is_instructor:
+            mylaUser.objects.create(name=user_name, sis_name=username,
+                                                course_id=canvas_course_long_id,
+                                                user_id=canvas_user_long_id, sis_id=user_sis_id,
+                                                enrollment_type=mylaUser.ENROLLMENT_TYPES.TeacherEnrollment)
 
     if course_details is None:
         logger.info(f'Course {course_id} data has not yet been loaded')
@@ -162,7 +171,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
         'help_url': settings.HELP_URL,
         'google_analytics_id': settings.GA_ID,
         'user_courses_info': [
-            {'course_id': course_id, 'course_name': course_name, 'enrollment_type': short_user_role_list(user_roles)}],
+            {'course_id': course_id, 'course_name': course_name, 'enrollment_types': short_user_role_list(user_roles)}],
         'lti_launch_id': launch_id,
         'lti_is_course_data_loaded': is_course_data_loaded,
     }

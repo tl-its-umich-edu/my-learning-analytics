@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { withStyles } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Avatar from '@material-ui/core/Avatar'
@@ -12,7 +11,7 @@ import Typography from '@material-ui/core/Typography'
 import { siteTheme } from '../globals'
 import AlertBanner from '../components/AlertBanner'
 import AvatarModal from '../components/AvatarModal'
-import SelectCard from '../components/SelectCard'
+import CourseListCard from '../components/CourseListCard/CourseListCard'
 
 const styles = theme => ({
   root: {
@@ -88,12 +87,11 @@ function CourseList (props) {
             )
             : (
               <Grid container spacing={2}>
+                <Grid item xs={12} />
                 {
                   user.relatedCourses.map((course, key) => (
                     <Grid item xs={12} sm={6} lg={4} key={key}>
-                      <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={`/courses/${course.course_id}`}>
-                        <SelectCard cardData={{ title: course.course_name }} />
-                      </Link>
+                      <CourseListCard path={`/courses/${course.course_id}`} courseName={course.course_name} />
                     </Grid>
                   ))
                 }
