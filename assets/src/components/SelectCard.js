@@ -44,6 +44,11 @@ const styles = theme => ({
   infoLink: {
     color: 'white'
   },
+  viewLink: {
+    outline: 'none',
+    textDecoration: 'none',
+    color: 'white'
+  },
   wrapper: {
     margin: theme.spacing(1),
     position: 'relative'
@@ -127,7 +132,7 @@ const SelectCard = props => {
     if (cardData && cardData.image) {
       return (
         <>
-          <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
+          <Link className={classes.viewLink} tabIndex={-1} to={cardData.path}>
             <CardMedia className={classes.media} image={cardData.image} title={cardData.title} />
           </Link>
         </>
@@ -157,7 +162,7 @@ const SelectCard = props => {
         <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
           <Grid container>
             <Grid item xs={11}>
-              <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path} className={classes.titleLink}>
+              <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
                 {cardData.title}
               </Link>
             </Grid>
@@ -166,9 +171,11 @@ const SelectCard = props => {
             </Grid>
           </Grid>
         </Typography>
-        <Typography component='p' className={classes.description}>
-          {cardData.description}
-        </Typography>
+        <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
+          <Typography component='p' className={classes.description}>
+            {cardData.description}
+          </Typography>
+        </Link>
       </CardContent>)
 
     return <>{cardImage}{cardContent}</>
