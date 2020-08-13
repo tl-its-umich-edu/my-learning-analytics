@@ -60,6 +60,27 @@ def gpa_map(grade):
 def get_home_template(request):
     return render(request, 'frontend/index.html')
 
+def view_names_mapping():
+    view_column_names: dict = {
+        'ap': CourseViewOption.show_assignment_planning.field.column,
+        'apv1': CourseViewOption.show_assignment_planning_v1.field.column,
+        'gd': CourseViewOption.show_grade_distribution.field.column,
+        'ra': CourseViewOption.show_resources_accessed.field.column
+    }
+    return view_column_names
+
+
+def get_course_view_options(is_admin, course):
+    view_column_names: dict = view_names_mapping()
+    global_views_disabled = []
+    for view in settings.VIEWS_DISABLED:
+        if view in view_column_names.values():
+            global_views_disabled.append((list(view_column_names.keys()))[list(view_column_names.values()).index(view)])
+    admin_course_views = CourseViewOption.objects.get(course=course).json(include_id=False)
+    course_view_options = {key: value for key, value in admin_course_views.items() if key not in global_views_disabled}
+    return admin_course_views if is_admin else course_view_options
+
+
 
 @permission_required('dashboard.get_course_info',
     fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
@@ -125,16 +146,17 @@ def get_course_info(request, course_id=0):
     if total_weeks > settings.MAX_DEFAULT_WEEKS:
         logger.debug(f'{total_weeks} is greater than {settings.MAX_DEFAULT_WEEKS} setting total weeks to default.')
         total_weeks = settings.MAX_DEFAULT_WEEKS
-
     resp['current_week_number'] = current_week_number
     resp['total_weeks'] = total_weeks
-    resp['course_view_options'] = CourseViewOption.objects.get(course=course).json(include_id=False)
+    resp['course_view_options'] = get_course_view_options(request.user.is_staff, course)
     resp['resource_types'] = course_resource_list
-
     course_users_list = User.objects.filter(course_id=course_id)
     resp['course_user_exist'] = 1 if len(course_users_list) > 0 else 0
 
     return HttpResponse(json.dumps(resp, default=str))
+
+
+
 
 
 @permission_required('dashboard.update_course_info',
@@ -194,12 +216,7 @@ def update_course_info(request, course_id=0):
         return bad_json_response
 
     # to translate short names returned by model back to original column names
-    view_column_names: dict = {
-        'ap': CourseViewOption.show_assignment_planning.field.column,
-        'apv1': CourseViewOption.show_assignment_planning_v1.field.column,
-        'gd': CourseViewOption.show_grade_distribution.field.column,
-        'ra': CourseViewOption.show_resources_accessed.field.column
-    }
+    view_column_names: dict = view_names_mapping()
 
     view_settings: dict
     view_data: dict = {}
