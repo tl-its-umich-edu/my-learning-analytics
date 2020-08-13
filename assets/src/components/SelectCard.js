@@ -161,20 +161,18 @@ const SelectCard = props => {
 
     const cardContent = (
       <CardContent className={classes.content}>
-        <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
-          <Grid container>
-            <Grid item xs={11}>
-              <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
-                <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
-                  {cardData.title}
-                </Typography>
-              </Link>
-            </Grid>
-            <Grid item xs={1}>
-              {getHelpLink(cardData)}
-            </Grid>
+        <Grid container>
+          <Grid item xs={11}>
+            <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
+              <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
+                {cardData.title}
+              </Typography>
+            </Link>
           </Grid>
-        </Typography>
+          <Grid item xs={1}>
+            {getHelpLink(cardData)}
+          </Grid>
+        </Grid>
         <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
           <Typography component='p' className={classes.description}>
             {cardData.description}
