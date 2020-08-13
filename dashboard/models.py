@@ -263,7 +263,7 @@ class ResourceQuerySet(models.QuerySet):
         :return:
         """
         try:
-            return list(self.values_list('resource_type', flat=True).distinct().filter(course_id=course_id))
+            return list(self.values_list('resource_type', flat=True).distinct().filter(resourceaccess__course_id=course_id))
         except(self.model.DoesNotExist, Exception) as e:
             logger.error(f"Couldn't fetch Resource list in Course {course_id} due to: {e}")
             return None
