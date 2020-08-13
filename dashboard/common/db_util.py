@@ -86,6 +86,7 @@ def get_default_user_course_id(user_id):
 def get_user_courses_info(request: WSGIRequest, username: str) -> List[Dict[str, Union[str, int, List[str]]]]:
     logger.info(get_user_courses_info.__name__)
     user_courses_info: List[Dict[str, Union[str, int, List[str]]]] = []
+    path = request.path
     with django.db.connection.cursor() as cursor:
         cursor.execute('''
             SELECT c.canvas_id, c.name, u.enrollment_type
@@ -109,7 +110,7 @@ def get_user_courses_info(request: WSGIRequest, username: str) -> List[Dict[str,
             user_courses_info = list(course_enrollments.values())
     logger.info(f'User {username} is enrolled in these courses: {user_courses_info}')
 
-    course_id_to_filter = get_course_id_from_request_url(request)
+    course_id_to_filter = get_course_id_from_request_url(path)
     user_courses_info = filter_user_course_info(course_id_to_filter, user_courses_info)
     return user_courses_info
 
@@ -122,10 +123,9 @@ def filter_user_course_info(course_id_to_filter, user_courses_info):
     return user_courses_info
 
 
-def get_course_id_from_request_url(request):
+def get_course_id_from_request_url(path):
     course_id_to_filter = None
     if settings.STUDENT_DASHBOARD_LTI:
-        path = request.path
         # Looking for an matching pattern like this /courses/123455
         course_id_from_path = re.findall('/courses/(\d+)\/?', path)
         if len(course_id_from_path) == 1:

@@ -11,7 +11,6 @@ function App (props) {
   if (!user.isLoggedIn) {
     return (window.location.href = user.loginURL)
   }
-  // This is needed to support both the standalone and LTI tool
   const coursePageMatch = matchPath(location.pathname, '/courses/:courseId/')
   const courseId = coursePageMatch ? coursePageMatch.params.courseId : null
 
