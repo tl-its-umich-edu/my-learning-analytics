@@ -34,9 +34,14 @@ const styles = theme => ({
     marginBottom: 0,
     backgroundColor: theme.palette.primary.main
   },
+  titleArea: {
+    color: 'white',
+    backgroundColor: theme.palette.primary.main
+  },
   description: {
     padding: theme.spacing(1),
-    color: 'black'
+    color: 'black',
+    height: '100%'
   },
   titleLink: {
     color: 'white'
@@ -47,7 +52,8 @@ const styles = theme => ({
   viewLink: {
     outline: 'none',
     textDecoration: 'none',
-    color: 'white'
+    color: 'white',
+    height: '100%'
   },
   wrapper: {
     margin: theme.spacing(1),
@@ -161,7 +167,7 @@ const SelectCard = props => {
 
     const cardContent = (
       <CardContent className={classes.content}>
-        <Grid container>
+        <Grid container className={classes.titleArea}>
           <Grid item xs={11}>
             <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
               <Typography gutterBottom variant='h5' component='h4' className={classes.title}>

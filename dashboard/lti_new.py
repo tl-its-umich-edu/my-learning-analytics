@@ -172,7 +172,7 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
         'view_help_urls': { 
             'ra':settings.URL_VIEW_RESOURCES_ACCESSED,
             'apv1':settings.URL_VIEW_ASSIGNMENT_PLANNING_V1,
-            'ap':settings.URL_VIEW_ASSIGNMENT_PLANNING_V2,
+            'ap':settings.URL_VIEW_ASSIGNMENT_PLANNING,
             'gd':settings.URL_VIEW_GRADE_DISTRIBUTION 
         }  ,
         'google_analytics_id': settings.GA_ID,
