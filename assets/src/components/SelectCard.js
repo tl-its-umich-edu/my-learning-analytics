@@ -142,11 +142,13 @@ const SelectCard = props => {
   function getHelpLink (cardData) {
     if (cardData.helpUrl) {
       return (
-        <Tooltip title={'About ' + cardData.title}>
-          <MUILink className={classes.infoLink} href={cardData.helpUrl} target='_blank' rel='noopener noreferrer'>
-            <InfoIcon />
-          </MUILink>
-        </Tooltip>
+        <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
+          <Tooltip title={'About ' + cardData.title}>
+            <MUILink className={classes.infoLink} href={cardData.helpUrl} target='_blank' rel='noopener noreferrer'>
+              <InfoIcon />
+            </MUILink>
+          </Tooltip>
+        </Typography>
       )
     }
   }
@@ -160,7 +162,9 @@ const SelectCard = props => {
           <Grid container>
             <Grid item xs={11}>
               <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
-                {cardData.title}
+                <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
+                  {cardData.title}
+                </Typography>
               </Link>
             </Grid>
             <Grid item xs={1}>
