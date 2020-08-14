@@ -3,8 +3,10 @@ import logging, django, re
 from datetime import datetime
 from typing import Dict, List, Union
 from dateutil.parser import parse
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.handlers.wsgi import WSGIRequest
 from django_cron.models import CronJobLog
+from dashboard.models import Course, User
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -84,43 +86,46 @@ def get_default_user_course_id(user_id):
 
 
 def get_user_courses_info(request: WSGIRequest, username: str) -> List[Dict[str, Union[str, int, List[str]]]]:
+    """
+    Fetching the user courses enrollment info, for standalone it will return all the courses enrollment for LTI
+    single course enrollment info
+    http://za.github.io/2015/06/29/django-filter-query-exception/
+    :param request:
+    :param username:
+    :return:
+    """
     logger.info(get_user_courses_info.__name__)
-    user_courses_info: List[Dict[str, Union[str, int, List[str]]]] = []
     path = request.path
-    with django.db.connection.cursor() as cursor:
-        cursor.execute('''
-            SELECT c.canvas_id, c.name, u.enrollment_type
-            FROM user u
-            JOIN course c
-                ON u.course_id=c.id
-            WHERE u.sis_name= %s;
-        ''', [username])
-        courses = cursor.fetchall()
-        if courses is not None:
-            course_enrollments: Dict[int, Dict[str, Union[int, str, List[str]]]] = {}
-            for course in courses:
-                course_id, course_name, enrollment_type = course
-                if course_id not in course_enrollments.keys():
-                    course_enrollments[course_id] = {
-                        'course_id': course_id,
-                        'course_name': course_name,
-                        'enrollment_types': []
-                    }
-                course_enrollments[course_id]['enrollment_types'].append(enrollment_type)
-            user_courses_info = list(course_enrollments.values())
-    logger.info(f'User {username} is enrolled in these courses: {user_courses_info}')
-
     course_id_to_filter = get_course_id_from_request_url(path)
-    user_courses_info = filter_user_course_info(course_id_to_filter, user_courses_info)
-    return user_courses_info
+    course_enrollments: Dict[int, Dict[str, Union[int, str, List[str]]]] = {}
+    if course_id_to_filter:
+        user_enrollments = User.objects.filter(course_id=canvas_id_to_incremented_id(course_id_to_filter),
+                                               sis_name=username)
+    else:
+        user_enrollments = User.objects.filter(sis_name=username)
+    if user_enrollments.count() == 0:
+        logger.warning(
+            f'Couldn\'t find user {username} enrollment info could be admin or enrollment data not pulled in yet')
+        return []
 
-
-def filter_user_course_info(course_id_to_filter, user_courses_info):
-    if course_id_to_filter is not None and len(user_courses_info) != 0:
-        for course in user_courses_info:
-            if course['course_id'] != course_id_to_filter:
-                user_courses_info.remove(course)
-    return user_courses_info
+    for enrollment in user_enrollments:
+        enroll_type = enrollment.enrollment_type
+        course = int(incremented_id_to_canvas_id(enrollment.course_id))
+        if course not in course_enrollments.keys():
+            course_enrollments[course] = {
+                'course_id': course,
+                'course_name': '',
+                'enrollment_types': []
+            }
+        course_enrollments[course]['enrollment_types'].append(enroll_type)
+    courses = Course.objects.filter(canvas_id__in=course_enrollments.keys())
+    if courses.count() == 0:
+        logger.error(f'Could not fetch courses info')
+        return []
+    for course in courses:
+        course_enrollments[course.canvas_id]['course_name'] = course.name
+    logger.info(f'User {username} is enrolled in these courses: {course_enrollments.values()}')
+    return list(course_enrollments.values())
 
 
 def get_course_id_from_request_url(path):
