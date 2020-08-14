@@ -156,9 +156,6 @@ def get_course_info(request, course_id=0):
     return HttpResponse(json.dumps(resp, default=str))
 
 
-
-
-
 @permission_required('dashboard.update_course_info',
                      fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
 def update_course_info(request, course_id=0):
