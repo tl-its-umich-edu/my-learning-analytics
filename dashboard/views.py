@@ -195,10 +195,10 @@ def update_course_info(request, course_id=0):
 
     # to translate short names returned by model back to original column names
     view_column_names: dict = {
-        'ap': CourseViewOption.show_assignment_planning.field_name,
-        'apv1': CourseViewOption.show_assignment_planning_v1.field_name,
-        'gd': CourseViewOption.show_grade_distribution.field_name,
-        'ra': CourseViewOption.show_resources_accessed.field_name
+        'ap': CourseViewOption.show_assignment_planning.field.column,
+        'apv1': CourseViewOption.show_assignment_planning_v1.field.column,
+        'gd': CourseViewOption.show_grade_distribution.field.column,
+        'ra': CourseViewOption.show_resources_accessed.field.column
     }
 
     view_settings: dict
