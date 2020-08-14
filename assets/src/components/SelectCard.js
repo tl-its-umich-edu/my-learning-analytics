@@ -170,7 +170,7 @@ const SelectCard = props => {
         <Grid container className={classes.titleArea}>
           <Grid item xs={11}>
             <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
-              <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
+              <Typography gutterBottom variant='h5' component='h2' className={classes.title}>
                 {cardData.title}
               </Typography>
             </Link>
