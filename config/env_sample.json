@@ -259,7 +259,7 @@
                 "JSON_EXTRACT_SCALAR(event, '$.object.name') AS name,",
                 "datetime(EVENT_TIME) AS access_time",
                 "FROM event_store.events WHERE",
-                "(JSON_EXTRACT_SCALAR(event, '$.edApp') = 'https://aakaf.mivideo.it.umich.edu/caliper/info/app/KafEdApp' OR JSON_EXTRACT_SCALAR(event, '$.edApp.id') = 'https://aakaf.mivideo.it.umich.edu/caliper/info/app/KafEdApp')",
+                "COALESCE(JSON_EXTRACT_SCALAR(event, '$.edApp.id'), JSON_EXTRACT_SCALAR(event, '$.edApp')) = 'https://aakaf.mivideo.it.umich.edu/caliper/info/app/KafEdApp'",
                 "AND TYPE = 'MediaEvent'",
                 "AND JSON_EXTRACT_SCALAR(event, '$.action') = 'Started'",
                 "AND JSON_EXTRACT_SCALAR(event, '$.object.extensions.kaf:course_id') IN UNNEST(@course_ids_short)"
