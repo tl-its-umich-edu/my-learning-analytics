@@ -127,7 +127,7 @@ function AvatarModal (props) {
         <Grid item xs={12}>
           <List>
             <Divider />
-            <Link style={{ textDecoration: 'none' }} href={helpURL}>
+            <Link style={{ textDecoration: 'none' }} href={helpURL} target='_blank' rel='noopener'>
               <ListItem button>
                 <ListItemIcon>
                   <HelpIcon />
