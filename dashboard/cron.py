@@ -11,7 +11,6 @@ from django.db import connections as conns, models
 from django.db.models import QuerySet
 from django_cron import CronJobBase, Schedule
 from google.cloud import bigquery
-from pandas import DataFrame
 from sqlalchemy import create_engine, types
 
 from dashboard.common import db_util, utils
@@ -292,7 +291,7 @@ class DashboardCronJob(CronJobBase):
             # Location must match that of the dataset(s) referenced in the query.
             bq_query = bigquery_client.query(final_bq_query, location='US', job_config=job_config)
 
-            resource_access_df: DataFrame = bq_query.to_dataframe()
+            resource_access_df: pd.DataFrame = bq_query.to_dataframe()
             total_bytes_billed += bq_query.total_bytes_billed
 
             resource_access_row_count = len(resource_access_df)
