@@ -93,7 +93,7 @@ def get_myla_globals(current_user):
         "view_help_urls": { 
             'ra': settings.URL_VIEW_RESOURCES_ACCESSED,
             'apv1': settings.URL_VIEW_ASSIGNMENT_PLANNING_V1,
-            'ap':settings.URL_VIEW_ASSIGNMENT_PLANNING,
+            'ap': settings.URL_VIEW_ASSIGNMENT_PLANNING,
             'gd':settings.URL_VIEW_GRADE_DISTRIBUTION 
         }      
 
