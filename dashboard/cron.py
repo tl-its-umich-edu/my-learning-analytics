@@ -291,78 +291,136 @@ class DashboardCronJob(CronJobBase):
 
             # Location must match that of the dataset(s) referenced in the query.
             bq_query = bigquery_client.query(final_bq_query, location='US', job_config=job_config)
-            #bq_query.result()
+
             resource_access_df: DataFrame = bq_query.to_dataframe()
             total_bytes_billed += bq_query.total_bytes_billed
 
-            logger.debug(f'resource_access_df row count: ({len(resource_access_df)})')
-
-            if len(resource_access_df) == 0:
+            resource_access_row_count = len(resource_access_df)
+            if resource_access_row_count == 0:
                 logger.info('No resource access data found.  Continuing...')
                 continue
 
-            # for data which contains user login names, not IDs
-            if (('user_login_name' in resource_access_df.columns)
-                    and ('user_id' not in resource_access_df.columns)):
+            logger.debug('resource_access_df row count: '
+                         f'({resource_access_row_count})')
+
+            logger.debug(f'resource_access_df:\n'
+                         f'{resource_access_df}\n'
+                         f'{resource_access_df.dtypes}')
+
+            # process data which contains user login names, not IDs
+            if len(resource_access_df[
+                       resource_access_df['user_id'] == -1]) > 0:
                 login_names = ','.join(
                     map(repr, resource_access_df['user_login_name']
-                        .drop_duplicates().values))
+                        .drop_duplicates().dropna().values))
+
+                logger.debug(f'login_names:\n{login_names}')
+
+                # get user ID as string because pd.merge will convert int64 to
+                # scientific notation; converting SN to int64 causes
+                # Obi-Wan problems (off by one)
                 user_id_df = pd.read_sql(
-                    'select sis_name as user_login_name, user_id '
-                    'from user where sis_name in ({})'
-                        .format(login_names),
+                    'select sis_name as user_login_name,'
+                    'cast(user_id as char) as user_id_str '
+                    f'from user where sis_name in ({login_names})',
                     engine)
+
+                logger.debug(f'user_id_df:\n'
+                             f'{user_id_df}\n'
+                             f'{user_id_df.dtypes}')
+
+                # combine user login and ID data
                 resource_access_df = pd.merge(
-                    resource_access_df, user_id_df, on='user_login_name') \
-                    .drop(columns='user_login_name')
+                    resource_access_df, user_id_df,
+                    on='user_login_name', how='outer')
+
+                # replace real user_id values for missing ones (-1)
+                resource_access_df.loc[
+                    resource_access_df['user_id'] == -1,
+                    'user_id'] = resource_access_df['user_id_str']
+
+                # drops must be in this order; especially dropna() LAST
+                resource_access_df = resource_access_df \
+                    .drop(columns=['user_id_str', 'user_login_name']) \
+                    .dropna()
+
+                logger.debug(f'resource_access_df:\n'
+                             f'{resource_access_df}\n'
+                             f'{resource_access_df.dtypes}')
+            else:
+                resource_access_df = resource_access_df.drop(
+                    columns='user_login_name')
+            resource_access_df = resource_access_df.dropna()
 
             # drop duplicates
-            resource_access_df = resource_access_df.drop_duplicates(["resource_id", "user_id", "access_time"], keep='first')
+            resource_access_df = resource_access_df.drop_duplicates(
+                ['resource_id', 'user_id', 'access_time'], keep='first')
 
-            logger.debug(f'resource_access_df row count (de-duped): ({len(resource_access_df)})')
+            logger.debug('resource_access_df row count (de-duped): '
+                         f'({len(resource_access_df)})')
 
-            logger.debug(resource_access_df)
+            logger.debug(f'resource_access_df:\n'
+                         f'{resource_access_df}\n'
+                         f'{resource_access_df.dtypes}')
 
-            # Because we're pulling all the data down into one query we need to manipulate it a little bit
-            # Make a copy of the access dataframe
+            # Make resource data from resource_access data
             resource_df = resource_access_df.copy(deep=True)
-            # Drop out the columns user and access time from resource data frame
-            resource_df = resource_df.drop(["user_id", "access_time"], axis=1)
-            # Drop out the duplicates
-            resource_df = resource_df.drop_duplicates(["resource_id"])
+            resource_df = resource_df.drop(
+                columns=['user_id', 'access_time', 'course_id'])
+            resource_df = resource_df.drop_duplicates('resource_id')
 
-            # Set a dual index for upsert
-            resource_df = resource_df.set_index(["resource_id",])
+            # set resource_id as index for pangres.upsert
+            resource_df: pd.DataFrame = resource_df.set_index('resource_id')
 
-            # Drop out the columns resource_type, name from the resource_access
-            resource_access_df = resource_access_df.drop(["resource_type","name"], axis=1)
+            logger.debug(f'resource_df:\n'
+                         f'{resource_df}\n'
+                         f'{resource_df.dtypes}')
 
-            # Drop the columns where there is a Na value
-            resource_access_df_drop_na = resource_access_df.dropna()
+            resource_access_df = resource_access_df.drop(
+                columns=['resource_type', 'name'])
 
-            logger.info(f"{len(resource_access_df) - len(resource_access_df_drop_na)} / {len(resource_access_df)} rows were dropped because of NA")
+            ra_len_before = len(resource_access_df)
 
-            # First update the resource table
-            # write to MySQL
+            # Drop rows with NA in any column
+            resource_access_df = resource_access_df.dropna()
+
+            logger.info(f'{ra_len_before - len(resource_access_df)} / '
+                        f'{ra_len_before} resource_access_df rows with '
+                        'NA values dropped')
+
+            logger.debug(f'resource_access_df:\n'
+                         f'{resource_access_df}\n'
+                         f'{resource_access_df.dtypes}')
+
+            # First, update resource table
             try:
                 dtype = {'resource_id': types.VARCHAR(255)}
-                pangres.upsert(engine=engine, df=resource_df, table_name='resource', if_row_exists='update', dtype=dtype)
+                pangres.upsert(engine=engine, df=resource_df,
+                               table_name='resource', if_row_exists='update',
+                               dtype=dtype)
             except Exception as e:
-                logger.exception("Error running upsert on table resource")
+                logger.exception('Error running upsert on table resource')
                 raise
 
+            # Next, update resource_access table
             try:
-                resource_access_df_drop_na.to_sql(con=engine, name='resource_access', if_exists='append', index=False)
+                resource_access_df.to_sql(con=engine, name='resource_access',
+                                          if_exists='append', index=False)
             except Exception as e:
-                logger.exception("Error running to_sql on table resource_access")
+                logger.exception('Error running to_sql on table '
+                                 'resource_access')
                 raise
-            return_string += str(resource_access_df_drop_na.shape[0]) + " rows for courses " + ",".join(map(str, data_warehouse_course_ids)) + "\n"
+
+            return_string += \
+                f'{len(resource_access_df)} rows for courses [' + ', '.join(
+                map(repr, data_warehouse_course_ids)) + ']\n'
             logger.info(return_string)
 
         total_tbytes_billed = total_bytes_billed / 1024 / 1024 / 1024 / 1024
         # $5 per TB as of Feb 2019 https://cloud.google.com/bigquery/pricing
         total_tbytes_price = round(5 * total_tbytes_billed, 2)
-        status +=(f"TBytes billed for BQ: {total_tbytes_billed} = ${total_tbytes_price}\n")
+        status += (f'TBytes billed for BQ: {total_tbytes_billed} = '
+                   f'${total_tbytes_price}\n')
         return status
 
 
