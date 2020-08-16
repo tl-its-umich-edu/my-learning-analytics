@@ -396,6 +396,7 @@ class DashboardCronJob(CronJobBase):
                 dtype = {'resource_id': types.VARCHAR(255)}
                 pangres.upsert(engine=engine, df=resource_df,
                                table_name='resource', if_row_exists='update',
+                               create_schema=False, add_new_columns=False,
                                dtype=dtype)
             except Exception as e:
                 logger.exception('Error running upsert on table resource')
