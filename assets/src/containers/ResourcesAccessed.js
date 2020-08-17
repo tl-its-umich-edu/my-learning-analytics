@@ -21,6 +21,7 @@ import useSetUserSetting from '../hooks/useSetUserSetting'
 import useUserSetting from '../hooks/useUserSetting'
 import { isObjectEmpty } from '../util/object'
 import { handleError, defaultFetchOptions } from '../util/data'
+import { isTeacherOrAdmin } from '../util/roles'
 
 const styles = theme => ({
   root: {
@@ -51,8 +52,8 @@ const rememberSetting = 'Remember my setting'
 const settingNotUpdated = 'Setting not updated'
 
 function ResourcesAccessed (props) {
-  const { classes, courseInfo, courseId, disabled } = props
-  if (disabled) return (<AlertBanner>The Resources Accessed view is hidden for this course.</AlertBanner>)
+  const { classes, courseInfo, courseId, disabled, isAdmin, enrollmentTypes } = props
+  if (disabled && !isTeacherOrAdmin(isAdmin, enrollmentTypes)) return (<AlertBanner>The Resources Accessed view is hidden for this course.</AlertBanner>)
   const resourceTypes = courseInfo.resource_types.length === 0
     ? [{ label: 'Files', icon: 'fas fa-file fa-lg' }]
     : courseInfo.resource_types
@@ -231,71 +232,74 @@ function ResourcesAccessed (props) {
     }
   }
   return (
-    <div className={classes.root}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Paper className={classes.paper}>
-            <ViewHeader>Resources Accessed</ViewHeader>
-            {
-              dataControllerLoad === 2
-                ? (
-                  <RangeSlider
-                    curWeek={curWeek}
-                    className='slider'
-                    startWeek={weekRange[0]}
-                    endWeek={weekRange[1]}
-                    min={minMaxWeek[0]}
-                    max={minMaxWeek[1]}
-                    onWeekChange={onWeekChangeHandler}
-                  />
-                ) : ''
-            }
-            <div className={classes.formController}>
-              <p className={classes.controlText}>Resources accessed from week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now) ' : ''}</b> by students with these grades:</p>
-              <FormControl>
-                <Select
-                  value={resourceGradeFilter}
-                  onChange={handleResourceGradeFilter}
-                  inputProps={{
-                    name: 'grade',
-                    id: 'grade-range'
-                  }}
-                >
-                  <MenuItem value='All'>All</MenuItem>
-                  <MenuItem value='90-100'>90-100%</MenuItem>
-                  <MenuItem value='80-89'>80-89%</MenuItem>
-                  <MenuItem value='70-79'>70-79%</MenuItem>
-                </Select>
-              </FormControl>
+    <>
+      {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
+      <div className={classes.root}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Paper className={classes.paper}>
+              <ViewHeader>Resources Accessed</ViewHeader>
               {
-                showSaveSetting
+                dataControllerLoad === 2
                   ? (
-                    <Checkbox
-                      checked={saveSettingClicked}
-                      onChange={() => setSaveSettingClicked(!saveSettingClicked)}
-                      value='checked'
-                      color='secondary'
+                    <RangeSlider
+                      curWeek={curWeek}
+                      className='slider'
+                      startWeek={weekRange[0]}
+                      endWeek={weekRange[1]}
+                      min={minMaxWeek[0]}
+                      max={minMaxWeek[1]}
+                      onWeekChange={onWeekChangeHandler}
                     />
-                  )
-                  : <div style={{ padding: '10px' }} />
+                  ) : ''
               }
-              <div style={{ padding: '15px 2px' }}>{saveLabel}</div>
-            </div>
-            {
-              filterCheckbox()
-            }
-            <UserSettingSnackbar
-              saved={userSettingSaved}
-              response={userSettingResponse}
-              successMessage='Resource filter setting saved!'
-            />
-            {(resourceAccessData && dataLoaded) || resourceTypeFilter.length === 0
-              ? ResourceAccessChartBuilder(resourceAccessData)
-              : <Spinner />}
-          </Paper>
+              <div className={classes.formController}>
+                <p className={classes.controlText}>Resources accessed from week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now) ' : ''}</b> by students with these grades:</p>
+                <FormControl>
+                  <Select
+                    value={resourceGradeFilter}
+                    onChange={handleResourceGradeFilter}
+                    inputProps={{
+                      name: 'grade',
+                      id: 'grade-range'
+                    }}
+                  >
+                    <MenuItem value='All'>All</MenuItem>
+                    <MenuItem value='90-100'>90-100%</MenuItem>
+                    <MenuItem value='80-89'>80-89%</MenuItem>
+                    <MenuItem value='70-79'>70-79%</MenuItem>
+                  </Select>
+                </FormControl>
+                {
+                  showSaveSetting
+                    ? (
+                      <Checkbox
+                        checked={saveSettingClicked}
+                        onChange={() => setSaveSettingClicked(!saveSettingClicked)}
+                        value='checked'
+                        color='secondary'
+                      />
+                    )
+                    : <div style={{ padding: '10px' }} />
+                }
+                <div style={{ padding: '15px 2px' }}>{saveLabel}</div>
+              </div>
+              {
+                filterCheckbox()
+              }
+              <UserSettingSnackbar
+                saved={userSettingSaved}
+                response={userSettingResponse}
+                successMessage='Resource filter setting saved!'
+              />
+              {(resourceAccessData && dataLoaded) || resourceTypeFilter.length === 0
+                ? ResourceAccessChartBuilder(resourceAccessData)
+                : <Spinner />}
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
-    </div>
+      </div>
+    </>
   )
 }
 

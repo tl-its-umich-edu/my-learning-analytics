@@ -82,6 +82,8 @@ function Course (props) {
                         disabled={!courseInfo.course_view_options.gd}
                         courseId={courseId}
                         user={user}
+                        enrollmentTypes={enrollmentTypes}
+                        isAdmin={user.admin}
                       />}
                   />
                   <Route
@@ -91,6 +93,8 @@ function Course (props) {
                         {...props}
                         disabled={!courseInfo.course_view_options.apv1}
                         courseId={courseId}
+                        enrollmentTypes={enrollmentTypes}
+                        isAdmin={user.admin}
                       />}
                   />
                   <Route
@@ -100,6 +104,8 @@ function Course (props) {
                         {...props}
                         disabled={!courseInfo.course_view_options.ap}
                         courseId={courseId}
+                        enrollmentTypes={enrollmentTypes}
+                        isAdmin={user.admin}
                       />}
                   />
                   <Route
@@ -110,6 +116,8 @@ function Course (props) {
                         disabled={!courseInfo.course_view_options.ra}
                         courseInfo={courseInfo}
                         courseId={courseId}
+                        enrollmentTypes={enrollmentTypes}
+                        isAdmin={user.admin}
                       />}
                   />
                 </>
