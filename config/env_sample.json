@@ -176,6 +176,7 @@
     "/*  Control course view options globally": "*/",
     "/*  Current possible values are a CSV list of any/none/all of show_resources_accessed, show_assignment_planning, show_grade_distribution": "*/",
     "/*  By default this is empty and no views are disabled": "*/",
+    "/* options are as described in course_view_options table column names [\"show_assignment_planning\", \"show_grade_distribution\"]": "*/",
     "VIEWS_DISABLED": "",
     "/*  Data Warehouse configuration": "*/",
     "/*  Uncomment these variables and fill them in if you're using cron to load": "*/",
