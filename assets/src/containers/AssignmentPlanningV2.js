@@ -18,7 +18,7 @@ import useSaveUserSetting from '../hooks/useSaveUserSetting'
 import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrade'
 import useUserAssignmentSetting from '../hooks/useUserAssignmentSetting'
 import { isTeacherOrAdmin } from '../util/roles'
-import PreviewBanner from '../components/PreviewBanner/PreviewBanner'
+
 import {
   clearGoals,
   setAssignmentGoalGrade,
@@ -129,7 +129,7 @@ function AssignmentPlanningV2 (props) {
 
   return (
     <>
-      <PreviewBanner isDisabled={disabled} />
+      {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
       <div className={classes.root}>
         <Grid container spacing={2}>
           <Grid item xs={12}>

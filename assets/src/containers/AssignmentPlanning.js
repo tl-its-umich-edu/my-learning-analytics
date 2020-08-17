@@ -21,7 +21,6 @@ import { useAssignmentData } from '../service/api'
 import { getCurrentWeek } from '../util/data'
 import { isObjectEmpty } from '../util/object'
 import { isTeacherOrAdmin } from '../util/roles'
-import PreviewBanner from '../components/PreviewBanner/PreviewBanner'
 
 const styles = theme => ({
   root: {
@@ -136,7 +135,7 @@ function AssignmentPlanning (props) {
 
   return (
     <>
-      <PreviewBanner isDisabled={disabled} />
+      {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
       <div className={classes.root}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
