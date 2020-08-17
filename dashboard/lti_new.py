@@ -105,7 +105,7 @@ def short_user_role_list(roles):
     return [role.split('#')[1] for role in roles]
 
 
-def extracting_launch_variables_for_tool_use(request, message_launch):
+def extract_launch_variables_for_tool_use(request, message_launch):
     launch_data = message_launch.get_launch_data()
     logger.debug(f'lti launch data {launch_data}')
     custom_params = launch_data['https://purl.imsglobal.org/spec/lti/claim/custom']
@@ -183,7 +183,7 @@ def launch(request):
         logger.info('DummyCache is set up, recommended atleast to us Mysql DB cache for LTI advantage services')
 
     try:
-        course_id = extracting_launch_variables_for_tool_use(request, message_launch)
+        course_id = extract_launch_variables_for_tool_use(request, message_launch)
     except Exception as e:
         return LTIError(e).response_json()
 

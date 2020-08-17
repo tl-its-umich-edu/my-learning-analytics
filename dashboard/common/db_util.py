@@ -1,10 +1,9 @@
 # Some utility functions used by other classes in this project
-import logging, django, re
+import logging
 from datetime import datetime
 from typing import Dict, List, Union
 from dateutil.parser import parse
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.handlers.wsgi import WSGIRequest
+import django
 from django_cron.models import CronJobLog
 from dashboard.models import Course, User
 from django.conf import settings
@@ -85,21 +84,19 @@ def get_default_user_course_id(user_id):
     return course_id
 
 
-def get_user_courses_info(request: WSGIRequest, username: str) -> List[Dict[str, Union[str, int, List[str]]]]:
+def get_user_courses_info(username: str, course_id=None) -> List[Dict[str, Union[str, int, List[str]]]]:
     """
     Fetching the user courses enrollment info, for standalone it will return all the courses enrollment for LTI
     single course enrollment info
     http://za.github.io/2015/06/29/django-filter-query-exception/
-    :param request:
-    :param username:
-    :return:
+    :param course_id: canvas short course id
+    :param username: user sis_name
+    :return: [{`course_id`: 1233, `course_name`: 'COURSES WN 2020', `enrollment_types`: ['StudentEnrollment'] }]
     """
     logger.info(get_user_courses_info.__name__)
-    path = request.path
-    course_id_to_filter = get_course_id_from_request_url(path)
     course_enrollments: Dict[int, Dict[str, Union[int, str, List[str]]]] = {}
-    if course_id_to_filter:
-        user_enrollments = User.objects.filter(course_id=canvas_id_to_incremented_id(course_id_to_filter),
+    if course_id:
+        user_enrollments = User.objects.filter(course_id=canvas_id_to_incremented_id(course_id),
                                                sis_name=username)
     else:
         user_enrollments = User.objects.filter(sis_name=username)
@@ -124,19 +121,9 @@ def get_user_courses_info(request: WSGIRequest, username: str) -> List[Dict[str,
         return []
     for course in courses:
         course_enrollments[course.canvas_id]['course_name'] = course.name
-    logger.info(f'User {username} is enrolled in these courses: {course_enrollments.values()}')
-    return list(course_enrollments.values())
-
-
-def get_course_id_from_request_url(path):
-    course_id_to_filter = None
-    if settings.STUDENT_DASHBOARD_LTI:
-        # Looking for an matching pattern like this /courses/123455
-        course_id_from_path = re.findall('/courses/(\d+)\/?', path)
-        if len(course_id_from_path) == 1:
-            course_id_to_filter = int(course_id_from_path[0])
-            logger.info(f'course_id from path: {course_id_to_filter}')
-    return course_id_to_filter
+    enrollments = course_enrollments.values()
+    logger.info(f'User {username} is enrolled in these courses: {enrollments}')
+    return list(enrollments)
 
 
 def get_last_cron_run():

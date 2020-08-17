@@ -1,9 +1,10 @@
-import logging, os
+import logging, os, re
 
 from django.conf import settings
 
 from dashboard.common.db_util import get_user_courses_info
 from dashboard.models import Course
+from typing import Union
 
 
 logger = logging.getLogger(__name__)
@@ -60,6 +61,17 @@ def search_key_for_resource_value(my_dict, search_for):
     return None
 
 
+def get_course_id_from_request_url(path: str) -> Union[None, int]:
+    course_id = None
+    if settings.STUDENT_DASHBOARD_LTI:
+        # Looking for an matching pattern like this /courses/123455
+        course_id_from_path = re.findall('/courses/(\d+)\/?', path)
+        if len(course_id_from_path) == 1:
+            course_id = int(course_id_from_path[0])
+            logger.info(f'course_id from path: {course_id}')
+    return course_id
+
+
 def get_myla_globals(request):
     current_user = request.user
     username = ""
@@ -67,11 +79,13 @@ def get_myla_globals(request):
     login_url = ""
     logout_url = ""
     google_analytics_id = ""
+    path = request.path
+    course_id = get_course_id_from_request_url(path)
 
     is_superuser = current_user.is_staff
     if current_user.is_authenticated:
         username = current_user.get_username()
-        user_courses_info = get_user_courses_info(request, username)
+        user_courses_info = get_user_courses_info(username, course_id)
 
     if settings.LOGIN_URL:
         login_url = settings.LOGIN_URL
