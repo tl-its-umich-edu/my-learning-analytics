@@ -79,8 +79,7 @@ def get_myla_globals(request):
     login_url = ""
     logout_url = ""
     google_analytics_id = ""
-    path = request.path
-    course_id = get_course_id_from_request_url(path)
+    course_id = get_course_id_from_request_url(request.path)
 
     is_superuser = current_user.is_staff
     if current_user.is_authenticated:
