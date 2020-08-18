@@ -19,7 +19,6 @@ const user = Object.freeze({
   logoutURL: mylaGlobals.logout,
   LTIlaunchID: mylaGlobals.lti_launch_id,
   LTIIsCourseDataLoaded: mylaGlobals.lti_is_course_data_loaded
-  helpURL: mylaGlobals.help_url
 })
 
 const viewHelpURLs = Object.freeze(mylaGlobals.view_help_urls)
