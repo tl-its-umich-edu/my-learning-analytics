@@ -363,13 +363,8 @@ class DashboardCronJob(CronJobBase):
                          f'{resource_access_df.dtypes}')
 
             # Make resource data from resource_access data
-            resource_df = resource_access_df.copy(deep=True)
-            resource_df = resource_df.drop(
-                columns=['user_id', 'access_time', 'course_id'])
-            resource_df = resource_df.drop_duplicates('resource_id')
-
-            # set resource_id as index for pangres.upsert
-            resource_df: pd.DataFrame = resource_df.set_index('resource_id')
+            resource_df = resource_access_df.filter(["resource_id", "resource_type", "name"])
+            resource_df = resource_df.drop_duplicates(["resource_id"])
 
             logger.debug(f'resource_df:\n'
                          f'{resource_df}\n'
