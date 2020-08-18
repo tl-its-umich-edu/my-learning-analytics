@@ -107,23 +107,23 @@ def get_user_courses_info(username: str, course_id=None) -> List[Dict[str, Union
 
     for enrollment in user_enrollments:
         enroll_type = enrollment.enrollment_type
-        course = int(incremented_id_to_canvas_id(enrollment.course_id))
-        if course not in course_enrollments.keys():
-            course_enrollments[course] = {
-                'course_id': course,
+        course_id = int(incremented_id_to_canvas_id(enrollment.course_id))
+        if course_id not in course_enrollments.keys():
+            course_enrollments[course_id] = {
+                'course_id': course_id,
                 'course_name': '',
                 'enrollment_types': []
             }
-        course_enrollments[course]['enrollment_types'].append(enroll_type)
+        course_enrollments[course_id]['enrollment_types'].append(enroll_type)
     courses = Course.objects.filter(canvas_id__in=course_enrollments.keys())
     if courses.count() == 0:
         logger.error(f'Could not fetch courses info')
         return []
     for course in courses:
         course_enrollments[course.canvas_id]['course_name'] = course.name
-    enrollments = course_enrollments.values()
+    enrollments = list(course_enrollments.values())
     logger.info(f'User {username} is enrolled in these courses: {enrollments}')
-    return list(enrollments)
+    return enrollments
 
 
 def get_last_cron_run():
