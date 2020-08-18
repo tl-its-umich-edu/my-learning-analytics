@@ -154,7 +154,7 @@ const SelectCard = props => {
         <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
           <Tooltip title={'About ' + cardData.title}>
             <MUILink className={classes.infoLink} href={cardData.helpUrl} target='_blank' rel='noopener noreferrer'>
-              <InfoIcon />
+              <InfoIcon fontSize='large' />
             </MUILink>
           </Tooltip>
         </Typography>
@@ -168,14 +168,14 @@ const SelectCard = props => {
     const cardContent = (
       <CardContent className={classes.content}>
         <Grid container className={classes.titleArea}>
-          <Grid item xs={11}>
+          <Grid item xs={10}>
             <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
               <Typography gutterBottom variant='h5' component='h2' className={classes.title}>
                 {cardData.title}
               </Typography>
             </Link>
           </Grid>
-          <Grid item xs={1}>
+          <Grid item xs={2}>
             {getHelpLink(cardData)}
           </Grid>
         </Grid>
