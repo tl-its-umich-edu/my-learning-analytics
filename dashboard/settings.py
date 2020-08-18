@@ -43,7 +43,12 @@ LOGIN_URL = '/accounts/login/'
 # In local development, a slash will be appended by Django during logout.
 # However, the SAML inplementation breaks on logout if a slash is used here.
 LOGOUT_URL = '/accounts/logout'
-HELP_URL = ENV.get("HELP_URL", "https://sites.google.com/umich.edu/my-learning-analytics-help/home")
+HELP_URL = ENV.get("HELP_URL", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics")
+
+URL_VIEW_RESOURCES_ACCESSED = ENV.get("URL_VIEW_RESOURCES_ACCESSED", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/resources-accessed")
+URL_VIEW_ASSIGNMENT_PLANNING_V1 = ENV.get("URL_VIEW_ASSIGNMENT_PLANNING_V1", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/assignment-planning")
+URL_VIEW_ASSIGNMENT_PLANNING = ENV.get("URL_VIEW_ASSIGNMENT_PLANNING", None)
+URL_VIEW_GRADE_DISTRIBUTION = ENV.get("URL_VIEW_GRADE_DISTRIBUTION", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/grade-distribution")
 
 # Google Analytics ID
 GA_ID = ENV.get('GA_ID', '')

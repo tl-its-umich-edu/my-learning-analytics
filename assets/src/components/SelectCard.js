@@ -1,13 +1,15 @@
 /* global fetch */
 import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Card, CardActionArea, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Snackbar, Typography } from '@material-ui/core'
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank'
+import { Card, CardActionArea, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Link as MUILink, Snackbar, Tooltip, Typography } from '@material-ui/core'
 import CheckBoxIcon from '@material-ui/icons/CheckBox'
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank'
 import CloseIcon from '@material-ui/icons/Close'
-import { Link } from 'react-router-dom'
-import { yellow, grey } from '@material-ui/core/colors'
+import InfoIcon from '@material-ui/icons/Info'
 import SaveIcon from '@material-ui/icons/Save'
+import { Link } from 'react-router-dom'
+import Grid from '@material-ui/core/Grid'
+import { yellow, grey } from '@material-ui/core/colors'
 import clsx from 'clsx'
 import { defaultFetchOptions, handleError } from '../util/data'
 import { isTeacherOrAdmin } from '../util/roles'
@@ -32,9 +34,26 @@ const styles = theme => ({
     marginBottom: 0,
     backgroundColor: theme.palette.primary.main
   },
+  titleArea: {
+    color: 'white',
+    backgroundColor: theme.palette.primary.main
+  },
   description: {
     padding: theme.spacing(1),
-    color: 'black'
+    color: 'black',
+    height: '100%'
+  },
+  titleLink: {
+    color: 'white'
+  },
+  infoLink: {
+    color: 'white'
+  },
+  viewLink: {
+    outline: 'none',
+    textDecoration: 'none',
+    color: 'white',
+    height: '100%'
   },
   wrapper: {
     margin: theme.spacing(1),
@@ -117,9 +136,29 @@ const SelectCard = props => {
 
   function getCardImage (cardData) {
     if (cardData && cardData.image) {
-      return <CardMedia className={classes.media} image={cardData.image} title={cardData.title} />
+      return (
+        <>
+          <Link className={classes.viewLink} tabIndex={-1} to={cardData.path}>
+            <CardMedia className={classes.media} image={cardData.image} title={cardData.title} />
+          </Link>
+        </>
+      )
     } else {
       return null
+    }
+  }
+
+  function getHelpLink (cardData) {
+    if (cardData.helpUrl) {
+      return (
+        <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
+          <Tooltip title={'About ' + cardData.title}>
+            <MUILink className={classes.infoLink} href={cardData.helpUrl} target='_blank' rel='noopener noreferrer'>
+              <InfoIcon fontSize='large' />
+            </MUILink>
+          </Tooltip>
+        </Typography>
+      )
     }
   }
 
@@ -128,12 +167,23 @@ const SelectCard = props => {
 
     const cardContent = (
       <CardContent className={classes.content}>
-        <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
-          {cardData.title}
-        </Typography>
-        <Typography component='p' className={classes.description}>
-          {cardData.description}
-        </Typography>
+        <Grid container className={classes.titleArea}>
+          <Grid item xs={10}>
+            <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
+              <Typography gutterBottom variant='h5' component='h2' className={classes.title}>
+                {cardData.title}
+              </Typography>
+            </Link>
+          </Grid>
+          <Grid item xs={2}>
+            {getHelpLink(cardData)}
+          </Grid>
+        </Grid>
+        <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
+          <Typography component='p' className={classes.description}>
+            {cardData.description}
+          </Typography>
+        </Link>
       </CardContent>)
 
     return <>{cardImage}{cardContent}</>
@@ -143,9 +193,7 @@ const SelectCard = props => {
     <>
       <Card className={classes.card} elevation={2}>
         <CardActionArea>
-          <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={cardData.path}>
-            {getLinkContents(cardData)}
-          </Link>
+          {getLinkContents(cardData)}
         </CardActionArea>
         {
           isTeacherOrAdmin(props.isAdmin, props.enrollmentTypes)
@@ -210,7 +258,8 @@ SelectCard.propTypes = {
     path: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
-    image: PropTypes.string
+    image: PropTypes.string,
+    helpUrl: PropTypes.string
   }).isRequired,
   courseId: PropTypes.number.isRequired,
   enrollmentTypes: PropTypes.array.isRequired
