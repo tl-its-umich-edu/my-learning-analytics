@@ -102,7 +102,7 @@ def get_user_courses_info(username: str, course_id=None) -> List[Dict[str, Union
         user_enrollments = User.objects.filter(sis_name=username)
     if user_enrollments.count() == 0:
         logger.warning(
-            f'Couldn\'t find user {username} enrollment info could be admin or enrollment data not pulled in yet')
+            f'Couldn\'t find user {username} in enrollment info. The user could be an admin, or enrollment data has not been populated yet.')
         return []
 
     for enrollment in user_enrollments:
