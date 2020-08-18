@@ -147,10 +147,9 @@ CONTEXT_PROCESSORS = [
     'django_su.context_processors.is_su',
     'django_settings_export.settings_export',
     'dashboard.context_processors.get_git_version_info',
+    'dashboard.context_processors.get_myla_globals',
     'dashboard.context_processors.last_updated'
 ]
-if not ENV.get('STUDENT_DASHBOARD_LTI', False):
-    CONTEXT_PROCESSORS += ['dashboard.context_processors.get_myla_globals']
 
 TEMPLATES = [
     {

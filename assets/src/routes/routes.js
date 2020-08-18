@@ -44,7 +44,7 @@ const routes = (courseId, activeViews, activeOnly = true) => {
       helpUrl: viewHelpURLs.gd
     }
   ]
-  return !activeOnly ? allViews : allViews.filter(view => activeViews[view.viewCode])
+  return !activeOnly ? allViews.filter(view => view.enabled !== undefined) : allViews.filter(view => activeViews[view.viewCode])
 }
 
 export default routes
