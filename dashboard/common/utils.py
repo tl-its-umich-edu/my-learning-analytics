@@ -79,7 +79,6 @@ def get_myla_globals(current_user):
     if settings.GA_ID:
         google_analytics_id = settings.GA_ID
     primary_ui_color = settings.PRIMARY_UI_COLOR
-    help_url = settings.HELP_URL
 
     myla_globals = {
         "username" : username,
@@ -89,12 +88,12 @@ def get_myla_globals(current_user):
         "logout": logout_url,
         "primary_ui_color": primary_ui_color,
         "google_analytics_id": google_analytics_id,
-        "help_url": help_url,
         "view_help_urls": { 
             'ra': settings.URL_VIEW_RESOURCES_ACCESSED,
             'apv1': settings.URL_VIEW_ASSIGNMENT_PLANNING_V1,
             'ap': settings.URL_VIEW_ASSIGNMENT_PLANNING,
-            'gd': settings.URL_VIEW_GRADE_DISTRIBUTION
+            'gd': settings.URL_VIEW_GRADE_DISTRIBUTION,
+            'home': settings.HELP_URL
         }      
 
     }

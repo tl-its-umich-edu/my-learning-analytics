@@ -168,12 +168,12 @@ def extracting_launch_variables_for_tool_use(request, message_launch):
         'logout': settings.LOGOUT_URL,
         'user_image': user_img,
         'primary_ui_color': settings.PRIMARY_UI_COLOR,
-        'help_url': settings.HELP_URL,
         'view_help_urls': { 
             'ra':settings.URL_VIEW_RESOURCES_ACCESSED,
             'apv1':settings.URL_VIEW_ASSIGNMENT_PLANNING_V1,
             'ap':settings.URL_VIEW_ASSIGNMENT_PLANNING,
-            'gd':settings.URL_VIEW_GRADE_DISTRIBUTION 
+            'gd':settings.URL_VIEW_GRADE_DISTRIBUTION,
+            'home':settings.HELP_URL
         }  ,
         'google_analytics_id': settings.GA_ID,
         'user_courses_info': [
