@@ -15,10 +15,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 
 from collections import namedtuple
-from datetime import datetime, timedelta
-import pytz
-
+import datetime
 import logging
+import pytz
+from typing import Optional
+
 logger = logging.getLogger(__name__)
 
 from model_utils import Choices
@@ -150,13 +151,33 @@ class CourseQuerySet(models.QuerySet):
             logger.info("Courses did not exist", exc_info = True)
         return []
 
+    def earliest_start_datetime(self) -> Optional[datetime.datetime]:
+        """Get the earliest start date of all courses
 
-class CourseManager(models.Manager):
-    def get_queryset(self):
-        return CourseQuerySet(self.model, using=self._db)
+        :return: Earliest start date of all courses, or None if no course dates found
+        :rtype: datetime
+        """
+        sorted_courses = sorted(self.all(), key=lambda course: course.course_date_range.start)
 
-    def get_supported_courses(self):
-        return self.get_queryset().get_supported_courses()
+        earliest_start = None
+        if len(sorted_courses) > 0:
+            earliest_course = sorted_courses[0]
+            earliest_start = earliest_course.course_date_range.start
+            logger.info(f"Earliest start datetime for all courses: {earliest_start.isoformat()} found in course {earliest_course.canvas_id}")
+        else:
+            logger.info(f"No course listed. Return None as the earliest_start_datetime_of_course. ")
+        return earliest_start
+
+    @staticmethod
+    def earliest_new_course_start_datetime() -> Optional[datetime.datetime]:
+        """ Returns the datetime of any new courses, otherwise returns None
+            This uses the course and user table so needs to be run user table is refreshed.
+
+        :return: datetime. Either the earliest or None
+        :rtype: None
+        """
+        new_courses = Course.objects.extra(where=['course.id not in (SELECT course_id FROM USER)'])
+        return new_courses.earliest_start_datetime()
 
 
 class Course(models.Model):
@@ -172,7 +193,7 @@ class Course(models.Model):
     show_grade_type = models.CharField(verbose_name="Show Grade Type", max_length=255,
                                          choices=GRADING_CHOICES, default='Percent')
 
-    objects = CourseManager()
+    objects = CourseQuerySet().as_manager()
 
     def __str__(self):
         return self.name
@@ -185,14 +206,14 @@ class Course(models.Model):
             start = self.term.date_start
         else:
             logger.warning("No date_start value was found for course or term; setting to current date and time")
-            start = datetime.now(pytz.UTC)
+            start = datetime.datetime.now(pytz.UTC)
         if self.date_end is not None:
             end = self.date_end
         elif self.term is not None and self.term.date_end is not None:
             end = self.term.get_correct_date_end()
         else:
             logger.warning("No date_end value was found for course or term; setting to two weeks from now")
-            end = start + timedelta(weeks=2)
+            end = start + datetime.timedelta(weeks=2)
         DateRange = namedtuple("DateRange", ["start", "end"])
         return DateRange(start, end)
 
@@ -291,6 +312,31 @@ class Resource(models.Model):
     class Meta:
         db_table = 'resource'
 
+class ResourceAccessQuerySet(models.QuerySet):
+
+    def next_resource_run(self) -> Optional[datetime.datetime]:
+        """ 1) Get the earliest start date of all courses. 
+            2) Check if there's any new courses since last run.
+            3) If there are new courses, return this date
+            4) Otherwise return the last run from big query
+
+        :param any_course_new: If there's new courses
+        :type any_course_new: bool
+        :return: Either the earliest date of the term (or if no courses the date defined) or lastest resource_access
+        :rtype: datetime
+        """
+
+        course_start_time = Course.objects.earliest_new_course_start_datetime()
+        # Try to find the last run date of all resources_accessed
+        try:
+            latest_resource = self.latest('access_time')
+            latest_resource_time = latest_resource.access_time
+        except ResourceAccess.DoesNotExist:
+            logger.info("No resources found, defaulting to the earliest course start time")
+            latest_resource_time = course_start_time
+
+        return latest_resource_time
+
 class ResourceAccess(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
     resource_id = models.ForeignKey(Resource, on_delete=models.CASCADE, to_field='resource_id', db_column='resource_id')
@@ -298,6 +344,7 @@ class ResourceAccess(models.Model):
     user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id')
     access_time = models.DateTimeField(verbose_name="Access Time")
 
+    objects = ResourceAccessQuerySet.as_manager()
     def __str__(self):
         return f"Resource {self.resource_id} accessed by {self.user_id}"
 
@@ -330,7 +377,7 @@ class UnizinMetadata(models.Model):
         db_table = 'unizin_metadata'
 
 
-class UserQuerySet(models.query.QuerySet):
+class UserQuerySet(models.QuerySet):
     def get_user_in_course(self, user, course):
         return self.get_user_in_course_id(user, course.id)
 

@@ -110,7 +110,7 @@ class DashboardCronJob(CronJobBase):
 
     schedule = Schedule(run_at_times=settings.RUN_AT_TIMES)
     code = 'dashboard.DashboardCronJob'    # a unique code
-    any_course_new = False
+    earliest_new_start_datetime = None
 
     def __init__(self) -> None:
         """Constructor to be used to declare valid_locked_course_ids instance variable."""
@@ -249,7 +249,9 @@ class DashboardCronJob(CronJobBase):
         # BQ Total Bytes Billed to report to status
         total_bytes_billed = 0
 
-        latest_resource_time = utils.find_next_resource_run(self.any_course_new)
+        latest_resource_time = self.earliest_new_start_datetime
+        if not latest_resource_time:
+            latest_resource_time = ResourceAccess.objects.get().find_next_resource_run()
 
         status += deleteAllRecordInTable("resource_access", f"WHERE access_time > %s", [latest_resource_time,])
         # loop through multiple course ids, 20 at a time
@@ -614,7 +616,6 @@ class DashboardCronJob(CronJobBase):
 
         # continue cron tasks
 
-
         logger.info("** term")
         status += self.update_term()
 
@@ -627,18 +628,19 @@ class DashboardCronJob(CronJobBase):
         
             # We need to check if any courses are new after updating the course table but before
             # updating the users
-            self.any_course_new = db_util.is_any_course_new()
+            self.earliest_new_start_datetime = Course.objects.earliest_new_course_start_datetime()
 
             logger.info("** user")
             status += self.update_user()
 
+            """
             logger.info("** assignment")
             status += self.update_groups()
             status += self.update_assignment()
 
             status += self.submission()
             status += self.weight_consideration()
-
+            """
             logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
                 try:

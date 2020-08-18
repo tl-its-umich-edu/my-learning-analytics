@@ -159,19 +159,3 @@ def get_canvas_data_date():
     except Exception:
         logger.info("Value could not be found from metadata", exc_info = True)
     return datetime.min
-
-def is_any_course_new() -> bool:
-    """ Returns True if any course is new (has no data loaded yet), otherwise returns False
-        This uses the course and user table so needs to be run user table is refreshed.
-
-    :return: Boolean for whether the course has users (which would indicate it isn't new)
-    :rtype: bool
-    """
-    with django.db.connection.cursor() as cursor:
-        cursor.execute("SELECT id FROM course WHERE id NOT IN (SELECT course_id FROM user)")
-        row = cursor.fetchone()
-        if (row == None):
-            logger.debug("No new courses found since last run")
-            return False 
-    logger.info("New course(s) found since last run!")
-    return True
