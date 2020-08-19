@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-import os
-import json
+import json, os
+from typing import Tuple, Union
 
 from debug_toolbar import settings as dt_settings
 from django.utils.module_loading import import_string
@@ -25,9 +25,10 @@ PROJECT_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), ".."),
 )
 
-if os.getenv("ENV_JSON"):
+env_json: Union[str, None] = os.getenv('ENV_JSON')
+if env_json:
     # optionally load settings from an environment variable
-    ENV = json.loads(os.getenv("ENV_JSON"))
+    ENV = json.loads(env_json)
 else:
     # else try loading settings from the json config file
     try:
@@ -318,7 +319,7 @@ try:
 except ImportError:
     pass
 
-AUTHENTICATION_BACKENDS = (
+AUTHENTICATION_BACKENDS: Tuple[str, ...] = (
     'rules.permissions.ObjectPermissionBackend',
     'django_su.backends.SuBackend',
 )

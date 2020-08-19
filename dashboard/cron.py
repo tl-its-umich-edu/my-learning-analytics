@@ -1,6 +1,6 @@
 import datetime, logging
 from collections import namedtuple
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 import pandas as pd
 import pytz
@@ -559,7 +559,7 @@ class DashboardCronJob(CronJobBase):
 
         for course in courses:
             updated_fields: List[str] = []
-            warehouse_course_dict: Dict[str, any] = warehouse_courses_data.loc[warehouse_courses_data['id'] == course.id].iloc[0].to_dict()
+            warehouse_course_dict: Dict[str, Any] = warehouse_courses_data.loc[warehouse_courses_data['id'] == course.id].iloc[0].to_dict()
 
             warehouse_course_name: str = warehouse_course_dict['name']
             if course.name != warehouse_course_name:

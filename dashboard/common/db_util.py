@@ -1,12 +1,15 @@
 # Some utility functions used by other classes in this project
 import logging
 from datetime import datetime
-from typing import Dict, List, Union
+from typing import Any, Dict, List, TypedDict, Union
+
 from dateutil.parser import parse
 import django
-from django_cron.models import CronJobLog
-from dashboard.models import Course, User
 from django.conf import settings
+from django_cron.models import CronJobLog
+
+from dashboard.models import Course, User
+
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +87,13 @@ def get_default_user_course_id(user_id):
     return course_id
 
 
-def get_user_courses_info(username: str, course_id=None) -> List[Dict[str, Union[str, int, List[str]]]]:
+class CourseEnrollment(TypedDict):
+    course_id: int
+    course_name: str
+    enrollment_types: List[str]
+
+
+def get_user_courses_info(username: str, course_id: Union[int, None] = None) -> List[CourseEnrollment]:
     """
     Fetching the user courses enrollment info, for standalone it will return all the courses enrollment for LTI
     single course enrollment info
@@ -94,7 +103,7 @@ def get_user_courses_info(username: str, course_id=None) -> List[Dict[str, Union
     :return: [{`course_id`: 1233, `course_name`: 'COURSES WN 2020', `enrollment_types`: ['StudentEnrollment'] }]
     """
     logger.info(get_user_courses_info.__name__)
-    course_enrollments: Dict[int, Dict[str, Union[int, str, List[str]]]] = {}
+    course_enrollments: Dict[int, CourseEnrollment] = {}
     if course_id:
         user_enrollments = User.objects.filter(course_id=canvas_id_to_incremented_id(course_id),
                                                sis_name=username)
