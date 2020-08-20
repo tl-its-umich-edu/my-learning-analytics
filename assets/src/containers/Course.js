@@ -53,7 +53,7 @@ function Course (props) {
               enrollmentTypes={enrollmentTypes}
               isAdmin={user.admin}
             />
-            {courseInfo.course_user_exist === 0
+            {courseInfo.course_data_loaded === 0
               ? (
                 <>
                   <AlertBanner>

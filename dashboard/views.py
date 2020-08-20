@@ -150,8 +150,7 @@ def get_course_info(request, course_id=0):
     resp['total_weeks'] = total_weeks
     resp['course_view_options'] = get_course_view_options(request.user.is_staff, course)
     resp['resource_types'] = course_resource_list
-    course_users_list = User.objects.filter(course_id=course_id)
-    resp['course_user_exist'] = 1 if len(course_users_list) > 0 else 0
+    resp['course_data_loaded'] = 1 if course.term_id else 0
 
     return HttpResponse(json.dumps(resp, default=str))
 
