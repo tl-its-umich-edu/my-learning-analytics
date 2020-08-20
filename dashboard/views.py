@@ -636,9 +636,9 @@ def get_course_assignments(course_id):
 
     assignments_in_course = pd.read_sql(sql,conn,params={'course_id': course_id}, parse_dates={'due_date': '%Y-%m-%d'})
     # No assignments found in the course
-    if assignments_in_course.empty:
+    if assignments_in_course.empty or (assignments_in_course['assignment_id'] == 0).all():
         logger.info('The course %s don\'t seems to have assignment data' % course_id)
-        return assignments_in_course
+        return pd.DataFrame()
 
     assignments_in_course['due_date'] = pd.to_datetime(assignments_in_course['due_date'],unit='ms')
     assignments_in_course[['points_possible','group_points']]=assignments_in_course[['points_possible','group_points']].fillna(0)
@@ -690,6 +690,8 @@ def no_show_avg_score_for_ungraded_assignments(row):
 
 
 def user_percent(row):
+    if len(row) == 0:
+        return 0
     if row['graded']:
         s = round((row['score'] / row['points_possible']) * row['towards_final_grade'], 2)
         return s
@@ -716,8 +718,9 @@ def percent_calculation(consider_weight,total_points,hidden_assignments,row):
         return round((row['points_possible']/row['group_points'])*row['weight'],2)
     if consider_weight and row['group_points']!=0:
         return round((row['points_possible']/row['group_points'])*row['weight'],2)
-    if not consider_weight:
+    if not consider_weight and total_points != 0:
         return round((row['points_possible']/total_points)*100,2)
+    else:return 0
 
 
 def find_min_week(course_id):
