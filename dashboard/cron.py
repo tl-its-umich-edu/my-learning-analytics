@@ -306,49 +306,53 @@ class DashboardCronJob(CronJobBase):
                          f'{resource_access_df}\n'
                          f'{resource_access_df.dtypes}')
 
-            # process data which contains user login names, not IDs
-            if len(resource_access_df[
-                       resource_access_df['user_id'] == -1]) > 0:
-                login_names = ','.join(
-                    map(repr, resource_access_df['user_login_name']
-                        .drop_duplicates().dropna().values))
-
-                logger.debug(f'login_names:\n{login_names}')
-
-                # get user ID as string because pd.merge will convert int64 to
-                # scientific notation; converting SN to int64 causes
-                # Obi-Wan problems (off by one)
-                user_id_df = pd.read_sql(
-                    'select sis_name as user_login_name,'
-                    'cast(user_id as char) as user_id_str '
-                    f'from user where sis_name in ({login_names})',
-                    engine)
-
-                logger.debug(f'user_id_df:\n'
-                             f'{user_id_df}\n'
-                             f'{user_id_df.dtypes}')
-
-                # combine user login and ID data
-                resource_access_df = pd.merge(
-                    resource_access_df, user_id_df,
-                    on='user_login_name', how='outer')
-
-                # replace real user_id values for missing ones (-1)
-                resource_access_df.loc[
-                    resource_access_df['user_id'] == -1,
-                    'user_id'] = resource_access_df['user_id_str']
-
-                # drops must be in this order; especially dropna() LAST
-                resource_access_df = resource_access_df \
-                    .drop(columns=['user_id_str', 'user_login_name']) \
-                    .dropna()
-
-                logger.debug(f'resource_access_df:\n'
-                             f'{resource_access_df}\n'
-                             f'{resource_access_df.dtypes}')
+            if 'user_login_name' not in resource_access_df.columns:
+                logger.warning('Update queries in configuration file '
+                               'to include column "user_login_name".')
             else:
-                resource_access_df = resource_access_df.drop(
-                    columns='user_login_name')
+                # process data which contains user login names, but not IDs
+                if -1 in resource_access_df['user_id'].values:
+                    login_names = ','.join(
+                        map(repr, resource_access_df['user_login_name']
+                            .drop_duplicates().dropna().values))
+
+                    logger.debug(f'login_names:\n{login_names}')
+
+                    # get user ID as string because pd.merge will convert
+                    # int64 to scientific notation; converting SN to int64
+                    # causes Obi-Wan problems (off by one)
+                    user_id_df = pd.read_sql(
+                        'select sis_name as user_login_name,'
+                        'cast(user_id as char) as user_id_str '
+                        f'from user where sis_name in ({login_names})',
+                        engine)
+
+                    logger.debug(f'user_id_df:\n'
+                                 f'{user_id_df}\n'
+                                 f'{user_id_df.dtypes}')
+
+                    # combine user login and ID data
+                    resource_access_df = pd.merge(
+                        resource_access_df, user_id_df,
+                        on='user_login_name', how='outer')
+
+                    # replace real user_id values for missing ones (-1)
+                    resource_access_df.loc[
+                        resource_access_df['user_id'] == -1,
+                        'user_id'] = resource_access_df['user_id_str']
+
+                    # drops must be in this order; especially dropna() LAST
+                    resource_access_df = resource_access_df \
+                        .drop(columns=['user_id_str', 'user_login_name']) \
+                        .dropna()
+
+                    logger.debug(f'resource_access_df:\n'
+                                 f'{resource_access_df}\n'
+                                 f'{resource_access_df.dtypes}')
+                else:
+                    resource_access_df = resource_access_df.drop(
+                        columns='user_login_name')
+
             resource_access_df = resource_access_df.dropna()
 
             # drop duplicates
@@ -365,6 +369,8 @@ class DashboardCronJob(CronJobBase):
             # Make resource data from resource_access data
             resource_df = resource_access_df.filter(["resource_id", "resource_type", "name"])
             resource_df = resource_df.drop_duplicates(["resource_id"])
+            # pangres.upsert() requires DataFrame to have index
+            resource_df = resource_df.set_index('resource_id')
 
             logger.debug(f'resource_df:\n'
                          f'{resource_df}\n'
