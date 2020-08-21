@@ -203,7 +203,7 @@
     "/* resource type for resource view add or remove per institution needs": "/*",
     "RESOURCE_VALUES": {
         "files":  {"types": ["canvas"], "icon": "fas fa-file fa-lg"},
-        "videos": {"types": ["leccap"], "icon": "fas fa-video fa-lg"}
+        "videos": {"types": ["leccap", "mivideo"], "icon": "fas fa-video fa-lg"}
     },
     "/* Institute specific urls add or remove to your needs, will be used for Resources view": "*/",
     "/*cron queries to pull the data from various caliper data sources replace if not relevant with your institution": "*/",
