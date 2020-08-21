@@ -11,10 +11,21 @@ import Spinner from '../components/Spinner'
 import { isObjectEmpty } from '../util/object'
 import { useCourseInfo } from '../service/api'
 import WarningBanner from '../components/WarningBanner'
-import AlertBanner from '../components/AlertBanner'
+import { CardMedia, Card } from '@material-ui/core'
+import { withStyles } from '@material-ui/core/styles'
+
+const styles = theme => ({
+  card: {
+    margin: theme.spacing(3)
+  },
+  media: {
+    height: '500px',
+    backgroundSize: 'contain'
+  }
+})
 
 function Course (props) {
-  const { courseId, user } = props
+  const { courseId, user, classes } = props
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
@@ -53,13 +64,11 @@ function Course (props) {
               enrollmentTypes={enrollmentTypes}
               isAdmin={user.admin}
             />
-            {courseInfo.course_user_exist === 0
+            {courseInfo.course_data_loaded === 0
               ? (
-                <>
-                  <AlertBanner>
-                    No data is available for {courseInfo.name} yet. Please wait for the next system data load.
-                  </AlertBanner>
-                </>
+                <Card className={classes.card}>
+                  <CardMedia className={classes.media} image='/static/images/no-course-data-msg.png' />
+                </Card>
               ) : (
                 <>
                   <Route
@@ -128,4 +137,4 @@ function Course (props) {
   )
 }
 
-export default Course
+export default withStyles(styles)(Course)
