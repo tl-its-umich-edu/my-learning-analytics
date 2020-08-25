@@ -660,7 +660,7 @@ def get_course_assignments(course_id):
     assignments_in_course['current_week']=assignments_in_course['calender_week'].apply(lambda x: find_current_week(x))
     assignments_in_course['due_date_mod'] =assignments_in_course['due_date'].astype(str).apply(lambda x:x.split()[0])
     assignments_in_course['due_dates']= pd.to_datetime(assignments_in_course['due_date_mod']).dt.strftime('%m/%d')
-    assignments_in_course['due_dates'].replace('NaT','N/A',inplace=True)
+    assignments_in_course['due_dates']= assignments_in_course['due_dates'].fillna('No due date')
     return assignments_in_course
 
 
