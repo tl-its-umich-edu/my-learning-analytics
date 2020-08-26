@@ -92,9 +92,9 @@
     "/*  LTI Configuration": "*/",
     "/*  LTI is disabled by default": "*/",
     "STUDENT_DASHBOARD_LTI": false,
-    "/*LTI 1.3 configuration":"*/",
+    "/*  LTI 1.3 configuration":"*/",
+    "/*  The first key of LTI_CONFIG is your Canvas domain name":"*/",
     "LTI_CONFIG": {
-        "/*canvas LMS domain name, fill this out for your institution.":"*/",
         "https://canvas.instructure.com": [
             {
                 "/*The default set of variables for LTI validation":"*/",
