@@ -611,9 +611,6 @@ class DashboardCronJob(CronJobBase):
 
         # Lock in valid course IDs that data will be pulled for.
         course_df: pd.DataFrame = course_verification.course_data
-        # It not be a best practice to set instance variables in a method, but seemed less messy than overriding the __init__
-        # from CronJobBase. See https://stackoverflow.com/questions/19284857/instance-attribute-attribute-name-defined-outside-init
-        # I'll probably look into this more later. - Sam
         self.valid_locked_course_ids: List[int] = course_df['id'].to_list()
 
         # continue cron tasks
