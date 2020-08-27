@@ -156,8 +156,7 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("user")
 
         # loop through multiple course ids
-        for data_warehouse_course_id in Course.objects.get_supported_courses():
-
+        for data_warehouse_course_id in self.valid_locked_course_ids:
 
             # select all student registered for the course
             user_sql=f"""with
@@ -211,7 +210,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in update canvas resource")
 
         # Select all the files for these courses
-        course_ids = Course.objects.get_supported_courses()
+        course_ids = self.valid_locked_course_ids
         file_sql = f"select id, file_state, display_name from file_dim where course_id in %(course_ids)s"
         df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids':tuple(course_ids)})
 
@@ -256,7 +255,7 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
-        for data_warehouse_course_ids in split_list(Course.objects.get_supported_courses(), settings.CRON_BQ_IN_LIMIT):
+        for data_warehouse_course_ids in split_list(self.valid_locked_course_ids, settings.CRON_BQ_IN_LIMIT):
             # query to retrieve all file access events for one course
             # There is no catch if this query fails, event_store.events needs to exist
 
@@ -437,7 +436,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug("update_assignment_groups(): ")
 
         # loop through multiple course ids
-        for data_warehouse_course_id in Course.objects.get_supported_courses():
+        for data_warehouse_course_id in self.valid_locked_course_ids:
             assignment_groups_sql= f"""with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{data_warehouse_course_id}' and ad.visibility = 'everyone' and ad.workflow_state='published'),
             assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf on agd.id = agf.assignment_group_id  where agd.course_id='{data_warehouse_course_id}' and workflow_state='available'),
             assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join (select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id ),
@@ -462,7 +461,7 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("assignment")
 
         # loop through multiple course ids
-        for data_warehouse_course_id in Course.objects.get_supported_courses():
+        for data_warehouse_course_id in self.valid_locked_course_ids:
             assignment_sql = f"""with assignment_info as
                             (select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone '{settings.TIME_ZONE}' as local_date,
                             ad.title AS name,af.course_id AS course_id,af.assignment_id AS id,
@@ -487,7 +486,7 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("submission")
 
         # loop through multiple course ids
-        for data_warehouse_course_id in Course.objects.get_supported_courses():
+        for data_warehouse_course_id in self.valid_locked_course_ids:
             submission_url = f"""with sub_fact as (select submission_id, assignment_id, course_id, user_id, global_canvas_id, published_score from submission_fact sf join user_dim u on sf.user_id = u.id where course_id = '{data_warehouse_course_id}'),
                 enrollment as (select  distinct(user_id) from enrollment_dim where course_id = '{data_warehouse_course_id}' and workflow_state='active' and type = 'StudentEnrollment'),
                 sub_with_enroll as (select sf.* from sub_fact sf join enrollment e on e.user_id = sf.user_id),
@@ -496,7 +495,7 @@ class DashboardCronJob(CronJobBase):
                 assign_sub_time as (select a.*, t.graded_at, t.grade_posted_local_date from assign_fact a join submission_time t on a.submission_id = t.id),
                 all_assign_sub as (select submission_id AS id, assignment_id AS assignment_id, course_id, global_canvas_id AS user_id, round(published_score,1) AS score, graded_at AS graded_date, grade_posted_local_date from assign_sub_time order by assignment_id)
                 select f.*, f1.avg_score from all_assign_sub f join (select assignment_id, round(avg(score),1) as avg_score from all_assign_sub group by assignment_id) as f1 on f.assignment_id = f1.assignment_id;
-          """
+            """
             status += util_function(data_warehouse_course_id, submission_url,'submission')
 
         return status
@@ -513,7 +512,7 @@ class DashboardCronJob(CronJobBase):
         status += deleteAllRecordInTable("assignment_weight_consideration")
 
         # loop through multiple course ids
-        for data_warehouse_course_id in Course.objects.get_supported_courses():
+        for data_warehouse_course_id in self.valid_locked_course_ids:
             is_weight_considered_sql = f"""with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact
                                         where course_id = '{data_warehouse_course_id}' group by course_id having sum(group_weight)>1)
                                         (select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)
@@ -559,8 +558,8 @@ class DashboardCronJob(CronJobBase):
         logger.debug('update_course()')
 
         logger.debug(warehouse_courses_data.to_json(orient='records'))
-        courses: QuerySet = Course.objects.all()
-        courses_string: str = ', '.join([str(x) for x in Course.objects.get_supported_courses()])
+        courses: QuerySet = Course.objects.filter(id__in=self.valid_locked_course_ids)
+        courses_string: str = ', '.join([str(x) for x in self.valid_locked_course_ids])
         status += f'{str(len(courses))} course(s): {courses_string}\n'
 
         for course in courses:
@@ -610,12 +609,19 @@ class DashboardCronJob(CronJobBase):
             logger.info("************ total status=" + status + "/n/n")
             return (status,)
 
+        # Lock in valid course IDs that data will be pulled for.
+        course_df: pd.DataFrame = course_verification.course_data
+        # It not be a best practice to set instance variables in a method, but seemed less messy than overriding the __init__
+        # from CronJobBase. See https://stackoverflow.com/questions/19284857/instance-attribute-attribute-name-defined-outside-init
+        # I'll probably look into this more later. - Sam
+        self.valid_locked_course_ids: List[int] = course_df['id'].to_list()
+
         # continue cron tasks
 
         logger.info("** term")
         status += self.update_term()
 
-        if len(Course.objects.get_supported_courses()) == 0:
+        if len(self.valid_locked_course_ids) == 0:
             logger.info("Skipping course-related table updates...")
             status += "Skipped course-related table updates.\n"
         else:
@@ -643,6 +649,10 @@ class DashboardCronJob(CronJobBase):
         if settings.DATA_WAREHOUSE_IS_UNIZIN:
             logger.info("** informational")
             status += self.update_unizin_metadata()
+
+        courses_added_during_cron: List[int] = list(set(Course.objects.get_supported_courses()) - set(self.valid_locked_course_ids))
+        logger.warning(f'During the run, users added {len(courses_added_during_cron)} course(s): {courses_added_during_cron}')
+        logger.warning(f'No data was pulled for these courses.')
 
         status += "End cron: " +  str(datetime.datetime.now()) + "\n"
 
