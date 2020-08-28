@@ -108,6 +108,12 @@ class DashboardCronJob(CronJobBase):
     schedule = Schedule(run_at_times=settings.RUN_AT_TIMES)
     code = 'dashboard.DashboardCronJob'    # a unique code
 
+    def __init__(self) -> None:
+        """Constructor to be used to declare valid_locked_course_ids instance variable."""
+        super().__init__()
+        self.valid_locked_course_ids: List[int]
+
+
     # verify whether course ids are valid
     def verify_course_ids(self):
         # whether all course ids are valid ids
@@ -610,8 +616,7 @@ class DashboardCronJob(CronJobBase):
             return (status,)
 
         # Lock in valid course IDs that data will be pulled for.
-        course_df: pd.DataFrame = course_verification.course_data
-        self.valid_locked_course_ids: List[int] = course_df['id'].to_list()
+        self.valid_locked_course_ids = course_verification.course_data['id'].to_list()
 
         # continue cron tasks
 
@@ -648,8 +653,9 @@ class DashboardCronJob(CronJobBase):
             status += self.update_unizin_metadata()
 
         courses_added_during_cron: List[int] = list(set(Course.objects.get_supported_courses()) - set(self.valid_locked_course_ids))
-        logger.warning(f'During the run, users added {len(courses_added_during_cron)} course(s): {courses_added_during_cron}')
-        logger.warning(f'No data was pulled for these courses.')
+        if courses_added_during_cron:
+            logger.warning(f'During the run, users added {len(courses_added_during_cron)} course(s): {courses_added_during_cron}')
+            logger.warning(f'No data was pulled for these courses.')
 
         status += "End cron: " +  str(datetime.datetime.now()) + "\n"
 
