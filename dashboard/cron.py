@@ -113,7 +113,6 @@ class DashboardCronJob(CronJobBase):
         super().__init__()
         self.valid_locked_course_ids: List[int]
 
-
     # verify whether course ids are valid
     def verify_course_ids(self):
         # whether all course ids are valid ids
