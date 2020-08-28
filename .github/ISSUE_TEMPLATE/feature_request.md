@@ -9,10 +9,10 @@ assignees: ''
 
 Thank you for contributing to this project!
 
-## Describe your problem or feature you'd like added
+### Describe your problem or feature you'd like added
 
-## Describe the solution you'd like
+### Describe the solution you'd like
 
-## Describe any possible alternatives you've considered
+### Describe any possible alternatives you've considered
 
-## Additional context
+### Additional context
