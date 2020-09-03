@@ -95,6 +95,9 @@ PTVSD_REMOTE_ADDRESS = ENV.get("PTVSD_REMOTE_ADDRESS", "0.0.0.0")
 PTVSD_REMOTE_PORT = ENV.get("PTVSD_REMOTE_PORT", 3000)
 PTVSD_WAIT_FOR_ATTACH = ENV.get("PTVSD_WAIT_FOR_ATTACH", False)
 
+LOGIN_REDIRECT_URL = ENV.get('DJANGO_LOGIN_REDIRECT_URL', '/')
+LOGOUT_REDIRECT_URL = ENV.get('DJANGO_LOGOUT_REDIRECT_URL', '/')
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -324,7 +327,8 @@ AUTHENTICATION_BACKENDS: Tuple[str, ...] = (
     'django_su.backends.SuBackend',
 )
 
-#Shib
+# Set the backend login to true unless disabled
+ENABLE_BACKEND_LOGIN = True
 
 # Give an opportunity to disable SAML
 if ENV.get('STUDENT_DASHBOARD_SAML', True):
@@ -405,9 +409,6 @@ if ENV.get('STUDENT_DASHBOARD_SAML', True):
     }
 
     ACS_DEFAULT_REDIRECT_URL = ENV.get('DJANGO_ACS_DEFAULT_REDIRECT', '/')
-    LOGIN_REDIRECT_URL = ENV.get('DJANGO_LOGIN_REDIRECT_URL', '/')
-
-    LOGOUT_REDIRECT_URL = ENV.get('DJANGO_LOGOUT_REDIRECT_URL', '/')
 
     SAML_CREATE_UNKNOWN_USER = True
 
@@ -417,17 +418,13 @@ if ENV.get('STUDENT_DASHBOARD_SAML', True):
         'givenName': ('first_name', ),
         'sn': ('last_name', ),
     }
-else:
-    AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
-    LOGIN_REDIRECT_URL = '/'
-    LOGOUT_REDIRECT_URL='/'
+
+    ENABLE_BACKEND_LOGIN = False
 
 # Give an opportunity to disable LTI
-if ENV.get('STUDENT_DASHBOARD_LTI', False):
-    if not 'django.contrib.auth.backends.ModelBackend' in AUTHENTICATION_BACKENDS:
-        AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
-
+if STUDENT_DASHBOARD_LTI:
     LTI_CONFIG = ENV.get('LTI_CONFIG', {})
+    ENABLE_BACKEND_LOGIN = False
 
 # controls whether Unizin specific features/data is available from the Canvas Data source
 DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)
@@ -495,6 +492,15 @@ if CSRF_COOKIE_SECURE:
 # this when new browser versions expect (and the Django version allows) the string "None".
 SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", None)
 CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", None)
+
+# Give a chance to enable the backend login via a setting
+ENABLE_BACKEND_LOGIN = ENV.get("ENABLE_BACKEND_LOGIN", ENABLE_BACKEND_LOGIN)
+
+# If backend login is still enabled, enable the ModelBackend
+if ENABLE_BACKEND_LOGIN:
+    AUTHENTICATION_BACKENDS += (
+        'django.contrib.auth.backends.ModelBackend',
+    )
 
 # IMPORT LOCAL ENV
 # =====================
