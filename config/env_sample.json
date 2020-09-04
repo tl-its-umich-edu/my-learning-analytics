@@ -132,7 +132,7 @@
     "/*  This is enabled by default if no external auth (Currently LTI/SAML) is set.": "*/",
     "ENABLE_BACKEND_LOGIN": false,
     "/*  SAML Configuration": "*/",
-    "/*  Need to set this to false to turn it off for dev, but default is true": "*/",
+    "/*  Set this to true if you plan to use SAML and then configure it": "*/",
     "STUDENT_DASHBOARD_SAML": false,
     "/*  Where your local secrets are stored": "*/",
     "SAML2_FILES_BASE": "/secrets/saml/",

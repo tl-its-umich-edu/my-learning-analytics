@@ -88,6 +88,7 @@ WATCHMAN_DATABASES = ('default',)
 # courses_enabled api
 COURSES_ENABLED = ENV.get('COURSES_ENABLED', False)
 STUDENT_DASHBOARD_LTI = ENV.get('STUDENT_DASHBOARD_LTI', False)
+STUDENT_DASHBOARD_SAML = ENV.get('STUDENT_DASHBOARD_SAML', False)
 
 # Defaults for PTVSD
 PTVSD_ENABLE = ENV.get("PTVSD_ENABLE", False)
@@ -327,11 +328,7 @@ AUTHENTICATION_BACKENDS: Tuple[str, ...] = (
     'django_su.backends.SuBackend',
 )
 
-# Set the backend login to true unless disabled
-ENABLE_BACKEND_LOGIN = True
-
-# Give an opportunity to disable SAML
-if ENV.get('STUDENT_DASHBOARD_SAML', True):
+if STUDENT_DASHBOARD_SAML:
     import saml2
 
     SAML2_URL_PATH = '/accounts/'
@@ -419,12 +416,8 @@ if ENV.get('STUDENT_DASHBOARD_SAML', True):
         'sn': ('last_name', ),
     }
 
-    ENABLE_BACKEND_LOGIN = False
-
-# Give an opportunity to disable LTI
 if STUDENT_DASHBOARD_LTI:
     LTI_CONFIG = ENV.get('LTI_CONFIG', {})
-    ENABLE_BACKEND_LOGIN = False
 
 # controls whether Unizin specific features/data is available from the Canvas Data source
 DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)
@@ -493,7 +486,9 @@ if CSRF_COOKIE_SECURE:
 SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", None)
 CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", None)
 
-# Give a chance to enable the backend login via a setting
+ENABLE_BACKEND_LOGIN = False if STUDENT_DASHBOARD_SAML or STUDENT_DASHBOARD_LTI else True 
+
+# Allow for ENABLE_BACKEND_LOGIN override
 ENABLE_BACKEND_LOGIN = ENV.get("ENABLE_BACKEND_LOGIN", ENABLE_BACKEND_LOGIN)
 
 # If backend login is still enabled, enable the ModelBackend
