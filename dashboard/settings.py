@@ -415,17 +415,9 @@ if STUDENT_DASHBOARD_SAML:
         'givenName': ('first_name', ),
         'sn': ('last_name', ),
     }
-<<<<<<< HEAD
 
-=======
-
-    ENABLE_BACKEND_LOGIN = False
-
-# Give an opportunity to disable LTI
->>>>>>> Only enable django backend login methods if explicitly loaded or not other auth.
 if STUDENT_DASHBOARD_LTI:
     LTI_CONFIG = ENV.get('LTI_CONFIG', {})
-    ENABLE_BACKEND_LOGIN = False
 
 # controls whether Unizin specific features/data is available from the Canvas Data source
 DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)
@@ -494,7 +486,6 @@ if CSRF_COOKIE_SECURE:
 SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", None)
 CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", None)
 
-<<<<<<< HEAD
 CHECK_ENABLE_BACKEND_LOGIN = False if STUDENT_DASHBOARD_SAML or STUDENT_DASHBOARD_LTI else True 
 
 # Allow for ENABLE_BACKEND_LOGIN override
@@ -502,13 +493,6 @@ ENABLE_BACKEND_LOGIN = ENV.get("ENABLE_BACKEND_LOGIN", CHECK_ENABLE_BACKEND_LOGI
 
 # If backend login is still enabled or LTI is used (since it uses this), enable the ModelBackend
 if ENABLE_BACKEND_LOGIN or STUDENT_DASHBOARD_LTI:
-=======
-# Give a chance to enable the backend login via a setting
-ENABLE_BACKEND_LOGIN = ENV.get("ENABLE_BACKEND_LOGIN", ENABLE_BACKEND_LOGIN)
-
-# If backend login is still enabled, enable the ModelBackend
-if ENABLE_BACKEND_LOGIN:
->>>>>>> Only enable django backend login methods if explicitly loaded or not other auth.
     AUTHENTICATION_BACKENDS += (
         'django.contrib.auth.backends.ModelBackend',
     )
