@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import json, os
 from typing import Tuple, Union
 
-from debug_toolbar import settings as dt_settings
 from django.utils.module_loading import import_string
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -118,15 +117,13 @@ INSTALLED_APPS = [
     'django_cron',
     'watchman',
     'macros',
-    'debug_toolbar',
     'pinax.eventlog',
     'webpack_loader',
     'rules.apps.AutodiscoverRulesConfig',
     'django_mysql',
 ]
 
-# The order of this is important. It says DebugToolbar should be on top but
-# The tips has it on the bottom
+# The order of this MIDDLEWARE is important 
 MIDDLEWARE = [
     'dashboard.middleware.samesite.SameSiteMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -136,7 +133,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 CRON_CLASSES = [
@@ -433,16 +429,6 @@ RUN_AT_TIMES = ENV.get('RUN_AT_TIMES', [])
 
 # Add any settings you need to be available to templates in this array
 SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'RESOURCE_VALUES']
-
-# Method to show the user, if they're authenticated and superuser
-def show_debug_toolbar(request):
-    return DEBUG and request.user and request.user.is_authenticated and request.user.is_superuser
-
-DEBUG_TOOLBAR_PANELS = dt_settings.PANELS_DEFAULTS
-
-DEBUG_TOOLBAR_CONFIG = {
-    "SHOW_TOOLBAR_CALLBACK" : show_debug_toolbar,
-}
 
 # Number of weeks max to allow by default. some begin/end dates in Canvas aren't correct
 MAX_DEFAULT_WEEKS = ENV.get("MAX_DEFAULT_WEEKS", 16)
