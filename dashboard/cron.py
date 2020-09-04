@@ -143,7 +143,7 @@ class DashboardCronJob(CronJobBase):
             courses_data = pd.concat(course_dfs).reset_index()
         else:
             logger.info("No course records were found in the database.")
-            courses_data = pd.DataFrame()
+            courses_data = pd.DataFrame(columns=["id", "canvas_id", "enrollment_term_id", "name", "start_at", "conclude_at"])
 
         CourseVerification = namedtuple("CourseVerification", ["invalid_course_ids", "course_data"])
         return CourseVerification(invalid_course_id_list, courses_data)
@@ -615,10 +615,8 @@ class DashboardCronJob(CronJobBase):
             return (status,)
 
         # Lock in valid course IDs that data will be pulled for.
-        if not course_verification.course_data.empty:
-            self.valid_locked_course_ids = course_verification.course_data['id'].to_list()
-        else:
-            self.valid_locked_course_ids = []
+        self.valid_locked_course_ids = course_verification.course_data['id'].to_list()
+        logger.info(f'Valid locked course IDs: {self.valid_locked_course_ids}')
 
         # continue cron tasks
 
