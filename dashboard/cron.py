@@ -615,7 +615,10 @@ class DashboardCronJob(CronJobBase):
             return (status,)
 
         # Lock in valid course IDs that data will be pulled for.
-        self.valid_locked_course_ids = course_verification.course_data['id'].to_list()
+        if not course_verification.course_data.empty:
+            self.valid_locked_course_ids = course_verification.course_data['id'].to_list()
+        else:
+            self.valid_locked_course_ids = []
 
         # continue cron tasks
 
