@@ -574,26 +574,25 @@ def assignments(request, course_id=0):
         df['avg_score']= df.apply(no_show_avg_score_for_ungraded_assignments, axis=1)
     df['avg_score']=df['avg_score'].fillna('Not available')
 
-    df3 = df[df['towards_final_grade'] > 0.0]
     # operate on dataframe copy to prevent Pandas "SettingWithCopyWarning" warning
-    df3 = df3.copy()
-    df3[['score']] = df3[['score']].astype(float)
-    df3['graded'] = df3['graded'].fillna(False)
-    df3[['score']] = df3[['score']].astype(float)
-    df3['percent_gotten'] = df3.apply(lambda x: user_percent(x), axis=1)
-    df3.sort_values(by=['graded', 'due_date_mod'], ascending=[False, True], inplace=True)
-    df3.reset_index(inplace=True)
-    df3.drop(columns=['index'], inplace=True)
+    df_progressbar = df.loc[df['towards_final_grade'] > 0.0].copy()
+    df_progressbar[['score']] = df_progressbar[['score']].astype(float)
+    df_progressbar['graded'] = df_progressbar['graded'].fillna(False)
+    df_progressbar[['score']] = df_progressbar[['score']].astype(float)
+    df_progressbar['percent_gotten'] = df_progressbar.apply(lambda x: user_percent(x), axis=1)
+    df_progressbar.sort_values(by=['graded', 'due_date_mod'], ascending=[False, True], inplace=True)
+    df_progressbar.reset_index(inplace=True)
+    df_progressbar.drop(columns=['index'], inplace=True)
 
     assignment_data = {}
-    assignment_data['progress'] = json.loads(df3.to_json(orient='records'))
+    assignment_data['progress'] = json.loads(df_progressbar.to_json(orient='records'))
 
     # Group the data according the assignment prep view
-    df2 = df[df['towards_final_grade'] >= percent_selection]
-    df2.reset_index(inplace=True)
-    df2.drop(columns=['index'], inplace=True)
-    logger.debug('The Dataframe for the assignment planning %s ' % df2)
-    grouped = df2.groupby(['week', 'due_dates'])
+    df_greaterthan_percent = df.loc[df['towards_final_grade'] >= percent_selection].copy()
+    df_greaterthan_percent.reset_index(inplace=True)
+    df_greaterthan_percent.drop(columns=['index'], inplace=True)
+    logger.debug('The Dataframe for the assignment planning %s ' % df_greaterthan_percent)
+    grouped = df_greaterthan_percent.groupby(['week', 'due_dates'])
 
     assignment_list = []
     for name, group in grouped:
@@ -645,8 +644,8 @@ def get_course_assignments(course_id):
     assignments_in_course[['points_possible','group_points']]=assignments_in_course[['points_possible','group_points']].fillna(0)
     assignments_in_course[['points_possible', 'group_points','weight']] = assignments_in_course[['points_possible', 'group_points','weight']].astype(float)
     consider_weight=is_weight_considered(course_id)
-    df2 = assignments_in_course[['weight','group_points','grp_id']].drop_duplicates()
-    hidden_assignments = are_weighted_assignments_hidden(course_id, df2)
+    df_assignment = assignments_in_course[['weight','group_points','grp_id']].drop_duplicates().copy()
+    hidden_assignments = are_weighted_assignments_hidden(course_id, df_assignment)
     total_points=assignments_in_course['points_possible'].sum()
     # if assignment group is weighted and no assignments added yet then assignment name will be nothing so situation is specific to that
     if hidden_assignments:
