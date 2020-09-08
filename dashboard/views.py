@@ -575,6 +575,8 @@ def assignments(request, course_id=0):
     df['avg_score']=df['avg_score'].fillna('Not available')
 
     df3 = df[df['towards_final_grade'] > 0.0]
+    # operate on dataframe copy to prevent Pandas "SettingWithCopyWarning" warning
+    df3 = df3.copy()
     df3[['score']] = df3[['score']].astype(float)
     df3['graded'] = df3['graded'].fillna(False)
     df3[['score']] = df3[['score']].astype(float)
