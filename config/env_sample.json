@@ -144,6 +144,7 @@
     "/*  Login Redirect (If SAML enabled)": "*/",
     "DJANGO_LOGIN_REDIRECT_URL": "http://localhost:5001/",
     "/*  Logout redirect (If SAML enabled)": "*/",
+    "/*  This URL should be configured to the logout URL on SAML host": "*/",
     "DJANGO_LOGOUT_REDIRECT_URL": "http://localhost:5001/",
     "/*  Optional token value to be used for token based authentication": "*/",
     "DJANGO_WATCHMAN_TOKEN": "",
