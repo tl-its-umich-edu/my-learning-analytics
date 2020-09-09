@@ -80,7 +80,7 @@ def executeDbQuery(query: str, params: List=None) -> ResultProxy:
 def deleteAllRecordInTable(table_name: str, where_clause: str="", where_params: List=None):
     # delete all records in the table first, can have an optional where clause
     result_proxy = executeDbQuery(f"delete from {table_name} {where_clause}", where_params)
-    return(f"{result_proxy.rowcount} rows deleted from {table_name}")
+    return(f"{result_proxy.rowcount} rows deleted from {table_name}\n")
 
 
 def soft_update_datetime_field(
@@ -110,7 +110,6 @@ class DashboardCronJob(CronJobBase):
 
     schedule = Schedule(run_at_times=settings.RUN_AT_TIMES)
     code = 'dashboard.DashboardCronJob'    # a unique code
-    earliest_new_start_datetime = None
 
     def __init__(self) -> None:
         """Constructor to be used to declare valid_locked_course_ids instance variable."""
@@ -249,11 +248,9 @@ class DashboardCronJob(CronJobBase):
         # BQ Total Bytes Billed to report to status
         total_bytes_billed = 0
 
-        latest_resource_time = self.earliest_new_start_datetime
-        if not latest_resource_time:
-            latest_resource_time = ResourceAccess.objects.get().find_next_resource_run()
+        last_cron_run = Course.objects.last_cron_run()
 
-        status += deleteAllRecordInTable("resource_access", f"WHERE access_time > %s", [latest_resource_time,])
+        status += deleteAllRecordInTable("resource_access", f"WHERE access_time > %s", [last_cron_run,])
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
         for data_warehouse_course_ids in split_list(self.valid_locked_course_ids, settings.CRON_BQ_IN_LIMIT):
@@ -265,9 +262,9 @@ class DashboardCronJob(CronJobBase):
                 # concatenate the multi-line presentation of query into one single string
                 query = " ".join(query_obj['query'])
 
-                if (latest_resource_time is not None):
+                if (last_cron_run is not None):
                     # insert the start time parameter for query
-                    query += " and event_time > @latest_resource_time"
+                    query += " and event_time > @last_cron_run"
 
                 final_bq_query.append(query)
             final_bq_query = "  UNION ALL   ".join(final_bq_query)
@@ -281,9 +278,9 @@ class DashboardCronJob(CronJobBase):
                 bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
                 bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT)
             ]
-            if (latest_resource_time is not None):
+            if (last_cron_run is not None):
                 # insert the start time parameter for query
-                query_params.append(bigquery.ScalarQueryParameter('latest_resource_time', 'TIMESTAMP', latest_resource_time))
+                query_params.append(bigquery.ScalarQueryParameter('last_cron_run', 'TIMESTAMP', last_cron_run))
 
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
@@ -626,10 +623,6 @@ class DashboardCronJob(CronJobBase):
             logger.info("** course")
             status += self.update_course(course_verification.course_data)
         
-            # We need to check if any courses are new after updating the course table but before
-            # updating the users
-            self.earliest_new_start_datetime = Course.objects.earliest_new_course_start_datetime()
-
             logger.info("** user")
             status += self.update_user()
 
@@ -653,10 +646,15 @@ class DashboardCronJob(CronJobBase):
             logger.info("** informational")
             status += self.update_unizin_metadata()
 
+<<<<<<< HEAD
         courses_added_during_cron: List[int] = list(set(Course.objects.get_supported_courses()) - set(self.valid_locked_course_ids))
         if courses_added_during_cron:
             logger.warning(f'During the run, users added {len(courses_added_during_cron)} course(s): {courses_added_during_cron}')
             logger.warning(f'No data was pulled for these courses.')
+=======
+        # Set all of the courses to have been updated now (this is the same set update_course runs on)
+        Course.objects.all().update_all_last_cron_run()
+>>>>>>> Changing this fix so that is uses a new column
 
         status += "End cron: " +  str(datetime.datetime.now()) + "\n"
 

@@ -152,9 +152,9 @@ class CourseQuerySet(models.QuerySet):
         return []
 
     def earliest_start_datetime(self) -> Optional[datetime.datetime]:
-        """Get the earliest start date of all courses
+        """Get the earliest start date of courses in the QuerySet
 
-        :return: Earliest start date of all courses, or None if no course dates found
+        :return: Earliest start date of courses in the QuerySet, or None if no course dates found
         :rtype: datetime
         """
         sorted_courses = sorted(self.all(), key=lambda course: course.course_date_range.start)
@@ -165,20 +165,31 @@ class CourseQuerySet(models.QuerySet):
             earliest_start = earliest_course.course_date_range.start
             logger.info(f"Earliest start datetime for all courses: {earliest_start.isoformat()} found in course {earliest_course.canvas_id}")
         else:
-            logger.info(f"No course listed. Return None as the earliest_start_datetime_of_course. ")
+            logger.info(f"No course listed. Returning None as the earliest_start_datetime_of_course. ")
         return earliest_start
 
-    @staticmethod
-    def earliest_new_course_start_datetime() -> Optional[datetime.datetime]:
-        """ Returns the datetime of any new courses, otherwise returns None
-            This uses the course and user table so needs to be run user table is refreshed.
+    def update_all_last_cron_run(self):
+        """ Updates the last cron run to now for all courses in QuerySet
+        """
+        # Finally update the time on all courses updated
+        self.update(last_cron_run=datetime.datetime.now())
+
+    def last_cron_run(self) -> Optional[datetime.datetime]:
+        """ Returns the datetime of the last cron run of all courses
+            This checks for any courses where the last_cron_run value is null.
 
         :return: datetime. Either the earliest or None
         :rtype: None
         """
-        new_courses = Course.objects.extra(where=['course.id not in (SELECT course_id FROM USER)'])
-        return new_courses.earliest_start_datetime()
+        new_courses = self.filter(last_cron_run__isnull=True)
 
+        # If there are new courses (courses with no last run) return the earliest time of all
+        if len(new_courses) > 0:
+            return new_courses.earliest_start_datetime()
+        # Otherwise return the latest cron run
+        else:
+            return self.all().latest("last_cron_run").last_cron_run
+            
 
 class Course(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Course Id", db_column='id', editable=False)
@@ -192,6 +203,7 @@ class Course(models.Model):
     GRADING_CHOICES = [('Percent', 'Percent'), ('Point', 'Point'), ]
     show_grade_type = models.CharField(verbose_name="Show Grade Type", max_length=255,
                                          choices=GRADING_CHOICES, default='Percent')
+    last_cron_run = models.DateTimeField(verbose_name="Last time cron ran for this course", null=True, blank=True)
 
     objects = CourseQuerySet().as_manager()
 
@@ -312,31 +324,6 @@ class Resource(models.Model):
     class Meta:
         db_table = 'resource'
 
-class ResourceAccessQuerySet(models.QuerySet):
-
-    def next_resource_run(self) -> Optional[datetime.datetime]:
-        """ 1) Get the earliest start date of all courses. 
-            2) Check if there's any new courses since last run.
-            3) If there are new courses, return this date
-            4) Otherwise return the last run from big query
-
-        :param any_course_new: If there's new courses
-        :type any_course_new: bool
-        :return: Either the earliest date of the term (or if no courses the date defined) or lastest resource_access
-        :rtype: datetime
-        """
-
-        course_start_time = Course.objects.earliest_new_course_start_datetime()
-        # Try to find the last run date of all resources_accessed
-        try:
-            latest_resource = self.latest('access_time')
-            latest_resource_time = latest_resource.access_time
-        except ResourceAccess.DoesNotExist:
-            logger.info("No resources found, defaulting to the earliest course start time")
-            latest_resource_time = course_start_time
-
-        return latest_resource_time
-
 class ResourceAccess(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
     resource_id = models.ForeignKey(Resource, on_delete=models.CASCADE, to_field='resource_id', db_column='resource_id')
@@ -344,7 +331,6 @@ class ResourceAccess(models.Model):
     user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id')
     access_time = models.DateTimeField(verbose_name="Access Time")
 
-    objects = ResourceAccessQuerySet.as_manager()
     def __str__(self):
         return f"Resource {self.resource_id} accessed by {self.user_id}"
 
