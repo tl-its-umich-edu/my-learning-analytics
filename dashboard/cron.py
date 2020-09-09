@@ -626,14 +626,12 @@ class DashboardCronJob(CronJobBase):
             logger.info("** user")
             status += self.update_user()
 
-            """
             logger.info("** assignment")
             status += self.update_groups()
             status += self.update_assignment()
-
             status += self.submission()
             status += self.weight_consideration()
-            """
+
             logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
                 try:
@@ -646,15 +644,13 @@ class DashboardCronJob(CronJobBase):
             logger.info("** informational")
             status += self.update_unizin_metadata()
 
-<<<<<<< HEAD
         courses_added_during_cron: List[int] = list(set(Course.objects.get_supported_courses()) - set(self.valid_locked_course_ids))
         if courses_added_during_cron:
             logger.warning(f'During the run, users added {len(courses_added_during_cron)} course(s): {courses_added_during_cron}')
             logger.warning(f'No data was pulled for these courses.')
-=======
-        # Set all of the courses to have been updated now (this is the same set update_course runs on)
-        Course.objects.all().update_all_last_cron_run()
->>>>>>> Changing this fix so that is uses a new column
+            # Set all of the courses to have been updated now (this is the same set update_course runs on)
+
+        Course.objects.get_supported_courses().update_all_last_cron_run()
 
         status += "End cron: " +  str(datetime.datetime.now()) + "\n"
 
