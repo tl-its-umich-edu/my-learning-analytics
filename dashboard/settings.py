@@ -418,6 +418,7 @@ if STUDENT_DASHBOARD_SAML:
 
 if STUDENT_DASHBOARD_LTI:
     LTI_CONFIG = ENV.get('LTI_CONFIG', {})
+    LOGIN_URL = "/lti/login"
 
 # controls whether Unizin specific features/data is available from the Canvas Data source
 DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)
@@ -491,8 +492,8 @@ CHECK_ENABLE_BACKEND_LOGIN = False if STUDENT_DASHBOARD_SAML or STUDENT_DASHBOAR
 # Allow for ENABLE_BACKEND_LOGIN override
 ENABLE_BACKEND_LOGIN = ENV.get("ENABLE_BACKEND_LOGIN", CHECK_ENABLE_BACKEND_LOGIN)
 
-# If backend login is still enabled, enable the ModelBackend
-if ENABLE_BACKEND_LOGIN:
+# If backend login is still enabled or LTI is used (since it uses this), enable the ModelBackend
+if ENABLE_BACKEND_LOGIN or STUDENT_DASHBOARD_LTI:
     AUTHENTICATION_BACKENDS += (
         'django.contrib.auth.backends.ModelBackend',
     )
