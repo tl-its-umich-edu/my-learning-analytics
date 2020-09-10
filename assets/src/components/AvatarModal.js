@@ -156,14 +156,20 @@ function AvatarModal (props) {
                 ? SwitchCourses()
                 : null
             }
-            <Link style={{ textDecoration: 'none' }} href={user.logoutURL}>
-              <ListItem button>
-                <ListItemIcon>
-                  <LogoutIcon />
-                </ListItemIcon>
-                <ListItemText inset primary='Logout' className={classes.text} />
-              </ListItem>
-            </Link>
+            {
+              user.logoutURL !== ''
+                ? (
+                  <Link style={{ textDecoration: 'none' }} href={user.logoutURL}>
+                    <ListItem button>
+                      <ListItemIcon>
+                        <LogoutIcon />
+                      </ListItemIcon>
+                      <ListItemText inset primary='Logout' className={classes.text} />
+                    </ListItem>
+                  </Link>
+                )
+                : null
+            }
           </List>
         </Grid>
       </Grid>
