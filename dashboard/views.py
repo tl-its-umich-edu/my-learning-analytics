@@ -588,11 +588,11 @@ def assignments(request, course_id=0):
     assignment_data['progress'] = json.loads(df_progressbar.to_json(orient='records'))
 
     # Group the data according the assignment prep view
-    df_greaterthan_percent = df.loc[df['towards_final_grade'] >= percent_selection].copy()
-    df_greaterthan_percent.reset_index(inplace=True)
-    df_greaterthan_percent.drop(columns=['index'], inplace=True)
-    logger.debug('The Dataframe for the assignment planning %s ' % df_greaterthan_percent)
-    grouped = df_greaterthan_percent.groupby(['week', 'due_dates'])
+    df_plan = df.loc[df['towards_final_grade'] >= percent_selection].copy()
+    df_plan.reset_index(inplace=True)
+    df_plan.drop(columns=['index'], inplace=True)
+    logger.debug('The Dataframe for the assignment planning %s ' % df_plan)
+    grouped = df_plan.groupby(['week', 'due_dates'])
 
     assignment_list = []
     for name, group in grouped:
