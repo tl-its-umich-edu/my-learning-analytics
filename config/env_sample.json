@@ -128,8 +128,8 @@
         "CACHE_KEY_PREFIX": "myla",
         "CACHE_OPTIONS": {"COMPRESS_MIN_LENGTH": 5000, "COMPRESS_LEVEL": 6}
     },
-    "/*  Set this to true to enable the internal (Django) Login methods.": "*/",
-    "/*  This is enabled by default if no external auth (Currently LTI/SAML) is set.": "*/",
+    "/*  Set this to true to enable the backend login/logout URLs.": "*/",
+    "/*  This is enabled by default if no external auth is enabled.": "*/",
     "ENABLE_BACKEND_LOGIN": false,
     "/*  SAML Configuration": "*/",
     "/*  Set this to true if you plan to use SAML and then configure it": "*/",
