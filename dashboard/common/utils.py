@@ -1,5 +1,5 @@
-import datetime, logging, os, re
-from typing import Optional, Union
+import logging, os, re
+from typing import Union
 
 from django.conf import settings
 

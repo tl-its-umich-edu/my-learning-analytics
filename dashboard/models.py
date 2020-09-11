@@ -191,7 +191,7 @@ class CourseQuerySet(models.QuerySet):
         # Otherwise return the latest cron run
         else:
             return self.all().latest("data_last_updated").data_last_updated
-            
+
 
 class Course(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Course Id", db_column='id', editable=False)
