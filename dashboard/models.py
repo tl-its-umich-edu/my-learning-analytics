@@ -163,7 +163,7 @@ class CourseQuerySet(models.QuerySet):
         if len(sorted_courses) > 0:
             earliest_course = sorted_courses[0]
             earliest_start = earliest_course.course_date_range.start
-            logger.info(f"Earliest start datetime for all courses: {earliest_start.isoformat()} found in course {earliest_course.canvas_id}")
+            logger.info(f"Earliest start datetime for CourseQuerySet: {earliest_start.isoformat()} found in course {earliest_course.canvas_id}")
         else:
             logger.info(f"No courses in CourseQuerySet; returning None as the earliest_start_datetime")
         return earliest_start
