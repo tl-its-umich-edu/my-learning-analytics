@@ -122,7 +122,7 @@ def extract_launch_variables_for_tool_use(request, message_launch):
     canvas_user_id = custom_params['canvas_user_id']
     canvas_user_long_id = canvas_id_to_incremented_id(canvas_user_id)
     if 'email' not in launch_data.keys():
-        logger.error('Possibility that LTI launch by Instructor/admin becoming Canvas Test Student')
+        logger.info('Possibility that LTI launch by Instructor/admin becoming Canvas Test Student')
         error_message = 'Student view is not available for My Learning Analytics.'
         raise Exception(error_message)
 
