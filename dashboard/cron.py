@@ -1,4 +1,5 @@
-import datetime, logging
+from datetime import datetime
+import logging
 from collections import namedtuple
 from typing import Any, Dict, List, Union
 
@@ -86,13 +87,13 @@ def delete_all_records_in_table(table_name: str, where_clause: str="", where_par
 def soft_update_datetime_field(
     model_inst: models.Model,
     field_name: str,
-    warehouse_field_value: Union[datetime.datetime, None],
+    warehouse_field_value: Union[datetime, None],
 ) -> List[str]:
     """
     Uses Django ORM to update DateTime field of model instance if the field value is null and the warehouse data is non-null.
     """
     model_name: str = model_inst.__class__.__name__
-    current_field_value: Union[datetime.datetime, None] = getattr(model_inst, field_name)
+    current_field_value: Union[datetime, None] = getattr(model_inst, field_name)
     # Skipping update if the field already has a value, provided by a previous cron run or administrator
     if current_field_value is not None:
         logger.info(f'Skipped update of {field_name} for {model_name} instance ({model_inst.id}); existing value was found')
@@ -248,7 +249,7 @@ class DashboardCronJob(CronJobBase):
         # BQ Total Bytes Billed to report to status
         total_bytes_billed = 0
 
-        last_cron_run = Course.objects.last_cron_run()
+        last_cron_run = Course.objects.get_last_cron_run()
 
         status += delete_all_records_in_table("resource_access", f"WHERE access_time > %s", [last_cron_run,])
         # loop through multiple course ids, 20 at a time
@@ -576,11 +577,11 @@ class DashboardCronJob(CronJobBase):
                 logger.info(f'Term for {course.id} has been updated.')
                 updated_fields.append('term')
 
-            warehouse_date_start: Union[datetime.datetime, None] = (
+            warehouse_date_start: Union[datetime, None] = (
                 warehouse_course_dict['start_at'].to_pydatetime() if pd.notna(warehouse_course_dict['start_at']) else None
             )
             updated_fields += soft_update_datetime_field(course, 'date_start', warehouse_date_start)
-            warehouse_date_end: Union[datetime.datetime, None] = (
+            warehouse_date_end: Union[datetime, None] = (
                 warehouse_course_dict['conclude_at'].to_pydatetime() if pd.notna(warehouse_course_dict['conclude_at']) else None
             )
             updated_fields += soft_update_datetime_field(course, 'date_end', warehouse_date_end)
@@ -595,7 +596,9 @@ class DashboardCronJob(CronJobBase):
 
         status = ""
 
-        status += "Start cron: " +  str(datetime.datetime.now()) + "\n"
+        run_start = datetime.now()
+
+        status += f"Start cron: {str(run_start)}\n"
 
         course_verification = self.verify_course_ids()
         invalid_course_id_list = course_verification.invalid_course_ids
@@ -603,7 +606,7 @@ class DashboardCronJob(CronJobBase):
         if len(invalid_course_id_list) > 0:
             # error out and stop cron job
             status += f"ERROR: Those course ids are invalid: {invalid_course_id_list}\n"
-            status += "End cron: " +  str(datetime.datetime.now()) + "\n"
+            status += "End cron: " +  str(datetime.now()) + "\n"
             logger.info("************ total status=" + status + "/n/n")
             return (status,)
 
@@ -650,9 +653,9 @@ class DashboardCronJob(CronJobBase):
             logger.warning(f'No data was pulled for these courses.')
             # Set all of the courses to have been updated now (this is the same set update_course runs on)
 
-        Course.objects.get_supported_courses().update_all_last_cron_run()
+        Course.objects.get_supported_courses().update_all_last_cron_run(run_start)
 
-        status += "End cron: " +  str(datetime.datetime.now()) + "\n"
+        status += "End cron: " +  str(datetime.now()) + "\n"
 
         logger.info("************ total status=" + status + "\n")
 

@@ -15,7 +15,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 
 from collections import namedtuple
-import datetime
+from datetime import datetime, timedelta
 import logging
 import pytz
 from typing import Optional
@@ -151,7 +151,7 @@ class CourseQuerySet(models.QuerySet):
             logger.info("Courses did not exist", exc_info = True)
         return []
 
-    def earliest_start_datetime(self) -> Optional[datetime.datetime]:
+    def earliest_start_datetime(self) -> Optional[datetime]:
         """Get the earliest start date of courses in the QuerySet
 
         :return: Earliest start date of courses in the QuerySet, or None if no course dates found
@@ -168,13 +168,15 @@ class CourseQuerySet(models.QuerySet):
             logger.info(f"No course listed. Returning None as the earliest_start_datetime_of_course. ")
         return earliest_start
 
-    def update_all_last_cron_run(self):
+    def update_all_last_cron_run(self, update_date=None):
         """ Updates the last cron run to now for all courses in QuerySet
         """
         # Finally update the time on all courses updated
-        self.update(last_cron_run=datetime.datetime.now())
+        if update_date is None:
+            update_date = datetime.now()
+        self.update(last_cron_run=update_date)
 
-    def last_cron_run(self) -> Optional[datetime.datetime]:
+    def get_last_cron_run(self) -> Optional[datetime]:
         """ Returns the datetime of the last cron run of all courses
             This checks for any courses where the last_cron_run value is null.
 
@@ -218,14 +220,14 @@ class Course(models.Model):
             start = self.term.date_start
         else:
             logger.warning("No date_start value was found for course or term; setting to current date and time")
-            start = datetime.datetime.now(pytz.UTC)
+            start = datetime.now(pytz.UTC)
         if self.date_end is not None:
             end = self.date_end
         elif self.term is not None and self.term.date_end is not None:
             end = self.term.get_correct_date_end()
         else:
             logger.warning("No date_end value was found for course or term; setting to two weeks from now")
-            end = start + datetime.timedelta(weeks=2)
+            end = start + timedelta(weeks=2)
         DateRange = namedtuple("DateRange", ["start", "end"])
         return DateRange(start, end)
 
