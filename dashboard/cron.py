@@ -67,7 +67,7 @@ def util_function(data_warehouse_course_id, sql_string, mysql_table, table_ident
 
 
 # execute database query
-def executeDbQuery(query: str, params: List=None) -> ResultProxy:
+def execute_db_query(query: str, params: List=None) -> ResultProxy:
     with engine.connect() as connection:
         connection.detach()
         if params:
@@ -77,9 +77,9 @@ def executeDbQuery(query: str, params: List=None) -> ResultProxy:
 
 
 # remove all records inside the specified table
-def deleteAllRecordInTable(table_name: str, where_clause: str="", where_params: List=None):
+def delete_all_records_in_table(table_name: str, where_clause: str="", where_params: List=None):
     # delete all records in the table first, can have an optional where clause
-    result_proxy = executeDbQuery(f"delete from {table_name} {where_clause}", where_params)
+    result_proxy = execute_db_query(f"delete from {table_name} {where_clause}", where_params)
     return(f"{result_proxy.rowcount} rows deleted from {table_name}\n")
 
 
@@ -161,7 +161,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in update with data warehouse user")
 
         # delete all records in the table first
-        status += deleteAllRecordInTable("user")
+        status += delete_all_records_in_table("user")
 
         # loop through multiple course ids
         for data_warehouse_course_id in self.valid_locked_course_ids:
@@ -198,7 +198,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in update unizin metadata")
 
         # delete all records in the table first
-        status += deleteAllRecordInTable("unizin_metadata")
+        status += delete_all_records_in_table("unizin_metadata")
 
         # select all student registered for the course
         metadata_sql = "select key as pkey, value as pvalue from unizin_metadata"
@@ -250,7 +250,7 @@ class DashboardCronJob(CronJobBase):
 
         last_cron_run = Course.objects.last_cron_run()
 
-        status += deleteAllRecordInTable("resource_access", f"WHERE access_time > %s", [last_cron_run,])
+        status += delete_all_records_in_table("resource_access", f"WHERE access_time > %s", [last_cron_run,])
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
         for data_warehouse_course_ids in split_list(self.valid_locked_course_ids, settings.CRON_BQ_IN_LIMIT):
@@ -427,7 +427,7 @@ class DashboardCronJob(CronJobBase):
         status =""
 
         # delete all records in assignment_group table
-        status += deleteAllRecordInTable("assignment_groups")
+        status += delete_all_records_in_table("assignment_groups")
 
         # update groups
         #Loading the assignment groups inforamtion along with weight/points associated ith arn assignment
@@ -456,7 +456,7 @@ class DashboardCronJob(CronJobBase):
         logger.info("update_assignment(): ")
 
         # delete all records in assignment table
-        status += deleteAllRecordInTable("assignment")
+        status += delete_all_records_in_table("assignment")
 
         # loop through multiple course ids
         for data_warehouse_course_id in self.valid_locked_course_ids:
@@ -481,7 +481,7 @@ class DashboardCronJob(CronJobBase):
         logger.info("update_submission(): ")
 
         # delete all records in resource_access table
-        status += deleteAllRecordInTable("submission")
+        status += delete_all_records_in_table("submission")
 
         # loop through multiple course ids
         for data_warehouse_course_id in self.valid_locked_course_ids:
@@ -507,7 +507,7 @@ class DashboardCronJob(CronJobBase):
         logger.info("weight_consideration()")
 
         # delete all records in assignment_weight_consideration table
-        status += deleteAllRecordInTable("assignment_weight_consideration")
+        status += delete_all_records_in_table("assignment_weight_consideration")
 
         # loop through multiple course ids
         for data_warehouse_course_id in self.valid_locked_course_ids:
@@ -622,7 +622,7 @@ class DashboardCronJob(CronJobBase):
         else:
             logger.info("** course")
             status += self.update_course(course_verification.course_data)
-        
+
             logger.info("** user")
             status += self.update_user()
 
