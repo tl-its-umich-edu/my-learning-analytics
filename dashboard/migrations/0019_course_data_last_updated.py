@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='course',
-            name='last_cron_run',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Last time cron ran for this course'),
+            name='data_last_updated',
+            field=models.DateTimeField(blank=True, null=True, verbose_name='Last time data last updated for this course'),
         ),
     ]

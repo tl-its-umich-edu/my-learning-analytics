@@ -249,9 +249,9 @@ class DashboardCronJob(CronJobBase):
         # BQ Total Bytes Billed to report to status
         total_bytes_billed = 0
 
-        last_cron_run = Course.objects.get_last_cron_run()
+        data_last_updated = Course.objects.get_data_last_updated()
 
-        status += delete_all_records_in_table("resource_access", f"WHERE access_time > %s", [last_cron_run,])
+        status += delete_all_records_in_table("resource_access", f"WHERE access_time > %s", [data_last_updated,])
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
         for data_warehouse_course_ids in split_list(self.valid_locked_course_ids, settings.CRON_BQ_IN_LIMIT):
@@ -263,9 +263,9 @@ class DashboardCronJob(CronJobBase):
                 # concatenate the multi-line presentation of query into one single string
                 query = " ".join(query_obj['query'])
 
-                if (last_cron_run is not None):
+                if (data_last_updated is not None):
                     # insert the start time parameter for query
-                    query += " and event_time > @last_cron_run"
+                    query += " and event_time > @data_last_updated"
 
                 final_bq_query.append(query)
             final_bq_query = "  UNION ALL   ".join(final_bq_query)
@@ -279,9 +279,9 @@ class DashboardCronJob(CronJobBase):
                 bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
                 bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT)
             ]
-            if (last_cron_run is not None):
+            if (data_last_updated is not None):
                 # insert the start time parameter for query
-                query_params.append(bigquery.ScalarQueryParameter('last_cron_run', 'TIMESTAMP', last_cron_run))
+                query_params.append(bigquery.ScalarQueryParameter('data_last_updated', 'TIMESTAMP', data_last_updated))
 
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
@@ -653,7 +653,7 @@ class DashboardCronJob(CronJobBase):
             logger.warning(f'No data was pulled for these courses.')
             # Set all of the courses to have been updated now (this is the same set update_course runs on)
 
-        Course.objects.get_supported_courses().update_all_last_cron_run(run_start)
+        Course.objects.get_supported_courses().update_all_data_last_updated(run_start)
 
         status += "End cron: " +  str(datetime.now()) + "\n"
 

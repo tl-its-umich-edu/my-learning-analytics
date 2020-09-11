@@ -168,29 +168,29 @@ class CourseQuerySet(models.QuerySet):
             logger.info(f"No course listed. Returning None as the earliest_start_datetime_of_course. ")
         return earliest_start
 
-    def update_all_last_cron_run(self, update_date=None):
+    def update_all_data_last_updated(self, updated_date=None):
         """ Updates the last cron run to now for all courses in QuerySet
         """
         # Finally update the time on all courses updated
-        if update_date is None:
-            update_date = datetime.now()
-        self.update(last_cron_run=update_date)
+        if updated_date is None:
+            updated_date = datetime.now()
+        self.update(data_last_updated=updated_date)
 
-    def get_last_cron_run(self) -> Optional[datetime]:
+    def get_data_last_updated(self) -> Optional[datetime]:
         """ Returns the datetime of the last cron run of all courses
-            This checks for any courses where the last_cron_run value is null.
+            This checks for any courses where the data_last_updated value is null.
 
         :return: datetime. Either the earliest or None
         :rtype: None
         """
-        new_courses = self.filter(last_cron_run__isnull=True)
+        new_courses = self.filter(data_last_updated__isnull=True)
 
         # If there are new courses (courses with no last run) return the earliest time of all
         if len(new_courses) > 0:
             return new_courses.earliest_start_datetime()
         # Otherwise return the latest cron run
         else:
-            return self.all().latest("last_cron_run").last_cron_run
+            return self.all().latest("data_last_updated").data_last_updated
             
 
 class Course(models.Model):
@@ -205,7 +205,7 @@ class Course(models.Model):
     GRADING_CHOICES = [('Percent', 'Percent'), ('Point', 'Point'), ]
     show_grade_type = models.CharField(verbose_name="Show Grade Type", max_length=255,
                                          choices=GRADING_CHOICES, default='Percent')
-    last_cron_run = models.DateTimeField(verbose_name="Last time cron ran for this course", null=True, blank=True)
+    data_last_updated = models.DateTimeField(verbose_name="Last time data last updated for this course", null=True, blank=True)
 
     objects = CourseQuerySet().as_manager()
 
