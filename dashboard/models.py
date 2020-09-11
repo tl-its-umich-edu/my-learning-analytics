@@ -165,7 +165,7 @@ class CourseQuerySet(models.QuerySet):
             earliest_start = earliest_course.course_date_range.start
             logger.info(f"Earliest start datetime for all courses: {earliest_start.isoformat()} found in course {earliest_course.canvas_id}")
         else:
-            logger.info(f"No course listed. Returning None as the earliest_start_datetime_of_course. ")
+            logger.info(f"No courses in CourseQuerySet; returning None as the earliest_start_datetime")
         return earliest_start
 
     def update_all_data_last_updated(self, updated_date=None):
