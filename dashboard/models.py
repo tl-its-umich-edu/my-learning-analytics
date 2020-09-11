@@ -173,7 +173,7 @@ class CourseQuerySet(models.QuerySet):
         """
         # Finally update the time on all courses updated
         if updated_date is None:
-            updated_date = datetime.now()
+            updated_date = datetime.now(pytz.UTC)
         self.update(data_last_updated=updated_date)
 
     def get_data_last_updated(self) -> Optional[datetime]:
