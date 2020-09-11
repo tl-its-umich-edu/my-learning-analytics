@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.apps import apps
 from django.contrib import admin
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
@@ -29,11 +30,14 @@ from django.views.decorators.cache import cache_page
 from . import views
 
 import watchman.views
+
+# Disable the Django admin login page
+admin.site.login = staff_member_required(admin.site.login, login_url=settings.LOGIN_URL)
+
 urlpatterns = [
     path('', views.get_home_template, name = 'home'),
     path('status/', include('watchman.urls')),
     path('status/bare_status/', watchman.views.bare_status),
-
 
     path('admin/', admin.site.urls),
 
@@ -84,13 +88,6 @@ if apps.is_installed('djangosaml2'):
         # Note the absence of a trailing slash; adding one breaks the SAML implementation.
         path('accounts/logout', views.logout, name='auth_logout')
     )
-else:
-    from django.contrib.auth import views as auth_views
-    # Login patterns for testing, SAML should be installed in prod
-    urlpatterns += (
-        path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
-        path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
-             )
 
 if settings.STUDENT_DASHBOARD_LTI:
     from . import lti_new
@@ -98,6 +95,14 @@ if settings.STUDENT_DASHBOARD_LTI:
         path('lti/login/', lti_new.login, name="login"),
         path('lti/launch/', lti_new.launch, name="launch"),
         path('lti/jwks/', lti_new.get_jwks, name="get_jwks"),
+    )
+
+if settings.ENABLE_BACKEND_LOGIN:
+    from django.contrib.auth import views as auth_views
+    # Login patterns for testing, SAML should be installed in prod
+    urlpatterns += (
+        path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
+        path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
     )
 
 if apps.is_installed('registration'):

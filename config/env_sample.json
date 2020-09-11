@@ -128,8 +128,11 @@
         "CACHE_KEY_PREFIX": "myla",
         "CACHE_OPTIONS": {"COMPRESS_MIN_LENGTH": 5000, "COMPRESS_LEVEL": 6}
     },
+    "/*  Set this to true to enable the backend login/logout URLs.": "*/",
+    "/*  This is enabled by default if no external auth is enabled.": "*/",
+    "ENABLE_BACKEND_LOGIN": false,
     "/*  SAML Configuration": "*/",
-    "/*  Need to set this to false to turn it off for dev, but default is true": "*/",
+    "/*  Set this to true if you plan to use SAML and then configure it": "*/",
     "STUDENT_DASHBOARD_SAML": false,
     "/*  Where your local secrets are stored": "*/",
     "SAML2_FILES_BASE": "/secrets/saml/",

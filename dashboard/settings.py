@@ -88,12 +88,16 @@ WATCHMAN_DATABASES = ('default',)
 # courses_enabled api
 COURSES_ENABLED = ENV.get('COURSES_ENABLED', False)
 STUDENT_DASHBOARD_LTI = ENV.get('STUDENT_DASHBOARD_LTI', False)
+STUDENT_DASHBOARD_SAML = ENV.get('STUDENT_DASHBOARD_SAML', False)
 
 # Defaults for PTVSD
 PTVSD_ENABLE = ENV.get("PTVSD_ENABLE", False)
 PTVSD_REMOTE_ADDRESS = ENV.get("PTVSD_REMOTE_ADDRESS", "0.0.0.0")
 PTVSD_REMOTE_PORT = ENV.get("PTVSD_REMOTE_PORT", 3000)
 PTVSD_WAIT_FOR_ATTACH = ENV.get("PTVSD_WAIT_FOR_ATTACH", False)
+
+LOGIN_REDIRECT_URL = ENV.get('DJANGO_LOGIN_REDIRECT_URL', '/')
+LOGOUT_REDIRECT_URL = ENV.get('DJANGO_LOGOUT_REDIRECT_URL', '/')
 
 # Application definition
 
@@ -324,10 +328,7 @@ AUTHENTICATION_BACKENDS: Tuple[str, ...] = (
     'django_su.backends.SuBackend',
 )
 
-#Shib
-
-# Give an opportunity to disable SAML
-if ENV.get('STUDENT_DASHBOARD_SAML', True):
+if STUDENT_DASHBOARD_SAML:
     import saml2
 
     SAML2_URL_PATH = '/accounts/'
@@ -405,9 +406,6 @@ if ENV.get('STUDENT_DASHBOARD_SAML', True):
     }
 
     ACS_DEFAULT_REDIRECT_URL = ENV.get('DJANGO_ACS_DEFAULT_REDIRECT', '/')
-    LOGIN_REDIRECT_URL = ENV.get('DJANGO_LOGIN_REDIRECT_URL', '/')
-
-    LOGOUT_REDIRECT_URL = ENV.get('DJANGO_LOGOUT_REDIRECT_URL', '/')
 
     SAML_CREATE_UNKNOWN_USER = True
 
@@ -417,16 +415,8 @@ if ENV.get('STUDENT_DASHBOARD_SAML', True):
         'givenName': ('first_name', ),
         'sn': ('last_name', ),
     }
-else:
-    AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
-    LOGIN_REDIRECT_URL = '/'
-    LOGOUT_REDIRECT_URL='/'
 
-# Give an opportunity to disable LTI
-if ENV.get('STUDENT_DASHBOARD_LTI', False):
-    if not 'django.contrib.auth.backends.ModelBackend' in AUTHENTICATION_BACKENDS:
-        AUTHENTICATION_BACKENDS += ('django.contrib.auth.backends.ModelBackend',)
-
+if STUDENT_DASHBOARD_LTI:
     LTI_CONFIG = ENV.get('LTI_CONFIG', {})
 
 # controls whether Unizin specific features/data is available from the Canvas Data source
@@ -495,6 +485,17 @@ if CSRF_COOKIE_SECURE:
 # this when new browser versions expect (and the Django version allows) the string "None".
 SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", None)
 CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", None)
+
+CHECK_ENABLE_BACKEND_LOGIN = False if STUDENT_DASHBOARD_SAML or STUDENT_DASHBOARD_LTI else True 
+
+# Allow for ENABLE_BACKEND_LOGIN override
+ENABLE_BACKEND_LOGIN = ENV.get("ENABLE_BACKEND_LOGIN", CHECK_ENABLE_BACKEND_LOGIN)
+
+# If backend login is still enabled or LTI is used (since it uses this), enable the ModelBackend
+if ENABLE_BACKEND_LOGIN or STUDENT_DASHBOARD_LTI:
+    AUTHENTICATION_BACKENDS += (
+        'django.contrib.auth.backends.ModelBackend',
+    )
 
 # IMPORT LOCAL ENV
 # =====================
