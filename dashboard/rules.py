@@ -23,7 +23,7 @@ def is_enrolled_in_course(user, course):
 
 @rules.predicate
 def course_is_not_loaded(user, course):
-    notLoaded = Course.objects.filter(id=course.id).filter(term__isnull=True).count() == 1
+    notLoaded = Course.objects.filter(id=course.id, term__isnull=True).count() == 1
     if notLoaded:
         logger.info(f'Permissions course_is_not_loaded: user {user.id} requested access to unloaded course {course.id}')
     return notLoaded
