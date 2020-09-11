@@ -11,7 +11,7 @@ function App (props) {
 
   if (!user.isLoggedIn) {
     if (user.loginURL === '') {
-      return (<WarningBanner>You should launch this tool from your Canvas Course</WarningBanner>)
+      return (<WarningBanner>This tool needs to be launched from a Canvas course.</WarningBanner>)
     }
     return (window.location.href = user.loginURL)
   }
