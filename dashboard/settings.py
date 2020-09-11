@@ -411,9 +411,9 @@ if STUDENT_DASHBOARD_SAML:
         'givenName': ('first_name', ),
         'sn': ('last_name', ),
     }
+
 if STUDENT_DASHBOARD_LTI:
     LTI_CONFIG = ENV.get('LTI_CONFIG', {})
-    ENABLE_BACKEND_LOGIN = False
 
 # controls whether Unizin specific features/data is available from the Canvas Data source
 DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)
