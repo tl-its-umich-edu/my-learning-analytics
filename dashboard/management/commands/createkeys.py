@@ -15,22 +15,22 @@ class Command(BaseCommand):
     timestampFormat = '%Y%m%d%H%M%S'
 
     def add_arguments(self, parser: CommandParser):
-        parser.add_argument(f'--{self.baseNameOption}',
-                            dest=self.baseNameOption, type=str, required=False,
-                            help='Base file name of the key files generated.  '
-                                 'Default: timestamp of '
-                                 f'"{self.timestampFormat.replace("%", "%%")}"'
-                            )
+        parser.add_argument(
+            f'--{self.baseNameOption}',
+            default=datetime.now().strftime(self.timestampFormat),
+            type=str,
+            required=False,
+            help='Base file name of the key files generated. Default: '
+                 f'timestamp of "{self.timestampFormat.replace("%", "%%")}"',
+            dest=self.baseNameOption)
 
 
     def handle(self, *args, **options: dict):
         configDir = os.path.dirname(os.getenv('ENV_FILE', '/secrets/env.json'))
         self.stdout.write(f'Key files written to directory "{configDir}"...')
 
-        baseName = options.get(self.baseNameOption)
-        if not baseName:
-            baseName = datetime.now().strftime(self.timestampFormat)
-        keyFileBasePathName = os.path.join(configDir, baseName)
+        keyFileBasePathName = os.path.join(
+            configDir, options.get(self.baseNameOption))
 
         self.stdout.write('Generating key...')
         key = RSA.generate(4096)
