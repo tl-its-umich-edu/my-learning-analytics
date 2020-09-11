@@ -1,46 +1,64 @@
 import json
 import os
-import shutil
+from datetime import datetime
 
 from Crypto.PublicKey import RSA
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandParser
 from jwcrypto.jwk import JWK
-from jwt.utils import merge_dict
 
 
 class Command(BaseCommand):
-    private_key_suffix = '-private.pem'
-    public_key_suffix = '-public.pem'
-    jwk_suffix = '-public-jwk.json'
+    privateKeyFileSuffix = '_private.pem'
+    publicKeyFileSuffix = '_public.pem'
+    jwkFileSuffix = '_public-jwk.json'
+    baseNameOption = 'basename'
+    timestampFormat = '%Y%m%d%H%M%S'
 
-    def handle(self, *args, **options):
-        config_dir = os.path.dirname(os.getenv('ENV_FILE', '/secrets/env.json'))
-        self.stdout.write(f'Key files written to directory "{config_dir}"...')
+    def add_arguments(self, parser: CommandParser):
+        parser.add_argument(f'--{self.baseNameOption}',
+                            dest=self.baseNameOption, type=str, required=False,
+                            help='Base file name of the key files generated.  '
+                                 'Default: timestamp of '
+                                 f'"{self.timestampFormat.replace("%", "%%")}"'
+                            )
+
+
+    def handle(self, *args, **options: dict):
+        configDir = os.path.dirname(os.getenv('ENV_FILE', '/secrets/env.json'))
+        self.stdout.write(f'Key files written to directory "{configDir}"...')
+
+        baseName = options.get(self.baseNameOption)
+        if not baseName:
+            baseName = datetime.now().strftime(self.timestampFormat)
+        keyFileBasePathName = os.path.join(configDir, baseName)
 
         self.stdout.write('Generating key...')
         key = RSA.generate(4096)
 
         self.stdout.write('Preparing private and public key strings...')
-        private_key = key.exportKey()
-        public_key = key.publickey().exportKey()
+        privateKey = key.exportKey()
+        publicKey = key.publickey().exportKey()
 
+        privateKeyFileName = f'{keyFileBasePathName}{self.privateKeyFileSuffix}'
         self.stdout.write(
-            f'Writing private key to file "{self.private_key_suffix}"...')
-        with open(self.private_key_suffix, 'w') as f:
-            f.writelines((private_key.decode('utf-8'), '\n'))
+            f'Writing private key to file "{privateKeyFileName}"...')
+        with open(privateKeyFileName, 'w') as f:
+            f.writelines((privateKey.decode('utf-8'), '\n'))
 
+        publicKeyFileName = f'{keyFileBasePathName}{self.publicKeyFileSuffix}'
         self.stdout.write(
-            f'Writing public key to file "{self.public_key_suffix}"...')
-        with open(self.public_key_suffix, 'w') as f:
-            f.writelines((public_key.decode('utf-8'), '\n'))
+            f'Writing public key to file "{publicKeyFileName}"...')
+        with open(publicKeyFileName, 'w') as f:
+            f.writelines((publicKey.decode('utf-8'), '\n'))
 
-        jwk_obj = JWK.from_pem(public_key)
+        jwk_obj = JWK.from_pem(publicKey)
         public_jwk = {
             **json.loads(jwk_obj.export_public()),
             **{'alg': 'RS256', 'use': 'sig'}
         }
 
+        jwkFileName = f'{keyFileBasePathName}{self.jwkFileSuffix}'
         self.stdout.write(
-            f'Writing JWK to file "{self.jwk_suffix}"...')
-        with open(self.jwk_suffix, 'w') as f:
+            f'Writing JWK to file "{jwkFileName}"...')
+        with open(jwkFileName, 'w') as f:
             f.writelines((json.dumps(public_jwk), '\n'))
