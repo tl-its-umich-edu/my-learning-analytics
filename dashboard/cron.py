@@ -655,7 +655,7 @@ class DashboardCronJob(CronJobBase):
             logger.warning(f'No data was pulled for these courses.')
         
         # Set all of the courses to have been updated now (this is the same set update_course runs on)
-        Course.objects.filter(id__in=self.valid_locked_course_ids).update_all_data_last_updated()
+        Course.objects.filter(id__in=self.valid_locked_course_ids).update(data_last_updated=datetime.now(pytz.UTC))
 
         status += "End cron: " +  str(datetime.now()) + "\n"
 

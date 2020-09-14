@@ -168,14 +168,6 @@ class CourseQuerySet(models.QuerySet):
             logger.info(f"No courses in CourseQuerySet; returning None as the earliest_start_datetime")
         return earliest_start
 
-    def update_all_data_last_updated(self, updated_date=None) -> None:
-        """ Updates the last cron run to now for all courses in QuerySet
-        """
-        # Finally update the time on all courses updated
-        if updated_date is None:
-            updated_date = datetime.now(pytz.UTC)
-        self.update(data_last_updated=updated_date)
-
     def get_data_last_updated(self) -> Optional[datetime]:
         """ Returns the datetime of the last cron run of all courses
             This checks for any courses where the data_last_updated value is null.
