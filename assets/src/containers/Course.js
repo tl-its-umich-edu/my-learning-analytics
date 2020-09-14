@@ -18,9 +18,12 @@ const styles = theme => ({
   card: {
     margin: theme.spacing(3)
   },
-  media: {
-    height: '500px',
-    backgroundSize: 'contain'
+  notLoadedMedia: {
+    maxWidth: '50%',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2)
   }
 })
 
@@ -43,6 +46,8 @@ function Course (props) {
   else if (error.message === 'Forbidden') return (<WarningBanner>You do not have access to course {courseId}.</WarningBanner>)
   else if (error) return (<WarningBanner />)
   if (loaded && isObjectEmpty(courseInfo)) return (<WarningBanner>My Learning Analytics is not enabled for this course.</WarningBanner>)
+
+  const notLoadedAltMessage = 'Mouse running on wheel with text "Course Data Being Processed, Try Back in 24 Hours"'
 
   return (
     <>
@@ -68,9 +73,11 @@ function Course (props) {
               ? (
                 <Card className={classes.card}>
                   <CardMedia
-                    className={classes.media}
+                    className={classes.notLoadedMedia}
+                    component='img'
                     image='/static/images/no-course-data-msg.png'
-                    title='Mouse running on wheel with text "course data being processed Try back in 24 hours"'
+                    title={notLoadedAltMessage}
+                    alt={notLoadedAltMessage}
                   />
                 </Card>
               ) : (
