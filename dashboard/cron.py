@@ -599,7 +599,6 @@ class DashboardCronJob(CronJobBase):
         status = ""
 
         run_start = datetime.now()
-
         status += f"Start cron: {str(run_start)}\n"
 
         course_verification = self.verify_course_ids()
