@@ -24,7 +24,6 @@ class Command(BaseCommand):
                  f'timestamp of "{self.timestampFormat.replace("%", "%%")}"',
             dest=self.baseNameOption)
 
-
     def handle(self, *args, **options: dict):
         configDir = os.path.dirname(os.getenv('ENV_FILE', '/secrets/env.json'))
         self.stdout.write('Key files will be written to '
