@@ -135,7 +135,7 @@ def get_user_courses_info(username: str, course_id: Union[int, None] = None) -> 
     return enrollments
 
 
-def get_last_cron_run():
+def get_last_cronjob_run():
     try:
         c = CronJobLog.objects.filter(is_success=1).latest('end_time')
         end_time = c.end_time
@@ -147,7 +147,7 @@ def get_last_cron_run():
 
 def get_canvas_data_date():
     if not settings.DATA_WAREHOUSE_IS_UNIZIN:
-        return get_last_cron_run()
+        return get_last_cronjob_run()
 
     try:
         with django.db.connection.cursor() as cursor:

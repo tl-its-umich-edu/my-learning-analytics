@@ -1,27 +1,13 @@
 import logging, os, re
+from typing import Union
 
 from django.conf import settings
 
-from dashboard.common.db_util import get_user_courses_info
-from dashboard.models import Course
-from typing import Union
+from dashboard.common import db_util
+from dashboard.models import Course, ResourceAccess
 
 
 logger = logging.getLogger(__name__)
-
-
-def find_earliest_start_datetime_of_courses():
-    sorted_courses = sorted(Course.objects.all(), key=lambda course: course.course_date_range.start)
-
-    earliest_start = None
-    if len(sorted_courses) > 0:
-        earliest_course = sorted_courses[0]
-        earliest_start = earliest_course.course_date_range.start
-        logger.info(f"Earliest start datetime for all courses: {earliest_start.isoformat()} found in course {earliest_course.canvas_id}")
-    else:
-        logger.info(f"No course listed. Return None as the earliest_start_datetime_of_course. ")
-    return earliest_start
-
 
 def format_github_url_using_https(github_url):
     ssh_base = "git@"
@@ -84,7 +70,7 @@ def get_myla_globals(request):
     is_superuser = current_user.is_staff
     if current_user.is_authenticated:
         username = current_user.get_username()
-        user_courses_info = get_user_courses_info(username, course_id)
+        user_courses_info = db_util.get_user_courses_info(username, course_id)
 
     if settings.SHOW_LOGOUT_LINK:
         login_url = settings.LOGIN_URL
