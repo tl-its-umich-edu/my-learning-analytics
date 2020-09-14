@@ -86,10 +86,10 @@ def get_myla_globals(request):
         username = current_user.get_username()
         user_courses_info = get_user_courses_info(username, course_id)
 
-    if not settings.STUDENT_DASHBOARD_LTI:
+    if settings.SHOW_LOGOUT_LINK:
         login_url = settings.LOGIN_URL
-    if not settings.STUDENT_DASHBOARD_LTI:
         logout_url = settings.LOGOUT_URL
+
     if settings.GA_ID:
         google_analytics_id = settings.GA_ID
     primary_ui_color = settings.PRIMARY_UI_COLOR
