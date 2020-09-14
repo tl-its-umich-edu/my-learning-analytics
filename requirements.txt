@@ -48,3 +48,6 @@ PyLTI1p3==1.7.0
 django-webpack-loader==0.6.0
 jsonschema==3.2.0
 django-csp==3.6
+
+jwcrypto==0.8
+pycryptodome==3.9.8
