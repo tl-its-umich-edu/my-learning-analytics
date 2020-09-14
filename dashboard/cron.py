@@ -1,4 +1,5 @@
-import datetime, logging
+from datetime import datetime
+import logging
 from collections import namedtuple
 from typing import Any, Dict, List, Union
 
@@ -12,6 +13,7 @@ from django.db.models import QuerySet
 from django_cron import CronJobBase, Schedule
 from google.cloud import bigquery
 from sqlalchemy import create_engine, types
+from sqlalchemy.engine import ResultProxy
 
 from dashboard.common import db_util, utils
 from dashboard.models import Course, Resource, AcademicTerms, ResourceAccess
@@ -66,30 +68,32 @@ def util_function(data_warehouse_course_id, sql_string, mysql_table, table_ident
 
 
 # execute database query
-def executeDbQuery(query):
+def execute_db_query(query: str, params: List=None) -> ResultProxy:
     with engine.connect() as connection:
         connection.detach()
-        connection.execute(query)
+        if params:
+            return connection.execute(query, params)
+        else:
+            return connection.execute(query)
 
 
 # remove all records inside the specified table
-def deleteAllRecordInTable(tableName):
-    # delete all records in the table first
-    executeDbQuery(f"delete from {tableName}")
-
-    return f"delete : {tableName}\n"
+def delete_all_records_in_table(table_name: str, where_clause: str="", where_params: List=None):
+    # delete all records in the table first, can have an optional where clause
+    result_proxy = execute_db_query(f"delete from {table_name} {where_clause}", where_params)
+    return(f"{result_proxy.rowcount} rows deleted from {table_name}\n")
 
 
 def soft_update_datetime_field(
     model_inst: models.Model,
     field_name: str,
-    warehouse_field_value: Union[datetime.datetime, None],
+    warehouse_field_value: Union[datetime, None],
 ) -> List[str]:
     """
     Uses Django ORM to update DateTime field of model instance if the field value is null and the warehouse data is non-null.
     """
     model_name: str = model_inst.__class__.__name__
-    current_field_value: Union[datetime.datetime, None] = getattr(model_inst, field_name)
+    current_field_value: Union[datetime, None] = getattr(model_inst, field_name)
     # Skipping update if the field already has a value, provided by a previous cron run or administrator
     if current_field_value is not None:
         logger.info(f'Skipped update of {field_name} for {model_name} instance ({model_inst.id}); existing value was found')
@@ -158,7 +162,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in update with data warehouse user")
 
         # delete all records in the table first
-        status += deleteAllRecordInTable("user")
+        status += delete_all_records_in_table("user")
 
         # loop through multiple course ids
         for data_warehouse_course_id in self.valid_locked_course_ids:
@@ -195,7 +199,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in update unizin metadata")
 
         # delete all records in the table first
-        status += deleteAllRecordInTable("unizin_metadata")
+        status += delete_all_records_in_table("unizin_metadata")
 
         # select all student registered for the course
         metadata_sql = "select key as pkey, value as pvalue from unizin_metadata"
@@ -230,7 +234,6 @@ class DashboardCronJob(CronJobBase):
                 status += f"Row {row.id} removed as it is not available\n"
         return status
 
-
     # update RESOURCE_ACCESS records from BigQuery
     def update_with_bq_access(self):
 
@@ -246,18 +249,11 @@ class DashboardCronJob(CronJobBase):
         # BQ Total Bytes Billed to report to status
         total_bytes_billed = 0
 
-        # the earliest start date of all courses
-        course_start_time = utils.find_earliest_start_datetime_of_courses()
+        data_last_updated = Course.objects.filter(id__in=self.valid_locked_course_ids).get_data_last_updated()
 
-        # the earliest latest date of all resources_accessed
-        try:
-            latest_resource = ResourceAccess.objects.latest('access_time')
-            latest_resource_time = latest_resource.access_time
-        except ResourceAccess.DoesNotExist:
-            latest_resource_time = course_start_time
+        logger.info(f"Deleting all records in resource_access after {data_last_updated}")
 
-        logger.info(f"Earliest Start: {course_start_time} Latest resource: {latest_resource_time}")
-
+        status += delete_all_records_in_table("resource_access", f"WHERE access_time > %s", [data_last_updated,])
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
         for data_warehouse_course_ids in split_list(self.valid_locked_course_ids, settings.CRON_BQ_IN_LIMIT):
@@ -269,9 +265,9 @@ class DashboardCronJob(CronJobBase):
                 # concatenate the multi-line presentation of query into one single string
                 query = " ".join(query_obj['query'])
 
-                if (latest_resource_time is not None):
+                if (data_last_updated is not None):
                     # insert the start time parameter for query
-                    query += " and event_time > @latest_resource_time"
+                    query += " and event_time > @data_last_updated"
 
                 final_bq_query.append(query)
             final_bq_query = "  UNION ALL   ".join(final_bq_query)
@@ -285,9 +281,9 @@ class DashboardCronJob(CronJobBase):
                 bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
                 bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT)
             ]
-            if (latest_resource_time is not None):
+            if (data_last_updated is not None):
                 # insert the start time parameter for query
-                query_params.append(bigquery.ScalarQueryParameter('latest_resource_time', 'TIMESTAMP', latest_resource_time))
+                query_params.append(bigquery.ScalarQueryParameter('data_last_updated', 'TIMESTAMP', data_last_updated))
 
             job_config = bigquery.QueryJobConfig()
             job_config.query_parameters = query_params
@@ -434,7 +430,7 @@ class DashboardCronJob(CronJobBase):
         status =""
 
         # delete all records in assignment_group table
-        status += deleteAllRecordInTable("assignment_groups")
+        status += delete_all_records_in_table("assignment_groups")
 
         # update groups
         #Loading the assignment groups inforamtion along with weight/points associated ith arn assignment
@@ -463,7 +459,7 @@ class DashboardCronJob(CronJobBase):
         logger.info("update_assignment(): ")
 
         # delete all records in assignment table
-        status += deleteAllRecordInTable("assignment")
+        status += delete_all_records_in_table("assignment")
 
         # loop through multiple course ids
         for data_warehouse_course_id in self.valid_locked_course_ids:
@@ -488,7 +484,7 @@ class DashboardCronJob(CronJobBase):
         logger.info("update_submission(): ")
 
         # delete all records in resource_access table
-        status += deleteAllRecordInTable("submission")
+        status += delete_all_records_in_table("submission")
 
         # loop through multiple course ids
         for data_warehouse_course_id in self.valid_locked_course_ids:
@@ -514,7 +510,7 @@ class DashboardCronJob(CronJobBase):
         logger.info("weight_consideration()")
 
         # delete all records in assignment_weight_consideration table
-        status += deleteAllRecordInTable("assignment_weight_consideration")
+        status += delete_all_records_in_table("assignment_weight_consideration")
 
         # loop through multiple course ids
         for data_warehouse_course_id in self.valid_locked_course_ids:
@@ -583,11 +579,11 @@ class DashboardCronJob(CronJobBase):
                 logger.info(f'Term for {course.id} has been updated.')
                 updated_fields.append('term')
 
-            warehouse_date_start: Union[datetime.datetime, None] = (
+            warehouse_date_start: Union[datetime, None] = (
                 warehouse_course_dict['start_at'].to_pydatetime() if pd.notna(warehouse_course_dict['start_at']) else None
             )
             updated_fields += soft_update_datetime_field(course, 'date_start', warehouse_date_start)
-            warehouse_date_end: Union[datetime.datetime, None] = (
+            warehouse_date_end: Union[datetime, None] = (
                 warehouse_course_dict['conclude_at'].to_pydatetime() if pd.notna(warehouse_course_dict['conclude_at']) else None
             )
             updated_fields += soft_update_datetime_field(course, 'date_end', warehouse_date_end)
@@ -602,7 +598,8 @@ class DashboardCronJob(CronJobBase):
 
         status = ""
 
-        status += "Start cron: " +  str(datetime.datetime.now()) + "\n"
+        run_start = datetime.now()
+        status += f"Start cron: {str(run_start)}\n"
 
         course_verification = self.verify_course_ids()
         invalid_course_id_list = course_verification.invalid_course_ids
@@ -610,7 +607,7 @@ class DashboardCronJob(CronJobBase):
         if len(invalid_course_id_list) > 0:
             # error out and stop cron job
             status += f"ERROR: Those course ids are invalid: {invalid_course_id_list}\n"
-            status += "End cron: " +  str(datetime.datetime.now()) + "\n"
+            status += "End cron: " +  str(datetime.now()) + "\n"
             logger.info("************ total status=" + status + "/n/n")
             return (status,)
 
@@ -636,7 +633,6 @@ class DashboardCronJob(CronJobBase):
             logger.info("** assignment")
             status += self.update_groups()
             status += self.update_assignment()
-
             status += self.submission()
             status += self.weight_consideration()
 
@@ -656,8 +652,11 @@ class DashboardCronJob(CronJobBase):
         if courses_added_during_cron:
             logger.warning(f'During the run, users added {len(courses_added_during_cron)} course(s): {courses_added_during_cron}')
             logger.warning(f'No data was pulled for these courses.')
+        
+        # Set all of the courses to have been updated now (this is the same set update_course runs on)
+        Course.objects.filter(id__in=self.valid_locked_course_ids).update(data_last_updated=datetime.now(pytz.UTC))
 
-        status += "End cron: " +  str(datetime.datetime.now()) + "\n"
+        status += "End cron: " +  str(datetime.now()) + "\n"
 
         logger.info("************ total status=" + status + "\n")
 
