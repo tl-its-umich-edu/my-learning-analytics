@@ -476,6 +476,8 @@ CHECK_ENABLE_BACKEND_LOGIN = False if STUDENT_DASHBOARD_SAML or STUDENT_DASHBOAR
 
 # Allow for ENABLE_BACKEND_LOGIN override
 ENABLE_BACKEND_LOGIN = ENV.get("ENABLE_BACKEND_LOGIN", CHECK_ENABLE_BACKEND_LOGIN)
+# only show logout URL with saml and django forms
+SHOW_LOGOUT_LINK = True if ENABLE_BACKEND_LOGIN or STUDENT_DASHBOARD_SAML else False
 
 # If backend login is still enabled or LTI is used (since it uses this), enable the ModelBackend
 if ENABLE_BACKEND_LOGIN or STUDENT_DASHBOARD_LTI:
