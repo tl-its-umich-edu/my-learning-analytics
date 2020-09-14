@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -139,7 +139,7 @@ class AssignmentWeightConsideration(models.Model):
 
 
 class CourseQuerySet(models.QuerySet):
-    def get_supported_courses(self):
+    def get_supported_courses(self) -> QuerySet:
         """Returns the list of supported courses from the database
 
         :return: [List of supported course ids]
@@ -149,7 +149,7 @@ class CourseQuerySet(models.QuerySet):
             return self.values_list('id', flat=True)
         except self.model.DoesNotExist:
             logger.info("Courses did not exist", exc_info = True)
-        return []
+        return Course.objects.none()
 
     def earliest_start_datetime(self) -> Optional[datetime]:
         """Get the earliest start date of courses in the QuerySet
@@ -168,7 +168,7 @@ class CourseQuerySet(models.QuerySet):
             logger.info(f"No courses in CourseQuerySet; returning None as the earliest_start_datetime")
         return earliest_start
 
-    def update_all_data_last_updated(self, updated_date=None):
+    def update_all_data_last_updated(self, updated_date=None) -> None:
         """ Updates the last cron run to now for all courses in QuerySet
         """
         # Finally update the time on all courses updated
