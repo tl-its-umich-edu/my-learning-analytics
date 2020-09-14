@@ -67,7 +67,11 @@ function Course (props) {
             {courseInfo.course_data_loaded === 0
               ? (
                 <Card className={classes.card}>
-                  <CardMedia className={classes.media} image='/static/images/no-course-data-msg.png' />
+                  <CardMedia
+                    className={classes.media}
+                    image='/static/images/no-course-data-msg.png'
+                    title='Mouse running on wheel with text "course data being processed Try back in 24 hours"'
+                  />
                 </Card>
               ) : (
                 <>
