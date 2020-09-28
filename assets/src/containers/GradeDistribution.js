@@ -17,6 +17,7 @@ import { isObjectEmpty } from '../util/object'
 import useSetUserSetting from '../hooks/useSetUserSetting'
 import useUserSetting from '../hooks/useUserSetting'
 import { isTeacherOrAdmin } from '../util/roles'
+import { Helmet } from 'react-helmet'
 
 const styles = theme => ({
   root: {
@@ -131,6 +132,7 @@ function GradeDistribution (props) {
 
   return (
     <>
+      <Helmet title='Grade Distribution' />
       {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
       <div className={classes.root}>
         <Grid container spacing={2}>
