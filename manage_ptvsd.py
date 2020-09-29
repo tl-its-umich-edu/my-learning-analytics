@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os, sys, warnings
-from dashboard.ptvsd_util import check_and_enable_ptvsd
+from debug_utils.ptvsd import check_and_enable_ptvsd
 from django.core.management import execute_from_command_line
 
 if __name__ == "__main__":
