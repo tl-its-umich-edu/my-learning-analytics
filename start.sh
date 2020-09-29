@@ -77,18 +77,16 @@ fi
 if [ "${IS_CRON_POD:-"false",,}" == "false" ]; then
     if [ "${PTVSD_ENABLE:-"false",,}" == "false" ]; then
         echo "Starting Gunicorn for production"
-        exec gunicorn dashboard.wsgi:application \
-            --bind 0.0.0.0:${GUNICORN_PORT} \
-            --workers="${GUNICORN_WORKERS}" \
-            ${GUNICORN_RELOAD}
     else
         echo "Starting Gunicorn for PTVSD debugging"
         # Workers need to be set to 1 for PTVSD
-        exec gunicorn dashboard.wsgi:application \
-            --bind 0.0.0.0:${GUNICORN_PORT} \
-            --workers=1 \
-            ${GUNICORN_RELOAD}
+        GUNICORN_WORKERS=1
     fi
+    exec gunicorn dashboard.wsgi:application \
+        --bind 0.0.0.0:${GUNICORN_PORT} \
+        --workers="${GUNICORN_WORKERS}" \
+        "${GUNICORN_RELOAD}"
+ 
 else
     if [ -z "${CRONTAB_SCHEDULE}" ]; then
         echo "CRONTAB_SCHEDULE environment variable not set, crontab cannot be started. Please set this to a crontab acceptable format."

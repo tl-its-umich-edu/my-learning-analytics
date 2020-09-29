@@ -102,7 +102,6 @@ LOGOUT_REDIRECT_URL = ENV.get('DJANGO_LOGOUT_REDIRECT_URL', '/')
 
 INSTALLED_APPS = [
     'dashboard',
-    'django_ptvsd',
     'django_su',
     'django.contrib.admin',
     'django.contrib.auth',
