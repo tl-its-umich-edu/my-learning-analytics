@@ -94,13 +94,15 @@ class CourseEnrollment(TypedDict):
     enrollment_types: List[str]
 
 def is_superuser(user_name: str) -> bool:
-    logger.info(is_superuser.__name__+f' \'{user_name}\'')
+    logger.debug(is_superuser.__name__+f' \'{user_name}\'')
 
     user = DjangoUser.objects.filter(username=user_name)
     if user.count() == 0:
-        return False
+        result = False
     else:
-        return user[0].is_superuser
+        result = user[0].is_superuser
+    logger.debug(is_superuser.__name__+f' \'{user_name}\':{result}')
+    return result
 
 def get_user_courses_info(username: str, course_id: Union[int, None] = None) -> List[CourseEnrollment]:
     """
