@@ -6,7 +6,7 @@ class KeyFileUtils:
     _keyFileBasePathName: str
 
     class KeyFileType(Enum):
-        JWK = ('JWK', '_public-jwk.json')
+        JWK = ('public key JWK', '_public-jwk.json')
         PRIVATE = ('private key', '_private.pem')
         PUBLIC = ('public key', '_public.pem')
 
