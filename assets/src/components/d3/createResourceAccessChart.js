@@ -155,16 +155,40 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   const textScale = d3.scaleLinear().range([12, 6]).domain([15, 50]).clamp(true)
 
   // Build the chart
-  const svg = d3.select(domElement).append('svg')
+  const main = d3.select(domElement).append('div')
+  const unReadResources = resourceData.filter(resource => resource.self_access_count === 0)
+  const narrativeTextForResources = () => {
+    const i = [`Resource you did not access ${unReadResources.length}/${resourceData.length}. Resources List for look for in the course:  `]
+    unReadResources.map(x =>
+      i.push(`Resource ${x.resource_name.split('|')[1]} Type ${x.resource_type} was accessed ${x.total_percent}% `)
+    )
+    return i.toString()
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  const desp = main.append('div')
+    .attr('aria-live', 'polite')
+    .attr('id', 'resource-view-narrative')
+    .attr('class', 'screenreader-only sr-only')
+    .text(d => narrativeTextForResources())
+
+  const svg = main.append('svg')
     .attr('class', 'svgWrapper')
     .attr('width', availWidth)
     .attr('height', availHeight)
+    .attr('aria-describedby', 'resource-view-narrative')
+    .attr('role', 'img')
+    .attr('aria-labelledby', 'resource-view-title-id')
     .attr('transform', `translate(${margin.left}, ${margin.top})`)
     .on('wheel.zoom', scroll)
     .on('mousedown.zoom', null) // Override the center selection
     .on('touchstart.zoom', null)
     .on('touchmove.zoom', null)
     .on('touchend.zoom', null)
+
+  svg.append('svg:title')
+    .attr('id', 'resource-view-title-id')
+    .text(d => 'Resource view SVG Graph')
 
   function update () {
     const bar = d3.select('.mainGroup').selectAll('.bar')

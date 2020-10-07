@@ -16,8 +16,8 @@ function createHistogram ({
 
   // the set operation removes duplicates
   const tempUniqData = [...new Set(data)]
-  const firstGradeAfterBinnedGrade = tempUniqData[1]
 
+  const firstGradeAfterBinnedGrade = tempUniqData[1]
   /* only showing the tick values above the binned grades eg, with above data the tick will start from 75%
   * if course has 0% or > 95% grades then we just show the whole distribution
   * */
@@ -30,6 +30,16 @@ function createHistogram ({
   const bins = d3.histogram()
     .domain(x.domain())
     .thresholds(x.ticks(40))(data)
+
+  const isBinningUsed = new Set(data.slice(0, 5)).size === 1
+  const binnedGradeText = `First five low performers scores are binned their scores are less than ${Math.trunc(firstGradeAfterBinnedGrade)}%.`
+  const yourGradeText = `your course grade is ${myGrade}.`
+  const narrativeTextCollection = [`${myGrade ? yourGradeText : ''} ${isBinningUsed ? binnedGradeText : ''} Course grades are:`]
+  for (const gradeBin in bins) {
+    if (bins[gradeBin].length > 0) {
+      narrativeTextCollection.push(`${bins[gradeBin].length} grades in ${bins[gradeBin].x0} - ${bins[gradeBin].x1}% range`)
+    }
+  }
 
   // getting the first bin that has some grades in them, accessing the x1(higher bin) value
   const dashLine = () => {
@@ -44,9 +54,25 @@ function createHistogram ({
     .domain([0, d3.max(bins, d => d.length)]).nice()
     .range([aHeight - margin.bottom, margin.top])
 
-  const svg = d3.select(domElement).append('svg')
+  const main = d3.select(domElement).append('div')
+
+  // eslint-disable-next-line no-unused-vars
+  const desp = main.append('div')
+    .attr('aria-live', 'polite')
+    .attr('id', 'grade-view-narrative')
+    .attr('class', 'screenreader-only sr-only')
+    .text(d => narrativeTextCollection.toString())
+
+  const svg = main.append('svg')
     .attr('width', aWidth)
     .attr('height', aHeight)
+    .attr('aria-describedby', 'grade-view-narrative')
+    .attr('role', 'img')
+    .attr('aria-labelledby', 'Grade-view-title-id')
+
+  svg.append('svg:title')
+    .attr('id', 'Grade-view-title-id')
+    .text(d => 'Grade distribution SVG Graph')
 
   const bar = svg.selectAll('rect')
     .data(bins).enter()
