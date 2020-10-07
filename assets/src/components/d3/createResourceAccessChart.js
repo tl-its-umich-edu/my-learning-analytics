@@ -86,7 +86,7 @@ function truncate (selection, labelWidth) {
   })
 }
 
-function createResourceAccessChart ({ data, width, height, domElement }) {
+function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceType, width, height, domElement }) {
   const resourceData = data.sort((a, b) => b.total_percent - a.total_percent)
   /* Assign an index to each resource.  This is used to assist with keyboard navigation
   To set the tab sequence to go from resource name to its corresponding bar graph we use
@@ -158,11 +158,14 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   const main = d3.select(domElement).append('div')
   const unReadResources = resourceData.filter(resource => resource.self_access_count === 0)
   const narrativeTextForResources = () => {
-    const i = [`Resource you did not access ${unReadResources.length}/${resourceData.length}. Resources List for look for in the course:  `]
+    const base = `Resource accessed from week ${weekRange[0]} to ${weekRange[1]} with the grades ${gradeSelection}
+                  and selected resource types to be viewed is ${resourceType}.
+                  ${unReadResources.length}/${resourceData.length} are not accessed by you.`
+    const i = ['Resources List accessed by other students are:  ']
     unReadResources.map(x =>
-      i.push(`Resource ${x.resource_name.split('|')[1]} Type ${x.resource_type} was accessed ${x.total_percent}% `)
+      i.push(`${x.resource_name.split('|')[1]} of Type ${x.resource_type} was accessed ${x.total_percent}% `)
     )
-    return i.toString()
+    return base.concat(i.toString())
   }
 
   // eslint-disable-next-line no-unused-vars

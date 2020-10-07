@@ -54,6 +54,7 @@ const settingNotUpdated = 'Setting not updated'
 
 function ResourcesAccessed (props) {
   const { classes, courseInfo, courseId, disabled, isAdmin, enrollmentTypes } = props
+  console.log(courseInfo)
   if (disabled && !isTeacherOrAdmin(isAdmin, enrollmentTypes)) return (<AlertBanner>The Resources Accessed view is hidden for this course.</AlertBanner>)
   const resourceTypes = courseInfo.resource_types.length === 0
     ? [{ label: 'Files', icon: 'fas fa-file fa-lg' }]
@@ -226,6 +227,9 @@ function ResourcesAccessed (props) {
       return (
         <ResourceAccessChart
           data={resourceData}
+          weekRange={weekRange}
+          gradeSelection={resourceGradeFilter}
+          resourceType={resourceTypeFilter}
           aspectRatio={0.3}
           minHeight={350}
         />
