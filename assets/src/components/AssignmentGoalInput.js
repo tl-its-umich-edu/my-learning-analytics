@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { withStyles, Typography } from '@material-ui/core'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import StyledTextField from './StyledTextField'
+import debounce from 'lodash.debounce'
 
 const styles = ({
   goalGradeInput: {
@@ -21,14 +22,26 @@ function AssignmentGoalInput (props) {
     classes
   } = props
 
+  const [goalGradeInternal, setGoalGradeInternal] = useState(goalGrade)
+  const debouncedGoalGrade = useRef(debounce(q => setGoalGrade(q), 500)).current
+
+  const updateGoalGradeInternal = (grade) => {
+    debouncedGoalGrade(grade)
+    setGoalGradeInternal(grade)
+  }
+
+  useEffect(() => {
+    setGoalGradeInternal(goalGrade)
+  }, [goalGrade])
+
   return (
     <Grid container>
       <Grid item style={{ display: 'inline-block' }}>
         <Typography style={{ display: 'inline-block', marginRight: '10px' }} variant='h6'>Goal</Typography>
         <StyledTextField
-          error={goalGrade > 100 || mathWarning || goalGrade > maxPossibleGrade}
+          error={goalGradeInternal > 100 || mathWarning || goalGradeInternal > maxPossibleGrade}
           id='standard-number'
-          value={goalGrade}
+          value={goalGradeInternal}
           label={
             mathWarning
               ? 'Math may no longer add up'
@@ -41,13 +54,13 @@ function AssignmentGoalInput (props) {
           onChange={event => {
             const goalGrade = event.target.value
             if (goalGrade === '') {
-              setGoalGrade('')
+              updateGoalGradeInternal('')
             } else if (goalGrade <= 0) {
-              setGoalGrade(0)
+              updateGoalGradeInternal(0)
             } else if (goalGrade > 125) {
-              setGoalGrade(125)
+              updateGoalGradeInternal(125)
             } else {
-              setGoalGrade(goalGrade)
+              updateGoalGradeInternal(goalGrade)
             }
           }}
           type='number'
