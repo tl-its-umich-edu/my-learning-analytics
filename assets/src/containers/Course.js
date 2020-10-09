@@ -13,6 +13,7 @@ import { useCourseInfo } from '../service/api'
 import WarningBanner from '../components/WarningBanner'
 import { CardMedia, Card } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
+import { Helmet } from 'react-helmet'
 
 const styles = theme => ({
   card: {
@@ -54,6 +55,7 @@ function Course (props) {
       {loaded
         ? (
           <>
+            <Helmet titleTemplate='%s | My Learning Analytics' title={courseInfo.name} />
             <DashboardAppBar
               onMenuBarClick={toggleDrawer}
               sideDrawerState={sideDrawerState}

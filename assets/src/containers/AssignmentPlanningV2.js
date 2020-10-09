@@ -18,6 +18,7 @@ import useSaveUserSetting from '../hooks/useSaveUserSetting'
 import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrade'
 import useUserAssignmentSetting from '../hooks/useUserAssignmentSetting'
 import { isTeacherOrAdmin } from '../util/roles'
+import { Helmet } from 'react-helmet'
 
 import {
   clearGoals,
@@ -129,6 +130,7 @@ function AssignmentPlanningV2 (props) {
 
   return (
     <>
+      <Helmet title='Assignment Planning' />
       {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
       <div className={classes.root}>
         <Grid container spacing={2}>
