@@ -146,7 +146,7 @@
                             "default": "disabled",
                             "placement": "course_navigation",
                             "message_type": "LtiResourceLinkRequest",
-                            "target_link_uri": "{base_url}{url_login}"
+                            "target_link_uri": "{base_url}{url_launch}"
                         }
                     ]
                 },
