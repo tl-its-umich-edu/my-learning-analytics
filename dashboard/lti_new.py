@@ -4,8 +4,9 @@ from datetime import datetime
 from typing import Mapping, MutableSequence, Union
 
 import django.contrib.auth
+from django.contrib.staticfiles import finders
 
-from django.http import JsonResponse, HttpRequest
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.decorators.http import require_POST
@@ -72,53 +73,33 @@ def check_if_success_getting_tool_config(tool_config):
         return False
 
 
-def get_jwks(request):
+def get_jwks(_):
     config = get_tool_conf()
     if not check_if_success_getting_tool_config(config):
         return LTIError(config).response_json()
     return JsonResponse(config.get_jwks())
 
 
-def recursive_format(args, **kwargs):
-    """
-    Recursively apply `string.format()` to all strings in a data structure.
-
-    This is intended to be used on a data structure that may contain
-    format strings just before it is passed to `json.dump()` or `dumps()`.
-
-    :param args: data structure; mostly dictionaries and lists
-    :param kwargs: values to be used in `string.format()`
-    :return: a new data structure with formatted strings
-    """
-    if isinstance(args, Mapping):
-        return {key: recursive_format(value, **kwargs)
-                for (key, value) in args.items()}
-    elif isinstance(args, MutableSequence):
-        return [recursive_format(value, **kwargs)
-                for value in args]
-    else:
-        return args.format(**kwargs)
-
-
-def generate_config_json(request: HttpRequest) -> Union[
-    JsonResponse, LTIError]:
+def generate_config_json(request: HttpRequest) -> \
+        Union[HttpResponse, LTIError]:
     config = get_tool_conf()
     if not check_if_success_getting_tool_config(config):
         return LTIError(config).response_json()
 
-    params = {
+    parameters = {
         'timestamp': datetime.now().isoformat(),
         'host': request.get_host(),
         'base_url': urllib.parse.urlunsplit(
             [request.scheme, request.get_host()] + 3 * ['']),
-        'url_login': reverse('login'),
-        'url_launch': reverse('launch'),
-        'url_get_jwks': reverse('get_jwks'),
+        'login_url_suffix': reverse('login'),
+        'launch_url_suffix': reverse('launch'),
+        'jwks_url_suffix': reverse('get_jwks'),
     }
 
-    return JsonResponse(
-        recursive_format(settings.LTI_CONFIG_TEMPLATE, **params)
-    )
+    return HttpResponse(
+        open(finders.find(
+            'config/lti_config_template.json')).read() % parameters,
+        content_type='application/json')
 
 
 def get_cache_config():
