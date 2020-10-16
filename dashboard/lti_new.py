@@ -69,7 +69,7 @@ def check_if_success_getting_tool_config(tool_config):
         logger.info('Success in fetching LTI tool configuration')
         return True
     else:
-        logger.error(tool_config)
+        logger.error(f'Invalid LTI configuration: "{tool_config}"')
         return False
 
 
@@ -84,7 +84,8 @@ def generate_config_json(request: HttpRequest) -> \
         Union[HttpResponse, LTIError]:
     config = get_tool_conf()
     if not check_if_success_getting_tool_config(config):
-        return LTIError(config).response_json()
+        return LTIError(f'Invalid LTI configuration: "{config}"')\
+            .response_json()
 
     parameters = {
         'timestamp': datetime.now().isoformat(),
