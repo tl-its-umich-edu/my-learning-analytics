@@ -95,7 +95,8 @@ if settings.STUDENT_DASHBOARD_LTI:
         path('lti/login/', lti_new.login, name='login'),
         path('lti/launch/', lti_new.launch, name='launch'),
         path('lti/jwks/', lti_new.get_jwks, name='get_jwks'),
-        path('lti/config/', lti_new.generate_config_json, name=lti_new.generate_config_json.__name__),
+        path('lti/config/', lti_new.generate_config_json,
+             name=lti_new.generate_config_json.__name__),
     )
 
 if settings.ENABLE_BACKEND_LOGIN:
