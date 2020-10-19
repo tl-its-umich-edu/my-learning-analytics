@@ -90,11 +90,10 @@ def get_jwks(_):
 
 
 def generate_config_json(request: HttpRequest) -> \
-        Union[HttpResponse, LTIError]:
+        Union[HttpResponse, JsonResponse]:
     config = get_tool_conf()
-    if not check_if_success_getting_tool_config(config):
-        return LTIError(f'Invalid LTI configuration: "{config}"')\
-            .response_json()
+    if not is_config_valid(config):
+        return lti_error(f'Invalid LTI configuration: "{config}"')
 
     parameters = {
         'timestamp': datetime.now().isoformat(),
@@ -106,10 +105,31 @@ def generate_config_json(request: HttpRequest) -> \
         'jwks_url_suffix': reverse('get_jwks'),
     }
 
-    return HttpResponse(
-        open(finders.find(
-            'config/lti_config_template.json')).read() % parameters,
-        content_type='application/json')
+    template_path: str
+    if settings.LTI_CONFIG_TEMPLATE_PATH is not None:
+        template_path = settings.LTI_CONFIG_TEMPLATE_PATH
+    else:
+        template_path = finders.find(
+            'config/lti_config_template.json')
+
+    logger.debug(f'template_path: "{template_path}"')
+
+    template_contents: str
+    try:
+        with open(template_path, 'r') as template_file:
+            template_contents = template_file.read()
+    except OSError as error:
+        return lti_error('Error reading LTI template file '
+                         f'"{template_path}": ({error})')
+
+    config_json: str
+    try:
+        config_json = template_contents % parameters
+    except KeyError as error:
+        return lti_error('Error filling in LTI template from '
+                         f'"{template_path}": ({error})')
+
+    return HttpResponse(config_json, content_type='application/json')
 
 
 def get_cache_config():
