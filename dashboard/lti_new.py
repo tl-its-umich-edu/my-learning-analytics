@@ -1,7 +1,7 @@
 import logging, string, random
 import urllib.parse
 from datetime import datetime
-from typing import Mapping, MutableSequence, Union
+from typing import Mapping, MutableSequence, Union, Any
 
 import django.contrib.auth
 from django.contrib.staticfiles import finders
@@ -22,7 +22,6 @@ from pylti1p3.tool_config import ToolConfDict
 from dashboard.models import Course, CourseViewOption, User as MylaUser
 from dashboard.common.db_util import canvas_id_to_incremented_id
 
-
 logger = logging.getLogger(__name__)
 INSTRUCTOR = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
 TA = 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant'
@@ -30,53 +29,63 @@ COURSE_MEMBERSHIP = 'http://purl.imsglobal.org/vocab/lis/v2/membership'
 DUMMY_CACHE = 'DummyCache'
 
 
-class LTIError:
-    def __init__(self, msg):
-        self.msg = msg
+def lti_error(error_message: Any) -> JsonResponse:
+    """
+    Log an error message and return a JSON response with HTTP status 500.
 
-    def response_json(self):
-        error_message = {
-            'lti_error': f'{self.msg}'
-        }
-        return JsonResponse(error_message, status=500)
+    :param error_message: `Any` type is allowed so objects may be used
+    :return: JsonResponse, with status 500
+    """
+    logger.error(f'LTI error: {error_message}')
+    return JsonResponse({'lti_error': f'{error_message}'}, status=500)
 
 
 def get_tool_conf():
     lti_config = settings.LTI_CONFIG
+
     try:
-        tool_config = ToolConfDict(lti_config)
-    except Exception as e:
-        return e
-    # There should be one key per platform and the name relay on platforms generic domain not institution specific
+        config = ToolConfDict(lti_config)
+    except Exception as error:
+        return error
+
+    # There should be one key per platform
+    # and the name relay on platforms generic domain not institution specific
     platform_domain = list(lti_config.keys())[0]
-    client_id = lti_config[platform_domain][0]['client_id']
-    private_key_file_path = lti_config[platform_domain][0]['private_key_file']
-    public_key_file_path = lti_config[platform_domain][0]['public_key_file']
-    public_key = public_key_file_path if public_key_file_path else '/secret/public.key'
-    private_key = private_key_file_path if private_key_file_path else '/secret/private.key'
+    platform_config = lti_config[platform_domain][0]
+    client_id = platform_config['client_id']
+
     try:
-        private_key_content = open(private_key, 'r').read()
-        public_key_content = open(public_key, 'r').read()
-    except OSError as e:
-        return e
-    tool_config.set_public_key(platform_domain, public_key_content, client_id=client_id)
-    tool_config.set_private_key(platform_domain, private_key_content, client_id=client_id)
-    return tool_config
+        with open(platform_config.get(
+                'private_key_file', '/secrets/private.key'),
+                'r') as private_key_file:
+            config.set_private_key(
+                platform_domain, private_key_file.read(), client_id)
+
+        with open(platform_config.get(
+                'public_key_file', '/secrets/public.key'),
+                'r') as public_key_file:
+            config.set_public_key(
+                platform_domain, public_key_file.read(), client_id)
+
+    except OSError as error:
+        return error
+
+    return config
 
 
-def check_if_success_getting_tool_config(tool_config):
-    if isinstance(tool_config, ToolConfDict):
-        logger.info('Success in fetching LTI tool configuration')
+def is_config_valid(config: ToolConfDict):
+    if isinstance(config, ToolConfDict):
+        logger.info('LTI configuration valid.')
         return True
     else:
-        logger.error(f'Invalid LTI configuration: "{tool_config}"')
+        logger.error(f'Invalid LTI configuration: "{config}"')
         return False
 
 
 def get_jwks(_):
     config = get_tool_conf()
-    if not check_if_success_getting_tool_config(config):
-        return LTIError(config).response_json()
+    if not is_config_valid(config):
+        return lti_error(config)
     return JsonResponse(config.get_jwks())
 
 
@@ -189,12 +198,12 @@ def extract_launch_variables_for_tool_use(request, message_launch):
 @csrf_exempt
 def login(request):
     config = get_tool_conf()
-    if not check_if_success_getting_tool_config(config):
-        return LTIError(config).response_json()
+    if not is_config_valid(config):
+        return lti_error(config)
     target_link_uri = request.POST.get('target_link_uri', request.GET.get('target_link_uri'))
     if not target_link_uri:
         error_message = 'LTI Login failed due to missing "target_link_uri" param'
-        return LTIError(error_message).response_json()
+        return lti_error(error_message)
     CacheConfig = get_cache_config()
     oidc_login = DjangoOIDCLogin(request, config, launch_data_storage=CacheConfig.launch_data_storage)
     return oidc_login.enable_check_cookies().redirect(target_link_uri)
@@ -204,8 +213,8 @@ def login(request):
 @csrf_exempt
 def launch(request):
     config = get_tool_conf()
-    if not check_if_success_getting_tool_config(config):
-        return LTIError(config).response_json()
+    if not is_config_valid(config):
+        return lti_error(config)
     CacheConfig = get_cache_config()
     message_launch = DjangoMessageLaunch(request, config, launch_data_storage=CacheConfig.launch_data_storage)
     if not CacheConfig.is_dummy_cache:
@@ -218,8 +227,7 @@ def launch(request):
     try:
         course_id = extract_launch_variables_for_tool_use(request, message_launch)
     except Exception as e:
-        return LTIError(e).response_json()
+        return lti_error(e)
 
     url = reverse('courses', kwargs={'course_id': course_id})
     return redirect(url)
-
