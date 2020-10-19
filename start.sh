@@ -7,7 +7,7 @@ if [ -z "${ENV_FILE}" ]; then
     ENV_FILE="/secrets/env.json"
 fi
 
-echo "$DJANGO_SETTINGS_MODULE"
+echo $DJANGO_SETTINGS_MODULE
 
 if [ -z "${GUNICORN_WORKERS}" ]; then
     GUNICORN_WORKERS=4
@@ -85,7 +85,7 @@ if [ "${IS_CRON_POD:-"false",,}" == "false" ]; then
     exec gunicorn dashboard.wsgi:application \
         --bind 0.0.0.0:${GUNICORN_PORT} \
         --workers="${GUNICORN_WORKERS}" \
-        "${GUNICORN_RELOAD}"
+        ${GUNICORN_RELOAD}
  
 else
     if [ -z "${CRONTAB_SCHEDULE}" ]; then

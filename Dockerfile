@@ -1,5 +1,5 @@
 # build react components for production mode
-FROM node:12-alpine AS node-webpack
+FROM node:14-slim AS node-webpack
 WORKDIR /usr/src/app
 
 # NOTE: package.json and webpack.config.js not likely to change between dev builds
@@ -14,12 +14,13 @@ RUN npm run prod
 # We need these later we'll just uncompress them 
 # Put them in node_modules as this directory isn't masked by docker-compose
 # Also remove src and the symlinks afterward
-RUN apk --update add tar && \ 
+RUN apt-get update && \
+    apt-get install tar && \
     find node_modules -type l -print0 | tar -zcvf node_modules/all_symlinks.tgz --remove-files --null -T - && \
     rm -rf /usr/src/app/assets/src
 
 # build node libraries for production mode
-FROM node:12-alpine AS node-prod-deps
+FROM node:14-slim AS node-prod-deps
 
 COPY --from=node-webpack /usr/src/app /usr/src/app
 RUN npm prune --production && \
