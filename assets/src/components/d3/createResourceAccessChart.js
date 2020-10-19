@@ -158,14 +158,20 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
   const main = d3.select(domElement).append('div')
   const unReadResources = resourceData.filter(resource => resource.self_access_count === 0)
   const narrativeTextForResources = () => {
-    const base = `Resource accessed from week ${weekRange[0]} to ${weekRange[1]} with the grades ${gradeSelection}
-                  and selected resource types to be viewed is ${resourceType}.
-                  ${unReadResources.length}/${resourceData.length} are not accessed by you.`
-    const i = ['Resources List accessed by other students are:  ']
-    unReadResources.map(x =>
-      i.push(`${x.resource_name.split('|')[1]} of Type ${x.resource_type} was accessed ${x.total_percent}% `)
-    )
-    return base.concat(i.toString())
+    let base = `Resources accessed from week ${weekRange[0]} to ${weekRange[1]}.  `
+    if (gradeSelection.toUpperCase() !== 'ALL') {
+      base = base.concat(`Filtering on grades ${gradeSelection}.  `)
+    }
+    base = base.concat(`Selected resource type is ${resourceType}.  `)
+    if (unReadResources.length > 0) {
+      base = base.concat(`You have not yet accessed ${unReadResources.length} of ${resourceData.length} resources.  `)
+      const i = ['Unaccessed resources are:  ']
+      unReadResources.map(x =>
+        i.push(`${x.resource_name.split('|')[1]} of Type ${x.resource_type} accessed by ${x.total_percent}%; `)
+      )
+      base = base.concat(i)
+    }
+    return base
   }
 
   // eslint-disable-next-line no-unused-vars
