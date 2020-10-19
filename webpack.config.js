@@ -7,6 +7,10 @@ module.exports = {
     path: path.join(__dirname, 'assets/dist'),
     filename: '[name]-[hash].js'
   },
+  watchOptions: {
+    ignored: /node_modules/,
+    aggregateTimeout: 600
+  },
   module: {
     rules: [
       {
