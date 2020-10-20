@@ -3,10 +3,12 @@ import { adjustViewport } from '../../util/chart'
 import { roundToXDecimals } from '../../util/math'
 import { siteTheme } from '../../globals'
 
-function createHistogram ({
-  data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, maxGrade = 100,
-  showNumberOnBars = false, showDashedLine = true
-}) {
+function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, gradesSummary }) {
+  console.log(gradesSummary)
+  const myGrade = gradesSummary.current_user_grade
+  const maxGrade = gradesSummary.graph_upper_limit
+  const showNumberOnBars = gradesSummary.show_number_on_bars
+  const showDashedLine = gradesSummary.show_dash_line
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
   const barColor = siteTheme.palette.secondary.main
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
@@ -31,15 +33,19 @@ function createHistogram ({
     .domain(x.domain())
     .thresholds(x.ticks(40))(data)
 
+  const narrativeText = {}
+
   const isBinningUsed = new Set(data.slice(0, 5)).size === 1
-  const binnedGradeText = `First five low performers scores are binned their scores are less than ${Math.trunc(firstGradeAfterBinnedGrade)}%.`
-  const yourGradeText = `your course grade is ${myGrade}.`
-  const narrativeTextCollection = [`${myGrade ? yourGradeText : ''} ${isBinningUsed ? binnedGradeText : ''} Course grades are:`]
+  narrativeText.courseStats = `Course info: Number of students= ${gradesSummary.tot_students}, Average grade= ${gradesSummary.grade_avg}, Median grade= ${gradesSummary.median_grade}.`
+  narrativeText.yourGrade = myGrade ? `your grade: ${myGrade}` : ''
+  narrativeText.binnedGradeText = isBinningUsed ? `First five low performers scores are binned their scores are less than ${Math.trunc(firstGradeAfterBinnedGrade)}%.` : ''
+  narrativeText.courseGrades = []
   for (const gradeBin in bins) {
     if (bins[gradeBin].length > 0) {
-      narrativeTextCollection.push(`${bins[gradeBin].length} grades in ${bins[gradeBin].x0} - ${bins[gradeBin].x1}% range`)
+      narrativeText.courseGrades.push(`${bins[gradeBin].length} in ${bins[gradeBin].x0} - ${bins[gradeBin].x1}%`)
     }
   }
+  console.log(narrativeText)
 
   // getting the first bin that has some grades in them, accessing the x1(higher bin) value
   const dashLine = () => {
@@ -61,7 +67,9 @@ function createHistogram ({
     .attr('aria-live', 'polite')
     .attr('id', 'grade-view-narrative')
     .attr('class', 'screenreader-only sr-only')
-    .text(d => narrativeTextCollection.toString())
+    .text(d => {
+      return narrativeText.courseStats.concat(narrativeText.courseStats, narrativeText.yourGrade, narrativeText.binnedGradeText, narrativeText.courseGrades.toString())
+    })
 
   const svg = main.append('svg')
     .attr('width', aWidth)
