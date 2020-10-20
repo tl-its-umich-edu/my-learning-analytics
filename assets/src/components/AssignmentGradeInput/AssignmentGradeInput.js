@@ -48,7 +48,6 @@ function AssignmentGradeInput (props) {
       onChange={event => {
         const assignmentGoalGrade = event.target.value
         updateGoalGradeInternal(assignmentGoalGrade)
-        //handleAssignmentGoalGrade(gradeKey, assignmentGoalGrade)
       }}
       type='number'
       className={className}

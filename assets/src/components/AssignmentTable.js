@@ -14,7 +14,7 @@ import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
 // import StyledTextField from './StyledTextField'
 import { calculateWeekOffset } from '../util/date'
-import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
+import { roundToXDecimals } from '../util/math'
 import AssignmentGradeInput from './AssignmentGradeInput/AssignmentGradeInput'
 
 const styles = theme => ({
@@ -105,10 +105,6 @@ function AssignmentTable (props) {
       ? assignments[key - 1].dueDateMonthDay === dueDateMonthDay
       : false
   }
-
-  // Use decimal place of pointsPossible if it's a decimal; otherwise, round to nearest tenth
-  const placeToRoundTo = pointsPossible => (String(pointsPossible).includes('.'))
-    ? getDecimalPlaceOfFloat(pointsPossible) : 1
 
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
@@ -202,26 +198,6 @@ function AssignmentTable (props) {
                           ? <div className={classes.possiblePointsText}>{a.outOf === 0 ? '0' : `${a.currentUserSubmission.score}`}</div>
                           : (
                             <>
-                              {/* <StyledTextField
-                                error={(a.goalGrade / a.pointsPossible) > 1}
-                                disabled={!courseGoalGradeSet}
-                                id='standard-number'
-                                value={roundToXDecimals(a.goalGrade, placeToRoundTo(a.pointsPossible))}
-                                label={
-                                  !courseGoalGradeSet ? 'Set a goal'
-                                    : (a.goalGrade / a.pointsPossible) > 1
-                                      ? 'Over 100%'
-                                      : 'Set a goal'
-                                }
-                                onChange={event => {
-                                  const assignmentGoalGrade = event.target.value
-                                  handleAssignmentGoalGrade(key, assignmentGoalGrade)
-                                }}
-                                type='number'
-                                className={classes.goalGradeInput}
-                                onFocus={() => handleInputFocus(key)}
-                                onBlur={() => handleInputBlur(key)}
-                              /> */}
                               <AssignmentGradeInput
                                 assignment={a}
                                 className={classes.goalGradeInput}
