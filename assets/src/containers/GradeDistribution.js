@@ -111,6 +111,7 @@ function GradeDistribution (props) {
             aspectRatio={0.3}
             xAxisLabel='Grade %'
             yAxisLabel='Number of Students'
+            showGrade={showGrade}
             gradesSummary={gradeData.summary}
           />
         </Grid>

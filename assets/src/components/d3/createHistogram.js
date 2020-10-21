@@ -1,12 +1,12 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import { roundToXDecimals } from '../../util/math'
+import { isInRange } from '../../util/chartsMisc'
 import { siteTheme } from '../../globals'
 
-function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, gradesSummary }) {
-  console.log(gradesSummary)
-  const myGrade = gradesSummary.current_user_grade
+function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, showGrade, gradesSummary }) {
   const maxGrade = gradesSummary.graph_upper_limit
+  const myGrade = gradesSummary.current_user_grade
   const showNumberOnBars = gradesSummary.show_number_on_bars
   const showDashedLine = gradesSummary.show_dash_line
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
@@ -36,16 +36,24 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   const narrativeText = {}
 
   const isBinningUsed = new Set(data.slice(0, 5)).size === 1
-  narrativeText.courseStats = `Course info: Number of students= ${gradesSummary.tot_students}, Average grade= ${gradesSummary.grade_avg}, Median grade= ${gradesSummary.median_grade}.`
-  narrativeText.yourGrade = myGrade ? `your grade: ${myGrade}` : ''
-  narrativeText.binnedGradeText = isBinningUsed ? `First five low performers scores are binned their scores are less than ${Math.trunc(firstGradeAfterBinnedGrade)}%.` : ''
+  narrativeText.courseStats = `Course information: Number of students = ${gradesSummary.tot_students}, Average grade = ${gradesSummary.grade_avg}, Median grade = ${gradesSummary.median_grade}.`
+  narrativeText.binnedGradeText = isBinningUsed ? ` First grades are binned at ${Math.trunc(firstGradeAfterBinnedGrade)}% or lower.` : ''
   narrativeText.courseGrades = []
   for (const gradeBin in bins) {
     if (bins[gradeBin].length > 0) {
-      narrativeText.courseGrades.push(`${bins[gradeBin].length} in ${bins[gradeBin].x0} - ${bins[gradeBin].x1}%`)
+      const binLowerLimit = bins[gradeBin].x0
+      const binUpperLimit = bins[gradeBin].x1
+      if (isInRange(myGrade, binLowerLimit, binUpperLimit) && showGrade) {
+        narrativeText.courseGrades.push(`${(narrativeText.courseGrades.length !== 0)
+          ? `${bins[gradeBin].length} in ${binLowerLimit} - ${binUpperLimit}% and your grade ${myGrade}% is in this range`
+          : `${bins[gradeBin].length} grades in ${binLowerLimit} - ${binUpperLimit}% range and your grade ${myGrade}% is in this range`}`)
+      } else {
+        narrativeText.courseGrades.push(`${(narrativeText.courseGrades.length !== 0
+          ? `${bins[gradeBin].length} in ${binLowerLimit} - ${binUpperLimit}% `
+          : `${bins[gradeBin].length} grades in ${binLowerLimit} - ${binUpperLimit}%`)}`)
+      }
     }
   }
-  console.log(narrativeText)
 
   // getting the first bin that has some grades in them, accessing the x1(higher bin) value
   const dashLine = () => {
@@ -68,7 +76,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     .attr('id', 'grade-view-narrative')
     .attr('class', 'screenreader-only sr-only')
     .text(d => {
-      return narrativeText.courseStats.concat(narrativeText.courseStats, narrativeText.yourGrade, narrativeText.binnedGradeText, narrativeText.courseGrades.toString())
+      return narrativeText.courseStats.concat(narrativeText.binnedGradeText, narrativeText.courseGrades.toString())
     })
 
   const svg = main.append('svg')
@@ -144,7 +152,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   svg.append('g')
     .call(yAxis)
 
-  if (myGrade) {
+  if (showGrade) {
     svg.append('line')
       .attr('transform', `translate(0, ${aHeight - margin.bottom})`)
       .attr('x1', x(myGrade))
