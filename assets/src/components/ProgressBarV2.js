@@ -23,7 +23,8 @@ function ProgressBarV2 (props) {
     percentWidth,
     height = 10,
     margin = 0,
-    lines = []
+    lines = [],
+    description
   } = props
 
   const scoreRatio = score
@@ -46,6 +47,8 @@ function ProgressBarV2 (props) {
     <>
       {
         <div
+          tabIndex='0'
+          aria-label={description !== undefined ? description : undefined }
           className={classes.outOfBar}
           style={{
             width: `${percentWidth}%`,
