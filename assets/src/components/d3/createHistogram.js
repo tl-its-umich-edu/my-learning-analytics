@@ -4,9 +4,9 @@ import { roundToXDecimals } from '../../util/math'
 import { isInRange } from '../../util/chartsMisc'
 import { siteTheme } from '../../globals'
 
-function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, showGrade, gradesSummary }) {
+function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, gradesSummary }) {
+  console.log(data)
   const maxGrade = gradesSummary.graph_upper_limit
-  const myGrade = gradesSummary.current_user_grade
   const showNumberOnBars = gradesSummary.show_number_on_bars
   const showDashedLine = gradesSummary.show_dash_line
   const margin = { top: 20, right: 20, bottom: 50, left: 40 }
@@ -43,7 +43,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     if (bins[gradeBin].length > 0) {
       const binLowerLimit = bins[gradeBin].x0
       const binUpperLimit = bins[gradeBin].x1
-      if (isInRange(myGrade, binLowerLimit, binUpperLimit) && showGrade) {
+      if (isInRange(myGrade, binLowerLimit, binUpperLimit) && myGrade) {
         narrativeText.courseGrades.push(`${(narrativeText.courseGrades.length !== 0)
           ? `${bins[gradeBin].length} in ${binLowerLimit} - ${binUpperLimit}% and your grade ${myGrade}% is in this range`
           : `${bins[gradeBin].length} grades in ${binLowerLimit} - ${binUpperLimit}% range and your grade ${myGrade}% is in this range`}`)
@@ -152,7 +152,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   svg.append('g')
     .call(yAxis)
 
-  if (showGrade) {
+  if (myGrade) {
     svg.append('line')
       .attr('transform', `translate(0, ${aHeight - margin.bottom})`)
       .attr('x1', x(myGrade))
