@@ -23,11 +23,11 @@ const foreignObjSide = 24
 
 const resourceToolTipText = (resource, sendHTMLTag) => {
   if (resource.self_access_count === 0) {
-    return (sendHTMLTag) ? '<b>You haven\'t accessed this resource. </b>' : 'You haven\'t accessed this resource.'
+    return (sendHTMLTag) ? '<b>You haven\'t accessed this resource </b>' : 'You haven\'t accessed this resource'
   } else if (resource.self_access_count === 1) {
-    return `You accessed this resource once on ${new Date(resource.self_access_last_time).toDateString()}.`
+    return `You accessed this resource once on ${new Date(resource.self_access_last_time).toDateString()}`
   } else {
-    return `You accessed this resource ${resource.self_access_count} times. The last time you accessed this resource was on ${new Date(resource.self_access_last_time).toDateString()}.`
+    return `You accessed this resource ${resource.self_access_count} times. The last time you accessed this resource was on ${new Date(resource.self_access_last_time).toDateString()}`
   }
 }
 
@@ -158,14 +158,14 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
 
   const textScale = d3.scaleLinear().range([12, 6]).domain([15, 50]).clamp(true)
   const unReadResources = resourceData.filter(resource => resource.self_access_count === 0)
-  // this is d3 graph narrative text
+  // d3 graph narrative text
   const narrativeTextResources = {}
   narrativeTextResources.weekRange = `Resources accessed from week ${weekRange[0]} to ${weekRange[1]}.  `
   narrativeTextResources.resourceType = `Selected resource type is ${resourceType}.  `
   narrativeTextResources.gradeFilter = gradeSelection.toUpperCase() !== 'ALL' ? `Filtering on grades ${gradeSelection}.  ` : ''
   narrativeTextResources.resourcesUnaccessCount = `You have not yet accessed ${unReadResources.length} of ${resourceData.length} resources.  `
   narrativeTextResources.resourcesList = resourceData.map(x =>
-    `${x.resource_name.split('|')[1]} of Type ${x.resource_type} accessed ${x.total_percent}%. ${resourceToolTipText(x, false)}  `
+    `${x.resource_name.split('|')[1]} of type ${x.resource_type} accessed ${x.total_percent}% and ${resourceToolTipText(x, false)} `
   )
 
   // Build the chart
