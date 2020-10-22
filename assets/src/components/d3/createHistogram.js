@@ -44,18 +44,18 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
       }
     }
   }
-  const narrativeText = {}
-  narrativeText.courseStats = `Course information: Number of students = ${gradesSummary.tot_students}, Average grade = ${gradesSummary.grade_avg}, Median grade = ${gradesSummary.median_grade}.`
-  narrativeText.binnedGradeText = userGradeInBinnedGroup()
-  narrativeText.courseGrades = []
+  const narrativeTextGrades = {}
+  narrativeTextGrades.courseStats = `Course information: Number of students = ${gradesSummary.tot_students}, Average grade = ${gradesSummary.grade_avg}, Median grade = ${gradesSummary.median_grade}.`
+  narrativeTextGrades.binnedGradeText = userGradeInBinnedGroup()
+  narrativeTextGrades.courseGrades = []
   for (const gradeBin in bins) {
     if (bins[gradeBin].length > 0) {
       const binLowerLimit = bins[gradeBin].x0
       const binUpperLimit = bins[gradeBin].x1
       if (isInRange(myGrade, binLowerLimit, binUpperLimit) && myGrade) {
-        narrativeText.courseGrades.push(`${bins[gradeBin].length} grades in ${binLowerLimit} - ${binUpperLimit}% range and your grade ${myGrade}% is in this range `)
+        narrativeTextGrades.courseGrades.push(`${bins[gradeBin].length} grades in ${binLowerLimit} - ${binUpperLimit}% range and your grade ${myGrade}% is in this range `)
       } else {
-        narrativeText.courseGrades.push(`${(narrativeText.courseGrades.length !== 0
+        narrativeTextGrades.courseGrades.push(`${(narrativeTextGrades.courseGrades.length !== 0
           ? `${bins[gradeBin].length} in ${binLowerLimit} - ${binUpperLimit}% `
           : `${bins[gradeBin].length} grades in ${binLowerLimit} - ${binUpperLimit}%`)}`)
       }
@@ -83,7 +83,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     .attr('id', 'grade-view-narrative')
     .attr('class', 'screenreader-only sr-only')
     .text(d => {
-      return narrativeText.courseStats.concat(narrativeText.binnedGradeText, narrativeText.courseGrades.toString())
+      return narrativeTextGrades.courseStats.concat(narrativeTextGrades.binnedGradeText, narrativeTextGrades.courseGrades.toString())
     })
 
   const svg = main.append('svg')
