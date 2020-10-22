@@ -21,9 +21,9 @@ const linkColor = siteTheme.palette.link.main
 // resource icon and padding to its right; this value is also used to calculate the resourceLabelWidth.
 const foreignObjSide = 24
 
-const resourceToolTipText = (resource) => {
+const resourceToolTipText = (resource, sendHTMLTag) => {
   if (resource.self_access_count === 0) {
-    return '<b>You haven\'t accessed this resource. </b>'
+    return (sendHTMLTag) ? '<b>You haven\'t accessed this resource. </b>' : 'You haven\'t accessed this resource.'
   } else if (resource.self_access_count === 1) {
     return `You accessed this resource once on ${new Date(resource.self_access_last_time).toDateString()}.`
   } else {
@@ -34,7 +34,7 @@ const resourceToolTipText = (resource) => {
 const toolTip = d3tip().attr('class', 'd3-tip')
   .direction('n').offset([-5, 5])
   .html(d => {
-    return resourceToolTipText(d)
+    return resourceToolTipText(d, true)
   })
 
 function appendLegend (svg) {
@@ -165,7 +165,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
   narrativeTextResources.gradeFilter = gradeSelection.toUpperCase() !== 'ALL' ? `Filtering on grades ${gradeSelection}.  ` : ''
   narrativeTextResources.resourcesUnaccessCount = `You have not yet accessed ${unReadResources.length} of ${resourceData.length} resources.  `
   narrativeTextResources.resourcesList = resourceData.map(x =>
-    `${x.resource_name.split('|')[1]} of Type ${x.resource_type} accessed ${x.total_percent}%. ${resourceToolTipText(x)}  `
+    `${x.resource_name.split('|')[1]} of Type ${x.resource_type} accessed ${x.total_percent}%. ${resourceToolTipText(x, false)}  `
   )
 
   // Build the chart
