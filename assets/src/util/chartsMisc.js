@@ -5,7 +5,7 @@ const isInRange = (data, lowerLimit, upperLimit) => {
 }
 
 const isOutOfRange = (data, checkPointData) => {
-  if (data < checkPointData) {
+  if (data !== null && data < checkPointData) {
     return true
   } else { return false }
 }
