@@ -120,16 +120,6 @@ function AssignmentTable (props) {
     }
   }, [currentWeekRow.current])
 
-  const getDescription = (assignment) => {
-    let description = 'This assignment is worth ' + assignment.percentOfFinalGrade + '% of your grade.  '
-    description = description.concat('Points possible: ' + assignment.pointsPossible + '.  ')
-    description = description.concat('Your goal: ' + (assignment.goalGrade ? assignment.goalGrade : 'None') + '.  ')
-    description = description.concat('Your grade: ' + (assignment.grade ? assignment.grade : 'Not graded') + '.  ')
-    description = description.concat('Class average: ' + assignment.averageGrade + '.  ')
-    description = description.concat('Rules: ' + (assignment.rules ? assignment.rules : 'There are no rules for this assignment') + '.  ')
-    return description
-  }
-
   return (
     <RootRef rootRef={tableRef}>
       <TableContainer className={classes.container}>
@@ -252,7 +242,12 @@ function AssignmentTable (props) {
                               ? [{ color: 'green', value: a.goalGrade, draggable: true }]
                               : []
                           }
-                          description={getDescription(a)}
+                          description={`This assignment is worth ${a.percentOfFinalGrade}% of your grade.  
+                          Points possible: ${a.pointsPossible}.
+                          Your goal: ${(a.goalGrade ? a.goalGrade : 'None')}.  
+                          Your grade: ${(a.grade ? a.grade : 'Not graded')}.  
+                          Class average: ${a.averageGrade}.  
+                          Rules: ${(a.rules ? a.rules : 'There are no rules for this assignment')}.  `}
                         />
                         <Popover
                           className={classes.popover}
