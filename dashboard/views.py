@@ -391,7 +391,7 @@ def resource_access_within_week(request, course_id=0):
 
     output_df.fillna(0, inplace=True) #replace null value with 0
 
-    output_df['resource_id_part'], output_df['resource_name_part'] = output_df['resource_id_name'].str.split(';', 1).str
+    output_df[['resource_id_part','resource_name_part']] = output_df['resource_id_name'].str.split(';', expand=True)
 
     output_df['resource_name'] = output_df.apply(
         lambda row:
