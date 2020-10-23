@@ -404,7 +404,7 @@ def resource_access_within_week(request, course_id=0):
             ),
         axis=1)
     # RESOURCE_VALUES_MAP {'canvas': 'files', 'leccap': 'videos', 'mivideo': 'videos'}
-    output_df['resource_type'] =  output_df['resource_type'].replace(RESOURCE_VALUES_MAP)
+    output_df['resource_type'] = output_df['resource_type'].replace(RESOURCE_VALUES_MAP)
     output_df.drop(columns=['resource_id_part', 'resource_name_part', 'resource_id_name'], inplace=True)
 
     logger.debug(output_df.to_json(orient='records'))

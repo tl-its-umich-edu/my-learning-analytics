@@ -29,23 +29,24 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     .domain([0, maxGrade]).nice()
     .range([margin.left, aWidth - margin.right])
 
-  const isBinningUsed = new Set(data.slice(0, 5)).size === 1
-
   const bins = d3.histogram()
     .domain(x.domain())
     .thresholds(x.ticks(40))(data)
 
-  const userGradeInBinnedGroup = () => {
-    if (isBinningUsed) {
-      if (isOutOfRange(myGrade, firstGradeAfterBinnedGrade)) {
-        return `First grades are binned at ${Math.trunc(firstGradeAfterBinnedGrade)}% or lower and your grade ${myGrade} fall in this bin. `
-      } else {
-        return `First grades are binned at ${Math.trunc(firstGradeAfterBinnedGrade)}% or lower. `
-      }
+  // SVG narrative for accessibility
+  const isBinningUsed = new Set(data.slice(0, 5)).size === 1
+  const binningNarrativeText = () => {
+    if (isOutOfRange(myGrade, firstGradeAfterBinnedGrade)) {
+      return `First grades are binned at ${Math.trunc(firstGradeAfterBinnedGrade)}% or lower and your grade ${myGrade} fall in this bin. `
+    } else {
+      return `First grades are binned at ${Math.trunc(firstGradeAfterBinnedGrade)}% or lower. `
     }
   }
+  const userGradeInBinnedGroup = () => {
+    return isBinningUsed ? binningNarrativeText() : ''
+  }
   const narrativeTextGrades = {}
-  narrativeTextGrades.courseStats = `Course information: Number of students = ${gradesSummary.tot_students}, Average grade = ${gradesSummary.grade_avg}, Median grade = ${gradesSummary.median_grade}.`
+  narrativeTextGrades.courseStats = `Course information: Class Size = ${gradesSummary.tot_students}, Average grade = ${gradesSummary.grade_avg}%, Median grade = ${gradesSummary.median_grade}%.`
   narrativeTextGrades.binnedGradeText = userGradeInBinnedGroup()
   narrativeTextGrades.courseGrades = []
   for (const gradeBin in bins) {
@@ -57,7 +58,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
       } else {
         narrativeTextGrades.courseGrades.push(`${(narrativeTextGrades.courseGrades.length !== 0
           ? `${bins[gradeBin].length} in ${binLowerLimit} - ${binUpperLimit}% `
-          : `${bins[gradeBin].length} grades in ${binLowerLimit} - ${binUpperLimit}%`)}`)
+          : `${bins[gradeBin].length} grades in ${binLowerLimit} - ${binUpperLimit}% range`)}`)
       }
     }
   }
@@ -75,10 +76,10 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     .domain([0, d3.max(bins, d => d.length)]).nice()
     .range([aHeight - margin.bottom, margin.top])
 
+  // SVG Components
   const main = d3.select(domElement).append('div')
-
   // eslint-disable-next-line no-unused-vars
-  const desp = main.append('div')
+  const containerGradesDiv = main.append('div')
     .attr('aria-live', 'polite')
     .attr('id', 'grade-view-narrative')
     .attr('class', 'screenreader-only sr-only')

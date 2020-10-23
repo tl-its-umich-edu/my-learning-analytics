@@ -172,7 +172,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
   const main = d3.select(domElement).append('div')
 
   // eslint-disable-next-line no-unused-vars
-  const desp = main.append('div')
+  const containerResourcesDiv = main.append('div')
     .attr('aria-live', 'polite')
     .attr('id', 'resource-view-narrative')
     .attr('class', 'screenreader-only sr-only')
