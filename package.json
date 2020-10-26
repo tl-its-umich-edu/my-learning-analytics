@@ -1,7 +1,7 @@
 {
   "name": "my-learning-analytics",
   "version": "0.0.2",
-  "description": "Providing students with visualization",
+  "description": "Providing data visualization",
   "repository": "https://github.com/tl-its-umich-edu/my-learning-analytics",
   "license": "Apache-2.0",
   "dependencies": {

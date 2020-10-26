@@ -1,20 +1,20 @@
 const path = require('path')
 const BundleTracker = require('webpack-bundle-tracker')
+const isDevelopment = process.env.BABEL_ENV !== 'production'
 
 module.exports = {
+  mode: isDevelopment ? 'development' : 'production',
   entry: path.join(__dirname, 'assets/src/index'),
   output: {
     path: path.join(__dirname, 'assets/dist'),
     filename: '[name]-[hash].js'
   },
-  watchOptions: {
-    ignored: /node_modules/,
-    aggregateTimeout: 600
-  },
+  devtool: isDevelopment ? 'inline-source-map' : 'false',
   module: {
     rules: [
       {
         test: /\.(js|mjs|jsx|ts|tsx)$/,
+        exclude: /node_modules/,
         loader: 'babel-loader'
       },
       {
