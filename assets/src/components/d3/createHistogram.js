@@ -5,7 +5,6 @@ import { isInRange, isOutOfRange } from '../../util/chartsMisc'
 import { siteTheme } from '../../globals'
 
 function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, gradesSummary }) {
-  console.log(data)
   const maxGrade = gradesSummary.graph_upper_limit
   const showNumberOnBars = gradesSummary.show_number_on_bars
   const showDashedLine = gradesSummary.show_dash_line
@@ -90,13 +89,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   const svg = main.append('svg')
     .attr('width', aWidth)
     .attr('height', aHeight)
-    .attr('aria-describedby', 'grade-view-narrative')
-    .attr('role', 'img')
-    .attr('aria-labelledby', 'Grade-view-title-id')
-
-  svg.append('svg:title')
-    .attr('id', 'Grade-view-title-id')
-    .text(d => 'Grade distribution SVG Graph')
+    .attr('aria-hidden', 'true')
 
   const bar = svg.selectAll('rect')
     .data(bins).enter()

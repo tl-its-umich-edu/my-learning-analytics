@@ -185,19 +185,13 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     .attr('class', 'svgWrapper')
     .attr('width', availWidth)
     .attr('height', availHeight)
-    .attr('aria-describedby', 'resource-view-narrative')
-    .attr('role', 'img')
-    .attr('aria-labelledby', 'resource-view-title-id')
+    .attr('aria-hidden', 'true')
     .attr('transform', `translate(${margin.left}, ${margin.top})`)
     .on('wheel.zoom', scroll)
     .on('mousedown.zoom', null) // Override the center selection
     .on('touchstart.zoom', null)
     .on('touchmove.zoom', null)
     .on('touchend.zoom', null)
-
-  svg.append('svg:title')
-    .attr('id', 'resource-view-title-id')
-    .text(d => 'Resource view SVG Graph')
 
   function update () {
     const bar = d3.select('.mainGroup').selectAll('.bar')
