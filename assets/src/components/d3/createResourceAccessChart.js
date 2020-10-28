@@ -1,5 +1,6 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
+import { resources } from './d3ViewsNarrative'
 import d3tip from 'd3-tip'
 import './createResourceAccessChart.css'
 import '@fortawesome/fontawesome-free'
@@ -21,20 +22,20 @@ const linkColor = siteTheme.palette.link.main
 // resource icon and padding to its right; this value is also used to calculate the resourceLabelWidth.
 const foreignObjSide = 24
 
-const resourceToolTipText = (resource, sendHTMLTag) => {
+const resourceToolTipText = (resource) => {
   if (resource.self_access_count === 0) {
-    return (sendHTMLTag) ? '<b>You haven\'t accessed this resource </b>' : 'You haven\'t accessed this resource'
+    return '<b>You haven\'t accessed this resource. </b>'
   } else if (resource.self_access_count === 1) {
-    return `You accessed this resource once on ${new Date(resource.self_access_last_time).toDateString()}`
+    return `You accessed this resource once on ${new Date(resource.self_access_last_time).toDateString()}.`
   } else {
-    return `You accessed this resource ${resource.self_access_count} times. The last time you accessed this resource was on ${new Date(resource.self_access_last_time).toDateString()}`
+    return `You accessed this resource ${resource.self_access_count} times. The last time you accessed this resource was on ${new Date(resource.self_access_last_time).toDateString()}.`
   }
 }
 
 const toolTip = d3tip().attr('class', 'd3-tip')
   .direction('n').offset([-5, 5])
   .html(d => {
-    return resourceToolTipText(d, true)
+    return resourceToolTipText(d)
   })
 
 function appendLegend (svg) {
@@ -157,17 +158,8 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
   const miniYScale = d3.scaleBand().range([0, miniHeight])
 
   const textScale = d3.scaleLinear().range([12, 6]).domain([15, 50]).clamp(true)
-  const unReadResources = resourceData.filter(resource => resource.self_access_count === 0)
   // d3 graph narrative text
-  const narrativeTextResources = {}
-  narrativeTextResources.weekRange = `Resources accessed from week ${weekRange[0]} to ${weekRange[1]}.  `
-  narrativeTextResources.resourceType = `Selected resource type is ${resourceType}.  `
-  narrativeTextResources.gradeFilter = gradeSelection.toUpperCase() !== 'ALL' ? `Filtering on grades ${gradeSelection}.  ` : ''
-  narrativeTextResources.resourcesUnaccessCount = `You have not yet accessed ${unReadResources.length} of ${resourceData.length} resources.  `
-  narrativeTextResources.resourcesList = resourceData.map(x =>
-    `${x.resource_name.split('|')[1]} of type ${x.resource_type} accessed ${x.total_percent}% and ${resourceToolTipText(x, false)} `
-  )
-
+  const narrativeTextResources = resources(resourceData, resourceType, gradeSelection, weekRange)
   // Build the chart
   const main = d3.select(domElement).append('div')
 
@@ -178,7 +170,8 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     .attr('class', 'screenreader-only sr-only')
     .text(d => {
       return narrativeTextResources.weekRange.concat(narrativeTextResources.resourceType,
-        narrativeTextResources.gradeFilter, narrativeTextResources.resourcesUnaccessCount, narrativeTextResources.resourcesList)
+        narrativeTextResources.gradeFilter, narrativeTextResources.resourcesUnaccessCount,
+        narrativeTextResources.resourcesUnAccessList, narrativeTextResources.resourcesAccessCount, narrativeTextResources.resourceAccessList)
     })
 
   const svg = main.append('svg')

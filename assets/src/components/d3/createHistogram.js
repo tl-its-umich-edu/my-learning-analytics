@@ -1,8 +1,8 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import { roundToXDecimals } from '../../util/math'
-import { isInRange, isOutOfRange } from '../../util/chartsMisc'
 import { siteTheme } from '../../globals'
+import { grades } from './d3ViewsNarrative'
 
 function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, gradesSummary }) {
   const maxGrade = gradesSummary.graph_upper_limit
@@ -33,34 +33,8 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     .thresholds(x.ticks(40))(data)
 
   // SVG narrative for accessibility
-  const isBinningUsed = new Set(data.slice(0, 5)).size === 1
-  const binningNarrativeText = () => {
-    if (isOutOfRange(myGrade, firstGradeAfterBinnedGrade)) {
-      return `First grades are binned at ${Math.trunc(firstGradeAfterBinnedGrade)}% or lower and your grade ${myGrade} fall in this bin. `
-    } else {
-      return `First grades are binned at ${Math.trunc(firstGradeAfterBinnedGrade)}% or lower. `
-    }
-  }
-  const userGradeInBinnedGroup = () => {
-    return isBinningUsed ? binningNarrativeText() : ''
-  }
-  const narrativeTextGrades = {}
-  narrativeTextGrades.courseStats = `Course information: Class Size = ${gradesSummary.tot_students}, Average grade = ${gradesSummary.grade_avg}%, Median grade = ${gradesSummary.median_grade}%.`
-  narrativeTextGrades.binnedGradeText = userGradeInBinnedGroup()
-  narrativeTextGrades.courseGrades = []
-  for (const gradeBin in bins) {
-    if (bins[gradeBin].length > 0) {
-      const binLowerLimit = bins[gradeBin].x0
-      const binUpperLimit = bins[gradeBin].x1
-      if (isInRange(myGrade, binLowerLimit, binUpperLimit) && myGrade) {
-        narrativeTextGrades.courseGrades.push(`${bins[gradeBin].length} grades in ${binLowerLimit} - ${binUpperLimit}% range and your grade ${myGrade}% is in this range `)
-      } else {
-        narrativeTextGrades.courseGrades.push(`${(narrativeTextGrades.courseGrades.length !== 0
-          ? `${bins[gradeBin].length} in ${binLowerLimit} - ${binUpperLimit}% `
-          : `${bins[gradeBin].length} grades in ${binLowerLimit} - ${binUpperLimit}% range`)}`)
-      }
-    }
-  }
+
+  const narrativeTextGrades = grades(data, bins, gradesSummary, myGrade, firstGradeAfterBinnedGrade)
 
   // getting the first bin that has some grades in them, accessing the x1(higher bin) value
   const dashLine = () => {
