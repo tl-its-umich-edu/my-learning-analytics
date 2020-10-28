@@ -44,9 +44,18 @@ function createHistogram ({
     .domain([0, d3.max(bins, d => d.length)]).nice()
     .range([aHeight - margin.bottom, margin.top])
 
-  const svg = d3.select(domElement).append('svg')
+  const main = d3.select(domElement).append('div')
+  // eslint-disable-next-line no-unused-vars
+  const containerGradesDiv = main.append('div')
+    .attr('aria-live', 'polite')
+    .attr('id', 'grade-view-narrative')
+    .attr('class', 'screenreader-only sr-only')
+    .text('This is Grades narrative')
+
+  const svg = main.append('svg')
     .attr('width', aWidth)
     .attr('height', aHeight)
+    .attr('aria-hidden', 'true')
 
   const bar = svg.selectAll('rect')
     .data(bins).enter()
