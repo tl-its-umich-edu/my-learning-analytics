@@ -24,7 +24,6 @@ function AssignmentGradeInput (props) {
 
   const updateGoalGradeInternal = (grade) => {
     const roundedGrade = roundToXDecimals(grade, placeToRoundTo(assignment.pointsPossible))
-    console.log('debouncedGoalGrade ' + roundedGrade)
     debouncedGoalGrade(roundedGrade)
     setGoalGradeInternal(roundedGrade)
   }
