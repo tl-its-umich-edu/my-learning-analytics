@@ -11,6 +11,7 @@ exports[`renders correctly 1`] = `
       "width": "90%",
     }
   }
+  tabIndex="0"
 >
   <div>
     <div
