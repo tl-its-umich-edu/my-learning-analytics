@@ -88,6 +88,13 @@ function truncate (selection, labelWidth) {
 
 function createResourceAccessChart ({ data, width, height, domElement }) {
   const resourceData = data.sort((a, b) => b.total_percent - a.total_percent)
+  /* Assign an index to each resource.  This is used to assist with keyboard navigation
+  To set the tab sequence to go from resource name to its corresponding bar graph we use
+  tabindex of index*10 for the file name and index*10+1 for the bar
+  */
+  for (const index in resourceData) {
+    resourceData[index].index = Number(index) + 10
+  }
 
   const sideMarginSize = width * 0.075
   const margin = { top: 0, right: sideMarginSize, bottom: 0, left: sideMarginSize }
@@ -170,6 +177,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
     bar.enter()
       .append('rect')
+      .attr('tabindex', d => d.index * 10 + 1)
       .attr('y', d => mainYScale(d.resource_name))
       .attr('width', d => mainXScale(d.total_percent))
       .attr('height', mainYScale.bandwidth())
@@ -180,6 +188,9 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       )
       .on('mouseover', toolTip.show)
       .on('mouseout', toolTip.hide)
+      .append('foreignObject')
+      .append('div')
+      .attr('title', d => d.resource_name.split('|')[1] + ' has been accessed by ' + d.total_percent + '% of students.')
 
     // Append percentage value text to bars
     svg.selectAll('.label').remove()
@@ -430,11 +441,13 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     // Have to use ES5 function to correctly use `this` keyword
     const link = d.split('|')[0]
     const name = d.split('|')[1]
+    const resourceDataIndex = resourceData.filter(rd => rd.resource_name === d)[0].index
     const a = d3.select(this.parentNode).append('a')
       .attr('xlink:title', name)
       .attr('xlink:target', '_blank')
       .attr('xlink:href', link)
       .attr('text-anchor', 'start')
+      .attr('tabindex', resourceDataIndex * 10)
     a.node().appendChild(this)
 
     const icon = d.split('|')[2]
