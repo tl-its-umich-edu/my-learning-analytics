@@ -15,7 +15,7 @@ RUN npm run prod
 # Put them in node_modules as this directory isn't masked by docker-compose
 # Also remove src and the symlinks afterward
 RUN apt-get update && \
-    apt-get install tar && \
+    apt-get install -y --no-install-recommends tar && \
     find node_modules -type l -print0 | tar -zcvf node_modules/all_symlinks.tgz --remove-files --null -T - && \
     rm -rf /usr/src/app/assets/src
 

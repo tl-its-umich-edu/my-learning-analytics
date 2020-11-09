@@ -1,6 +1,6 @@
 {
   "name": "my-learning-analytics",
-  "version": "0.0.2",
+  "version": "",
   "description": "Providing data visualization",
   "repository": "https://github.com/tl-its-umich-edu/my-learning-analytics",
   "license": "Apache-2.0",
@@ -18,11 +18,11 @@
     "lodash.debounce": "^4.0.8",
     "lodash.isequal": "^4.5.0",
     "rc-slider": "^8.7.1",
-    "react-helmet": "^6.1.0",
     "react": "^16.10.2",
     "react-app-polyfill": "^2.0.0",
     "react-dom": "^16.10.2",
     "react-ga": "~2.5.7",
+    "react-helmet": "^6.1.0",
     "react-router-dom": "^5.0.0"
   },
   "babel": {
