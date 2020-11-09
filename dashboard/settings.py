@@ -29,6 +29,11 @@ env_json: Union[str, None] = os.getenv('ENV_JSON')
 if env_json:
     # optionally load settings from an environment variable
     ENV = json.loads(env_json)
+    env_overrides = os.getenv("ENV_OVERRIDES", "").split(',')
+    for env_override in env_overrides:
+        ENV[env_override] = os.getenv(env_override)
+        if env_override in ['MYSQL', 'DATA_WAREHOUSE', 'LRS', 'LTI_CONFIG']:
+            ENV[env_override] = json.loads(ENV[env_override])
 else:
     # else try loading settings from the json config file
     try:

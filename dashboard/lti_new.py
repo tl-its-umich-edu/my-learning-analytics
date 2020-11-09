@@ -78,22 +78,8 @@ def get_tool_conf():
     platform_domain = list(lti_config.keys())[0]
     platform_config = lti_config[platform_domain][0]
     client_id = platform_config['client_id']
-
-    try:
-        with open(platform_config.get(
-                'private_key_file', '/secrets/private.key'),
-                'r') as private_key_file:
-            config.set_private_key(
-                platform_domain, private_key_file.read(), client_id)
-
-        with open(platform_config.get(
-                'public_key_file', '/secrets/public.key'),
-                'r') as public_key_file:
-            config.set_public_key(
-                platform_domain, public_key_file.read(), client_id)
-
-    except OSError as error:
-        return error
+    config.set_private_key(platform_domain, platform_config.get('private_key'), client_id)
+    config.set_public_key(platform_domain, platform_config.get('public_key'), client_id)
 
     return config
 

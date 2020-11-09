@@ -71,6 +71,7 @@ function Course (props) {
               enrollmentTypes={enrollmentTypes}
               isAdmin={user.admin}
             />
+            <WarningBanner>MyLA Pilot: This is a pilot of a new learning tool. Data is refreshed daily and may not contain all activities. For more information about pilots, please see <a target="_blank" href="https://lthub.ubc.ca/initiatives/technology-pilots/">the LT Hub site</a>.</WarningBanner>
             {courseInfo.course_data_loaded === 0
               ? (
                 <Card className={classes.card}>
