@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 
 from django.core.management.base import BaseCommand, CommandParser
-from django.http import JsonResponse
 
 from dashboard import lti_new
 from dashboard.keyfileutils import KeyFileUtils
@@ -35,12 +34,11 @@ class Command(BaseCommand):
             dest=self.dumpOption)
 
     def handle(self, *args, **options: dict):
-        jwkResponse: JsonResponse = lti_new.get_jwks(None)
-        jwkObject = json.loads(jwkResponse.content.decode('utf8'))
-        jwkJson = json.dumps(jwkObject['keys'][0])
+        jwks = lti_new.generate_jwks()
+        jwksJson = json.dumps(jwks['keys'][0])
 
         if options.get(self.dumpOption) is True:
-            self.stdout.write(jwkJson)
+            self.stdout.write(jwksJson)
         else:
             configDir: str = os.path.dirname(
                 os.getenv('ENV_FILE', '/secrets/env.json'))
@@ -52,5 +50,5 @@ class Command(BaseCommand):
                 configDir, options.get(self.baseNameOption))
             result: str = keyFileUtils.writeKeyFile(
                 keyFileUtils.KeyFileType.JWK,
-                jwkJson)
+                jwksJson)
             self.stdout.write(result)
