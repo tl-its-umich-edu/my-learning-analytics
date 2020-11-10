@@ -5,7 +5,7 @@ from datetime import datetime
 from django.core.management.base import BaseCommand, CommandParser
 
 from dashboard import lti_new
-from dashboard.keyfileutils import KeyFileUtils
+from dashboard.common.keyfileutils import KeyFileUtils
 
 
 class Command(BaseCommand):

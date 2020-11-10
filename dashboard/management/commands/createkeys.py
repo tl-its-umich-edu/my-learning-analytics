@@ -5,7 +5,7 @@ from Crypto.PublicKey import RSA
 from Crypto.PublicKey.RSA import RsaKey
 from django.core.management.base import BaseCommand, CommandParser
 
-from dashboard.keyfileutils import KeyFileUtils
+from dashboard.common.keyfileutils import KeyFileUtils
 
 
 class Command(BaseCommand):
