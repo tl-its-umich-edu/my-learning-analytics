@@ -33,8 +33,8 @@
   },
   "scripts": {
     "prod": "BABEL_ENV=production webpack --config webpack.config.js --mode production",
-    "build": "BABEL_ENV=development webpack --config webpack.config.js --mode development --display-error-details",
-    "watch": "BABEL_ENV=development webpack --config webpack.config.js --watch --mode development --display-error-details",
+    "build": "BABEL_ENV=development webpack --config webpack.config.js --mode development",
+    "watch": "BABEL_ENV=development webpack --config webpack.config.js --watch --mode development",
     "test": "jest",
     "test:watch": "jest --watchAll",
     "cypress:open": "cypress open",
@@ -91,10 +91,10 @@
     ]
   },
   "devDependencies": {
+    "@babel/cli": "~7.12.1",
     "@babel/core": "~7.12.1",
     "@babel/preset-env": "~7.12.1",
     "@babel/preset-react": "~7.12.1",
-    "@babel/cli": "~7.12.1",
     "@babel/register": "~7.12.1",
     "@material-ui/core": "^4.8.0",
     "@material-ui/icons": "^4.0.0",
@@ -114,6 +114,6 @@
     "url-loader": "1.1.2",
     "webpack": "~4.29.6",
     "webpack-bundle-tracker": "^0.4.3",
-    "webpack-cli": "~3.2.3"
+    "webpack-cli": "^4.2.0"
   }
 }
