@@ -120,6 +120,20 @@ function AssignmentTable (props) {
     }
   }, [currentWeekRow.current])
 
+  const [assignmentFilter, setAssignmentFilter] = useState('')
+  function handleChange (e) {
+    setAssignmentFilter(e.target.value)
+  }
+
+  const getFilter = (heading, key) => {
+    switch (heading) {
+      case 'Assignment Name':
+        return <div><input value={assignmentFilter} placeholder='Search...' onChange={handleChange} /></div>
+      default:
+        return undefined
+    }
+  }
+
   return (
     <RootRef rootRef={tableRef}>
       <TableContainer className={classes.container}>
@@ -140,6 +154,7 @@ function AssignmentTable (props) {
                     key={key}
                   >
                     {heading}
+                    {getFilter(heading)}
                   </TableCell>
                 ))
               }
@@ -147,7 +162,7 @@ function AssignmentTable (props) {
           </TableHead>
           <TableBody>
             {
-              assignments.map((a, key) => (
+              assignments.filter(assignment => assignmentFilter.trim().length === 0 || assignment.name.toUpperCase().includes(assignmentFilter.toUpperCase())).map((a, key) => (
                 <ConditionalWrapper
                   condition={a.week === currentWeek}
                   wrapper={children => <RootRef rootRef={currentWeekRow} key={key}>{children}</RootRef>}
