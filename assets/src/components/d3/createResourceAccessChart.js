@@ -153,9 +153,9 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('width', availWidth)
     .attr('height', availHeight)
     .attr('transform', `translate(${margin.left}, ${margin.top})`)
-    .on('wheel.zoom', scroll)
+    .on('wheel.zoom', scroll, { passive: true })
     .on('mousedown.zoom', null) // Override the center selection
-    .on('touchstart.zoom', null)
+    .on('touchstart.zoom', null, { passive: true })
     .on('touchmove.zoom', null)
     .on('touchend.zoom', null)
 
@@ -352,7 +352,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   gBrush
     .select('.overlay')
     .on('mousedown.brush', brushcenter)
-    .on('touchstart.brush', brushcenter)
+    .on('touchstart.brush', brushcenter, { passive: true })
 
   // Clips
   svg.append('defs')
