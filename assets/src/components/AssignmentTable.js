@@ -15,6 +15,7 @@ import ConditionalWrapper from './ConditionalWrapper'
 import StyledTextField from './StyledTextField'
 import { calculateWeekOffset } from '../util/date'
 import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
+import DoneIcon from '@material-ui/icons/Done';
 
 const styles = theme => ({
   root: {
@@ -72,6 +73,8 @@ function AssignmentTable (props) {
 
   const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
 
+  const [gradedOnly, setGradedOnly] = useState(false)
+
   const tableRef = useRef(null)
   const currentWeekRow = useRef(null)
 
@@ -121,14 +124,20 @@ function AssignmentTable (props) {
   }, [currentWeekRow.current])
 
   const [assignmentFilter, setAssignmentFilter] = useState('')
-  function handleChange (e) {
+  function handleNameFilterChange (e) {
     setAssignmentFilter(e.target.value)
+  }
+
+  function handleGradedOnlyFilterChange (e) {
+    setGradedOnly(!gradedOnly)
   }
 
   const getFilter = (heading, key) => {
     switch (heading) {
       case 'Assignment Name':
-        return <div><input value={assignmentFilter} placeholder='Search...' onChange={handleChange} /></div>
+        return <div><input value={assignmentFilter} placeholder='Search...' onChange={handleNameFilterChange} /></div>
+      case 'Graded':
+        return <div><Checkbox checked={gradedOnly} color='primary' onChange={handleGradedOnlyFilterChange} /></div>
       default:
         return undefined
     }
@@ -147,6 +156,7 @@ function AssignmentTable (props) {
                   'Assignment Name',
                   'Percent of Final Grade',
                   'Score / Out of',
+                  'Graded',
                   'Lock Goal'
                 ].map((heading, key) => (
                   <TableCell
@@ -162,139 +172,145 @@ function AssignmentTable (props) {
           </TableHead>
           <TableBody>
             {
-              assignments.filter(assignment => assignmentFilter.trim().length === 0 || assignment.name.toUpperCase().includes(assignmentFilter.toUpperCase())).map((a, key) => (
-                <ConditionalWrapper
-                  condition={a.week === currentWeek}
-                  wrapper={children => <RootRef rootRef={currentWeekRow} key={key}>{children}</RootRef>}
-                  key={key}
-                >
-                  <TableRow key={key}>
-                    <TableCell
-                      style={{
-                        ...isNextWeekTheSame(a.week, key)
-                          ? { borderBottom: 'none' }
-                          : {},
-                        ...a.week === currentWeek
-                          ? { color: 'orange' }
-                          : {}
-                      }}
-                      className={classes.narrowCell}
-                    >
-                      {
-                        a.week
-                          ? isPreviousWeekTheSame(a.week, key)
-                            ? ''
-                            : `Week ${a.week}`
-                          : 'No due date'
-                      }
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        ...isNextDayTheSame(a.dueDateMonthDay, key)
-                          ? { borderBottom: 'none' }
-                          : {}
-                      }}
-                      className={classes.narrowCell}
-                    >
-                      {
-                        a.week
-                          ? isPreviousDayTheSame(a.dueDateMonthDay, key)
-                            ? ''
-                            : a.dueDateMonthDay
-                          : ''
-                      }
-                    </TableCell>
-                    <TableCell style={{ width: '30%' }}>
-                      {a.name}
-                    </TableCell>
-                    <TableCell className={classes.narrowCell}>
-                      {`${roundToXDecimals(a.percentOfFinalGrade, 1)}%`}
-                    </TableCell>
-                    <TableCell style={{ width: '20%' }}>
-                      {
-                        a.graded || a.outOf === 0
-                          ? <div className={classes.possiblePointsText}>{a.outOf === 0 ? '0' : `${a.currentUserSubmission.score}`}</div>
-                          : (
-                            <StyledTextField
-                              error={(a.goalGrade / a.pointsPossible) > 1}
-                              disabled={!courseGoalGradeSet}
-                              id='standard-number'
-                              value={roundToXDecimals(a.goalGrade, placeToRoundTo(a.pointsPossible))}
-                              label={
-                                !courseGoalGradeSet ? 'Set a goal'
-                                  : (a.goalGrade / a.pointsPossible) > 1
-                                    ? 'Over 100%'
-                                    : 'Set a goal'
-                              }
-                              onChange={event => {
-                                const assignmentGoalGrade = event.target.value
-                                handleAssignmentGoalGrade(key, assignmentGoalGrade)
-                              }}
-                              type='number'
-                              className={classes.goalGradeInput}
-                              onFocus={() => handleInputFocus(key)}
-                              onBlur={() => handleInputBlur(key)}
-                            />
-                          )
-                      }
-                      {
-                        <div className={classes.possiblePointsText}>
-                          {` / ${a.outOf}`}
-                        </div>
-                      }
-                      <div
-                        onMouseEnter={event => setPopoverEl({ popoverId: key, anchorEl: event.currentTarget })}
-                        onMouseLeave={() => setPopoverEl({ popoverId: null, anchorEl: null })}
+              assignments
+                .filter(assignment => assignmentFilter.trim().length === 0 || assignment.name.toUpperCase().includes(assignmentFilter.toUpperCase()))
+                .filter(assignment => !gradedOnly || assignment.graded)
+                .map((a, key) => (
+                  <ConditionalWrapper
+                    condition={a.week === currentWeek}
+                    wrapper={children => <RootRef rootRef={currentWeekRow} key={key}>{children}</RootRef>}
+                    key={key}
+                  >
+                    <TableRow key={key}>
+                      <TableCell
+                        style={{
+                          ...isNextWeekTheSame(a.week, key)
+                            ? { borderBottom: 'none' }
+                            : {},
+                          ...a.week === currentWeek
+                            ? { color: 'orange' }
+                            : {}
+                        }}
+                        className={classes.narrowCell}
                       >
-                        <ProgressBarV2
-                          score={a.currentUserSubmission ? a.currentUserSubmission.score : 0}
-                          outOf={a.outOf}
-                          goalGrade={a.goalGrade}
-                          percentWidth={a.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
-                          displayLabel
-                          lines={
-                            a.goalGrade !== ''
-                              ? [{ color: 'green', value: a.goalGrade, draggable: true }]
-                              : []
-                          }
-                          description={`This assignment is worth ${a.percentOfFinalGrade}% of your grade.  
-                          Points possible: ${a.pointsPossible}.
-                          Your goal: ${(a.goalGrade ? a.goalGrade : 'None')}.  
-                          Your grade: ${(a.grade ? a.grade : 'Not graded')}.  
-                          Class average: ${a.averageGrade}.  
-                          Rules: ${(a.rules ? a.rules : 'There are no rules for this assignment')}.  `}
-                        />
-                        <Popover
-                          className={classes.popover}
-                          classes={{ paper: classes.paper }}
-                          anchorEl={popoverEl.anchorEl}
-                          open={popoverEl.popoverId === key}
-                          onClose={() => setPopoverEl({ popoverId: null, anchorEl: null })}
-                          anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'left'
-                          }}
-                          transformOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left'
-                          }}
-                          disableRestoreFocus
+                        {
+                          a.week
+                            ? isPreviousWeekTheSame(a.week, key)
+                              ? ''
+                              : `Week ${a.week}`
+                            : 'No due date'
+                        }
+                      </TableCell>
+                      <TableCell
+                        style={{
+                          ...isNextDayTheSame(a.dueDateMonthDay, key)
+                            ? { borderBottom: 'none' }
+                            : {}
+                        }}
+                        className={classes.narrowCell}
+                      >
+                        {
+                          a.week
+                            ? isPreviousDayTheSame(a.dueDateMonthDay, key)
+                              ? ''
+                              : a.dueDateMonthDay
+                            : ''
+                        }
+                      </TableCell>
+                      <TableCell style={{ width: '30%' }}>
+                        {a.name}
+                      </TableCell>
+                      <TableCell className={classes.narrowCell}>
+                        {`${roundToXDecimals(a.percentOfFinalGrade, 1)}%`}
+                      </TableCell>
+                      <TableCell style={{ width: '20%' }}>
+                        {
+                          a.graded || a.outOf === 0
+                            ? <div className={classes.possiblePointsText}>{a.outOf === 0 ? '0' : `${a.currentUserSubmission.score}`}</div>
+                            : (
+                              <StyledTextField
+                                error={(a.goalGrade / a.pointsPossible) > 1}
+                                disabled={!courseGoalGradeSet}
+                                id='standard-number'
+                                value={roundToXDecimals(a.goalGrade, placeToRoundTo(a.pointsPossible))}
+                                label={
+                                  !courseGoalGradeSet ? 'Set a goal'
+                                    : (a.goalGrade / a.pointsPossible) > 1
+                                      ? 'Over 100%'
+                                      : 'Set a goal'
+                                }
+                                onChange={event => {
+                                  const assignmentGoalGrade = event.target.value
+                                  handleAssignmentGoalGrade(key, assignmentGoalGrade)
+                                }}
+                                type='number'
+                                className={classes.goalGradeInput}
+                                onFocus={() => handleInputFocus(key)}
+                                onBlur={() => handleInputBlur(key)}
+                              />
+                            )
+                        }
+                        {
+                          <div className={classes.possiblePointsText}>
+                            {` / ${a.outOf}`}
+                          </div>
+                        }
+                        <div
+                          onMouseEnter={event => setPopoverEl({ popoverId: key, anchorEl: event.currentTarget })}
+                          onMouseLeave={() => setPopoverEl({ popoverId: null, anchorEl: null })}
                         >
-                          <PopupMessage a={a} assignmentGroups={assignmentGroups} />
-                        </Popover>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        disabled={a.graded || !courseGoalGradeSet}
-                        checked={!!a.goalGradeSetByUser}
-                        onChange={event => handleAssignmentLock(key, event.target.checked)}
-                        color='primary'
-                      />
-                    </TableCell>
-                  </TableRow>
-                </ConditionalWrapper>
-              ))
+                          <ProgressBarV2
+                            score={a.currentUserSubmission ? a.currentUserSubmission.score : 0}
+                            outOf={a.outOf}
+                            goalGrade={a.goalGrade}
+                            percentWidth={a.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
+                            displayLabel
+                            lines={
+                              a.goalGrade !== ''
+                                ? [{ color: 'green', value: a.goalGrade, draggable: true }]
+                                : []
+                            }
+                            description={`This assignment is worth ${a.percentOfFinalGrade}% of your grade.  
+                            Points possible: ${a.pointsPossible}.
+                            Your goal: ${(a.goalGrade ? a.goalGrade : 'None')}.  
+                            Your grade: ${(a.grade ? a.grade : 'Not graded')}.  
+                            Class average: ${a.averageGrade}.  
+                            Rules: ${(a.rules ? a.rules : 'There are no rules for this assignment')}.  `}
+                          />
+                          <Popover
+                            className={classes.popover}
+                            classes={{ paper: classes.paper }}
+                            anchorEl={popoverEl.anchorEl}
+                            open={popoverEl.popoverId === key}
+                            onClose={() => setPopoverEl({ popoverId: null, anchorEl: null })}
+                            anchorOrigin={{
+                              vertical: 'top',
+                              horizontal: 'left'
+                            }}
+                            transformOrigin={{
+                              vertical: 'bottom',
+                              horizontal: 'left'
+                            }}
+                            disableRestoreFocus
+                          >
+                            <PopupMessage a={a} assignmentGroups={assignmentGroups} />
+                          </Popover>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {a.graded ? <DoneIcon /> : <div />}
+                      </TableCell>
+                      <TableCell>
+                        <Checkbox
+                          disabled={a.graded || !courseGoalGradeSet}
+                          checked={!!a.goalGradeSetByUser}
+                          onChange={event => handleAssignmentLock(key, event.target.checked)}
+                          color='primary'
+                        />
+                      </TableCell>
+                    </TableRow>
+                  </ConditionalWrapper>
+                ))
             }
           </TableBody>
         </MTable>
