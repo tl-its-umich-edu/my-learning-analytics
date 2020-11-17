@@ -37,9 +37,21 @@ const styles = theme => ({
     padding: theme.spacing(2),
     color: theme.palette.text.secondary
   },
+  goalAlign: {
+    display: 'flex'
+  },
   section: {
     paddingBottom: 10,
     paddingTop: 10
+  },
+  stickyTop: {
+    position: 'sticky',
+    top: 0,
+    bottom: 20,
+    // paddingTop: '40px',
+    // paddingBottom: '40px',
+    zIndex: 5
+    // border: '2px solid #4CAF50'
   },
   clearButton: {
     float: 'right',
@@ -165,36 +177,8 @@ function AssignmentPlanningV2 (props) {
                 loading
                   ? <Spinner />
                   : (
-                    <div>
-                      <div className={classes.section}>
-                        <Typography variant='h6' gutterBottom>Grade Progress</Typography>
-                        <ProgressBarV2
-                          score={currentGrade}
-                          lines={[
-                            {
-                              label: 'Current',
-                              value: currentGrade,
-                              color: 'steelblue',
-                              labelPlacement: 'down1'
-                            },
-                            {
-                              label: 'Goal',
-                              value: goalGrade,
-                              color: 'green',
-                              labelPlacement: 'up1'
-                            },
-                            {
-                              label: 'Max Possible',
-                              value: maxPossibleGrade,
-                              color: 'grey',
-                              labelPlacement: 'down2'
-                            }
-                          ]}
-                          outOf={100}
-                          percentWidth={90}
-                          height={50}
-                          margin={50}
-                        />
+                    <div style={{ border: '2px solid red' }}>
+                      <div className={classes.section + ' ' + classes.goalAlign + ' ' + classes.stickyTop}>
                         <AssignmentGoalInput
                           currentGrade={currentGrade}
                           goalGrade={goalGrade}
@@ -209,6 +193,36 @@ function AssignmentPlanningV2 (props) {
                           handleClearGoalGrades={handleClearGoalGrades}
                           mathWarning={showMathWarning}
                         />
+                        <div style={{ flex: 4 }}>
+                          <Typography variant='h6' gutterBottom>Grade Progress</Typography>
+                          <ProgressBarV2
+                            score={currentGrade}
+                            lines={[
+                              {
+                                label: 'Current',
+                                value: currentGrade,
+                                color: 'steelblue',
+                                labelPlacement: 'down1'
+                              },
+                              {
+                                label: 'Goal',
+                                value: goalGrade,
+                                color: 'green',
+                                labelPlacement: 'up1'
+                              },
+                              {
+                                label: 'Max Possible',
+                                value: maxPossibleGrade,
+                                color: 'grey',
+                                labelPlacement: 'down2'
+                              }
+                            ]}
+                            outOf={100}
+                            percentWidth={90}
+                            height={50}
+                            margin={50}
+                          />
+                        </div>
                       </div>
                       <div className={classes.section}>
                         <Grid container>
