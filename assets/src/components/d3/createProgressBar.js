@@ -65,12 +65,12 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
         tipPosition('s')
       }
       d3.select(this)
-        .attr('fill', d => d.graded ? gradedColor : ungradedColor)
+        .attr('fill', d => d.graded ? gradedColor : d.submitted_at ? ungradedColor : unsubmittedColor)
         .style('outline', '1px solid black')
     })
     .on('mouseout', function () {
       d3.select(this)
-        .attr('fill', d => d.graded ? gradedColor : ungradedColor)
+        .attr('fill', d => d.graded ? gradedColor : d.submitted_at ? ungradedColor : unsubmittedColor)
         .style('outline', '1px solid rgb(255, 255, 255)')
     })
 
