@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import { roundToXDecimals } from '../../util/math'
 import { siteTheme } from '../../globals'
-import { grades } from './d3ViewsNarrative'
+import { createGradesText } from './d3ViewsNarrative'
 
 function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, gradesSummary }) {
   const maxGrade = gradesSummary.graph_upper_limit
@@ -34,7 +34,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
 
   // SVG narrative for accessibility
 
-  const narrativeTextGrades = grades(data, bins, gradesSummary, myGrade, firstGradeAfterBinnedGrade)
+  const narrativeTextGrades = createGradesText(data, bins, gradesSummary, myGrade, firstGradeAfterBinnedGrade)
 
   // getting the first bin that has some grades in them, accessing the x1(higher bin) value
   const dashLine = () => {

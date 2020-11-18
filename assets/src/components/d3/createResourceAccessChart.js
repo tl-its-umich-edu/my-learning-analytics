@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
-import { resources } from './d3ViewsNarrative'
+import { createResourcesText } from './d3ViewsNarrative'
 import d3tip from 'd3-tip'
 import './createResourceAccessChart.css'
 import '@fortawesome/fontawesome-free'
@@ -159,7 +159,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
 
   const textScale = d3.scaleLinear().range([12, 6]).domain([15, 50]).clamp(true)
   // d3 graph narrative text
-  const narrativeTextResources = resources(resourceData, resourceType, gradeSelection, weekRange)
+  const narrativeTextResources = createResourcesText(resourceData, resourceType, gradeSelection, weekRange)
   // Build the chart
   const main = d3.select(domElement).append('div')
 
