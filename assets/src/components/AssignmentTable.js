@@ -69,7 +69,7 @@ const styles = theme => ({
   },
   formControl: {
     margin: theme.spacing(1),
-    width: '100%'
+    width: '95%'
   },
   filterArea: {
     alignItems: 'center',
@@ -212,6 +212,7 @@ function AssignmentTable (props) {
           </Grid>
           <Grid item xs={12} sm={1}>
             <FormControlLabel
+              className={classes.formControl}
               control={
                 <Checkbox
                   checked={gradedOnly}
