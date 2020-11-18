@@ -1,4 +1,4 @@
-import { isInRange, isOutOfRange } from '../../util/chartsMisc'
+import { isInRange, isOutOfRange } from '../../util/math'
 
 const resources = (resourceData, resourceType, gradeSelection, weekRange) => {
   const unAccessedResources = resourceData.filter(resource => resource.self_access_count === 0)
@@ -20,7 +20,8 @@ const resources = (resourceData, resourceType, gradeSelection, weekRange) => {
       : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`}`)
   return narrativeTextResources
 }
-const grades = (data, bins, gradesSummary, myGrade, firstGradeAfterBinnedGrade) => {
+const grades = (data, bins, gradesSummary, firstGradeAfterBinnedGrade) => {
+  const myGrade = gradesSummary.current_user_grade
   const isBinningUsed = new Set(data.slice(0, 5)).size === 1
   const binningNarrativeText = () => {
     if (isOutOfRange(myGrade, firstGradeAfterBinnedGrade)) {
