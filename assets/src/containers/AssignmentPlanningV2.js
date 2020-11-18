@@ -45,13 +45,13 @@ const styles = theme => ({
     paddingTop: 10
   },
   stickyTop: {
-    position: 'sticky',
-    top: 0,
-    bottom: 20,
-    // paddingTop: '40px',
-    // paddingBottom: '40px',
+    top: '72px',
+    left: '20px',
+    right: '0px',
+    position: 'fixed',
+    background: '#fff',
+    borderBottom: '1px solid #ccc',
     zIndex: 5
-    // border: '2px solid #4CAF50'
   },
   clearButton: {
     float: 'right',
@@ -177,7 +177,7 @@ function AssignmentPlanningV2 (props) {
                 loading
                   ? <Spinner />
                   : (
-                    <div style={{ border: '2px solid red' }}>
+                    <div style={{ border: '2px solid red', position: 'relative' }}>
                       <div className={classes.section + ' ' + classes.goalAlign + ' ' + classes.stickyTop}>
                         <AssignmentGoalInput
                           currentGrade={currentGrade}
