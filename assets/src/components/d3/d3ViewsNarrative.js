@@ -30,12 +30,9 @@ const grades = (data, bins, gradesSummary, firstGradeAfterBinnedGrade) => {
       return `Grades at around ${Math.trunc(firstGradeAfterBinnedGrade)}% or lower are placed into one bin. `
     }
   }
-  const userGradeInBinnedGroup = () => {
-    return isBinningUsed ? binningNarrativeText() : ''
-  }
   const narrativeTextGrades = {}
   narrativeTextGrades.courseStats = `Course information: Class Size = ${gradesSummary.tot_students}, Average grade = ${gradesSummary.grade_avg}%, Median grade = ${gradesSummary.median_grade}%.`
-  narrativeTextGrades.binnedGradeText = userGradeInBinnedGroup()
+  narrativeTextGrades.binnedGradeText = isBinningUsed ? binningNarrativeText() : ''
   narrativeTextGrades.courseGrades = []
   for (const gradeBin in bins) {
     if (bins[gradeBin].length > 0) {
