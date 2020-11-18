@@ -20,6 +20,8 @@ import useUserSetting from '../hooks/useUserSetting'
 import { useAssignmentData } from '../service/api'
 import { getCurrentWeek } from '../util/data'
 import { isObjectEmpty } from '../util/object'
+import { isTeacherOrAdmin } from '../util/roles'
+import { Helmet } from 'react-helmet'
 
 const styles = theme => ({
   root: {
@@ -72,8 +74,8 @@ const assignmentTable = assignmentData => {
 }
 
 function AssignmentPlanning (props) {
-  const { classes, disabled, courseId } = props
-  if (disabled) return (<AlertBanner>The Assignment Planning view is hidden for this course.</AlertBanner>)
+  const { classes, disabled, courseId, isAdmin, enrollmentTypes } = props
+  if (disabled && !isTeacherOrAdmin(isAdmin, enrollmentTypes)) return (<AlertBanner>The Assignment Planning view is hidden for this course.</AlertBanner>)
 
   const [showSaveSetting, setShowSaveSetting] = useState(false)
   const [saveSettingClicked, setSaveSettingClicked] = useState(false)
@@ -139,85 +141,91 @@ function AssignmentPlanning (props) {
   if (assignmentError) return (<WarningBanner />)
 
   return (
-    <div className={classes.root}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Paper className={classes.paper}>
-            <ViewHeader>Assignment Planning</ViewHeader>
-            <div className={classes.section}>
-              <Typography variant='h6' gutterBottom>Progress toward Final Grade</Typography>
-              {
-                assignmentData
-                  ? (
-                    <ProgressBar
-                      data={assignmentData.progress}
-                      aspectRatio={0.12}
-                      tip={AssignmentPlanningTooltip(classes)}
-                    />
-                  )
-                  : <Spinner />
-              }
-            </div>
-            <div className={classes.section}>
-              <Grid container>
-                <Grid item xs={12} md={10}>
-                  <Typography variant='h6' gutterBottom>Assignments Due by Date</Typography>
+    <>
+      <Helmet title='Assignment Planning' />
+      {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
+      <div className={classes.root}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Paper className={classes.paper}>
+              <ViewHeader>Assignment Planning</ViewHeader>
+              <div className={classes.section}>
+                <Typography variant='h6' gutterBottom>Progress toward Final Grade</Typography>
+                {
+                  assignmentData
+                    ? (
+                      <ProgressBar
+                        data={assignmentData.progress}
+                        aspectRatio={0.12}
+                        tip={AssignmentPlanningTooltip(classes)}
+                      />
+                    )
+                    : <Spinner />
+                }
+              </div>
+              <div className={classes.section}>
+                <Grid container>
+                  <Grid item xs={12} md={10}>
+                    <Typography variant='h6' gutterBottom>Assignments Due by Date</Typography>
+                  </Grid>
+                  <Grid item xs={12} md={2}>
+                    <Typography variant='h6'>Assignment Status</Typography>
+                    <div className={classes.graded} />
+                    <Typography style={{ display: 'inline' }}> Graded</Typography>
+                    <br />
+                    <div className={classes.ungraded} />
+                    <Typography style={{ display: 'inline' }}> Not Yet Graded</Typography>
+                    <br />
+                    <Typography style={{ display: 'inline' }}> Graded</Typography>
+                    <br />
+                    <div className={classes.unsubmitted} />
+                    <Typography style={{ display: 'inline' }}> Unsubmitted</Typography>
+                    <br />
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} md={2}>
-                  <Typography variant='h6'>Assignment Status</Typography>
-                  <div className={classes.graded} />
-                  <Typography style={{ display: 'inline' }}> Graded</Typography>
-                  <br />
-                  <div className={classes.ungraded} />
-                  <Typography style={{ display: 'inline' }}> Submitted and ungraded</Typography>
-                  <br />
-                  <div className={classes.unsubmitted} />
-                  <Typography style={{ display: 'inline' }}> Unsubmitted</Typography>
-                  <br />
-                </Grid>
-              </Grid>
-              <FormControl>
-                <Typography>Show assignments that weigh at least</Typography>
-                <div style={{ display: 'flex' }}>
-                  <Select
-                    value={assignmentGradeFilter}
-                    onChange={handleAssignmentFilter}
-                  >
-                    <MenuItem value={0}>0% (all)</MenuItem>
-                    <MenuItem value={2}>2%</MenuItem>
-                    <MenuItem value={5}>5%</MenuItem>
-                    <MenuItem value={10}>10%</MenuItem>
-                    <MenuItem value={20}>20%</MenuItem>
-                    <MenuItem value={50}>50%</MenuItem>
-                    <MenuItem value={75}>75%</MenuItem>
-                  </Select>
-                  {
-                    showSaveSetting
-                      ? (
-                        <Checkbox
-                          checked={saveSettingClicked}
-                          onChange={() => setSaveSettingClicked(!saveSettingClicked)}
-                          value='checked'
-                          color='secondary'
-                        />
-                      )
-                      : null
-                  }
-                  <div style={{ padding: '15px 2px' }}>{saveLabel}</div>
-                </div>
-              </FormControl>
-              <UserSettingSnackbar
-                saved={userSettingSaved}
-                response={userSettingResponse}
-                successMessage='Assignment filter setting saved!'
-              />
-              {/* in case of no data empty list is sent */}
-              {assignmentLoaded ? assignmentTable(assignmentData.plan) : <Spinner />}
-            </div>
-          </Paper>
+                <FormControl>
+                  <Typography>Show assignments that weigh at least</Typography>
+                  <div style={{ display: 'flex' }}>
+                    <Select
+                      value={assignmentGradeFilter}
+                      onChange={handleAssignmentFilter}
+                    >
+                      <MenuItem value={0}>0% (all)</MenuItem>
+                      <MenuItem value={2}>2%</MenuItem>
+                      <MenuItem value={5}>5%</MenuItem>
+                      <MenuItem value={10}>10%</MenuItem>
+                      <MenuItem value={20}>20%</MenuItem>
+                      <MenuItem value={50}>50%</MenuItem>
+                      <MenuItem value={75}>75%</MenuItem>
+                    </Select>
+                    {
+                      showSaveSetting
+                        ? (
+                          <Checkbox
+                            checked={saveSettingClicked}
+                            onChange={() => setSaveSettingClicked(!saveSettingClicked)}
+                            value='checked'
+                            color='secondary'
+                          />
+                        )
+                        : null
+                    }
+                    <div style={{ padding: '15px 2px' }}>{saveLabel}</div>
+                  </div>
+                </FormControl>
+                <UserSettingSnackbar
+                  saved={userSettingSaved}
+                  response={userSettingResponse}
+                  successMessage='Assignment filter setting saved!'
+                />
+                {/* in case of no data empty list is sent */}
+                {assignmentLoaded ? assignmentTable(assignmentData.plan) : <Spinner />}
+              </div>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
-    </div>
+      </div>
+    </>
   )
 }
 

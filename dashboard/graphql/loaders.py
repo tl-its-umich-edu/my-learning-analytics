@@ -21,10 +21,6 @@ class AssignmentsByCourseIdLoader(DataLoader):
         return Promise.resolve([results.get(key, []) for key in keys])
 
 class AssignmentByCourseIdAndIdLoader(DataLoader):
-    # overwrite get_cache_key since it doesn't handle dictionaries
-    def get_cache_key(self, key):  # type: ignore
-        return f"course_id:{key.get('course_id')}|id:{key.get('id')}"
-
     def batch_load_fn(self, keys):
         results = defaultdict(None)
 
@@ -54,10 +50,6 @@ class AssignmentsByAssignmentGroupIdLoader(DataLoader):
         return Promise.resolve([results.get(key, []) for key in keys])
 
 class AssignmentByAssignmentGroupIdAndIdLoader(DataLoader):
-    # overwrite get_cache_key since it doesn't handle dictionaries
-    def get_cache_key(self, key):  # type: ignore
-        return f"assignment_group_id:{key.get('assignment_group_id')}|id:{key.get('id')}"
-
     def batch_load_fn(self, keys):
         results = defaultdict(None)
 
@@ -87,10 +79,6 @@ class SubmissionsByAssignmentIdLoader(DataLoader):
         return Promise.resolve([results.get(key, []) for key in keys])
 
 class SubmissionByAssignmentIdAndUserIdLoader(DataLoader):
-    # overwrite get_cache_key since it doesn't handle dictionaries
-    def get_cache_key(self, key):  # type: ignore
-        return f"assignment_id:{key.get('assignment_id')}|user_id:{key.get('user_id')}"
-
     def batch_load_fn(self, keys):
         results = defaultdict(None)
 
@@ -121,10 +109,6 @@ class AssignmentGroupsByCourseIdLoader(DataLoader):
 
 
 class AssignmentGroupByCourseIdAndIdLoader(DataLoader):
-    # overwrite get_cache_key since it doesn't handle dictionaries
-    def get_cache_key(self, key):  # type: ignore
-        return f"course_id:{key.get('course_id')}|id:{key.get('id')}"
-
     def batch_load_fn(self, keys):
         results = defaultdict(None)
 
@@ -155,10 +139,6 @@ class AssignmentWeightConsiderationByCourseIdLoader(DataLoader):
         return Promise.resolve([results.get(key, None) for key in keys])
 
 class UserDefaultSelectionsByCourseIdAndUserLoader(DataLoader):
-    # overwrite get_cache_key since it doesn't handle dictionaries
-    def get_cache_key(self, key):  # type: ignore
-        return f"course_id:{key.get('course_id')}|user_sis_name:{key.get('user_sis_name')}"
-
     def batch_load_fn(self, keys):
         results = defaultdict(list)
 
@@ -179,10 +159,6 @@ class UserDefaultSelectionsByCourseIdAndUserLoader(DataLoader):
         ])
 
 class UserDefaultSelectionByCourseIdAndUserAndViewTypeLoader(DataLoader):
-    # overwrite get_cache_key since it doesn't handle dictionaries
-    def get_cache_key(self, key):  # type: ignore
-        return f"course_id:{key.get('course_id')}|user_sis_name:{key.get('user_sis_name')}|default_view_type:{key.get('default_view_type')}"
-
     def batch_load_fn(self, keys):
         results = defaultdict(None)
 

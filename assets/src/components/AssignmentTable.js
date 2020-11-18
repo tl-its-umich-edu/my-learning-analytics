@@ -242,6 +242,12 @@ function AssignmentTable (props) {
                               ? [{ color: 'green', value: a.goalGrade, draggable: true }]
                               : []
                           }
+                          description={`This assignment is worth ${a.percentOfFinalGrade}% of your grade.  
+                          Points possible: ${a.pointsPossible}.
+                          Your goal: ${(a.goalGrade ? a.goalGrade : 'None')}.  
+                          Your grade: ${(a.grade ? a.grade : 'Not graded')}.  
+                          Class average: ${a.averageGrade}.  
+                          Rules: ${(a.rules ? a.rules : 'There are no rules for this assignment')}.  `}
                         />
                         <Popover
                           className={classes.popover}

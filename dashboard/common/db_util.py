@@ -1,13 +1,16 @@
 # Some utility functions used by other classes in this project
-
-import django
 import logging
 from datetime import datetime
-from dateutil.parser import parse
+from typing import Any, Dict, List, TypedDict, Union
 
-from django_cron.models import CronJobLog
-import pandas as pd
+from dateutil.parser import parse
+import django
 from django.conf import settings
+from django_cron.models import CronJobLog
+
+from dashboard.models import Course, User
+
+from django.contrib.auth.models import User as DjangoUser
 
 logger = logging.getLogger(__name__)
 
@@ -85,30 +88,66 @@ def get_default_user_course_id(user_id):
     return course_id
 
 
-def get_user_courses_info(username):
+class CourseEnrollment(TypedDict):
+    course_id: int
+    course_name: str
+    enrollment_types: List[str]
+
+def is_superuser(user_name: str) -> bool:
+    logger.debug(is_superuser.__name__+f' \'{user_name}\'')
+
+    user = DjangoUser.objects.filter(username=user_name)
+    if user.count() == 0:
+        result = False
+    else:
+        result = user[0].is_superuser
+    logger.debug(is_superuser.__name__+f' \'{user_name}\':{result}')
+    return result
+
+def get_user_courses_info(username: str, course_id: Union[int, None] = None) -> List[CourseEnrollment]:
+    """
+    Fetching the user courses enrollment info, for standalone it will return all the courses enrollment for LTI
+    single course enrollment info
+    http://za.github.io/2015/06/29/django-filter-query-exception/
+    :param course_id: canvas short course id
+    :param username: user sis_name
+    :return: [{`course_id`: 1233, `course_name`: 'COURSES WN 2020', `enrollment_types`: ['StudentEnrollment'] }]
+    """
     logger.info(get_user_courses_info.__name__)
-    course_list = []
-    course_info = []
-    with django.db.connection.cursor() as cursor:
-        cursor.execute("SELECT course_id FROM user WHERE sis_name= %s", [username])
-        courses = cursor.fetchall()
-        if courses is not None:
-            for course in courses:
-                course_id = incremented_id_to_canvas_id(course[0])
-                course_list.append(int(course_id))
-    if course_list:
-        course_tuple = tuple(course_list)
-        with django.db.connection.cursor() as cursor:
-            cursor.execute("select canvas_id, name from course where canvas_id in %s",[course_tuple])
-            course_names = cursor.fetchall()
-            df = pd.DataFrame(list(course_names))
-            df.columns = ["course_id", "course_name"]
-            course_info = df.to_dict(orient='records')
-            logger.info(f"User {username} is enrolled in these courses: {course_info}")
-    return course_info
+    course_enrollments: Dict[int, CourseEnrollment] = {}
+    if course_id:
+        user_enrollments = User.objects.filter(course_id=canvas_id_to_incremented_id(course_id),
+                                               sis_name=username)
+    else:
+        user_enrollments = User.objects.filter(sis_name=username)
+    if user_enrollments.count() == 0:
+        if not is_superuser(username):
+            logger.warning(
+                f'Couldn\'t find user {username} in enrollment info. Enrollment data has not been populated yet.')
+        return []
+
+    for enrollment in user_enrollments:
+        enroll_type = enrollment.enrollment_type
+        course_id = int(incremented_id_to_canvas_id(enrollment.course_id))
+        if course_id not in course_enrollments.keys():
+            course_enrollments[course_id] = {
+                'course_id': course_id,
+                'course_name': '',
+                'enrollment_types': []
+            }
+        course_enrollments[course_id]['enrollment_types'].append(enroll_type)
+    courses = Course.objects.filter(canvas_id__in=course_enrollments.keys())
+    if courses.count() == 0:
+        logger.error(f'Could not fetch courses info')
+        return []
+    for course in courses:
+        course_enrollments[course.canvas_id]['course_name'] = course.name
+    enrollments = list(course_enrollments.values())
+    logger.info(f'User {username} is enrolled in these courses: {enrollments}')
+    return enrollments
 
 
-def get_last_cron_run():
+def get_last_cronjob_run():
     try:
         c = CronJobLog.objects.filter(is_success=1).latest('end_time')
         end_time = c.end_time
@@ -120,7 +159,7 @@ def get_last_cron_run():
 
 def get_canvas_data_date():
     if not settings.DATA_WAREHOUSE_IS_UNIZIN:
-        return get_last_cron_run()
+        return get_last_cronjob_run()
 
     try:
         with django.db.connection.cursor() as cursor:

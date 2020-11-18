@@ -16,6 +16,8 @@ import { useGradeData } from '../service/api'
 import { isObjectEmpty } from '../util/object'
 import useSetUserSetting from '../hooks/useSetUserSetting'
 import useUserSetting from '../hooks/useUserSetting'
+import { isTeacherOrAdmin } from '../util/roles'
+import { Helmet } from 'react-helmet'
 
 const styles = theme => ({
   root: {
@@ -32,8 +34,8 @@ const styles = theme => ({
 })
 
 function GradeDistribution (props) {
-  const { classes, disabled, courseId, user } = props
-  if (disabled) return (<AlertBanner>The Grade Distribution view is hidden for this course.</AlertBanner>)
+  const { classes, disabled, courseId, user, isAdmin, enrollmentTypes } = props
+  if (disabled && !isTeacherOrAdmin(isAdmin, enrollmentTypes)) return (<AlertBanner>The Grade Distribution view is hidden for this course.</AlertBanner>)
 
   const [gradeLoaded, gradeError, gradeData] = useGradeData(courseId)
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'grade')
@@ -129,20 +131,24 @@ function GradeDistribution (props) {
   }
 
   return (
-    <div className={classes.root}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Paper className={classes.paper}>
-            <ViewHeader>Grade Distribution</ViewHeader>
-            {gradeContent}
-            <UserSettingSnackbar
-              saved={userSettingSaved}
-              response={userSettingResponse}
-            />
-          </Paper>
+    <>
+      <Helmet title='Grade Distribution' />
+      {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
+      <div className={classes.root}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Paper className={classes.paper}>
+              <ViewHeader>Grade Distribution</ViewHeader>
+              {gradeContent}
+              <UserSettingSnackbar
+                saved={userSettingSaved}
+                response={userSettingResponse}
+              />
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
-    </div>
+      </div>
+    </>
   )
 }
 

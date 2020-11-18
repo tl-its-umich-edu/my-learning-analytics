@@ -1,6 +1,7 @@
 import { Grade } from '@material-ui/icons'
+import { viewHelpURLs } from '../globals'
 
-const routes = (courseId, activeViews) => {
+const routes = (courseId, activeViews, activeOnly = true) => {
   const allViews = [
     {
       path: `/courses/${courseId}/resources`,
@@ -8,7 +9,9 @@ const routes = (courseId, activeViews) => {
       icon: Grade,
       description: 'See what resources you and your peers are viewing.',
       image: '/static/images/file_access_trends_icon.png',
-      viewCode: 'ra'
+      viewCode: 'ra',
+      enabled: activeViews.ra,
+      helpUrl: viewHelpURLs.ra
     },
     {
       path: `/courses/${courseId}/assignmentsv1`,
@@ -16,7 +19,9 @@ const routes = (courseId, activeViews) => {
       icon: Grade,
       description: 'See what assignments have the greatest impact on your grade.',
       image: '/static/images/assignments_planning_icon.png',
-      viewCode: 'apv1'
+      viewCode: 'apv1',
+      enabled: activeViews.apv1,
+      helpUrl: viewHelpURLs.apv1
     },
     {
       path: `/courses/${courseId}/assignments`,
@@ -24,7 +29,9 @@ const routes = (courseId, activeViews) => {
       icon: Grade,
       description: 'See what assignments have the greatest impact on your grade.',
       image: '/static/images/assignments_planning_icon.png',
-      viewCode: 'ap'
+      viewCode: 'ap',
+      enabled: activeViews.ap,
+      helpUrl: viewHelpURLs.ap
     },
     {
       path: `/courses/${courseId}/grades`,
@@ -32,10 +39,12 @@ const routes = (courseId, activeViews) => {
       icon: Grade,
       description: 'See where your grade sits within the course grade distribution.',
       image: '/static/images/grade_distribution_icon.png',
-      viewCode: 'gd'
+      viewCode: 'gd',
+      enabled: activeViews.gd,
+      helpUrl: viewHelpURLs.gd
     }
   ]
-  return allViews.filter(view => activeViews[view.viewCode])
+  return !activeOnly ? allViews.filter(view => view.enabled !== undefined) : allViews.filter(view => activeViews[view.viewCode])
 }
 
 export default routes

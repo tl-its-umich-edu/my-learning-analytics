@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from django import forms
 from django.conf import settings
 from django.contrib import admin
@@ -25,7 +27,7 @@ class CourseViewOptionInline(admin.StackedInline):
     model = CourseViewOption
     form = AlwaysChangedModelForm
 
-    exclude = ()
+    exclude: Tuple[str, ...] = ()
 
     # exclude disabled views
     for view in CourseViewOption.VIEWS:
@@ -60,12 +62,14 @@ class CourseAdmin(admin.ModelAdmin):
     form = CourseForm
     list_display = ('canvas_id', 'name', 'term', 'show_grade_counts', 'course_link', '_courseviewoption', 'show_grade_type')
     list_select_related = True
-    readonly_fields = ('term',)
+    readonly_fields = ('term', 'data_last_updated',)
 
     # Need this method to correctly display the line breaks
     def _courseviewoption(self, obj):
         return mark_safe(linebreaksbr(obj.courseviewoption))
-    _courseviewoption.short_description = "Course View Option(s)"
+
+    # Known mypy issue: https://github.com/python/mypy/issues/708
+    _courseviewoption.short_description = "Course View Option(s)" # type: ignore[attr-defined]
 
     def course_link(self, obj):
         return format_html('<a href="{}">Link</a>', obj.absolute_url)

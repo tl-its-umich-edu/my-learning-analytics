@@ -1,8 +1,9 @@
 {
-    "python.formatting.provider": "autopep8",
-    "python.formatting.autopep8Args": ["--ignore=E501", "--max-line-length=120"],
-    "python.linting.pycodestyleArgs": ["--ignore=E501", "--max-line-length=120"],
     "python.linting.pylintArgs": ["--load-plugins=pylint_django"],
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": false,
+    "python.linting.mypyEnabled": true,
     "[javascript]": {
         "editor.tabSize": 2
     }

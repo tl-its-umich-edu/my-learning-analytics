@@ -60,6 +60,27 @@ def gpa_map(grade):
 def get_home_template(request):
     return render(request, 'frontend/index.html')
 
+def view_names_mapping():
+    view_column_names: dict = {
+        'ap': CourseViewOption.show_assignment_planning.field.column,
+        'apv1': CourseViewOption.show_assignment_planning_v1.field.column,
+        'gd': CourseViewOption.show_grade_distribution.field.column,
+        'ra': CourseViewOption.show_resources_accessed.field.column
+    }
+    return view_column_names
+
+
+def get_course_view_options(is_admin, course):
+    view_column_names: dict = view_names_mapping()
+    global_views_disabled = []
+    for view in settings.VIEWS_DISABLED:
+        if view in view_column_names.values():
+            global_views_disabled.append((list(view_column_names.keys()))[list(view_column_names.values()).index(view)])
+    admin_course_views = CourseViewOption.objects.get(course=course).json(include_id=False)
+    course_view_options = {key: value for key, value in admin_course_views.items() if key not in global_views_disabled}
+    return admin_course_views if is_admin else course_view_options
+
+
 
 @permission_required('dashboard.get_course_info',
     fn=objectgetter(Course, 'course_id', 'canvas_id'), raise_exception=True)
@@ -125,14 +146,11 @@ def get_course_info(request, course_id=0):
     if total_weeks > settings.MAX_DEFAULT_WEEKS:
         logger.debug(f'{total_weeks} is greater than {settings.MAX_DEFAULT_WEEKS} setting total weeks to default.')
         total_weeks = settings.MAX_DEFAULT_WEEKS
-
     resp['current_week_number'] = current_week_number
     resp['total_weeks'] = total_weeks
-    resp['course_view_options'] = CourseViewOption.objects.get(course=course).json(include_id=False)
+    resp['course_view_options'] = get_course_view_options(request.user.is_staff, course)
     resp['resource_types'] = course_resource_list
-
-    course_users_list = User.objects.filter(course_id=course_id)
-    resp['course_user_exist'] = 1 if len(course_users_list) > 0 else 0
+    resp['course_data_loaded'] = 1 if course.term_id else 0
 
     return HttpResponse(json.dumps(resp, default=str))
 
@@ -194,12 +212,7 @@ def update_course_info(request, course_id=0):
         return bad_json_response
 
     # to translate short names returned by model back to original column names
-    view_column_names: dict = {
-        'ap': CourseViewOption.show_assignment_planning.field_name,
-        'apv1': CourseViewOption.show_assignment_planning_v1.field_name,
-        'gd': CourseViewOption.show_grade_distribution.field_name,
-        'ra': CourseViewOption.show_resources_accessed.field_name
-    }
+    view_column_names: dict = view_names_mapping()
 
     view_settings: dict
     view_data: dict = {}
@@ -286,10 +299,10 @@ def resource_access_within_week(request, course_id=0):
     sqlString = f"""SELECT a.resource_id as resource_id, r.resource_type as resource_type, r.name as resource_name, u.current_grade as current_grade, a.user_id as user_id
                     FROM resource r, resource_access a, user u, course c, academic_terms t
                     WHERE a.resource_id = r.resource_id and a.user_id = u.user_id
-                    and r.course_id = c.id and c.term_id = t.id
+                    and a.course_id = c.id and c.term_id = t.id
                     and a.access_time > %(start_time)s
                     and a.access_time < %(end_time)s
-                    and r.course_id = %(course_id)s
+                    and a.course_id = %(course_id)s
                     and u.course_id = %(course_id)s
                     and u.enrollment_type = 'StudentEnrollment' """
 
@@ -561,24 +574,25 @@ def assignments(request, course_id=0):
         df['avg_score']= df.apply(no_show_avg_score_for_ungraded_assignments, axis=1)
     df['avg_score']=df['avg_score'].fillna('Not available')
 
-    df3 = df[df['towards_final_grade'] > 0.0]
-    df3[['score']] = df3[['score']].astype(float)
-    df3['graded'] = df3['graded'].fillna(False)
-    df3[['score']] = df3[['score']].astype(float)
-    df3['percent_gotten'] = df3.apply(lambda x: user_percent(x), axis=1)
-    df3.sort_values(by=['graded', 'due_date_mod'], ascending=[False, True], inplace=True)
-    df3.reset_index(inplace=True)
-    df3.drop(columns=['index'], inplace=True)
+    # operate on dataframe copy to prevent Pandas "SettingWithCopyWarning" warning
+    df_progressbar = df.loc[df['towards_final_grade'] > 0.0].copy()
+    df_progressbar[['score']] = df_progressbar[['score']].astype(float)
+    df_progressbar['graded'] = df_progressbar['graded'].fillna(False)
+    df_progressbar[['score']] = df_progressbar[['score']].astype(float)
+    df_progressbar['percent_gotten'] = df_progressbar.apply(lambda x: user_percent(x), axis=1)
+    df_progressbar.sort_values(by=['graded', 'due_date_mod'], ascending=[False, True], inplace=True)
+    df_progressbar.reset_index(inplace=True)
+    df_progressbar.drop(columns=['index'], inplace=True)
 
     assignment_data = {}
-    assignment_data['progress'] = json.loads(df3.to_json(orient='records'))
+    assignment_data['progress'] = json.loads(df_progressbar.to_json(orient='records'))
 
     # Group the data according the assignment prep view
-    df2 = df[df['towards_final_grade'] >= percent_selection]
-    df2.reset_index(inplace=True)
-    df2.drop(columns=['index'], inplace=True)
-    logger.debug('The Dataframe for the assignment planning %s ' % df2)
-    grouped = df2.groupby(['week', 'due_dates'])
+    df_plan = df.loc[df['towards_final_grade'] >= percent_selection].copy()
+    df_plan.reset_index(inplace=True)
+    df_plan.drop(columns=['index'], inplace=True)
+    logger.debug('The Dataframe for the assignment planning %s ' % df_plan)
+    grouped = df_plan.groupby(['week', 'due_dates'])
 
     assignment_list = []
     for name, group in grouped:
@@ -622,16 +636,16 @@ def get_course_assignments(course_id):
 
     assignments_in_course = pd.read_sql(sql,conn,params={'course_id': course_id}, parse_dates={'due_date': '%Y-%m-%d'})
     # No assignments found in the course
-    if assignments_in_course.empty:
+    if assignments_in_course.empty or (assignments_in_course['assignment_id'] == 0).all():
         logger.info('The course %s don\'t seems to have assignment data' % course_id)
-        return assignments_in_course
+        return pd.DataFrame()
 
     assignments_in_course['due_date'] = pd.to_datetime(assignments_in_course['due_date'],unit='ms')
     assignments_in_course[['points_possible','group_points']]=assignments_in_course[['points_possible','group_points']].fillna(0)
     assignments_in_course[['points_possible', 'group_points','weight']] = assignments_in_course[['points_possible', 'group_points','weight']].astype(float)
     consider_weight=is_weight_considered(course_id)
-    df2 = assignments_in_course[['weight','group_points','grp_id']].drop_duplicates()
-    hidden_assignments = are_weighted_assignments_hidden(course_id, df2)
+    df_assignment = assignments_in_course[['weight','group_points','grp_id']].drop_duplicates().copy()
+    hidden_assignments = are_weighted_assignments_hidden(course_id, df_assignment)
     total_points=assignments_in_course['points_possible'].sum()
     # if assignment group is weighted and no assignments added yet then assignment name will be nothing so situation is specific to that
     if hidden_assignments:
@@ -647,7 +661,7 @@ def get_course_assignments(course_id):
     assignments_in_course['current_week']=assignments_in_course['calender_week'].apply(lambda x: find_current_week(x))
     assignments_in_course['due_date_mod'] =assignments_in_course['due_date'].astype(str).apply(lambda x:x.split()[0])
     assignments_in_course['due_dates']= pd.to_datetime(assignments_in_course['due_date_mod']).dt.strftime('%m/%d')
-    assignments_in_course['due_dates'].replace('NaT','N/A',inplace=True)
+    assignments_in_course['due_dates']= assignments_in_course['due_dates'].fillna('No due date')
     return assignments_in_course
 
 
@@ -676,6 +690,8 @@ def no_show_avg_score_for_ungraded_assignments(row):
 
 
 def user_percent(row):
+    if len(row) == 0:
+        return 0
     if row['graded']:
         s = round((row['score'] / row['points_possible']) * row['towards_final_grade'], 2)
         return s
@@ -702,8 +718,9 @@ def percent_calculation(consider_weight,total_points,hidden_assignments,row):
         return round((row['points_possible']/row['group_points'])*row['weight'],2)
     if consider_weight and row['group_points']!=0:
         return round((row['points_possible']/row['group_points'])*row['weight'],2)
-    if not consider_weight:
+    if not consider_weight and total_points != 0:
         return round((row['points_possible']/total_points)*100,2)
+    else:return 0
 
 
 def find_min_week(course_id):

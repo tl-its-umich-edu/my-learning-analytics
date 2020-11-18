@@ -8,7 +8,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -16,9 +16,10 @@ from django.urls import reverse
 
 from collections import namedtuple
 from datetime import datetime, timedelta
-import pytz
-
 import logging
+import pytz
+from typing import Optional
+
 logger = logging.getLogger(__name__)
 
 from model_utils import Choices
@@ -138,7 +139,7 @@ class AssignmentWeightConsideration(models.Model):
 
 
 class CourseQuerySet(models.QuerySet):
-    def get_supported_courses(self):
+    def get_supported_courses(self) -> QuerySet:
         """Returns the list of supported courses from the database
 
         :return: [List of supported course ids]
@@ -148,15 +149,40 @@ class CourseQuerySet(models.QuerySet):
             return self.values_list('id', flat=True)
         except self.model.DoesNotExist:
             logger.info("Courses did not exist", exc_info = True)
-        return []
+        return Course.objects.none()
 
+    def earliest_start_datetime(self) -> Optional[datetime]:
+        """Get the earliest start date of courses in the QuerySet
 
-class CourseManager(models.Manager):
-    def get_queryset(self):
-        return CourseQuerySet(self.model, using=self._db)
+        :return: Earliest start date of courses in the QuerySet, or None if no course dates found
+        :rtype: datetime
+        """
+        sorted_courses = sorted(self.all(), key=lambda course: course.course_date_range.start)
 
-    def get_supported_courses(self):
-        return self.get_queryset().get_supported_courses()
+        earliest_start = None
+        if len(sorted_courses) > 0:
+            earliest_course = sorted_courses[0]
+            earliest_start = earliest_course.course_date_range.start
+            logger.info(f"Earliest start datetime for CourseQuerySet: {earliest_start.isoformat()} found in course {earliest_course.canvas_id}")
+        else:
+            logger.info(f"No courses in CourseQuerySet; returning None as the earliest_start_datetime")
+        return earliest_start
+
+    def get_data_last_updated(self) -> Optional[datetime]:
+        """ Returns the datetime of the last cron run of all courses
+            This checks for any courses where the data_last_updated value is null.
+
+        :return: datetime. Either the earliest or None
+        :rtype: None
+        """
+        new_courses = self.filter(data_last_updated__isnull=True)
+
+        # If there are new courses (courses with no last run) return the earliest time of all
+        if len(new_courses) > 0:
+            return new_courses.earliest_start_datetime()
+        # Otherwise return the latest cron run
+        else:
+            return self.all().latest("data_last_updated").data_last_updated
 
 
 class Course(models.Model):
@@ -171,8 +197,9 @@ class Course(models.Model):
     GRADING_CHOICES = [('Percent', 'Percent'), ('Point', 'Point'), ]
     show_grade_type = models.CharField(verbose_name="Show Grade Type", max_length=255,
                                          choices=GRADING_CHOICES, default='Percent')
+    data_last_updated = models.DateTimeField(verbose_name="Time data for this course was last updated", null=True, blank=True)
 
-    objects = CourseManager()
+    objects = CourseQuerySet().as_manager()
 
     def __str__(self):
         return self.name
@@ -263,7 +290,7 @@ class ResourceQuerySet(models.QuerySet):
         :return:
         """
         try:
-            return list(self.values_list('resource_type', flat=True).distinct().filter(course_id=course_id))
+            return list(self.values_list('resource_type', flat=True).distinct().filter(resourceaccess__course_id=course_id))
         except(self.model.DoesNotExist, Exception) as e:
             logger.error(f"Couldn't fetch Resource list in Course {course_id} due to: {e}")
             return None
@@ -280,9 +307,8 @@ class ResourceManager(models.Manager):
 class Resource(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
     resource_type = models.CharField(max_length=255, verbose_name="Resource Type")
-    resource_id = models.CharField(blank=True, db_index=True, max_length=255, null=False, verbose_name="Resource Id")
+    resource_id = models.CharField(unique=True, db_index=True, max_length=255, verbose_name="Resource Id")
     name = models.TextField(verbose_name="Resource Name")
-    course_id = models.BigIntegerField(verbose_name="Course Id")
 
     objects = ResourceManager()
 
@@ -292,6 +318,18 @@ class Resource(models.Model):
     class Meta:
         db_table = 'resource'
 
+class ResourceAccess(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name="Table Id")
+    resource_id = models.ForeignKey(Resource, on_delete=models.CASCADE, to_field='resource_id', db_column='resource_id')
+    course_id = models.ForeignKey(Course, null=True, default=None, on_delete=models.CASCADE, db_column='course_id')
+    user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id')
+    access_time = models.DateTimeField(verbose_name="Access Time")
+
+    def __str__(self):
+        return f"Resource {self.resource_id} accessed by {self.user_id}"
+
+    class Meta:
+        db_table = 'resource_access'
 
 class Submission(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Submission Id")
@@ -321,7 +359,7 @@ class UnizinMetadata(models.Model):
         db_table = 'unizin_metadata'
 
 
-class UserQuerySet(models.query.QuerySet):
+class UserQuerySet(models.QuerySet):
     def get_user_in_course(self, user, course):
         return self.get_user_in_course_id(user, course.id)
 
@@ -359,16 +397,3 @@ class User(models.Model):
     class Meta:
         db_table = 'user'
         unique_together = (('id', 'course_id'),)
-
-
-class ResourceAccess(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name="Table Id")
-    resource_id = models.CharField(blank=True, max_length=255, null=False, verbose_name='Resource Id')
-    user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id')
-    access_time = models.DateTimeField(verbose_name="Access Time")
-
-    def __str__(self):
-        return f"Resource {self.resource_id} accessed by {self.user_id}"
-
-    class Meta:
-        db_table = 'resource_access'

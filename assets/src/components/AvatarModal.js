@@ -15,6 +15,7 @@ import LogoutIcon from '@material-ui/icons/ExitToApp'
 import HelpIcon from '@material-ui/icons/HelpOutline'
 import Lock from '@material-ui/icons/Lock'
 import Launch from '@material-ui/icons/Launch'
+import { viewHelpURLs } from '../globals'
 
 const styles = theme => ({
   root: {
@@ -94,14 +95,23 @@ function AvatarModal (props) {
   )
 
   useEffect(() => {
-    const helpUrlContext = url.includes('grades')
-      ? '/grade-distribution'
-      : url.includes('assignment')
-        ? '/assignment-planning'
-        : url.includes('resources')
-          ? '/resources-accessed'
-          : ''
-    setHelpURL(`${helpURL}${helpUrlContext}`)
+    const getContextHelpUrl = (url) => {
+      let target
+      if (url.includes('grades')) {
+        target = viewHelpURLs.gd
+      } else if (url.includes('assignmentsv1')) {
+        target = viewHelpURLs.apv1
+      } else if (url.includes('assignments')) {
+        target = viewHelpURLs.ap
+      } else if (url.includes('resources')) {
+        target = viewHelpURLs.ra
+      } else {
+        target = viewHelpURLs.home
+      }
+      return target || viewHelpURLs.home
+    }
+    // In the case no help is defined, use the default help page which *should* be
+    setHelpURL(getContextHelpUrl(url))
   }, [url])
 
   return (
@@ -127,7 +137,7 @@ function AvatarModal (props) {
         <Grid item xs={12}>
           <List>
             <Divider />
-            <Link style={{ textDecoration: 'none' }} href={helpURL}>
+            <Link style={{ textDecoration: 'none' }} href={helpURL} target='_blank' rel='noopener'>
               <ListItem button>
                 <ListItemIcon>
                   <HelpIcon />
@@ -146,14 +156,20 @@ function AvatarModal (props) {
                 ? SwitchCourses()
                 : null
             }
-            <Link style={{ textDecoration: 'none' }} href={user.logoutURL}>
-              <ListItem button>
-                <ListItemIcon>
-                  <LogoutIcon />
-                </ListItemIcon>
-                <ListItemText inset primary='Logout' className={classes.text} />
-              </ListItem>
-            </Link>
+            {
+              user.logoutURL !== ''
+                ? (
+                  <Link style={{ textDecoration: 'none' }} href={user.logoutURL}>
+                    <ListItem button>
+                      <ListItemIcon>
+                        <LogoutIcon />
+                      </ListItemIcon>
+                      <ListItemText inset primary='Logout' className={classes.text} />
+                    </ListItem>
+                  </Link>
+                )
+                : null
+            }
           </List>
         </Grid>
       </Grid>

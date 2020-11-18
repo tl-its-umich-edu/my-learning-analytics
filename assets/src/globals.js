@@ -17,8 +17,11 @@ const user = Object.freeze({
   isLoggedIn: !!mylaGlobals.username,
   loginURL: mylaGlobals.login,
   logoutURL: mylaGlobals.logout,
-  helpURL: mylaGlobals.help_url
+  LTIlaunchID: mylaGlobals.lti_launch_id,
+  LTIIsCourseDataLoaded: mylaGlobals.lti_is_course_data_loaded
 })
+
+const viewHelpURLs = Object.freeze(mylaGlobals.view_help_urls)
 
 const sitePalette = JSON.parse(JSON.stringify(defaultPalette))
 // Don't update the palette if mylaGlobals.primary_ui_color is null or undefined
@@ -43,4 +46,4 @@ const siteTheme = createMuiTheme({
 })
 const gaId = mylaGlobals.google_analytics_id
 
-export { user, siteTheme, gaId }
+export { user, siteTheme, gaId, viewHelpURLs }

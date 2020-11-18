@@ -61,13 +61,7 @@ Then you can edit your files! (Probably in /code/dashboard)
 
     `docker exec student_dashboard pkill -HUP gunicorn`
 
-3. The django-debug-toolbar is available for debugging. For this to be displayed.
-  - The environment needs to be DEBUG (set DJANGO_DEBUG=true in your .env)
-  - You have to be authenticated and a "super user" account. See step #1
-  - The method that controls this access is in show_debug_toolbar(request):
-  - Configuration of the panels is in DEBUG_TOOLBAR_PANELS as described on https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-panels
-
-4. VsCode is supported via PTVSD for debugging the code running in Docker. See this information here for details https://code.visualstudio.com/docs/python/debugging#_remote-debugging
+3. VsCode is supported via PTVSD for debugging the code running in Docker. See this information here for details https://code.visualstudio.com/docs/python/debugging#_remote-debugging
 
     A few variables are available to be defined in the .env file to enable this but minimally you have to set PTVSD_ENABLE=True. Currently docker-compose.yml opens 2 ports that can be used current, 3000 and 3001. If you need more you can open them. You can configure these with other variables. See the .env.sample for examples.
 

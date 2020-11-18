@@ -1,8 +1,8 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
+from django.conf import settings
 import random, string
 
-RANDOM_PASSWORD_DEFAULT_LENGTH = 8
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -15,7 +15,7 @@ class Command(BaseCommand):
         username = options.get('username')
         password = options.get('password')
         if password is None:
-            password = ''.join(random.sample(string.ascii_letters, RANDOM_PASSWORD_DEFAULT_LENGTH))
+            password = ''.join(random.sample(string.ascii_letters, settings.RANDOM_PASSWORD_DEFAULT_LENGTH))
             self.stderr.write ("Password not specified on command line generated password {}".format(password))
 
         email = options.get('email')
