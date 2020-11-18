@@ -16,8 +16,8 @@ const resources = (resourceData, resourceType, gradeSelection, weekRange) => {
   )
   narrativeTextResources.resourceAccessList = accesedResources.map(x =>
     `${resourceType.length === 1
-      ? `${x.resource_name.split('|')[1]} accessed ${x.total_percent}% last time you accessed on ${new Date(x.self_access_last_time).toDateString()}`
-      : `${x.resource_name.split('|')[1]} of type ${x.resource_type} accessed ${x.total_percent}% last time you accessed on ${new Date(x.self_access_last_time).toDateString()}`}`)
+      ? `${x.resource_name.split('|')[1]} has been accessed by ${x.total_percent}% of students. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`
+      : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`}`)
   return narrativeTextResources
 }
 const grades = (data, bins, gradesSummary, myGrade, firstGradeAfterBinnedGrade) => {
