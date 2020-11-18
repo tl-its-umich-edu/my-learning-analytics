@@ -41,11 +41,11 @@ const grades = (data, bins, gradesSummary, myGrade, firstGradeAfterBinnedGrade) 
       const binLowerLimit = bins[gradeBin].x0
       const binUpperLimit = bins[gradeBin].x1
       if (isInRange(myGrade, binLowerLimit, binUpperLimit) && myGrade) {
-        narrativeTextGrades.courseGrades.push(`${bins[gradeBin].length} grades in ${binLowerLimit} - ${binUpperLimit}% range and your grade ${myGrade}% is in this range `)
+        narrativeTextGrades.courseGrades.push(`${bins[gradeBin].length} grades are in the ${binLowerLimit} to ${binUpperLimit}% range, and your grade ${myGrade}% is in this range `)
       } else {
         narrativeTextGrades.courseGrades.push(`${(narrativeTextGrades.courseGrades.length !== 0
-          ? `${bins[gradeBin].length} in ${binLowerLimit} - ${binUpperLimit}% `
-          : `${bins[gradeBin].length} grades in ${binLowerLimit} - ${binUpperLimit}% range`)}`)
+          ? `${bins[gradeBin].length} in the ${binLowerLimit} to ${binUpperLimit}%`
+          : `${bins[gradeBin].length} grades are in the ${binLowerLimit} to ${binUpperLimit}% range`)}`)
       }
     }
   }
