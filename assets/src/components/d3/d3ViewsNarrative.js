@@ -18,7 +18,9 @@ const resources = (resourceData, resourceType, gradeSelection, weekRange) => {
     `${resourceType.length === 1
       ? `${x.resource_name.split('|')[1]} has been accessed by ${x.total_percent}% of students. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`
       : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`}`)
-  return narrativeTextResources
+  return narrativeTextResources.weekRange.concat(narrativeTextResources.resourceType,
+    narrativeTextResources.gradeFilter, narrativeTextResources.resourcesUnaccessCount,
+    narrativeTextResources.resourcesUnAccessList, narrativeTextResources.resourcesAccessCount, narrativeTextResources.resourceAccessList)
 }
 const grades = (data, bins, gradesSummary, firstGradeAfterBinnedGrade) => {
   const myGrade = gradesSummary.current_user_grade
@@ -47,7 +49,7 @@ const grades = (data, bins, gradesSummary, firstGradeAfterBinnedGrade) => {
       }
     }
   }
-  return narrativeTextGrades
+  return narrativeTextGrades.courseStats.concat(narrativeTextGrades.binnedGradeText, narrativeTextGrades.courseGrades.toString())
 }
 export {
   resources,

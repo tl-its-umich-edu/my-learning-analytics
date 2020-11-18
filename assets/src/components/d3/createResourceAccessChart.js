@@ -167,11 +167,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     .attr('aria-live', 'polite')
     .attr('id', 'resource-view-narrative')
     .attr('class', 'screenreader-only sr-only')
-    .text(d => {
-      return narrativeTextResources.weekRange.concat(narrativeTextResources.resourceType,
-        narrativeTextResources.gradeFilter, narrativeTextResources.resourcesUnaccessCount,
-        narrativeTextResources.resourcesUnAccessList, narrativeTextResources.resourcesAccessCount, narrativeTextResources.resourceAccessList)
-    })
+    .text(d => narrativeTextResources)
 
   const svg = main.append('svg')
     .attr('class', 'svgWrapper')
