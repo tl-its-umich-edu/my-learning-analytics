@@ -11,6 +11,9 @@ query Assignment{
       pointsPossible
       averageGrade
       assignmentGroupId
+      assignmentGroup{
+        name
+      }
       currentUserSubmission {
         score
         gradedDate

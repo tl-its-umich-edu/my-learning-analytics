@@ -1,21 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import TableContainer from '@material-ui/core/TableContainer'
-import RootRef from '@material-ui/core/RootRef'
+import Checkbox from '@material-ui/core/Checkbox'
+import FormControl from '@material-ui/core/FormControl'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Grid from '@material-ui/core/Grid'
+import InputLabel from '@material-ui/core/InputLabel'
+import Input from '@material-ui/core/Input'
+import ListItemText from '@material-ui/core/ListItemText'
+import MenuItem from '@material-ui/core/MenuItem'
 import MTable from '@material-ui/core/Table'
-import TableHead from '@material-ui/core/TableHead'
-import TableRow from '@material-ui/core/TableRow'
+import Popover from '@material-ui/core/Popover'
+import RootRef from '@material-ui/core/RootRef'
+import Select from '@material-ui/core/Select'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
-import Checkbox from '@material-ui/core/Checkbox'
-import Popover from '@material-ui/core/Popover'
+import TableContainer from '@material-ui/core/TableContainer'
+import TableHead from '@material-ui/core/TableHead'
+import TableRow from '@material-ui/core/TableRow'
+import DoneIcon from '@material-ui/icons/Done'
 import ProgressBarV2 from './ProgressBarV2'
 import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
 import StyledTextField from './StyledTextField'
 import { calculateWeekOffset } from '../util/date'
 import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
-import DoneIcon from '@material-ui/icons/Done';
 
 const styles = theme => ({
   root: {
@@ -49,12 +57,24 @@ const styles = theme => ({
   narrowCell: {
     width: '120px'
   },
+  veryNarrowCell: {
+    width: '60px'
+  },
   possiblePointsText: {
     margin: 'auto',
     display: 'inline-block',
     paddingTop: '22px',
     paddingLeft: '5px',
     verticalAlign: 'middle'
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    width: '100%'
+  },
+  filterArea: {
+    alignItems: 'center',
+    marginBottom: '2px',
+    backgroundColor: '#F4F4F4'
   }
 })
 
@@ -123,28 +143,86 @@ function AssignmentTable (props) {
     }
   }, [currentWeekRow.current])
 
+  const [assignmentGroupNames, setAssignmentGroupNames] = useState([])
+  useEffect(() => {
+    const allGroupNames = assignments.map(ag => ag.assignmentGroup.name)
+    var uniqueGroupNames = [...new Set(allGroupNames)]
+    uniqueGroupNames.sort()
+    setAssignmentGroupNames(uniqueGroupNames)
+  }, [assignments])
+
   const [assignmentFilter, setAssignmentFilter] = useState('')
   function handleNameFilterChange (e) {
     setAssignmentFilter(e.target.value)
+  }
+
+  const ITEM_HEIGHT = 48
+  const ITEM_PADDING_TOP = 8
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        width: 250
+      }
+    }
+  }
+
+  const [assignmentGroupFilterArray, setAssignmentGroupFilterArray] = useState([])
+  function handleGroupNameArrayFilterChange (e) {
+    setAssignmentGroupFilterArray(e.target.value)
   }
 
   function handleGradedOnlyFilterChange (e) {
     setGradedOnly(!gradedOnly)
   }
 
-  const getFilter = (heading, key) => {
-    switch (heading) {
-      case 'Assignment Name':
-        return <div><input value={assignmentFilter} placeholder='Search...' onChange={handleNameFilterChange} /></div>
-      case 'Graded':
-        return <div><Checkbox checked={gradedOnly} color='primary' onChange={handleGradedOnlyFilterChange} /></div>
-      default:
-        return undefined
-    }
-  }
-
   return (
     <RootRef rootRef={tableRef}>
+      <Grid container className={classes.filterArea}>
+        {/* Hidden until UI requirements are hashed out */}
+        <Grid item xs={12} sm={5} hidden>
+          <FormControl className={classes.formControl}>
+            <InputLabel>Assignment Group</InputLabel>
+            <Select
+              labelId='assignment-group-checkbox-label'
+              id='assignment-group-mutiple-checkbox'
+              multiple
+              value={assignmentGroupFilterArray}
+              onChange={handleGroupNameArrayFilterChange}
+              input={<Input />}
+              renderValue={(selected) => selected.join(', ')}
+              MenuProps={MenuProps}
+              width='250px'
+            >
+              {assignmentGroupNames.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={assignmentGroupFilterArray.indexOf(name) > -1} />
+                  <ListItemText primary={name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={5}>
+          <FormControl className={classes.formControl}>
+            <InputLabel>Assignment Name</InputLabel>
+            <Input value={assignmentFilter} placeholder='Filter by assignment name...' onChange={handleNameFilterChange} />
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={1}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={gradedOnly}
+                onChange={handleGradedOnlyFilterChange}
+                name='checkedB'
+                color='primary'
+              />
+            }
+            label='Graded'
+          />
+        </Grid>
+      </Grid>
       <TableContainer className={classes.container}>
         <MTable stickyHeader ref={tableRef}>
           <TableHead>
@@ -164,7 +242,6 @@ function AssignmentTable (props) {
                     key={key}
                   >
                     {heading}
-                    {getFilter(heading)}
                   </TableCell>
                 ))
               }
@@ -175,6 +252,9 @@ function AssignmentTable (props) {
               assignments
                 .filter(assignment => assignmentFilter.trim().length === 0 || assignment.name.toUpperCase().includes(assignmentFilter.toUpperCase()))
                 .filter(assignment => !gradedOnly || assignment.graded)
+                // Commented out until group name UI requirements are hashed out, though it wouldn't make a difference
+                // .filter(assignment => assignmentGroupFilter.trim().length === 0 || assignment.assignmentGroup.name.toUpperCase().includes(assignmentGroupFilter.toUpperCase()))
+                .filter(assignment => assignmentGroupFilterArray.length === 0 || assignmentGroupFilterArray.indexOf(assignment.assignmentGroup.name) >= 0)
                 .map((a, key) => (
                   <ConditionalWrapper
                     condition={a.week === currentWeek}
@@ -297,7 +377,7 @@ function AssignmentTable (props) {
                           </Popover>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className={classes.veryNarrowCell}>
                         {a.graded ? <DoneIcon /> : <div />}
                       </TableCell>
                       <TableCell>
