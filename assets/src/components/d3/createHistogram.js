@@ -51,8 +51,8 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
 
   // SVG Components
   const main = d3.select(domElement).append('div')
-  // eslint-disable-next-line no-unused-vars
-  const containerGradesDiv = main.append('div')
+
+  main.append('div')
     .attr('aria-live', 'polite')
     .attr('id', 'grade-view-narrative')
     .attr('class', 'screenreader-only sr-only')
