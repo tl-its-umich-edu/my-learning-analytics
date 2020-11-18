@@ -24,9 +24,9 @@ const grades = (data, bins, gradesSummary, myGrade, firstGradeAfterBinnedGrade) 
   const isBinningUsed = new Set(data.slice(0, 5)).size === 1
   const binningNarrativeText = () => {
     if (isOutOfRange(myGrade, firstGradeAfterBinnedGrade)) {
-      return `First grades are binned at ${Math.trunc(firstGradeAfterBinnedGrade)}% or lower and your grade ${myGrade} fall in this bin. `
+      return `Grades at around ${Math.trunc(firstGradeAfterBinnedGrade)}% or lower are placed into one bin, and your grade ${myGrade}% falls into this bin. `
     } else {
-      return `First grades are binned at ${Math.trunc(firstGradeAfterBinnedGrade)}% or lower. `
+      return `Grades at around ${Math.trunc(firstGradeAfterBinnedGrade)}% or lower are placed into one bin. `
     }
   }
   const userGradeInBinnedGroup = () => {
