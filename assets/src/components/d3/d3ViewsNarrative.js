@@ -11,8 +11,8 @@ const createResourcesText = (resourceData, resourceType, gradeSelection, weekRan
   narrativeTextResources.resourcesAccessCount = accessedResources.length !== 0 ? `. You have accessed ${accessedResources.length} of ${resourceData.length} resources.  ` : ''
   narrativeTextResources.resourcesUnAccessList = unAccessedResources.map(x =>
     resourceType.length === 1
-      ? `${x.resource_name.split('|')[1]} accessed ${x.total_percent}%`
-      : `${x.resource_name.split('|')[1]} of type ${x.resource_type} accessed ${x.total_percent}%`
+      ? `${x.resource_name.split('|')[1]} has been accessed by ${x.total_percent}% of students.`
+      : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students.`
   )
   narrativeTextResources.resourceAccessList = accessedResources.map(x =>
     resourceType.length === 1
