@@ -8,7 +8,7 @@ exports[`createHistogram should build a histogram bar chart binning last five gr
       class="screenreader-only sr-only"
       id="grade-view-narrative"
     >
-      Course information: Class Size = 84, Average grade = 90.49%, Median grade = 93.39%.First grades are binned at 74% or lower. 5 grades in 72 - 74% range,3 in 74 - 76% ,3 grades in 76 - 78% range and your grade 76.8% is in this range ,4 in 78 - 80% ,5 in 80 - 82% ,3 in 82 - 84% ,8 in 84 - 86% ,5 in 86 - 88% ,8 in 88 - 90% ,7 in 90 - 92% ,11 in 92 - 94% ,10 in 94 - 96% ,7 in 96 - 98% ,2 in 98 - 100% 
+      Course information: Class Size = 84, Average grade = 90.49%, Median grade = 93.39%.Grades at around 74% or lower are placed into one bin. 5 grades are in the 72 to 74% range,3 in the 74 to 76%,3 grades are in the 76 to 78% range, and your grade 76.8% is in this range ,4 in the 78 to 80%,5 in the 80 to 82%,3 in the 82 to 84%,8 in the 84 to 86%,5 in the 86 to 88%,8 in the 88 to 90%,7 in the 90 to 92%,11 in the 92 to 94%,10 in the 94 to 96%,7 in the 96 to 98%,2 in the 98 to 100%
     </div>
     <svg
       aria-hidden="true"
