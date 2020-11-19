@@ -4,7 +4,7 @@ const createResourcesText = (resourceData, resourceType, gradeSelection, weekRan
   const unAccessedResources = resourceData.filter(resource => resource.self_access_count === 0)
   const accessedResources = resourceData.filter(resource => resource.self_access_count >= 1)
   const narrativeTextResources = {}
-  narrativeTextResources.weekRange = `Resources accessed from week ${weekRange[0]} to ${weekRange[1]}.  `
+  narrativeTextResources.weekRange = `Resources accessed from week ${weekRange[0]} to ${weekRange[1]}. `
   narrativeTextResources.resourceType = `Selected resource type(s) ${resourceType.length === 1 ? 'is' : 'are'} ${resourceType}. `
   narrativeTextResources.gradeFilter = gradeSelection.toUpperCase() !== 'ALL' ? `Filtering on grades ${gradeSelection}. ` : ''
   narrativeTextResources.resourcesUnaccessCount = `You have not yet accessed ${unAccessedResources.length} of ${resourceData.length} resources.  `
