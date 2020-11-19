@@ -44,7 +44,7 @@ const createGradesText = (data, bins, gradesSummary, myGrade, firstGradeAfterBin
         narrativeTextGrades.courseGrades.push(`${bins[gradeBin].length} grades are in the ${binLowerLimit} to ${binUpperLimit}% range, and your grade ${myGrade}% is in this range. `)
       } else {
         narrativeTextGrades.courseGrades.push(narrativeTextGrades.courseGrades.length !== 0
-          ? `${bins[gradeBin].length} in the ${binLowerLimit} to ${binUpperLimit}%`
+          ? `${bins[gradeBin].length} grades are in the ${binLowerLimit} to ${binUpperLimit}% range. `
           : `${bins[gradeBin].length} grades are in the ${binLowerLimit} to ${binUpperLimit}% range. `)
       }
     }
