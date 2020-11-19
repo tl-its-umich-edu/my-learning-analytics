@@ -59,13 +59,13 @@ const generateAssignmentTable = plan => {
       assignmentItems.forEach(assignment => {
         const assignmentName = assignment.name
         const percentOfFinalGrade = assignment.towards_final_grade
-        const submitted_at = assignment.submitted_at
         const graded = assignment.graded
+        const submitted = assignment.submitted
         const pointsPossible = assignment.points_possible
         const score = assignment.score
         const dropLowest = assignment.drop_lowest
         const dropHighest = assignment.drop_highest
-        const barData = { percentOfFinalGrade, submitted_at, graded, pointsPossible, score, dropLowest, dropHighest }
+        const barData = { percentOfFinalGrade, graded, submitted, pointsPossible, score, dropLowest, dropHighest }
         acc.push([week, dueDate, assignmentName, barData])
       })
     })
@@ -92,10 +92,10 @@ function CustomAssignmentTable (props) {
 
   const data = generateAssignmentTable(tableData)
     .map(row => {
-      const { percentOfFinalGrade, submitted_at, graded, pointsPossible, score, dropLowest, dropHighest } = row.pop()
+      const { percentOfFinalGrade, graded, submitted, pointsPossible, score, dropLowest, dropHighest } = row.pop()
       row.push(
         <HorizontalBar
-          data={[{ label: 'grade', data: percentOfFinalGrade, submitted_at, graded, pointsPossible, score, dropLowest, dropHighest }]}
+          data={[{ label: 'grade', data: percentOfFinalGrade, graded, submitted, pointsPossible, score, dropLowest, dropHighest }]}
           width={200}
           height={20}
           tip={createToolTip(d =>

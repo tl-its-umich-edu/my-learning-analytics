@@ -8,6 +8,7 @@ it('renders correctly', () => {
   const tree = renderer
     .create(
       <ProgressBarV2
+        submitted=''
         score={85}
         outOf={100}
         percentWidth={90}

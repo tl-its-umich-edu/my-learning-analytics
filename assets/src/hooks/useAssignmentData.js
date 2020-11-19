@@ -14,6 +14,7 @@ query Assignment{
       currentUserSubmission {
         score
         gradedDate
+        submittedAt
       }
     }
     dateStart

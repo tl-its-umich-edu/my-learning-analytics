@@ -578,6 +578,7 @@ def assignments(request, course_id=0):
     df_progressbar = df.loc[df['towards_final_grade'] > 0.0].copy()
     df_progressbar[['score']] = df_progressbar[['score']].astype(float)
     df_progressbar['graded'] = df_progressbar['graded'].fillna(False)
+    df_progressbar['submitted'] = df_progressbar['submitted'].fillna(False)
     df_progressbar[['score']] = df_progressbar[['score']].astype(float)
     df_progressbar['percent_gotten'] = df_progressbar.apply(lambda x: user_percent(x), axis=1)
     df_progressbar.sort_values(by=['graded', 'due_date_mod'], ascending=[False, True], inplace=True)
@@ -676,9 +677,12 @@ def get_user_assignment_submission(current_user,assignments_in_course_df, course
         assignment_submissions['assignment_id'] = assignments_in_course_df['assignment_id']
         assignment_submissions['score'] = None
         assignment_submissions['graded'] = False
+        assignment_submissions['submitted'] = False
     else:
         assignment_submissions['graded'] = assignment_submissions['graded_date'].notnull()
         assignment_submissions.drop(columns=['graded_date'], inplace=True)
+        assignment_submissions['submitted'] = assignment_submissions['submitted_at'].notnull()
+        assignment_submissions.drop(columns=['submitted_at'], inplace=True)
     return assignment_submissions
 
 
