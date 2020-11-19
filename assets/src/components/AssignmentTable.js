@@ -17,6 +17,7 @@ import TableCell from '@material-ui/core/TableCell'
 import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
+import Tooltip from '@material-ui/core/Tooltip'
 import DoneIcon from '@material-ui/icons/Done'
 import ProgressBarV2 from './ProgressBarV2'
 import PopupMessage from './PopupMessage'
@@ -176,12 +177,19 @@ function AssignmentTable (props) {
     setGradedOnly(!gradedOnly)
   }
 
+  const TRUNCATED_GROUP_NAME_LENGTH = 30
+  const shortenString = text => {
+    return (text.length > TRUNCATED_GROUP_NAME_LENGTH)
+      ? text.substring(0, TRUNCATED_GROUP_NAME_LENGTH - 3) + '...'
+      : text
+  }
+
   return (
     <RootRef rootRef={tableRef}>
       <div>
         <Grid container className={classes.filterArea}>
           {/* Hidden until UI requirements are hashed out */}
-          <Grid item xs={12} sm={5} hidden>
+          <Grid item xs={12} sm={5}>
             <FormControl className={classes.formControl}>
               <InputLabel>Assignment Group</InputLabel>
               <Select
@@ -233,6 +241,7 @@ function AssignmentTable (props) {
                   [
                     'Week',
                     'Due',
+                    'Assignment Group',
                     'Assignment Name',
                     'Percent of Final Grade',
                     'Score / Out of',
@@ -254,8 +263,6 @@ function AssignmentTable (props) {
                 assignments
                   .filter(assignment => assignmentFilter.trim().length === 0 || assignment.name.toUpperCase().includes(assignmentFilter.toUpperCase()))
                   .filter(assignment => !gradedOnly || assignment.graded)
-                  // Commented out until group name UI requirements are hashed out, though it wouldn't make a difference
-                  // .filter(assignment => assignmentGroupFilter.trim().length === 0 || assignment.assignmentGroup.name.toUpperCase().includes(assignmentGroupFilter.toUpperCase()))
                   .filter(assignment => assignmentGroupFilterArray.length === 0 || assignmentGroupFilterArray.indexOf(assignment.assignmentGroup.name) >= 0)
                   .map((a, key) => (
                     <ConditionalWrapper
@@ -299,7 +306,12 @@ function AssignmentTable (props) {
                               : ''
                           }
                         </TableCell>
-                        <TableCell style={{ width: '30%' }}>
+                        <TableCell style={{ width: '20%' }}>
+                          <Tooltip title={a.assignmentGroup.name} placement='top' enterDelay={500}>
+                            <div>{shortenString(a.assignmentGroup.name)}</div>
+                          </Tooltip>
+                        </TableCell>
+                        <TableCell style={{ width: '20%' }}>
                           {a.name}
                         </TableCell>
                         <TableCell className={classes.narrowCell}>
