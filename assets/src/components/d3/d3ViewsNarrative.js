@@ -33,7 +33,7 @@ const createGradesText = (data, bins, gradesSummary, myGrade, firstGradeAfterBin
     }
   }
   const narrativeTextGrades = {}
-  narrativeTextGrades.courseStats = `Course information: Class Size = ${gradesSummary.tot_students}, Average grade = ${gradesSummary.grade_avg}%, Median grade = ${gradesSummary.median_grade}%.`
+  narrativeTextGrades.courseStats = `Course information: Class size = ${gradesSummary.tot_students}, Average grade = ${gradesSummary.grade_avg}%, Median grade = ${gradesSummary.median_grade}%.`
   narrativeTextGrades.binnedGradeText = isBinningUsed ? binningNarrativeText() : ''
   narrativeTextGrades.courseGrades = []
   for (const gradeBin in bins) {
