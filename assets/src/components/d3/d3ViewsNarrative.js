@@ -8,16 +8,16 @@ const createResourcesText = (resourceData, resourceType, gradeSelection, weekRan
   narrativeTextResources.resourceType = `Selected resource type is ${resourceType}.  `
   narrativeTextResources.gradeFilter = gradeSelection.toUpperCase() !== 'ALL' ? `Filtering on grades ${gradeSelection}.  ` : ''
   narrativeTextResources.resourcesUnaccessCount = `You have not yet accessed ${unAccessedResources.length} of ${resourceData.length} resources.  `
-  narrativeTextResources.resourcesAccessCount = `${accessedResources.length !== 0 ? `. You have accessed ${accessedResources.length} of ${resourceData.length} resources.  ` : ''}`
+  narrativeTextResources.resourcesAccessCount = accessedResources.length !== 0 ? `. You have accessed ${accessedResources.length} of ${resourceData.length} resources.  ` : ''
   narrativeTextResources.resourcesUnAccessList = unAccessedResources.map(x =>
-    `${resourceType.length === 1
+    resourceType.length === 1
       ? `${x.resource_name.split('|')[1]} accessed ${x.total_percent}%`
-      : `${x.resource_name.split('|')[1]} of type ${x.resource_type} accessed ${x.total_percent}%`}`
+      : `${x.resource_name.split('|')[1]} of type ${x.resource_type} accessed ${x.total_percent}%`
   )
   narrativeTextResources.resourceAccessList = accessedResources.map(x =>
-    `${resourceType.length === 1
+    resourceType.length === 1
       ? `${x.resource_name.split('|')[1]} has been accessed by ${x.total_percent}% of students. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`
-      : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`}`)
+      : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`)
   return narrativeTextResources.weekRange.concat(narrativeTextResources.resourceType,
     narrativeTextResources.gradeFilter, narrativeTextResources.resourcesUnaccessCount,
     narrativeTextResources.resourcesUnAccessList, narrativeTextResources.resourcesAccessCount, narrativeTextResources.resourceAccessList)
@@ -43,9 +43,9 @@ const createGradesText = (data, bins, gradesSummary, firstGradeAfterBinnedGrade)
       if (isInRange(myGrade, binLowerLimit, binUpperLimit) && myGrade) {
         narrativeTextGrades.courseGrades.push(`${bins[gradeBin].length} grades are in the ${binLowerLimit} to ${binUpperLimit}% range, and your grade ${myGrade}% is in this range `)
       } else {
-        narrativeTextGrades.courseGrades.push(`${(narrativeTextGrades.courseGrades.length !== 0
+        narrativeTextGrades.courseGrades.push(narrativeTextGrades.courseGrades.length !== 0
           ? `${bins[gradeBin].length} in the ${binLowerLimit} to ${binUpperLimit}%`
-          : `${bins[gradeBin].length} grades are in the ${binLowerLimit} to ${binUpperLimit}% range`)}`)
+          : `${bins[gradeBin].length} grades are in the ${binLowerLimit} to ${binUpperLimit}% range`)
       }
     }
   }
