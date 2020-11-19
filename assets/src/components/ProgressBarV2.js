@@ -4,7 +4,7 @@ import Label from './Label'
 import { withStyles } from '@material-ui/core/styles'
 import { roundToXDecimals } from '../util/math'
 
-const styles = theme =>({
+const styles = theme => ({
   gradedBar: {
     float: 'left',
     backgroundColor: theme.palette.secondary.main,
