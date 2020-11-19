@@ -2,7 +2,7 @@ import { isInRange, isOutOfRange } from '../../util/math'
 
 const createResourcesText = (resourceData, resourceType, gradeSelection, weekRange) => {
   const unAccessedResources = resourceData.filter(resource => resource.self_access_count === 0)
-  const accessedResources = resourceData.filter(resource => resource.self_access_count === 1)
+  const accessedResources = resourceData.filter(resource => resource.self_access_count >= 1)
   const narrativeTextResources = {}
   narrativeTextResources.weekRange = `Resources accessed from week ${weekRange[0]} to ${weekRange[1]}.  `
   narrativeTextResources.resourceType = `Selected resource type ${resourceType.length === 1 ? 'is' : 'are'} ${resourceType}.`
