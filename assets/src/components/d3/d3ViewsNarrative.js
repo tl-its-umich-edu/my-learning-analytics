@@ -6,7 +6,7 @@ const createResourcesText = (resourceData, resourceType, gradeSelection, weekRan
   const narrativeTextResources = {}
   narrativeTextResources.weekRange = `Resources accessed from week ${weekRange[0]} to ${weekRange[1]}.  `
   narrativeTextResources.resourceType = `Selected resource type ${resourceType.length === 1 ? 'is' : 'are'} ${resourceType}.`
-  narrativeTextResources.gradeFilter = gradeSelection.toUpperCase() !== 'ALL' ? `Filtering on grades ${gradeSelection}.  ` : ''
+  narrativeTextResources.gradeFilter = gradeSelection.toUpperCase() !== 'ALL' ? `Filtering on grades ${gradeSelection}. ` : ''
   narrativeTextResources.resourcesUnaccessCount = `You have not yet accessed ${unAccessedResources.length} of ${resourceData.length} resources.  `
   narrativeTextResources.resourcesAccessCount = accessedResources.length !== 0 ? `. You have accessed ${accessedResources.length} of ${resourceData.length} resources.  ` : ''
   narrativeTextResources.resourcesUnAccessList = unAccessedResources.map(x =>
