@@ -22,6 +22,7 @@ const createResourcesText = (resourceData, resourceType, gradeSelection, weekRan
     narrativeTextResources.gradeFilter, narrativeTextResources.resourcesUnaccessCount,
     narrativeTextResources.resourcesUnAccessList, narrativeTextResources.resourcesAccessCount, narrativeTextResources.resourceAccessList)
 }
+
 const createGradesText = (data, bins, gradesSummary, myGrade, firstGradeAfterBinnedGrade) => {
   const isBinningUsed = new Set(data.slice(0, 5)).size === 1
   const binningNarrativeText = () => {
