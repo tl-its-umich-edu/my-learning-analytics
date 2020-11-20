@@ -226,6 +226,9 @@ function ResourcesAccessed (props) {
       return (
         <ResourceAccessChart
           data={resourceData}
+          weekRange={weekRange}
+          gradeSelection={resourceGradeFilter}
+          resourceType={resourceTypeFilter}
           aspectRatio={0.3}
           minHeight={350}
         />

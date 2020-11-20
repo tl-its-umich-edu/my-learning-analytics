@@ -1,5 +1,6 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
+import { createResourcesText } from './d3ViewsNarrative'
 import d3tip from 'd3-tip'
 import './createResourceAccessChart.css'
 import '@fortawesome/fontawesome-free'
@@ -21,16 +22,20 @@ const linkColor = siteTheme.palette.link.main
 // resource icon and padding to its right; this value is also used to calculate the resourceLabelWidth.
 const foreignObjSide = 24
 
+const resourceToolTipText = (resource) => {
+  if (resource.self_access_count === 0) {
+    return '<b>You haven\'t accessed this resource. </b>'
+  } else if (resource.self_access_count === 1) {
+    return `You accessed this resource once on ${new Date(resource.self_access_last_time).toDateString()}.`
+  } else {
+    return `You accessed this resource ${resource.self_access_count} times. The last time you accessed this resource was on ${new Date(resource.self_access_last_time).toDateString()}.`
+  }
+}
+
 const toolTip = d3tip().attr('class', 'd3-tip')
   .direction('n').offset([-5, 5])
   .html(d => {
-    if (d.self_access_count === 0) {
-      return '<b>You haven\'t accessed this resource. </b>'
-    } else if (d.self_access_count === 1) {
-      return `You accessed this resource once on ${new Date(d.self_access_last_time).toDateString()}.`
-    } else {
-      return `You accessed this resource ${d.self_access_count} times. The last time you accessed this resource was on ${new Date(d.self_access_last_time).toDateString()}.`
-    }
+    return resourceToolTipText(d)
   })
 
 function appendLegend (svg) {
@@ -86,7 +91,7 @@ function truncate (selection, labelWidth) {
   })
 }
 
-function createResourceAccessChart ({ data, width, height, domElement }) {
+function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceType, width, height, domElement }) {
   const resourceData = data.sort((a, b) => b.total_percent - a.total_percent)
   /* Assign an index to each resource.  This is used to assist with keyboard navigation
   To set the tab sequence to go from resource name to its corresponding bar graph we use
@@ -153,12 +158,22 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   const miniYScale = d3.scaleBand().range([0, miniHeight])
 
   const textScale = d3.scaleLinear().range([12, 6]).domain([15, 50]).clamp(true)
-
+  // d3 graph narrative text
+  const narrativeTextResources = createResourcesText(resourceData, resourceType, gradeSelection, weekRange)
   // Build the chart
-  const svg = d3.select(domElement).append('svg')
+  const main = d3.select(domElement).append('div')
+
+  main.append('div')
+    .attr('aria-live', 'polite')
+    .attr('id', 'resource-view-narrative')
+    .attr('class', 'screenreader-only sr-only')
+    .text(d => narrativeTextResources)
+
+  const svg = main.append('svg')
     .attr('class', 'svgWrapper')
     .attr('width', availWidth)
     .attr('height', availHeight)
+    .attr('aria-hidden', 'true')
     .attr('transform', `translate(${margin.left}, ${margin.top})`)
     .on('wheel.zoom', scroll)
     .on('mousedown.zoom', null) // Override the center selection
