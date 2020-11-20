@@ -45,13 +45,13 @@ const styles = theme => ({
     paddingTop: 10
   },
   stickyTop: {
-    top: '72px',
+    top: '0px',
     left: '20px',
     right: '0px',
-    position: 'fixed',
     background: '#fff',
     borderBottom: '1px solid #ccc',
-    zIndex: 5
+    position: 'sticky'
+    // zIndex: 5
   },
   clearButton: {
     float: 'right',
@@ -177,8 +177,9 @@ function AssignmentPlanningV2 (props) {
                 loading
                   ? <Spinner />
                   : (
-                    <div style={{ border: '2px solid red', position: 'relative' }}>
-                      <div className={classes.section + ' ' + classes.goalAlign + ' ' + classes.stickyTop}>
+                    <div style={{ position: 'relative' }}>
+                      {/* <div className={classes.section + ' ' + classes.goalAlign + ' ' + classes.stickyTop}> */}
+                      <div className={classes.goalAlign + ' ' + classes.stickyTop}>
                         <AssignmentGoalInput
                           currentGrade={currentGrade}
                           goalGrade={goalGrade}
@@ -242,16 +243,21 @@ function AssignmentPlanningV2 (props) {
                             <br />
                           </Grid>
                         </Grid>
-                        <AssignmentTable
-                          courseGoalGradeSet={goalGrade !== ''}
-                          assignments={assignments}
-                          assignmentGroups={assignmentGroups}
-                          dateStart={data.course.dateStart}
-                          handleAssignmentGoalGrade={handleAssignmentGoalGrade}
-                          handleAssignmentLock={handleAssignmentLock}
-                          handleInputFocus={handleInputFocus}
-                          handleInputBlur={handleInputBlur}
-                        />
+                        {/* <div className={classes.section}> */}
+                        {/* <Typography variant='h6' gutterBottom>Assignments by Due Date</Typography> */}
+                        <div style={{ position: 'fixed', width: '100%' }}>
+                          <AssignmentTable
+                            courseGoalGradeSet={goalGrade !== ''}
+                            assignments={assignments}
+                            assignmentGroups={assignmentGroups}
+                            dateStart={data.course.dateStart}
+                            handleAssignmentGoalGrade={handleAssignmentGoalGrade}
+                            handleAssignmentLock={handleAssignmentLock}
+                            handleInputFocus={handleInputFocus}
+                            handleInputBlur={handleInputBlur}
+                          />
+                        </div>
+                        {/* </div> */}
                       </div>
                     </div>
                   )
