@@ -132,7 +132,8 @@ function AssignmentTable (props) {
   const currentWeekRow = useRef(null)
 
   const currentDate = new Date()
-  const currentWeek = calculateWeekOffset(dateStart, currentDate)
+  // const currentWeek = calculateWeekOffset(dateStart, currentDate)
+  const currentWeek = 9
 
   const maxPercentOfFinalGrade = Math.max(
     ...assignments.map(({ percentOfFinalGrade }) => percentOfFinalGrade)
