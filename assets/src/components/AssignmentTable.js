@@ -153,7 +153,7 @@ function AssignmentTable (props) {
   }, [assignments])
 
   const [assignmentFilter, setAssignmentFilter] = useState('')
-  function handleNameFilterChange (e) {
+  const handleNameFilterChange = e => {
     setAssignmentFilter(e.target.value)
   }
 
@@ -169,11 +169,11 @@ function AssignmentTable (props) {
   }
 
   const [assignmentGroupFilterArray, setAssignmentGroupFilterArray] = useState([])
-  function handleGroupNameArrayFilterChange (e) {
+  const handleGroupNameArrayFilterChange = e => {
     setAssignmentGroupFilterArray(e.target.value)
   }
 
-  function handleGradedOnlyFilterChange (e) {
+  const handleGradedOnlyFilterChange = e => {
     setGradedOnly(!gradedOnly)
   }
 
