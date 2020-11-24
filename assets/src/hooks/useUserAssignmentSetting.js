@@ -9,7 +9,9 @@ const useUserAssignmentSetting =
     assignments,
     userSetting,
     setGoalGrade,
-    setAssignments
+    setAssignments,
+    currentGrade,
+    maxPossibleGrade
   }) => {
     useEffect(() => {
       if (loadedWithoutError(loading, error)) {
@@ -19,6 +21,8 @@ const useUserAssignmentSetting =
               ? ''
               : userSetting.goalGrade
           )
+          userSetting.currentGrade = currentGrade
+          userSetting.maxPossibleGrade = maxPossibleGrade
           if (userSetting.assignments) {
             const assignmentsWithUserSetting = assignments.map(a => {
               const assignmentSetting = userSetting.assignments
