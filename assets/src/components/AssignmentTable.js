@@ -188,7 +188,6 @@ function AssignmentTable (props) {
     <RootRef rootRef={tableRef}>
       <div>
         <Grid container className={classes.filterArea}>
-          {/* Hidden until UI requirements are hashed out */}
           <Grid item xs={12} sm={5}>
             <FormControl className={classes.formControl}>
               <InputLabel>Assignment Group</InputLabel>
