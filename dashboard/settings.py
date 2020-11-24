@@ -180,7 +180,6 @@ WEBPACK_LOADER = {
 }
 
 NPM_FILE_PATTERNS = {
-    'bootstrap': ['dist/css/*'],
     'jquery': ['dist/jquery.min.js'],
     '@fortawesome': ['fontawesome-free/*']
 }
