@@ -21,7 +21,7 @@ exports[`renders correctly 1`] = `
         }
       }
     >
-      Goal
+      My Minimum Goal
     </h6>
     <div
       className="MuiFormControl-root MuiTextField-root WithStyles(ForwardRef(TextField))-root-2 AssignmentGoalInput-goalGradeInput-1 MuiFormControl-marginNormal"
@@ -38,7 +38,7 @@ exports[`renders correctly 1`] = `
         htmlFor="standard-number"
         id="standard-number-label"
       >
-        Set course goal
+        Set Minimum Goal
       </label>
       <div
         className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-formControl"
@@ -66,7 +66,7 @@ exports[`renders correctly 1`] = `
             className="PrivateNotchedOutline-legendLabelled-5 PrivateNotchedOutline-legendNotched-6"
           >
             <span>
-              Set course goal
+              Set Minimum Goal
             </span>
           </legend>
         </fieldset>
