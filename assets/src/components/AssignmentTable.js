@@ -233,7 +233,7 @@ function AssignmentTable (props) {
                       >
                         <ProgressBarV2
                           score={a.currentUserSubmission ? a.currentUserSubmission.score : 0}
-                          submitted = {a.currentUserSubmission? a.currentUserSubmission.submittedAt:''}
+                          submitted={a.currentUserSubmission ? a.currentUserSubmission.submittedAt : ''}
                           outOf={a.outOf}
                           goalGrade={a.goalGrade}
                           percentWidth={a.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
