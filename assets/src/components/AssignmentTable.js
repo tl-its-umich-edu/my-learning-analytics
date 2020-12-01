@@ -96,6 +96,12 @@ function AssignmentTable (props) {
 
   const [gradedOnly, setGradedOnly] = useState(false)
 
+  const [assignmentGroupNames, setAssignmentGroupNames] = useState([])
+
+  const [assignmentFilter, setAssignmentFilter] = useState('')
+
+  const [assignmentGroupFilterArray, setAssignmentGroupFilterArray] = useState([])
+
   const tableRef = useRef(null)
   const currentWeekRow = useRef(null)
 
@@ -144,15 +150,12 @@ function AssignmentTable (props) {
     }
   }, [currentWeekRow.current])
 
-  const [assignmentGroupNames, setAssignmentGroupNames] = useState([])
   useEffect(() => {
     const allGroupNames = assignments.map(ag => ag.assignmentGroup.name)
-    var uniqueGroupNames = [...new Set(allGroupNames)]
-    uniqueGroupNames.sort()
+    const uniqueGroupNames = [...new Set(allGroupNames)].sort()
     setAssignmentGroupNames(uniqueGroupNames)
   }, [assignments])
 
-  const [assignmentFilter, setAssignmentFilter] = useState('')
   const handleNameFilterChange = e => {
     setAssignmentFilter(e.target.value)
   }
@@ -168,7 +171,6 @@ function AssignmentTable (props) {
     }
   }
 
-  const [assignmentGroupFilterArray, setAssignmentGroupFilterArray] = useState([])
   const handleGroupNameArrayFilterChange = e => {
     setAssignmentGroupFilterArray(e.target.value)
   }
