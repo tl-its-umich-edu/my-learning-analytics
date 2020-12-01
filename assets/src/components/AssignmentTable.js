@@ -156,10 +156,6 @@ function AssignmentTable (props) {
     setAssignmentGroupNames(uniqueGroupNames)
   }, [assignments])
 
-  const handleNameFilterChange = e => {
-    setAssignmentFilter(e.target.value)
-  }
-
   const ITEM_HEIGHT = 48
   const ITEM_PADDING_TOP = 8
   const MenuProps = {
@@ -169,14 +165,6 @@ function AssignmentTable (props) {
         width: 250
       }
     }
-  }
-
-  const handleGroupNameArrayFilterChange = e => {
-    setAssignmentGroupFilterArray(e.target.value)
-  }
-
-  const handleGradedOnlyFilterChange = e => {
-    setGradedOnly(!gradedOnly)
   }
 
   const TRUNCATED_GROUP_NAME_LENGTH = 30
@@ -198,7 +186,7 @@ function AssignmentTable (props) {
                 id='assignment-group-mutiple-checkbox'
                 multiple
                 value={assignmentGroupFilterArray}
-                onChange={handleGroupNameArrayFilterChange}
+                onChange={e => setAssignmentGroupFilterArray(e.target.value)}
                 input={<Input />}
                 renderValue={(selected) => selected.join(', ')}
                 MenuProps={MenuProps}
@@ -216,7 +204,7 @@ function AssignmentTable (props) {
           <Grid item xs={12} sm={5}>
             <FormControl className={classes.formControl}>
               <InputLabel>Filter by Assignment Name</InputLabel>
-              <Input value={assignmentFilter} placeholder='Filter by assignment name...' onChange={handleNameFilterChange} />
+              <Input value={assignmentFilter} placeholder='Filter by assignment name...' onChange={e => setAssignmentFilter(e.target.value)} />
             </FormControl>
           </Grid>
           <Grid item xs={12} sm={1}>
@@ -225,7 +213,7 @@ function AssignmentTable (props) {
               control={
                 <Checkbox
                   checked={gradedOnly}
-                  onChange={handleGradedOnlyFilterChange}
+                  onChange={() => setGradedOnly(!gradedOnly)}
                   name='checkedB'
                   color='primary'
                 />
