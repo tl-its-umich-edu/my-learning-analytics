@@ -82,10 +82,12 @@ if [ "${IS_CRON_POD:-"false",,}" == "false" ]; then
         # Workers need to be set to 1 for PTVSD
         GUNICORN_WORKERS=1
         GUNICORN_RELOAD="--reload"
+        GUNICORN_TIMEOUT=0
     fi
     exec gunicorn dashboard.wsgi:application \
         --bind 0.0.0.0:${GUNICORN_PORT} \
         --workers="${GUNICORN_WORKERS}" \
+        --timeout="${GUNICORN_TIMEOUT}" \
         ${GUNICORN_RELOAD}
  
 else
