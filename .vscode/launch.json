@@ -27,8 +27,7 @@
             ],
             "port": 3001,
             "host": "localhost",
-            "justMyCode": false,
-            "subProcess": true
+            "justMyCode": false
         }
     ]
 }
