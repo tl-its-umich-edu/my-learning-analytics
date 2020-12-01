@@ -24,7 +24,7 @@ fi
 if [ "${GUNICORN_RELOAD}" ]; then
     GUNICORN_RELOAD="--reload"
 else
-    GUNICORN_RELOAD=""
+    GUNICORN_RELOAD=
 fi
 
 DOMAIN_JQ='.ALLOWED_HOSTS | . - ["127.0.0.1", "localhost", ".ngrok.io"] | if . | length == 0 then "localhost" else .[0] end'
@@ -81,11 +81,12 @@ if [ "${IS_CRON_POD:-"false",,}" == "false" ]; then
         echo "Starting Gunicorn for PTVSD debugging"
         # Workers need to be set to 1 for PTVSD
         GUNICORN_WORKERS=1
+        GUNICORN_RELOAD="--reload"
     fi
     exec gunicorn dashboard.wsgi:application \
         --bind 0.0.0.0:${GUNICORN_PORT} \
         --workers="${GUNICORN_WORKERS}" \
-        "${GUNICORN_RELOAD}"
+        ${GUNICORN_RELOAD}
  
 else
     if [ -z "${CRONTAB_SCHEDULE}" ]; then
