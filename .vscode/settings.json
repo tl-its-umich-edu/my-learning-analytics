@@ -11,5 +11,6 @@
     "python.linting.mypyEnabled": true,
     "[javascript]": {
         "editor.tabSize": 2
-    }
+    },
+    "editor.formatOnSaveMode": "modifications"
 }
