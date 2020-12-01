@@ -289,10 +289,17 @@ class DashboardCronJob(CronJobBase):
             job_config.query_parameters = query_params
 
             # Location must match that of the dataset(s) referenced in the query.
-            bq_query = bigquery_client.query(final_bq_query, location='US', job_config=job_config)
-
-            resource_access_df: pd.DataFrame = bq_query.to_dataframe()
-            total_bytes_billed += bq_query.total_bytes_billed
+            try:
+                bq_job = bigquery_client.query(final_bq_query, location='US', job_config=job_config)
+                # This is the call that could result in an exception
+                resource_access_df: pd.DataFrame = bq_job.result().to_dataframe()
+                total_bytes_billed += bq_job.total_bytes_billed
+            # If there is an exception here print an error message and return
+            except Exception as e:
+                err_msg = f"There was an exception running the bigquery job of {e.message}"
+                # Print this as an error so it will trigger an error in the cron
+                logger.error(err_msg)
+                return status + err_msg
 
             resource_access_row_count = len(resource_access_df)
             if resource_access_row_count == 0:
