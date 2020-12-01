@@ -175,11 +175,9 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     .attr('height', availHeight)
     .attr('aria-hidden', 'true')
     .attr('transform', `translate(${margin.left}, ${margin.top})`)
-    /* eslint-disable object-curly-spacing */
-    .on('wheel.zoom', scroll, {passive: true })
+    .on('wheel.zoom', scroll, { passive: true })
     .on('mousedown.zoom', null) // Override the center selection
-    /* eslint-disable object-curly-spacing */
-    .on('touchstart.zoom', null, {passive: true })
+    .on('touchstart.zoom', null, { passive: true })
     .on('touchmove.zoom', null)
     .on('touchend.zoom', null)
 
@@ -380,8 +378,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
   gBrush
     .select('.overlay')
     .on('mousedown.brush', brushcenter)
-    /* eslint-disable object-curly-spacing */
-    .on('touchstart.brush', brushcenter, {passive: true })
+    .on('touchstart.brush', brushcenter, { passive: true })
 
   // Clips
   svg.append('defs')
