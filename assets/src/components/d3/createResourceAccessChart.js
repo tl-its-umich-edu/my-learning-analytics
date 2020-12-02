@@ -175,9 +175,9 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     .attr('height', availHeight)
     .attr('aria-hidden', 'true')
     .attr('transform', `translate(${margin.left}, ${margin.top})`)
-    .on('wheel.zoom', scroll)
+    .on('wheel.zoom', scroll, { passive: true })
     .on('mousedown.zoom', null) // Override the center selection
-    .on('touchstart.zoom', null)
+    .on('touchstart.zoom', null, { passive: true })
     .on('touchmove.zoom', null)
     .on('touchend.zoom', null)
 
@@ -378,7 +378,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
   gBrush
     .select('.overlay')
     .on('mousedown.brush', brushcenter)
-    .on('touchstart.brush', brushcenter)
+    .on('touchstart.brush', brushcenter, { passive: true })
 
   // Clips
   svg.append('defs')
