@@ -43,6 +43,9 @@ const styles = theme => ({
     color: 'black',
     height: '100%'
   },
+  titleIcon: {
+    paddingBottom: '0px'
+  },
   titleLink: {
     color: 'white'
   },
@@ -151,7 +154,7 @@ const SelectCard = props => {
   function getHelpLink (cardData) {
     if (cardData.helpUrl) {
       return (
-        <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
+        <Typography gutterBottom variant='h5' component='h4' className={ `${classes.title} ${classes.titleIcon}`}>
           <Tooltip title={'About ' + cardData.title}>
             <MUILink className={classes.infoLink} href={cardData.helpUrl} target='_blank' rel='noopener noreferrer'>
               <InfoIcon fontSize='large' />
