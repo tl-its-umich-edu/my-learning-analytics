@@ -16,6 +16,18 @@ const median = arr => {
     : sorted[middle]
 }
 
+const isInRange = (data, lowerLimit, upperLimit) => {
+  if ((data >= lowerLimit) && (data <= upperLimit)) {
+    return true
+  } else { return false }
+}
+
+const isOutOfRange = (data, checkPointData) => {
+  if (data !== null && data <= checkPointData) {
+    return true
+  } else { return false }
+}
+
 const sum = arr => arr.reduce((acc, cur) => (acc += cur), 0)
 
 export {
@@ -23,5 +35,7 @@ export {
   getDecimalPlaceOfFloat,
   median,
   roundToXDecimals,
-  sum
+  sum,
+  isInRange,
+  isOutOfRange
 }

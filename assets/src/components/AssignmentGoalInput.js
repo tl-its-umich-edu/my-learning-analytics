@@ -37,7 +37,7 @@ function AssignmentGoalInput (props) {
   return (
     <Grid container>
       <Grid item style={{ display: 'inline-block' }}>
-        <Typography style={{ display: 'inline-block', marginRight: '10px' }} variant='h6'>Goal</Typography>
+        <Typography style={{ display: 'inline-block', marginRight: '10px' }} variant='h6'>My Minimum Goal</Typography>
         <StyledTextField
           error={goalGradeInternal > 100 || mathWarning || goalGradeInternal > maxPossibleGrade}
           id='standard-number'
@@ -49,7 +49,7 @@ function AssignmentGoalInput (props) {
                 ? 'Over 100%'
                 : goalGrade > maxPossibleGrade
                   ? 'Greater than max possible grade'
-                  : 'Set course goal'
+                  : 'Set Minimum Goal'
           }
           onChange={event => {
             const goalGrade = event.target.value

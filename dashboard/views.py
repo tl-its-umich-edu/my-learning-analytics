@@ -352,7 +352,6 @@ def resource_access_within_week(request, course_id=0):
     output_df.reset_index(inplace=True)
 
     # now insert person's own viewing records: what resources the user has viewed, and the last access timestamp
-    # now insert person's own viewing records: what resources the user has viewed, and the last access timestamp
     selfSqlString = "select CONCAT(r.resource_id, ';', r.name) as resource_id_name, count(*) as self_access_count, max(a.access_time) as self_access_last_time " \
                     "from resource_access a, user u, resource r " \
                     "where a.user_id = u.user_id " \
@@ -392,7 +391,7 @@ def resource_access_within_week(request, course_id=0):
 
     output_df.fillna(0, inplace=True) #replace null value with 0
 
-    output_df['resource_id_part'], output_df['resource_name_part'] = output_df['resource_id_name'].str.split(';', 1).str
+    output_df[['resource_id_part','resource_name_part']] = output_df['resource_id_name'].str.split(';', expand=True)
 
     output_df['resource_name'] = output_df.apply(
         lambda row:
@@ -404,6 +403,8 @@ def resource_access_within_week(request, course_id=0):
             RESOURCE_VALUES.get(RESOURCE_VALUES_MAP.get(row.resource_type)).get('icon')
             ),
         axis=1)
+    # RESOURCE_VALUES_MAP {'canvas': 'files', 'leccap': 'videos', 'mivideo': 'videos'}
+    output_df['resource_type'] = output_df['resource_type'].replace(RESOURCE_VALUES_MAP)
     output_df.drop(columns=['resource_id_part', 'resource_name_part', 'resource_id_name'], inplace=True)
 
     logger.debug(output_df.to_json(orient='records'))

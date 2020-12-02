@@ -108,10 +108,10 @@ const calculateWeight = (pointsPossible, assignmentGroupId, assignmentGroups) =>
 const calculateMaxGrade = (assignments, assignmentGroups, assignmentWeightConsideration) => {
   const [totalUserPoints, totalPossiblePoints] = assignments
     .reduce((acc, a) => {
-      const assignmentGrade = a.graded
+      const assignmentGrade = a.graded && a.pointsPossible !== 0
         ? a.currentUserSubmission.score / a.pointsPossible
         // if user sets assignment goal, use the set goal as part of grade calc.
-        : a.goalGradeSetByUser
+        : a.goalGradeSetByUser && a.pointsPossible !== 0
           ? a.goalGrade / a.pointsPossible
           // give a perfect score if assignment is not graded to calculate the max grade possible.
           : 1
