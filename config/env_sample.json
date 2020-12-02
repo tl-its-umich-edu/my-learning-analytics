@@ -117,6 +117,8 @@
             }
         ]
     },
+    "/*Full path in container to LTI config template.  If unset or null, defaults to location of 'config/lti_config_template.json' (usually '/code/assets/config/lti_config_template.json' in container)":"*/",
+    "LTI_CONFIG_TEMPLATE_PATH": null,
     "/*Database caching using mysql cache for ltiv1p3":"*/",
     "DB_CACHE_CONFIGS": {
         "/*cache timeout":"*/",

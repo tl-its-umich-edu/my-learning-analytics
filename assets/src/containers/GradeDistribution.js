@@ -17,6 +17,7 @@ import { isObjectEmpty } from '../util/object'
 import useSetUserSetting from '../hooks/useSetUserSetting'
 import useUserSetting from '../hooks/useUserSetting'
 import { isTeacherOrAdmin } from '../util/roles'
+import { Helmet } from 'react-helmet'
 
 const styles = theme => ({
   root: {
@@ -111,9 +112,7 @@ function GradeDistribution (props) {
             xAxisLabel='Grade %'
             yAxisLabel='Number of Students'
             myGrade={showGrade ? gradeData.summary.current_user_grade : null}
-            maxGrade={gradeData.summary.graph_upper_limit}
-            showNumberOnBars={gradeData.summary.show_number_on_bars}
-            showDashedLine={gradeData.summary.show_dash_line}
+            gradesSummary={gradeData.summary}
           />
         </Grid>
       </Grid>
@@ -131,6 +130,7 @@ function GradeDistribution (props) {
 
   return (
     <>
+      <Helmet title='Grade Distribution' />
       {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
       <div className={classes.root}>
         <Grid container spacing={2}>

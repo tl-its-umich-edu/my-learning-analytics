@@ -1,6 +1,5 @@
 import { gql } from 'apollo-boost'
 import { useMutation } from '@apollo/react-hooks'
-import debounce from 'lodash.debounce'
 
 const UPDATE_USER_SETTING = gql`
   mutation setUserDefaultSelection($input: UserDefaultSelectionInput!) {
@@ -16,14 +15,9 @@ const UPDATE_USER_SETTING = gql`
 
 const useSetUserSettingGQL = () => {
   const [
-    updateUserSetting,
+    saveUserSetting,
     { loading: mutationLoading, error: mutationError }
   ] = useMutation(UPDATE_USER_SETTING)
-
-  const saveUserSetting = debounce(updateUserSetting, 500, {
-    leading: false,
-    trailing: true
-  })
 
   return { saveUserSetting, mutationLoading, mutationError }
 }

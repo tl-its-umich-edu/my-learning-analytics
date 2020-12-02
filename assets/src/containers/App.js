@@ -5,6 +5,7 @@ import GoogleAnalyticsTracking from '../components/GoogleAnalyticsTracking'
 import CourseList from './CourseList'
 import Course from './Course'
 import WarningBanner from '../components/WarningBanner'
+import { Helmet } from 'react-helmet'
 
 function App (props) {
   const { location, user, gaId } = props
@@ -20,6 +21,7 @@ function App (props) {
 
   return (
     <>
+      <Helmet titleTemplate='%s | My Learning Analytics' title='Courses' />
       <GoogleAnalyticsTracking gaId={gaId} />
       <Route path='/' exact render={props => <CourseList {...props} user={user} />} />
       <Route path='/courses' exact render={props => <CourseList {...props} user={user} />} />

@@ -180,7 +180,6 @@ WEBPACK_LOADER = {
 }
 
 NPM_FILE_PATTERNS = {
-    'bootstrap': ['dist/css/*'],
     'jquery': ['dist/jquery.min.js'],
     '@fortawesome': ['fontawesome-free/*']
 }
@@ -413,6 +412,7 @@ if STUDENT_DASHBOARD_SAML:
 
 if STUDENT_DASHBOARD_LTI:
     LTI_CONFIG = ENV.get('LTI_CONFIG', {})
+    LTI_CONFIG_TEMPLATE_PATH = ENV.get('LTI_CONFIG_TEMPLATE_PATH')
 
 # controls whether Unizin specific features/data is available from the Canvas Data source
 DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)

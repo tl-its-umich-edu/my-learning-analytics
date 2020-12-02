@@ -21,6 +21,7 @@ import { useAssignmentData } from '../service/api'
 import { getCurrentWeek } from '../util/data'
 import { isObjectEmpty } from '../util/object'
 import { isTeacherOrAdmin } from '../util/roles'
+import { Helmet } from 'react-helmet'
 
 const styles = theme => ({
   root: {
@@ -135,6 +136,7 @@ function AssignmentPlanning (props) {
 
   return (
     <>
+      <Helmet title='Assignment Planning' />
       {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
       <div className={classes.root}>
         <Grid container spacing={2}>
