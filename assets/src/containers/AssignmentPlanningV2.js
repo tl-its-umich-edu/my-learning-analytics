@@ -46,6 +46,24 @@ const styles = theme => ({
   },
   mainProgressBar: {
     marginBottom: '50px'
+  },
+  graded: {
+    width: '10px',
+    height: '10px',
+    background: theme.palette.secondary.main,
+    display: 'inline-block'
+  },
+  ungraded: {
+    width: '10px',
+    height: '10px',
+    background: theme.palette.info.main,
+    display: 'inline-block'
+  },
+  unsubmitted: {
+    width: '10px',
+    height: '10px',
+    background: theme.palette.negative.main,
+    display: 'inline-block'
   }
 })
 
@@ -184,7 +202,23 @@ function AssignmentPlanningV2 (props) {
                         />
                       </div>
                       <div className={classes.section}>
-                        <Typography variant='h6' gutterBottom>Assignments by Due Date</Typography>
+                        <Grid container>
+                          <Grid item xs={12} md={10}>
+                            <Typography variant='h6' gutterBottom>Assignments by Due Date</Typography>
+                          </Grid>
+                          <Grid item xs={12} md={2}>
+                            <Typography variant='h6'>Assignment Status</Typography>
+                            <div className={classes.graded} />
+                            <Typography style={{ display: 'inline' }}> Graded</Typography>
+                            <br />
+                            <div className={classes.ungraded} />
+                            <Typography style={{ display: 'inline' }}> Not Yet Graded</Typography>
+                            <br />
+                            <div className={classes.unsubmitted} />
+                            <Typography style={{ display: 'inline' }}> Unsubmitted</Typography>
+                            <br />
+                          </Grid>
+                        </Grid>
                         <AssignmentTable
                           courseGoalGradeSet={goalGrade !== ''}
                           assignments={assignments}

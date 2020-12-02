@@ -336,6 +336,8 @@ class Submission(models.Model):
     assignment_id = models.BigIntegerField(verbose_name="Assignment Id")
     course_id = models.BigIntegerField(verbose_name="Course Id")
     user_id = models.BigIntegerField(verbose_name="User Id")
+    # Timestamp of when the submission was submitted.
+    submitted_at = models.DateTimeField(blank=True, null=True, verbose_name="Submitted DateTime")
     score = models.FloatField(blank=True, null=True, verbose_name="Score")
     graded_date = models.DateTimeField(blank=True, null=True, verbose_name="Graded DateTime")
     # This is used for tracking of grade posted date and not used in Assignment view hence making it CharField

@@ -21,6 +21,12 @@ const defaultPalette = {
      (i.e. color='link'), which isn't fully supported. */
   link: {
     main: '#0000EE'
+  },
+  /*  The 'info' color is used to confirm a submitted or stored by system state .
+    For now, this should be used directly through theme.palette.info.main instead of the color prop
+    (i.e. color='info'), which isn't fully supported. */
+  info: {
+    main: '#ffb74d'
   }
 }
 

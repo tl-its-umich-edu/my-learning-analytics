@@ -48,12 +48,13 @@ class SubmissionType(DjangoObjectType):
     score = graphene.Float()
     #avg_score = graphene.Float()
     graded_date = graphene.types.datetime.DateTime()
+    submitted_at = graphene.types.datetime.DateTime()
 
     class Meta:
         model = Submission
         only_fields = (
             'id', 'assignment_id', 'course_id', 'user_id',
-            'score', 'graded_date'
+            'score', 'graded_date', 'submitted_at'
         )
 
 class AssignmentGroupType(DjangoObjectType):

@@ -13,6 +13,7 @@ export const AssignmentPlanningTooltip = classes => createToolTip(d => renderToS
       Total points possible: <strong>{d.points_possible}</strong><br />
       Avg. assignment grade: <strong>{d.avg_score}</strong><br />
       Percentage of final grade: <strong>{d.towards_final_grade}%</strong><br />
+      <strong>{d.submitted_at ? 'You have submitted the assignment.' : 'You have NOT submitted the assignment yet.'}</strong>
     </Typography>
     {
       parseInt(d.drop_lowest) !== 0

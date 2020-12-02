@@ -4,14 +4,20 @@ import Label from './Label'
 import { withStyles } from '@material-ui/core/styles'
 import { roundToXDecimals } from '../util/math'
 
-const styles = ({
+const styles = theme => ({
   gradedBar: {
     float: 'left',
-    backgroundColor: 'steelblue'
+    backgroundColor: theme.palette.secondary.main
   },
+
+  ungradedBar: {
+    float: 'left',
+    backgroundColor: theme.palette.info.main
+  },
+
   outOfBar: {
     float: 'left',
-    backgroundColor: '#f1f1f1'
+    backgroundColor: theme.palette.negative.main
   }
 })
 
@@ -20,6 +26,7 @@ function ProgressBarV2 (props) {
     classes,
     score,
     outOf,
+    submitted,
     percentWidth,
     height = 10,
     margin = 0,
@@ -48,8 +55,8 @@ function ProgressBarV2 (props) {
       {
         <div
           tabIndex='0'
-          aria-label={description !== undefined ? description : undefined }
-          className={classes.outOfBar}
+          aria-label={description !== undefined ? description : undefined}
+          className={submitted && !score ? classes.ungradedBar : classes.outOfBar} // submitted assignment, and ungraded yet : otherwise
           style={{
             width: `${percentWidth}%`,
             height: `${height}px`,

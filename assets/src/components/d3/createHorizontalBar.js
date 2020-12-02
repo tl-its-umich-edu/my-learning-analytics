@@ -5,7 +5,8 @@ import { siteTheme } from '../../globals'
 function createHorizontalBar ({ data, width, height, domElement, tip }) {
   const margin = { top: 0, bottom: 0, left: 0, right: 0 }
   const gradedColor = siteTheme.palette.secondary.main
-  const ungradedColor = siteTheme.palette.negative.main
+  const ungradedColor = siteTheme.palette.info.main
+  const unsubmittedColor = siteTheme.palette.negative.main
   const [aWidth, aHeight] = adjustViewport(width, height, margin)
 
   const x = d3.scaleLinear()
@@ -36,7 +37,7 @@ function createHorizontalBar ({ data, width, height, domElement, tip }) {
       y(d.label)
     })
     .attr('height', y.bandwidth())
-    .attr('fill', d => d.graded ? gradedColor : ungradedColor)
+    .attr('fill', d => d.graded ? gradedColor : d.submitted ? ungradedColor : unsubmittedColor)
 
   // appending text end of the bar with some padding
   bar.append('text')
