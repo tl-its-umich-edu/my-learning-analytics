@@ -44,7 +44,7 @@ const useSyncAssignmentAndGoalGrade =
         goalGradePrev: goalGrade === '' ? '' : roundToXDecimals(goalGradePrev, 1),
         currentGrade: goalGrade === '' ? '' : roundToXDecimals(currentGrade, 1),
         maxPossible: goalGrade === '' ? '' : roundToXDecimals(maxPossibleGrade, 1),
-        assignments: assignmentsSetByUser
+        assignments: goalGrade === '' ? [] : assignmentsSetByUser
       })
 
       if (goalGrade !== '') {

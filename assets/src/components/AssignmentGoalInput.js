@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import StyledTextField from './StyledTextField'
 import debounce from 'lodash.debounce'
+import usePrevious from '../hooks/usePreviousValue'
 
 const styles = ({
   goalGradeInput: {
@@ -11,14 +12,6 @@ const styles = ({
     width: 150
   }
 })
-
-function usePrevious (value) {
-  const ref = useRef()
-  useEffect(() => {
-    ref.current = value
-  }, [value])
-  return ref.current
-}
 
 function AssignmentGoalInput (props) {
   console.log('AssignmentGoalInput.....')
