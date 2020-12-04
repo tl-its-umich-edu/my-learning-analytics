@@ -12,12 +12,7 @@ const useUserAssignmentSetting =
     setAssignments
   }) => {
     useEffect(() => {
-      console.log('useUserAssignmentSetting: ' + new Date())
       if (loadedWithoutError(loading, error)) {
-        console.log('useUserAssignmentSetting: loadedWithoutError ')
-        console.log(`useUserAssignmentSetting: userSetting ${JSON.stringify(userSetting)}`)
-        console.log('useUserAssignmentSetting: assignments before ......')
-        console.log(assignments)
         if (userSetting) {
           setGoalGrade(
             typeof userSetting.goalGrade === 'undefined'
@@ -36,8 +31,6 @@ const useUserAssignmentSetting =
               return a
             })
             setAssignments(assignmentsWithUserSetting)
-            console.log('useUserAssignmentSetting: assignments after ........')
-            console.log(assignments)
           }
         }
       }

@@ -14,7 +14,6 @@ const styles = ({
 })
 
 function AssignmentGoalInput (props) {
-  console.log('AssignmentGoalInput.....')
   const {
     maxPossibleGrade,
     goalGrade,
@@ -29,7 +28,6 @@ function AssignmentGoalInput (props) {
   const preGra = usePrevious(goalGrade)
   const debouncedGoalGrade = useRef(debounce(q => setGoalGrade(q), 500)).current
   const updateGoalGradeInternal = (grade) => {
-    console.log('AssignmentGoalInput: updateGoalGradeInternal')
     setGoalGradePrev(preGra)
     debouncedGoalGrade(grade)
     setGoalGradeInternal(grade)

@@ -20,9 +20,7 @@ const useInitAssignmentState =
     const [maxPossibleGrade, setMaxPossibleGrade] = useState(0)
 
     useEffect(() => {
-      console.log(`UseInit Call ${loading}`)
       if (loadedWithoutError(loading, error)) {
-        console.log(`UseInit Call inside condition ${loading} ${new Date()}`)
         const {
           assignments,
           assignmentGroups,
@@ -30,8 +28,6 @@ const useInitAssignmentState =
           assignmentWeightConsideration,
           currentUserDefaultSelection
         } = data.course
-        console.log('UseInit: assignment ( not from Effects) Before .....')
-        console.log(assignments)
         setAssignments(
           createAssignmentFields(assignments, assignmentGroups, dateStart, assignmentWeightConsideration)
         )
@@ -47,8 +43,6 @@ const useInitAssignmentState =
             ? JSON.parse(currentUserDefaultSelection.defaultViewValue)
             : {}
         )
-        console.log('UseInit: assignment ( not from Effects) After .....')
-        console.log(assignments)
       }
     }, [loading])
 

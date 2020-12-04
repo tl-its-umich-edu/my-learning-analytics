@@ -15,10 +15,6 @@ const useSyncAssignmentAndGoalGrade =
     setAssignments,
     setUserSetting
   }) => {
-    console.log('useSyncAssignmentAndGoalGrade called ' + new Date())
-    console.log(`useSyncAssignmentAndGoalGrade: goalGrade: ${goalGrade} `)
-    console.log('useSyncAssignmentAndGoalGrade: assignments.... ')
-    console.log(assignments)
     const assignmentInputBlurChange = assignments
       .map(a => a.inputBlur).every(Boolean)
 
@@ -57,8 +53,6 @@ const useSyncAssignmentAndGoalGrade =
           )
         )
       }
-      console.log('useSyncAssignmentAndGoalGrade: after setAssignments.... ')
-      console.log(assignments)
     }, [
       goalGrade,
       assignmentGoalGradeChange,

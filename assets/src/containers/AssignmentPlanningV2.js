@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
@@ -77,7 +77,9 @@ function AssignmentPlanningV2 (props) {
   const [goalGradePrev, setGoalGradePrev] = useState('')
   const [userSetting, setUserSetting] = useState({})
   const [settingChanged, setSettingChanged] = useState(false)
+
   const { loading, error, data } = useAssignmentData(courseId)
+
   const [assignmentGroups, currentGrade, maxPossibleGrade] = useInitAssignmentState({
     loading,
     error,
@@ -105,7 +107,6 @@ function AssignmentPlanningV2 (props) {
     setAssignments,
     setUserSetting
   })
-  // const prevGoalGrade = usePrevious(goalGrade)
 
   const showMathWarning = useMathWarning(assignments)
 
