@@ -1,6 +1,8 @@
 # Our project specific
 saml
 bq_cred.json
+env.json
+demo_init.sh
 .idea/
 .DS_Store
 
@@ -121,8 +123,5 @@ dmypy.json
 .data/
 .data
 node_modules/
-package-lock.json
 
 webpack-stats.json
-
-assets/dist

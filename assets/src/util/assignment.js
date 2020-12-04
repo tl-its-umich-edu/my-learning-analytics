@@ -34,10 +34,12 @@ const setAssignmentGoalGrade = (assignmentId, assignments, goalGrade) => {
     return assignments
   } else {
     const key = assignments.indexOf(assignment[0])
+    const prevGoalGrade = assignments[key].goalGrade
     return [
       ...assignments.slice(0, key),
       {
         ...assignments[key],
+        goalGradePrev: prevGoalGrade === '' ? '' : roundToXDecimals(Number(prevGoalGrade), 1),
         goalGrade: goalGrade === '' ? '' : roundToXDecimals(Number(goalGrade), 3),
         goalGradeSetByUser: !!goalGrade
       },

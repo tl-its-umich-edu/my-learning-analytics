@@ -35,7 +35,6 @@ services:
     env_file:
       - .env
     environment:
-      - GUNICORN_RELOAD=True
       # port in use when the application is running on localhost
       - LOCALHOST_PORT=5001
     container_name: student_dashboard

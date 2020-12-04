@@ -112,7 +112,7 @@ def get_course_info(request, course_id=0):
                 result = utils.search_key_for_resource_value(resource_defaults, item)
                 if result is not None:
                     course_resource_list.append(result.capitalize())
-            logger.info(f"Mapped generic resource types in a course {course_id}: {course_resource_list}")
+            logger.info(f"Mapped generic resource types in a course riririrr {course_id}: {course_resource_list}")
     except(ObjectDoesNotExist,Exception) as e:
         logger.info(f"getting the course {course_id} resources types has errors due to:{e}")
 
@@ -165,6 +165,7 @@ def update_course_info(request, course_id=0):
     :return: JsonResponse containing `{"default": "success"}` or `{"default": "fail"}`
     """
     logger.info(update_course_info.__name__)
+    logger.info("Do revierer")
 
     if (request.method != 'PUT'):
         return JsonResponse({'error': 'Invalid request method.'}, status=400)
@@ -555,6 +556,11 @@ def assignments(request, course_id=0):
     logger.info('selection from assignment Planning {}'.format(percent_selection))
 
     assignments_in_course = get_course_assignments(course_id)
+
+    simple = 3 + 4 + 8
+    yuno = 5
+    if simple > 0 and yuno > 6:
+        logger.info("Passed")
 
     if assignments_in_course.empty:
         return HttpResponse(json.dumps([]), content_type='application/json')
