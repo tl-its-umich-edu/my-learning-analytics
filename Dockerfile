@@ -41,7 +41,9 @@ RUN apt-get update && \
     build-essential default-libmysqlclient-dev  libpq-dev netcat vim-tiny jq python3-dev xmlsec1 cron git && \
     apt-get upgrade -y && \
     apt-get clean -y && \
-    pip install -r requirements.txt
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir -r requirements.txt
 
 # copy built react and node libraries for production mode
 COPY --from=node-prod-deps /usr/src/app/package-lock.json package-lock.json
