@@ -39,7 +39,7 @@ function AssignmentGoalInput (props) {
   }, [goalGrade])
 
   return (
-    <Grid container>
+    <Grid container alignContent='center'>
       <Grid item style={{ display: 'inline-block' }}>
         <Typography style={{ display: 'inline-block', marginRight: '10px' }} variant='h6'>My Minimum Goal</Typography>
         <StyledTextField
