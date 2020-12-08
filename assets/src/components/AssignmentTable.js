@@ -18,7 +18,9 @@ import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Tooltip from '@material-ui/core/Tooltip'
-import DoneIcon from '@material-ui/icons/Done'
+import {default as GradedIcon} from '@material-ui/icons/Done'
+import {default as UnsubmittedIcon} from '@material-ui/icons/Remove';
+import {default as SubmittedIcon} from '@material-ui/icons/Textsms'
 import ProgressBarV2 from './ProgressBarV2'
 import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
@@ -76,6 +78,15 @@ const styles = theme => ({
     alignItems: 'center',
     marginBottom: '2px',
     backgroundColor: '#F4F4F4'
+  },
+  graded: {
+    color: theme.palette.secondary.main
+  },
+  ungraded: {
+    color: theme.palette.info.main
+  },
+  unsubmitted: {
+    color: theme.palette.negative.main
   }
 })
 
@@ -234,7 +245,7 @@ function AssignmentTable (props) {
                     'Name',
                     'Percent of Final Grade',
                     'Score / Out of',
-                    'Graded',
+                    'Status',
                     'Lock Goal'
                   ].map((heading, key) => (
                     <TableCell
@@ -382,7 +393,9 @@ function AssignmentTable (props) {
                           </div>
                         </TableCell>
                         <TableCell className={classes.veryNarrowCell}>
-                          {a.graded ? <DoneIcon /> : <div />}
+                          <Tooltip title={a.graded ? 'Graded' : a.submitted ? 'Submitted' : 'Unsubmitted'}>
+                            {a.graded ? <GradedIcon className={classes.graded}/> : a.submitted ? <SubmittedIcon className={classes.ungraded}/> : <UnsubmittedIcon className={classes.unsubmitted} />}
+                          </Tooltip>
                         </TableCell>
                         <TableCell>
                           <Checkbox
