@@ -150,22 +150,19 @@ const calculateMaxGrade = (assignments, assignmentGroups, assignmentWeightConsid
       return acc
     }, [0, 0])
 
-  return 95
-
-  // return totalPossiblePoints > 0
-  //   ? (totalUserPoints / totalPossiblePoints * 100)
-  //   : 0
+  return totalPossiblePoints > 0
+    ? (totalUserPoints / totalPossiblePoints * 100)
+    : 0
 }
 
 // calculateCurrentGrade ignores any ungraded assignments
 const calculateCurrentGrade = (assignments, assignmentGroups, assignmentWeightConsideration) =>
-{ return 85 }
-  // calculateMaxGrade(
-  //   assignments
-  //     .filter(a => a.graded),
-  //   assignmentGroups,
-  //   assignmentWeightConsideration
-  // )
+  calculateMaxGrade(
+    assignments
+      .filter(a => a.graded),
+    assignmentGroups,
+    assignmentWeightConsideration
+  )
 
 const sumAssignmentGoalGrade = assignments => sum(
   assignments.map(a => a.goalGrade || 0)
