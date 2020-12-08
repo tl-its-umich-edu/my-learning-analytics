@@ -94,6 +94,7 @@ function DashboardAppBar (props) {
           </Popover>
         </Toolbar>
       </AppBar>
+      <Toolbar />
     </div>
   )
 }
