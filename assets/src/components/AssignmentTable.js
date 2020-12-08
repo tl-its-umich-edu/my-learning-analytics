@@ -18,9 +18,9 @@ import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Tooltip from '@material-ui/core/Tooltip'
-import ClearIcon from '@material-ui/icons/Clear';
+import ClearIcon from '@material-ui/icons/Clear'
 import GradedIcon from '@material-ui/icons/Done'
-import UnsubmittedIcon from '@material-ui/icons/Remove';
+import UnsubmittedIcon from '@material-ui/icons/Remove'
 import SubmittedIcon from '@material-ui/icons/Textsms'
 import ProgressBarV2 from './ProgressBarV2'
 import PopupMessage from './PopupMessage'
@@ -111,6 +111,7 @@ function AssignmentTable (props) {
   }
 
   const assignmentStatusNames = [assignmentStatus.GRADED, assignmentStatus.SUBMITTED, assignmentStatus.UNSUBMITTED]
+  const [filteredAssignments, setFilteredAssignments] = useState(assignments)
 
   const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
 
@@ -135,25 +136,25 @@ function AssignmentTable (props) {
   )
 
   const isNextWeekTheSame = (week, key) => {
-    return assignments[key + 1]
-      ? assignments[key + 1].week === week
+    return filteredAssignments[key + 1]
+      ? filteredAssignments[key + 1].week === week
       : false
   }
 
   const isPreviousWeekTheSame = (week, key) => {
     return key >= 1
-      ? assignments[key - 1].week === week
+      ? filteredAssignments[key - 1].week === week
       : false
   }
 
   const isNextDayTheSame = (dueDateMonthDay, key) => {
-    return assignments[key + 1]
-      ? assignments[key + 1].dueDateMonthDay === dueDateMonthDay
+    return filteredAssignments[key + 1]
+      ? filteredAssignments[key + 1].dueDateMonthDay === dueDateMonthDay
       : false
   }
   const isPreviousDayTheSame = (dueDateMonthDay, key) => {
     return key >= 1
-      ? assignments[key - 1].dueDateMonthDay === dueDateMonthDay
+      ? filteredAssignments[key - 1].dueDateMonthDay === dueDateMonthDay
       : false
   }
 
@@ -181,6 +182,15 @@ function AssignmentTable (props) {
   useEffect(() => {
     setFiltersAreClear(assignmentNameFilter.trim().length === 0 && assignmentStatusFilterArray.length === 0 && assignmentGroupFilterArray.length === 0)
   }, [assignmentNameFilter, assignmentStatusFilterArray, assignmentGroupFilterArray])
+
+  useEffect(() => {
+    setFilteredAssignments(
+      assignments
+        .filter(assignment => assignmentNameFilter.trim().length === 0 || assignment.name.toUpperCase().includes(assignmentNameFilter.toUpperCase()))
+        .filter(assignment => assignmentStatusFilterArray.length === 0 || (assignmentStatusFilterArray.indexOf(assignmentStatus.GRADED) >= 0 && assignment.graded) || (assignmentStatusFilterArray.indexOf(assignmentStatus.SUBMITTED) >= 0 && assignment.submitted && !assignment.graded) || (assignmentStatusFilterArray.indexOf(assignmentStatus.UNSUBMITTED) >= 0 && !(assignment.graded || assignment.submitted)))
+        .filter(assignment => assignmentGroupFilterArray.length === 0 || assignmentGroupFilterArray.indexOf(assignment.assignmentGroup.name) >= 0)
+    )
+  }, [assignments, assignmentNameFilter, assignmentStatusFilterArray, assignmentGroupFilterArray])
 
   const ITEM_HEIGHT = 48
   const ITEM_PADDING_TOP = 8
@@ -297,10 +307,7 @@ function AssignmentTable (props) {
             </TableHead>
             <TableBody>
               {
-                assignments
-                  .filter(assignment => assignmentNameFilter.trim().length === 0 || assignment.name.toUpperCase().includes(assignmentNameFilter.toUpperCase()))
-                  .filter(assignment => assignmentStatusFilterArray.length === 0 || (assignmentStatusFilterArray.indexOf(assignmentStatus.GRADED) >= 0 && assignment.graded) || (assignmentStatusFilterArray.indexOf(assignmentStatus.SUBMITTED) >= 0 && assignment.submitted && !assignment.graded) || (assignmentStatusFilterArray.indexOf(assignmentStatus.UNSUBMITTED) >= 0 && !(assignment.graded || assignment.submitted)))
-                  .filter(assignment => assignmentGroupFilterArray.length === 0 || assignmentGroupFilterArray.indexOf(assignment.assignmentGroup.name) >= 0)
+                filteredAssignments
                   .map((a, key) => (
                     <ConditionalWrapper
                       condition={a.week === currentWeek}
@@ -372,12 +379,12 @@ function AssignmentTable (props) {
                                   }
                                   onChange={event => {
                                     const assignmentGoalGrade = event.target.value
-                                    handleAssignmentGoalGrade(key, assignmentGoalGrade)
+                                    handleAssignmentGoalGrade(a.id, assignmentGoalGrade)
                                   }}
                                   type='number'
                                   className={classes.goalGradeInput}
-                                  onFocus={() => handleInputFocus(key)}
-                                  onBlur={() => handleInputBlur(key)}
+                                  onFocus={() => handleInputFocus(a.id)}
+                                  onBlur={() => handleInputBlur(a.id)}
                                 />
                               )
                           }
@@ -438,7 +445,7 @@ function AssignmentTable (props) {
                           <Checkbox
                             disabled={a.graded || !courseGoalGradeSet}
                             checked={!!a.goalGradeSetByUser}
-                            onChange={event => handleAssignmentLock(key, event.target.checked)}
+                            onChange={event => handleAssignmentLock(a.id, event.target.checked)}
                             color='primary'
                           />
                         </TableCell>
