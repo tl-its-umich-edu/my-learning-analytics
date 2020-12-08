@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { withStyles } from '@material-ui/core/styles'
+import Button from '@material-ui/core/Button'
 import Checkbox from '@material-ui/core/Checkbox'
 import FormControl from '@material-ui/core/FormControl'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Grid from '@material-ui/core/Grid'
 import InputLabel from '@material-ui/core/InputLabel'
 import Input from '@material-ui/core/Input'
@@ -18,9 +18,10 @@ import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Tooltip from '@material-ui/core/Tooltip'
-import {default as GradedIcon} from '@material-ui/icons/Done'
-import {default as UnsubmittedIcon} from '@material-ui/icons/Remove';
-import {default as SubmittedIcon} from '@material-ui/icons/Textsms'
+import ClearIcon from '@material-ui/icons/Clear';
+import GradedIcon from '@material-ui/icons/Done'
+import UnsubmittedIcon from '@material-ui/icons/Remove';
+import SubmittedIcon from '@material-ui/icons/Textsms'
 import ProgressBarV2 from './ProgressBarV2'
 import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
@@ -109,20 +110,19 @@ function AssignmentTable (props) {
     UNSUBMITTED: 'Unsubmitted'
   }
 
+  const assignmentStatusNames = [assignmentStatus.GRADED, assignmentStatus.SUBMITTED, assignmentStatus.UNSUBMITTED]
 
   const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
 
-  const [gradedOnly, setGradedOnly] = useState(false)
-
   const [assignmentGroupNames, setAssignmentGroupNames] = useState([])
 
-  const [assignmentStatusNames, setAssignmentStatusNames] = useState([assignmentStatus.GRADED, assignmentStatus.SUBMITTED, assignmentStatus.UNSUBMITTED])
-
-  const [assignmentFilter, setAssignmentFilter] = useState('')
+  const [assignmentNameFilter, setAssignmentNameFilter] = useState('')
 
   const [assignmentGroupFilterArray, setAssignmentGroupFilterArray] = useState([])
 
   const [assignmentStatusFilterArray, setAssignmentStatusFilterArray] = useState([])
+
+  const [filtersAreClear, setFiltersAreClear] = useState(true)
 
   const tableRef = useRef(null)
   const currentWeekRow = useRef(null)
@@ -178,6 +178,10 @@ function AssignmentTable (props) {
     setAssignmentGroupNames(uniqueGroupNames)
   }, [assignments])
 
+  useEffect(() => {
+    setFiltersAreClear(assignmentNameFilter.trim().length === 0 && assignmentStatusFilterArray.length === 0 && assignmentGroupFilterArray.length === 0)
+  }, [assignmentNameFilter, assignmentStatusFilterArray, assignmentGroupFilterArray])
+
   const ITEM_HEIGHT = 48
   const ITEM_PADDING_TOP = 8
   const MenuProps = {
@@ -196,11 +200,17 @@ function AssignmentTable (props) {
       : text
   }
 
+  const clearFilters = () => {
+    setAssignmentGroupFilterArray([])
+    setAssignmentNameFilter('')
+    setAssignmentStatusFilterArray([])
+  }
+
   return (
     <RootRef rootRef={tableRef}>
       <div>
         <Grid container className={classes.filterArea}>
-          <Grid item xs={12} sm={5}>
+          <Grid item xs={12} sm={4}>
             <FormControl className={classes.formControl}>
               <InputLabel>Filter by Type</InputLabel>
               <Select
@@ -223,34 +233,41 @@ function AssignmentTable (props) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={5}>
+          <Grid item xs={12} sm={3}>
             <FormControl className={classes.formControl}>
               <InputLabel>Filter by Name</InputLabel>
-              <Input value={assignmentFilter} placeholder='Filter by name...' onChange={e => setAssignmentFilter(e.target.value)} />
+              <Input value={assignmentNameFilter} placeholder='Filter by name...' onChange={e => setAssignmentNameFilter(e.target.value)} />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <FormControl className={classes.formControl}>
+              <InputLabel>Filter by Status</InputLabel>
+              <Select
+                labelId='assignment-status-checkbox-label'
+                id='assignment-status-mutiple-checkbox'
+                multiple
+                value={assignmentStatusFilterArray}
+                onChange={e => setAssignmentStatusFilterArray(e.target.value)}
+                input={<Input />}
+                renderValue={(selected) => selected.join(', ')}
+                MenuProps={MenuProps}
+                width='250px'
+              >
+                {assignmentStatusNames.map((name) => (
+                  <MenuItem key={name} value={name}>
+                    <Checkbox checked={assignmentStatusFilterArray.indexOf(name) > -1} />
+                    <ListItemText primary={name} />
+                  </MenuItem>
+                ))}
+              </Select>
             </FormControl>
           </Grid>
           <Grid item xs={12} sm={1}>
-            <FormControl className={classes.formControl}>
-                <InputLabel>Filter by Status</InputLabel>
-                <Select
-                  labelId='assignment-status-checkbox-label'
-                  id='assignment-status-mutiple-checkbox'
-                  multiple
-                  value={assignmentStatusFilterArray}
-                  onChange={e => setAssignmentStatusFilterArray(e.target.value)}
-                  input={<Input />}
-                  renderValue={(selected) => selected.join(', ')}
-                  MenuProps={MenuProps}
-                  width='250px'
-                >
-                  {assignmentStatusNames.map((name) => (
-                    <MenuItem key={name} value={name}>
-                      <Checkbox checked={assignmentStatusFilterArray.indexOf(name) > -1} />
-                      <ListItemText primary={name} />
-                    </MenuItem>
-                  ))}
-                </Select>
+            <Tooltip title='Clear filters' placement='bottom' enterDelay={500}>
+              <FormControl className={classes.formControl}>
+                <Button size='small' variant='contained' onClick={() => clearFilters()} disabled={filtersAreClear}><ClearIcon /></Button>
               </FormControl>
+            </Tooltip>
           </Grid>
         </Grid>
         <TableContainer className={classes.container}>
@@ -281,8 +298,8 @@ function AssignmentTable (props) {
             <TableBody>
               {
                 assignments
-                  .filter(assignment => assignmentFilter.trim().length === 0 || assignment.name.toUpperCase().includes(assignmentFilter.toUpperCase()))
-                  .filter(assignment => assignmentStatusFilterArray.length === 0 || (assignmentStatusFilterArray.indexOf(assignmentStatus.GRADED) >= 0 && assignment.graded) || (assignmentStatusFilterArray.indexOf(assignmentStatus.SUBMITTED) >= 0 && assignment.submitted && !assignment.graded) || (assignmentStatusFilterArray.indexOf(assignmentStatus.UNSUBMITTED) >= 0 && !(assignment.graded ||assignment.submitted)))
+                  .filter(assignment => assignmentNameFilter.trim().length === 0 || assignment.name.toUpperCase().includes(assignmentNameFilter.toUpperCase()))
+                  .filter(assignment => assignmentStatusFilterArray.length === 0 || (assignmentStatusFilterArray.indexOf(assignmentStatus.GRADED) >= 0 && assignment.graded) || (assignmentStatusFilterArray.indexOf(assignmentStatus.SUBMITTED) >= 0 && assignment.submitted && !assignment.graded) || (assignmentStatusFilterArray.indexOf(assignmentStatus.UNSUBMITTED) >= 0 && !(assignment.graded || assignment.submitted)))
                   .filter(assignment => assignmentGroupFilterArray.length === 0 || assignmentGroupFilterArray.indexOf(assignment.assignmentGroup.name) >= 0)
                   .map((a, key) => (
                     <ConditionalWrapper
@@ -414,7 +431,7 @@ function AssignmentTable (props) {
                         </TableCell>
                         <TableCell className={classes.veryNarrowCell}>
                           <Tooltip title={a.graded ? assignmentStatus.GRADED : a.submitted ? assignmentStatus.SUBMITTED : assignmentStatus.UNSUBMITTED}>
-                            {a.graded ? <GradedIcon className={classes.graded}/> : a.submitted ? <SubmittedIcon className={classes.ungraded}/> : <UnsubmittedIcon className={classes.unsubmitted} />}
+                            {a.graded ? <GradedIcon className={classes.graded} /> : a.submitted ? <SubmittedIcon className={classes.ungraded} /> : <UnsubmittedIcon className={classes.unsubmitted} />}
                           </Tooltip>
                         </TableCell>
                         <TableCell>
