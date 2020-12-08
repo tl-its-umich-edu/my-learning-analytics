@@ -92,6 +92,8 @@ function AssignmentTable (props) {
     handleInputBlur
   } = props
 
+  const [filteredAssignments, setFilteredAssignments] = useState(assignments)
+
   const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
 
   const [gradedOnly, setGradedOnly] = useState(false)
@@ -113,25 +115,25 @@ function AssignmentTable (props) {
   )
 
   const isNextWeekTheSame = (week, key) => {
-    return assignments[key + 1]
-      ? assignments[key + 1].week === week
+    return filteredAssignments[key + 1]
+      ? filteredAssignments[key + 1].week === week
       : false
   }
 
   const isPreviousWeekTheSame = (week, key) => {
     return key >= 1
-      ? assignments[key - 1].week === week
+      ? filteredAssignments[key - 1].week === week
       : false
   }
 
   const isNextDayTheSame = (dueDateMonthDay, key) => {
-    return assignments[key + 1]
-      ? assignments[key + 1].dueDateMonthDay === dueDateMonthDay
+    return filteredAssignments[key + 1]
+      ? filteredAssignments[key + 1].dueDateMonthDay === dueDateMonthDay
       : false
   }
   const isPreviousDayTheSame = (dueDateMonthDay, key) => {
     return key >= 1
-      ? assignments[key - 1].dueDateMonthDay === dueDateMonthDay
+      ? filteredAssignments[key - 1].dueDateMonthDay === dueDateMonthDay
       : false
   }
 
@@ -155,6 +157,15 @@ function AssignmentTable (props) {
     const uniqueGroupNames = [...new Set(allGroupNames)].sort()
     setAssignmentGroupNames(uniqueGroupNames)
   }, [assignments])
+
+  useEffect(() => {
+    setFilteredAssignments(
+      assignments
+        .filter(assignment => assignmentFilter.trim().length === 0 || assignment.name.toUpperCase().includes(assignmentFilter.toUpperCase()))
+        .filter(assignment => !gradedOnly || assignment.graded)
+        .filter(assignment => assignmentGroupFilterArray.length === 0 || assignmentGroupFilterArray.indexOf(assignment.assignmentGroup.name) >= 0)
+    )
+  }, [assignments, assignmentFilter, gradedOnly, assignmentGroupFilterArray])
 
   const ITEM_HEIGHT = 48
   const ITEM_PADDING_TOP = 8
@@ -249,10 +260,7 @@ function AssignmentTable (props) {
             </TableHead>
             <TableBody>
               {
-                assignments
-                  .filter(assignment => assignmentFilter.trim().length === 0 || assignment.name.toUpperCase().includes(assignmentFilter.toUpperCase()))
-                  .filter(assignment => !gradedOnly || assignment.graded)
-                  .filter(assignment => assignmentGroupFilterArray.length === 0 || assignmentGroupFilterArray.indexOf(assignment.assignmentGroup.name) >= 0)
+                filteredAssignments
                   .map((a, key) => (
                     <ConditionalWrapper
                       condition={a.week === currentWeek}
@@ -324,12 +332,12 @@ function AssignmentTable (props) {
                                   }
                                   onChange={event => {
                                     const assignmentGoalGrade = event.target.value
-                                    handleAssignmentGoalGrade(key, assignmentGoalGrade)
+                                    handleAssignmentGoalGrade(a.id, assignmentGoalGrade)
                                   }}
                                   type='number'
                                   className={classes.goalGradeInput}
-                                  onFocus={() => handleInputFocus(key)}
-                                  onBlur={() => handleInputBlur(key)}
+                                  onFocus={() => handleInputFocus(a.id)}
+                                  onBlur={() => handleInputBlur(a.id)}
                                 />
                               )
                           }
@@ -388,7 +396,7 @@ function AssignmentTable (props) {
                           <Checkbox
                             disabled={a.graded || !courseGoalGradeSet}
                             checked={!!a.goalGradeSetByUser}
-                            onChange={event => handleAssignmentLock(key, event.target.checked)}
+                            onChange={event => handleAssignmentLock(a.id, event.target.checked)}
                             color='primary'
                           />
                         </TableCell>
