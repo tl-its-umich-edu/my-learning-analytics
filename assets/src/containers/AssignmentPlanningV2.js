@@ -37,9 +37,6 @@ const styles = theme => ({
     padding: theme.spacing(2),
     color: theme.palette.text.secondary
   },
-  goalAlign: {
-    display: 'flex'
-  },
   section: {
     paddingBottom: 10,
     paddingTop: 10
@@ -165,8 +162,8 @@ function AssignmentPlanningV2 (props) {
                   ? <Spinner />
                   : (
                     <div>
-                      <div className={classes.section + ' ' + classes.goalAlign}>
-                        <div style={{ flex: 4 }}>
+                      <Grid container alignContent='center' className={classes.section}>
+                        <Grid item xs={4}>
                           <AssignmentGoalInput
                             currentGrade={currentGrade}
                             goalGrade={goalGrade}
@@ -181,9 +178,11 @@ function AssignmentPlanningV2 (props) {
                             handleClearGoalGrades={handleClearGoalGrades}
                             mathWarning={showMathWarning}
                           />
-                        </div>
-                        <div style={{ flex: 6 }}>
-                          <Typography style={{ display: 'inline-block', textAlign: 'center' }} variant='h6'>Grade Progress</Typography>
+                        </Grid>
+                        <Grid item xs={8} style={{ display: 'inline-block' }}>
+                          <Typography style={{ display: 'inline-block', paddingLeft: '30px' }} variant='h6'>Grade
+                            Progress
+                          </Typography>
                           <ProgressBarV2
                             score={currentGrade}
                             lines={[
@@ -211,34 +210,33 @@ function AssignmentPlanningV2 (props) {
                             height={50}
                             floatTo='right'
                           />
-                        </div>
-                      </div>
-                      <div style={{ margin: '20px' }}>
-                        <Grid container>
-                          <Grid item xs={6} md={8}>
-                            <Typography variant='h6' gutterBottom>Assignments by Due Date</Typography>
-                          </Grid>
-                          <Grid item xs={6} md={4}>
-                            <Typography variant='h6'>Assignment Status</Typography>
-                            <div className={classes.graded + ' ' + classes.assignStatus} />
-                            <Typography style={{ display: 'inline', padding: '4px' }}> {assignmentStatus.GRADED}</Typography>
-                            <div className={classes.ungraded + ' ' + classes.assignStatus} />
-                            <Typography style={{ display: 'inline', padding: '4px' }}>{assignmentStatus.SUBMITTED}</Typography>
-                            <div className={classes.unsubmitted + ' ' + classes.assignStatus} />
-                            <Typography style={{ display: 'inline', padding: '4px' }}> {assignmentStatus.UNSUBMITTED}</Typography>
-                          </Grid>
                         </Grid>
-                        <AssignmentTable
-                          courseGoalGradeSet={goalGrade !== ''}
-                          assignments={assignments}
-                          assignmentGroups={assignmentGroups}
-                          dateStart={data.course.dateStart}
-                          handleAssignmentGoalGrade={handleAssignmentGoalGrade}
-                          handleAssignmentLock={handleAssignmentLock}
-                          handleInputFocus={handleInputFocus}
-                          handleInputBlur={handleInputBlur}
-                        />
-                      </div>
+                      </Grid>
+                      <div style={{ margin: '20px' }} />
+                      <Grid container>
+                        <Grid item xs={6} md={8}>
+                          <Typography variant='h6' gutterBottom>Assignments by Due Date</Typography>
+                        </Grid>
+                        <Grid item xs={6} md={4}>
+                          <Typography variant='h6'>Assignment Status</Typography>
+                          <div className={classes.graded + ' ' + classes.assignStatus} />
+                          <Typography style={{ display: 'inline', padding: '4px' }}> {assignmentStatus.GRADED}</Typography>
+                          <div className={classes.ungraded + ' ' + classes.assignStatus} />
+                          <Typography style={{ display: 'inline', padding: '4px' }}> {assignmentStatus.SUBMITTED}</Typography>
+                          <div className={classes.unsubmitted + ' ' + classes.assignStatus} />
+                          <Typography style={{ display: 'inline', padding: '4px' }}> {assignmentStatus.UNSUBMITTED}</Typography>
+                        </Grid>
+                      </Grid>
+                      <AssignmentTable
+                        courseGoalGradeSet={goalGrade !== ''}
+                        assignments={assignments}
+                        assignmentGroups={assignmentGroups}
+                        dateStart={data.course.dateStart}
+                        handleAssignmentGoalGrade={handleAssignmentGoalGrade}
+                        handleAssignmentLock={handleAssignmentLock}
+                        handleInputFocus={handleInputFocus}
+                        handleInputBlur={handleInputBlur}
+                      />
                     </div>
                   )
               }
