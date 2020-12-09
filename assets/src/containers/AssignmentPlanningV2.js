@@ -21,6 +21,7 @@ import { isTeacherOrAdmin } from '../util/roles'
 import { Helmet } from 'react-helmet'
 
 import {
+  assignmentStatus,
   clearGoals,
   setAssignmentGoalGrade,
   setAssignmentGoalLockState,
@@ -209,13 +210,13 @@ function AssignmentPlanningV2 (props) {
                           <Grid item xs={12} md={2}>
                             <Typography variant='h6'>Assignment Status</Typography>
                             <div className={classes.graded} />
-                            <Typography style={{ display: 'inline' }}> Graded</Typography>
+                            <Typography style={{ display: 'inline' }}> {assignmentStatus.GRADED}</Typography>
                             <br />
                             <div className={classes.ungraded} />
-                            <Typography style={{ display: 'inline' }}> Not Yet Graded</Typography>
+                            <Typography style={{ display: 'inline' }}> {assignmentStatus.SUBMITTED}</Typography>
                             <br />
                             <div className={classes.unsubmitted} />
-                            <Typography style={{ display: 'inline' }}> Unsubmitted</Typography>
+                            <Typography style={{ display: 'inline' }}> {assignmentStatus.UNSUBMITTED}</Typography>
                             <br />
                           </Grid>
                         </Grid>
