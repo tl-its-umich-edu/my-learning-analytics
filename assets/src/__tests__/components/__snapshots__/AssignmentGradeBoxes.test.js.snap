@@ -2,100 +2,96 @@
 
 exports[`renders correctly 1`] = `
 <div
-  className="MuiGrid-root MuiGrid-container"
+  className="MuiGrid-root MuiGrid-item"
+  style={
+    Object {
+      "display": "inline-block",
+    }
+  }
 >
-  <div
-    className="MuiGrid-root MuiGrid-item"
+  <h6
+    className="MuiTypography-root MuiTypography-h6"
     style={
       Object {
         "display": "inline-block",
+        "marginRight": "10px",
       }
     }
   >
-    <h6
-      className="MuiTypography-root MuiTypography-h6"
-      style={
-        Object {
-          "display": "inline-block",
-          "marginRight": "10px",
-        }
+    My Minimum Goal
+  </h6>
+  <div
+    className="MuiFormControl-root MuiTextField-root WithStyles(ForwardRef(TextField))-root-2 AssignmentGoalInput-goalGradeInput-1 MuiFormControl-marginNormal"
+    style={
+      Object {
+        "marginRight": "10px",
+        "width": "25ch",
       }
+    }
+  >
+    <label
+      className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-filled"
+      data-shrink={true}
+      htmlFor="standard-number"
+      id="standard-number-label"
     >
-      My Minimum Goal
-    </h6>
+      Set Minimum Goal
+    </label>
     <div
-      className="MuiFormControl-root MuiTextField-root WithStyles(ForwardRef(TextField))-root-2 AssignmentGoalInput-goalGradeInput-1 MuiFormControl-marginNormal"
-      style={
-        Object {
-          "marginRight": "10px",
-          "width": "25ch",
-        }
-      }
+      className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-formControl"
+      onClick={[Function]}
     >
-      <label
-        className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-filled"
-        data-shrink={true}
-        htmlFor="standard-number"
-        id="standard-number-label"
+      <input
+        aria-invalid={false}
+        autoFocus={false}
+        className="MuiInputBase-input MuiOutlinedInput-input"
+        disabled={false}
+        id="standard-number"
+        onAnimationStart={[Function]}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onFocus={[Function]}
+        required={false}
+        type="number"
+        value={90}
+      />
+      <fieldset
+        aria-hidden={true}
+        className="PrivateNotchedOutline-root-3 MuiOutlinedInput-notchedOutline"
       >
-        Set Minimum Goal
-      </label>
-      <div
-        className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-formControl"
-        onClick={[Function]}
-      >
-        <input
-          aria-invalid={false}
-          autoFocus={false}
-          className="MuiInputBase-input MuiOutlinedInput-input"
-          disabled={false}
-          id="standard-number"
-          onAnimationStart={[Function]}
-          onBlur={[Function]}
-          onChange={[Function]}
-          onFocus={[Function]}
-          required={false}
-          type="number"
-          value={90}
-        />
-        <fieldset
-          aria-hidden={true}
-          className="PrivateNotchedOutline-root-3 MuiOutlinedInput-notchedOutline"
+        <legend
+          className="PrivateNotchedOutline-legendLabelled-5 PrivateNotchedOutline-legendNotched-6"
         >
-          <legend
-            className="PrivateNotchedOutline-legendLabelled-5 PrivateNotchedOutline-legendNotched-6"
-          >
-            <span>
-              Set Minimum Goal
-            </span>
-          </legend>
-        </fieldset>
-      </div>
+          <span>
+            Set Minimum Goal
+          </span>
+        </legend>
+      </fieldset>
     </div>
-    <button
-      aria-label="clear"
-      className="MuiButtonBase-root MuiButton-root MuiButton-contained"
-      disabled={false}
-      onBlur={[Function]}
-      onDragLeave={[Function]}
-      onFocus={[Function]}
-      onKeyDown={[Function]}
-      onKeyUp={[Function]}
-      onMouseDown={[Function]}
-      onMouseLeave={[Function]}
-      onMouseUp={[Function]}
-      onTouchEnd={[Function]}
-      onTouchMove={[Function]}
-      onTouchStart={[Function]}
-      tabIndex={0}
-      type="button"
-    >
-      <span
-        className="MuiButton-label"
-      >
-        Clear
-      </span>
-    </button>
   </div>
+  <button
+    aria-label="clear"
+    className="MuiButtonBase-root MuiButton-root MuiButton-contained"
+    disabled={false}
+    onBlur={[Function]}
+    onDragLeave={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    onMouseLeave={[Function]}
+    onMouseUp={[Function]}
+    onTouchEnd={[Function]}
+    onTouchMove={[Function]}
+    onTouchStart={[Function]}
+    tabIndex={0}
+    type="button"
+  >
+    <span
+      className="MuiButton-label"
+    >
+      Clear
+    </span>
+  </button>
 </div>
 `;

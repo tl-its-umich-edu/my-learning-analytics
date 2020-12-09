@@ -2,9 +2,10 @@
 
 exports[`renders correctly 1`] = `
 <div
-  className="ProgressBarV2-outOfBar-2"
+  className="ProgressBarV2-outOfBar-3"
   style={
     Object {
+      "float": "left",
       "height": "10px",
       "margin": "0px",
       "position": "relative",
