@@ -8,39 +8,60 @@ const clearGoals = assignments => assignments
     return a
   })
 
-const setAssigmentGoalInputState = (key, assignments, inputFocus) => {
-  return [
-    ...assignments.slice(0, key),
-    {
-      ...assignments[key],
-      inputFocus,
-      inputBlur: !inputFocus
-    },
-    ...assignments.slice(key + 1)
-  ]
+const setAssigmentGoalInputState = (assignmentId, assignments, inputFocus) => {
+  const assignment = assignments.filter(a => a.id === assignmentId)
+  if (assignment.length !== 1) {
+    console.error('Error finding unique assignment id')
+    return assignments
+  } else {
+    const key = assignments.indexOf(assignment[0])
+    return [
+      ...assignments.slice(0, key),
+      {
+        ...assignments[key],
+        inputFocus,
+        inputBlur: !inputFocus
+      },
+      ...assignments.slice(key + 1)
+    ]
+  }
 }
 
-const setAssignmentGoalGrade = (key, assignments, goalGrade) => {
-  return [
-    ...assignments.slice(0, key),
-    {
-      ...assignments[key],
-      goalGrade: goalGrade === '' ? '' : roundToXDecimals(Number(goalGrade), 3),
-      goalGradeSetByUser: !!goalGrade
-    },
-    ...assignments.slice(key + 1)
-  ]
+const setAssignmentGoalGrade = (assignmentId, assignments, goalGrade) => {
+  const assignment = assignments.filter(a => a.id === assignmentId)
+  if (assignment.length !== 1) {
+    console.error('Error finding unique assignment id')
+    return assignments
+  } else {
+    const key = assignments.indexOf(assignment[0])
+    return [
+      ...assignments.slice(0, key),
+      {
+        ...assignments[key],
+        goalGrade: goalGrade === '' ? '' : roundToXDecimals(Number(goalGrade), 3),
+        goalGradeSetByUser: !!goalGrade
+      },
+      ...assignments.slice(key + 1)
+    ]
+  }
 }
 
-const setAssignmentGoalLockState = (key, assignments, checkboxState) => {
-  return [
-    ...assignments.slice(0, key),
-    {
-      ...assignments[key],
-      goalGradeSetByUser: !!checkboxState
-    },
-    ...assignments.slice(key + 1)
-  ]
+const setAssignmentGoalLockState = (assignmentId, assignments, checkboxState) => {
+  const assignment = assignments.filter(a => a.id === assignmentId)
+  if (assignment.length !== 1) {
+    console.error('Error finding unique assignment id')
+    return assignments
+  } else {
+    const key = assignments.indexOf(assignment[0])
+    return [
+      ...assignments.slice(0, key),
+      {
+        ...assignments[key],
+        goalGradeSetByUser: !!checkboxState
+      },
+      ...assignments.slice(key + 1)
+    ]
+  }
 }
 
 const calculateTotalPointsPossible = (assignments, assignmentGroups, assignmentWeightConsideration) => sum(
@@ -211,7 +232,14 @@ const createUserSettings = (courseId, viewName, setting) => {
   return mutation
 }
 
+const assignmentStatus = {
+  GRADED: 'Graded',
+  SUBMITTED: 'Not Yet Graded',
+  UNSUBMITTED: 'Unsubmitted'
+}
+
 export {
+  assignmentStatus,
   calculateAssignmentGoalsFromCourseGoal,
   calculateWeight,
   calculateCurrentGrade,

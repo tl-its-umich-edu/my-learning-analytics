@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { withStyles } from '@material-ui/core/styles'
+import Button from '@material-ui/core/Button'
 import Checkbox from '@material-ui/core/Checkbox'
 import FormControl from '@material-ui/core/FormControl'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Grid from '@material-ui/core/Grid'
 import InputLabel from '@material-ui/core/InputLabel'
 import Input from '@material-ui/core/Input'
@@ -18,13 +18,17 @@ import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Tooltip from '@material-ui/core/Tooltip'
-import DoneIcon from '@material-ui/icons/Done'
+import ClearIcon from '@material-ui/icons/Clear'
+import GradedIcon from '@material-ui/icons/Done'
+import UnsubmittedIcon from '@material-ui/icons/Remove'
+import SubmittedIcon from '@material-ui/icons/Textsms'
 import ProgressBarV2 from './ProgressBarV2'
 import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
 import StyledTextField from './StyledTextField'
 import { calculateWeekOffset } from '../util/date'
 import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
+import { assignmentStatus } from '../util/assignment'
 
 const styles = theme => ({
   root: {
@@ -76,6 +80,15 @@ const styles = theme => ({
     alignItems: 'center',
     marginBottom: '2px',
     backgroundColor: '#F4F4F4'
+  },
+  graded: {
+    color: theme.palette.secondary.main
+  },
+  ungraded: {
+    color: theme.palette.info.main
+  },
+  unsubmitted: {
+    color: theme.palette.negative.main
   }
 })
 
@@ -92,15 +105,25 @@ function AssignmentTable (props) {
     handleInputBlur
   } = props
 
-  const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
+  const assignmentStatusNames = Object.values(assignmentStatus)
 
-  const [gradedOnly, setGradedOnly] = useState(false)
+  /*
+    filteredAssignments is a local copy of assignments that reflects the
+    current state of the various AssignmentTable filters.
+  */
+  const [filteredAssignments, setFilteredAssignments] = useState(assignments)
+
+  const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
 
   const [assignmentGroupNames, setAssignmentGroupNames] = useState([])
 
-  const [assignmentFilter, setAssignmentFilter] = useState('')
+  const [assignmentNameFilter, setAssignmentNameFilter] = useState('')
 
   const [assignmentGroupFilterArray, setAssignmentGroupFilterArray] = useState([])
+
+  const [assignmentStatusFilterArray, setAssignmentStatusFilterArray] = useState([])
+
+  const [filtersAreClear, setFiltersAreClear] = useState(true)
 
   const tableRef = useRef(null)
   const currentWeekRow = useRef(null)
@@ -113,25 +136,25 @@ function AssignmentTable (props) {
   )
 
   const isNextWeekTheSame = (week, key) => {
-    return assignments[key + 1]
-      ? assignments[key + 1].week === week
+    return filteredAssignments[key + 1]
+      ? filteredAssignments[key + 1].week === week
       : false
   }
 
   const isPreviousWeekTheSame = (week, key) => {
     return key >= 1
-      ? assignments[key - 1].week === week
+      ? filteredAssignments[key - 1].week === week
       : false
   }
 
   const isNextDayTheSame = (dueDateMonthDay, key) => {
-    return assignments[key + 1]
-      ? assignments[key + 1].dueDateMonthDay === dueDateMonthDay
+    return filteredAssignments[key + 1]
+      ? filteredAssignments[key + 1].dueDateMonthDay === dueDateMonthDay
       : false
   }
   const isPreviousDayTheSame = (dueDateMonthDay, key) => {
     return key >= 1
-      ? assignments[key - 1].dueDateMonthDay === dueDateMonthDay
+      ? filteredAssignments[key - 1].dueDateMonthDay === dueDateMonthDay
       : false
   }
 
@@ -156,6 +179,32 @@ function AssignmentTable (props) {
     setAssignmentGroupNames(uniqueGroupNames)
   }, [assignments])
 
+  useEffect(() => {
+    setFiltersAreClear(assignmentNameFilter.trim().length === 0 && assignmentStatusFilterArray.length === 0 && assignmentGroupFilterArray.length === 0)
+  }, [assignmentNameFilter, assignmentStatusFilterArray, assignmentGroupFilterArray])
+
+  const matchesNameFilter = (assignment, nameFilter) => {
+    return nameFilter.trim().length === 0 || assignment.name.toUpperCase().includes(nameFilter.toUpperCase())
+  }
+
+  const matchesAssignmentStatusFilter = (assignment, statusArray) => {
+    return statusArray.length === 0 || (statusArray.indexOf(assignmentStatus.GRADED) >= 0 && assignment.graded) || (statusArray.indexOf(assignmentStatus.SUBMITTED) >= 0 && assignment.submitted && !assignment.graded) || (statusArray.indexOf(assignmentStatus.UNSUBMITTED) >= 0 && !(assignment.graded || assignment.submitted))
+  }
+
+  const matchesAssignmentGroupFilter = (assignment, groupArray) => {
+    return groupArray.length === 0 || groupArray.indexOf(assignment.assignmentGroup.name) >= 0
+  }
+
+  // Update filteredAssignments when any of the filters change
+  useEffect(() => {
+    setFilteredAssignments(
+      assignments
+        .filter(assignment => matchesNameFilter(assignment, assignmentNameFilter))
+        .filter(assignment => matchesAssignmentStatusFilter(assignment, assignmentStatusFilterArray))
+        .filter(assignment => matchesAssignmentGroupFilter(assignment, assignmentGroupFilterArray))
+    )
+  }, [assignments, assignmentNameFilter, assignmentStatusFilterArray, assignmentGroupFilterArray])
+
   const ITEM_HEIGHT = 48
   const ITEM_PADDING_TOP = 8
   const MenuProps = {
@@ -174,13 +223,19 @@ function AssignmentTable (props) {
       : text
   }
 
+  const clearFilters = () => {
+    setAssignmentGroupFilterArray([])
+    setAssignmentNameFilter('')
+    setAssignmentStatusFilterArray([])
+  }
+
   return (
     <RootRef rootRef={tableRef}>
       <div>
         <Grid container className={classes.filterArea}>
-          <Grid item xs={12} sm={5}>
+          <Grid item xs={12} sm={4}>
             <FormControl className={classes.formControl}>
-              <InputLabel>Filter by Assignment Group</InputLabel>
+              <InputLabel>Filter by Type</InputLabel>
               <Select
                 labelId='assignment-group-checkbox-label'
                 id='assignment-group-mutiple-checkbox'
@@ -201,25 +256,41 @@ function AssignmentTable (props) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={5}>
+          <Grid item xs={12} sm={3}>
             <FormControl className={classes.formControl}>
-              <InputLabel>Filter by Assignment Name</InputLabel>
-              <Input value={assignmentFilter} placeholder='Filter by assignment name...' onChange={e => setAssignmentFilter(e.target.value)} />
+              <InputLabel>Filter by Name</InputLabel>
+              <Input value={assignmentNameFilter} placeholder='Filter by name...' onChange={e => setAssignmentNameFilter(e.target.value)} />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <FormControl className={classes.formControl}>
+              <InputLabel>Filter by Status</InputLabel>
+              <Select
+                labelId='assignment-status-checkbox-label'
+                id='assignment-status-mutiple-checkbox'
+                multiple
+                value={assignmentStatusFilterArray}
+                onChange={e => setAssignmentStatusFilterArray(e.target.value)}
+                input={<Input />}
+                renderValue={(selected) => selected.join(', ')}
+                MenuProps={MenuProps}
+                width='250px'
+              >
+                {assignmentStatusNames.map((name) => (
+                  <MenuItem key={name} value={name}>
+                    <Checkbox checked={assignmentStatusFilterArray.indexOf(name) > -1} />
+                    <ListItemText primary={name} />
+                  </MenuItem>
+                ))}
+              </Select>
             </FormControl>
           </Grid>
           <Grid item xs={12} sm={1}>
-            <FormControlLabel
-              className={classes.formControl}
-              control={
-                <Checkbox
-                  checked={gradedOnly}
-                  onChange={() => setGradedOnly(!gradedOnly)}
-                  name='checkedB'
-                  color='primary'
-                />
-              }
-              label='Graded'
-            />
+            <Tooltip title='Clear filters' placement='bottom' enterDelay={500}>
+              <FormControl className={classes.formControl}>
+                <Button size='small' variant='contained' onClick={() => clearFilters()} disabled={filtersAreClear}><ClearIcon /></Button>
+              </FormControl>
+            </Tooltip>
           </Grid>
         </Grid>
         <TableContainer className={classes.container}>
@@ -230,11 +301,11 @@ function AssignmentTable (props) {
                   [
                     'Week',
                     'Due',
-                    'Assignment Group',
-                    'Assignment Name',
+                    'Type',
+                    'Name',
                     'Percent of Final Grade',
                     'Score / Out of',
-                    'Graded',
+                    'Status',
                     'Lock Goal'
                   ].map((heading, key) => (
                     <TableCell
@@ -249,10 +320,7 @@ function AssignmentTable (props) {
             </TableHead>
             <TableBody>
               {
-                assignments
-                  .filter(assignment => assignmentFilter.trim().length === 0 || assignment.name.toUpperCase().includes(assignmentFilter.toUpperCase()))
-                  .filter(assignment => !gradedOnly || assignment.graded)
-                  .filter(assignment => assignmentGroupFilterArray.length === 0 || assignmentGroupFilterArray.indexOf(assignment.assignmentGroup.name) >= 0)
+                filteredAssignments
                   .map((a, key) => (
                     <ConditionalWrapper
                       condition={a.week === currentWeek}
@@ -324,12 +392,12 @@ function AssignmentTable (props) {
                                   }
                                   onChange={event => {
                                     const assignmentGoalGrade = event.target.value
-                                    handleAssignmentGoalGrade(key, assignmentGoalGrade)
+                                    handleAssignmentGoalGrade(a.id, assignmentGoalGrade)
                                   }}
                                   type='number'
                                   className={classes.goalGradeInput}
-                                  onFocus={() => handleInputFocus(key)}
-                                  onBlur={() => handleInputBlur(key)}
+                                  onFocus={() => handleInputFocus(a.id)}
+                                  onBlur={() => handleInputBlur(a.id)}
                                 />
                               )
                           }
@@ -382,13 +450,15 @@ function AssignmentTable (props) {
                           </div>
                         </TableCell>
                         <TableCell className={classes.veryNarrowCell}>
-                          {a.graded ? <DoneIcon /> : <div />}
+                          <Tooltip title={a.graded ? assignmentStatus.GRADED : a.submitted ? assignmentStatus.SUBMITTED : assignmentStatus.UNSUBMITTED}>
+                            {a.graded ? <GradedIcon className={classes.graded} /> : a.submitted ? <SubmittedIcon className={classes.ungraded} /> : <UnsubmittedIcon className={classes.unsubmitted} />}
+                          </Tooltip>
                         </TableCell>
                         <TableCell>
                           <Checkbox
                             disabled={a.graded || !courseGoalGradeSet}
                             checked={!!a.goalGradeSetByUser}
-                            onChange={event => handleAssignmentLock(key, event.target.checked)}
+                            onChange={event => handleAssignmentLock(a.id, event.target.checked)}
                             color='primary'
                           />
                         </TableCell>
