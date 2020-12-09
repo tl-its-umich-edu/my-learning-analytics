@@ -232,7 +232,14 @@ const createUserSettings = (courseId, viewName, setting) => {
   return mutation
 }
 
+const assignmentStatus = {
+  GRADED: 'Graded',
+  SUBMITTED: 'Not Yet Graded',
+  UNSUBMITTED: 'Unsubmitted'
+}
+
 export {
+  assignmentStatus,
   calculateAssignmentGoalsFromCourseGoal,
   calculateWeight,
   calculateCurrentGrade,

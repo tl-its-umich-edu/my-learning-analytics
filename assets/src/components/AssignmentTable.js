@@ -28,6 +28,7 @@ import ConditionalWrapper from './ConditionalWrapper'
 import StyledTextField from './StyledTextField'
 import { calculateWeekOffset } from '../util/date'
 import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
+import { assignmentStatus } from '../util/assignment'
 
 const styles = theme => ({
   root: {
@@ -104,13 +105,7 @@ function AssignmentTable (props) {
     handleInputBlur
   } = props
 
-  const assignmentStatus = {
-    GRADED: 'Graded',
-    SUBMITTED: 'Not Yet Graded',
-    UNSUBMITTED: 'Unsubmitted'
-  }
-
-  const assignmentStatusNames = [assignmentStatus.GRADED, assignmentStatus.SUBMITTED, assignmentStatus.UNSUBMITTED]
+  const assignmentStatusNames = Object.values(assignmentStatus)
   const [filteredAssignments, setFilteredAssignments] = useState(assignments)
 
   const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
