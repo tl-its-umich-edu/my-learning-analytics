@@ -403,7 +403,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
   // Append axis to main chart
   const xAxis = d3.select('.mainGroupWrapper')
     .append('g')
-    .attr('class', 'axis axis--x')
+    .attr('class', 'black-axis-line black-axis-text axis--x')
     .attr('transform', `translate(0,${mainHeight})`)
     .call(mainXAxis.tickFormat(d => d + '%'))
 
@@ -416,7 +416,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     .style('font-size', '14px')
 
   mainGroup.append('g')
-    .attr('class', 'axis axis--y')
+    .attr('class', 'black-axis-line axis--y')
     .attr('transform', 'translate(0,0)')
     .call(mainYAxis)
 

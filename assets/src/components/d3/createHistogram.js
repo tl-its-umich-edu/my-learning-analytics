@@ -86,6 +86,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
 
   const xAxis = g => g
     .attr('transform', `translate(0, ${aHeight - margin.bottom})`)
+    .attr('class', 'black-axis-line black-axis-text')
     .call(d3
       .axisBottom(x)
       .tickSizeOuter(0)
@@ -95,7 +96,6 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     .call(g => g.append('text')
       .attr('x', aWidth / 2)
       .attr('y', 40)
-      .attr('fill', 'rgba(0, 0, 0, 0.87)')
       .attr('font-size', '0.875rem')
       .attr('font-weight', '400')
       .attr('line-height', '1.46429em')
@@ -105,7 +105,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
 
   const yAxis = g => g
     .attr('transform', `translate(${margin.left},0)`)
-    .attr('class', 'axis')
+    .attr('class', 'black-axis-text axis')
     .call(d3.axisLeft(y).tickSizeInner(-aWidth).ticks(5))
     .call(g => g.select('.domain').remove())
     .call(g => g.select('.tick:last-of-type text').clone()

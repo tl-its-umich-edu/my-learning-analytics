@@ -15,6 +15,18 @@ code {
   stroke: rgba(0,0,0,0.18)
 }
 
+.black-axis-line line {
+  stroke: black;
+}
+
+.black-axis-line path {
+  stroke: black;
+}
+
+.black-axis-text text {
+  fill: black;
+}
+
 .spinner {
   width: 40px;
   height: 40px;
