@@ -18,8 +18,8 @@ def check_and_enable_debugpy():
 
     if DEBUGPY_ENABLE:
         import debugpy
-        debugpy.enable_attach(address=(DEBUGPY_ADDRESS, DEBUGPY_PORT))
-        logger.info('DEBUGPY: Enabled Attach ({0}:{1})'.format(DEBUGPY_ADDRESS, DEBUGPY_PORT))
+        debugpy.listen((DEBUGPY_ADDRESS, DEBUGPY_PORT))
+        logger.info('DEBUGPY: Enabled Listen ({0}:{1})'.format(DEBUGPY_ADDRESS, DEBUGPY_PORT))
         if DEBUGPY_WAIT_FOR_ATTACH:
             logger.info('DEBUGPY: Waiting for attach...')
-            debugpy.wait_for_attach()
+            debugpy.wait_for_client()
