@@ -106,6 +106,11 @@ function AssignmentTable (props) {
   } = props
 
   const assignmentStatusNames = Object.values(assignmentStatus)
+
+  /*
+    filteredAssignments is a local copy of assignments that reflects the
+    current state of the various AssignmentTable filters.
+  */
   const [filteredAssignments, setFilteredAssignments] = useState(assignments)
 
   const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
@@ -189,6 +194,8 @@ function AssignmentTable (props) {
   const matchesAssignmentGroupFilter = (assignment, groupArray) => {
     return groupArray.length === 0 || groupArray.indexOf(assignment.assignmentGroup.name) >= 0
   }
+
+  // Update filteredAssignments when any of the filters change
   useEffect(() => {
     setFilteredAssignments(
       assignments
