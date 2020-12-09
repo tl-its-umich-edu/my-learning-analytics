@@ -51,7 +51,7 @@ function DashboardAppBar (props) {
 
   return (
     <div>
-      <AppBar className={classes.root} position='static'>
+      <AppBar className={classes.root} position='fixed'>
         <Toolbar>
           <IconButton
             onClick={onMenuBarClick(true)}
@@ -94,6 +94,7 @@ function DashboardAppBar (props) {
           </Popover>
         </Toolbar>
       </AppBar>
+      <Toolbar />
     </div>
   )
 }
