@@ -230,69 +230,69 @@ function AssignmentTable (props) {
   }
 
   return (
-    <RootRef rootRef={tableRef}>
-      <div>
-        <Grid container className={classes.filterArea}>
-          <Grid item xs={12} sm={4}>
-            <FormControl className={classes.formControl}>
-              <InputLabel>Filter by Type</InputLabel>
-              <Select
-                labelId='assignment-group-checkbox-label'
-                id='assignment-group-mutiple-checkbox'
-                multiple
-                value={assignmentGroupFilterArray}
-                onChange={e => setAssignmentGroupFilterArray(e.target.value)}
-                input={<Input />}
-                renderValue={(selected) => selected.join(', ')}
-                MenuProps={MenuProps}
-                width='250px'
-              >
-                {assignmentGroupNames.map((name) => (
-                  <MenuItem key={name} value={name}>
-                    <Checkbox checked={assignmentGroupFilterArray.indexOf(name) > -1} />
-                    <ListItemText primary={name} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <FormControl className={classes.formControl}>
-              <InputLabel>Filter by Name</InputLabel>
-              <Input value={assignmentNameFilter} placeholder='Filter by name...' onChange={e => setAssignmentNameFilter(e.target.value)} />
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <FormControl className={classes.formControl}>
-              <InputLabel>Filter by Status</InputLabel>
-              <Select
-                labelId='assignment-status-checkbox-label'
-                id='assignment-status-mutiple-checkbox'
-                multiple
-                value={assignmentStatusFilterArray}
-                onChange={e => setAssignmentStatusFilterArray(e.target.value)}
-                input={<Input />}
-                renderValue={(selected) => selected.join(', ')}
-                MenuProps={MenuProps}
-                width='250px'
-              >
-                {assignmentStatusNames.map((name) => (
-                  <MenuItem key={name} value={name}>
-                    <Checkbox checked={assignmentStatusFilterArray.indexOf(name) > -1} />
-                    <ListItemText primary={name} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={1}>
-            <Tooltip title='Clear filters' placement='bottom' enterDelay={500}>
-              <FormControl className={classes.formControl}>
-                <Button size='small' variant='contained' onClick={() => clearFilters()} disabled={filtersAreClear}><ClearIcon /></Button>
-              </FormControl>
-            </Tooltip>
-          </Grid>
+    <div>
+      <Grid container className={classes.filterArea}>
+        <Grid item xs={12} sm={4}>
+          <FormControl className={classes.formControl}>
+            <InputLabel>Filter by Type</InputLabel>
+            <Select
+              labelId='assignment-group-checkbox-label'
+              id='assignment-group-mutiple-checkbox'
+              multiple
+              value={assignmentGroupFilterArray}
+              onChange={e => setAssignmentGroupFilterArray(e.target.value)}
+              input={<Input />}
+              renderValue={(selected) => selected.join(', ')}
+              MenuProps={MenuProps}
+              width='250px'
+            >
+              {assignmentGroupNames.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={assignmentGroupFilterArray.indexOf(name) > -1} />
+                  <ListItemText primary={name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
+        <Grid item xs={12} sm={3}>
+          <FormControl className={classes.formControl}>
+            <InputLabel>Filter by Name</InputLabel>
+            <Input value={assignmentNameFilter} placeholder='Filter by name...' onChange={e => setAssignmentNameFilter(e.target.value)} />
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <FormControl className={classes.formControl}>
+            <InputLabel>Filter by Status</InputLabel>
+            <Select
+              labelId='assignment-status-checkbox-label'
+              id='assignment-status-mutiple-checkbox'
+              multiple
+              value={assignmentStatusFilterArray}
+              onChange={e => setAssignmentStatusFilterArray(e.target.value)}
+              input={<Input />}
+              renderValue={(selected) => selected.join(', ')}
+              MenuProps={MenuProps}
+              width='250px'
+            >
+              {assignmentStatusNames.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={assignmentStatusFilterArray.indexOf(name) > -1} />
+                  <ListItemText primary={name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={1}>
+          <Tooltip title='Clear filters' placement='bottom' enterDelay={500}>
+            <FormControl className={classes.formControl}>
+              <Button size='small' variant='contained' onClick={() => clearFilters()} disabled={filtersAreClear}><ClearIcon /></Button>
+            </FormControl>
+          </Tooltip>
+        </Grid>
+      </Grid>
+      <RootRef rootRef={tableRef}>
         <TableContainer className={classes.container}>
           <MTable stickyHeader ref={tableRef}>
             <TableHead>
@@ -469,8 +469,8 @@ function AssignmentTable (props) {
             </TableBody>
           </MTable>
         </TableContainer>
-      </div>
-    </RootRef>
+      </RootRef>
+    </div>
   )
 }
 
