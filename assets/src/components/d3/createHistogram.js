@@ -105,7 +105,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
 
   const yAxis = g => g
     .attr('transform', `translate(${margin.left},0)`)
-    .attr('class', 'black-axis-text axis')
+    .attr('class', 'gray-axis-line black-axis-text')
     .call(d3.axisLeft(y).tickSizeInner(-aWidth).ticks(5))
     .call(g => g.select('.domain').remove())
     .call(g => g.select('.tick:last-of-type text').clone()

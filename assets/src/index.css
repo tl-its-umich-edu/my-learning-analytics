@@ -11,16 +11,16 @@ code {
     monospace;
 }
 
-.axis line {
+.gray-axis-line line {
   stroke: rgba(0,0,0,0.18)
 }
 
 .black-axis-line line {
-  stroke: black;
+  stroke: #000000;
 }
 
 .black-axis-text text {
-  fill: black;
+  fill: #000000;
 }
 
 .spinner {
