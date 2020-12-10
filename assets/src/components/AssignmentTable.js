@@ -125,11 +125,16 @@ function AssignmentTable (props) {
 
   const [filtersAreClear, setFiltersAreClear] = useState(true)
 
+  const [previousWeek, setPreviousWeek] = useState()
+
+  const [weeksPresent, setWeeksPresentInCollection] = useState([])
+
   const tableRef = useRef(null)
-  const currentWeekRow = useRef(null)
+  const previousWeekRow = useRef(null)
 
   const currentDate = new Date()
   const currentWeek = calculateWeekOffset(dateStart, currentDate)
+  // const previousWeek = currentWeek - 1
 
   const maxPercentOfFinalGrade = Math.max(
     ...assignments.map(({ percentOfFinalGrade }) => percentOfFinalGrade)
@@ -164,19 +169,27 @@ function AssignmentTable (props) {
 
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
-    if (currentWeekRow.current) {
-      const tableHeaderOffset = 120
+    if (previousWeekRow.current) {
+      const tableHeaderOffset = -74 // Manually measured height of table header row
       tableRef.current.scrollTo({
-        top: currentWeekRow.current.offsetTop - tableHeaderOffset,
+        top: previousWeekRow.current.offsetTop - tableHeaderOffset,
         behavior: 'smooth'
       })
     }
-  }, [currentWeekRow.current])
+  }, [previousWeekRow.current])
 
   useEffect(() => {
     const allGroupNames = assignments.map(ag => ag.assignmentGroup.name)
     const uniqueGroupNames = [...new Set(allGroupNames)].sort()
     setAssignmentGroupNames(uniqueGroupNames)
+  }, [assignments])
+
+  useEffect(() => {
+    setWeeksPresentInCollection([...new Set(assignments.map(a => a.week))].sort((a, b) => { return a - b }))
+    const indexOfCurrentWeek = weeksPresent.indexOf(currentWeek)
+    if (indexOfCurrentWeek > 0) {
+      setPreviousWeek(weeksPresent[indexOfCurrentWeek - 1])
+    }
   }, [assignments])
 
   useEffect(() => {
@@ -323,8 +336,8 @@ function AssignmentTable (props) {
                 filteredAssignments
                   .map((a, key) => (
                     <ConditionalWrapper
-                      condition={a.week === currentWeek}
-                      wrapper={children => <RootRef rootRef={currentWeekRow} key={key}>{children}</RootRef>}
+                      condition={a.week === previousWeek}
+                      wrapper={children => <RootRef rootRef={previousWeekRow} key={key}>{children}</RootRef>}
                       key={key}
                     >
                       <TableRow key={key}>
