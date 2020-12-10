@@ -11,7 +11,7 @@ const clearGoals = assignments => assignments
 const setAssigmentGoalInputState = (assignmentId, assignments, inputFocus) => {
   const assignment = assignments.filter(a => a.id === assignmentId)
   if (assignment.length !== 1) {
-    console.log('Error finding unique assignment id')
+    console.error('Error finding unique assignment id')
     return assignments
   } else {
     const key = assignments.indexOf(assignment[0])
@@ -30,7 +30,7 @@ const setAssigmentGoalInputState = (assignmentId, assignments, inputFocus) => {
 const setAssignmentGoalGrade = (assignmentId, assignments, goalGrade) => {
   const assignment = assignments.filter(a => a.id === assignmentId)
   if (assignment.length !== 1) {
-    console.log('Error finding unique assignment id')
+    console.error('Error finding unique assignment id')
     return assignments
   } else {
     const key = assignments.indexOf(assignment[0])
@@ -49,7 +49,7 @@ const setAssignmentGoalGrade = (assignmentId, assignments, goalGrade) => {
 const setAssignmentGoalLockState = (assignmentId, assignments, checkboxState) => {
   const assignment = assignments.filter(a => a.id === assignmentId)
   if (assignment.length !== 1) {
-    console.log('Error finding unique assignment id')
+    console.error('Error finding unique assignment id')
     return assignments
   } else {
     const key = assignments.indexOf(assignment[0])
@@ -252,7 +252,14 @@ const createUserSettings = (courseId, viewName, setting) => {
   return mutation
 }
 
+const assignmentStatus = {
+  GRADED: 'Graded',
+  SUBMITTED: 'Not Yet Graded',
+  UNSUBMITTED: 'Unsubmitted'
+}
+
 export {
+  assignmentStatus,
   calculateAssignmentGoalsFromCourseGoal,
   calculateWeight,
   calculateCurrentGrade,

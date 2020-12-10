@@ -28,6 +28,7 @@ import ConditionalWrapper from './ConditionalWrapper'
 import StyledTextField from './StyledTextField'
 import { calculateWeekOffset } from '../util/date'
 import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
+import { assignmentStatus } from '../util/assignment'
 
 const styles = theme => ({
   root: {
@@ -104,13 +105,12 @@ function AssignmentTable (props) {
     handleInputBlur
   } = props
 
-  const assignmentStatus = {
-    GRADED: 'Graded',
-    SUBMITTED: 'Not Yet Graded',
-    UNSUBMITTED: 'Unsubmitted'
-  }
+  const assignmentStatusNames = Object.values(assignmentStatus)
 
-  const assignmentStatusNames = [assignmentStatus.GRADED, assignmentStatus.SUBMITTED, assignmentStatus.UNSUBMITTED]
+  /*
+    filteredAssignments is a local copy of assignments that reflects the
+    current state of the various AssignmentTable filters.
+  */
   const [filteredAssignments, setFilteredAssignments] = useState(assignments)
 
   const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
@@ -183,12 +183,25 @@ function AssignmentTable (props) {
     setFiltersAreClear(assignmentNameFilter.trim().length === 0 && assignmentStatusFilterArray.length === 0 && assignmentGroupFilterArray.length === 0)
   }, [assignmentNameFilter, assignmentStatusFilterArray, assignmentGroupFilterArray])
 
+  const matchesNameFilter = (assignment, nameFilter) => {
+    return nameFilter.trim().length === 0 || assignment.name.toUpperCase().includes(nameFilter.toUpperCase())
+  }
+
+  const matchesAssignmentStatusFilter = (assignment, statusArray) => {
+    return statusArray.length === 0 || (statusArray.indexOf(assignmentStatus.GRADED) >= 0 && assignment.graded) || (statusArray.indexOf(assignmentStatus.SUBMITTED) >= 0 && assignment.submitted && !assignment.graded) || (statusArray.indexOf(assignmentStatus.UNSUBMITTED) >= 0 && !(assignment.graded || assignment.submitted))
+  }
+
+  const matchesAssignmentGroupFilter = (assignment, groupArray) => {
+    return groupArray.length === 0 || groupArray.indexOf(assignment.assignmentGroup.name) >= 0
+  }
+
+  // Update filteredAssignments when any of the filters change
   useEffect(() => {
     setFilteredAssignments(
       assignments
-        .filter(assignment => assignmentNameFilter.trim().length === 0 || assignment.name.toUpperCase().includes(assignmentNameFilter.toUpperCase()))
-        .filter(assignment => assignmentStatusFilterArray.length === 0 || (assignmentStatusFilterArray.indexOf(assignmentStatus.GRADED) >= 0 && assignment.graded) || (assignmentStatusFilterArray.indexOf(assignmentStatus.SUBMITTED) >= 0 && assignment.submitted && !assignment.graded) || (assignmentStatusFilterArray.indexOf(assignmentStatus.UNSUBMITTED) >= 0 && !(assignment.graded || assignment.submitted)))
-        .filter(assignment => assignmentGroupFilterArray.length === 0 || assignmentGroupFilterArray.indexOf(assignment.assignmentGroup.name) >= 0)
+        .filter(assignment => matchesNameFilter(assignment, assignmentNameFilter))
+        .filter(assignment => matchesAssignmentStatusFilter(assignment, assignmentStatusFilterArray))
+        .filter(assignment => matchesAssignmentGroupFilter(assignment, assignmentGroupFilterArray))
     )
   }, [assignments, assignmentNameFilter, assignmentStatusFilterArray, assignmentGroupFilterArray])
 
