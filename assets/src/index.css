@@ -19,10 +19,6 @@ code {
   stroke: black;
 }
 
-.black-axis-line path {
-  stroke: black;
-}
-
 .black-axis-text text {
   fill: black;
 }
