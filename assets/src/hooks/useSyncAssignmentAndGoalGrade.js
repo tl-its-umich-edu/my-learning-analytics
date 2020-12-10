@@ -35,13 +35,20 @@ const useSyncAssignmentAndGoalGrade =
           }
         ))
 
-      setUserSetting({
-        goalGrade,
-        goalGradePrev: goalGrade === '' ? '' : roundToXDecimals(goalGradePrev, 1),
-        currentGrade: goalGrade === '' ? '' : roundToXDecimals(currentGrade, 1),
-        maxPossible: goalGrade === '' ? '' : roundToXDecimals(maxPossibleGrade, 1),
-        assignments: goalGrade === '' ? [] : assignmentsSetByUser
-      })
+      const userSetting = () => {
+        const setting = {
+          goalGrade,
+          currentGrade: roundToXDecimals(currentGrade, 1),
+          maxPossible: roundToXDecimals(maxPossibleGrade, 1),
+          assignments: assignmentsSetByUser
+        }
+        if (goalGradePrev !== '') {
+          setting.goalGradePrev = roundToXDecimals(goalGradePrev, 1)
+        }
+        return setting
+      }
+
+      setUserSetting(userSetting)
 
       if (goalGrade !== '') {
         setAssignments(

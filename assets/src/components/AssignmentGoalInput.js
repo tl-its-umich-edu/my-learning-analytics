@@ -25,16 +25,16 @@ function AssignmentGoalInput (props) {
   } = props
 
   const [goalGradeInternal, setGoalGradeInternal] = useState(goalGrade)
-  const preGrade = usePrevious(goalGrade)
+  const prevGrade = usePrevious(goalGrade)
   const debouncedGoalGrade = useRef(debounce(q => setGoalGrade(q), 500)).current
   const updateGoalGradeInternal = (grade) => {
-    setGoalGradePrev(preGrade)
+    setGoalGradePrev(prevGrade)
     debouncedGoalGrade(grade)
     setGoalGradeInternal(grade)
   }
 
   useEffect(() => {
-    setGoalGradePrev(preGrade)
+    setGoalGradePrev(prevGrade)
     setGoalGradeInternal(goalGrade)
   }, [goalGrade])
 
