@@ -48,7 +48,7 @@ function AssignmentGoalInput (props) {
           value={goalGradeInternal}
           label={
             mathWarning
-              ? 'Math may no longer add up'
+              ? 'Scores no longer match goal'
               : goalGrade > 100
                 ? 'Over 100%'
                 : goalGrade > maxPossibleGrade
