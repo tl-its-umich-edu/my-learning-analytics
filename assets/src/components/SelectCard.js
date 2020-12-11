@@ -195,7 +195,7 @@ const SelectCard = props => {
   return (
     <>
       <Card className={classes.card} elevation={2}>
-        <CardActionArea>
+        <CardActionArea aria-label={'About ' + cardData.title}>
           {getLinkContents(cardData)}
         </CardActionArea>
         {
