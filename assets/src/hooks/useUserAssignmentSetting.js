@@ -26,6 +26,7 @@ const useUserAssignmentSetting =
               if (assignmentSetting) {
                 a.goalGrade = assignmentSetting.goalGrade
                 a.goalGradeSetByUser = assignmentSetting.goalGradeSetByUser
+                a.goalGradePrev = assignmentSetting.goalGradePrev
               }
               return a
             })

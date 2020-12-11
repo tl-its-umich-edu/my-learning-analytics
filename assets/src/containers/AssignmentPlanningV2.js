@@ -74,6 +74,7 @@ function AssignmentPlanningV2 (props) {
 
   const [assignments, setAssignments] = useState([])
   const [goalGrade, setGoalGrade] = useState('')
+  const [goalGradePrev, setGoalGradePrev] = useState('')
   const [userSetting, setUserSetting] = useState({})
   const [settingChanged, setSettingChanged] = useState(false)
 
@@ -100,6 +101,9 @@ function AssignmentPlanningV2 (props) {
     data,
     assignments,
     goalGrade,
+    goalGradePrev,
+    currentGrade,
+    maxPossibleGrade,
     setAssignments,
     setUserSetting
   })
@@ -123,6 +127,7 @@ function AssignmentPlanningV2 (props) {
 
   const handleClearGoalGrades = () => {
     setAssignments(clearGoals(assignments))
+    setGoalGradePrev(goalGrade)
     setGoalGrade('')
     setSettingChanged(true)
   }
@@ -194,6 +199,9 @@ function AssignmentPlanningV2 (props) {
                           currentGrade={currentGrade}
                           goalGrade={goalGrade}
                           maxPossibleGrade={maxPossibleGrade}
+                          setGoalGradePrev={grade => {
+                            setGoalGradePrev(grade)
+                          }}
                           setGoalGrade={grade => {
                             setSettingChanged(true)
                             setGoalGrade(grade)
