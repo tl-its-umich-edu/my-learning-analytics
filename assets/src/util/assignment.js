@@ -236,7 +236,7 @@ const createUserSettings = (courseId, viewName, setting) => {
 
 const assignmentStatus = {
   GRADED: 'Graded',
-  SUBMITTED: 'Not Yet Graded',
+  SUBMITTED: 'Pending Grade',
   UNSUBMITTED: 'Unsubmitted'
 }
 
