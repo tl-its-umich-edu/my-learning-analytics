@@ -18,7 +18,6 @@ import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Tooltip from '@material-ui/core/Tooltip'
-import ClearIcon from '@material-ui/icons/Clear'
 import GradedIcon from '@material-ui/icons/Done'
 import UnsubmittedIcon from '@material-ui/icons/Remove'
 import SubmittedIcon from '@material-ui/icons/Textsms'
@@ -90,6 +89,9 @@ const styles = theme => ({
   },
   unsubmitted: {
     color: theme.palette.negative.main
+  },
+  filterButton: {
+    textTransform: 'none'
   }
 })
 
@@ -288,7 +290,7 @@ function AssignmentTable (props) {
         <Grid item xs={12} sm={1}>
           <Tooltip title='Clear filters' placement='bottom' enterDelay={500}>
             <FormControl className={classes.formControl}>
-              <Button size='small' variant='contained' onClick={() => clearFilters()} disabled={filtersAreClear}><ClearIcon /></Button>
+              <Button size='small' variant='contained' onClick={() => clearFilters()} disabled={filtersAreClear} className={classes.filterButton}>Clear Filters</Button>
             </FormControl>
           </Tooltip>
         </Grid>
