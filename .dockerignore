@@ -3,6 +3,14 @@ saml
 bq_cred.json
 .idea/
 .DS_Store
+*.sql
+*.md
+*.sample
+*.tgz
+*.txt
+# However keep this file
+!requirements.txt
+
 
 # From https://github.com/github/gitignore/blob/master/Python.gitignore
 
