@@ -26,6 +26,7 @@ import ProgressBarV2 from './ProgressBarV2'
 import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
 import StyledTextField from './StyledTextField'
+import AlertBanner from '../components/AlertBanner'
 import { calculateWeekOffset } from '../util/date'
 import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
 import { assignmentStatus } from '../util/assignment'
@@ -469,6 +470,8 @@ function AssignmentTable (props) {
             </TableBody>
           </MTable>
         </TableContainer>
+        {assignments.length > 0 && filteredAssignments.length === 0 &&
+          <AlertBanner>No assignments match your filter selections.</AlertBanner>}
       </RootRef>
     </div>
   )
