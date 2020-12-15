@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import Checkbox from '@material-ui/core/Checkbox'
@@ -127,7 +127,7 @@ function AssignmentTable (props) {
 
   const [previousWeek, setPreviousWeek] = useState()
 
-  const [weeksPresent, setWeeksPresentInCollection] = useState([])
+  const weeksPresent = useRef([])
 
   const tableRef = useRef(null)
   const previousWeekRow = useRef(null)
@@ -170,13 +170,13 @@ function AssignmentTable (props) {
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
     if (previousWeekRow.current) {
-      const tableHeaderOffset = -74 // Manually measured height of table header row
+      const tableHeaderOffset = -50 // Manually measured height of table header row
       tableRef.current.scrollTo({
         top: previousWeekRow.current.offsetTop - tableHeaderOffset,
         behavior: 'smooth'
       })
     }
-  }, [previousWeekRow.current])
+  }, [previousWeekRow.current, filteredAssignments])
 
   useEffect(() => {
     const allGroupNames = assignments.map(ag => ag.assignmentGroup.name)
@@ -185,10 +185,14 @@ function AssignmentTable (props) {
   }, [assignments])
 
   useEffect(() => {
-    setWeeksPresentInCollection([...new Set(assignments.map(a => a.week))].sort((a, b) => { return a - b }))
-    const indexOfCurrentWeek = weeksPresent.indexOf(currentWeek)
-    if (indexOfCurrentWeek > 0) {
-      setPreviousWeek(weeksPresent[indexOfCurrentWeek - 1])
+    const allWeeks = [...new Set(assignments.map(a => a.week))].sort((a, b) => { return a - b })
+    if (allWeeks.length > 0) {
+      weeksPresent.current = allWeeks
+      const firstItem = weeksPresent.current.indexOf(0) === -1 ? weeksPresent.current.indexOf(1) : weeksPresent.current.indexOf(0)
+      const indexOfCurrentWeek = weeksPresent.current.indexOf(currentWeek)
+      if (indexOfCurrentWeek > 0 && firstItem !== indexOfCurrentWeek) {
+        setPreviousWeek(weeksPresent.current[indexOfCurrentWeek - 1])
+      }
     }
   }, [assignments])
 
