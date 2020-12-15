@@ -18,7 +18,6 @@ import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Tooltip from '@material-ui/core/Tooltip'
-import ClearIcon from '@material-ui/icons/Clear'
 import GradedIcon from '@material-ui/icons/Done'
 import UnsubmittedIcon from '@material-ui/icons/Remove'
 import SubmittedIcon from '@material-ui/icons/Textsms'
@@ -26,6 +25,7 @@ import ProgressBarV2 from './ProgressBarV2'
 import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
 import StyledTextField from './StyledTextField'
+import AlertBanner from '../components/AlertBanner'
 import { calculateWeekOffset } from '../util/date'
 import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
 import { assignmentStatus } from '../util/assignment'
@@ -95,6 +95,9 @@ const styles = theme => ({
   },
   assignmentName: {
     whiteSpace: 'nowrap '
+  },
+  filterButton: {
+    textTransform: 'none'
   }
 })
 
@@ -311,7 +314,7 @@ function AssignmentTable (props) {
         <Grid item xs={12} sm={1}>
           <Tooltip title='Clear filters' placement='bottom' enterDelay={500}>
             <FormControl className={classes.formControl}>
-              <Button size='small' variant='contained' onClick={() => clearFilters()} disabled={filtersAreClear}><ClearIcon /></Button>
+              <Button size='small' variant='contained' onClick={() => clearFilters()} disabled={filtersAreClear} className={classes.filterButton}>Clear Filters</Button>
             </FormControl>
           </Tooltip>
         </Grid>
@@ -495,6 +498,8 @@ function AssignmentTable (props) {
             </TableBody>
           </MTable>
         </TableContainer>
+        {assignments.length > 0 && filteredAssignments.length === 0 &&
+          <AlertBanner>No assignments match your filter selections.</AlertBanner>}
       </RootRef>
     </div>
   )
