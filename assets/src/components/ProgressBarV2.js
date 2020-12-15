@@ -14,8 +14,7 @@ const styles = theme => ({
   },
 
   outOfBar: {
-    // for Jest test the negative palette attributes is not available so adding the condition
-    backgroundColor: theme.palette.negative ? theme.palette.negative.main : '#B5B5B5'
+    backgroundColor: theme.palette.negative.main
   }
 })
 

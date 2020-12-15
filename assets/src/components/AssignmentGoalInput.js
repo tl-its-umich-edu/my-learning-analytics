@@ -68,9 +68,6 @@ function AssignmentGoalInput (props) {
         }}
         type='number'
         className={classes.goalGradeInput}
-        InputLabelProps={{
-          // endAdornment: <InputAdornment position='start'>%</InputAdornment> // doesn't seem to be working
-        }}
         margin='normal'
         variant='outlined'
         style={{ marginRight: '10px', width: '25ch' }}
