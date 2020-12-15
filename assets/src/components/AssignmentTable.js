@@ -472,9 +472,8 @@ function AssignmentTable (props) {
             </TableBody>
           </MTable>
         </TableContainer>
-        {assignments.length > 0 && filteredAssignments.length === 0 &&
-          <AlertBanner>No assignments match your filter selections.</AlertBanner>}
       </RootRef>
+      {assignments.length > 0 && filteredAssignments.length === 0 && <AlertBanner>No assignments match your filter selections.</AlertBanner>}
     </div>
   )
 }
