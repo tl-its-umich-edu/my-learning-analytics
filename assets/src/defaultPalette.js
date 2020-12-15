@@ -27,7 +27,7 @@ const defaultPalette = {
     main: '#FFB74D'
   },
   /*  The 'warning' color is used with text or interface elements to alert the user something may be wrong or
-      need their attention. */
+      needs their attention. */
   warning: {
     main: '#D84315'
   }
