@@ -30,6 +30,8 @@ import { calculateWeekOffset } from '../util/date'
 import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
 import { assignmentStatus } from '../util/assignment'
 
+const headerHeight = 105
+
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -54,7 +56,8 @@ const styles = theme => ({
     border: 'none'
   },
   tableHeadCell: {
-    fontSize: '1em'
+    fontSize: '1em',
+    height: headerHeight + 'px'
   },
   popover: {
     pointerEvents: 'none'
@@ -89,6 +92,9 @@ const styles = theme => ({
   },
   unsubmitted: {
     color: theme.palette.negative.main
+  },
+  assignmentName: {
+    whiteSpace: 'nowrap '
   }
 })
 
@@ -170,7 +176,7 @@ function AssignmentTable (props) {
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
     if (previousWeekRow.current) {
-      const tableHeaderOffset = -74 // Manually measured height of table header row
+      const tableHeaderOffset = 35 // And the universe said 'Let the offset be 35'
       tableRef.current.scrollTo({
         top: previousWeekRow.current.offsetTop - tableHeaderOffset,
         behavior: 'smooth'
@@ -230,9 +236,10 @@ function AssignmentTable (props) {
   }
 
   const TRUNCATED_GROUP_NAME_LENGTH = 30
-  const shortenString = text => {
-    return (text.length > TRUNCATED_GROUP_NAME_LENGTH)
-      ? text.substring(0, TRUNCATED_GROUP_NAME_LENGTH - 3) + '...'
+  const TRUNCATED_ASSIGNMENT_NAME_LENGTH = 50
+  const shortenString = (text, len) => {
+    return (text.length > len)
+      ? text.substring(0, len - 3) + '...'
       : text
   }
 
@@ -376,18 +383,20 @@ function AssignmentTable (props) {
                               : ''
                           }
                         </TableCell>
-                        <TableCell style={{ width: '20%' }}>
+                        <TableCell style={{ width: '15%' }}>
                           <Tooltip title={a.assignmentGroup.name} placement='top' enterDelay={500}>
-                            <div>{shortenString(a.assignmentGroup.name)}</div>
+                            <div>{shortenString(a.assignmentGroup.name, TRUNCATED_GROUP_NAME_LENGTH)}</div>
                           </Tooltip>
                         </TableCell>
-                        <TableCell style={{ width: '20%' }}>
-                          {a.name}
+                        <TableCell style={{ width: '25%' }}>
+                          <Tooltip title={a.name} placement='top-start' enterDelay={500}>
+                            <div className={classes.assignmentName}>{shortenString(a.name, TRUNCATED_ASSIGNMENT_NAME_LENGTH)}</div>
+                          </Tooltip>
                         </TableCell>
                         <TableCell className={classes.narrowCell}>
                           {`${roundToXDecimals(a.percentOfFinalGrade, 1)}%`}
                         </TableCell>
-                        <TableCell style={{ width: '20%' }}>
+                        <TableCell style={{ minWidth: '200px' }}>
                           {
                             a.graded || a.outOf === 0
                               ? <div className={classes.possiblePointsText}>{a.outOf === 0 ? '0' : `${a.currentUserSubmission.score}`}</div>
