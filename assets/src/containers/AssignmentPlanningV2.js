@@ -220,9 +220,9 @@ function AssignmentPlanningV2 (props) {
                         <Grid item xs={6} md={4}>
                           <Typography variant='h6'>Assignment Status</Typography>
                           <div className={classes.graded + ' ' + classes.assignStatus} />
-                          <Typography style={{ display: 'inline', padding: '4px' }}> {assignmentStatus.GRADED}</Typography>
+                          <Typography style={{ display: 'inline', padding: '4px', marginRight: '2px' }}> {assignmentStatus.GRADED}</Typography>
                           <div className={classes.ungraded + ' ' + classes.assignStatus} />
-                          <Typography style={{ display: 'inline', padding: '4px' }}> {assignmentStatus.SUBMITTED}</Typography>
+                          <Typography style={{ display: 'inline', padding: '4px', marginRight: '2px' }}> {assignmentStatus.SUBMITTED}</Typography>
                           <div className={classes.unsubmitted + ' ' + classes.assignStatus} />
                           <Typography style={{ display: 'inline', padding: '4px' }}> {assignmentStatus.UNSUBMITTED}</Typography>
                         </Grid>
