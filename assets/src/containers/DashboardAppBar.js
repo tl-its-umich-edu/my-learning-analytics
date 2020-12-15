@@ -61,10 +61,10 @@ function DashboardAppBar (props) {
           >
             <MenuIcon />
           </IconButton>
-          <Link tabIndex={-1} to='/courses/' className={classes.homeButton}>
+          <Link to='/courses/' className={classes.homeButton}>
             My Learning Analytics:
           </Link>
-          <Link tabIndex={-1} to={`/courses/${courseId}`} className={classes.homeButton}>
+          <Link to={`/courses/${courseId}`} className={classes.homeButton}>
             {courseName}
           </Link>
           <div className={classes.grow} />
