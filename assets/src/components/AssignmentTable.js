@@ -172,14 +172,17 @@ function AssignmentTable (props) {
       : false
   }
 
+  const scrolledOnce = useRef(false)
+
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
-    if (previousWeekRow.current) {
+    if (!scrolledOnce.current && previousWeekRow.current) {
       const tableHeaderOffset = 35 // And the universe said 'Let the offset be 35'
       tableRef.current.scrollTo({
         top: previousWeekRow.current.offsetTop - tableHeaderOffset,
         behavior: 'smooth'
       })
+      scrolledOnce.current = true
     }
   }, [previousWeekRow.current, filteredAssignments])
 
