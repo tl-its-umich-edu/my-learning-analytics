@@ -5,9 +5,8 @@ exports[`renders correctly 1`] = `
   className="ProgressBarV2-outOfBar-3"
   style={
     Object {
-      "float": "left",
       "height": "10px",
-      "margin": "0px",
+      "margin": undefined,
       "position": "relative",
       "width": "90%",
     }

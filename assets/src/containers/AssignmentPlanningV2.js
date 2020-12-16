@@ -46,12 +46,20 @@ const styles = theme => ({
     margin: '30px'
   },
   mainProgressBar: {
-    marginBottom: '50px'
+    marginBottom: '2.5rem'
   },
   assignStatus: {
     width: '10px',
     height: '10px',
     display: 'inline-block'
+  },
+  legendItem: {
+    display: 'inline-block',
+    marginRight: '14px'
+  },
+  legendItemLabel: {
+    display: 'inline',
+    marginLeft: '6px'
   },
   graded: {
     background: theme.palette.secondary.main
@@ -163,7 +171,7 @@ function AssignmentPlanningV2 (props) {
                   : (
                     <div>
                       <Grid container alignContent='center' className={classes.section}>
-                        <Grid item xs={4}>
+                        <Grid item lg={4} md={5} xs={12}>
                           <AssignmentGoalInput
                             currentGrade={currentGrade}
                             goalGrade={goalGrade}
@@ -179,10 +187,8 @@ function AssignmentPlanningV2 (props) {
                             mathWarning={showMathWarning}
                           />
                         </Grid>
-                        <Grid item xs={8} style={{ display: 'inline-block' }}>
-                          <Typography style={{ display: 'inline-block', paddingLeft: '30px' }} variant='h6'>Grade
-                            Progress
-                          </Typography>
+                        <Grid item lg={8} md={7} xs={12} className={classes.mainProgressBar}>
+                          <Typography variant='h6' gutterBottom>Grade Progress</Typography>
                           <ProgressBarV2
                             score={currentGrade}
                             lines={[
@@ -206,25 +212,29 @@ function AssignmentPlanningV2 (props) {
                               }
                             ]}
                             outOf={100}
-                            percentWidth={80}
+                            percentWidth={100}
                             height={50}
-                            floatTo='right'
                           />
                         </Grid>
                       </Grid>
-                      <div style={{ margin: '20px' }} />
                       <Grid container>
                         <Grid item xs={6} md={8}>
                           <Typography variant='h6' gutterBottom>Assignments by Due Date</Typography>
                         </Grid>
-                        <Grid item xs={6} md={4}>
-                          <Typography variant='h6'>Assignment Status</Typography>
-                          <div className={classes.graded + ' ' + classes.assignStatus} />
-                          <Typography style={{ display: 'inline', padding: '4px', marginRight: '2px' }}> {assignmentStatus.GRADED}</Typography>
-                          <div className={classes.ungraded + ' ' + classes.assignStatus} />
-                          <Typography style={{ display: 'inline', padding: '4px', marginRight: '2px' }}> {assignmentStatus.SUBMITTED}</Typography>
-                          <div className={classes.unsubmitted + ' ' + classes.assignStatus} />
-                          <Typography style={{ display: 'inline', padding: '4px' }}> {assignmentStatus.UNSUBMITTED}</Typography>
+                        <Grid item xs={6} md={4} style={{ marginBottom: '1rem' }}>
+                          <Typography variant='h6' gutterBottom>Assignment Status</Typography>
+                          <div className={classes.legendItem}>
+                            <div className={classes.graded + ' ' + classes.assignStatus} />
+                            <Typography className={classes.legendItemLabel}>{assignmentStatus.GRADED}</Typography>
+                          </div>
+                          <div className={classes.legendItem}>
+                            <div className={classes.ungraded + ' ' + classes.assignStatus} />
+                            <Typography className={classes.legendItemLabel}>{assignmentStatus.SUBMITTED}</Typography>
+                          </div>
+                          <div className={classes.legendItem}>
+                            <div className={classes.unsubmitted + ' ' + classes.assignStatus} />
+                            <Typography className={classes.legendItemLabel}>{assignmentStatus.UNSUBMITTED}</Typography>
+                          </div>
                         </Grid>
                       </Grid>
                       <AssignmentTable

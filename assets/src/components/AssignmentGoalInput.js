@@ -39,8 +39,8 @@ function AssignmentGoalInput (props) {
   }, [goalGrade])
 
   return (
-    <Grid item style={{ display: 'inline-block' }}>
-      <Typography style={{ display: 'inline-block', marginRight: '10px' }} variant='h6'>My Minimum Goal</Typography>
+    <Grid item>
+      <Typography variant='h6' gutterBottom>My Minimum Goal</Typography>
       <StyledTextField
         error={goalGradeInternal > 100 || mathWarning || goalGradeInternal > maxPossibleGrade}
         id='standard-number'
