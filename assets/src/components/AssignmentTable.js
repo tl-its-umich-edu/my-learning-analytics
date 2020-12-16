@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import Checkbox from '@material-ui/core/Checkbox'
@@ -30,6 +30,8 @@ import { calculateWeekOffset } from '../util/date'
 import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
 import { assignmentStatus } from '../util/assignment'
 
+const headerHeight = 105
+
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -54,7 +56,8 @@ const styles = theme => ({
     border: 'none'
   },
   tableHeadCell: {
-    fontSize: '1em'
+    fontSize: '1em',
+    height: headerHeight + 'px'
   },
   popover: {
     pointerEvents: 'none'
@@ -89,6 +92,9 @@ const styles = theme => ({
   },
   unsubmitted: {
     color: theme.palette.negative.main
+  },
+  assignmentName: {
+    whiteSpace: 'nowrap '
   },
   filterButton: {
     textTransform: 'none'
@@ -128,11 +134,16 @@ function AssignmentTable (props) {
 
   const [filtersAreClear, setFiltersAreClear] = useState(true)
 
+  const [previousWeek, setPreviousWeek] = useState()
+
+  const weeksPresent = useRef([])
+
   const tableRef = useRef(null)
-  const currentWeekRow = useRef(null)
+  const previousWeekRow = useRef(null)
 
   const currentDate = new Date()
   const currentWeek = calculateWeekOffset(dateStart, currentDate)
+  // const previousWeek = currentWeek - 1
 
   const maxPercentOfFinalGrade = Math.max(
     ...assignments.map(({ percentOfFinalGrade }) => percentOfFinalGrade)
@@ -167,19 +178,31 @@ function AssignmentTable (props) {
 
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
-    if (currentWeekRow.current) {
-      const tableHeaderOffset = 120
+    if (previousWeekRow.current) {
+      const tableHeaderOffset = 35 // And the universe said 'Let the offset be 35'
       tableRef.current.scrollTo({
-        top: currentWeekRow.current.offsetTop - tableHeaderOffset,
+        top: previousWeekRow.current.offsetTop - tableHeaderOffset,
         behavior: 'smooth'
       })
     }
-  }, [currentWeekRow.current])
+  }, [previousWeekRow.current, filteredAssignments])
 
   useEffect(() => {
     const allGroupNames = assignments.map(ag => ag.assignmentGroup.name)
     const uniqueGroupNames = [...new Set(allGroupNames)].sort()
     setAssignmentGroupNames(uniqueGroupNames)
+  }, [assignments])
+
+  useEffect(() => {
+    const allWeeks = [...new Set(assignments.map(a => a.week))].sort((a, b) => { return a - b })
+    if (allWeeks.length > 0) {
+      weeksPresent.current = allWeeks
+      const firstItem = weeksPresent.current.indexOf(0) === -1 ? weeksPresent.current.indexOf(1) : weeksPresent.current.indexOf(0)
+      const indexOfCurrentWeek = weeksPresent.current.indexOf(currentWeek)
+      if (indexOfCurrentWeek > 0 && firstItem !== indexOfCurrentWeek) {
+        setPreviousWeek(weeksPresent.current[indexOfCurrentWeek - 1])
+      }
+    }
   }, [assignments])
 
   useEffect(() => {
@@ -220,9 +243,10 @@ function AssignmentTable (props) {
   }
 
   const TRUNCATED_GROUP_NAME_LENGTH = 30
-  const shortenString = text => {
-    return (text.length > TRUNCATED_GROUP_NAME_LENGTH)
-      ? text.substring(0, TRUNCATED_GROUP_NAME_LENGTH - 3) + '...'
+  const TRUNCATED_ASSIGNMENT_NAME_LENGTH = 50
+  const shortenString = (text, len) => {
+    return (text.length > len)
+      ? text.substring(0, len - 3) + '...'
       : text
   }
 
@@ -326,8 +350,8 @@ function AssignmentTable (props) {
                 filteredAssignments
                   .map((a, key) => (
                     <ConditionalWrapper
-                      condition={a.week === currentWeek}
-                      wrapper={children => <RootRef rootRef={currentWeekRow} key={key}>{children}</RootRef>}
+                      condition={a.week === previousWeek}
+                      wrapper={children => <RootRef rootRef={previousWeekRow} key={key}>{children}</RootRef>}
                       key={key}
                     >
                       <TableRow key={key}>
@@ -366,18 +390,20 @@ function AssignmentTable (props) {
                               : ''
                           }
                         </TableCell>
-                        <TableCell style={{ width: '20%' }}>
+                        <TableCell style={{ width: '15%' }}>
                           <Tooltip title={a.assignmentGroup.name} placement='top' enterDelay={500}>
-                            <div>{shortenString(a.assignmentGroup.name)}</div>
+                            <div>{shortenString(a.assignmentGroup.name, TRUNCATED_GROUP_NAME_LENGTH)}</div>
                           </Tooltip>
                         </TableCell>
-                        <TableCell style={{ width: '20%' }}>
-                          {a.name}
+                        <TableCell style={{ width: '25%' }}>
+                          <Tooltip title={a.name} placement='top-start' enterDelay={500}>
+                            <div className={classes.assignmentName}>{shortenString(a.name, TRUNCATED_ASSIGNMENT_NAME_LENGTH)}</div>
+                          </Tooltip>
                         </TableCell>
                         <TableCell className={classes.narrowCell}>
                           {`${roundToXDecimals(a.percentOfFinalGrade, 1)}%`}
                         </TableCell>
-                        <TableCell style={{ width: '20%' }}>
+                        <TableCell style={{ minWidth: '200px' }}>
                           {
                             a.graded || a.outOf === 0
                               ? <div className={classes.possiblePointsText}>{a.outOf === 0 ? '0' : `${a.currentUserSubmission.score}`}</div>
