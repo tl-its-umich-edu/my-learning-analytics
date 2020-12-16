@@ -118,10 +118,10 @@ function AssignmentPlanningV2 (props) {
     settingChanged
   })
 
-  const handleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
+  const handleAssignmentGoalGrade = (key, assignmentGoalGrade, previousGoalGrade) => {
     setSettingChanged(true)
     setAssignments(
-      setAssignmentGoalGrade(key, assignments, assignmentGoalGrade)
+      setAssignmentGoalGrade(key, assignments, assignmentGoalGrade, previousGoalGrade)
     )
   }
 
