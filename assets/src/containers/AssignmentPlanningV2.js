@@ -46,25 +46,29 @@ const styles = theme => ({
     margin: '30px'
   },
   mainProgressBar: {
-    marginBottom: '50px'
+    marginBottom: '2.5rem'
+  },
+  assignStatus: {
+    width: '10px',
+    height: '10px',
+    display: 'inline-block'
+  },
+  legendItem: {
+    display: 'inline-block',
+    marginRight: '14px'
+  },
+  legendItemLabel: {
+    display: 'inline',
+    marginLeft: '6px'
   },
   graded: {
-    width: '10px',
-    height: '10px',
-    background: theme.palette.secondary.main,
-    display: 'inline-block'
+    background: theme.palette.secondary.main
   },
   ungraded: {
-    width: '10px',
-    height: '10px',
-    background: theme.palette.info.main,
-    display: 'inline-block'
+    background: theme.palette.info.main
   },
   unsubmitted: {
-    width: '10px',
-    height: '10px',
-    background: theme.palette.negative.main,
-    display: 'inline-block'
+    background: theme.palette.negative.main
   }
 })
 
@@ -166,79 +170,83 @@ function AssignmentPlanningV2 (props) {
                   ? <Spinner />
                   : (
                     <div>
-                      <div className={classes.section}>
-                        <Typography variant='h6' gutterBottom>Grade Progress</Typography>
-                        <ProgressBarV2
-                          score={currentGrade}
-                          lines={[
-                            {
-                              label: 'Current',
-                              value: currentGrade,
-                              color: 'steelblue',
-                              labelPlacement: 'down1'
-                            },
-                            {
-                              label: 'Goal',
-                              value: goalGrade,
-                              color: 'green',
-                              labelPlacement: 'up1'
-                            },
-                            {
-                              label: 'Max Possible',
-                              value: maxPossibleGrade,
-                              color: 'grey',
-                              labelPlacement: 'down2'
-                            }
-                          ]}
-                          outOf={100}
-                          percentWidth={90}
-                          height={50}
-                          margin={50}
-                        />
-                        <AssignmentGoalInput
-                          currentGrade={currentGrade}
-                          goalGrade={goalGrade}
-                          maxPossibleGrade={maxPossibleGrade}
-                          setGoalGradePrev={grade => {
-                            setGoalGradePrev(grade)
-                          }}
-                          setGoalGrade={grade => {
-                            setSettingChanged(true)
-                            setGoalGrade(grade)
-                          }}
-                          handleClearGoalGrades={handleClearGoalGrades}
-                          mathWarning={showMathWarning}
-                        />
-                      </div>
-                      <div className={classes.section}>
-                        <Grid container>
-                          <Grid item xs={12} md={10}>
-                            <Typography variant='h6' gutterBottom>Assignments by Due Date</Typography>
-                          </Grid>
-                          <Grid item xs={12} md={2}>
-                            <Typography variant='h6'>Assignment Status</Typography>
-                            <div className={classes.graded} />
-                            <Typography style={{ display: 'inline' }}> {assignmentStatus.GRADED}</Typography>
-                            <br />
-                            <div className={classes.ungraded} />
-                            <Typography style={{ display: 'inline' }}> {assignmentStatus.SUBMITTED}</Typography>
-                            <br />
-                            <div className={classes.unsubmitted} />
-                            <Typography style={{ display: 'inline' }}> {assignmentStatus.UNSUBMITTED}</Typography>
-                            <br />
-                          </Grid>
+                      <Grid container alignContent='center' className={classes.section}>
+                        <Grid item lg={4} md={5} xs={12}>
+                          <AssignmentGoalInput
+                            currentGrade={currentGrade}
+                            goalGrade={goalGrade}
+                            maxPossibleGrade={maxPossibleGrade}
+                            setGoalGradePrev={grade => {
+                              setGoalGradePrev(grade)
+                            }}
+                            setGoalGrade={grade => {
+                              setSettingChanged(true)
+                              setGoalGrade(grade)
+                            }}
+                            handleClearGoalGrades={handleClearGoalGrades}
+                            mathWarning={showMathWarning}
+                          />
                         </Grid>
-                        <AssignmentTable
-                          courseGoalGradeSet={goalGrade !== ''}
-                          assignments={assignments}
-                          assignmentGroups={assignmentGroups}
-                          dateStart={data.course.dateStart}
-                          handleAssignmentGoalGrade={handleAssignmentGoalGrade}
-                          handleAssignmentLock={handleAssignmentLock}
-                          handleInputFocus={handleInputFocus}
-                          handleInputBlur={handleInputBlur}
-                        />
-                      </div>
+                        <Grid item lg={8} md={7} xs={12} className={classes.mainProgressBar}>
+                          <Typography variant='h6' gutterBottom>Grade Progress</Typography>
+                          <ProgressBarV2
+                            score={currentGrade}
+                            lines={[
+                              {
+                                label: 'Current',
+                                value: currentGrade,
+                                color: 'steelblue',
+                                labelPlacement: 'down1'
+                              },
+                              {
+                                label: 'Goal',
+                                value: goalGrade,
+                                color: 'green',
+                                labelPlacement: 'up1'
+                              },
+                              {
+                                label: 'Max Possible',
+                                value: maxPossibleGrade,
+                                color: 'grey',
+                                labelPlacement: 'down2'
+                              }
+                            ]}
+                            outOf={100}
+                            percentWidth={100}
+                            height={50}
+                          />
+                        </Grid>
+                      </Grid>
+                      <Grid container>
+                        <Grid item xs={6} md={8}>
+                          <Typography variant='h6' gutterBottom>Assignments by Due Date</Typography>
+                        </Grid>
+                        <Grid item xs={6} md={4} style={{ marginBottom: '1rem' }}>
+                          <Typography variant='h6' gutterBottom>Assignment Status</Typography>
+                          <div className={classes.legendItem}>
+                            <div className={classes.graded + ' ' + classes.assignStatus} />
+                            <Typography className={classes.legendItemLabel}>{assignmentStatus.GRADED}</Typography>
+                          </div>
+                          <div className={classes.legendItem}>
+                            <div className={classes.ungraded + ' ' + classes.assignStatus} />
+                            <Typography className={classes.legendItemLabel}>{assignmentStatus.SUBMITTED}</Typography>
+                          </div>
+                          <div className={classes.legendItem}>
+                            <div className={classes.unsubmitted + ' ' + classes.assignStatus} />
+                            <Typography className={classes.legendItemLabel}>{assignmentStatus.UNSUBMITTED}</Typography>
+                          </div>
+                        </Grid>
+                      </Grid>
+                      <AssignmentTable
+                        courseGoalGradeSet={goalGrade !== ''}
+                        assignments={assignments}
+                        assignmentGroups={assignmentGroups}
+                        dateStart={data.course.dateStart}
+                        handleAssignmentGoalGrade={handleAssignmentGoalGrade}
+                        handleAssignmentLock={handleAssignmentLock}
+                        handleInputFocus={handleInputFocus}
+                        handleInputBlur={handleInputBlur}
+                      />
                     </div>
                   )
               }
