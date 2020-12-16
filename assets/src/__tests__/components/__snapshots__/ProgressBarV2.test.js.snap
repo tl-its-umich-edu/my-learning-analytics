@@ -2,11 +2,11 @@
 
 exports[`renders correctly 1`] = `
 <div
-  className="ProgressBarV2-outOfBar-2"
+  className="ProgressBarV2-outOfBar-3"
   style={
     Object {
       "height": "10px",
-      "margin": "0px",
+      "margin": undefined,
       "position": "relative",
       "width": "90%",
     }
