@@ -137,6 +137,7 @@ function AssignmentTable (props) {
   const [previousWeek, setPreviousWeek] = useState()
 
   const weeksPresent = useRef([])
+  const shouldScrollToCurrentWeek = useRef(false)
 
   const tableRef = useRef(null)
   const previousWeekRow = useRef(null)
@@ -178,12 +179,13 @@ function AssignmentTable (props) {
 
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
-    if (previousWeekRow.current) {
+    if (!shouldScrollToCurrentWeek.current && previousWeekRow.current) {
       const tableHeaderOffset = 35 // And the universe said 'Let the offset be 35'
       tableRef.current.scrollTo({
         top: previousWeekRow.current.offsetTop - tableHeaderOffset,
         behavior: 'smooth'
       })
+      shouldScrollToCurrentWeek.current = true
     }
   }, [previousWeekRow.current, filteredAssignments])
 
@@ -421,7 +423,7 @@ function AssignmentTable (props) {
                                   }
                                   onChange={event => {
                                     const assignmentGoalGrade = event.target.value
-                                    handleAssignmentGoalGrade(a.id, assignmentGoalGrade)
+                                    handleAssignmentGoalGrade(a.id, assignmentGoalGrade, a.goalGrade)
                                   }}
                                   type='number'
                                   className={classes.goalGradeInput}
