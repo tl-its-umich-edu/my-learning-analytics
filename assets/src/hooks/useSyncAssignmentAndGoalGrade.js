@@ -9,11 +9,9 @@ const useSyncAssignmentAndGoalGrade =
     data,
     assignments,
     goalGrade,
-    goalGradePrev,
-    currentGrade,
-    maxPossibleGrade,
     setAssignments,
-    setUserSetting
+    setUserSetting,
+    event
   }) => {
     const assignmentInputBlurChange = assignments
       .map(a => a.inputBlur).every(Boolean)
@@ -26,24 +24,19 @@ const useSyncAssignmentAndGoalGrade =
     useEffect(() => {
       const assignmentsSetByUser = assignments
         .filter(a => a.goalGradeSetByUser)
-        .map(({ id, goalGradeSetByUser, goalGrade, goalGradePrev }) => (
+        .map(({ id, goalGradeSetByUser, goalGrade }) => (
           {
             assignmentId: id,
             goalGradeSetByUser,
-            goalGrade,
-            goalGradePrev
+            goalGrade
           }
         ))
 
       const userSetting = () => {
         const setting = {
           goalGrade,
-          currentGrade: roundToXDecimals(currentGrade, 1),
-          maxPossible: roundToXDecimals(maxPossibleGrade, 1),
-          assignments: assignmentsSetByUser
-        }
-        if (goalGradePrev !== '') {
-          setting.goalGradePrev = roundToXDecimals(goalGradePrev, 1)
+          assignments: assignmentsSetByUser,
+          event: event
         }
         return setting
       }

@@ -78,7 +78,7 @@ function AssignmentPlanningV2 (props) {
 
   const [assignments, setAssignments] = useState([])
   const [goalGrade, setGoalGrade] = useState('')
-  const [goalGradePrev, setGoalGradePrev] = useState('')
+  const [event, setEvent] = useState('')
   const [userSetting, setUserSetting] = useState({})
   const [settingChanged, setSettingChanged] = useState(false)
 
@@ -105,11 +105,11 @@ function AssignmentPlanningV2 (props) {
     data,
     assignments,
     goalGrade,
-    goalGradePrev,
     currentGrade,
     maxPossibleGrade,
     setAssignments,
-    setUserSetting
+    setUserSetting,
+    event
   })
 
   const showMathWarning = useMathWarning(assignments)
@@ -122,7 +122,8 @@ function AssignmentPlanningV2 (props) {
     settingChanged
   })
 
-  const handleAssignmentGoalGrade = (key, assignmentGoalGrade) => {
+  const handleAssignmentGoalGrade = (key, assignmentGoalGrade, prevGoalGrade) => {
+    setEvent({ assignmentId: key, assignGoalGrade: assignmentGoalGrade, assignPrevGoalGrade: prevGoalGrade })
     setSettingChanged(true)
     setAssignments(
       setAssignmentGoalGrade(key, assignments, assignmentGoalGrade)
@@ -130,13 +131,15 @@ function AssignmentPlanningV2 (props) {
   }
 
   const handleClearGoalGrades = () => {
+    setEvent({ courseGoalGrade: '', prevCourseGoalGrade: goalGrade })
     setAssignments(clearGoals(assignments))
-    setGoalGradePrev(goalGrade)
     setGoalGrade('')
     setSettingChanged(true)
   }
 
   const handleAssignmentLock = (key, checkboxState) => {
+    const assignment = assignments.filter(a => a.id === key)
+    setEvent({ assignmentId: key, assignGoalGrade: assignment[0].goalGrade, checkboxLockState: checkboxState })
     setAssignments(
       setAssignmentGoalLockState(key, assignments, checkboxState)
     )
@@ -176,8 +179,8 @@ function AssignmentPlanningV2 (props) {
                             currentGrade={currentGrade}
                             goalGrade={goalGrade}
                             maxPossibleGrade={maxPossibleGrade}
-                            setGoalGradePrev={grade => {
-                              setGoalGradePrev(grade)
+                            setEvent={eventLog => {
+                              setEvent(eventLog)
                             }}
                             setGoalGrade={grade => {
                               setSettingChanged(true)

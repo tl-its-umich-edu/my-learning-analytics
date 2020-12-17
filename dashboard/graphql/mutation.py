@@ -54,10 +54,11 @@ class UserDefaultSelectionMutation(graphene.Mutation):
         )
         user_default_selection.default_view_value = json.dumps(data.default_view_value)
         user_default_selection.save()
+
         event_log_data = {
             "course_id": course_id,
             "default_type": data.default_view_type,
-            "default_value": data.default_view_value
+            "default_value": {} if not data.default_view_value else data.default_view_value['event']
         }
         eventlog(user, EventLogTypes.EVENT_VIEW_SET_DEFAULT.value, extra=event_log_data)
 
