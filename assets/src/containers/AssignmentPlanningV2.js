@@ -19,6 +19,8 @@ import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrad
 import useUserAssignmentSetting from '../hooks/useUserAssignmentSetting'
 import { isTeacherOrAdmin } from '../util/roles'
 import { Helmet } from 'react-helmet'
+import { eventLogExtra } from '../util/object'
+import { roundToXDecimals } from '../util/math'
 
 import {
   assignmentStatus,
@@ -78,7 +80,7 @@ function AssignmentPlanningV2 (props) {
 
   const [assignments, setAssignments] = useState([])
   const [goalGrade, setGoalGrade] = useState('')
-  const [event, setEvent] = useState('')
+  const [eventLog, setEventLog] = useState({ count: 0, eLog: {} })
   const [userSetting, setUserSetting] = useState({})
   const [settingChanged, setSettingChanged] = useState(false)
 
@@ -109,7 +111,7 @@ function AssignmentPlanningV2 (props) {
     maxPossibleGrade,
     setAssignments,
     setUserSetting,
-    event
+    eventLog
   })
 
   const showMathWarning = useMathWarning(assignments)
@@ -123,7 +125,12 @@ function AssignmentPlanningV2 (props) {
   })
 
   const handleAssignmentGoalGrade = (key, assignmentGoalGrade, prevGoalGrade) => {
-    setEvent({ assignmentId: key, assignGoalGrade: assignmentGoalGrade, assignPrevGoalGrade: prevGoalGrade })
+    const v = {
+      assignmentId: key,
+      assignGoalGrade: assignmentGoalGrade,
+      assignPrevGoalGrade: roundToXDecimals(prevGoalGrade, 1)
+    }
+    setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
     setSettingChanged(true)
     setAssignments(
       setAssignmentGoalGrade(key, assignments, assignmentGoalGrade)
@@ -131,7 +138,8 @@ function AssignmentPlanningV2 (props) {
   }
 
   const handleClearGoalGrades = () => {
-    setEvent({ courseGoalGrade: '', prevCourseGoalGrade: goalGrade })
+    const v = { courseGoalGrade: '', prevCourseGoalGrade: goalGrade }
+    setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
     setAssignments(clearGoals(assignments))
     setGoalGrade('')
     setSettingChanged(true)
@@ -139,7 +147,8 @@ function AssignmentPlanningV2 (props) {
 
   const handleAssignmentLock = (key, checkboxState) => {
     const assignment = assignments.filter(a => a.id === key)
-    setEvent({ assignmentId: key, assignGoalGrade: assignment[0].goalGrade, checkboxLockState: checkboxState })
+    const v = { assignmentId: key, assignGoalGrade: assignment[0].goalGrade, checkboxLockState: checkboxState }
+    setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
     setAssignments(
       setAssignmentGoalLockState(key, assignments, checkboxState)
     )
@@ -179,8 +188,9 @@ function AssignmentPlanningV2 (props) {
                             currentGrade={currentGrade}
                             goalGrade={goalGrade}
                             maxPossibleGrade={maxPossibleGrade}
-                            setEvent={eventLog => {
-                              setEvent(eventLog)
+                            eventLog={eventLog}
+                            setEventLog={eventLog => {
+                              setEventLog(eventLog)
                             }}
                             setGoalGrade={grade => {
                               setSettingChanged(true)

@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { calculateAssignmentGoalsFromCourseGoal, sumAssignmentGoalGrade } from '../util/assignment'
-import { roundToXDecimals } from '../util/math'
 
 // this effect is used to keep the goal of the course and assignments "in sync"
 // run if goalGrade changes, or if the sum of goal grades set by user changes
@@ -11,7 +10,7 @@ const useSyncAssignmentAndGoalGrade =
     goalGrade,
     setAssignments,
     setUserSetting,
-    event
+    eventLog
   }) => {
     const assignmentInputBlurChange = assignments
       .map(a => a.inputBlur).every(Boolean)
@@ -36,7 +35,7 @@ const useSyncAssignmentAndGoalGrade =
         const setting = {
           goalGrade,
           assignments: assignmentsSetByUser,
-          event: event
+          event: eventLog.eLog
         }
         return setting
       }
