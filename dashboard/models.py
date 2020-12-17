@@ -187,7 +187,7 @@ class CourseQuerySet(models.QuerySet):
             earliest_start_date_of_new_courses = new_courses.earliest_start_datetime()
 
         # Return the lower value of existing_earliest and new_earliest, otherwise return None
-        return min((val for val in [earliest_data_last_updated, earliest_start_date_of_new_courses] if val is not None), default=None)
+        return min(filter(None, (earliest_data_last_updated, earliest_start_date_of_new_courses)), default=None)
 
 
 class Course(models.Model):
