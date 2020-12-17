@@ -4,7 +4,6 @@ import { createUserSettings } from '../util/assignment'
 import { loadedWithoutError } from '../util/data'
 
 const useSaveUserSetting = ({ loading, error, courseId, userSetting, settingChanged }) => {
-  console.log(userSetting)
   const { saveUserSetting, mutationLoading, mutationError } = useSetUserSettingGQL()
 
   useEffect(() => {
