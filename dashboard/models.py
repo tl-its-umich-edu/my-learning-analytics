@@ -168,21 +168,26 @@ class CourseQuerySet(models.QuerySet):
             logger.info(f"No courses in CourseQuerySet; returning None as the earliest_start_datetime")
         return earliest_start
 
-    def get_data_last_updated(self) -> Optional[datetime]:
+    def get_data_earliest_date(self) -> Optional[datetime]:
         """ Returns the datetime of the last cron run of all courses
             This checks for any courses where the data_last_updated value is null.
 
+            If there are new courses it will return the lower value of the last run date or the earliest start date.
+
         :return: datetime. Either the earliest or None
-        :rtype: None
+        :rtype: None, datetime
         """
         new_courses = self.filter(data_last_updated__isnull=True)
+        existing_courses = self.filter(data_last_updated__isnull=False)
 
+        earliest_data_last_updated = existing_courses.earliest("data_last_updated").data_last_updated
         # If there are new courses (courses with no last run) return the earliest time of all
+        earliest_start_datetime = None
         if len(new_courses) > 0:
-            return new_courses.earliest_start_datetime()
-        # Otherwise return the latest cron run
-        else:
-            return self.all().latest("data_last_updated").data_last_updated
+            earliest_start_datetime = new_courses.earliest_start_datetime()
+
+        # Return the lower value of existing_earliest and new_earliest, otherwise return None
+        return min(filter(None, (earliest_data_last_updated, earliest_start_datetime)), default=None)
 
 
 class Course(models.Model):
