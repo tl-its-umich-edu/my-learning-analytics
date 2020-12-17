@@ -27,8 +27,8 @@ const routes = (courseId, activeViews, activeOnly = true) => {
       path: `/courses/${courseId}/assignments`,
       title: 'Assignment Planning',
       icon: Grade,
-      description: 'See what assignments have the greatest impact on your grade.',
-      image: '/static/images/assignments_planning_icon.png',
+      description: 'See what assignments have the greatest impact on your grade and set grade goals.',
+      image: '/static/images/assignment_planning_icon.png',
       viewCode: 'ap',
       enabled: activeViews.ap,
       helpUrl: viewHelpURLs.ap
