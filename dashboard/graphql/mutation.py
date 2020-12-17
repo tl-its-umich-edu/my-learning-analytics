@@ -46,19 +46,27 @@ class UserDefaultSelectionMutation(graphene.Mutation):
         if not is_admin_or_enrolled_in_course_id.test(user, course_id):
             raise GraphQLError('You do not have permission to update this resource!')
 
+        event_log = {} if not data.default_view_value else data.default_view_value['event']
+
         # check if exists
         user_default_selection, created = UserDefaultSelection.objects.get_or_create(
             course_id = course_id,
             user_sis_name = user.get_username(),
             default_view_type = data.default_view_type,
         )
-        user_default_selection.default_view_value = json.dumps(data.default_view_value)
+        user_defaults = data.default_view_value
+        try:
+            event_log = user_defaults.pop('event', {})
+        except KeyError:
+            logger.error(f'event key is missing from user default object The event key captures the event log actions.')
+
+        user_default_selection.default_view_value = json.dumps(user_defaults)
         user_default_selection.save()
 
         event_log_data = {
             "course_id": course_id,
             "default_type": data.default_view_type,
-            "default_value": {} if not data.default_view_value else data.default_view_value['event']
+            "default_value": event_log
         }
         eventlog(user, EventLogTypes.EVENT_VIEW_SET_DEFAULT.value, extra=event_log_data)
 
