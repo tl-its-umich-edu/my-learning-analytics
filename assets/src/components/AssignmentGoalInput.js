@@ -31,7 +31,7 @@ function AssignmentGoalInput (props) {
   const updateGoalGradeInternal = (grade) => {
     const v = { courseGoalGrade: grade }
     if (goalGrade !== '') {
-      // only send prev grade object with there is previous value
+      // only send prev grade object when there is previous value
       v.prevCourseGoalGrade = goalGrade
     }
     setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
