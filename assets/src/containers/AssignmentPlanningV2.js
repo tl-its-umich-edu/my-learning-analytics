@@ -147,7 +147,7 @@ function AssignmentPlanningV2 (props) {
 
   const handleAssignmentLock = (key, checkboxState) => {
     const assignment = assignments.filter(a => a.id === key)
-    const v = { assignmentId: key, assignGoalGrade: assignment[0].goalGrade, checkboxLockState: checkboxState }
+    const v = { assignmentId: key, assignGoalGrade: roundToXDecimals(assignment[0].goalGrade, 1), checkboxLockState: checkboxState }
     setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
     setAssignments(
       setAssignmentGoalLockState(key, assignments, checkboxState)
