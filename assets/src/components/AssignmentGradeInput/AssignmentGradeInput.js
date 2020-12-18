@@ -19,7 +19,7 @@ function AssignmentGradeInput (props) {
   const placeToRoundTo = pointsPossible => (String(pointsPossible).includes('.'))
     ? getDecimalPlaceOfFloat(pointsPossible) : 1
 
-  const previousGrade = useRef(null)
+  const previousGrade = useRef(assignment.goalGrade)
   const [goalGradeInternal, setGoalGradeInternal] = useState(roundToXDecimals(assignment.goalGrade, placeToRoundTo(assignment.pointsPossible)))
   const debouncedGoalGrade = useRef(debounce(grade => {
     handleAssignmentGoalGrade(gradeKey, grade, previousGrade.current)
@@ -27,11 +27,7 @@ function AssignmentGradeInput (props) {
   }, 500)).current
 
   useEffect(() => {
-    if (assignment.goalGradeSetByUser) {
-      previousGrade.current = assignment.goalGrade
-    } else {
-      previousGrade.current = null
-    }
+    previousGrade.current = assignment.goalGrade
   }, [assignment.goalGrade])
 
   const updateGoalGradeInternal = (grade) => {
