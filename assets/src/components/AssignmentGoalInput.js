@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { withStyles, Typography } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import StyledTextField from './StyledTextField'
@@ -45,7 +45,6 @@ function AssignmentGoalInput (props) {
 
   return (
     <Grid item>
-      <Typography variant='h6' gutterBottom>My Minimum Goal</Typography>
       <StyledTextField
         error={goalGradeInternal > 100 || mathWarning || goalGradeInternal > maxPossibleGrade}
         id='standard-number'
