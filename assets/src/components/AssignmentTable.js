@@ -123,7 +123,7 @@ function AssignmentTable (props) {
   */
   const [filteredAssignments, setFilteredAssignments] = useState(assignments)
 
-  const [popoverEl, setPopover, clearPopover] = usePopoverEl()
+  const [popoverEl, setPopoverEl, clearPopoverEl] = usePopoverEl()
 
   const [assignmentGroupNames, setAssignmentGroupNames] = useState([])
 
@@ -439,8 +439,8 @@ function AssignmentTable (props) {
                             </div>
                           }
                           <div
-                            onMouseEnter={event => setPopover(key, event.currentTarget)}
-                            onMouseLeave={clearPopover}
+                            onMouseEnter={event => setPopoverEl(key, event.currentTarget)}
+                            onMouseLeave={clearPopoverEl}
                           >
                             <ProgressBarV2
                               score={a.currentUserSubmission ? a.currentUserSubmission.score : 0}
@@ -460,15 +460,15 @@ function AssignmentTable (props) {
                               Your grade: ${(a.grade ? a.grade : 'Not graded')}.  
                               Class average: ${a.averageGrade}.  
                               Rules: ${(a.rules ? a.rules : 'There are no rules for this assignment')}.  `}
-                              onBarFocus={(el) => setPopover(key, el)}
-                              onBarBlur={clearPopover}
+                              onBarFocus={el => setPopoverEl(key, el)}
+                              onBarBlur={clearPopoverEl}
                             />
                             <Popover
                               className={classes.popover}
                               classes={{ paper: classes.paper }}
                               anchorEl={popoverEl.anchorEl}
                               open={popoverEl.popoverId === key}
-                              onClose={clearPopover}
+                              onClose={clearPopoverEl}
                               anchorOrigin={{
                                 vertical: 'top',
                                 horizontal: 'left'

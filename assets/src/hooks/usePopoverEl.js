@@ -1,15 +1,14 @@
 import { useState } from 'react'
 
 function usePopoverEl () {
-  const emptyPopover = { popoverId: null, anchorEl: null }
-  const [popoverEl, setPopoverEl] = useState(emptyPopover)
+  const emptyPopoverEl = { popoverId: null, anchorEl: null }
+  const [popoverEl, setPopoverEl] = useState(emptyPopoverEl)
 
-  const setPopover = (key, el) => {
-    setPopoverEl({ popoverId: key, anchorEl: el })
-  }
-  const clearPopover = () => setPopoverEl(emptyPopover)
+  const setNewPopoverEl = (key, el) => setPopoverEl({ popoverId: key, anchorEl: el })
 
-  return [popoverEl, setPopover, clearPopover]
+  const clearPopoverEl = () => setPopoverEl(emptyPopoverEl)
+
+  return [popoverEl, setNewPopoverEl, clearPopoverEl]
 }
 
 export default usePopoverEl
