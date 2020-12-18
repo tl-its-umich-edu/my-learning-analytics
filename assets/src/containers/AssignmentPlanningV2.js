@@ -133,7 +133,7 @@ function AssignmentPlanningV2 (props) {
     setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
     setSettingChanged(true)
     setAssignments(
-      setAssignmentGoalGrade(key, assignments, assignmentGoalGrade, prevGoalGrade)
+      setAssignmentGoalGrade(key, assignments, assignmentGoalGrade)
     )
   }
 
