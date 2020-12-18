@@ -184,6 +184,7 @@ function AssignmentPlanningV2 (props) {
                     <div>
                       <Grid container alignContent='center' className={classes.section}>
                         <Grid item lg={4} md={5} xs={12}>
+                          <Typography variant='h6' gutterBottom>My Minimum Goal (%)</Typography>
                           <AssignmentGoalInput
                             currentGrade={currentGrade}
                             goalGrade={goalGrade}
