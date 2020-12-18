@@ -47,7 +47,6 @@ else
     DOMAIN=$(echo "${ENV_JSON}" | jq -r -c "${DOMAIN_JQ} | values")
 fi
 
-echo "$DEBUGPY_ENABLE"
 echo "Waiting for DB"
 while ! nc -z "${MYSQL_HOST}" "${MYSQL_PORT}"; do   
   sleep 1 # wait 1 second before check again
@@ -74,8 +73,8 @@ fi
 
 # If these values aren't set or they're set to false
 # This syntax substitutes False if null or unset
-if [ "${IS_CRON_POD:-"false",,}" == "false" ]; then
-    if [ "${DEBUGPY_ENABLE:-"false",,}" == "false" ]; then
+if [ "${IS_CRON_POD:-"false"}" == "false" ]; then
+    if [ "${DEBUGPY_ENABLE:-"false"}" == "false" ]; then
         echo "Starting Gunicorn for production"
     else
         echo "Starting Gunicorn for DEBUGPY debugging"
