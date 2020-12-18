@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import StyledTextField from './StyledTextField'
 import debounce from 'lodash.debounce'
-import usePrevious from '../hooks/usePreviousValue'
+import { eventLogExtra } from '../util/object'
 
 const styles = ({
   goalGradeInput: {
@@ -15,26 +15,31 @@ const styles = ({
 
 function AssignmentGoalInput (props) {
   const {
+    currentGrade,
     maxPossibleGrade,
     goalGrade,
     setGoalGrade,
-    setGoalGradePrev,
+    setEventLog,
+    eventLog,
     handleClearGoalGrades,
     mathWarning,
     classes
   } = props
 
   const [goalGradeInternal, setGoalGradeInternal] = useState(goalGrade)
-  const prevGrade = usePrevious(goalGrade)
   const debouncedGoalGrade = useRef(debounce(q => setGoalGrade(q), 500)).current
   const updateGoalGradeInternal = (grade) => {
-    setGoalGradePrev(prevGrade)
+    const v = { courseGoalGrade: grade }
+    if (goalGrade !== '') {
+      // only send prev grade object when there is previous value
+      v.prevCourseGoalGrade = goalGrade
+    }
+    setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
     debouncedGoalGrade(grade)
     setGoalGradeInternal(grade)
   }
 
   useEffect(() => {
-    setGoalGradePrev(prevGrade)
     setGoalGradeInternal(goalGrade)
   }, [goalGrade])
 

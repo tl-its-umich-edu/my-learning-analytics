@@ -38,7 +38,6 @@ const setAssignmentGoalGrade = (assignmentId, assignments, goalGrade, prevGoalGr
       ...assignments.slice(0, key),
       {
         ...assignments[key],
-        goalGradePrev: prevGoalGrade === '' ? '' : roundToXDecimals(Number(prevGoalGrade), 1),
         goalGrade: goalGrade === '' ? '' : roundToXDecimals(Number(goalGrade), 3),
         goalGradeSetByUser: !!goalGrade
       },
