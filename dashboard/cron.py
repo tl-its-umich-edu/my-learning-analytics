@@ -296,7 +296,7 @@ class DashboardCronJob(CronJobBase):
                 total_bytes_billed += bq_job.total_bytes_billed
             # If there is an exception here print an error message and return
             except Exception as e:
-                err_msg = f"There was an exception running the bigquery job of {e.message}"
+                err_msg = f"There was an exception running the BigQuery job of {e.message}"
                 # Print this as an error so it will trigger an error in the cron
                 logger.error(err_msg)
                 return status + err_msg
