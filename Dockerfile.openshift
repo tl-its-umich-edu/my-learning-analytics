@@ -1,6 +1,5 @@
-# NOTE: When updating this file, also update Dockerfile.openshift
 # build react components for production mode
-FROM node:14-slim AS node-webpack
+FROM docker-registry.default.svc:5000/openshift/node:14-slim AS node-webpack
 WORKDIR /usr/src/app
 
 # NOTE: package.json and webpack.config.js not likely to change between dev builds
@@ -21,7 +20,7 @@ RUN apt-get update && \
     rm -rf /usr/src/app/assets/src
 
 # build node libraries for production mode
-FROM node:14-slim AS node-prod-deps
+FROM docker-registry.default.svc:5000/openshift/node:14-slim AS node-prod-deps
 
 COPY --from=node-webpack /usr/src/app /usr/src/app
 RUN npm prune --production && \
@@ -29,7 +28,7 @@ RUN npm prune --production && \
     find /usr/src/app/node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
 
 # FROM directive instructing base image to build upon
-FROM python:3.8-slim AS app
+FROM docker-registry.default.svc:5000/openshift/python:3.8-slim AS app
 
 # EXPOSE port 5000 to allow communication to/from server
 EXPOSE 5000
