@@ -28,7 +28,9 @@ function ProgressBarV2 (props) {
     height = 10,
     margin,
     lines = [],
-    description
+    description,
+    onBarFocus,
+    onBarBlur
   } = props
 
   const scoreRatio = score
@@ -60,6 +62,8 @@ function ProgressBarV2 (props) {
             position: 'relative',
             margin: margin
           }}
+          onFocus={(event) => { if (onBarFocus) onBarFocus(event.currentTarget) }}
+          onBlur={(event) => { if (onBarBlur) onBarBlur() }}
         >
           {
             lines.length > 0
