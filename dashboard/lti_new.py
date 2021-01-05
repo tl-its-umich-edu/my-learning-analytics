@@ -102,7 +102,7 @@ def is_config_valid(config: ToolConfDict):
 
 def generate_jwks() -> Dict[str, list]:
     config = get_tool_conf()
-    if not check_if_success_getting_tool_config(config):
+    if not is_config_valid(config):
         raise LTIException(config)
     return config.get_jwks()
 

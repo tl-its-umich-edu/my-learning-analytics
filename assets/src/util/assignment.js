@@ -166,14 +166,30 @@ const sumAssignmentGoalGrade = assignments => sum(
   assignments.map(a => a.goalGrade || 0)
 )
 
-const sortAssignmentsByWeek = assignments => {
-  const assignmentsWithDueDates = assignments
+// assignmentGroup.name can be null
+const sortByAssignmentGroupName = assignments => assignments.sort((a, b) => {
+  return (a.assignmentGroup.name === null && b.assignmentGroup.name === null) ? 0
+    : a.assignmentGroup.name ? a.assignmentGroup.name.localeCompare(b.assignmentGroup.name)
+      : b.assignmentGroup.name.localeCompare(a.assignmentGroup.name)
+})
+
+// name can be null
+const sortByAssignmentName = assignments => assignments.sort((a, b) => {
+  return (a.name === null && b.name === null) ? 0
+    : a.name ? a.name.localeCompare(b.name)
+      : b.name.localeCompare(a.name)
+})
+
+// Sort columns with precedence due date, assignment group name, assignment name
+const sortAssignments = assignments => {
+  const initialSortedAssignments = sortByAssignmentGroupName(sortByAssignmentName(assignments))
+
+  const assignmentsWithDueDates = initialSortedAssignments
     .filter(a => a.week)
-    .sort((a, b) => a.week - b.week)
+    .sort((a, b) => new Date(a.localDate).getTime() - new Date(b.localDate).getTime())
 
-  const assignmentsWithoutDueDates = assignments
+  const assignmentsWithoutDueDates = initialSortedAssignments
     .filter(a => !a.week)
-
   return [...assignmentsWithDueDates, ...assignmentsWithoutDueDates]
 }
 
@@ -188,7 +204,7 @@ const createAssignmentFields = (
     assignmentGroups,
     assignmentWeightConsideration
   )
-  return sortAssignmentsByWeek(
+  return sortAssignments(
     assignments.map(a => {
       const {
         localDate,
@@ -234,7 +250,7 @@ const createUserSettings = (courseId, viewName, setting) => {
 
 const assignmentStatus = {
   GRADED: 'Graded',
-  SUBMITTED: 'Not Yet Graded',
+  SUBMITTED: 'Pending Grade',
   UNSUBMITTED: 'Unsubmitted'
 }
 

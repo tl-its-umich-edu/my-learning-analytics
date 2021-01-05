@@ -33,7 +33,7 @@ if [ -z "${ENV_JSON}" ]; then
     MYSQL_HOST=$(jq -r -c ".MYSQL_HOST | values" ${ENV_FILE})
     MYSQL_PORT=$(jq -r -c ".MYSQL_PORT | values" ${ENV_FILE})
     IS_CRON_POD=$(jq -r -c ".IS_CRON_POD | values" ${ENV_FILE})
-    PTVSD_ENABLE=$(jq -r -c ".PTVSD_ENABLE | values" ${ENV_FILE})
+    DEBUGPY_ENABLE=$(jq -r -c ".DEBUGPY_ENABLE | values" ${ENV_FILE})
     CRONTAB_SCHEDULE=$(jq -r -c ".CRONTAB_SCHEDULE | values" ${ENV_FILE})
     RUN_AT_TIMES=$(jq -r -c ".RUN_AT_TIMES | values" ${ENV_FILE})
     DOMAIN=$(jq -r -c "${DOMAIN_JQ} | values" ${ENV_FILE})
@@ -41,13 +41,12 @@ else
     MYSQL_HOST=$(echo "${ENV_JSON}" | jq -r -c ".MYSQL_HOST | values")
     MYSQL_PORT=$(echo "${ENV_JSON}" | jq -r -c ".MYSQL_PORT | values")
     IS_CRON_POD=$(echo "${ENV_JSON}" | jq -r -c ".IS_CRON_POD | values")
-    PTVSD_ENABLE=$(echo "${ENV_JSON}" | jq -r -c ".PTVSD_ENABLE | values")
+    DEBUGPY_ENABLE=$(echo "${ENV_JSON}" | jq -r -c ".DEBUGPY_ENABLE | values")
     CRONTAB_SCHEDULE=$(echo "${ENV_JSON}" | jq -r -c ".CRONTAB_SCHEDULE | values")
     RUN_AT_TIMES=$(echo "${ENV_JSON}" | jq -r -c ".RUN_AT_TIMES | values")
     DOMAIN=$(echo "${ENV_JSON}" | jq -r -c "${DOMAIN_JQ} | values")
 fi
 
-echo "$PTVSD_ENABLE"
 echo "Waiting for DB"
 while ! nc -z "${MYSQL_HOST}" "${MYSQL_PORT}"; do   
   sleep 1 # wait 1 second before check again
@@ -74,12 +73,12 @@ fi
 
 # If these values aren't set or they're set to false
 # This syntax substitutes False if null or unset
-if [ "${IS_CRON_POD:-"false",,}" == "false" ]; then
-    if [ "${PTVSD_ENABLE:-"false",,}" == "false" ]; then
+if [ "${IS_CRON_POD:-"false"}" == "false" ]; then
+    if [ "${DEBUGPY_ENABLE:-"false"}" == "false" ]; then
         echo "Starting Gunicorn for production"
     else
-        echo "Starting Gunicorn for PTVSD debugging"
-        # Workers need to be set to 1 for PTVSD
+        echo "Starting Gunicorn for DEBUGPY debugging"
+        # Workers need to be set to 1 for DEBUGPY
         GUNICORN_WORKERS=1
         GUNICORN_RELOAD="--reload"
         GUNICORN_TIMEOUT=0

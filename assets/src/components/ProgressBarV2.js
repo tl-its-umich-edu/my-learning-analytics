@@ -6,17 +6,14 @@ import { roundToXDecimals } from '../util/math'
 
 const styles = theme => ({
   gradedBar: {
-    float: 'left',
     backgroundColor: theme.palette.secondary.main
   },
 
   ungradedBar: {
-    float: 'left',
     backgroundColor: theme.palette.info.main
   },
 
   outOfBar: {
-    float: 'left',
     backgroundColor: theme.palette.negative.main
   }
 })
@@ -29,9 +26,11 @@ function ProgressBarV2 (props) {
     submitted,
     percentWidth,
     height = 10,
-    margin = 0,
+    margin,
     lines = [],
-    description
+    description,
+    onBarFocus,
+    onBarBlur
   } = props
 
   const scoreRatio = score
@@ -61,8 +60,10 @@ function ProgressBarV2 (props) {
             width: `${percentWidth}%`,
             height: `${height}px`,
             position: 'relative',
-            margin: `${margin}px`
+            margin: margin
           }}
+          onFocus={(event) => { if (onBarFocus) onBarFocus(event.currentTarget) }}
+          onBlur={(event) => { if (onBarBlur) onBarBlur() }}
         >
           {
             lines.length > 0

@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { withStyles, Typography } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import StyledTextField from './StyledTextField'
 import debounce from 'lodash.debounce'
+import { eventLogExtra } from '../util/object'
 
 const styles = ({
   goalGradeInput: {
@@ -14,9 +15,12 @@ const styles = ({
 
 function AssignmentGoalInput (props) {
   const {
+    currentGrade,
     maxPossibleGrade,
     goalGrade,
     setGoalGrade,
+    setEventLog,
+    eventLog,
     handleClearGoalGrades,
     mathWarning,
     classes
@@ -24,8 +28,13 @@ function AssignmentGoalInput (props) {
 
   const [goalGradeInternal, setGoalGradeInternal] = useState(goalGrade)
   const debouncedGoalGrade = useRef(debounce(q => setGoalGrade(q), 500)).current
-
   const updateGoalGradeInternal = (grade) => {
+    const v = { courseGoalGrade: grade }
+    if (goalGrade !== '') {
+      // only send prev grade object when there is previous value
+      v.prevCourseGoalGrade = goalGrade
+    }
+    setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
     debouncedGoalGrade(grade)
     setGoalGradeInternal(grade)
   }
@@ -35,54 +44,48 @@ function AssignmentGoalInput (props) {
   }, [goalGrade])
 
   return (
-    <Grid container>
-      <Grid item style={{ display: 'inline-block' }}>
-        <Typography style={{ display: 'inline-block', marginRight: '10px' }} variant='h6'>My Minimum Goal</Typography>
-        <StyledTextField
-          error={goalGradeInternal > 100 || mathWarning || goalGradeInternal > maxPossibleGrade}
-          id='standard-number'
-          value={goalGradeInternal}
-          label={
-            mathWarning
-              ? 'Math may no longer add up'
-              : goalGrade > 100
-                ? 'Over 100%'
-                : goalGrade > maxPossibleGrade
-                  ? 'Greater than max possible grade'
-                  : 'Set Minimum Goal'
-          }
-          onChange={event => {
-            const goalGrade = event.target.value
-            if (goalGrade === '') {
-              updateGoalGradeInternal('')
-            } else if (goalGrade <= 0) {
-              updateGoalGradeInternal(0)
-            } else if (goalGrade > 125) {
-              updateGoalGradeInternal(125)
-            } else {
-              updateGoalGradeInternal(goalGrade)
-            }
-          }}
-          type='number'
-          className={classes.goalGradeInput}
-          InputLabelProps={{
-            // endAdornment: <InputAdornment position='start'>%</InputAdornment> // doesn't seem to be working
-          }}
-          margin='normal'
-          variant='outlined'
-          style={{ marginRight: '10px', width: '25ch' }}
-        />
-        {
-          <Button
-            variant='contained'
-            className={classes.clearButton}
-            onClick={handleClearGoalGrades}
-            aria-label='clear'
-          >
-            Clear
-          </Button>
+    <Grid item>
+      <StyledTextField
+        error={goalGradeInternal > 100 || mathWarning || goalGradeInternal > maxPossibleGrade}
+        id='standard-number'
+        value={goalGradeInternal}
+        label={
+          mathWarning
+            ? 'Math may no longer add up'
+            : goalGrade > 100
+              ? 'Over 100%'
+              : goalGrade > maxPossibleGrade
+                ? 'Greater than max possible grade'
+                : 'Set Minimum Goal'
         }
-      </Grid>
+        onChange={event => {
+          const goalGrade = event.target.value
+          if (goalGrade === '') {
+            updateGoalGradeInternal('')
+          } else if (goalGrade <= 0) {
+            updateGoalGradeInternal(0)
+          } else if (goalGrade > 125) {
+            updateGoalGradeInternal(125)
+          } else {
+            updateGoalGradeInternal(goalGrade)
+          }
+        }}
+        type='number'
+        className={classes.goalGradeInput}
+        margin='normal'
+        variant='outlined'
+        style={{ marginRight: '10px', width: '25ch' }}
+      />
+      {
+        <Button
+          variant='contained'
+          className={classes.clearButton}
+          onClick={handleClearGoalGrades}
+          aria-label='clear'
+        >
+          Clear
+        </Button>
+      }
     </Grid>
   )
 }

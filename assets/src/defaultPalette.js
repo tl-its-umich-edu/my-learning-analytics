@@ -22,11 +22,14 @@ const defaultPalette = {
   link: {
     main: '#0000EE'
   },
-  /*  The 'info' color is used to confirm a submitted or stored by system state .
-    For now, this should be used directly through theme.palette.info.main instead of the color prop
-    (i.e. color='info'), which isn't fully supported. */
+  /*  The 'info' color is used to confirm a submitted or stored by system state. */
   info: {
-    main: '#ffb74d'
+    main: '#FFB74D'
+  },
+  /*  The 'warning' color is used with text or interface elements to alert the user something may be wrong or
+      needs their attention. */
+  warning: {
+    main: '#D84315'
   }
 }
 

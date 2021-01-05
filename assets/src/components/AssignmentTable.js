@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import Checkbox from '@material-ui/core/Checkbox'
@@ -18,7 +18,6 @@ import TableContainer from '@material-ui/core/TableContainer'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Tooltip from '@material-ui/core/Tooltip'
-import ClearIcon from '@material-ui/icons/Clear'
 import GradedIcon from '@material-ui/icons/Done'
 import UnsubmittedIcon from '@material-ui/icons/Remove'
 import SubmittedIcon from '@material-ui/icons/Textsms'
@@ -26,9 +25,13 @@ import ProgressBarV2 from './ProgressBarV2'
 import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
 import StyledTextField from './StyledTextField'
+import AlertBanner from '../components/AlertBanner'
+import usePopoverEl from '../hooks/usePopoverEl'
 import { calculateWeekOffset } from '../util/date'
 import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
 import { assignmentStatus } from '../util/assignment'
+
+const headerHeight = 105
 
 const styles = theme => ({
   root: {
@@ -54,7 +57,8 @@ const styles = theme => ({
     border: 'none'
   },
   tableHeadCell: {
-    fontSize: '1em'
+    fontSize: '1em',
+    height: headerHeight + 'px'
   },
   popover: {
     pointerEvents: 'none'
@@ -89,6 +93,12 @@ const styles = theme => ({
   },
   unsubmitted: {
     color: theme.palette.negative.main
+  },
+  assignmentName: {
+    whiteSpace: 'nowrap '
+  },
+  filterButton: {
+    textTransform: 'none'
   }
 })
 
@@ -113,7 +123,7 @@ function AssignmentTable (props) {
   */
   const [filteredAssignments, setFilteredAssignments] = useState(assignments)
 
-  const [popoverEl, setPopoverEl] = useState({ popoverId: null, anchorEl: null })
+  const [popoverEl, setPopoverEl, clearPopoverEl] = usePopoverEl()
 
   const [assignmentGroupNames, setAssignmentGroupNames] = useState([])
 
@@ -125,11 +135,17 @@ function AssignmentTable (props) {
 
   const [filtersAreClear, setFiltersAreClear] = useState(true)
 
+  const [previousWeek, setPreviousWeek] = useState()
+
+  const weeksPresent = useRef([])
+  const shouldScrollToCurrentWeek = useRef(false)
+
   const tableRef = useRef(null)
-  const currentWeekRow = useRef(null)
+  const previousWeekRow = useRef(null)
 
   const currentDate = new Date()
   const currentWeek = calculateWeekOffset(dateStart, currentDate)
+  // const previousWeek = currentWeek - 1
 
   const maxPercentOfFinalGrade = Math.max(
     ...assignments.map(({ percentOfFinalGrade }) => percentOfFinalGrade)
@@ -164,19 +180,32 @@ function AssignmentTable (props) {
 
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
-    if (currentWeekRow.current) {
-      const tableHeaderOffset = 120
+    if (!shouldScrollToCurrentWeek.current && previousWeekRow.current) {
+      const tableHeaderOffset = 35 // And the universe said 'Let the offset be 35'
       tableRef.current.scrollTo({
-        top: currentWeekRow.current.offsetTop - tableHeaderOffset,
+        top: previousWeekRow.current.offsetTop - tableHeaderOffset,
         behavior: 'smooth'
       })
+      shouldScrollToCurrentWeek.current = true
     }
-  }, [currentWeekRow.current])
+  }, [previousWeekRow.current, filteredAssignments])
 
   useEffect(() => {
     const allGroupNames = assignments.map(ag => ag.assignmentGroup.name)
     const uniqueGroupNames = [...new Set(allGroupNames)].sort()
     setAssignmentGroupNames(uniqueGroupNames)
+  }, [assignments])
+
+  useEffect(() => {
+    const allWeeks = [...new Set(assignments.map(a => a.week))].sort((a, b) => { return a - b })
+    if (allWeeks.length > 0) {
+      weeksPresent.current = allWeeks
+      const firstItem = weeksPresent.current.indexOf(0) === -1 ? weeksPresent.current.indexOf(1) : weeksPresent.current.indexOf(0)
+      const indexOfCurrentWeek = weeksPresent.current.indexOf(currentWeek)
+      if (indexOfCurrentWeek > 0 && firstItem !== indexOfCurrentWeek) {
+        setPreviousWeek(weeksPresent.current[indexOfCurrentWeek - 1])
+      }
+    }
   }, [assignments])
 
   useEffect(() => {
@@ -217,9 +246,10 @@ function AssignmentTable (props) {
   }
 
   const TRUNCATED_GROUP_NAME_LENGTH = 30
-  const shortenString = text => {
-    return (text.length > TRUNCATED_GROUP_NAME_LENGTH)
-      ? text.substring(0, TRUNCATED_GROUP_NAME_LENGTH - 3) + '...'
+  const TRUNCATED_ASSIGNMENT_NAME_LENGTH = 50
+  const shortenString = (text, len) => {
+    return (text.length > len)
+      ? text.substring(0, len - 3) + '...'
       : text
   }
 
@@ -230,69 +260,69 @@ function AssignmentTable (props) {
   }
 
   return (
-    <RootRef rootRef={tableRef}>
-      <div>
-        <Grid container className={classes.filterArea}>
-          <Grid item xs={12} sm={4}>
-            <FormControl className={classes.formControl}>
-              <InputLabel>Filter by Type</InputLabel>
-              <Select
-                labelId='assignment-group-checkbox-label'
-                id='assignment-group-mutiple-checkbox'
-                multiple
-                value={assignmentGroupFilterArray}
-                onChange={e => setAssignmentGroupFilterArray(e.target.value)}
-                input={<Input />}
-                renderValue={(selected) => selected.join(', ')}
-                MenuProps={MenuProps}
-                width='250px'
-              >
-                {assignmentGroupNames.map((name) => (
-                  <MenuItem key={name} value={name}>
-                    <Checkbox checked={assignmentGroupFilterArray.indexOf(name) > -1} />
-                    <ListItemText primary={name} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <FormControl className={classes.formControl}>
-              <InputLabel>Filter by Name</InputLabel>
-              <Input value={assignmentNameFilter} placeholder='Filter by name...' onChange={e => setAssignmentNameFilter(e.target.value)} />
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <FormControl className={classes.formControl}>
-              <InputLabel>Filter by Status</InputLabel>
-              <Select
-                labelId='assignment-status-checkbox-label'
-                id='assignment-status-mutiple-checkbox'
-                multiple
-                value={assignmentStatusFilterArray}
-                onChange={e => setAssignmentStatusFilterArray(e.target.value)}
-                input={<Input />}
-                renderValue={(selected) => selected.join(', ')}
-                MenuProps={MenuProps}
-                width='250px'
-              >
-                {assignmentStatusNames.map((name) => (
-                  <MenuItem key={name} value={name}>
-                    <Checkbox checked={assignmentStatusFilterArray.indexOf(name) > -1} />
-                    <ListItemText primary={name} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={1}>
-            <Tooltip title='Clear filters' placement='bottom' enterDelay={500}>
-              <FormControl className={classes.formControl}>
-                <Button size='small' variant='contained' onClick={() => clearFilters()} disabled={filtersAreClear}><ClearIcon /></Button>
-              </FormControl>
-            </Tooltip>
-          </Grid>
+    <div>
+      <Grid container className={classes.filterArea}>
+        <Grid item xs={12} sm={4}>
+          <FormControl className={classes.formControl}>
+            <InputLabel>Filter by Type</InputLabel>
+            <Select
+              labelId='assignment-group-checkbox-label'
+              id='assignment-group-mutiple-checkbox'
+              multiple
+              value={assignmentGroupFilterArray}
+              onChange={e => setAssignmentGroupFilterArray(e.target.value)}
+              input={<Input />}
+              renderValue={(selected) => selected.join(', ')}
+              MenuProps={MenuProps}
+              width='250px'
+            >
+              {assignmentGroupNames.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={assignmentGroupFilterArray.indexOf(name) > -1} />
+                  <ListItemText primary={name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
+        <Grid item xs={12} sm={3}>
+          <FormControl className={classes.formControl}>
+            <InputLabel>Filter by Name</InputLabel>
+            <Input value={assignmentNameFilter} placeholder='Filter by name...' onChange={e => setAssignmentNameFilter(e.target.value)} />
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <FormControl className={classes.formControl}>
+            <InputLabel>Filter by Status</InputLabel>
+            <Select
+              labelId='assignment-status-checkbox-label'
+              id='assignment-status-mutiple-checkbox'
+              multiple
+              value={assignmentStatusFilterArray}
+              onChange={e => setAssignmentStatusFilterArray(e.target.value)}
+              input={<Input />}
+              renderValue={(selected) => selected.join(', ')}
+              MenuProps={MenuProps}
+              width='250px'
+            >
+              {assignmentStatusNames.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={assignmentStatusFilterArray.indexOf(name) > -1} />
+                  <ListItemText primary={name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={1}>
+          <Tooltip title='Clear filters' placement='bottom' enterDelay={500}>
+            <FormControl className={classes.formControl}>
+              <Button size='small' variant='contained' onClick={() => clearFilters()} disabled={filtersAreClear} className={classes.filterButton}>Clear Filters</Button>
+            </FormControl>
+          </Tooltip>
+        </Grid>
+      </Grid>
+      <RootRef rootRef={tableRef}>
         <TableContainer className={classes.container}>
           <MTable stickyHeader ref={tableRef}>
             <TableHead>
@@ -323,8 +353,8 @@ function AssignmentTable (props) {
                 filteredAssignments
                   .map((a, key) => (
                     <ConditionalWrapper
-                      condition={a.week === currentWeek}
-                      wrapper={children => <RootRef rootRef={currentWeekRow} key={key}>{children}</RootRef>}
+                      condition={a.week === previousWeek}
+                      wrapper={children => <RootRef rootRef={previousWeekRow} key={key}>{children}</RootRef>}
                       key={key}
                     >
                       <TableRow key={key}>
@@ -363,18 +393,20 @@ function AssignmentTable (props) {
                               : ''
                           }
                         </TableCell>
-                        <TableCell style={{ width: '20%' }}>
+                        <TableCell style={{ width: '15%' }}>
                           <Tooltip title={a.assignmentGroup.name} placement='top' enterDelay={500}>
-                            <div>{shortenString(a.assignmentGroup.name)}</div>
+                            <div>{shortenString(a.assignmentGroup.name, TRUNCATED_GROUP_NAME_LENGTH)}</div>
                           </Tooltip>
                         </TableCell>
-                        <TableCell style={{ width: '20%' }}>
-                          {a.name}
+                        <TableCell style={{ width: '25%' }}>
+                          <Tooltip title={a.name} placement='top-start' enterDelay={500}>
+                            <div className={classes.assignmentName}>{shortenString(a.name, TRUNCATED_ASSIGNMENT_NAME_LENGTH)}</div>
+                          </Tooltip>
                         </TableCell>
                         <TableCell className={classes.narrowCell}>
                           {`${roundToXDecimals(a.percentOfFinalGrade, 1)}%`}
                         </TableCell>
-                        <TableCell style={{ width: '20%' }}>
+                        <TableCell style={{ minWidth: '200px' }}>
                           {
                             a.graded || a.outOf === 0
                               ? <div className={classes.possiblePointsText}>{a.outOf === 0 ? '0' : `${a.currentUserSubmission.score}`}</div>
@@ -392,7 +424,7 @@ function AssignmentTable (props) {
                                   }
                                   onChange={event => {
                                     const assignmentGoalGrade = event.target.value
-                                    handleAssignmentGoalGrade(a.id, assignmentGoalGrade)
+                                    handleAssignmentGoalGrade(a.id, assignmentGoalGrade, a.goalGrade)
                                   }}
                                   type='number'
                                   className={classes.goalGradeInput}
@@ -407,8 +439,8 @@ function AssignmentTable (props) {
                             </div>
                           }
                           <div
-                            onMouseEnter={event => setPopoverEl({ popoverId: key, anchorEl: event.currentTarget })}
-                            onMouseLeave={() => setPopoverEl({ popoverId: null, anchorEl: null })}
+                            onMouseEnter={event => setPopoverEl(key, event.currentTarget)}
+                            onMouseLeave={clearPopoverEl}
                           >
                             <ProgressBarV2
                               score={a.currentUserSubmission ? a.currentUserSubmission.score : 0}
@@ -428,13 +460,15 @@ function AssignmentTable (props) {
                               Your grade: ${(a.grade ? a.grade : 'Not graded')}.  
                               Class average: ${a.averageGrade}.  
                               Rules: ${(a.rules ? a.rules : 'There are no rules for this assignment')}.  `}
+                              onBarFocus={el => setPopoverEl(key, el)}
+                              onBarBlur={clearPopoverEl}
                             />
                             <Popover
                               className={classes.popover}
                               classes={{ paper: classes.paper }}
                               anchorEl={popoverEl.anchorEl}
                               open={popoverEl.popoverId === key}
-                              onClose={() => setPopoverEl({ popoverId: null, anchorEl: null })}
+                              onClose={clearPopoverEl}
                               anchorOrigin={{
                                 vertical: 'top',
                                 horizontal: 'left'
@@ -444,6 +478,8 @@ function AssignmentTable (props) {
                                 horizontal: 'left'
                               }}
                               disableRestoreFocus
+                              disableAutoFocus
+                              disableEnforceFocus
                             >
                               <PopupMessage a={a} assignmentGroups={assignmentGroups} />
                             </Popover>
@@ -469,8 +505,9 @@ function AssignmentTable (props) {
             </TableBody>
           </MTable>
         </TableContainer>
-      </div>
-    </RootRef>
+      </RootRef>
+      {assignments.length > 0 && filteredAssignments.length === 0 && <AlertBanner>No assignments match your filter selections.</AlertBanner>}
+    </div>
   )
 }
 

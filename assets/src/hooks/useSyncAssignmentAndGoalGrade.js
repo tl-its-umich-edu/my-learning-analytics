@@ -9,7 +9,8 @@ const useSyncAssignmentAndGoalGrade =
     assignments,
     goalGrade,
     setAssignments,
-    setUserSetting
+    setUserSetting,
+    eventLog
   }) => {
     const assignmentInputBlurChange = assignments
       .map(a => a.inputBlur).every(Boolean)
@@ -30,10 +31,16 @@ const useSyncAssignmentAndGoalGrade =
           }
         ))
 
-      setUserSetting({
-        goalGrade,
-        assignments: assignmentsSetByUser
-      })
+      const userSetting = () => {
+        const setting = {
+          goalGrade,
+          assignments: assignmentsSetByUser,
+          event: eventLog.eLog
+        }
+        return setting
+      }
+
+      setUserSetting(userSetting)
 
       if (goalGrade !== '') {
         setAssignments(

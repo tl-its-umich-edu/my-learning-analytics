@@ -61,14 +61,14 @@ Then you can edit your files! (Probably in /code/dashboard)
 
     `docker exec student_dashboard pkill -HUP gunicorn`
 
-3. VsCode is supported via PTVSD for debugging the code running in Docker. See this information here for details https://code.visualstudio.com/docs/python/debugging#_remote-debugging
+3. VsCode is supported via DEBUGPY (Formerly PTVSD) for debugging the code running in Docker. See this information here for details https://code.visualstudio.com/docs/python/debugging#_remote-debugging
 
-    A few variables are available to be defined in the .env file to enable this but minimally you have to set PTVSD_ENABLE=True. Currently docker-compose.yml opens 2 ports that can be used current, 3000 and 3001. If you need more you can open them. You can configure these with other variables. See the .env.sample for examples.
+    A few variables are available to be defined in the .env file to enable this but minimally you have to set DEBUGPY_ENABLE=True. Currently docker-compose.yml opens 2 ports that can be used current, 3000 and 3001. If you need more you can open them. You can configure these with other variables. See the .env.sample for examples.
 
     If you want to connect to the cron job you'll have to use a different port as Django uses 3000 by default and also wait for attach.
 
     Set your breakpoints then run this command in the docker instance! Then connect to the cron configuration. The job will start when you attach the debugger.
-    `docker exec -it student_dashboard /bin/bash -c "PTVSD_WAIT_FOR_ATTACH=True PTVSD_ENABLE=TRUE PTVSD_REMOTE_PORT=3001 ./manage_ptvsd.py runcrons --force"`
+    `docker exec -it student_dashboard /bin/bash -c "DEBUGPY_WAIT_FOR_ATTACH=True DEBUGPY_ENABLE=TRUE DEBUGPY_REMOTE_PORT=3001 ./manage_debugpy.py runcrons --force"`
 
 ## Code Review
 All contributions will be code reviewed and you may need to make some changes to your contribution. We really appreciate tests as well, so if at all possible please try to add tests.

@@ -249,7 +249,7 @@ class DashboardCronJob(CronJobBase):
         # BQ Total Bytes Billed to report to status
         total_bytes_billed = 0
 
-        data_last_updated = Course.objects.filter(id__in=self.valid_locked_course_ids).get_data_last_updated()
+        data_last_updated = Course.objects.filter(id__in=self.valid_locked_course_ids).get_data_earliest_date()
 
         logger.info(f"Deleting all records in resource_access after {data_last_updated}")
 
