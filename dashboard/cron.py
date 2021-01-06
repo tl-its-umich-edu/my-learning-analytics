@@ -289,10 +289,10 @@ class DashboardCronJob(CronJobBase):
             job_config.query_parameters = query_params
 
             # Location must match that of the dataset(s) referenced in the query.
-            bq_query = bigquery_client.query(final_bq_query, location='US', job_config=job_config)
-
-            resource_access_df: pd.DataFrame = bq_query.to_dataframe()
-            total_bytes_billed += bq_query.total_bytes_billed
+            bq_job = bigquery_client.query(final_bq_query, location='US', job_config=job_config)
+            # This is the call that could result in an exception
+            resource_access_df: pd.DataFrame = bq_job.result().to_dataframe()
+            total_bytes_billed += bq_job.total_bytes_billed
 
             resource_access_row_count = len(resource_access_df)
             if resource_access_row_count == 0:
@@ -598,8 +598,8 @@ class DashboardCronJob(CronJobBase):
 
         status = ""
 
-        run_start = datetime.now()
-        status += f"Start cron: {str(run_start)}\n"
+        run_start = datetime.now(pytz.UTC)
+        status += f"Start cron: {str(run_start)} UTC\n"
 
         course_verification = self.verify_course_ids()
         invalid_course_id_list = course_verification.invalid_course_ids
@@ -624,6 +624,8 @@ class DashboardCronJob(CronJobBase):
             logger.info("Skipping course-related table updates...")
             status += "Skipped course-related table updates.\n"
         else:
+            # Update the date unless there is an exception
+            exception_in_run = False
             logger.info("** course")
             status += self.update_course(course_verification.course_data)
 
@@ -642,7 +644,9 @@ class DashboardCronJob(CronJobBase):
                     status += self.update_with_bq_access()
                     status += self.update_canvas_resource()
                 except Exception as e:
-                    logger.exception("Exception running BigQuery update")
+                    logger.error(f"Exception running BigQuery update: {str(e)}")
+                    status += str(e)
+                    exception_in_run = True
 
         if settings.DATA_WAREHOUSE_IS_UNIZIN:
             logger.info("** informational")
@@ -654,7 +658,11 @@ class DashboardCronJob(CronJobBase):
             logger.warning(f'No data was pulled for these courses.')
         
         # Set all of the courses to have been updated now (this is the same set update_course runs on)
-        Course.objects.filter(id__in=self.valid_locked_course_ids).update(data_last_updated=datetime.now(pytz.UTC))
+        if not exception_in_run:
+            logger.info(f"Updating all valid courses from when this run was started at {run_start}")
+            Course.objects.filter(id__in=self.valid_locked_course_ids).update(data_last_updated=run_start)
+        else:
+            logger.warn("data_last_updated not updated because of an Exception during this run")
 
         status += "End cron: " +  str(datetime.now()) + "\n"
 
