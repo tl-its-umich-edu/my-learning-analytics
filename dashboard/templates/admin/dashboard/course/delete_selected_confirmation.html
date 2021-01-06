@@ -1,0 +1,45 @@
+<!-- Copied from the following URL and modified:
+    https://github.com/django/django/blob/stable/3.0.x/django/contrib/admin/templates/admin/delete_selected_confirmation.html
+-->
+
+
+{% extends "admin/delete_selected_confirmation.html" %}
+{% load i18n l10n admin_urls %}
+
+{% block content %}
+{% if perms_lacking %}
+    <p>{% blocktrans %}Deleting the selected {{ objects_name }} would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktrans %}</p>
+    <ul>
+    {% for obj in perms_lacking %}
+        <li>{{ obj }}</li>
+    {% endfor %}
+    </ul>
+{% elif protected %}
+    <p>{% blocktrans %}Deleting the selected {{ objects_name }} would require deleting the following protected related objects:{% endblocktrans %}</p>
+    <ul>
+    {% for obj in protected %}
+        <li>{{ obj }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>{% blocktrans %}Are you sure you want to delete the selected {{ objects_name }}? Below are a list of the selected {{ objects_name }} and a summary of the related items that will be deleted:{% endblocktrans %}</p>
+    <h2>{{ objects_name }} Selected</h2>
+    <ul>
+        {% for obj in queryset %}
+        <li>{{ obj.name }} (ID: {{ obj.id }})</li>
+        {% endfor %}
+    </ul>
+    {% include "admin/includes/object_delete_summary.html" %}
+    <form method="post">{% csrf_token %}
+    <div>
+    {% for obj in queryset %}
+    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}">
+    {% endfor %}
+    <input type="hidden" name="action" value="delete_selected">
+    <input type="hidden" name="post" value="yes">
+    <input type="submit" value="{% trans 'Yes, I’m sure' %}">
+    <a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
+    </div>
+    </form>
+{% endif %}
+{% endblock %}
