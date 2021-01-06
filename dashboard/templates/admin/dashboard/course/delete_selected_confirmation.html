@@ -22,8 +22,8 @@
     {% endfor %}
     </ul>
 {% else %}
-    <p>{% blocktrans %}Are you sure you want to delete the selected {{ objects_name }}? Below is a summary of the objects and related items that will be deleted:{% endblocktrans %}</p>
-    <h2>{{ objects_name}} Selected</h2>
+    <p>{% blocktrans %}Are you sure you want to delete the selected {{ objects_name }}? Below are a list of the selected {{ objects_name }} and a summary of the related items that will be deleted:{% endblocktrans %}</p>
+    <h2>{{ objects_name }} Selected</h2>
     <ul>
         {% for obj in queryset %}
         <li>{{ obj.name }} (ID: {{ obj.id }})</li>
