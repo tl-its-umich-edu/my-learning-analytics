@@ -172,7 +172,8 @@ class DashboardCronJob(CronJobBase):
                          enroll_data as (select id as enroll_id, user_id, type from enrollment_dim where course_id='{data_warehouse_course_id}'
                                          and type in ('StudentEnrollment', 'TaEnrollment', 'TeacherEnrollment') and workflow_state= 'active'),
                          user_info as (select p.unique_name,p.sis_user_id, u.name, u.id as user_id, u.global_canvas_id
-                                        from pseudonym_dim p join user_dim u on u.id = p.user_id where p.sis_user_id is not null),
+                                        from (SELECT ROW_NUMBER() OVER (PARTITION BY user_id order by sis_user_id asc) AS row_number, * FROM pseudonym_dim) as p
+                                        join user_dim u on u.id = p.user_id WHERE row_number = 1),
                          user_enroll as (select u.unique_name, u.sis_user_id, u.name, u.user_id, e.enroll_id,
                                          u.global_canvas_id, e.type from enroll_data e join user_info u on e.user_id= u.user_id),
                          course_fact as (select enrollment_id, current_score, final_score from course_score_fact
