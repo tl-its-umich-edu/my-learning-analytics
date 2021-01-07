@@ -16,6 +16,7 @@ services:
   web:
     build:
       context: .
+      dockerfile: dockerfiles/Dockerfile
       args:
         TZ: ${TZ}
     command: bash -c "./start.sh"
