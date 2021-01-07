@@ -12,6 +12,6 @@ into the openshift image stream then configure your build YAML to use the follow
 ```
   strategy:
     dockerStrategy:
-      dockerfilePath: dockerfilesDockerfile.openshift
+      dockerfilePath: dockerfiles/Dockerfile.openshift
     type: Docker
 ```
