@@ -43,6 +43,7 @@ services:
   webpack_watcher:
     build:
       context: .
+      dockerfile: dockerfiles/Dockerfile
       target: node-webpack
     command: sh -c "tar zxvf node_modules/all_symlinks.tgz && npm run watch"
     volumes:
