@@ -9,7 +9,7 @@ The Dockerfile(s) for the build are in this directory.
 If you're using Openshift you'll want to put both python and node into 
 into the openshift image stream then configure your build YAML to use the following `strategy` block:
 
-``
+```
   strategy:
     dockerStrategy:
       dockerfilePath: dockerfilesDockerfile.openshift
