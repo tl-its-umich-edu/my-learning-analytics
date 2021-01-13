@@ -43,7 +43,6 @@ function DashboardAppBar (props) {
   const {
     classes,
     onMenuBarClick,
-    onSurveyButtonClick,
     user,
     courseId,
     courseName

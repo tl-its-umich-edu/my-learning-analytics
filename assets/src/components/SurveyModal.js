@@ -56,19 +56,13 @@ export default function SurveyModal(props) {
   const [modalStyle] = React.useState(getModalStyle);
   const [open, setOpen] = React.useState(false);
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const toggleOpen = () => setOpen(!open)
 
   const body = (
     <div style={modalStyle} className={classes.paper}>
       <DialogTitle disableTypography className={classes.dialogTitle}>
         <h4 id="survey-modal-title">Take the My Learning Analytics Survey</h4>
-        <IconButton onClick={handleClose}>
+        <IconButton onClick={toggleOpen}>
             <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -83,10 +77,10 @@ export default function SurveyModal(props) {
 
   return (
     <div>
-      <Button variant="contained" color="secondary" onClick={handleOpen}>Take Survey</Button>
+      <Button variant="contained" color="secondary" onClick={toggleOpen}>Take Survey</Button>
       <Modal
         open={open}
-        onClose={handleClose}
+        onClose={toggleOpen}
         aria-labelledby="survey-modal-title"
         aria-describedby="survey-modal-description"
       >

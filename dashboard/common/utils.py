@@ -95,7 +95,7 @@ def get_myla_globals(request):
             'ap': settings.URL_VIEW_ASSIGNMENT_PLANNING,
             'gd': settings.URL_VIEW_GRADE_DISTRIBUTION,
             'home': settings.HELP_URL
-        },      
+        },
         "survey_url": config.SURVEY_URL
     }
     return myla_globals
