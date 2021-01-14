@@ -52,13 +52,14 @@ while ! nc -z "${MYSQL_HOST}" "${MYSQL_PORT}"; do
   sleep 1 # wait 1 second before check again
 done
 
-echo "Setting Git info variables"
-GIT_REPO="$(git config --local remote.origin.url)"
-export GIT_REPO
-GIT_COMMIT="$(git rev-parse HEAD)"
-export GIT_COMMIT
-GIT_BRANCH="$(git name-rev "$GIT_COMMIT" --name-only)"
-export GIT_BRANCH
+if [ -d .git ]; then
+  GIT_REPO="$(git config --local remote.origin.url)"
+  export GIT_REPO
+  GIT_COMMIT="$(git rev-parse HEAD)"
+  export GIT_COMMIT
+  GIT_BRANCH="$(git name-rev "$GIT_COMMIT" --name-only)"
+  export GIT_BRANCH
+fi;
 
 echo Running python startups
 python manage.py migrate
