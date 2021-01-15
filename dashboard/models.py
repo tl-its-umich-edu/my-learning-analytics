@@ -37,8 +37,10 @@ class AcademicTerms(models.Model):
 
     # # Replace the year in the end date with start date (Hack to get around far out years)
     # # This should be replaced in the future via an API call so the terms have correct end years, or Canvas data adjusted
-    def get_correct_date_end(self):
-        if self.date_start is not None and (self.date_end.year - self.date_start.year) > 1:
+    def get_correct_date_end(self) -> models.DateTimeField:
+        if (self.date_end is not None 
+            and self.date_start is not None 
+            and (self.date_end.year - self.date_start.year) > 1):
             logger.info(f'{self.date_end.year} - {self.date_start.year} greater than 1 so setting end year to match start year.')
             return self.date_end.replace(year=self.date_start.year)
         else:
