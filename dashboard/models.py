@@ -180,9 +180,12 @@ class CourseQuerySet(models.QuerySet):
         new_courses = self.filter(data_last_updated__isnull=True)
         existing_courses = self.filter(data_last_updated__isnull=False)
 
-        earliest_data_last_updated = existing_courses.earliest("data_last_updated").data_last_updated
-        # If there are new courses (courses with no last run) return the earliest time of all
+        earliest_data_last_updated = None
+        if len(existing_courses) > 0:
+            earliest_data_last_updated = existing_courses.earliest("data_last_updated").data_last_updated
+
         earliest_start_datetime = None
+        # If there are new courses (courses with no last run) return the earliest time of all
         if len(new_courses) > 0:
             earliest_start_datetime = new_courses.earliest_start_datetime()
 

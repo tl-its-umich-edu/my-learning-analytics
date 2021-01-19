@@ -235,20 +235,20 @@ class DashboardCronJob(CronJobBase):
                 status += f"Row {row.id} removed as it is not available\n"
         return status
 
-    # update RESOURCE_ACCESS records from BigQuery
-    def update_with_bq_access(self):
-
+    # update RESOURCE_ACCESS records from BigQuery or LRS data sources
+    def update_resource_access(self):
         # cron status
         status = ""
 
         # return string with concatenated SQL insert result
         return_string = ""
 
-        # Instantiates a client
-        bigquery_client = bigquery.Client()
+        if settings.LRS_IS_BIGQUERY:
+            # Instantiates a client
+            bigquery_client = bigquery.Client()
 
-        # BQ Total Bytes Billed to report to status
-        total_bytes_billed = 0
+            # BQ Total Bytes Billed to report to status
+            total_bytes_billed = 0
 
         data_last_updated = Course.objects.filter(id__in=self.valid_locked_course_ids).get_data_earliest_date()
 
@@ -261,39 +261,54 @@ class DashboardCronJob(CronJobBase):
             # query to retrieve all file access events for one course
             # There is no catch if this query fails, event_store.events needs to exist
 
-            final_bq_query = []
+            final_query = []
             for k, query_obj in settings.RESOURCE_ACCESS_CONFIG.items():
                 # concatenate the multi-line presentation of query into one single string
                 query = " ".join(query_obj['query'])
 
                 if (data_last_updated is not None):
                     # insert the start time parameter for query
-                    query += " and event_time > @data_last_updated"
+                    if query_obj.get('query_data_last_updated_condition'):
+                        query += f" {query_obj['query_data_last_updated_condition']} "
+                    elif settings.LRS_IS_BIGQUERY:
+                        query += " and event_time > @data_last_updated "
 
-                final_bq_query.append(query)
-            final_bq_query = "  UNION ALL   ".join(final_bq_query)
+                final_query.append(query)
+            final_query = "  UNION ALL   ".join(final_query)
 
             data_warehouse_course_ids_short = [db_util.incremented_id_to_canvas_id(id) for id in data_warehouse_course_ids]
 
-            logger.debug(final_bq_query)
+            logger.debug(final_query)
             logger.debug(data_warehouse_course_ids)
-            query_params = [
-                bigquery.ArrayQueryParameter('course_ids', 'STRING', data_warehouse_course_ids),
-                bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
-                bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT)
-            ]
-            if (data_last_updated is not None):
-                # insert the start time parameter for query
-                query_params.append(bigquery.ScalarQueryParameter('data_last_updated', 'TIMESTAMP', data_last_updated))
 
-            job_config = bigquery.QueryJobConfig()
-            job_config.query_parameters = query_params
+            if settings.LRS_IS_BIGQUERY:
+                query_params = [
+                    bigquery.ArrayQueryParameter('course_ids', 'STRING', data_warehouse_course_ids),
+                    bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
+                    bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT)
+                ]
+                if (data_last_updated is not None):
+                    # insert the start time parameter for query
+                    query_params.append(bigquery.ScalarQueryParameter('data_last_updated', 'TIMESTAMP', data_last_updated))
 
-            # Location must match that of the dataset(s) referenced in the query.
-            bq_job = bigquery_client.query(final_bq_query, location='US', job_config=job_config)
-            # This is the call that could result in an exception
-            resource_access_df: pd.DataFrame = bq_job.result().to_dataframe()
-            total_bytes_billed += bq_job.total_bytes_billed
+                job_config = bigquery.QueryJobConfig()
+                job_config.query_parameters = query_params
+
+                # Location must match that of the dataset(s) referenced in the query.
+                bq_job = bigquery_client.query(final_query, location='US', job_config=job_config)
+                # This is the call that could result in an exception
+                resource_access_df: pd.DataFrame = bq_job.result().to_dataframe()
+                total_bytes_billed += bq_job.total_bytes_billed
+            else:
+                query_params = {
+                    'course_ids': data_warehouse_course_ids,
+                    'course_ids_short': data_warehouse_course_ids_short,
+                    'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT,
+                }
+                if (data_last_updated is not None):
+                    query_params['data_last_updated'] = data_last_updated
+
+                resource_access_df = pd.read_sql(final_query, conns['LRS'], params=query_params)
 
             resource_access_row_count = len(resource_access_df)
             if resource_access_row_count == 0:
@@ -418,11 +433,12 @@ class DashboardCronJob(CronJobBase):
                 map(repr, data_warehouse_course_ids)) + ']\n'
             logger.info(return_string)
 
-        total_tbytes_billed = total_bytes_billed / 1024 / 1024 / 1024 / 1024
-        # $5 per TB as of Feb 2019 https://cloud.google.com/bigquery/pricing
-        total_tbytes_price = round(5 * total_tbytes_billed, 2)
-        status += (f'TBytes billed for BQ: {total_tbytes_billed} = '
-                   f'${total_tbytes_price}\n')
+        if settings.LRS_IS_BIGQUERY:
+            total_tbytes_billed = total_bytes_billed / 1024 / 1024 / 1024 / 1024
+            # $5 per TB as of Feb 2019 https://cloud.google.com/bigquery/pricing
+            total_tbytes_price = round(5 * total_tbytes_billed, 2)
+            status += (f'TBytes billed for BQ: {total_tbytes_billed} = '
+                    f'${total_tbytes_price}\n')
         return status
 
 
@@ -642,7 +658,7 @@ class DashboardCronJob(CronJobBase):
             logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
                 try:
-                    status += self.update_with_bq_access()
+                    status += self.update_resource_access()
                     status += self.update_canvas_resource()
                 except Exception as e:
                     logger.error(f"Exception running BigQuery update: {str(e)}")
@@ -657,7 +673,7 @@ class DashboardCronJob(CronJobBase):
         if courses_added_during_cron:
             logger.warning(f'During the run, users added {len(courses_added_during_cron)} course(s): {courses_added_during_cron}')
             logger.warning(f'No data was pulled for these courses.')
-        
+
         # Set all of the courses to have been updated now (this is the same set update_course runs on)
         if not exception_in_run:
             logger.info(f"Updating all valid courses from when this run was started at {run_start}")
