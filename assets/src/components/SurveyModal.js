@@ -67,11 +67,11 @@ export default function SurveyModal (props) {
         </IconButton>
       </DialogTitle>
 
-      <p id='survey-modal-description'>
+      <div id='survey-modal-description'>
         <div className={classes.iframeContainer}>
           <iframe className={classes.iframe} src={props.surveyURL} height='600px' width='400px' />
         </div>
-      </p>
+      </div>
     </div>
   )
 
