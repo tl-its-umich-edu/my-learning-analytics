@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import DialogTitle from '@material-ui/core/DialogTitle'
@@ -53,8 +53,8 @@ const useStyles = makeStyles((theme) => ({
 export default function SurveyModal (props) {
   const classes = useStyles()
   // getModalStyle is not a pure function, we roll the style only on the first render
-  const [modalStyle] = React.useState(getModalStyle)
-  const [open, setOpen] = React.useState(false)
+  const [modalStyle] = useState(getModalStyle)
+  const [open, setOpen] = useState(false)
 
   const toggleOpen = () => setOpen(!open)
 
