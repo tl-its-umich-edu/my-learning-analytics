@@ -71,9 +71,7 @@ function DashboardAppBar (props) {
           </Link>
           <div className={classes.grow} />
           {
-            surveyURL
-              ? <SurveyModal surveyURL={surveyURL} />
-              : null
+            surveyURL && <SurveyModal surveyURL={surveyURL} />
           }
           <IconButton
             aria-owns={avatarOpen ? 'simple-popper' : undefined}
