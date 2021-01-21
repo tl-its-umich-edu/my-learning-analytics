@@ -6,18 +6,12 @@ import IconButton from '@material-ui/core/IconButton'
 import Modal from '@material-ui/core/Modal'
 import CloseIcon from '@material-ui/icons/Close'
 
-const top = 10
-const left = 50
-
-function getModalStyle () {
-  return {
-    top: `${top}%`,
-    left: `${left}%`,
-    transform: `translate(-${left}%)`
-  }
-}
-
 const useStyles = makeStyles((theme) => ({
+  modal: {
+    top: '10%',
+    left: '50%',
+    transform: 'translate(-50%)'
+  },
   paper: {
     position: 'absolute',
     width: 400,
@@ -52,14 +46,12 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SurveyModal (props) {
   const classes = useStyles()
-  // getModalStyle is not a pure function, we roll the style only on the first render
-  const [modalStyle] = useState(getModalStyle)
   const [open, setOpen] = useState(false)
 
   const toggleOpen = () => setOpen(!open)
 
   const body = (
-    <div style={modalStyle} className={classes.paper}>
+    <div className={`${classes.paper} ${classes.modal}`}>
       <DialogTitle disableTypography className={classes.dialogTitle}>
         <h4 id='survey-modal-title'>Take the My Learning Analytics Survey</h4>
         <IconButton onClick={toggleOpen}>
