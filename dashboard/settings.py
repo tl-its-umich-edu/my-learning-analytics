@@ -120,6 +120,8 @@ INSTALLED_APPS = [
     'webpack_loader',
     'rules.apps.AutodiscoverRulesConfig',
     'django_mysql',
+    'constance',
+    'constance.backends.database',
 ]
 
 # The order of this MIDDLEWARE is important 
@@ -483,6 +485,12 @@ if ENABLE_BACKEND_LOGIN or STUDENT_DASHBOARD_LTI:
     AUTHENTICATION_BACKENDS += (
         'django.contrib.auth.backends.ModelBackend',
     )
+
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+
+CONSTANCE_CONFIG = {
+    'SURVEY_URL': ('', 'URL To qualtrics survey', str),
+}
 
 # IMPORT LOCAL ENV
 # =====================

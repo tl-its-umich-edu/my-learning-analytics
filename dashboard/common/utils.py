@@ -2,6 +2,7 @@ import logging, os, re
 from typing import Union
 
 from django.conf import settings
+from constance import config
 
 from dashboard.common import db_util
 from dashboard.models import Course, ResourceAccess
@@ -94,7 +95,7 @@ def get_myla_globals(request):
             'ap': settings.URL_VIEW_ASSIGNMENT_PLANNING,
             'gd': settings.URL_VIEW_GRADE_DISTRIBUTION,
             'home': settings.HELP_URL
-        }      
-
+        },
+        "survey_url": config.SURVEY_URL
     }
     return myla_globals

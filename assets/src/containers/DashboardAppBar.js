@@ -8,6 +8,8 @@ import MenuIcon from '@material-ui/icons/Menu'
 import Avatar from '@material-ui/core/Avatar'
 import Popover from '@material-ui/core/Popover'
 import AvatarModal from '../components/AvatarModal'
+import SurveyModal from '../components/SurveyModal'
+import { surveyURL } from '../globals'
 
 const styles = theme => ({
   root: {
@@ -68,6 +70,9 @@ function DashboardAppBar (props) {
             {courseName}
           </Link>
           <div className={classes.grow} />
+          {
+            surveyURL && <SurveyModal surveyURL={surveyURL} />
+          }
           <IconButton
             aria-owns={avatarOpen ? 'simple-popper' : undefined}
             onClick={event => setAvatarEl(event.currentTarget)}
