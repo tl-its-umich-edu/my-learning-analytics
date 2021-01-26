@@ -196,35 +196,47 @@ WSGI_APPLICATION = 'dashboard.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': ENV.get('MYSQL_ENGINE', 'django.db.backends.mysql'),
-        'NAME': ENV.get('MYSQL_DATABASE', 'student_dashboard'),  # your mysql database name
-        'USER': ENV.get('MYSQL_USER', 'student_dashboard_user'), # your mysql user for the database
-        'PASSWORD': ENV.get('MYSQL_PASSWORD', 'student_dashboard_password'), # password for user
-        'HOST': ENV.get('MYSQL_HOST', 'localhost'),
-        'PORT': ENV.get('MYSQL_PORT', 3306),
-        'OPTIONS': {'charset': 'utf8mb4'},
+        **{
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'student_dashboard',
+            'USER': 'student_dashboard_user',
+            'PASSWORD': 'student_dashboard_password',
+            'HOST': 'localhost',
+            'PORT': 3306,
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+            },
+        },
+        **ENV.get('MYSQL', {})
     },
     'DATA_WAREHOUSE': {
-        'ENGINE': ENV.get('DATA_WAREHOUSE_ENGINE', 'django.db.backends.postgresql'),
-        'NAME': ENV.get('DATA_WAREHOUSE_DATABASE', ''),
-        'USER': ENV.get('DATA_WAREHOUSE_USER', ''),
-        'PASSWORD': ENV.get('DATA_WAREHOUSE_PASSWORD', ''),
-        'HOST': ENV.get('DATA_WAREHOUSE_HOST', ''),
-        'PORT': ENV.get('DATA_WAREHOUSE_PORT', 5432),
+        **{
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': '',
+            'USER': '',
+            'PASSWORD': '',
+            'HOST': '',
+            'PORT': 5432,
+            'OPTIONS': {},
+            'IS_UNIZIN': True
+        },
+        **ENV.get('DATA_WAREHOUSE', {})
     },
 }
-
 # optionally set LRS data source
-LRS_IS_BIGQUERY = ENV.get('LRS_ENGINE', 'google.cloud.bigquery') == 'google.cloud.bigquery'
+LRS_IS_BIGQUERY = ENV.get('LRS', {}).get('ENGINE', 'google.cloud.bigquery') == 'google.cloud.bigquery'
 if not LRS_IS_BIGQUERY:
     DATABASES['LRS'] = {
-        'ENGINE': ENV.get('LRS_ENGINE', ''),
-        'NAME': ENV.get('LRS_DATABASE', ''),
-        'USER': ENV.get('LRS_USER', ''),
-        'PASSWORD': ENV.get('LRS_PASSWORD', ''),
-        'HOST': ENV.get('LRS_HOST', ''),
-        'PORT': ENV.get('LRS_PORT', 5432),
-        'OPTIONS': ENV.get('LRS_OPTIONS', {}),
+        **{
+            'ENGINE': '',
+            'NAME': '',
+            'USER': '',
+            'PASSWORD': '',
+            'HOST': '',
+            'PORT': 5432,
+            'OPTIONS': {},
+        },
+        **ENV.get('LRS', {})
     }
 
 # Internationalization
@@ -429,9 +441,6 @@ if STUDENT_DASHBOARD_LTI:
     LTI_CONFIG = ENV.get('LTI_CONFIG', {})
     LTI_CONFIG_TEMPLATE_PATH = ENV.get('LTI_CONFIG_TEMPLATE_PATH')
     LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION = ENV.get('LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION', False)
-
-# controls whether Unizin specific features/data is available from the Canvas Data source
-DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)
 
 # This is used to fix ids from Canvas Data which are incremented by some large number
 CANVAS_DATA_ID_INCREMENT = ENV.get("CANVAS_DATA_ID_INCREMENT", 17700000000000000)

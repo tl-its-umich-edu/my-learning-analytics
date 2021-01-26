@@ -665,7 +665,7 @@ class DashboardCronJob(CronJobBase):
                     status += str(e)
                     exception_in_run = True
 
-        if settings.DATA_WAREHOUSE_IS_UNIZIN:
+        if settings.DATABASES.get('DATA_WAREHOUSE', {}).get('IS_UNIZIN'):
             logger.info("** informational")
             status += self.update_unizin_metadata()
 
