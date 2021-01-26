@@ -30,6 +30,10 @@ const isOutOfRange = (data, checkPointData) => {
 
 const sum = arr => arr.reduce((acc, cur) => (acc += cur), 0)
 
+// Use decimal place of pointsPossible if it's a decimal; otherwise, round to nearest tenth
+const placeToRoundTo = pointsPossible => (String(pointsPossible).includes('.'))
+  ? getDecimalPlaceOfFloat(pointsPossible) : 1
+
 export {
   average,
   getDecimalPlaceOfFloat,
@@ -37,5 +41,6 @@ export {
   roundToXDecimals,
   sum,
   isInRange,
-  isOutOfRange
+  isOutOfRange,
+  placeToRoundTo
 }

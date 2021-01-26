@@ -5,6 +5,7 @@ import Button from '@material-ui/core/Button'
 import StyledTextField from './StyledTextField'
 import debounce from 'lodash.debounce'
 import { eventLogExtra } from '../util/object'
+import useDebounce from '../hooks/useDebounce'
 
 const styles = ({
   goalGradeInput: {

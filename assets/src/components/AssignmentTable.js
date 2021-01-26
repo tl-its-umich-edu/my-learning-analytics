@@ -30,6 +30,7 @@ import usePopoverEl from '../hooks/usePopoverEl'
 import { calculateWeekOffset } from '../util/date'
 import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
 import { assignmentStatus } from '../util/assignment'
+import DebouncedGoalInput from './DebouncedGoalInput'
 
 const headerHeight = 105
 
@@ -102,7 +103,7 @@ const styles = theme => ({
   }
 })
 
-function AssignmentTable (props) {
+function AssignmentTable(props) {
   const {
     classes,
     courseGoalGradeSet,
@@ -173,10 +174,6 @@ function AssignmentTable (props) {
       ? filteredAssignments[key - 1].dueDateMonthDay === dueDateMonthDay
       : false
   }
-
-  // Use decimal place of pointsPossible if it's a decimal; otherwise, round to nearest tenth
-  const placeToRoundTo = pointsPossible => (String(pointsPossible).includes('.'))
-    ? getDecimalPlaceOfFloat(pointsPossible) : 1
 
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
@@ -411,25 +408,12 @@ function AssignmentTable (props) {
                             a.graded || a.outOf === 0
                               ? <div className={classes.possiblePointsText}>{a.outOf === 0 ? '0' : `${a.currentUserSubmission.score}`}</div>
                               : (
-                                <StyledTextField
-                                  error={(a.goalGrade / a.pointsPossible) > 1}
+                                <DebouncedGoalInput
+                                  id={a.id}
                                   disabled={!courseGoalGradeSet}
-                                  id='standard-number'
-                                  value={roundToXDecimals(a.goalGrade, placeToRoundTo(a.pointsPossible))}
-                                  label={
-                                    !courseGoalGradeSet ? 'Set a goal'
-                                      : (a.goalGrade / a.pointsPossible) > 1
-                                        ? 'Over 100%'
-                                        : 'Set a goal'
-                                  }
-                                  onChange={event => {
-                                    const assignmentGoalGrade = event.target.value
-                                    handleAssignmentGoalGrade(a.id, assignmentGoalGrade, a.goalGrade)
-                                  }}
-                                  type='number'
-                                  className={classes.goalGradeInput}
-                                  onFocus={() => handleInputFocus(a.id)}
-                                  onBlur={() => handleInputBlur(a.id)}
+                                  goalGrade={a.goalGrade}
+                                  pointsPossible={a.pointsPossible}
+                                  handleAssignmentGoalGrade={handleAssignmentGoalGrade}
                                 />
                               )
                           }
@@ -454,11 +438,11 @@ function AssignmentTable (props) {
                                   ? [{ color: 'green', value: a.goalGrade, draggable: true }]
                                   : []
                               }
-                              description={`This assignment is worth ${a.percentOfFinalGrade}% of your grade.  
+                              description={`This assignment is worth ${a.percentOfFinalGrade}% of your grade.
                               Points possible: ${a.pointsPossible}.
-                              Your goal: ${(a.goalGrade ? a.goalGrade : 'None')}.  
-                              Your grade: ${(a.grade ? a.grade : 'Not graded')}.  
-                              Class average: ${a.averageGrade}.  
+                              Your goal: ${(a.goalGrade ? a.goalGrade : 'None')}.
+                              Your grade: ${(a.grade ? a.grade : 'Not graded')}.
+                              Class average: ${a.averageGrade}.
                               Rules: ${(a.rules ? a.rules : 'There are no rules for this assignment')}.  `}
                               onBarFocus={el => setPopoverEl(key, el)}
                               onBarBlur={clearPopoverEl}
