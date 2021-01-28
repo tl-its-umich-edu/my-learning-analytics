@@ -124,7 +124,7 @@ INSTALLED_APPS = [
     'constance.backends.database',
 ]
 
-# The order of this MIDDLEWARE is important 
+# The order of this MIDDLEWARE is important
 MIDDLEWARE = [
     'dashboard.middleware.samesite.SameSiteMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -211,8 +211,21 @@ DATABASES = {
         'PASSWORD': ENV.get('DATA_WAREHOUSE_PASSWORD', ''),
         'HOST': ENV.get('DATA_WAREHOUSE_HOST', ''),
         'PORT': ENV.get('DATA_WAREHOUSE_PORT', 5432),
-    }
+    },
 }
+
+# optionally set LRS data source
+LRS_IS_BIGQUERY = ENV.get('LRS_ENGINE', 'google.cloud.bigquery') == 'google.cloud.bigquery'
+if not LRS_IS_BIGQUERY:
+    DATABASES['LRS'] = {
+        'ENGINE': ENV.get('LRS_ENGINE', ''),
+        'NAME': ENV.get('LRS_DATABASE', ''),
+        'USER': ENV.get('LRS_USER', ''),
+        'PASSWORD': ENV.get('LRS_PASSWORD', ''),
+        'HOST': ENV.get('LRS_HOST', ''),
+        'PORT': ENV.get('LRS_PORT', 5432),
+        'OPTIONS': ENV.get('LRS_OPTIONS', {}),
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -462,7 +475,7 @@ if "CSP" in ENV:
 else:
     MIDDLEWARE += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
 
-# These are mostly needed by Canvas but it should also be in on general 
+# These are mostly needed by Canvas but it should also be in on general
 CSRF_COOKIE_SECURE = ENV.get("CSRF_COOKIE_SECURE", False)
 if CSRF_COOKIE_SECURE:
     CSRF_TRUSTED_ORIGINS = ENV.get("CSRF_TRUSTED_ORIGINS", [])
@@ -474,7 +487,7 @@ if CSRF_COOKIE_SECURE:
 SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", None)
 CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", None)
 
-CHECK_ENABLE_BACKEND_LOGIN = False if STUDENT_DASHBOARD_SAML or STUDENT_DASHBOARD_LTI else True 
+CHECK_ENABLE_BACKEND_LOGIN = False if STUDENT_DASHBOARD_SAML or STUDENT_DASHBOARD_LTI else True
 
 # Allow for ENABLE_BACKEND_LOGIN override
 ENABLE_BACKEND_LOGIN = ENV.get("ENABLE_BACKEND_LOGIN", CHECK_ENABLE_BACKEND_LOGIN)
