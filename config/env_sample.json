@@ -93,7 +93,7 @@
     "/*  LTI is disabled by default": "*/",
     "STUDENT_DASHBOARD_LTI": false,
     "/*  LTI 1.3 configuration":"*/",
-    "/*  The first key of LTI_CONFIG is your environment specific Canvas url and not domain specific":"*/",
+    "/*  The first key of LTI_CONFIG is the Canvas URL (production, beta, or test)":"*/",
     "LTI_CONFIG": {
         "https://canvas.instructure.com": [
             {
