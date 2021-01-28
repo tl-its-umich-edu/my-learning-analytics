@@ -35,6 +35,13 @@ TA = 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssis
 COURSE_MEMBERSHIP = 'http://purl.imsglobal.org/vocab/lis/v2/membership'
 DUMMY_CACHE = 'DummyCache'
 
+# do not require deployment ids if LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION is true
+class ExtendedDjangoMessageLaunch(DjangoMessageLaunch):
+    def validate_deployment(self):
+        if settings.LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION:
+            return self
+
+        return super().validate_deployment()
 
 def lti_error(error_message: Any) -> JsonResponse:
     """
@@ -269,7 +276,7 @@ def launch(request):
     if not is_config_valid(config):
         return lti_error(config)
     CacheConfig = get_cache_config()
-    message_launch = DjangoMessageLaunch(request, config, launch_data_storage=CacheConfig.launch_data_storage)
+    message_launch = ExtendedDjangoMessageLaunch(request, config, launch_data_storage=CacheConfig.launch_data_storage)
     if not CacheConfig.is_dummy_cache:
         # fetch platform's public key from cache instead of calling the API will speed up the launch process
         message_launch.set_public_key_caching(CacheConfig.launch_data_storage,

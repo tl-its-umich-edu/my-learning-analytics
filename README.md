@@ -91,6 +91,7 @@ Other colors from the user interface are currently fixed and included in version
 
 * You also need to configure CSP value in the environment, specifically the `FRAME_SRC.` (See next section) In addition you need to ensure you are using https and `CSRF_COOKIE_SECURE` is true with your domain (or instructure.com) in trusted origins.
 
+* You may optionally disable Deployment Id validation by settings `LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION` to `True` (default `False`).
 
 ### Content Security Policy
 
