@@ -104,7 +104,6 @@
                 "/*Allowed hosts for the following 3 URLs: canvas.instructure.com, canvas.beta.instructure.com, canvas.test.instructure.com":"*/",
                 "auth_login_url": "https://canvas.instructure.com/api/lti/authorize_redirect",
                 "auth_token_url": "https://canvas.instructure.com/login/oauth2/token",
-                "/*fill this out environment specific and need not to be domain specific.":"*/",
                 "key_set_url": "https://canvas.instructure.com/api/lti/security/jwks",
                 "key_set":null,
                 "/*Tools private key for LTI validation":"*/",
