@@ -23,18 +23,12 @@ function DebouncedGoalInput (props) {
     id
   } = props
 
-  const [tempGrade, setTempGrade] = useState(0)
+  const [tempGrade, setTempGrade] = useState(goalGrade)
   const debouncedGrade = useDebounce(tempGrade, 500)
 
   useEffect(() => {
-    if (goalGrade) {
-      setTempGrade(goalGrade)
-    }
-  }, [goalGrade])
-
-  useEffect(() => {
-    console.log(debouncedGrade)
     if (debouncedGrade) {
+      console.log(debouncedGrade)
       handleAssignmentGoalGrade(id, debouncedGrade)
     }
   }, [debouncedGrade, id])
@@ -44,7 +38,7 @@ function DebouncedGoalInput (props) {
       error={(goalGrade / pointsPossible) > 1}
       disabled={disabled}
       id='standard-number'
-      value={roundToXDecimals(tempGrade, placeToRoundTo(pointsPossible))}
+      value={goalGrade || tempGrade}
       label={
         !disabled ? 'Set a goal'
           : (goalGrade / pointsPossible) > 1

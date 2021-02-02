@@ -29,7 +29,7 @@ const setAssigmentGoalInputState = (assignmentId, assignments, inputFocus) => {
 
 const setAssignmentGoalGrade = (assignmentId, assignments, goalGrade) => {
   const assignment = assignments.filter(a => a.id === assignmentId)[0]
-  if (assignment) {
+  if (!assignment) {
     console.error('Error finding unique assignment id')
     return assignments
   } else {
