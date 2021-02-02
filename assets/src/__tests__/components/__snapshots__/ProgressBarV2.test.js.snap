@@ -3,6 +3,8 @@
 exports[`renders correctly 1`] = `
 <div
   className="ProgressBarV2-outOfBar-3"
+  onBlur={[Function]}
+  onFocus={[Function]}
   style={
     Object {
       "height": "10px",

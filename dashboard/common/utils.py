@@ -62,6 +62,8 @@ def get_course_id_from_request_url(path: str) -> Union[None, int]:
 def get_myla_globals(request):
     current_user = request.user
     username = ""
+    display_name = ""
+    initials = ""
     user_courses_info = []
     login_url = ""
     logout_url = ""
@@ -73,6 +75,14 @@ def get_myla_globals(request):
         username = current_user.get_username()
         user_courses_info = db_util.get_user_courses_info(username, course_id)
 
+        display_name = current_user.get_full_name()
+        # if full name blank, use username instead
+        if display_name.strip() == '':
+            display_name = username
+
+        # get first initial only
+        initials = display_name[:1].upper()
+
     if settings.SHOW_LOGOUT_LINK:
         login_url = settings.LOGIN_URL
         logout_url = settings.LOGOUT_URL
@@ -83,13 +93,15 @@ def get_myla_globals(request):
 
     myla_globals = {
         "username" : username,
+        "display_name" : display_name,
+        "initials" : initials,
         "is_superuser": is_superuser,
         "user_courses_info": user_courses_info,
         "login": login_url,
         "logout": logout_url,
         "primary_ui_color": primary_ui_color,
         "google_analytics_id": google_analytics_id,
-        "view_help_urls": { 
+        "view_help_urls": {
             'ra': settings.URL_VIEW_RESOURCES_ACCESSED,
             'apv1': settings.URL_VIEW_ASSIGNMENT_PLANNING_V1,
             'ap': settings.URL_VIEW_ASSIGNMENT_PLANNING,

@@ -119,7 +119,7 @@ function AvatarModal (props) {
       <Grid container>
         <Grid item xs={4}>
           <Avatar className={classes.avatar}>
-            {user.username.slice(0, 1)}
+            {user.initials}
           </Avatar>
         </Grid>
         <Grid item xs={8} container direction='column'>
@@ -131,7 +131,7 @@ function AvatarModal (props) {
             variant='subtitle1'
             style={{ marginTop: 0 }}
           >
-            {user.username}
+            {user.displayName}
           </Typography>
         </Grid>
         <Grid item xs={12}>
