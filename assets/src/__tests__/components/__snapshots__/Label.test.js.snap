@@ -6,12 +6,12 @@ exports[`renders correctly 1`] = `
     Object {
       "color": "blue",
       "display": "inline-block",
-      "left": "undefined%",
+      "left": "0",
       "position": "absolute",
-      "right": "0",
-      "textAlign": "left",
+      "right": "75%",
+      "textAlign": "right",
       "top": "59px",
-      "width": "",
+      "width": "75%",
       "zIndex": "2",
     }
   }

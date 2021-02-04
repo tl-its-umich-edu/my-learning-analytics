@@ -10,7 +10,7 @@ it('renders correctly', () => {
       <Label
         labelText='Current: 75.0'
         color='blue'
-        visualXPercent={75}
+        visualPercent={75}
         top='59px'
         zIndex='2'
       />
