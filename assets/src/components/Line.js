@@ -57,7 +57,7 @@ function Line (props) {
     color,
     width = 2,
     placement, // Value should be one of 'up1', 'down1', and 'down2'.  1 or 2 represents an approximation of lines of text of offset up or down.
-    label = undefined
+    label
   } = props
 
   const verticalStyles = getVerticalStyles(barHeight, placement)
