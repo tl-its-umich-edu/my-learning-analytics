@@ -3,7 +3,7 @@ import React from 'react'
 import Label from './Label'
 import { roundToXDecimals } from '../util/math'
 
-const determineVisualXPercent = (value, maxValue) => {
+const determineVisualPercent = (value, maxValue) => {
   if (value > maxValue) return maxValue
   if (value < 0) return 0
   return value / maxValue * 100
@@ -61,6 +61,7 @@ function Line (props) {
   } = props
 
   const verticalStyles = getVerticalStyles(barHeight, placement)
+  const visualPercent = determineVisualPercent(value, outOf)
 
   return (
     <>
@@ -71,7 +72,7 @@ function Line (props) {
           width: `${width}px`,
           backgroundColor: color,
           height: verticalStyles.lineHeight,
-          left: `${determineVisualXPercent(value, outOf)}%`,
+          left: `${visualPercent}%`,
           zIndex: 1,
           marginTop: verticalStyles.lineMarginTop,
           marginBottom: verticalStyles.lineMarginBottom
@@ -82,7 +83,7 @@ function Line (props) {
           <Label
             labelText={`${label}: ${roundToXDecimals(value, 1)}%`}
             color={color}
-            visualXPercent={determineVisualXPercent(value, outOf)}
+            visualPercent={visualPercent}
             top={verticalStyles.labelTop}
             zIndex={verticalStyles.labelZIndex}
           />

@@ -10,7 +10,7 @@ exports[`renders correctly 1`] = `
       "height": "10px",
       "margin": undefined,
       "position": "relative",
-      "width": "90%",
+      "width": "100%",
     }
   }
   tabIndex="0"
@@ -21,10 +21,10 @@ exports[`renders correctly 1`] = `
         Object {
           "backgroundColor": "steelblue",
           "display": "inline-block",
-          "height": "12px",
+          "height": "35px",
           "left": "80%",
-          "marginBottom": 0,
-          "marginTop": 0,
+          "marginBottom": "-25px",
+          "marginTop": "0",
           "position": "absolute",
           "width": "2px",
           "zIndex": 1,
@@ -40,9 +40,9 @@ exports[`renders correctly 1`] = `
           "position": "absolute",
           "right": "80%",
           "textAlign": "right",
-          "top": 0,
+          "top": "19px",
           "width": "80%",
-          "zIndex": "0",
+          "zIndex": "2",
         }
       }
     >
@@ -57,10 +57,10 @@ exports[`renders correctly 1`] = `
         Object {
           "backgroundColor": "green",
           "display": "inline-block",
-          "height": "12px",
+          "height": "35px",
           "left": "40%",
-          "marginBottom": 0,
-          "marginTop": 0,
+          "marginBottom": "0",
+          "marginTop": "-25px",
           "position": "absolute",
           "width": "2px",
           "zIndex": 1,
@@ -76,9 +76,9 @@ exports[`renders correctly 1`] = `
           "position": "absolute",
           "right": "40%",
           "textAlign": "right",
-          "top": 0,
+          "top": "-25px",
           "width": "40%",
-          "zIndex": "0",
+          "zIndex": "3",
         }
       }
     >
@@ -93,10 +93,10 @@ exports[`renders correctly 1`] = `
         Object {
           "backgroundColor": "grey",
           "display": "inline-block",
-          "height": "12px",
+          "height": "60px",
           "left": "23%",
-          "marginBottom": 0,
-          "marginTop": 0,
+          "marginBottom": "-25px",
+          "marginTop": "0",
           "position": "absolute",
           "width": "2px",
           "zIndex": 1,
@@ -110,11 +110,11 @@ exports[`renders correctly 1`] = `
           "display": "inline-block",
           "left": "23%",
           "position": "absolute",
-          "right": "",
+          "right": "0",
           "textAlign": "left",
-          "top": 0,
+          "top": "44px",
           "width": "",
-          "zIndex": "0",
+          "zIndex": "1",
         }
       }
     >

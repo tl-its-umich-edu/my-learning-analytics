@@ -13,7 +13,7 @@ const getHorizontalStyles = (value) => {
       : {
         left: value + '%',
         right: '0',
-        width: undefined,
+        width: '',
         textAlign: 'left'
       }
   )
@@ -23,7 +23,7 @@ function Label (props) {
   const {
     labelText,
     color,
-    visualXPercent,
+    visualPercent,
     top,
     zIndex
   } = props
@@ -36,7 +36,7 @@ function Label (props) {
         color,
         top,
         zIndex,
-        ...getHorizontalStyles(visualXPercent)
+        ...getHorizontalStyles(visualPercent)
       }}
     >
       &nbsp;{labelText}&nbsp;
