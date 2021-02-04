@@ -232,6 +232,11 @@ def extract_launch_variables_for_tool_use(request, message_launch):
     # Add user to DB if not there; avoids Django redirection to login page
     try:
         user_obj = User.objects.get(username=username)
+        # update
+        user_obj.first_name = first_name
+        user_obj.last_name = last_name
+        user_obj.email = email
+        user_obj.save()
     except User.DoesNotExist:
         password = ''.join(random.sample(string.ascii_letters, settings.RANDOM_PASSWORD_DEFAULT_LENGTH))
         user_obj = User.objects.create_user(username=username, email=email, password=password, first_name=first_name,

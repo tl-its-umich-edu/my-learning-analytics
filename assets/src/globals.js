@@ -11,6 +11,8 @@ mylaGlobals should ONLY be accessed in globals.js, and nowhere else.
 */
 const user = Object.freeze({
   username: mylaGlobals.username,
+  displayName: mylaGlobals.display_name,
+  initials: mylaGlobals.initials,
   admin: mylaGlobals.is_superuser,
   relatedCourses: mylaGlobals.user_courses_info,
   isSuperuser: mylaGlobals.is_superuser,

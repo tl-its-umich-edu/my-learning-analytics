@@ -4,11 +4,6 @@ exports[`renders correctly 1`] = `
 <div
   className="MuiGrid-root MuiGrid-item"
 >
-  <h6
-    className="MuiTypography-root MuiTypography-h6 MuiTypography-gutterBottom"
-  >
-    My Minimum Goal
-  </h6>
   <div
     className="MuiFormControl-root MuiTextField-root WithStyles(ForwardRef(TextField))-root-2 AssignmentGoalInput-goalGradeInput-1 MuiFormControl-marginNormal"
     style={
