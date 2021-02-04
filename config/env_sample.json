@@ -206,7 +206,7 @@
         "/*  database host": "*/",
         "HOST": "",
         "/*  database port": "*/",
-        "/*  PORT=5432": "*/",
+        "PORT": 5432,
         "/*  Enable/Disable Unizin Date Warehouse specific features/data": "*/",
         "IS_UNIZIN": true
     },
