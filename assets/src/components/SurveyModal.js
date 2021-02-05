@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
   },
   surveyButton: {
     color: theme.palette.primary.main,
-    background: theme.palette.getContrastText(theme.palette.primary.main),
+    background: theme.palette.getContrastText(theme.palette.primary.main)
   }
 }))
 
