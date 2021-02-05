@@ -206,7 +206,7 @@
         "/*  database host": "*/",
         "HOST": "",
         "/*  database port": "*/",
-        "/*  PORT=5432": "*/",
+        "PORT": 5432,
         "/*  Enable/Disable Unizin Date Warehouse specific features/data": "*/",
         "IS_UNIZIN": true
     },
@@ -225,7 +225,7 @@
         "/*  LRS database port": "*/",
         "PORT": 5432,
         "/*  LRS database options": "*/",
-        "OPTIONS": {},
+        "OPTIONS": {}
     },
     "/* Use the LRS data source instead of bigquery (default: false)": "/*",
     "/* resource type for resource view add or remove per institution needs": "/*",
