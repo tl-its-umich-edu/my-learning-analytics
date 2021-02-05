@@ -41,6 +41,10 @@ const useStyles = makeStyles((theme) => ({
     right: 0,
     width: '100%',
     height: '100%'
+  },
+  surveyButton: {
+    color: theme.palette.primary.main,
+    background: theme.palette.getContrastText(theme.palette.primary.main)
   }
 }))
 
@@ -69,7 +73,7 @@ export default function SurveyModal (props) {
 
   return (
     <div>
-      <Button variant='contained' color='secondary' onClick={toggleOpen}>Take Survey</Button>
+      <Button variant='contained' className={classes.surveyButton} onClick={toggleOpen}>Take Survey</Button>
       <Modal
         open={open}
         onClose={toggleOpen}
