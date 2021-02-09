@@ -1,5 +1,5 @@
 import logging, os, re
-from typing import Optional, Union, TypedDict
+from typing import Optional, TypedDict, Union
 
 from django.conf import settings
 from constance import config
