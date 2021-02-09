@@ -35,6 +35,7 @@ function Label (props) {
         display: 'inline-block',
         color,
         top,
+        lineHeight: '90%',
         zIndex,
         ...getHorizontalStyles(visualPercent)
       }}

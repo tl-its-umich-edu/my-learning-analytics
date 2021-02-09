@@ -10,8 +10,8 @@ const determineVisualPercent = (value, maxValue) => {
 }
 
 const getVerticalStyles = (barHeight, placement) => {
-  const verticalUnit = 25
-  const textHeight = 16
+  const verticalUnit = 20
+  const textHeight = 13
 
   switch (placement) {
     case 'up1':

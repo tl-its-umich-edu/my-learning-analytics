@@ -7,6 +7,7 @@ exports[`renders correctly 1`] = `
       "color": "blue",
       "display": "inline-block",
       "left": "0",
+      "lineHeight": "90%",
       "position": "absolute",
       "right": "75%",
       "textAlign": "right",
