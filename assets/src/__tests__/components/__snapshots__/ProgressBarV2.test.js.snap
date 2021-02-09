@@ -10,7 +10,7 @@ exports[`renders correctly 1`] = `
       "height": "10px",
       "margin": undefined,
       "position": "relative",
-      "width": "90%",
+      "width": "100%",
     }
   }
   tabIndex="0"
@@ -21,10 +21,10 @@ exports[`renders correctly 1`] = `
         Object {
           "backgroundColor": "steelblue",
           "display": "inline-block",
-          "height": "12px",
+          "height": "30px",
           "left": "80%",
-          "marginBottom": 0,
-          "marginTop": 0,
+          "marginBottom": "-20px",
+          "marginTop": "0",
           "position": "absolute",
           "width": "2px",
           "zIndex": 1,
@@ -37,12 +37,13 @@ exports[`renders correctly 1`] = `
           "color": "steelblue",
           "display": "inline-block",
           "left": "0",
+          "lineHeight": "90%",
           "position": "absolute",
           "right": "80%",
           "textAlign": "right",
-          "top": 0,
+          "top": "17px",
           "width": "80%",
-          "zIndex": "0",
+          "zIndex": "2",
         }
       }
     >
@@ -57,10 +58,10 @@ exports[`renders correctly 1`] = `
         Object {
           "backgroundColor": "green",
           "display": "inline-block",
-          "height": "12px",
+          "height": "30px",
           "left": "40%",
-          "marginBottom": 0,
-          "marginTop": 0,
+          "marginBottom": "0",
+          "marginTop": "-20px",
           "position": "absolute",
           "width": "2px",
           "zIndex": 1,
@@ -73,12 +74,13 @@ exports[`renders correctly 1`] = `
           "color": "green",
           "display": "inline-block",
           "left": "0",
+          "lineHeight": "90%",
           "position": "absolute",
           "right": "40%",
           "textAlign": "right",
-          "top": 0,
+          "top": "-20px",
           "width": "40%",
-          "zIndex": "0",
+          "zIndex": "3",
         }
       }
     >
@@ -93,10 +95,10 @@ exports[`renders correctly 1`] = `
         Object {
           "backgroundColor": "grey",
           "display": "inline-block",
-          "height": "12px",
+          "height": "50px",
           "left": "23%",
-          "marginBottom": 0,
-          "marginTop": 0,
+          "marginBottom": "-20px",
+          "marginTop": "0",
           "position": "absolute",
           "width": "2px",
           "zIndex": 1,
@@ -109,12 +111,13 @@ exports[`renders correctly 1`] = `
           "color": "grey",
           "display": "inline-block",
           "left": "23%",
+          "lineHeight": "90%",
           "position": "absolute",
-          "right": "",
+          "right": "0",
           "textAlign": "left",
-          "top": 0,
+          "top": "37px",
           "width": "",
-          "zIndex": "0",
+          "zIndex": "1",
         }
       }
     >

@@ -8,10 +8,12 @@ it('renders correctly', () => {
   const tree = renderer
     .create(
       <Line
-        height={10}
-        left={5}
-        color='blue'
-        labelPlacement='up'
+        value={50}
+        outOf={100}
+        barHeight={50}
+        color='green'
+        placement='up1'
+        label='Goal'
       />
     ).toJSON()
 

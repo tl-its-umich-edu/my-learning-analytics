@@ -1,8 +1,6 @@
 import React from 'react'
 import Line from './Line'
-import Label from './Label'
 import { withStyles } from '@material-ui/core/styles'
-import { roundToXDecimals } from '../util/math'
 
 const styles = theme => ({
   gradedBar: {
@@ -37,18 +35,6 @@ function ProgressBarV2 (props) {
     ? score / outOf
     : null
 
-  const calculateLineLeftOffset = (value, maxValue) => {
-    if (value > maxValue) return 100
-    if (value < 0) return 0
-    return value / maxValue * 100
-  }
-
-  const calculateLableValue = (value, maxValue) => {
-    if (value > maxValue) return 100
-    if (value < 0) return 0
-    return value
-  }
-
   return (
     <>
       {
@@ -70,24 +56,7 @@ function ProgressBarV2 (props) {
               ? lines.filter(line => line.value || line.value === 0) // filter any lines without value
                 .map((line, key) => (
                   <div key={key}>
-                    <Line
-                      height={height}
-                      left={`${calculateLineLeftOffset(line.value, outOf)}%`}
-                      color={line.color}
-                      labelPlacement={line.labelPlacement}
-                    />
-                    {
-                      line.label
-                        ? (
-                          <Label
-                            value={`${calculateLableValue(line.value, outOf)}`}
-                            color={line.color}
-                            labelText={`${line.label}: ${roundToXDecimals(line.value, 1)}%`}
-                            labelPlacement={line.labelPlacement}
-                          />
-                        )
-                        : null
-                    }
+                    <Line {...line} barHeight={height} outOf={outOf} />
                   </div>
                 ))
               : null

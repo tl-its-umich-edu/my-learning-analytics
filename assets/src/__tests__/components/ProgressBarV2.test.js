@@ -12,24 +12,24 @@ it('renders correctly', () => {
           submitted=''
           score={85}
           outOf={100}
-          percentWidth={90}
+          percentWidth={100}
           lines={[{
             label: 'Current',
             value: 80,
             color: 'steelblue',
-            labelPlacement: 'down'
+            placement: 'down1'
           },
           {
             label: 'Goal',
             value: 40,
             color: 'green',
-            labelPlacement: 'up'
+            placement: 'up1'
           },
           {
             label: 'Max Possible',
             value: 23,
             color: 'grey',
-            labelPlacement: 'downLower'
+            placement: 'down2'
           }]}
         />
       </TestThemeProvider>

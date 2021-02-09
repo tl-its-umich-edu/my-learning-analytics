@@ -8,10 +8,11 @@ it('renders correctly', () => {
   const tree = renderer
     .create(
       <Label
-        value={5}
+        labelText='Current: 75.0'
         color='blue'
-        labelPlacement='up'
-        labelText='Hello world'
+        visualPercent={75}
+        top='59px'
+        zIndex='2'
       />
     ).toJSON()
 

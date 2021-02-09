@@ -1,29 +1,31 @@
 import React from 'react'
 
-const alignThreshold = 25
-
-const getLeft = (value) => {
-  return value > alignThreshold ? '0' : value + '%'
-}
-
-const getRight = (value) => {
-  return value > alignThreshold ? value + '%' : ''
-}
-
-const getWidth = (value) => {
-  return value > alignThreshold ? value + '%' : ''
-}
-
-const getTextAlign = (value) => {
-  return value > alignThreshold ? 'right' : 'left'
+const getHorizontalStyles = (value) => {
+  const alignThreshold = 25
+  return (
+    value > alignThreshold
+      ? {
+        left: '0',
+        right: value + '%',
+        width: value + '%',
+        textAlign: 'right'
+      }
+      : {
+        left: value + '%',
+        right: '0',
+        width: '',
+        textAlign: 'left'
+      }
+  )
 }
 
 function Label (props) {
   const {
-    value,
+    labelText,
     color,
-    labelPlacement, // Value should be one of 'up1', 'down1', and 'down2'.  1 or 2 represents an aproximation of lines of text of offset up or down.
-    labelText
+    visualPercent,
+    top,
+    zIndex
   } = props
 
   return (
@@ -32,24 +34,10 @@ function Label (props) {
         position: 'absolute',
         display: 'inline-block',
         color,
-        width: `${getWidth(value)}`,
-        textAlign: `${getTextAlign(value)}`,
-        left: `${getLeft(value)}`,
-        right: `${getRight(value)}`,
-        zIndex: labelPlacement === 'up1'
-          ? '3'
-          : labelPlacement === 'down1'
-            ? '2'
-            : labelPlacement === 'down2'
-              ? '1'
-              : '0',
-        top: labelPlacement === 'up1'
-          ? '-25px'
-          : labelPlacement === 'down1'
-            ? '55px'
-            : labelPlacement === 'down2'
-              ? '75px'
-              : 0
+        top,
+        lineHeight: '90%',
+        zIndex,
+        ...getHorizontalStyles(visualPercent)
       }}
     >
       &nbsp;{labelText}&nbsp;
