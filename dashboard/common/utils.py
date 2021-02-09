@@ -1,5 +1,5 @@
 import logging, os, re
-from typing import Union
+from typing import Optional, Union, TypedDict
 
 from django.conf import settings
 from constance import config
@@ -10,7 +10,7 @@ from dashboard.models import Course, ResourceAccess
 
 logger = logging.getLogger(__name__)
 
-def format_github_url_using_https(github_url):
+def format_github_url_using_https(github_url: str):
     ssh_base = "git@"
     https_base = "https://"
     # If the URL is formatted for SSH, convert, otherwise, do nothing
@@ -19,25 +19,37 @@ def format_github_url_using_https(github_url):
     return github_url
 
 
-def get_git_version_info():
+class GitInfo(TypedDict):
+    repo: str
+    commit: str
+    commit_abbrev: str
+    branch: str
+
+
+def get_git_version_info() -> Optional[GitInfo]:
     logger.debug(get_git_version_info.__name__)
 
-    commit = os.getenv("GIT_COMMIT", "")
-    if commit != "":
-        commit_abbrev = commit[:settings.SHA_ABBREV_LENGTH]
-    else:
-        commit_abbrev = ""
+    commit = os.getenv("GIT_COMMIT", None)
+    branch = os.getenv("GIT_BRANCH", None)
+    repo = os.getenv("GIT_REPO", None)
+
+    if not repo or not branch or not commit:
+        return None
+
+    commit_abbrev = (
+        commit[:settings.SHA_ABBREV_LENGTH]
+        if len(commit) > settings.SHA_ABBREV_LENGTH else commit
+    )
 
     # Only include the branch name and not remote info
-    branch = os.getenv("GIT_BRANCH", "").split('/')[-1]
+    branch = branch.split('/')[-1]
 
-    git_version = {
-        "repo": format_github_url_using_https(os.getenv("GIT_REPO", "")),
+    return {
+        "repo": format_github_url_using_https(repo),
         "commit": commit,
         "commit_abbrev": commit_abbrev,
         "branch": branch
     }
-    return git_version
 
 
 def search_key_for_resource_value(my_dict, search_for):
