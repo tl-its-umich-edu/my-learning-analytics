@@ -9,7 +9,7 @@ import Avatar from '@material-ui/core/Avatar'
 import Popover from '@material-ui/core/Popover'
 import AvatarModal from '../components/AvatarModal'
 import SurveyModal from '../components/SurveyModal'
-import { surveyURL } from '../globals'
+import { surveyLink } from '../globals'
 
 const styles = theme => ({
   root: {
@@ -71,7 +71,7 @@ function DashboardAppBar (props) {
           </Link>
           <div className={classes.grow} />
           {
-            surveyURL && <SurveyModal surveyURL={surveyURL} />
+            surveyLink && surveyLink.url && <SurveyModal surveyLink={surveyLink} />
           }
           <IconButton
             aria-owns={avatarOpen ? 'simple-popper' : undefined}
