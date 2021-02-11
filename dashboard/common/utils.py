@@ -21,34 +21,34 @@ def format_github_url_using_https(github_url: str):
 
 class GitInfo(TypedDict):
     repo: str
+    branch: str
     commit: str
     commit_abbrev: str
-    branch: str
 
 
 def get_git_version_info() -> Optional[GitInfo]:
     logger.debug(get_git_version_info.__name__)
 
-    commit = os.getenv("GIT_COMMIT", None)
-    branch = os.getenv("GIT_BRANCH", None)
     repo = os.getenv("GIT_REPO", None)
+    branch = os.getenv("GIT_BRANCH", None)
+    commit = os.getenv("GIT_COMMIT", None)
 
     if not repo or not branch or not commit:
         return None
+
+    # Only include the branch name and not remote info
+    branch = branch.split('/')[-1]
 
     commit_abbrev = (
         commit[:settings.SHA_ABBREV_LENGTH]
         if len(commit) > settings.SHA_ABBREV_LENGTH else commit
     )
 
-    # Only include the branch name and not remote info
-    branch = branch.split('/')[-1]
-
     return {
         "repo": format_github_url_using_https(repo),
+        "branch": branch,
         "commit": commit,
-        "commit_abbrev": commit_abbrev,
-        "branch": branch
+        "commit_abbrev": commit_abbrev
     }
 
 
