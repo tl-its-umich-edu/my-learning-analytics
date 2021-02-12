@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useLocation } from 'react-router'
 import { makeStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import DialogTitle from '@material-ui/core/DialogTitle'
@@ -50,7 +51,24 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SurveyModal (props) {
   const classes = useStyles()
+  const location = useLocation()
   const [open, setOpen] = useState(false)
+
+  const lastTwoSteps = location.pathname.split('/').slice(-2)
+  const viewName = lastTwoSteps.length < 2
+    ? ''
+    : lastTwoSteps[0] === 'courses'
+      ? 'courses'
+      : lastTwoSteps[1]
+
+  const params = {
+    userID: props.user.LTIlaunchID,
+    userName: props.user.username,
+    courseID: props.courseID,
+    view: viewName
+  }
+  const searchParams = new URLSearchParams()
+  Object.entries(params).map(([key, value]) => searchParams.append(key, value))
 
   const toggleOpen = () => setOpen(!open)
 
@@ -65,7 +83,7 @@ export default function SurveyModal (props) {
 
       <div id='survey-modal-description'>
         <div className={classes.iframeContainer}>
-          <iframe className={classes.iframe} src={props.surveyLink.url} height='600px' width='400px' />
+          <iframe className={classes.iframe} src={`${props.surveyLink.url}?${searchParams.toString()}`} height='600px' width='400px' />
         </div>
       </div>
     </div>
