@@ -51,7 +51,7 @@ function DashboardAppBar (props) {
   const [avatarEl, setAvatarEl] = useState(null)
   const avatarOpen = Boolean(avatarEl)
 
-  surveyLink.url = surveyLink.url + "?userID=" + user.LTIlaunchID + "&courseID=" + courseId + "&view=unknown"
+  surveyLink.url = surveyLink.url + "?userID=" + user.LTIlaunchID + "&userName=" + user.username + "&courseID=" + courseId + "&view=unknown"
 
   return (
     <div>
