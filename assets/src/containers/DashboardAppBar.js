@@ -73,7 +73,7 @@ function DashboardAppBar (props) {
           </Link>
           <div className={classes.grow} />
           {
-              <SurveyModal surveyLink={surveyLink} />
+            <SurveyModal surveyLink={surveyLink} />
           }
           <IconButton
             aria-owns={avatarOpen ? 'simple-popper' : undefined}
