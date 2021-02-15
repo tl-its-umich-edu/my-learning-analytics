@@ -51,6 +51,8 @@ function DashboardAppBar (props) {
   const [avatarEl, setAvatarEl] = useState(null)
   const avatarOpen = Boolean(avatarEl)
 
+  const showSurveyLink = Boolean(surveyLink.text.length && surveyLink.url.length)
+
   return (
     <div>
       <AppBar className={classes.root} position='fixed'>
@@ -70,9 +72,7 @@ function DashboardAppBar (props) {
             {courseName}
           </Link>
           <div className={classes.grow} />
-          {
-            surveyLink && surveyLink.url && <SurveyModal surveyLink={surveyLink} />
-          }
+          {showSurveyLink && <SurveyModal surveyLink={surveyLink} user={user} courseID={courseId} />}
           <IconButton
             aria-owns={avatarOpen ? 'simple-popper' : undefined}
             onClick={event => setAvatarEl(event.currentTarget)}
