@@ -56,7 +56,7 @@ function CourseList (props) {
             aria-haspopup='true'
             variant='contained'
           >
-            <Avatar>{user.username.slice(0, 1)}</Avatar>
+            <Avatar>{user.initials}</Avatar>
           </IconButton>
           <Popover
             open={avatarOpen}

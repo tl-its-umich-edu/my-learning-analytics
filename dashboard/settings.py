@@ -124,7 +124,7 @@ INSTALLED_APPS = [
     'constance.backends.database',
 ]
 
-# The order of this MIDDLEWARE is important 
+# The order of this MIDDLEWARE is important
 MIDDLEWARE = [
     'dashboard.middleware.samesite.SameSiteMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -196,23 +196,48 @@ WSGI_APPLICATION = 'dashboard.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': ENV.get('MYSQL_ENGINE', 'django.db.backends.mysql'),
-        'NAME': ENV.get('MYSQL_DATABASE', 'student_dashboard'),  # your mysql database name
-        'USER': ENV.get('MYSQL_USER', 'student_dashboard_user'), # your mysql user for the database
-        'PASSWORD': ENV.get('MYSQL_PASSWORD', 'student_dashboard_password'), # password for user
-        'HOST': ENV.get('MYSQL_HOST', 'localhost'),
-        'PORT': ENV.get('MYSQL_PORT', 3306),
-        'OPTIONS': {'charset': 'utf8mb4'},
+        **{
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'student_dashboard',
+            'USER': 'student_dashboard_user',
+            'PASSWORD': 'student_dashboard_password',
+            'HOST': 'localhost',
+            'PORT': 3306,
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+            },
+        },
+        **ENV.get('MYSQL', {})
     },
     'DATA_WAREHOUSE': {
-        'ENGINE': ENV.get('DATA_WAREHOUSE_ENGINE', 'django.db.backends.postgresql'),
-        'NAME': ENV.get('DATA_WAREHOUSE_DATABASE', ''),
-        'USER': ENV.get('DATA_WAREHOUSE_USER', ''),
-        'PASSWORD': ENV.get('DATA_WAREHOUSE_PASSWORD', ''),
-        'HOST': ENV.get('DATA_WAREHOUSE_HOST', ''),
-        'PORT': ENV.get('DATA_WAREHOUSE_PORT', 5432),
-    }
+        **{
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': '',
+            'USER': '',
+            'PASSWORD': '',
+            'HOST': '',
+            'PORT': 5432,
+            'OPTIONS': {},
+            'IS_UNIZIN': True
+        },
+        **ENV.get('DATA_WAREHOUSE', {})
+    },
 }
+# optionally set LRS data source
+LRS_IS_BIGQUERY = ENV.get('LRS', {}).get('ENGINE', 'google.cloud.bigquery') == 'google.cloud.bigquery'
+if not LRS_IS_BIGQUERY:
+    DATABASES['LRS'] = {
+        **{
+            'ENGINE': '',
+            'NAME': '',
+            'USER': '',
+            'PASSWORD': '',
+            'HOST': '',
+            'PORT': 5432,
+            'OPTIONS': {},
+        },
+        **ENV.get('LRS', {})
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -415,9 +440,7 @@ if STUDENT_DASHBOARD_SAML:
 if STUDENT_DASHBOARD_LTI:
     LTI_CONFIG = ENV.get('LTI_CONFIG', {})
     LTI_CONFIG_TEMPLATE_PATH = ENV.get('LTI_CONFIG_TEMPLATE_PATH')
-
-# controls whether Unizin specific features/data is available from the Canvas Data source
-DATA_WAREHOUSE_IS_UNIZIN = ENV.get("DATA_WAREHOUSE_IS_UNIZIN", True)
+    LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION = ENV.get('LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION', False)
 
 # This is used to fix ids from Canvas Data which are incremented by some large number
 CANVAS_DATA_ID_INCREMENT = ENV.get("CANVAS_DATA_ID_INCREMENT", 17700000000000000)
@@ -461,7 +484,7 @@ if "CSP" in ENV:
 else:
     MIDDLEWARE += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
 
-# These are mostly needed by Canvas but it should also be in on general 
+# These are mostly needed by Canvas but it should also be in on general
 CSRF_COOKIE_SECURE = ENV.get("CSRF_COOKIE_SECURE", False)
 if CSRF_COOKIE_SECURE:
     CSRF_TRUSTED_ORIGINS = ENV.get("CSRF_TRUSTED_ORIGINS", [])
@@ -473,7 +496,7 @@ if CSRF_COOKIE_SECURE:
 SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", None)
 CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", None)
 
-CHECK_ENABLE_BACKEND_LOGIN = False if STUDENT_DASHBOARD_SAML or STUDENT_DASHBOARD_LTI else True 
+CHECK_ENABLE_BACKEND_LOGIN = False if STUDENT_DASHBOARD_SAML or STUDENT_DASHBOARD_LTI else True
 
 # Allow for ENABLE_BACKEND_LOGIN override
 ENABLE_BACKEND_LOGIN = ENV.get("ENABLE_BACKEND_LOGIN", CHECK_ENABLE_BACKEND_LOGIN)
@@ -489,7 +512,8 @@ if ENABLE_BACKEND_LOGIN or STUDENT_DASHBOARD_LTI:
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 
 CONSTANCE_CONFIG = {
-    'SURVEY_URL': ('', 'URL To qualtrics survey', str),
+    'SURVEY_URL': ('', 'Full URL to Qualtrics survey. If left blank no survey link will display.', str),
+    'SURVEY_TEXT': ('Take Survey', 'Custom text for Qualtrics survey link and title. If left blank will default to "Take Survey". Must also configure SURVEY_URL. For best mobile fit keep this text to under 6 words/30 characters.', str)
 }
 
 # IMPORT LOCAL ENV

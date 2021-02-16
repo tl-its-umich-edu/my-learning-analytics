@@ -6,18 +6,19 @@ exports[`renders correctly 1`] = `
     Object {
       "color": "blue",
       "display": "inline-block",
-      "left": "5%",
+      "left": "0",
+      "lineHeight": "90%",
       "position": "absolute",
-      "right": "",
-      "textAlign": "left",
-      "top": 0,
-      "width": "",
-      "zIndex": "0",
+      "right": "75%",
+      "textAlign": "right",
+      "top": "59px",
+      "width": "75%",
+      "zIndex": "2",
     }
   }
 >
    
-  Hello world
+  Current: 75.0
    
 </div>
 `;

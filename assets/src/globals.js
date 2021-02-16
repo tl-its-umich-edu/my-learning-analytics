@@ -11,6 +11,8 @@ mylaGlobals should ONLY be accessed in globals.js, and nowhere else.
 */
 const user = Object.freeze({
   username: mylaGlobals.username,
+  displayName: mylaGlobals.display_name,
+  initials: mylaGlobals.initials,
   admin: mylaGlobals.is_superuser,
   relatedCourses: mylaGlobals.user_courses_info,
   isSuperuser: mylaGlobals.is_superuser,
@@ -23,7 +25,7 @@ const user = Object.freeze({
 
 const viewHelpURLs = Object.freeze(mylaGlobals.view_help_urls)
 
-const surveyURL = Object.freeze(mylaGlobals.survey_url)
+const surveyLink = Object.freeze(mylaGlobals.survey_link)
 
 const sitePalette = JSON.parse(JSON.stringify(defaultPalette))
 // Don't update the palette if mylaGlobals.primary_ui_color is null or undefined
@@ -48,4 +50,4 @@ const siteTheme = createMuiTheme({
 })
 const gaId = mylaGlobals.google_analytics_id
 
-export { user, siteTheme, gaId, viewHelpURLs, surveyURL }
+export { user, siteTheme, gaId, viewHelpURLs, surveyLink }

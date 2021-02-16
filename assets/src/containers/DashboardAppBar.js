@@ -9,7 +9,7 @@ import Avatar from '@material-ui/core/Avatar'
 import Popover from '@material-ui/core/Popover'
 import AvatarModal from '../components/AvatarModal'
 import SurveyModal from '../components/SurveyModal'
-import { surveyURL } from '../globals'
+import { surveyLink } from '../globals'
 
 const styles = theme => ({
   root: {
@@ -51,6 +51,8 @@ function DashboardAppBar (props) {
   const [avatarEl, setAvatarEl] = useState(null)
   const avatarOpen = Boolean(avatarEl)
 
+  const showSurveyLink = Boolean(surveyLink.text.length && surveyLink.url.length)
+
   return (
     <div>
       <AppBar className={classes.root} position='fixed'>
@@ -70,9 +72,7 @@ function DashboardAppBar (props) {
             {courseName}
           </Link>
           <div className={classes.grow} />
-          {
-            surveyURL && <SurveyModal surveyURL={surveyURL} />
-          }
+          {showSurveyLink && <SurveyModal surveyLink={surveyLink} user={user} courseID={courseId} />}
           <IconButton
             aria-owns={avatarOpen ? 'simple-popper' : undefined}
             onClick={event => setAvatarEl(event.currentTarget)}
@@ -80,7 +80,7 @@ function DashboardAppBar (props) {
             aria-haspopup='true'
             variant='contained'
           >
-            <Avatar>{user.username.slice(0, 1)}</Avatar>
+            <Avatar>{user.initials}</Avatar>
           </IconButton>
           <Popover
             open={avatarOpen}

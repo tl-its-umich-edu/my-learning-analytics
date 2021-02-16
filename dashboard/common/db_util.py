@@ -158,7 +158,7 @@ def get_last_cronjob_run():
 
 
 def get_canvas_data_date():
-    if not settings.DATA_WAREHOUSE_IS_UNIZIN:
+    if not settings.DATABASES.get('DATA_WAREHOUSE', {}).get('IS_UNIZIN'):
         return get_last_cronjob_run()
 
     try:

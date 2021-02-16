@@ -91,6 +91,7 @@ Other colors from the user interface are currently fixed and included in version
 
 * You also need to configure CSP value in the environment, specifically the `FRAME_SRC.` (See next section) In addition you need to ensure you are using https and `CSRF_COOKIE_SECURE` is true with your domain (or instructure.com) in trusted origins.
 
+* You may optionally disable Deployment Id validation by settings `LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION` to `True` (default `False`).
 
 ### Content Security Policy
 
@@ -153,7 +154,7 @@ The application currently uses two frameworks for front-end testing: [Cypress](h
 Some front-end tests are implemented using the [Cypress framework](https://www.cypress.io/). 
 
  For running cypress tests locally, it is essential that you have Myla instance running locally. Launch Myla from the
- browser go to the admin view and add user called `donald07` with password `root`. Get the latest depersonalized datadump
+ browser go to the admin view and add user called `donald07` with password `root`, first name `donald`, and last name `07`. Get the latest depersonalized datadump
  as described from the Step 9 in [installation and setup](#installation-and-setup).
  
  Install cypress 

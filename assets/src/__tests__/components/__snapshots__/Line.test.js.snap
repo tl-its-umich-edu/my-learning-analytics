@@ -1,19 +1,41 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders correctly 1`] = `
-<div
-  style={
-    Object {
-      "backgroundColor": "blue",
-      "display": "inline-block",
-      "height": "12px",
-      "left": 5,
-      "marginBottom": 0,
-      "marginTop": 0,
-      "position": "absolute",
-      "width": "2px",
-      "zIndex": 1,
+Array [
+  <div
+    style={
+      Object {
+        "backgroundColor": "green",
+        "display": "inline-block",
+        "height": "70px",
+        "left": "50%",
+        "marginBottom": "0",
+        "marginTop": "-20px",
+        "position": "absolute",
+        "width": "2px",
+        "zIndex": 1,
+      }
     }
-  }
-/>
+  />,
+  <div
+    style={
+      Object {
+        "color": "green",
+        "display": "inline-block",
+        "left": "0",
+        "lineHeight": "90%",
+        "position": "absolute",
+        "right": "50%",
+        "textAlign": "right",
+        "top": "-20px",
+        "width": "50%",
+        "zIndex": "3",
+      }
+    }
+  >
+     
+    Goal: 50%
+     
+  </div>,
+]
 `;

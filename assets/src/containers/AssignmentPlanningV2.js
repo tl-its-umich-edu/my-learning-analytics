@@ -210,19 +210,19 @@ function AssignmentPlanningV2 (props) {
                                 label: 'Current',
                                 value: currentGrade,
                                 color: 'steelblue',
-                                labelPlacement: 'down1'
+                                placement: 'down1'
                               },
                               {
                                 label: 'Goal',
                                 value: goalGrade,
                                 color: 'green',
-                                labelPlacement: 'up1'
+                                placement: 'up1'
                               },
                               {
                                 label: 'Max Possible',
                                 value: maxPossibleGrade,
                                 color: 'grey',
-                                labelPlacement: 'down2'
+                                placement: 'down2'
                               }
                             ]}
                             outOf={100}
