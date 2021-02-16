@@ -86,8 +86,8 @@ MyLA allows you to configure the primary color of the user interface (i.e., the 
 Other colors from the user interface are currently fixed and included in version control, as they are intentional design choices. You can see where color values are set in `assets/src/defaultPalette.js`.
 
 ### LTI v1.3 Configuration
-* MyLA Supports LTI 1.3 and using [pylti1.3](https://github.com/dmitry-viskov/pylti1.3) 
-* Instructions for LTI 1.3 configuration are in [MyLA Wiki](https://github.com/tl-its-umich-edu/my-learning-analytics/wiki/Configuration-for-LTI-1.3)
+* MyLA Supports LTI 1.3, using [pylti1.3](https://github.com/dmitry-viskov/pylti1.3) 
+* Instructions for LTI 1.3 configuration are in the [MyLA wiki](https://github.com/tl-its-umich-edu/my-learning-analytics/wiki/Dev%7CDeploy:-Configuration-for-LTI-1.3)
 
 * You also need to configure CSP value in the environment, specifically the `FRAME_SRC.` (See next section) In addition you need to ensure you are using https and `CSRF_COOKIE_SECURE` is true with your domain (or instructure.com) in trusted origins.
 
