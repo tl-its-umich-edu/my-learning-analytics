@@ -24,11 +24,10 @@ import SubmittedIcon from '@material-ui/icons/Textsms'
 import ProgressBarV2 from './ProgressBarV2'
 import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
-import StyledTextField from './StyledTextField'
 import AlertBanner from '../components/AlertBanner'
 import usePopoverEl from '../hooks/usePopoverEl'
 import { calculateWeekOffset } from '../util/date'
-import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
+import { roundToXDecimals } from '../util/math'
 import { assignmentStatus } from '../util/assignment'
 import GoalInput from './GoalInput'
 
@@ -123,24 +122,16 @@ function AssignmentTable (props) {
     current state of the various AssignmentTable filters.
   */
   const [filteredAssignments, setFilteredAssignments] = useState(assignments)
-
   const [popoverEl, setPopoverEl, clearPopoverEl] = usePopoverEl()
-
   const [assignmentGroupNames, setAssignmentGroupNames] = useState([])
-
   const [assignmentNameFilter, setAssignmentNameFilter] = useState('')
-
   const [assignmentGroupFilterArray, setAssignmentGroupFilterArray] = useState([])
-
   const [assignmentStatusFilterArray, setAssignmentStatusFilterArray] = useState([])
-
   const [filtersAreClear, setFiltersAreClear] = useState(true)
-
   const [previousWeek, setPreviousWeek] = useState()
 
   const weeksPresent = useRef([])
   const shouldScrollToCurrentWeek = useRef(false)
-
   const tableRef = useRef(null)
   const previousWeekRow = useRef(null)
 

@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/core/styles'
 import StyledTextField from './StyledTextField'
+import { placeToRoundTo, roundToXDecimals } from '../util/math'
+import { withStyles } from '@material-ui/core/styles'
 
 const styles = theme => ({
   goalGradeInput: {
@@ -25,7 +26,7 @@ function GoalInput (props) {
       error={(goalGrade / pointsPossible) > 1}
       disabled={disabled}
       id='standard-number'
-      value={goalGrade}
+      value={roundToXDecimals(goalGrade, placeToRoundTo(pointsPossible))}
       label={
         !disabled ? 'Set a goal'
           : (goalGrade / pointsPossible) > 1
