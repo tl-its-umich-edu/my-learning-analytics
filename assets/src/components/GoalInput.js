@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import StyledTextField from './StyledTextField'
-import { roundToXDecimals, placeToRoundTo } from '../util/math'
-import useDebounce from '../hooks/useDebounce'
 
 const styles = theme => ({
   goalGradeInput: {
@@ -13,32 +11,21 @@ const styles = theme => ({
   }
 })
 
-function DebouncedGoalInput (props) {
+function GoalInput (props) {
   const {
     classes,
     goalGrade,
     pointsPossible,
     disabled,
-    handleAssignmentGoalGrade,
-    id
+    handleAssignmentGoalGrade
   } = props
-
-  const [tempGrade, setTempGrade] = useState(goalGrade)
-  const debouncedGrade = useDebounce(tempGrade, 500)
-
-  useEffect(() => {
-    if (debouncedGrade) {
-      console.log(debouncedGrade)
-      handleAssignmentGoalGrade(id, debouncedGrade)
-    }
-  }, [debouncedGrade, id])
 
   return (
     <StyledTextField
       error={(goalGrade / pointsPossible) > 1}
       disabled={disabled}
       id='standard-number'
-      value={goalGrade || tempGrade}
+      value={goalGrade}
       label={
         !disabled ? 'Set a goal'
           : (goalGrade / pointsPossible) > 1
@@ -46,8 +33,8 @@ function DebouncedGoalInput (props) {
             : 'Set a goal'
       }
       onChange={event => {
-        const assignmentGoalGrade = event.target.value
-        setTempGrade(assignmentGoalGrade)
+        const goalGrade = event.target.value
+        handleAssignmentGoalGrade(goalGrade)
       }}
       type='number'
       className={classes.goalGradeInput}
@@ -55,12 +42,11 @@ function DebouncedGoalInput (props) {
   )
 }
 
-DebouncedGoalInput.propTypes = {
-  id: PropTypes.string.isRequired,
+GoalInput.propTypes = {
   goalGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   pointsPossible: PropTypes.number // seems like it should be required
 }
 
-DebouncedGoalInput.defaultProps = {}
+GoalInput.defaultProps = {}
 
-export default withStyles(styles)(DebouncedGoalInput)
+export default withStyles(styles)(GoalInput)

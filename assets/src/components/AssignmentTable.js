@@ -30,7 +30,7 @@ import usePopoverEl from '../hooks/usePopoverEl'
 import { calculateWeekOffset } from '../util/date'
 import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
 import { assignmentStatus } from '../util/assignment'
-import DebouncedGoalInput from './DebouncedGoalInput'
+import GoalInput from './GoalInput'
 
 const headerHeight = 105
 
@@ -103,7 +103,7 @@ const styles = theme => ({
   }
 })
 
-function AssignmentTable(props) {
+function AssignmentTable (props) {
   const {
     classes,
     courseGoalGradeSet,
@@ -408,12 +408,11 @@ function AssignmentTable(props) {
                             a.graded || a.outOf === 0
                               ? <div className={classes.possiblePointsText}>{a.outOf === 0 ? '0' : `${a.currentUserSubmission.score}`}</div>
                               : (
-                                <DebouncedGoalInput
-                                  id={a.id}
+                                <GoalInput
                                   disabled={!courseGoalGradeSet}
                                   goalGrade={a.goalGrade}
                                   pointsPossible={a.pointsPossible}
-                                  handleAssignmentGoalGrade={handleAssignmentGoalGrade}
+                                  handleAssignmentGoalGrade={handleAssignmentGoalGrade(a.id)}
                                 />
                               )
                           }
