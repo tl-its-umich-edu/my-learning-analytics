@@ -110,9 +110,7 @@ function AssignmentTable (props) {
     assignmentGroups,
     dateStart,
     handleAssignmentGoalGrade,
-    handleAssignmentLock,
-    handleInputFocus,
-    handleInputBlur
+    handleAssignmentLock
   } = props
 
   const assignmentStatusNames = Object.values(assignmentStatus)

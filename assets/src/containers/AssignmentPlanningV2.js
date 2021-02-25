@@ -21,13 +21,11 @@ import { isTeacherOrAdmin } from '../util/roles'
 import { Helmet } from 'react-helmet'
 import { eventLogExtra } from '../util/object'
 import { roundToXDecimals } from '../util/math'
-
 import {
   assignmentStatus,
   clearGoals,
   setAssignmentGoalGrade,
-  setAssignmentGoalLockState,
-  setAssigmentGoalInputState
+  setAssignmentGoalLockState
 } from '../util/assignment'
 
 const styles = theme => ({
@@ -154,18 +152,6 @@ function AssignmentPlanningV2 (props) {
     )
   }
 
-  const handleInputFocus = key => {
-    setAssignments(
-      setAssigmentGoalInputState(key, assignments, true)
-    )
-  }
-
-  const handleInputBlur = key => {
-    setAssignments(
-      setAssigmentGoalInputState(key, assignments, false)
-    )
-  }
-
   if (error) return (<WarningBanner />)
 
   return (
@@ -258,8 +244,6 @@ function AssignmentPlanningV2 (props) {
                         dateStart={data.course.dateStart}
                         handleAssignmentGoalGrade={handleAssignmentGoalGrade}
                         handleAssignmentLock={handleAssignmentLock}
-                        handleInputFocus={handleInputFocus}
-                        handleInputBlur={handleInputBlur}
                       />
                     </div>
                   )

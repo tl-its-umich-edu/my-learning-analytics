@@ -14,40 +14,40 @@ const styles = ({
 
 function AssignmentGoalInput (props) {
   const {
-    currentGrade,
+    // currentGrade,
     maxPossibleGrade,
     goalGrade,
     setGoalGrade,
-    setEventLog,
-    eventLog,
+    // setEventLog,
+    // eventLog,
     handleClearGoalGrades,
     mathWarning,
     classes
   } = props
 
-  const [goalGradeInternal, setGoalGradeInternal] = useState(goalGrade)
-  const debouncedGoalGrade = useRef(debounce(q => setGoalGrade(q), 500)).current
-  const updateGoalGradeInternal = (grade) => {
-    const v = { courseGoalGrade: grade }
-    if (goalGrade !== '') {
-      // only send prev grade object when there is previous value
-      v.prevCourseGoalGrade = goalGrade
-    }
-    setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
-    debouncedGoalGrade(grade)
-    setGoalGradeInternal(grade)
-  }
+  // const [goalGradeInternal, setGoalGradeInternal] = useState(goalGrade)
+  // const debouncedGoalGrade = useRef(debounce(q => setGoalGrade(q), 500)).current
+  // const updateGoalGradeInternal = (grade) => {
+  //   const v = { courseGoalGrade: grade }
+  //   if (goalGrade !== '') {
+  //     // only send prev grade object when there is previous value
+  //     v.prevCourseGoalGrade = goalGrade
+  //   }
+  //   setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
+  //   debouncedGoalGrade(grade)
+  //   setGoalGradeInternal(grade)
+  // }
 
-  useEffect(() => {
-    setGoalGradeInternal(goalGrade)
-  }, [goalGrade])
+  // useEffect(() => {
+  //   setGoalGradeInternal(goalGrade)
+  // }, [goalGrade])
 
   return (
     <Grid item>
       <StyledTextField
-        error={goalGradeInternal > 100 || mathWarning || goalGradeInternal > maxPossibleGrade}
+        error={goalGrade > 100 || mathWarning || goalGrade > maxPossibleGrade}
         id='standard-number'
-        value={goalGradeInternal}
+        value={goalGrade}
         label={
           mathWarning
             ? 'Scores no longer match goal'
@@ -60,13 +60,13 @@ function AssignmentGoalInput (props) {
         onChange={event => {
           const goalGrade = event.target.value
           if (goalGrade === '') {
-            updateGoalGradeInternal('')
+            setGoalGrade('')
           } else if (goalGrade <= 0) {
-            updateGoalGradeInternal(0)
+            goalGrade(0)
           } else if (goalGrade > 125) {
-            updateGoalGradeInternal(125)
+            goalGrade(125)
           } else {
-            updateGoalGradeInternal(goalGrade)
+            goalGrade(goalGrade)
           }
         }}
         type='number'

@@ -3,7 +3,7 @@ const isObjectEmpty = obj => Object.keys(obj).length === 0
 // could use Object.values but support isn't widespread yet
 const getObjectValues = obj => Object.keys(obj).map(key => obj[key])
 
-const eventLogExtra = (v, eventLog, currentGrade, maxPossibleGrade) => {
+const createEventLog = (v, eventLog, currentGrade, maxPossibleGrade) => {
   // only sending current and max grade when user change the setting for first time since these are not user controlled parameters
   if (eventLog.count === 0) {
     v.currentGrade = currentGrade
@@ -20,5 +20,5 @@ const eventLogExtra = (v, eventLog, currentGrade, maxPossibleGrade) => {
 export {
   isObjectEmpty,
   getObjectValues,
-  eventLogExtra
+  createEventLog
 }
