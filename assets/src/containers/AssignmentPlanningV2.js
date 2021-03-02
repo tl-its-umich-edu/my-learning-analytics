@@ -17,9 +17,10 @@ import useMathWarning from '../hooks/useMathWarning'
 import useSaveUserSetting from '../hooks/useSaveUserSetting'
 import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrade'
 import useUserAssignmentSetting from '../hooks/useUserAssignmentSetting'
+// import useEventLog from '../hooks/useEventLog'
 import { isTeacherOrAdmin } from '../util/roles'
 import { Helmet } from 'react-helmet'
-import { eventLogExtra } from '../util/object'
+import { createEventLog } from '../util/object'
 import { roundToXDecimals } from '../util/math'
 import {
   assignmentStatus,
@@ -122,22 +123,22 @@ function AssignmentPlanningV2 (props) {
     settingChanged
   })
 
-  const handleAssignmentGoalGrade = key => (assignmentGoalGrade, prevGoalGrade) => {
+  const handleAssignmentGoalGrade = key => (newGoalGrade, goalGrade) => {
     const v = {
       assignmentId: key,
-      assignGoalGrade: assignmentGoalGrade,
-      assignPrevGoalGrade: roundToXDecimals(prevGoalGrade, 1)
+      assignGoalGrade: newGoalGrade,
+      assignPrevGoalGrade: roundToXDecimals(goalGrade, 1)
     }
-    setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
+    setEventLog(createEventLog(v, eventLog, currentGrade, maxPossibleGrade))
     setSettingChanged(true)
     setAssignments(
-      setAssignmentGoalGrade(key, assignments, assignmentGoalGrade)
+      setAssignmentGoalGrade(key, assignments, newGoalGrade)
     )
   }
 
   const handleClearGoalGrades = () => {
     const v = { courseGoalGrade: '', prevCourseGoalGrade: goalGrade }
-    setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
+    setEventLog(createEventLog(v, eventLog, currentGrade, maxPossibleGrade))
     setAssignments(clearGoals(assignments))
     setGoalGrade('')
     setSettingChanged(true)
@@ -146,7 +147,7 @@ function AssignmentPlanningV2 (props) {
   const handleAssignmentLock = (key, checkboxState) => {
     const assignment = assignments.filter(a => a.id === key)
     const v = { assignmentId: key, assignGoalGrade: roundToXDecimals(assignment[0].goalGrade, 1), checkboxLockState: checkboxState }
-    setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
+    setEventLog(createEventLog(v, eventLog, currentGrade, maxPossibleGrade))
     setAssignments(
       setAssignmentGoalLockState(key, assignments, checkboxState)
     )

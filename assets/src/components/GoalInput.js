@@ -34,8 +34,8 @@ function GoalInput (props) {
             : 'Set a goal'
       }
       onChange={event => {
-        const goalGrade = event.target.value
-        handleAssignmentGoalGrade(goalGrade)
+        const newGoalGrade = event.target.value
+        handleAssignmentGoalGrade(newGoalGrade, goalGrade)
       }}
       type='number'
       className={classes.goalGradeInput}
