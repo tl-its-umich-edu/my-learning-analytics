@@ -1,10 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React from 'react'
 import { withStyles } from '@material-ui/core'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import StyledTextField from './StyledTextField'
-import debounce from 'lodash.debounce'
-import { eventLogExtra } from '../util/object'
+
 const styles = ({
   goalGradeInput: {
     marginTop: 0,
@@ -14,33 +13,13 @@ const styles = ({
 
 function AssignmentGoalInput (props) {
   const {
-    // currentGrade,
     maxPossibleGrade,
     goalGrade,
     setGoalGrade,
-    // setEventLog,
-    // eventLog,
     handleClearGoalGrades,
     mathWarning,
     classes
   } = props
-
-  // const [goalGradeInternal, setGoalGradeInternal] = useState(goalGrade)
-  // const debouncedGoalGrade = useRef(debounce(q => setGoalGrade(q), 500)).current
-  // const updateGoalGradeInternal = (grade) => {
-  //   const v = { courseGoalGrade: grade }
-  //   if (goalGrade !== '') {
-  //     // only send prev grade object when there is previous value
-  //     v.prevCourseGoalGrade = goalGrade
-  //   }
-  //   setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
-  //   debouncedGoalGrade(grade)
-  //   setGoalGradeInternal(grade)
-  // }
-
-  // useEffect(() => {
-  //   setGoalGradeInternal(goalGrade)
-  // }, [goalGrade])
 
   return (
     <Grid item>
@@ -62,11 +41,11 @@ function AssignmentGoalInput (props) {
           if (goalGrade === '') {
             setGoalGrade('')
           } else if (goalGrade <= 0) {
-            goalGrade(0)
+            setGoalGrade(0)
           } else if (goalGrade > 125) {
-            goalGrade(125)
+            setGoalGrade(125)
           } else {
-            goalGrade(goalGrade)
+            setGoalGrade(goalGrade)
           }
         }}
         type='number'

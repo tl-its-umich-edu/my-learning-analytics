@@ -17,7 +17,6 @@ import useMathWarning from '../hooks/useMathWarning'
 import useSaveUserSetting from '../hooks/useSaveUserSetting'
 import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrade'
 import useUserAssignmentSetting from '../hooks/useUserAssignmentSetting'
-// import useEventLog from '../hooks/useEventLog'
 import { isTeacherOrAdmin } from '../util/roles'
 import { Helmet } from 'react-helmet'
 import { createEventLog } from '../util/object'
@@ -123,16 +122,26 @@ function AssignmentPlanningV2 (props) {
     settingChanged
   })
 
-  const handleAssignmentGoalGrade = key => (newGoalGrade, goalGrade) => {
+  const handleGoalGrade = (goalGrade, prevGoalGrade) => {
+    const v = { courseGoalGrade: goalGrade }
+    if (goalGrade !== '') {
+      v.prevCourseGoalGrade = prevGoalGrade
+    }
+    setEventLog(createEventLog(v, eventLog, currentGrade, maxPossibleGrade))
+    setSettingChanged(true)
+    setGoalGrade(goalGrade)
+  }
+
+  const handleAssignmentGoalGrade = key => (goalGrade, prevGoalGrade) => {
     const v = {
       assignmentId: key,
-      assignGoalGrade: newGoalGrade,
-      assignPrevGoalGrade: roundToXDecimals(goalGrade, 1)
+      assignGoalGrade: goalGrade,
+      assignPrevGoalGrade: roundToXDecimals(prevGoalGrade, 1)
     }
     setEventLog(createEventLog(v, eventLog, currentGrade, maxPossibleGrade))
     setSettingChanged(true)
     setAssignments(
-      setAssignmentGoalGrade(key, assignments, newGoalGrade)
+      setAssignmentGoalGrade(key, assignments, goalGrade)
     )
   }
 
@@ -177,13 +186,7 @@ function AssignmentPlanningV2 (props) {
                             goalGrade={goalGrade}
                             maxPossibleGrade={maxPossibleGrade}
                             eventLog={eventLog}
-                            setEventLog={eventLog => {
-                              setEventLog(eventLog)
-                            }}
-                            setGoalGrade={grade => {
-                              setSettingChanged(true)
-                              setGoalGrade(grade)
-                            }}
+                            setGoalGrade={newGoalGrade => handleGoalGrade(newGoalGrade, goalGrade)}
                             handleClearGoalGrades={handleClearGoalGrades}
                             mathWarning={showMathWarning}
                           />
