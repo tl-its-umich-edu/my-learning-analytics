@@ -30,7 +30,9 @@ You may also optionally place the json settings directly into the `ENV_JSON` env
     username: root
     password: root
     ```
+    
 1. As you are now logged in as `root`, there are no courses listed. Next 3 steps will help you view a sample course.
+
 1. Connect to MySQL database.
     ```
     Host: 127.0.0.1
@@ -39,12 +41,20 @@ You may also optionally place the json settings directly into the `ENV_JSON` env
     Database: student_dashboard
     Port: 5306
     ```
-1. Navigate to `course` table and select canvas_id `canvas_id`("SELECT canvas_id From course"), which will be used in the next step.
-1. Nagivate to http://localhost:5001/courses/{canvas_id} with the canvas_id you found. (For example, with SQL file myla_test_data_2019_10_16.sql loaded in, nagivate to http://localhost:5001/courses/235420 or http://localhost:5001/courses/362855 and you can view the course page as an admin.) 
-1. To get to the Django admin panel, click on the Avator in the top right, then click `Admin`, or go here: http://localhost:5001/admin.
+    
+1. Navigate to `course` table and select a `canvas_id` value, which will be used in the next step.
+
+    ```mysql
+    SELECT canvas_id FROM course
+    ```
+
+1. Go to http://localhost:5001/courses/***`canvas_id`*** with the `canvas_id` you found. (For example, with SQL file `myla_test_data_2019_10_16.sql` loaded, Go to http://localhost:5001/courses/235420 or http://localhost:5001/courses/362855 and view the course page as an admin.) 
+
+1. To get to the Django admin panel, click the avatar in the top right, then click `Admin`, or go here: http://localhost:5001/admin.
 
 #### Logging in as a student
 1. Click on the top-right circle, then click `Logout`.
+
 1. Connect to MySQL database.
     ```
     Host: 127.0.0.1
@@ -53,10 +63,24 @@ You may also optionally place the json settings directly into the `ENV_JSON` env
     Database: student_dashboard
     Port: 5306
     ```
-1. Navigate to `user` table and select a student `sis_name`, which will be used in the next step.
-1. Create an authorized user. `docker exec -it student_dashboard python manage.py createuser --username={insert sis_name} --password={create password} --email=test@test.com`
-    - Note: You can also make a user a superuser by connecting to the database, editing the record in `auth_user` and setting `is_staff=1` and `is_superuser=1`.
+    
+1. Pick a student `sis_name` from the`user` table to be used in the next step.
+
+    ```sql
+    SELECT sis_name FROM `user` WHERE enrollment_type = 'StudentEnrollment'
+    ```
+
+    
+
+1. Create an authorized user.
+    ```sh
+    docker exec -it student_dashboard python manage.py createuser --username={insert sis_name} --password={create password} --email=test@test.com
+    ```
+    
+    Note: To make a user a superuser, edit the record in `auth_user` to set `is_staff=1` and `is_superuser=1`.
+    
 1. Login using the username and password created.
+
 1. The course(s) enrolled by the student with selected `sis_name` will be displayed. Click on a course to view as the student selected in step 3.
 
 ## MyLA Configuring Settings
@@ -156,19 +180,19 @@ Some front-end tests are implemented using the [Cypress framework](https://www.c
  For running cypress tests locally, it is essential that you have Myla instance running locally. Launch Myla from the
  browser go to the admin view and add user called `donald07` with password `root`, first name `donald`, and last name `07`. Get the latest depersonalized datadump
  as described from the Step 9 in [installation and setup](#installation-and-setup).
- 
+
  Install cypress 
- 
+
  `npm install cypress`
- 
+
  and install the plugins add-on with
- 
+
  `npm i cypress-plugin-snapshots -S`
- 
+
  Cypress can be started with the command
- 
+
  `npm run cypress:open`
- 
+
  When running tests do not use the All Tests button due to unsolved issues. 
  Run the cypress test if UI change are there as part of the work.
  If a snapshot fails due to change in the UI, try updating the snapshot from the failed test from cypress controlled 
