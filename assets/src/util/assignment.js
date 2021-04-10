@@ -223,7 +223,7 @@ const createAssignmentFields = (
       )
       a.outOf = pointsPossible
       // filter out null values
-      a.graded = (currentUserSubmission !== null) && (currentUserSubmission.gradedDate!== null) && (currentUserSubmission.score !== null)
+      a.graded = (currentUserSubmission !== null) && (currentUserSubmission.gradedDate !== null) && (currentUserSubmission.score !== null)
       a.submitted = !!currentUserSubmission && !!currentUserSubmission.submittedAt
       a.dueDateMonthDay = dateToMonthDay(localDate)
       a.goalGrade = ''
