@@ -126,7 +126,6 @@ INSTALLED_APPS = [
 
 # The order of this MIDDLEWARE is important
 MIDDLEWARE = [
-    'dashboard.middleware.samesite.SameSiteMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -493,8 +492,8 @@ if CSRF_COOKIE_SECURE:
 
 # When using the application with iframes (e.g. with LTI), these need to be set to None. However, we'll need to update
 # this when new browser versions expect (and the Django version allows) the string "None".
-SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", None)
-CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", None)
+SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", 'None')
+CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", 'None')
 
 CHECK_ENABLE_BACKEND_LOGIN = False if STUDENT_DASHBOARD_SAML or STUDENT_DASHBOARD_LTI else True
 
