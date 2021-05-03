@@ -81,7 +81,7 @@ def execute_db_query(query: str, params: List=None) -> ResultProxy:
 def delete_all_records_in_table(table_name: str, where_clause: str="", where_params: List=None):
     # delete all records in the table first, can have an optional where clause
     result_proxy = execute_db_query(f"delete from {table_name} {where_clause}", where_params)
-    return(f"{result_proxy.rowcount} rows deleted from {table_name}\n")
+    return(f"\n{result_proxy.rowcount} rows deleted from {table_name}\n")
 
 
 def soft_update_datetime_field(
@@ -271,7 +271,7 @@ class DashboardCronJob(CronJobBase):
                     if query_obj.get('query_data_last_updated_condition'):
                         query += f" {query_obj['query_data_last_updated_condition']} "
                     elif settings.LRS_IS_BIGQUERY:
-                        query += " and event_time > @data_last_updated "
+                        query += " and event_time > CAST(@data_last_updated as DATETIME) "
 
                 final_query.append(query)
             final_query = "  UNION ALL   ".join(final_query)

@@ -239,10 +239,10 @@
         "canvas": {
             "query": [
                 "SELECT 'canvas' AS resource_type, ",
-                "CAST(SUBSTR(object.id, -17) AS STRING) AS resource_id, ",
-                "CAST(SUBSTR(membership.id, -17) AS INT64) AS user_id, ",
+                "REGEXP_EXTRACT(object.id, r'.*:(.*)') AS resource_id, ",
+                "REGEXP_EXTRACT(membership.id, r'.*:(.*)') AS user_id, ",
                 "cast(null as string) AS user_login_name, ",
-                "CAST(SUBSTR(`group`.id, -17) AS INT64) course_id, ",
+                "CAST(REGEXP_EXTRACT(`group`.id, r'.*:(.*)') AS INT64) AS course_id, ",
                 "COALESCE(",
                 "JSON_EXTRACT_SCALAR(object.extensions, '$[\\'com.instructure.canvas\\'][asset_name]'), ",
                 "JSON_EXTRACT_SCALAR(object.extensions, '$[\\'com.instructure.canvas\\'][filename]'), ",
@@ -254,10 +254,10 @@
                 "where ",
                 "ed_app.id IN UNNEST(['http://m.canvas.umich.edu/' , 'http://umich.instructure.com/' ]) ",
                 "and type = 'NavigationEvent' ",
-                "and SUBSTR(object.id, 24, 10) = 'attachment' ",
+                "and STARTS_WITH(object.id, 'urn:instructure:canvas:attachment') ",
                 "and action = 'NavigatedTo' ",
                 "and membership.id is not null ",
-                "and SUBSTR(`group`.id, -17) IN UNNEST(@course_ids)"
+                "and REGEXP_EXTRACT(`group`.id, r'.*:(.*)') IN UNNEST(@course_ids)"
             ],
             "app_display_name": "Canvas Files",
             "canvas_course_id_format": "LONG",
