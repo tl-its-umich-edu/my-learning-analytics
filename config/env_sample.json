@@ -254,7 +254,7 @@
                 "where ",
                 "ed_app.id IN UNNEST(['http://m.canvas.umich.edu/' , 'http://umich.instructure.com/' ]) ",
                 "and type = 'NavigationEvent' ",
-                "and STARTS_WITH(object.id, 'urn:instructure:canvas:attachment') ",
+                "and object.name = 'attachment' ",
                 "and action = 'NavigatedTo' ",
                 "and membership.id is not null ",
                 "and REGEXP_EXTRACT(`group`.id, r'.*:(.*)') IN UNNEST(@course_ids)"
