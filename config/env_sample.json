@@ -240,8 +240,8 @@
             "query": [
                 "SELECT 'canvas' AS resource_type, ",
                 "REGEXP_EXTRACT(object.id, r'.*:(.*)') AS resource_id, ",
-                "REGEXP_EXTRACT(membership.id, r'.*:(.*)') AS user_id, ",
-                "cast(null as string) AS user_login_name, ",
+                "CAST(REGEXP_EXTRACT(membership.id, r'.*:(.*)') AS INT64) AS user_id, ",
+                "CAST(null as string) AS user_login_name, ",
                 "CAST(REGEXP_EXTRACT(`group`.id, r'.*:(.*)') AS INT64) AS course_id, ",
                 "COALESCE(",
                 "JSON_EXTRACT_SCALAR(object.extensions, '$[\\'com.instructure.canvas\\'][asset_name]'), ",
