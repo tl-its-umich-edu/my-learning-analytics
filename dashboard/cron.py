@@ -129,9 +129,22 @@ class DashboardCronJob(CronJobBase):
         for course_id in Course.objects.get_supported_courses():
             # select course based on course id
             course_sql = f"""
-                select id, canvas_id, enrollment_term_id, name, start_at, conclude_at
-                from course_dim c
-                where c.id = '{course_id}'
+                SELECT
+                    co2.lms_int_id as id,
+                    co2.lms_ext_id as canvas_id,
+                    at2.lms_int_id as enrollment_term_id,
+                    co.title as name, -- different than Canvas course name
+                    co.start_date as start_at,
+                    co.end_date as conclude_at
+                FROM
+                    entity.course_offering co,
+                    entity.academic_session as3,
+                    keymap.course_offering co2,
+                    keymap.academic_term at2
+                    WHERE co2.lms_int_id = '{course_id}'
+                    and co.course_offering_id = co2.id
+                    and co.academic_session_id = as3.academic_session_id
+                    and at2.id = as3.academic_term_id
             """
             logger.debug(course_sql)
             course_df = pd.read_sql(course_sql, conns['DATA_WAREHOUSE'])
@@ -203,7 +216,14 @@ class DashboardCronJob(CronJobBase):
         status += delete_all_records_in_table("unizin_metadata")
 
         # select all student registered for the course
-        metadata_sql = "select key as pkey, value as pvalue from unizin_metadata"
+        metadata_sql = f"""
+                    -- TODO There is no such matching table within UDP
+                    select
+                        key as pkey,
+                        value as pvalue
+                    from
+                        unizin_metadata
+                    """
 
         logger.debug(metadata_sql)
 
@@ -480,12 +500,28 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids
         for data_warehouse_course_id in self.valid_locked_course_ids:
-            assignment_sql = f"""with assignment_info as
-                            (select ad.due_at AS due_date,ad.due_at at time zone 'utc' at time zone '{settings.TIME_ZONE}' as local_date,
-                            ad.title AS name,af.course_id AS course_id,af.assignment_id AS id,
-                            af.points_possible AS points_possible,af.assignment_group_id AS assignment_group_id
-                            from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{data_warehouse_course_id}'
-                            and ad.visibility = 'everyone' and ad.workflow_state='published')
+            assignment_sql = f"""
+                            select
+                                la.due_date as due_date,
+                                la.due_date at time zone 'utc' at time zone '{settings.TIME_ZONE}' as local_date,
+                                la.title as name,
+                                co.lms_int_id as course_id,
+                                la_km.lms_int_id as id,
+                                la.points_possible as points_possible,
+                                lag_km.lms_int_id as assignment_group_id
+                            from
+                                entity.learner_activity la,
+                                keymap.course_offering co,
+                                keymap.learner_activity la_km,
+                                keymap.learner_activity_group lag_km
+                            where
+                                la.visibility = 'everyone'
+                                and	la.status = 'published'
+                                and la.course_offering_id = co.id
+                                and co.lms_int_id = '{data_warehouse_course_id}'
+                                and la.learner_activity_id = la_km.id
+                                and la.learner_activity_group_id = lag_km.id
+                            )
                             select * from assignment_info
                             """
             status += util_function(data_warehouse_course_id, assignment_sql,'assignment')
@@ -532,9 +568,25 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids
         for data_warehouse_course_id in self.valid_locked_course_ids:
-            is_weight_considered_sql = f"""with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact
-                                        where course_id = '{data_warehouse_course_id}' group by course_id having sum(group_weight)>1)
-                                        (select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)
+            is_weight_considered_sql = f"""
+                                        with course as (
+                                            select
+                                                ag2.lms_ext_id as course_id,
+                                                sum(ag.group_weight) as group_weight
+                                                from entity.learner_activity_group ag, keymap.learner_activity_group ag2
+                                                where
+                                                ag2.lms_int_id = '{data_warehouse_course_id}' and
+                                                ag.learner_activity_group_id = ag2.id
+                                                group by ag.course_offering_id
+                                                having sum(ag.group_weight) > 1
+                                            )
+                                        (
+                                            select case when exists (
+                                                select *
+                                                from course
+                                                where group_weight > 1
+                                            )
+                                            then cast(1 as boolean) else cast(0 as boolean) end)
                                         """
             status += util_function(data_warehouse_course_id, is_weight_considered_sql, 'assignment_weight_consideration', 'weight')
 
@@ -549,7 +601,19 @@ class DashboardCronJob(CronJobBase):
         status: str = ''
         logger.info('update_term()')
 
-        term_sql: str = 'SELECT id, canvas_id, name, date_start, date_end FROM enrollment_term_dim;'
+        term_sql: str = f"""
+                        select
+                            ka.lms_int_id  as id,
+                            ka.lms_ext_id as canvas_id,
+                            a.name as name,
+                            a.term_begin_date as date_start,
+                            a.term_end_date as date_end
+                        from
+                            entity.academic_term as a
+                            left join keymap.academic_term as ka on ka.id = a.academic_term_id
+                        where
+                            ka.lms_ext_id is not null
+                        """
         warehouse_term_df: pd.DataFrame = pd.read_sql(term_sql, conns['DATA_WAREHOUSE'])
 
         existing_terms_ids: List[int] = [term.id for term in list(AcademicTerms.objects.all())]
