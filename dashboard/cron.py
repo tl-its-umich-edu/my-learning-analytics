@@ -181,21 +181,41 @@ class DashboardCronJob(CronJobBase):
         for data_warehouse_course_id in self.valid_locked_course_ids:
 
             # select all student registered for the course
-            user_sql=f"""with
-                         enroll_data as (select id as enroll_id, user_id, type from enrollment_dim where course_id='{data_warehouse_course_id}'
-                                         and type in ('StudentEnrollment', 'TaEnrollment', 'TeacherEnrollment') and workflow_state= 'active'),
-                         user_info as (select p.unique_name,p.sis_user_id, u.name, u.id as user_id, u.global_canvas_id
-                                        from (SELECT ROW_NUMBER() OVER (PARTITION BY user_id order by sis_user_id asc) AS row_number, * FROM pseudonym_dim) as p
-                                        join user_dim u on u.id = p.user_id WHERE row_number = 1),
-                         user_enroll as (select u.unique_name, u.sis_user_id, u.name, u.user_id, e.enroll_id,
-                                         u.global_canvas_id, e.type from enroll_data e join user_info u on e.user_id= u.user_id),
-                         course_fact as (select enrollment_id, current_score, final_score from course_score_fact
-                                         where course_id='{data_warehouse_course_id}'),
-                         final as (select u.global_canvas_id as user_id,u.name, u.sis_user_id as sis_id, u.unique_name as sis_name,
-                                   '{data_warehouse_course_id}' as course_id, c.current_score as current_grade, c.final_score as final_grade,
-                                    u.type as enrollment_type
-                                    from user_enroll u left join course_fact c on u.enroll_id= c.enrollment_id)
-                         select * from final
+            user_sql=f"""
+                        select
+                            p2.lms_ext_id,
+                            p.first_name || ' ' || p.last_name as name,
+                            '' as sis_id,
+                            lower(split_part(pe.email_address , '@', 1)) as sis_name,
+                            co.lms_int_id as course_id,
+                            cg.le_current_score as current_grade,
+                            cg.le_final_score as final_grade,
+                            case
+                                when cse.role = 'Student' then 'StudentEnrollment'
+                                when cse.role = 'TeachingAssistant' then 'TaEnrollment'
+                                when cse.role = 'Teacher' then 'TeacherEnrollment'
+                                else '' end
+                                as enrollment_type,
+                            cse.role_status
+                        from entity.course_section_enrollment cse
+                        left join entity.course_section cs
+                            on cse.course_section_id = cs.course_section_id
+                        left join keymap.course_offering co
+                            on cs.course_offering_id = co.id
+                        left join entity.person p
+                            on cse.person_id = p.person_id
+                        left join keymap.person p2
+                            on p.person_id = p2.id
+                        left join entity.person_email pe
+                            on p.person_id = pe.person_id
+                        left join entity.course_grade cg
+                            on cse.course_section_id = cg.course_section_id and cse.person_id = cg.person_id
+                        where
+                            co.lms_int_id ='{data_warehouse_course_id}'
+                            and cse.role in ('Student', 'TeachingAssistant', 'Teacher')
+                            --and cse.role_status = 'Enrolled'
+                            and lower(pe.email_type)='organizational'
+                        order by p2.lms_ext_id
                       """
             logger.debug(user_sql)
 
