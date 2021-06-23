@@ -234,7 +234,8 @@
         "videos": {"types": [""], "icon": "fas fa-video fa-lg"}
     },
     "/* Institute specific urls add or remove to your needs, will be used for Resources view": "*/",
-    "/*cron queries to pull the data from various caliper data sources replace if not relevant with your institution": "*/",
+    "/* cron queries to pull the data from various caliper data sources replace if not relevant with your institution": "*/",
+    "/* More sample queries are provided in the MyLA GitHub wiki page: https://github.com/tl-its-umich-edu/my-learning-analytics/wiki/Deploy:-Institution-Architectures": "*/",
     "RESOURCE_ACCESS_CONFIG": {
         "canvas": {
             "query": [
@@ -252,7 +253,7 @@
                 "datetime(EVENT_TIME) as access_time ",
                 "FROM event_store.expanded ",
                 "where ",
-                "ed_app.id IN UNNEST(['http://m.canvas.umich.edu/' , 'http://umich.instructure.com/' ]) ",
+                "JSON_EXTRACT_SCALAR(ed_app.json, '$.id') IN UNNEST(['http://m.canvas.umich.edu/', 'http://umich.instructure.com/']) ",
                 "and type = 'NavigationEvent' ",
                 "and object.name = 'attachment' ",
                 "and action = 'NavigatedTo' ",
