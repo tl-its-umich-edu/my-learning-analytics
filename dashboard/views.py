@@ -357,11 +357,12 @@ def resource_access_within_week(request, course_id=0):
                     "where a.user_id = u.user_id " \
                     "and a.resource_id = r.resource_id " \
                     "and u.sis_name=%(current_user)s " \
+                    "and a.course_id = %(course_id)s" \
                     "group by CONCAT(r.resource_id, ';', r.name)"
     logger.debug(selfSqlString)
     logger.debug("current_user=" + current_user)
 
-    selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user})
+    selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user, "course_id": course_id})
 
     output_df = output_df.join(selfDf.set_index('resource_id_name'), on='resource_id_name', how='left')
     output_df["total_percent"] = output_df.apply(lambda row: row[GRADE_A] + row[GRADE_B] + row[GRADE_C] + row[GRADE_LOW] + row.NO_GRADE, axis=1)
