@@ -1,11 +1,8 @@
-from google.cloud import bigquery
-
-import time
 import pandas as pd
-import io
 import os
 import json
 import logging
+from google.cloud import bigquery
 
 
 def run_canvas_query(query_array, query_params):
