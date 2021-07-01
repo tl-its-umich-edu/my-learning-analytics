@@ -1,0 +1,7 @@
+{
+    "GOOGLE_APPLICATION_CREDENTIALS": "./bq_cred.json",
+    "DATA_WAREHOUSE_COURSE_IDS": ["course_id_1","course_id_2"],
+    "DATA_WAREHOUSE_SHORT_COURSE_IDS": ["course_id_1_short","course_id_2_short"],
+    "CANVAS_DATA_ID_INCREMENT": 17700000000000000,
+    "TIME_LIMIT": "2021-06-01"
+}

@@ -1,0 +1,15 @@
+# config
+**/.json
+venv
+.vscode
+
+# data
+.data
+
+# docs
+README.md
+
+# etc
+.DS_Store
+**/*.pyc
+**/__pycache__
