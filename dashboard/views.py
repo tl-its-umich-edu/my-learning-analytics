@@ -352,13 +352,13 @@ def resource_access_within_week(request, course_id=0):
     output_df.reset_index(inplace=True)
 
     # now insert person's own viewing records: what resources the user has viewed, and the last access timestamp
-    selfSqlString = "select CONCAT(r.resource_id, ';', r.name) as resource_id_name, count(*) as self_access_count, max(a.access_time) as self_access_last_time " \
-                    "from resource_access a, user u, resource r " \
-                    "where a.user_id = u.user_id " \
-                    "and a.resource_id = r.resource_id " \
-                    "and u.sis_name=%(current_user)s " \
-                    "and a.course_id = %(course_id)s" \
-                    "group by CONCAT(r.resource_id, ';', r.name)"
+    selfSqlString = f"""select CONCAT(r.resource_id, ';', r.name) as resource_id_name, count(*) as self_access_count, max(a.access_time) as self_access_last_time 
+                    from resource_access a, user u, resource r 
+                    where a.user_id = u.user_id 
+                    and a.resource_id = r.resource_id 
+                    and u.sis_name=%(current_user)s 
+                    and a.course_id = %(course_id)s
+                    group by CONCAT(r.resource_id, ';', r.name)"""
     logger.debug(selfSqlString)
     logger.debug("current_user=" + current_user)
 
