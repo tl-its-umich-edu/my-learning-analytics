@@ -44,7 +44,7 @@
         {% get_flatpages '/copyright/' as flatpages %}
         <table cellspacing="8" style="width: 100%; padding: 8px">
             <tr>
-                {% if flatpages.first.content %}
+                {% if flatpages.first and flatpages.first.content %}
                 <td style="text-align: left">
                     {{ flatpages.first.content|safe }}
                 </td>
