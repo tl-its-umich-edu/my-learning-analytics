@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import json, os
 from typing import Tuple, Union
 
+from django.core.management.utils import get_random_secret_key
 from django.utils.module_loading import import_string
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -70,7 +71,7 @@ SITE_ID = 1
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ENV.get('DJANGO_SECRET_KEY')
+SECRET_KEY = ENV.get('DJANGO_SECRET_KEY', get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = ENV.get('DJANGO_DEBUG', True)
