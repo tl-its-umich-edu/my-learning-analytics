@@ -55,8 +55,7 @@ COPY --from=node-prod-deps /usr/src/app/node_modules node_modules
 # NOTE: project files likely to change between dev builds
 COPY . .
 
-# This DJANGO_SECRET_KEY is set here just so collectstatic runs with an empty key. It can be set to anything
-RUN echo yes | DJANGO_SECRET_KEY="collectstatic" python manage.py collectstatic --verbosity 0
+RUN python manage.py collectstatic --verbosity 0 --noinput
 
 # Sets the local timezone of the docker image
 ARG TZ
