@@ -31,21 +31,20 @@ def run_canvas_query(query_array, query_params):
     return df
 
 
-def compare_extended_vs_events_df(extended_query_array, events_query_array, query_params):
+def compare_expanded_vs_events_df(expanded_query_array, events_query_array, query_params):
 
-    extended_df = run_canvas_query(
-        extended_query_array, query_params)
+    expanded_df = run_canvas_query(
+        expanded_query_array, query_params)
 
     events_df = run_canvas_query(
         events_query_array, query_params)
 
     # compare the two dataframes
-    # print(extended_df.columns.values)
+    # print(expanded_df.columns.values)
     # print(events_df.columns.values)
-    print(f"shape of dataframe from extended table: {extended_df.shape}")
+    print(f"shape of dataframe from expanded table: {expanded_df.shape}")
     print(f"shape of dataframe from events table: {events_df.shape}")
-    print("assert equal:")
-    pd.testing.assert_frame_equal(extended_df, events_df)
+    pd.testing.assert_frame_equal(expanded_df, events_df)
 
 
 def main():
@@ -82,7 +81,7 @@ def main():
     ]
 
     # compare the Canvas query
-    canvas_extended_query_array = [
+    canvas_expanded_query_array = [
         "SELECT 'canvas' AS resource_type, ",
         "REGEXP_EXTRACT(object.id, r'.*:(.*)') AS resource_id, ",
         "CAST(REGEXP_EXTRACT(membership.id, r'.*:(.*)') AS INT64) AS user_id, ",
@@ -130,11 +129,11 @@ def main():
         "and event_time > @time_limit ",
         "order by resource_id, user_id, access_time"
     ]
-    compare_extended_vs_events_df(
-        canvas_extended_query_array, canvas_events_query_array, query_params)
+    compare_expanded_vs_events_df(
+        canvas_expanded_query_array, canvas_events_query_array, query_params)
 
     # compare the lecture capture query
-    leccap_extended_query_array = [
+    leccap_expanded_query_array = [
         "select 'leccap' AS resource_type, ",
         "REGEXP_EXTRACT(object.id, r'.*:(.*)') AS resource_id, ",
         "@canvas_data_id_increment + CAST(JSON_EXTRACT_SCALAR(federated_session_json, '$.messageParameters.custom_canvas_user_id') AS INT64) AS user_id, ",
@@ -166,11 +165,11 @@ def main():
         "and event_time > @time_limit ",
         "order by resource_id, user_id, access_time"
     ]
-    compare_extended_vs_events_df(
-        leccap_extended_query_array, leccap_events_query_array, query_params)
+    compare_expanded_vs_events_df(
+        leccap_expanded_query_array, leccap_events_query_array, query_params)
 
     # compare MiVideo query
-    mivideo_extended_query_array = [
+    mivideo_expanded_query_array = [
         "SELECT 'mivideo' AS resource_type, ",
         "replace(object.id, 'https://aakaf.mivideo.it.umich.edu/caliper/info/media/' , '') AS resource_id, ",
         "cast(-1 as INT64) AS user_id, ",
@@ -204,8 +203,8 @@ def main():
     ]
 
     # compare mivideo
-    compare_extended_vs_events_df(
-        mivideo_extended_query_array, mivideo_events_query_array, query_params)
+    compare_expanded_vs_events_df(
+        mivideo_expanded_query_array, mivideo_events_query_array, query_params)
 
 
 if __name__ == "__main__":
