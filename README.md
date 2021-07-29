@@ -205,6 +205,23 @@ To run the Jest test suite, execute the command `docker exec -it webpack_watcher
 
 To update snapshots, execute `docker exec -it webpack_watcher npm run-script update-snapshot`
 
+## Data Validation Testing
+
+Data validation scripts are in scripts/data_validation folder. To run the data validation scripts, follow the steps below:
+
+1. Copy env.json file from env_sample.json file
+   ```sh
+   cp scripts/data_validation/env_sample.json scripts/data_validation/env.json
+   ```
+2. Update the configuration values. Note the hard-coded Michigan specific filters in various query strings. Please adjust those values for your institution usage.
+
+3. Run data validation script within docker container:
+
+   - Validate Expanded Table: This script will validate queries against the UDP BigQuery expanded and regular events table are identical.
+
+     ```sh
+     docker exec -it student_dashboard /bin/bash -c "python scripts/data_validation/events_vs_expanded.py"
+     ```
 ## Accessibility
 
 ### Keyboard Navigation
