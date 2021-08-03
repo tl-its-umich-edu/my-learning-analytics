@@ -251,7 +251,7 @@ def resource_access_within_week(request, course_id=0):
 
     # read quefrom request param
     week_num_start = int(request.GET.get('week_num_start','1'))
-    week_num_end = int(request.GET.get('week_num_end','0'))
+    week_num_end = int(request.GET.get('week_num_end','1'))
     grade = request.GET.get('grade','all')
     filter_values = request.GET.get(RESOURCE_TYPE_STRING, ['files', 'videos'])
     filter_values = filter_values.split(",")
@@ -290,8 +290,8 @@ def resource_access_within_week(request, course_id=0):
 
     course_date_start = get_course_date_start(course_id)
 
-    start = course_date_start + timedelta(days=(week_num_start * 7))
-    end = course_date_start + timedelta(days=(week_num_end * 7))
+    start = course_date_start + timedelta(days=((week_num_start-1) * 7))
+    end = course_date_start + timedelta(days=((week_num_end-1) * 7))
     logger.debug("course_start=" + str(course_date_start) + " start=" + str(start) + " end=" + str(end))
 
     # get time range based on week number passed in via request
