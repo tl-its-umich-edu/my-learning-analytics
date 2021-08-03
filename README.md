@@ -211,10 +211,15 @@ Data validation scripts are in scripts/data_validation folder. To run the data v
 
 3. Run data validation script within docker container:
 
-   - Validate Expanded Table: This script will validate queries against the UDP BigQuery expanded and regular events table are identical.
+   - Validate queries using UDP BigQuery Expanded Table: This script will validate queries against the UDP BigQuery `expanded` table, and compare whether the data results are identical with those returned from the `events` table queries.
 
      ```sh
-     docker exec -it student_dashboard /bin/bash -c "python scripts/data_validation/events_vs_expanded.py"
+     docker exec -it student_dashboard /bin/bash -c "python scripts/data_validation/validate_udp_events_vs_expanded.py"
+     ```
+    - Validate UDP context store queries: This script will validate queries against the UDP context_store tables, and compare whether the data results are identical with those returned from Unizin Data Warehouse(UDW) tables.
+
+     ```sh
+     docker exec -it student_dashboard /bin/bash -c "python scripts/data_validation/validate_udw_vs_udp.py"
      ```
 ## Accessibility
 

@@ -31,17 +31,21 @@ logger.debug("db-name:" + db_name)
 logger.debug("db-user:" + db_user)
 
 engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}?charset=utf8mb4"
-                       .format(db = db_name,  # your mysql database name
-                               user = db_user,  # your mysql user for the database
-                               password = db_password, # password for user
-                               host = db_host,
-                               port = db_port))
+                       .format(db=db_name,  # your mysql database name
+                               user=db_user,  # your mysql user for the database
+                               password=db_password,  # password for user
+                               host=db_host,
+                               port=db_port))
 
 # Split a list into *size* shorter pieces
+
+
 def split_list(a_list: list, size: int = 20):
     return [a_list[i:i + size] for i in range(0, len(a_list), size)]
 
 # the util function
+
+
 def util_function(data_warehouse_course_id, sql_string, mysql_table, table_identifier=None):
     df = pd.read_sql(sql_string, conns['DATA_WAREHOUSE'])
     logger.debug(df)
@@ -68,7 +72,7 @@ def util_function(data_warehouse_course_id, sql_string, mysql_table, table_ident
 
 
 # execute database query
-def execute_db_query(query: str, params: List=None) -> ResultProxy:
+def execute_db_query(query: str, params: List = None) -> ResultProxy:
     with engine.connect() as connection:
         connection.detach()
         if params:
@@ -78,7 +82,7 @@ def execute_db_query(query: str, params: List=None) -> ResultProxy:
 
 
 # remove all records inside the specified table
-def delete_all_records_in_table(table_name: str, where_clause: str="", where_params: List=None):
+def delete_all_records_in_table(table_name: str, where_clause: str = "", where_params: List = None):
     # delete all records in the table first, can have an optional where clause
     result_proxy = execute_db_query(f"delete from {table_name} {where_clause}", where_params)
     return(f"\n{result_proxy.rowcount} rows deleted from {table_name}\n")
@@ -96,7 +100,8 @@ def soft_update_datetime_field(
     current_field_value: Union[datetime, None] = getattr(model_inst, field_name)
     # Skipping update if the field already has a value, provided by a previous cron run or administrator
     if current_field_value is not None:
-        logger.info(f'Skipped update of {field_name} for {model_name} instance ({model_inst.id}); existing value was found')
+        logger.info(
+            f'Skipped update of {field_name} for {model_name} instance ({model_inst.id}); existing value was found')
     else:
         if warehouse_field_value:
             warehouse_field_value = warehouse_field_value.replace(tzinfo=pytz.UTC)
@@ -160,13 +165,14 @@ class DashboardCronJob(CronJobBase):
             courses_data = pd.concat(course_dfs).reset_index()
         else:
             logger.info("No course records were found in the database.")
-            courses_data = pd.DataFrame(columns=["id", "canvas_id", "enrollment_term_id", "name", "start_at", "conclude_at"])
+            courses_data = pd.DataFrame(
+                columns=["id", "canvas_id", "enrollment_term_id", "name", "start_at", "conclude_at"])
 
         CourseVerification = namedtuple("CourseVerification", ["invalid_course_ids", "course_data"])
         return CourseVerification(invalid_course_id_list, courses_data)
 
-
     # update USER records from DATA_WAREHOUSE
+
     def update_user(self):
 
         # cron status
@@ -181,7 +187,7 @@ class DashboardCronJob(CronJobBase):
         for data_warehouse_course_id in self.valid_locked_course_ids:
 
             # select all student registered for the course
-            user_sql=f"""
+            user_sql = f"""
                         select
                             p2.lms_ext_id,
                             p.first_name || ' ' || p.last_name as name,
@@ -223,8 +229,8 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
-
     # update unizin metadata from DATA_WAREHOUSE
+
     def update_unizin_metadata(self):
 
         # cron status
@@ -251,8 +257,8 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
-
     # update file records from Canvas that don't have names provided
+
     def update_canvas_resource(self):
         # cron status
         status = ""
@@ -261,8 +267,18 @@ class DashboardCronJob(CronJobBase):
 
         # Select all the files for these courses
         course_ids = self.valid_locked_course_ids
-        file_sql = f"select id, file_state, display_name from file_dim where course_id in %(course_ids)s"
-        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids':tuple(course_ids)})
+        file_sql = f'''
+                    select 
+                        cast(f_km.lms_int_id as BIGINT) as id, 
+                        f.status as file_state, 
+                        f.display_name as display_name
+                    from entity.file f, keymap.file f_km, keymap.course_offering co_km
+                    where
+                        f.course_offering_id = co_km.id
+                        and f.file_id = f_km.id
+                        and co_km.lms_int_id in %(course_ids)s
+                    '''
+        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids': tuple(course_ids)})
 
         # Update these back again based on the dataframe
         # Remove any rows where file_state is not available!
@@ -294,7 +310,7 @@ class DashboardCronJob(CronJobBase):
 
         logger.info(f"Deleting all records in resource_access after {data_last_updated}")
 
-        status += delete_all_records_in_table("resource_access", f"WHERE access_time > %s", [data_last_updated,])
+        status += delete_all_records_in_table("resource_access", f"WHERE access_time > %s", [data_last_updated, ])
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
         for data_warehouse_course_ids in split_list(self.valid_locked_course_ids, settings.CRON_BQ_IN_LIMIT):
@@ -316,7 +332,8 @@ class DashboardCronJob(CronJobBase):
                 final_query.append(query)
             final_query = "  UNION ALL   ".join(final_query)
 
-            data_warehouse_course_ids_short = [db_util.incremented_id_to_canvas_id(id) for id in data_warehouse_course_ids]
+            data_warehouse_course_ids_short = [
+                db_util.incremented_id_to_canvas_id(id) for id in data_warehouse_course_ids]
 
             logger.debug(final_query)
             logger.debug(data_warehouse_course_ids)
@@ -325,11 +342,13 @@ class DashboardCronJob(CronJobBase):
                 query_params = [
                     bigquery.ArrayQueryParameter('course_ids', 'STRING', data_warehouse_course_ids),
                     bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
-                    bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT)
+                    bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64',
+                                                  settings.CANVAS_DATA_ID_INCREMENT)
                 ]
                 if (data_last_updated is not None):
                     # insert the start time parameter for query
-                    query_params.append(bigquery.ScalarQueryParameter('data_last_updated', 'TIMESTAMP', data_last_updated))
+                    query_params.append(bigquery.ScalarQueryParameter(
+                        'data_last_updated', 'TIMESTAMP', data_last_updated))
 
                 job_config = bigquery.QueryJobConfig()
                 job_config.query_parameters = query_params
@@ -470,7 +489,7 @@ class DashboardCronJob(CronJobBase):
 
             return_string += \
                 f'{len(resource_access_df)} rows for courses [' + ', '.join(
-                map(repr, data_warehouse_course_ids)) + ']\n'
+                    map(repr, data_warehouse_course_ids)) + ']\n'
             logger.info(return_string)
 
         if settings.LRS_IS_BIGQUERY:
@@ -478,19 +497,18 @@ class DashboardCronJob(CronJobBase):
             # $5 per TB as of Feb 2019 https://cloud.google.com/bigquery/pricing
             total_tbytes_price = round(5 * total_tbytes_billed, 2)
             status += (f'TBytes billed for BQ: {total_tbytes_billed} = '
-                    f'${total_tbytes_price}\n')
+                       f'${total_tbytes_price}\n')
         return status
-
 
     def update_groups(self):
         # cron status
-        status =""
+        status = ""
 
         # delete all records in assignment_group table
         status += delete_all_records_in_table("assignment_groups")
 
         # update groups
-        #Loading the assignment groups inforamtion along with weight/points associated ith arn assignment
+        # Loading the assignment groups inforamtion along with weight/points associated ith arn assignment
         logger.debug("update_assignment_groups(): ")
 
         # loop through multiple course ids
@@ -530,26 +548,15 @@ class DashboardCronJob(CronJobBase):
                     from grp_full ad
                     join entity.learner_activity_group agr
                         on ad.learner_activity_group_id = agr.learner_activity_group_id
-                ), assignment_grp_points as (
-                    select ag.*, am.group_points AS group_points
-                    from assignment_grp ag join grp_full am on ag.learner_activity_group_id = am.learner_activity_group_id
-                )
-                select
-                learner_activity_group_id as id,
-                course_offering_id as course_id,
-                group_weight as weight,
-                name as name,
-                group_points as group_points
-                from assignment_grp_points
+                
             """
             status += util_function(data_warehouse_course_id, assignment_groups_sql, 'assignment_groups')
 
         return status
 
-
     def update_assignment(self):
-        #Load the assignment info w.r.t to a course such as due_date, points etc
-        status =""
+        # Load the assignment info w.r.t to a course such as due_date, points etc
+        status = ""
 
         logger.info("update_assignment(): ")
 
@@ -559,36 +566,37 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         for data_warehouse_course_id in self.valid_locked_course_ids:
             assignment_sql = f"""
-                            select
-                                la.due_date as due_date,
-                                la.due_date at time zone 'utc' at time zone '{settings.TIME_ZONE}' as local_date,
-                                la.title as name,
-                                co.lms_int_id as course_id,
-                                la_km.lms_int_id as id,
-                                la.points_possible as points_possible,
-                                lag_km.lms_int_id as assignment_group_id
-                            from
-                                entity.learner_activity la,
-                                keymap.course_offering co,
-                                keymap.learner_activity la_km,
-                                keymap.learner_activity_group lag_km
-                            where
-                                la.visibility = 'everyone'
-                                and	la.status = 'published'
-                                and la.course_offering_id = co.id
-                                and co.lms_int_id = '{data_warehouse_course_id}'
-                                and la.learner_activity_id = la_km.id
-                                and la.learner_activity_group_id = lag_km.id
-                            )
-                            select * from assignment_info
-                            """
-            status += util_function(data_warehouse_course_id, assignment_sql,'assignment')
+                with assignment_info as
+                (
+                    select
+                        la.due_date as due_date,
+                        la.due_date at time zone '{settings.TIME_ZONE}' as local_date,
+                        la.title as name,
+                        cast(co.lms_int_id as BIGINT) as course_id,
+                        cast(la_km.lms_int_id as BIGINT) as id,
+                        la.points_possible as points_possible,
+                        cast(lag_km.lms_int_id as BIGINT) as assignment_group_id
+                    from
+                        entity.learner_activity la,
+                        keymap.course_offering co,
+                        keymap.learner_activity la_km,
+                        keymap.learner_activity_group lag_km
+                    where
+                        la.visibility = 'everyone'
+                        and	la.status = 'published'
+                        and la.course_offering_id = co.id
+                        and co.lms_int_id = '{data_warehouse_course_id}'
+                        and la.learner_activity_id = la_km.id
+                        and la.learner_activity_group_id = lag_km.id
+                )
+                select * from assignment_info
+            """
+            status += util_function(data_warehouse_course_id, assignment_sql, 'assignment')
 
         return status
 
-
     def submission(self):
-        #student submission information for assignments
+        # student submission information for assignments
         # cron status
         status = ""
 
@@ -613,11 +621,10 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
-
     def weight_consideration(self):
-        #load the assignment weight consider information with in a course. Some assignments don't have weight consideration
-        #the result of it return boolean indicating weight is considered in table calculation or not
-        status =""
+        # load the assignment weight consider information with in a course. Some assignments don't have weight consideration
+        # the result of it return boolean indicating weight is considered in table calculation or not
+        status = ""
 
         logger.info("weight_consideration()")
 
@@ -628,25 +635,23 @@ class DashboardCronJob(CronJobBase):
         for data_warehouse_course_id in self.valid_locked_course_ids:
             is_weight_considered_sql = f"""
                                         with course as (
-                                            select
-                                                ag2.lms_ext_id as course_id,
-                                                sum(ag.group_weight) as group_weight
-                                                from entity.learner_activity_group ag, keymap.learner_activity_group ag2
-                                                where
-                                                ag2.lms_int_id = '{data_warehouse_course_id}' and
-                                                ag.learner_activity_group_id = ag2.id
-                                                group by ag.course_offering_id
-                                                having sum(ag.group_weight) > 1
-                                            )
-                                        (
-                                            select case when exists (
-                                                select *
-                                                from course
-                                                where group_weight > 1
-                                            )
-                                            then cast(1 as boolean) else cast(0 as boolean) end)
+                                            select 	course_offering_id as course_id,
+                                                    sum(group_weight) as group_weight
+                                            from entity.learner_activity_group lag, keymap.course_offering co_km
+                                            where 
+                                            lag.course_offering_id = co_km.id
+                                            and co_km.lms_int_id = '{data_warehouse_course_id}'
+                                            group by course_offering_id
+                                            having sum(group_weight) > 1
+                                        )
+                                        (select case when exists (
+                                            select *
+                                            from course
+                                            where group_weight > 1
+                                        ) then cast(1 as boolean) else cast(0 as boolean) end)
                                         """
-            status += util_function(data_warehouse_course_id, is_weight_considered_sql, 'assignment_weight_consideration', 'weight')
+            status += util_function(data_warehouse_course_id, is_weight_considered_sql,
+                                    'assignment_weight_consideration', 'weight')
 
             logger.debug(status + "\n\n")
 
@@ -705,7 +710,8 @@ class DashboardCronJob(CronJobBase):
 
         for course in courses:
             updated_fields: List[str] = []
-            warehouse_course_dict: Dict[str, Any] = warehouse_courses_data.loc[warehouse_courses_data['id'] == course.id].iloc[0].to_dict()
+            warehouse_course_dict: Dict[str, Any] = warehouse_courses_data.loc[warehouse_courses_data['id']
+                                                                               == course.id].iloc[0].to_dict()
 
             warehouse_course_name: str = warehouse_course_dict['name']
             if course.name != warehouse_course_name:
@@ -720,11 +726,13 @@ class DashboardCronJob(CronJobBase):
                 updated_fields.append('term')
 
             warehouse_date_start: Union[datetime, None] = (
-                warehouse_course_dict['start_at'].to_pydatetime() if pd.notna(warehouse_course_dict['start_at']) else None
+                warehouse_course_dict['start_at'].to_pydatetime() if pd.notna(
+                    warehouse_course_dict['start_at']) else None
             )
             updated_fields += soft_update_datetime_field(course, 'date_start', warehouse_date_start)
             warehouse_date_end: Union[datetime, None] = (
-                warehouse_course_dict['conclude_at'].to_pydatetime() if pd.notna(warehouse_course_dict['conclude_at']) else None
+                warehouse_course_dict['conclude_at'].to_pydatetime() if pd.notna(
+                    warehouse_course_dict['conclude_at']) else None
             )
             updated_fields += soft_update_datetime_field(course, 'date_end', warehouse_date_end)
 
@@ -747,7 +755,7 @@ class DashboardCronJob(CronJobBase):
         if len(invalid_course_id_list) > 0:
             # error out and stop cron job
             status += f"ERROR: Those course ids are invalid: {invalid_course_id_list}\n"
-            status += "End cron: " +  str(datetime.now()) + "\n"
+            status += "End cron: " + str(datetime.now()) + "\n"
             logger.info("************ total status=" + status + "/n/n")
             return (status,)
 
@@ -792,9 +800,11 @@ class DashboardCronJob(CronJobBase):
             logger.info("** informational")
             status += self.update_unizin_metadata()
 
-        courses_added_during_cron: List[int] = list(set(Course.objects.get_supported_courses()) - set(self.valid_locked_course_ids))
+        courses_added_during_cron: List[int] = list(
+            set(Course.objects.get_supported_courses()) - set(self.valid_locked_course_ids))
         if courses_added_during_cron:
-            logger.warning(f'During the run, users added {len(courses_added_during_cron)} course(s): {courses_added_during_cron}')
+            logger.warning(
+                f'During the run, users added {len(courses_added_during_cron)} course(s): {courses_added_during_cron}')
             logger.warning(f'No data was pulled for these courses.')
 
         # Set all of the courses to have been updated now (this is the same set update_course runs on)
@@ -804,7 +814,7 @@ class DashboardCronJob(CronJobBase):
         else:
             logger.warn("data_last_updated not updated because of an Exception during this run")
 
-        status += "End cron: " +  str(datetime.now()) + "\n"
+        status += "End cron: " + str(datetime.now()) + "\n"
 
         logger.info("************ total status=" + status + "\n")
 

@@ -134,5 +134,273 @@
                 '''
             ]
         }
+    },
+    ## compare the UDP vs UDW queries in cron job
+    "UDP_VS_UDW_QUERIES": {
+        # you can comment out and choose to execute validation/compare for specific type
+        "user" :{
+            "udw_query_string":
+            '''
+            with
+            enroll_data as (select id as enroll_id, user_id, type from enrollment_dim where course_id='{data_warehouse_course_id}'
+                            and type in ('StudentEnrollment', 'TaEnrollment', 'TeacherEnrollment') and workflow_state= 'active'),
+            user_info as (select p.unique_name,p.sis_user_id, u.name, u.id as user_id, u.global_canvas_id
+                        from (SELECT ROW_NUMBER() OVER (PARTITION BY user_id order by sis_user_id asc) AS row_number, * FROM pseudonym_dim) as p
+                        join user_dim u on u.id = p.user_id WHERE row_number = 1),
+            user_enroll as (select u.unique_name, u.sis_user_id, u.name, u.user_id, e.enroll_id,
+                            u.global_canvas_id, e.type from enroll_data e join user_info u on e.user_id= u.user_id),
+            course_fact as (select enrollment_id, current_score, final_score from course_score_fact
+                            where course_id='{data_warehouse_course_id}'),
+            final as (select u.global_canvas_id as user_id,u.name, u.sis_user_id as sis_id, u.unique_name as sis_name,
+                    '{data_warehouse_course_id}' as course_id, c.current_score as current_grade, c.final_score as final_grade,
+                    u.type as enrollment_type
+                    from user_enroll u left join course_fact c on u.enroll_id= c.enrollment_id)
+            select * from final
+            order by user_id
+            ''',
+            "udp_query_string":
+            '''
+            select
+                p2.lms_ext_id as user_id,
+                p.first_name || ' ' || p.last_name as name,
+                '' as sis_id,
+                lower(split_part(pe.email_address , '@', 1)) as sis_name,
+                co.lms_int_id as course_id,
+                cg.le_current_score as current_grade,
+                cg.le_final_score as final_grade,
+                case
+                    when cse.role = 'Student' then 'StudentEnrollment'
+                    when cse.role = 'TeachingAssistant' then 'TaEnrollment'
+                    when cse.role = 'Teacher' then 'TeacherEnrollment'
+                    else '' end
+                    as enrollment_type
+            from entity.course_section_enrollment cse
+            left join entity.course_section cs
+                on cse.course_section_id = cs.course_section_id
+            left join keymap.course_offering co
+                on cs.course_offering_id = co.id
+            left join entity.person p
+                on cse.person_id = p.person_id
+            left join keymap.person p2
+                on p.person_id = p2.id
+            left join entity.person_email pe
+                on p.person_id = pe.person_id
+            left join entity.course_grade cg
+                on cse.course_section_id = cg.course_section_id and cse.person_id = cg.person_id
+            where
+                co.lms_int_id ='{data_warehouse_course_id}'
+                and cse.role in ('Student', 'TeachingAssistant', 'Teacher')
+                --and cse.role_status = 'Enrolled'
+                and lower(pe.email_type)='organizational'
+            order by p2.lms_ext_id
+            '''
+        },
+        "assignment_groups": {
+            "udw_query_string":
+            '''
+            with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{data_warehouse_course_id}' and ad.visibility = 'everyone' and ad.workflow_state='published'),
+            assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf on agd.id = agf.assignment_group_id  where agd.course_id='{data_warehouse_course_id}' and workflow_state='available'),
+            assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join (select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id ),
+            grp_full as (select a.group_points, b.assignment_group_id from assign_more a right join assignment_grp b on a.assignment_group_id = b.assignment_group_id),
+            assign_rules as (select DISTINCT ad.assignment_group_id,agr.drop_lowest,agr.drop_highest from grp_full ad join assignment_group_rule_dim agr on ad.assignment_group_id=agr.assignment_group_id),
+            assignment_grp_points as (select ag.*, am.group_points AS group_points from assignment_grp ag join grp_full am on ag.assignment_group_id = am.assignment_group_id),
+            assign_final as (select assignment_group_id AS id, course_id AS course_id, group_weight AS weight, name AS name, group_points AS group_points from assignment_grp_points)
+            select g.*, ar.drop_lowest,ar.drop_highest from assign_rules ar join assign_final g on ar.assignment_group_id=g.id
+            order by id;
+            '''
+            ,
+            "udp_query_string":
+            '''
+            with assignment_details as (
+                select la.due_date, title, la.course_offering_id, la.learner_activity_id, la.points_possible, la.learner_activity_group_id
+                from entity.learner_activity la, keymap.course_offering co
+                where
+                    la.visibility = 'everyone'
+                    and	la.status = 'published'
+                    and la.course_offering_id = co.id
+                    and co.lms_int_id = '{data_warehouse_course_id}'
+                ), assignment_grp as (
+                    select lg.*
+                    from entity.learner_activity_group lg, keymap.course_offering co
+                    where
+                    lg.status = 'available'
+                    and lg.course_offering_id = co.id
+                    and co.lms_int_id = '{data_warehouse_course_id}'
+                ), assign_more as (
+                    select distinct(a.learner_activity_group_id), da.group_points
+                    from assignment_details a
+                    join (
+                        select learner_activity_group_id, sum(points_possible) as group_points
+                        from assignment_details
+                        group by learner_activity_group_id
+                    ) as da
+                        on a.learner_activity_group_id = da.learner_activity_group_id
+                ), grp_full as (
+                    select a.group_points, b.learner_activity_group_id
+                    from assign_more a
+                    right join assignment_grp b
+                        on a.learner_activity_group_id = b.learner_activity_group_id
+                ), assign_rules as (
+                    select distinct ad.learner_activity_group_id, agr.drop_lowest_amount as drop_lowest, agr.drop_highest_amount as drop_highest
+                    from grp_full ad
+                    join entity.learner_activity_group agr
+                        on ad.learner_activity_group_id = agr.learner_activity_group_id
+                ), assignment_grp_points as (
+                    select ag.*, am.group_points AS group_points, ar.drop_lowest as drop_lowest, ar.drop_highest as drop_highest
+                    from assignment_grp ag 
+                    join grp_full am on ag.learner_activity_group_id = am.learner_activity_group_id
+                    join assign_rules ar on ag.learner_activity_group_id = ar.learner_activity_group_id
+                )
+                select
+                cast(lag_km.lms_int_id as BIGINT) as id,
+                cast(co_km.lms_int_id as BIGINT) as course_id,
+                cast(agp.group_weight as float) as weight,
+                agp.name as name,
+                agp.group_points as group_points,
+                agp.drop_lowest as drop_lowest, 
+                agp.drop_highest as drop_highest
+                from assignment_grp_points agp, 
+                keymap.course_offering co_km, 
+                keymap.learner_activity_group lag_km
+                where agp.course_offering_id = co_km.id
+                and agp.learner_activity_group_id = lag_km.id
+                order by id
+            '''
+        },
+        "assignment": {
+            "udw_query_string":
+            '''
+            with assignment_info as
+                (select ad.due_at AS due_date,ad.due_at at time zone 'America/Detroit' as local_date,
+                ad.title AS name,af.course_id AS course_id,af.assignment_id AS id,
+                af.points_possible AS points_possible,af.assignment_group_id AS assignment_group_id
+                from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{data_warehouse_course_id}'
+                and ad.visibility = 'everyone' and ad.workflow_state='published')
+            select * from assignment_info
+            order by id
+            '''
+            ,
+            "udp_query_string": 
+            '''
+            with assignment_info as
+            (
+                select
+                    la.due_date as due_date,
+                    la.due_date at time zone 'America/Detroit' as local_date,
+                    la.title as name,
+                    cast(co.lms_int_id as BIGINT) as course_id,
+                    cast(la_km.lms_int_id as BIGINT) as id,
+                    la.points_possible as points_possible,
+                    cast(lag_km.lms_int_id as BIGINT) as assignment_group_id
+                from
+                    entity.learner_activity la,
+                    keymap.course_offering co,
+                    keymap.learner_activity la_km,
+                    keymap.learner_activity_group lag_km
+                where
+                    la.visibility = 'everyone'
+                    and	la.status = 'published'
+                    and la.course_offering_id = co.id
+                    and co.lms_int_id = '{data_warehouse_course_id}'
+                    and la.learner_activity_id = la_km.id
+                    and la.learner_activity_group_id = lag_km.id
+            )
+            select * from assignment_info
+            order by id
+            '''
+        }, 
+        "assignment_weight": {
+            "udw_query_string":
+            '''
+            with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact
+            where course_id = '{data_warehouse_course_id}' group by course_id having sum(group_weight)>1)
+            (select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)
+            ''',
+            "udp_query_string":
+            '''
+            with course as (
+                select 	course_offering_id as course_id,
+                        sum(group_weight) as group_weight
+                from entity.learner_activity_group lag, keymap.course_offering co_km
+                where 
+                lag.course_offering_id = co_km.id
+                and co_km.lms_int_id = '{data_warehouse_course_id}'
+                group by course_offering_id
+                having sum(group_weight) > 1
+            )
+            (select case when exists (
+                select *
+                from course
+                where group_weight > 1
+            ) then cast(1 as boolean) else cast(0 as boolean) end)
+            '''
+        },
+        "term": {
+            "udw_query_string":
+            '''
+            SELECT id, canvas_id, name, date_start, date_end FROM enrollment_term_dim order by id;
+            ''',
+            "udp_query_string":
+            '''
+            select
+                cast(ka.lms_int_id as BIGINT) as id,
+                cast(ka.lms_ext_id as BIGINT) as canvas_id,
+                a.name as name,
+                a.term_begin_date at time zone 'UTC' as date_start,
+                a.term_end_date at time zone 'UTC' as date_end
+            from
+                entity.academic_term as a
+                left join keymap.academic_term as ka on ka.id = a.academic_term_id
+            where
+                ka.lms_ext_id is not null
+            order by id
+            '''
+        },
+        "course": {
+            "udw_query_string":
+            '''
+                select id, canvas_id, enrollment_term_id, name, start_at, conclude_at
+                from course_dim c
+                where c.id = '{data_warehouse_course_id}'
+            ''',
+            "udp_query_string":
+            '''
+            SELECT
+                cast(co2.lms_int_id as BIGINT) as id,
+                cast(co2.lms_ext_id as BIGINT) as canvas_id,
+                cast(at2.lms_int_id as BIGINT) as enrollment_term_id,
+                co.title as name, -- different than Canvas course name
+                co.start_date at time zone 'UTC' as start_at,
+                co.end_date as conclude_at
+            FROM
+                entity.course_offering co,
+                entity.academic_session as3,
+                keymap.course_offering co2,
+                keymap.academic_term at2
+                WHERE co2.lms_int_id = '{data_warehouse_course_id}'
+                and co.course_offering_id = co2.id
+                and co.academic_session_id = as3.academic_session_id
+                and at2.id = as3.academic_term_id
+            '''
+        },
+        "resource": {
+            "udw_query_string":
+            '''
+                select id, file_state, display_name from file_dim 
+                where course_id = '{data_warehouse_course_id}'
+            ''',
+            "udp_query_string":
+            '''
+            select 
+	            cast(f_km.lms_int_id as BIGINT) as id, 
+	            f.status as file_state, 
+	            f.display_name as display_name
+            from entity.file f, keymap.file f_km, keymap.course_offering co_km
+            where
+            	f.course_offering_id = co_km.id
+	            and f.file_id = f_km.id
+	            and co_km.lms_int_id = '{data_warehouse_course_id}'
+            '''
+        }
     }
 }
