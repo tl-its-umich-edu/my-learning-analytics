@@ -252,7 +252,6 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
 
     // Make sure the page doesnt scroll
     d3.event.stopPropagation()
-    d3.event.preventDefault()
     // Move the brush
     gBrush.call(brush.move, [topSection, topSection + size])
   }
