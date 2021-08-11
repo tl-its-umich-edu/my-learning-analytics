@@ -26,7 +26,6 @@ django-filter==2.4.0
 
 # object-level permissions
 rules==3.0
-django-model-utils==4.1.1
 
 # These should be okay to update minors
 numpy==1.19.1
