@@ -147,7 +147,6 @@ CONTEXT_PROCESSORS = [
     'django.template.context_processors.request',
     'django.contrib.messages.context_processors.messages',
     'django_su.context_processors.is_su',
-    'django_settings_export.settings_export',
     'dashboard.context_processors.get_git_version_info',
     'dashboard.context_processors.get_myla_globals',
     'dashboard.context_processors.last_updated'
@@ -452,9 +451,6 @@ VIEWS_DISABLED = ENV.get('VIEWS_DISABLED', [])
 
 # Time to run cron
 RUN_AT_TIMES = ENV.get('RUN_AT_TIMES', [])
-
-# Add any settings you need to be available to templates in this array
-SETTINGS_EXPORT = ['LOGIN_URL','LOGOUT_URL','DEBUG', 'GA_ID', 'RESOURCE_VALUES']
 
 # Number of weeks max to allow by default. some begin/end dates in Canvas aren't correct
 MAX_DEFAULT_WEEKS = ENV.get("MAX_DEFAULT_WEEKS", 16)
