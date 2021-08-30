@@ -116,7 +116,6 @@ INSTALLED_APPS = [
     'graphene_django',
     'django_cron',
     'watchman',
-    'macros',
     'pinax.eventlog',
     'webpack_loader',
     'rules.apps.AutodiscoverRulesConfig',
