@@ -466,7 +466,7 @@ def grade_distribution(request, course_id=0):
     # json for eventlog
     data = {
         "course_id": course_id,
-        "show_number_on_bars": df['show_number_on_bars'].values[0]
+        "show_number_on_bars": int(df['show_number_on_bars'].values[0])
     }
     eventlog(request.user, EventLogTypes.EVENT_VIEW_GRADE_DISTRIBUTION.value, extra=data)
 
