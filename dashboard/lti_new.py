@@ -256,7 +256,7 @@ def extract_launch_variables_for_tool_use(request, message_launch):
             MylaUser.objects.create(name=full_name, sis_name=username,
                                     course_id=canvas_course_long_id,
                                     user_id=canvas_user_long_id, sis_id=user_sis_id,
-                                    enrollment_type=MylaUser.ENROLLMENT_TYPES.TeacherEnrollment)
+                                    enrollment_type=MylaUser.EnrollmentType.TEACHER)
     return course_id
 
 

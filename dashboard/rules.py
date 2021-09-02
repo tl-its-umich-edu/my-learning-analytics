@@ -56,7 +56,7 @@ def is_instructor_in_course_id(self, user, course_id):
 
     try:
         result = User.objects.get_user_in_course_id(user, course_id).filter(
-            enrollment_type=User.ENROLLMENT_TYPES.TeacherEnrollment
+            enrollment_type=User.EnrollmentType.TEACHER
         ).count() > 0
     except User.DoesNotExist:
         logger.error(f'Permission is_instructor_in_course_id: user {user.id} is not an instructor in course {course_id}')
