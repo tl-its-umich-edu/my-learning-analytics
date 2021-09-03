@@ -132,7 +132,7 @@ class AssignmentGroups(models.Model):
 
 class AssignmentWeightConsideration(models.Model):
     course_id = models.BigIntegerField(primary_key=True, verbose_name="Course Id")
-    consider_weight = models.NullBooleanField(blank=True, default=False, verbose_name="Consider Weight")
+    consider_weight = models.BooleanField(null=True, blank=True, default=False, verbose_name="Consider Weight")
 
     class Meta:
         db_table = 'assignment_weight_consideration'
