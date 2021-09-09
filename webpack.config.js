@@ -9,6 +9,7 @@ module.exports = {
     path: path.join(__dirname, 'assets/dist'),
     filename: '[name]-[hash].js'
   },
+  watchOptions: { poll: true },
   devtool: isDevelopment ? 'inline-source-map' : 'false',
   module: {
     rules: [

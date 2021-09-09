@@ -21,7 +21,7 @@ services:
         TZ: ${TZ}
     command: bash -c "./start.sh"
     volumes:
-      - .:/code:delegated
+      - .:/code:cached
       # use the container's node_modules folder (don't override)
       - /code/node_modules/
       - /code/static/
@@ -47,7 +47,7 @@ services:
       target: node-webpack
     command: sh -c "tar zxvf node_modules/all_symlinks.tgz && npm run watch"
     volumes:
-      - .:/usr/src/app:delegated
+      - .:/usr/src/app:cached
       # use the container's node_modules folder (don't override)
       - /usr/src/app/node_modules/
     container_name: webpack_watcher
