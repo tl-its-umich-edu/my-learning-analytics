@@ -51,9 +51,13 @@
                     (commit), {{ git_version.branch }} (branch)
                 </td>
                 {% endif %}
-                {% if last_updated %}
-                <td style="text-align: left">Data last updated on {{last_updated|date:"m/d/Y P T"}}</td>
-                {% endif %}
+                <td style="text-align: left">
+                    {% if last_updated %}
+                    Data last updated on {{last_updated|date:"m/d/Y P T"}}
+                    {% else %}
+                    Data not loaded yet
+                    {% endif %}
+                </td>
             </tr>
         </table>
     </footer>
