@@ -263,7 +263,7 @@ class DashboardCronJob(CronJobBase):
             # There is no catch if this query fails, event_store.events needs to exist
 
             final_query = []
-            for k, query_obj in queries['RESOURCE_ACCESS_CONFIG'].items():
+            for query_obj in queries['RESOURCE_ACCESS_CONFIG'].items():
                 # concatenate the multi-line presentation of query into one single string
                 query = query_obj['query']
                 if (data_last_updated is not None):
@@ -637,7 +637,7 @@ class DashboardCronJob(CronJobBase):
             logger.info("** assignment")
             status += self.update_groups()
             status += self.update_assignment()
-            #status += self.submission()
+            status += self.submission()
             status += self.weight_consideration()
 
             logger.info("** resources")

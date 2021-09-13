@@ -1,9 +1,9 @@
 import os
-import hjson, json
 import logging
+
+import hjson, json
 import pandas as pd
 from sqlalchemy import create_engine
-
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +88,6 @@ def main():
 
     # loop through course ids
     for course_id in DATA_WAREHOUSE_COURSE_IDS:
-        data_warehouse_course_id = int(course_id)
         print(f'\n\nfor course id {course_id}:')
 
         # from the configuration variable, load the queries based on UDP expanded vs events table

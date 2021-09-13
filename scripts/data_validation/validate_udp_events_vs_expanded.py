@@ -1,6 +1,7 @@
 import os
-import hjson
 import logging
+
+import hjson
 import pandas as pd
 from google.cloud import bigquery
 
