@@ -22,8 +22,6 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-from model_utils import Choices
-
 
 class AcademicTerms(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Term Id")
@@ -134,7 +132,7 @@ class AssignmentGroups(models.Model):
 
 class AssignmentWeightConsideration(models.Model):
     course_id = models.BigIntegerField(primary_key=True, verbose_name="Course Id")
-    consider_weight = models.NullBooleanField(blank=True, default=False, verbose_name="Consider Weight")
+    consider_weight = models.BooleanField(null=True, blank=True, default=False, verbose_name="Consider Weight")
 
     class Meta:
         db_table = 'assignment_weight_consideration'
@@ -380,14 +378,13 @@ class UserQuerySet(models.QuerySet):
         )
 
 class User(models.Model):
-    ENROLLMENT_TYPES = Choices(
-        ('StudentEnrollment', 'Student'),
-        #('StudentViewEnrollment', 'Student View'),
-        ('TaEnrollment', 'Teaching Assistant'),
-        ('TeacherEnrollment', 'Instructor'),
-        #('DesignerEnrollment', 'Designer'),
-        #('ObserverEnrollment', 'Observer'),
-    )
+    class EnrollmentType(models.TextChoices):
+        STUDENT = 'StudentEnrollment', 'Student'
+        TA = 'TaEnrollment', 'Teaching Assistant'
+        TEACHER = 'TeacherEnrollment', 'Instructor'
+        # STUDENT_VIEW = 'StudentViewEnrollment', 'Student View'
+        # DESIGNER = 'DesignerEnrollment', 'Designer'
+        # OBSERVER = 'ObserverEnrollment', 'Observer'
 
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
     user_id = models.BigIntegerField(null=False, blank=False, verbose_name="User Id")
@@ -397,7 +394,7 @@ class User(models.Model):
     course_id = models.BigIntegerField(blank=True, null=True, verbose_name="Course Id")
     current_grade = models.FloatField(blank=True, null=True, verbose_name="Current Grade")
     final_grade = models.FloatField(blank=True, null=True, verbose_name="Final Grade")
-    enrollment_type = models.CharField(max_length=50, choices=ENROLLMENT_TYPES, blank=True, null=True, verbose_name="Enrollment Type")
+    enrollment_type = models.CharField(max_length=50, choices=EnrollmentType.choices, blank=True, null=True, verbose_name="Enrollment Type")
 
     objects = UserQuerySet.as_manager()
 

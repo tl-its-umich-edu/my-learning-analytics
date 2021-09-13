@@ -1,7 +1,7 @@
 # Some utility functions used by other classes in this project
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, TypedDict, Union
+from typing import Dict, List, TypedDict, Union
 
 from dateutil.parser import parse
 import django
@@ -147,17 +147,17 @@ def get_user_courses_info(username: str, course_id: Union[int, None] = None) -> 
     return enrollments
 
 
-def get_last_cronjob_run():
+def get_last_cronjob_run() -> Union[datetime, None]:
     try:
         c = CronJobLog.objects.filter(is_success=1).latest('end_time')
         end_time = c.end_time
         return end_time
     except CronJobLog.DoesNotExist:
         logger.info("CronJobLog did not exist", exc_info = True)
-    return datetime.min
+    return None
 
 
-def get_canvas_data_date():
+def get_canvas_data_date() -> Union[datetime, None]:
     if not settings.DATABASES.get('DATA_WAREHOUSE', {}).get('IS_UNIZIN'):
         return get_last_cronjob_run()
 
@@ -170,4 +170,4 @@ def get_canvas_data_date():
                 return date
     except Exception:
         logger.info("Value could not be found from metadata", exc_info = True)
-    return datetime.min
+    return None

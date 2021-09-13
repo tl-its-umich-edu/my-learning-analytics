@@ -450,8 +450,8 @@ def grade_distribution(request, course_id=0):
     logger.debug(f"Grades distribution: {grades}")
     BinningGrade = find_binning_grade_value(grades)
     if BinningGrade is not None and not BinningGrade.binning_all:
-        df['current_grade'] = df['current_grade'].replace(df['current_grade'].head(BinningGrade.index),
-                                                      BinningGrade.value)
+        scores_to_replace = df['current_grade'].head(BinningGrade.index).to_list()
+        df['current_grade'] = df['current_grade'].replace(scores_to_replace, BinningGrade.value)
     summary['show_dash_line'] = show_dashed_line(df['current_grade'].iloc[0], BinningGrade)
     
     if df[df['current_grade'] > 100.0].shape[0] > 0:
@@ -466,7 +466,7 @@ def grade_distribution(request, course_id=0):
     # json for eventlog
     data = {
         "course_id": course_id,
-        "show_number_on_bars": df['show_number_on_bars'].values[0]
+        "show_number_on_bars": int(df['show_number_on_bars'].values[0])
     }
     eventlog(request.user, EventLogTypes.EVENT_VIEW_GRADE_DISTRIBUTION.value, extra=data)
 
@@ -654,7 +654,7 @@ def get_course_assignments(course_id):
     if hidden_assignments:
         assignments_in_course['name'] = assignments_in_course['name'].fillna(assignments_in_course['assign_grp_name']+' Group Unavailable Assignments')
     assignments_in_course['towards_final_grade']=assignments_in_course.apply(lambda x: percent_calculation(consider_weight, total_points,hidden_assignments, x), axis=1)
-    assignments_in_course['calender_week']=assignments_in_course['due_date'].dt.week
+    assignments_in_course['calender_week']=assignments_in_course['due_date'].dt.isocalendar().week
     assignments_in_course['calender_week']=assignments_in_course['calender_week'].fillna(0).astype(int)
     min_week=find_min_week(course_id)
     max_week=assignments_in_course['calender_week'].max()
