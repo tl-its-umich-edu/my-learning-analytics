@@ -223,28 +223,6 @@
     "/* More sample queries are provided in the MyLA GitHub wiki page: https://github.com/tl-its-umich-edu/my-learning-analytics/wiki/Deploy:-Institution-Architectures": "*/",
     "RESOURCE_ACCESS_CONFIG": {
         "canvas": {
-            "query": [
-                "SELECT 'canvas' AS resource_type, ",
-                "REGEXP_EXTRACT(object.id, r'.*:(.*)') AS resource_id, ",
-                "CAST(REGEXP_EXTRACT(membership.id, r'.*:(.*)') AS INT64) AS user_id, ",
-                "CAST(null as string) AS user_login_name, ",
-                "CAST(REGEXP_EXTRACT(`group`.id, r'.*:(.*)') AS INT64) AS course_id, ",
-                "COALESCE(",
-                "JSON_EXTRACT_SCALAR(object.extensions, '$[\\'com.instructure.canvas\\'][asset_name]'), ",
-                "JSON_EXTRACT_SCALAR(object.extensions, '$[\\'com.instructure.canvas\\'][filename]'), ",
-                "object.name, ",
-                "'attachment' ",
-                ") as name, ",
-                "datetime(EVENT_TIME) as access_time ",
-                "FROM event_store.expanded ",
-                "where ",
-                "JSON_EXTRACT_SCALAR(ed_app.json, '$.id') IN UNNEST(['http://m.canvas.umich.edu/', 'http://umich.instructure.com/']) ",
-                "and type = 'NavigationEvent' ",
-                "and object.name = 'attachment' ",
-                "and action = 'NavigatedTo' ",
-                "and membership.id is not null ",
-                "and REGEXP_EXTRACT(`group`.id, r'.*:(.*)') IN UNNEST(@course_ids)"
-            ],
             "app_display_name": "Canvas Files",
             "canvas_course_id_format": "LONG",
             "urls": {"prefix": "https://example.instructure.com/files/", "postfix": "/download?download_frd=1"}

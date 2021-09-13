@@ -135,6 +135,8 @@ MIDDLEWARE = [
 CRON_CLASSES = [
     "dashboard.cron.DashboardCronJob",
 ]
+# the cron.hjson file contains queries run by MyLA cron job
+CRON_QUERY_FILE = ENV.get('CRON_QUERY_FILE', '/secrets/cron.hjson')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 CONTEXT_PROCESSORS = [

@@ -15,6 +15,7 @@ These instructions will get a copy of MyLA up and running on your local machine 
 1. Then cd into the repo. `cd my-learning-analytics`
 1. Create a directory in your home directory called "mylasecrets". `mkdir ~/mylasecrets`. This directory is mapped by docker-compose.yml into the container as /secrets/
 1. Copy the config/env_sample.json into mylasecrets as env.json. `cp config/env_sample.json ~/mylasecrets/env.json`
+1. Copy the config/cron.hjson file into mylasecrets. `cp config/cron.hjson ~/mylasecrets/cron.hjson`
 1. Examine the `env.json` file, you may need to change some of the configuration in it now or later. There are comments to help the configuration.
 1. Create a new `.env` file and copy the values from `.env.sample`, which has the suggested default environment variable settings.
 1. Examine the `.env` file. It mostly just has the MySQL information as well as locations of the environment files.
@@ -203,9 +204,9 @@ To update snapshots, execute `docker exec -it webpack_watcher npm run-script upd
 
 Data validation scripts are in scripts/data_validation folder. To run the data validation scripts, follow the steps below:
 
-1. Copy env.hjson file from env_sample.hjson file
+1. Copy env.json file from env_sample.json file
    ```sh
-   cp scripts/data_validation/env_sample.hjson scripts/data_validation/env.hjson
+   cp scripts/data_validation/env_sample.json scripts/data_validation/env.json
    ```
 2. Update the configuration values. Note the hard-coded Michigan specific filters in various query strings. Please adjust those values for your institution usage.
 
@@ -217,6 +218,7 @@ Data validation scripts are in scripts/data_validation folder. To run the data v
      docker exec -it student_dashboard /bin/bash -c "python scripts/data_validation/validate_udp_events_vs_expanded.py"
      ```
     - Validate UDP context store queries: This script will validate queries against the UDP context_store tables, and compare whether the data results are identical with those returned from Unizin Data Warehouse(UDW) tables.
+        - Before running this queries, please make sure there are two cron queries files in ~/mylasecrets folder, naming cron.hjson (for UDW queries ) and cron_udp.hjson (for UDP queries) 
 
      ```sh
      docker exec -it student_dashboard /bin/bash -c "python scripts/data_validation/validate_udw_vs_udp.py"
