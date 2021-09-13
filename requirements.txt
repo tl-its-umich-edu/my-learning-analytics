@@ -30,7 +30,7 @@ pangres==2.3.1
 
 # These caused problems in the past so test when updating
 djangosaml2==0.19.1
-pysaml2==5.1.0
+pysaml2==6.5.0
 
 SQLAlchemy==1.4.22
 psycopg2==2.9.1
