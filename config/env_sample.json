@@ -96,6 +96,8 @@
     "STUDENT_DASHBOARD_LTI": false,
     "/*  LTI 1.3 configuration":"*/",
     "/*  The first key of LTI_CONFIG is the Canvas URL (production, beta, or test)":"*/",
+    "/*  Note: If you leave this undefined, it will be available for configuration in the admin interface":"*/",
+    "/*  If you define any settings here, these will take effect instead of the admin settings":"*/",
     "LTI_CONFIG": {
         "https://canvas.instructure.com": [
             {
