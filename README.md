@@ -89,12 +89,6 @@ You may also optionally place the json settings directly into the `ENV_JSON` env
 ### Secrets (Optional)
 The `bq_cred.json` defined in the `.env` file is service account for BigQuery, and it needs to be supplied and put into the directory defined in the `.env` file and setup in the environment.
 
-(Openshift Only) The `/secrets/saml` directory needs to contain 4 files for SAML configuration. These are currently hard-coded in `settings.py` though the path comes from the environment SAML2_FILES_BASE.
-
-	remote-metadata.xml
-	student-dashboard-saml.key
-	student-dashboard-saml.pem
-
 ### Control course view options
 View options can be controlled at the global and course level. If a view is disabled globally, it will be disabled for every course, even if previously enabled at the course level. If a view is not globally disabled, it can still be disabled at the course level.
 

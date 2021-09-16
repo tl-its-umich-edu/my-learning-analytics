@@ -42,7 +42,6 @@ else:
 LOGIN_URL = '/accounts/login/'
 # Note the absence of the trailing slash.
 # In local development, a slash will be appended by Django during logout.
-# However, the SAML inplementation breaks on logout if a slash is used here.
 LOGOUT_URL = '/accounts/logout'
 HELP_URL = ENV.get("HELP_URL", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics")
 
@@ -88,16 +87,12 @@ WATCHMAN_DATABASES = ('default',)
 # courses_enabled api
 COURSES_ENABLED = ENV.get('COURSES_ENABLED', False)
 STUDENT_DASHBOARD_LTI = ENV.get('STUDENT_DASHBOARD_LTI', False)
-STUDENT_DASHBOARD_SAML = ENV.get('STUDENT_DASHBOARD_SAML', False)
 
 # Defaults for DEBUGPY
 DEBUGPY_ENABLE = ENV.get("DEBUGPY_ENABLE", False)
 DEBUGPY_REMOTE_ADDRESS = ENV.get("DEBUGPY_REMOTE_ADDRESS", "0.0.0.0")
 DEBUGPY_REMOTE_PORT = ENV.get("DEBUGPY_REMOTE_PORT", 3000)
 DEBUGPY_WAIT_FOR_ATTACH = ENV.get("DEBUGPY_WAIT_FOR_ATTACH", False)
-
-LOGIN_REDIRECT_URL = ENV.get('DJANGO_LOGIN_REDIRECT_URL', '/')
-LOGOUT_REDIRECT_URL = ENV.get('DJANGO_LOGOUT_REDIRECT_URL', '/')
 
 # Application definition
 
@@ -349,94 +344,6 @@ AUTHENTICATION_BACKENDS: Tuple[str, ...] = (
     'django_su.backends.SuBackend',
 )
 
-if STUDENT_DASHBOARD_SAML:
-    import saml2
-
-    SAML2_URL_PATH = '/accounts/'
-    # modify to use port request comes
-    SAML2_URL_BASE = ENV.get('DJANGO_SAML2_URL_BASE', '/accounts/')
-    SAML2_DEFAULT_IDP = ENV.get('DJANGO_SAML2_DEFAULT_IDP', '')
-    # Append the query parameter for idp to the default if it's set, otherwise do nothing
-    if SAML2_DEFAULT_IDP:
-        SAML2_DEFAULT_IDP = '?idp=%s' % SAML2_DEFAULT_IDP
-
-    INSTALLED_APPS += ('djangosaml2',)
-    AUTHENTICATION_BACKENDS += (
-        'djangosaml2.backends.Saml2Backend',
-    )
-    LOGIN_URL = '%slogin/%s' % (SAML2_URL_PATH, SAML2_DEFAULT_IDP)
-    SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-    BASEDIR = os.path.dirname(os.path.abspath(__file__))
-    SAML2_FILES_BASE = ENV.get('SAML2_FILES_BASE', '/saml/')
-    SAML2_REMOTE_METADATA = ENV.get('SAML2_REMOTE_METADATA', '')
-    SAML2_REMOTE_PEM_FILE = ENV.get('SAML2_REMOTE_PEM_FILE', '')
-
-    SAML_CONFIG = {
-        'xmlsec_binary': '/usr/bin/xmlsec1',
-        'entityid': '%smetadata/' % SAML2_URL_BASE,
-
-        # directory with attribute mapping
-        # 'attribute_map_dir': path.join(BASEDIR, 'attribute-maps'),
-        'name': 'Student Dashboard',
-        # this block states what services we provide
-        'service': {
-            # we are just a lonely SP
-            'sp': {
-                'name': 'Student Dashboard',
-                'name_id_format': ('urn:oasis:names:tc:SAML:2.0:'
-                                   'nameid-format:transient'),
-                'authn_requests_signed': 'true',
-                'allow_unsolicited': True,
-                'endpoints': {
-                    # url and binding to the assetion consumer service view
-                    # do not change the binding or service name
-                    'assertion_consumer_service': [
-                        ('%sacs/' % SAML2_URL_BASE, saml2.BINDING_HTTP_POST),
-                    ],
-                    # url and binding to the single logout service view+
-
-                    # do not change the binding or service name
-                    'single_logout_service': [
-                        ('%sls/' % SAML2_URL_BASE, saml2.BINDING_HTTP_REDIRECT),
-                        ('%sls/post' % SAML2_URL_BASE, saml2.BINDING_HTTP_POST),
-                    ],
-                },
-
-                # attributes that this project need to identify a user
-                'required_attributes': ['uid'],
-
-                # attributes that may be useful to have but not required
-                'optional_attributes': ['eduPersonAffiliation'],
-            },
-        },
-
-        # where the remote metadata is stored
-        'metadata': [{
-            "class": "saml2.mdstore.MetaDataExtern",
-            "metadata": [
-                (SAML2_REMOTE_METADATA, SAML2_REMOTE_PEM_FILE)]
-            }
-        ],
-
-        # set to 1 to output debugging information
-        'debug': DEBUG,
-
-        # certificate
-        'key_file': os.path.join(SAML2_FILES_BASE, 'student-dashboard-saml.key'),  'cert_file': os.path.join(SAML2_FILES_BASE, 'student-dashboard-saml.pem'),
-    }
-
-    ACS_DEFAULT_REDIRECT_URL = ENV.get('DJANGO_ACS_DEFAULT_REDIRECT', '/')
-
-    SAML_CREATE_UNKNOWN_USER = True
-
-    SAML_ATTRIBUTE_MAPPING = {
-        'uid': ('username', ),
-        'mail': ('email', ),
-        'givenName': ('first_name', ),
-        'sn': ('last_name', ),
-    }
-
 if STUDENT_DASHBOARD_LTI:
     LTI_CONFIG = ENV.get('LTI_CONFIG', {})
     LTI_CONFIG_TEMPLATE_PATH = ENV.get('LTI_CONFIG_TEMPLATE_PATH')
@@ -493,12 +400,12 @@ if CSRF_COOKIE_SECURE:
 SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", 'None')
 CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", 'None')
 
-CHECK_ENABLE_BACKEND_LOGIN = False if STUDENT_DASHBOARD_SAML or STUDENT_DASHBOARD_LTI else True
+CHECK_ENABLE_BACKEND_LOGIN = False if STUDENT_DASHBOARD_LTI else True
 
 # Allow for ENABLE_BACKEND_LOGIN override
 ENABLE_BACKEND_LOGIN = ENV.get("ENABLE_BACKEND_LOGIN", CHECK_ENABLE_BACKEND_LOGIN)
-# only show logout URL with saml and django forms
-SHOW_LOGOUT_LINK = True if ENABLE_BACKEND_LOGIN or STUDENT_DASHBOARD_SAML else False
+# only show logout URL with backend enabled
+SHOW_LOGOUT_LINK = True if ENABLE_BACKEND_LOGIN else False
 
 # If backend login is still enabled or LTI is used (since it uses this), enable the ModelBackend
 if ENABLE_BACKEND_LOGIN or STUDENT_DASHBOARD_LTI:
