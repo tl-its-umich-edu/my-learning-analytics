@@ -78,17 +78,6 @@ urlpatterns = [
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
-if apps.is_installed('djangosaml2'):
-    from djangosaml2.views import echo_attributes
-    urlpatterns += (
-        # This URL *does* need a trailing slash because of the include
-        path('accounts/', include('djangosaml2.urls')),
-        path('samltest/', login_required(echo_attributes)),
-        # Override auth_logout from djangosaml2 and registration for consistency
-        # Note the absence of a trailing slash; adding one breaks the SAML implementation.
-        path('accounts/logout', views.logout, name='auth_logout')
-    )
-
 if settings.STUDENT_DASHBOARD_LTI:
     from . import lti_new
     urlpatterns += (
@@ -101,7 +90,7 @@ if settings.STUDENT_DASHBOARD_LTI:
 
 if settings.ENABLE_BACKEND_LOGIN:
     from django.contrib.auth import views as auth_views
-    # Login patterns for testing, SAML should be installed in prod
+    # Login patterns for testing
     urlpatterns += (
         path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
         path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
