@@ -40,9 +40,7 @@ else:
         ENV = os.environ
 
 LOGIN_URL = '/accounts/login/'
-# Note the absence of the trailing slash.
-# In local development, a slash will be appended by Django during logout.
-LOGOUT_URL = '/accounts/logout'
+LOGOUT_URL = '/accounts/logout/'
 HELP_URL = ENV.get("HELP_URL", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics")
 
 URL_VIEW_RESOURCES_ACCESSED = ENV.get("URL_VIEW_RESOURCES_ACCESSED", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/resources-accessed")
