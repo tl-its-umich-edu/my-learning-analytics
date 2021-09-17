@@ -138,7 +138,7 @@
     "/*  Login Redirect, default is /, probably don't need to change.": "*/",
     "DJANGO_LOGIN_REDIRECT_URL": "/",
     "/*  Logout redirect (If SAML enabled)": "*/",
-    "/*  This URL could be configured to the logout, but the default should work fine as LTI doesn't currentlyhave logout.": "*/",
+    "/*  This URL could be configured to the logout, but the default should work fine as LTI doesn't currently have logout.": "*/",
     "DJANGO_LOGOUT_REDIRECT_URL": "/",
     "/*  Optional token value to be used for token based authentication": "*/",
     "DJANGO_WATCHMAN_TOKEN": "",
