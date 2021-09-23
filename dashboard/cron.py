@@ -183,7 +183,8 @@ class DashboardCronJob(CronJobBase):
         for course_id in self.valid_locked_course_ids:
 
             # select all student registered for the course
-            user_sql = queries['CRON_QUERIES']['user'].format(course_id=course_id)
+            user_sql = queries['CRON_QUERIES']['user'].format(
+                course_id=course_id, canvas_data_id_increment=settings.CANVAS_DATA_ID_INCREMENT)
             logger.debug(user_sql)
 
             status += util_function(course_id, user_sql, 'user')
@@ -220,7 +221,8 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in update canvas resource")
 
         # Select all the files for these courses
-        course_ids = self.valid_locked_course_ids
+        # convert int array to str array
+        course_ids = list(map(str, self.valid_locked_course_ids))
         file_sql = queries['CRON_QUERIES']['resource']
         logger.debug(file_sql)
         df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids': tuple(course_ids)})
@@ -256,14 +258,14 @@ class DashboardCronJob(CronJobBase):
         logger.info(f"Deleting all records in resource_access after {data_last_updated}")
 
         status += delete_all_records_in_table("resource_access", f"WHERE access_time > %s", [data_last_updated, ])
+
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
         for data_warehouse_course_ids in split_list(self.valid_locked_course_ids, settings.CRON_BQ_IN_LIMIT):
             # query to retrieve all file access events for one course
             # There is no catch if this query fails, event_store.events needs to exist
-
             final_query = []
-            for query_obj in queries['RESOURCE_ACCESS_CONFIG'].items():
+            for type, query_obj in queries['RESOURCE_ACCESS_CONFIG'].items():
                 # concatenate the multi-line presentation of query into one single string
                 query = query_obj['query']
                 if (data_last_updated is not None):
@@ -272,12 +274,13 @@ class DashboardCronJob(CronJobBase):
                         query += f" {query_obj['query_data_last_updated_condition']} "
                     elif settings.LRS_IS_BIGQUERY:
                         query += " and event_time > CAST(@data_last_updated as DATETIME) "
-
                 final_query.append(query)
             final_query = "  UNION ALL   ".join(final_query)
 
+            # convert int array to string array
             data_warehouse_course_ids_short = [
                 db_util.incremented_id_to_canvas_id(id) for id in data_warehouse_course_ids]
+            course_ids_short = list(map(str, data_warehouse_course_ids_short))
 
             logger.debug(final_query)
             logger.debug(data_warehouse_course_ids)
@@ -285,7 +288,7 @@ class DashboardCronJob(CronJobBase):
             if settings.LRS_IS_BIGQUERY:
                 query_params = [
                     bigquery.ArrayQueryParameter('course_ids', 'STRING', data_warehouse_course_ids),
-                    bigquery.ArrayQueryParameter('course_ids_short', 'STRING', data_warehouse_course_ids_short),
+                    bigquery.ArrayQueryParameter('course_ids_short', 'STRING', course_ids_short),
                     bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64',
                                                   settings.CANVAS_DATA_ID_INCREMENT)
                 ]
@@ -293,7 +296,8 @@ class DashboardCronJob(CronJobBase):
                     # insert the start time parameter for query
                     query_params.append(bigquery.ScalarQueryParameter(
                         'data_last_updated', 'TIMESTAMP', data_last_updated))
-
+                    query_params.append(bigquery.ArrayQueryParameter(
+                        'canvas_event_urls', 'STRING', settings.CANVAS_EVENT_URLS))
                 job_config = bigquery.QueryJobConfig()
                 job_config.query_parameters = query_params
 
@@ -302,10 +306,11 @@ class DashboardCronJob(CronJobBase):
                 # This is the call that could result in an exception
                 resource_access_df: pd.DataFrame = bq_job.result().to_dataframe()
                 total_bytes_billed += bq_job.total_bytes_billed
+                logger.debug(total_bytes_billed)
             else:
                 query_params = {
                     'course_ids': data_warehouse_course_ids,
-                    'course_ids_short': data_warehouse_course_ids_short,
+                    'course_ids_short': course_ids_short,
                     'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT,
                 }
                 if (data_last_updated is not None):
@@ -495,7 +500,8 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         # filter out not released grades (submission_dim.posted_at date is not null) and partial grades (submission_dim.workflow_state != 'graded')
         for course_id in self.valid_locked_course_ids:
-            submission_sql = queries['CRON_QUERIES']['submission'].format(course_id=course_id)
+            submission_sql = queries['CRON_QUERIES']['submission'].format(
+                course_id=course_id, canvas_data_id_increment=settings.CANVAS_DATA_ID_INCREMENT)
             logger.debug(submission_sql)
             status += util_function(course_id, submission_sql,
                                     'submission')

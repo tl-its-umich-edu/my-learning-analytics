@@ -424,6 +424,9 @@ CONSTANCE_CONFIG = {
     'SURVEY_TEXT': ('Take Survey', 'Custom text for Qualtrics survey link and title. If left blank will default to "Take Survey". Must also configure SURVEY_URL. For best mobile fit keep this text to under 6 words/30 characters.', str)
 }
 
+# the url strings for Canvas Caliper events
+CANVAS_EVENT_URLS = ENV.get("CANVAS_EVENT_URLS", [])
+
 # IMPORT LOCAL ENV
 # =====================
 try:

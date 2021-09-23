@@ -3,10 +3,14 @@
     "user" :
         '''
         select
-            (17700000000000000 + cast(p2.lms_ext_id as bigint)) as user_id,
-            p.first_name || ' ' || p.last_name as name,
+            ({canvas_data_id_increment} + cast(p2.lms_ext_id as bigint)) as user_id,
+            case
+                when p.first_name is not null then p.first_name || ' ' || p.last_name
+                else p.person_id::text end as name,
             '' as sis_id,
-            lower(split_part(pe.email_address , '@', 1)) as sis_name,
+            case
+                when pe.email_address is not null then lower(split_part(pe.email_address , '@', 1))
+                else p.person_id::text end as sis_name,
             co.lms_int_id as course_id,
             cg.le_current_score as current_grade,
             cg.le_final_score as final_grade,
@@ -33,7 +37,6 @@
             co.lms_int_id ='{course_id}'
             and cse.role in ('Student', 'TeachingAssistant', 'Teacher')
             and cse.role_status = 'Enrolled'
-            and lower(pe.email_type)='organizational'
         order by user_id
         ''',
     "assignment_groups": 
@@ -229,7 +232,7 @@
                 cae.assignment_id as assignment_id,
                 cae.course_id as course_id,
                 lar.published_score as published_score,
-                (17700000000000000 + cast(p.lms_ext_id as bigint)) as user_id, 
+                ({canvas_data_id_increment} + cast(p.lms_ext_id as bigint)) as user_id,
                 lar.response_date as submitted_at,
                 lar.graded_date as graded_at,
                 lar.posted_at at time zone 'America/Detroit' as grade_posted_local_date,
@@ -325,40 +328,5 @@
             and membership.id is not null 
             and REGEXP_EXTRACT(`group`.id, r'.*:(.*)') IN UNNEST(@course_ids)
             '''
-    },
-    "leccap": {
-        "query": 
-            '''
-            select 'leccap' AS resource_type, 
-            REGEXP_EXTRACT(object.id, r'.*:(.*)') AS resource_id, 
-            @canvas_data_id_increment + CAST(JSON_EXTRACT_SCALAR(federated_session_json, '$.messageParameters.custom_canvas_user_id') AS INT64) AS user_id, 
-            cast(null as string) AS user_login_name,
-            @canvas_data_id_increment + CAST(JSON_EXTRACT_SCALAR(federated_session_json, '$.messageParameters.custom_canvas_course_id') AS INT64) AS course_id, 
-            object.name as name, 
-            datetime(EVENT_TIME) as access_time 
-            FROM event_store.expanded 
-            where ed_app.id = 'https://leccap.engin.umich.edu/#applicationName=Lecture+Capture'  
-            and type = 'MediaEvent' and action = 'Started' 
-            and JSON_EXTRACT_SCALAR(federated_session_json, '$.messageParameters.custom_canvas_course_id') is not null 
-            and JSON_EXTRACT_SCALAR(federated_session_json, '$.messageParameters.custom_canvas_course_id') IN UNNEST(@course_ids_short) 
-            '''
-    },
-    "mivideo": {
-        "query": 
-            '''
-            SELECT 'mivideo' AS resource_type, 
-            replace(object.id, 'https://aakaf.mivideo.it.umich.edu/caliper/info/media/' , '') AS resource_id, 
-            cast(-1 as INT64) AS user_id, 
-            replace(actor.id, 'https://aakaf.mivideo.it.umich.edu/caliper/info/user/' , '') AS user_login_name, 
-            @canvas_data_id_increment + CAST(JSON_EXTRACT_SCALAR(object.extensions, '$.kaf:course_id') AS INT64) AS course_id, 
-            object.name AS name, 
-            datetime(EVENT_TIME) AS access_time 
-            FROM event_store.expanded 
-            WHERE ed_app.id = 'https://aakaf.mivideo.it.umich.edu/caliper/info/app/KafEdApp'
-            AND TYPE = 'MediaEvent'
-            AND action = 'Started'
-            AND JSON_EXTRACT_SCALAR(object.extensions, '$.kaf:course_id') IN UNNEST(@course_ids_short)
-            '''
     }
-
 }

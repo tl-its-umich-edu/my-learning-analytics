@@ -86,6 +86,8 @@ def main():
 
     DATA_WAREHOUSE_COURSE_IDS = ENV_VALIDATION["DATA_WAREHOUSE_COURSE_IDS"]
 
+    CANVAS_DATA_ID_INCREMENT = ENV_VALIDATION["CANVAS_DATA_ID_INCREMENT"]
+
     # loop through course ids
     for course_id in DATA_WAREHOUSE_COURSE_IDS:
         print(f'\n\nfor course id {course_id}:')
@@ -96,8 +98,10 @@ def main():
         cron_udp_json = ENV_CRON_UDP["CRON_QUERIES"]
         for query_type in cron_udw_json:
             print(f'\ncomparing type {query_type}:')
-            formatted_udw_query_string = cron_udw_json[query_type].format(course_id=course_id)
-            formatted_udp_query_string = cron_udp_json[query_type].format(course_id=course_id)
+            formatted_udw_query_string = cron_udw_json[query_type].format(
+                course_id=course_id, canvas_data_id_increment=CANVAS_DATA_ID_INCREMENT)
+            formatted_udp_query_string = cron_udp_json[query_type].format(
+                course_id=course_id, canvas_data_id_increment=CANVAS_DATA_ID_INCREMENT)
             print(formatted_udw_query_string)
             print(formatted_udp_query_string)
 
