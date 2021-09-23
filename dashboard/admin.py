@@ -8,6 +8,14 @@ from django.template.defaultfilters import linebreaksbr
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
+from pinax.eventlog.admin import LogAdmin
+from pinax.eventlog.models import Log
+from django_cron.admin import CronJobLogAdmin
+from django_cron.models import CronJobLog
+
+from import_export.admin import ExportMixin
+from import_export import resources
+
 from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.models import AcademicTerms, Course, CourseViewOption
 
@@ -79,5 +87,34 @@ class CourseAdmin(admin.ModelAdmin):
         obj.id = canvas_id_to_incremented_id(obj.canvas_id)
         return super(CourseAdmin, self).save_model(request, obj, form, change)
 
+class LogResource(resources.ModelResource):
+    class Meta:
+        model = Log
+
+# This is a local class for logs that adds in Export and disables some actions on the admin
+class MyLALogAdmin(ExportMixin, LogAdmin):
+    resource_class = LogResource
+    # Remove adding and editing for logs
+    def has_add_permission(self, request, obj=None):
+        return False
+    def has_change_permission(self, request, obj=None):
+        return False
+
+# This is local class for Cron that disables add
+class MyLACronJobLogAdmin(CronJobLogAdmin):
+    # Remove adding and editing for cron logs
+    def has_add_permission(self, request, obj=None):
+        return False
+    def has_change_permission(self, request, obj=None):
+        return False
+
 admin.site.register(AcademicTerms, TermAdmin)
 admin.site.register(Course, CourseAdmin)
+
+# Remove the pinax LogAdmin and add ours
+admin.site.unregister(Log)
+admin.site.register(Log, MyLALogAdmin)
+
+# Remove the pinax cron and add ours
+admin.site.unregister(CronJobLog)
+admin.site.register(CronJobLog,MyLACronJobLogAdmin)
