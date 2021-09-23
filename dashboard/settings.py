@@ -349,6 +349,9 @@ if STUDENT_DASHBOARD_LTI:
     LTI_CONFIG = ENV.get('LTI_CONFIG', {})
     LTI_CONFIG_TEMPLATE_PATH = ENV.get('LTI_CONFIG_TEMPLATE_PATH')
     LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION = ENV.get('LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION', False)
+    # If LTI_CONFIG is not defined then add the admin interface config
+    if not LTI_CONFIG:
+        INSTALLED_APPS += ('pylti1p3.contrib.django.lti1p3_tool_config',)
 
 # This is used to fix ids from Canvas Data which are incremented by some large number
 CANVAS_DATA_ID_INCREMENT = ENV.get("CANVAS_DATA_ID_INCREMENT", 17700000000000000)

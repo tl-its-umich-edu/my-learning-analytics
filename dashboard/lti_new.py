@@ -23,7 +23,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from pylti1p3.contrib.django import DjangoOIDCLogin, DjangoMessageLaunch, \
-    DjangoCacheDataStorage
+    DjangoCacheDataStorage, DjangoDbToolConf
 from pylti1p3.tool_config import ToolConfDict
 
 from dashboard.common.db_util import canvas_id_to_incremented_id
@@ -68,38 +68,42 @@ class LTIException(Exception):
 def get_tool_conf():
     lti_config = settings.LTI_CONFIG
 
-    try:
-        config = ToolConfDict(lti_config)
-    except Exception as error:
-        return error
+    # If there are configurations for lti_config, use that otherwise use the database config
+    if lti_config: 
+        try:
+            config = ToolConfDict(lti_config)
+        except Exception as error:
+            return error
 
-    # There should be one key per platform
-    # and the name relay on platforms generic domain not institution specific
-    platform_domain = list(lti_config.keys())[0]
-    platform_config = lti_config[platform_domain][0]
-    client_id = platform_config['client_id']
+        # There should be one key per platform
+        # and the name relay on platforms generic domain not institution specific
+        platform_domain = list(lti_config.keys())[0]
+        platform_config = lti_config[platform_domain][0]
+        client_id = platform_config['client_id']
 
-    try:
-        with open(platform_config.get(
-                'private_key_file', '/secrets/private.key'),
-                'r') as private_key_file:
-            config.set_private_key(
-                platform_domain, private_key_file.read(), client_id)
+        try:
+            with open(platform_config.get(
+                    'private_key_file', '/secrets/private.key'),
+                    'r') as private_key_file:
+                config.set_private_key(
+                    platform_domain, private_key_file.read(), client_id)
 
-        with open(platform_config.get(
-                'public_key_file', '/secrets/public.key'),
-                'r') as public_key_file:
-            config.set_public_key(
-                platform_domain, public_key_file.read(), client_id)
+            with open(platform_config.get(
+                    'public_key_file', '/secrets/public.key'),
+                    'r') as public_key_file:
+                config.set_public_key(
+                    platform_domain, public_key_file.read(), client_id)
 
-    except OSError as error:
-        return error
+        except OSError as error:
+            return error
 
+    else:
+        config = DjangoDbToolConf()
     return config
 
 
 def is_config_valid(config: ToolConfDict):
-    if isinstance(config, ToolConfDict):
+    if isinstance(config, (ToolConfDict, DjangoDbToolConf)):
         logger.info('LTI configuration valid.')
         return True
     else:
