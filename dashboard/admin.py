@@ -95,17 +95,21 @@ class LogResource(resources.ModelResource):
 class MyLALogAdmin(ExportMixin, LogAdmin):
     resource_class = LogResource
     # Remove adding and editing for logs
-    def has_add_permission(self, request, obj=None):
+    @staticmethod
+    def has_add_permission(request):
         return False
-    def has_change_permission(self, request, obj=None):
+    @staticmethod
+    def has_change_permission(request):
         return False
 
 # This is local class for Cron that disables add
 class MyLACronJobLogAdmin(CronJobLogAdmin):
     # Remove adding and editing for cron logs
-    def has_add_permission(self, request, obj=None):
+    @staticmethod
+    def has_add_permission(request):
         return False
-    def has_change_permission(self, request, obj=None):
+    @staticmethod
+    def has_change_permission(request):
         return False
 
 admin.site.register(AcademicTerms, TermAdmin)
