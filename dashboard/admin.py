@@ -101,6 +101,9 @@ class MyLALogAdmin(ExportMixin, LogAdmin):
     @staticmethod
     def has_change_permission(request):
         return False
+    @staticmethod
+    def has_delete_permission(request):
+        return False
 
 # This is local class for Cron that disables add
 class MyLACronJobLogAdmin(CronJobLogAdmin):
@@ -110,6 +113,9 @@ class MyLACronJobLogAdmin(CronJobLogAdmin):
         return False
     @staticmethod
     def has_change_permission(request):
+        return False
+    @staticmethod
+    def has_delete_permission(request):
         return False
 
 admin.site.register(AcademicTerms, TermAdmin)
