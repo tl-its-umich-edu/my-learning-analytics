@@ -99,10 +99,10 @@ class MyLALogAdmin(ExportMixin, LogAdmin):
     def has_add_permission(request):
         return False
     @staticmethod
-    def has_change_permission(request):
+    def has_change_permission(request, obj=None):
         return False
     @staticmethod
-    def has_delete_permission(request):
+    def has_delete_permission(request, obj=None):
         return False
 
 # This is local class for Cron that disables add
@@ -112,10 +112,10 @@ class MyLACronJobLogAdmin(CronJobLogAdmin):
     def has_add_permission(request):
         return False
     @staticmethod
-    def has_change_permission(request):
+    def has_change_permission(request, obj=None):
         return False
     @staticmethod
-    def has_delete_permission(request):
+    def has_delete_permission(request, obj=None):
         return False
 
 admin.site.register(AcademicTerms, TermAdmin)
@@ -125,6 +125,6 @@ admin.site.register(Course, CourseAdmin)
 admin.site.unregister(Log)
 admin.site.register(Log, MyLALogAdmin)
 
-# Remove the pinax cron and add ours
+# Remove the django-cron CronJobLog and add ours
 admin.site.unregister(CronJobLog)
-admin.site.register(CronJobLog,MyLACronJobLogAdmin)
+admin.site.register(CronJobLog, MyLACronJobLogAdmin)
