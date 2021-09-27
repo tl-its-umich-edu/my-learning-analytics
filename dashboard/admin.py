@@ -91,29 +91,33 @@ class LogResource(resources.ModelResource):
     class Meta:
         model = Log
 
-# This is a local class for logs that adds in Export and disables some actions on the admin
+# This is a local class for LogAdmin that adds in export and disables adding and removing logs
 class MyLALogAdmin(ExportMixin, LogAdmin):
     resource_class = LogResource
     # Remove adding and editing for logs
     @staticmethod
     def has_add_permission(request):
         return False
+
     @staticmethod
     def has_change_permission(request, obj=None):
         return False
+    
     @staticmethod
     def has_delete_permission(request, obj=None):
         return False
 
-# This is local class for Cron that disables add
+# This is local class for CronJobLogAdmin that disables adding and removing cron logs
 class MyLACronJobLogAdmin(CronJobLogAdmin):
     # Remove adding and editing for cron logs
     @staticmethod
     def has_add_permission(request):
         return False
+    
     @staticmethod
     def has_change_permission(request, obj=None):
         return False
+    
     @staticmethod
     def has_delete_permission(request, obj=None):
         return False
