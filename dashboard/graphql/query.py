@@ -29,19 +29,3 @@ class Query(graphene.ObjectType):
             raise GraphQLError('You do not have permission to access this resource!')
 
         return course
-
-    @staticmethod
-    def resolve_courses(parent, info):
-        user = info.context.user
-        if not user.is_authenticated:
-            raise GraphQLError('You must be logged in to access these resource!')
-
-        if is_admin.test(user):
-            return Course.objects.all()
-        else:
-            courses = Course.objects.raw(f"""
-                SELECT course.*
-                FROM course join user on course.id = user.course_id
-                where user.sis_name = '{user.username}'
-            """)
-            return courses
