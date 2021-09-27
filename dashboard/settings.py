@@ -118,6 +118,7 @@ INSTALLED_APPS = [
     'django_mysql',
     'constance',
     'constance.backends.database',
+    'import_export',
 ]
 
 # The order of this MIDDLEWARE is important
