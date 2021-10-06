@@ -73,8 +73,8 @@ def main():
     dir_path = os.path.dirname(os.path.realpath(__file__))
     print(dir_path)
     print(os.path.abspath(os.path.abspath(os.pardir)))
-    ENV_UDW = get_env_file('/secrets/env.json', 'json')
-    ENV_UDP = get_env_file('/secrets/env_udp.json', 'json')
+    ENV_UDW = get_env_file('/secrets/env.hjson', 'hjson')
+    ENV_UDP = get_env_file('/secrets/env_udp.hjson', 'hjson')
     ENV_CRON_UDW = get_env_file('/secrets/cron.hjson', 'hjson')
     ENV_CRON_UDP = get_env_file('/secrets/cron_udp.hjson', 'hjson')
     ENV_VALIDATION = get_env_file(

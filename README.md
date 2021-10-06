@@ -14,16 +14,16 @@ These instructions will get a copy of MyLA up and running on your local machine 
 1. Clone this repo. `git clone https://github.com/tl-its-umich-edu/my-learning-analytics.git`
 1. Then cd into the repo. `cd my-learning-analytics`
 1. Create a directory in your home directory called "mylasecrets". `mkdir ~/mylasecrets`. This directory is mapped by docker-compose.yml into the container as /secrets/
-1. Copy the config/env_sample.json into mylasecrets as env.json. `cp config/env_sample.json ~/mylasecrets/env.json`
+1. Copy the config/env_sample.hjson into mylasecrets as env.hjson. `cp config/env_sample.hjson ~/mylasecrets/env.hjson`
 1. Copy the config/cron.hjson file into mylasecrets. `cp config/cron.hjson ~/mylasecrets/cron.hjson`
-1. Examine the `env.json` file, you may need to change some of the configuration in it now or later. There are comments to help the configuration.
+1. Examine the `env.hjson` file, you may need to change some of the configuration in it now or later. There are comments to help the configuration.
 1. Create a new `.env` file and copy the values from `.env.sample`, which has the suggested default environment variable settings.
 1. Examine the `.env` file. It mostly just has the MySQL information as well as locations of the environment files.
 1. Start the Docker build process (this will take some time). `docker-compose up -d --build`
 1. Download the latest SQL file from this link: https://drive.google.com/drive/u/0/folders/1Pj7roNjRPGyumKKal8-h5E6ukUiXTDI9.
 1. Load database with data. `docker exec -i student_dashboard_mysql mysql -u student_dashboard_user --password=student_dashboard_pw student_dashboard < {name of sql file}`
 
-You may also optionally place the json settings directly into the `ENV_JSON` environment variable if your deployment environment doesn't easily support mounting the `env.json` file into container. When using `ENV_JSON` put the entire contents of `env.json` into it as single line string.
+You may also optionally place the json settings directly into the `ENV_JSON` environment variable if your deployment environment doesn't easily support mounting the `env.hjson` file into container. When using `ENV_JSON` put the entire contents of `env.hjson` into it as single line string.
 
 #### Logging in as admininstrator
 1. Navigate to http://localhost:5001/ and log in as:
@@ -85,7 +85,7 @@ You may also optionally place the json settings directly into the `ENV_JSON` env
 1. The course(s) enrolled by the student with selected `sis_name` will be displayed. Click on a course to view as the student selected in step 3.
 
 ## MyLA Configuring Settings
-- If you were using a prior version of MyLA, there is a utility `env_to_json.py` to help convert your configuration. Running `python env_to_json.py > config/env.json` should create your new config file from your `.env`file.
+- If you were using a prior version of MyLA, there is a utility `env_to_json.py` to help convert your configuration. Running `python env_to_json.py > config/env.hjson` should create your new config file from your `.env`file.
 
 ### Secrets (Optional)
 The `bq_cred.json` defined in the `.env` file is service account for BigQuery, and it needs to be supplied and put into the directory defined in the `.env` file and setup in the environment.
@@ -100,7 +100,7 @@ View options can be controlled at the global and course level. If a view is disa
 Note that by default all views are enabled when a course is added.
 
 ### Control the primary user interface color
-MyLA allows you to configure the primary color of the user interface (i.e., the color used for the top toolbar, or DashboardAppBar, and other structural components of the application). You can set this color by defining a key-value pair in `env.json`, with the key being `"PRIMARY_UI_COLOR"` and the value being a valid hex value. See `env_sample.json` for an example.
+MyLA allows you to configure the primary color of the user interface (i.e., the color used for the top toolbar, or DashboardAppBar, and other structural components of the application). You can set this color by defining a key-value pair in `env.hjson`, with the key being `"PRIMARY_UI_COLOR"` and the value being a valid hex value. See `env_sample.hjson` for an example.
 
 Other colors from the user interface are currently fixed and included in version control, as they are intentional design choices. You can see where color values are set in `assets/src/defaultPalette.js`.
 
@@ -114,7 +114,7 @@ Other colors from the user interface are currently fixed and included in version
 
 ### Content Security Policy
 
-All of the Content Security Policy headers can be configured. In the `env_sample.json` there is a sample security policy that should work to bring it up. It has `REPORT_ONLY` set to true; by default it won't actually do anything. If you're using LTI to embed this tool or you want to configure the policy you need to adjust these values and set `REPORT_ONLY` to false.
+All of the Content Security Policy headers can be configured. In the `env_sample.hjson` there is a sample security policy that should work to bring it up. It has `REPORT_ONLY` set to true; by default it won't actually do anything. If you're using LTI to embed this tool or you want to configure the policy you need to adjust these values and set `REPORT_ONLY` to false.
 
 ### Populate initial terms and courses using demo
 A `demo_init.sh.sample` file has been provided to help initialize terms and courses. This can be used in combination
@@ -204,9 +204,9 @@ To update snapshots, execute `docker exec -it webpack_watcher npm run-script upd
 
 Data validation scripts are in scripts/data_validation folder. To run the data validation scripts, follow the steps below:
 
-1. Copy env.json file from env_sample.json file
+1. Copy env.hjson file from env_sample.hjson file
    ```sh
-   cp scripts/data_validation/env_sample.json scripts/data_validation/env.json
+   cp scripts/data_validation/env_sample.hjson scripts/data_validation/env.hjson
    ```
 2. Update the configuration values. Note the hard-coded Michigan specific filters in various query strings. Please adjust those values for your institution usage.
 

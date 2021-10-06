@@ -39,6 +39,7 @@ engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}?cha
 
 # Set up queries array from configuration file
 CRON_QUERY_FILE = settings.CRON_QUERY_FILE
+logger.info(CRON_QUERY_FILE)
 try:
     with open(CRON_QUERY_FILE) as cron_query_file:
         queries = hjson.load(cron_query_file)
@@ -144,7 +145,7 @@ class DashboardCronJob(CronJobBase):
         for course_id in Course.objects.get_supported_courses():
             logger.debug(course_id)
             # select course based on course id
-            course_sql = queries['CRON_QUERIES']['course'].format(course_id=course_id)
+            course_sql = queries['course'].format(course_id=course_id)
             logger.debug(course_sql)
 
             course_df = pd.read_sql(course_sql, conns['DATA_WAREHOUSE'])
@@ -183,7 +184,7 @@ class DashboardCronJob(CronJobBase):
         for course_id in self.valid_locked_course_ids:
 
             # select all student registered for the course
-            user_sql = queries['CRON_QUERIES']['user'].format(
+            user_sql = queries['user'].format(
                 course_id=course_id, canvas_data_id_increment=settings.CANVAS_DATA_ID_INCREMENT)
             logger.debug(user_sql)
 
@@ -223,7 +224,7 @@ class DashboardCronJob(CronJobBase):
         # Select all the files for these courses
         # convert int array to str array
         course_ids = list(map(str, self.valid_locked_course_ids))
-        file_sql = queries['CRON_QUERIES']['resource']
+        file_sql = queries['resource']
         logger.debug(file_sql)
         df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids': tuple(course_ids)})
         logger.debug(df_attach)
@@ -265,7 +266,7 @@ class DashboardCronJob(CronJobBase):
             # query to retrieve all file access events for one course
             # There is no catch if this query fails, event_store.events needs to exist
             final_query = []
-            for type, query_obj in queries['RESOURCE_ACCESS_CONFIG'].items():
+            for k, query_obj in settings.RESOURCE_ACCESS_CONFIG.items():
                 # concatenate the multi-line presentation of query into one single string
                 query = query_obj['query']
                 if (data_last_updated is not None):
@@ -462,7 +463,7 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids
         for course_id in self.valid_locked_course_ids:
-            assignment_groups_sql = queries['CRON_QUERIES']['assignment_groups'].format(course_id=course_id)
+            assignment_groups_sql = queries['assignment_groups'].format(course_id=course_id)
             logger.debug(assignment_groups_sql)
             status += util_function(course_id, assignment_groups_sql,
                                     'assignment_groups')
@@ -480,7 +481,7 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids
         for course_id in self.valid_locked_course_ids:
-            assignment_sql = queries['CRON_QUERIES']['assignment'].format(course_id=course_id)
+            assignment_sql = queries['assignment'].format(course_id=course_id)
             logger.debug(assignment_sql)
             status += util_function(course_id, assignment_sql,
                                     'assignment')
@@ -500,7 +501,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         # filter out not released grades (submission_dim.posted_at date is not null) and partial grades (submission_dim.workflow_state != 'graded')
         for course_id in self.valid_locked_course_ids:
-            submission_sql = queries['CRON_QUERIES']['submission'].format(
+            submission_sql = queries['submission'].format(
                 course_id=course_id, canvas_data_id_increment=settings.CANVAS_DATA_ID_INCREMENT)
             logger.debug(submission_sql)
             status += util_function(course_id, submission_sql,
@@ -520,7 +521,7 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids
         for course_id in self.valid_locked_course_ids:
-            is_weight_considered_sql = queries['CRON_QUERIES']['assignment_weight'].format(course_id=course_id)
+            is_weight_considered_sql = queries['assignment_weight'].format(course_id=course_id)
             logger.debug(is_weight_considered_sql)
             status += util_function(course_id, is_weight_considered_sql,
                                     'assignment_weight_consideration', 'weight')
@@ -536,7 +537,7 @@ class DashboardCronJob(CronJobBase):
         status: str = ''
         logger.info('update_term()')
 
-        term_sql: str = queries['CRON_QUERIES']['term']
+        term_sql: str = queries['term']
         logger.debug(term_sql)
         warehouse_term_df: pd.DataFrame = pd.read_sql(term_sql, conns['DATA_WAREHOUSE'])
 

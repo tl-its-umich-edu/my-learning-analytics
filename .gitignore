@@ -1,6 +1,6 @@
 # Our project specific
 bq_cred.json
-env.json
+env.hjson
 env_validation.hjson
 demo_init.sh
 .idea/
