@@ -273,7 +273,7 @@ def resource_access_within_week(request, course_id=0):
 
 
     # get total number of student within the course_id
-    total_number_student_sql = "select count(*) from user where course_id = %(course_id)s and enrollment_type='StudentEnrollment'"
+    total_number_student_sql = "select count(*) from user where course_id = %(course_id)s and enrollment_type=%(enrollment_type)s"
     if (grade == GRADE_A):
         total_number_student_sql += " and current_grade >= 90"
     elif (grade == GRADE_B):
@@ -281,7 +281,10 @@ def resource_access_within_week(request, course_id=0):
     elif (grade == GRADE_C):
         total_number_student_sql += " and current_grade >= 70 and current_grade < 80"
 
-    total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={"course_id": course_id})
+    total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={
+        "course_id": course_id,
+        "enrollment_type": "StudentEnrollment"
+        })
     total_number_student = total_number_student_df.iloc[0,0]
     logger.info(f"course_id {course_id} total student={total_number_student}")
     if total_number_student == 0:
@@ -304,13 +307,19 @@ def resource_access_within_week(request, course_id=0):
                     and a.access_time < %(end_time)s
                     and a.course_id = %(course_id)s
                     and u.course_id = %(course_id)s
-                    and u.enrollment_type = 'StudentEnrollment' """
+                    and u.enrollment_type = %(enrollment_type)s
+                """
 
     startTimeString = start.strftime('%Y%m%d') + "000000"
     endTimeString = end.strftime('%Y%m%d') + "000000"
     logger.debug(sqlString)
     logger.debug("start time=" + startTimeString + " end_time=" + endTimeString)
-    df = pd.read_sql(sqlString, conn, params={"start_time": startTimeString,"end_time": endTimeString, "course_id": course_id})
+    df = pd.read_sql(sqlString, conn, params={
+            "start_time": startTimeString,
+            "end_time": endTimeString,
+            "course_id": course_id,
+            "enrollment_type": 'StudentEnrollment'
+        })
     logger.debug(df)
 
     # return if there is no data during this interval
@@ -424,10 +433,14 @@ def grade_distribution(request, course_id=0):
 
     grade_score_sql = f"""select current_grade,
        (select show_grade_counts From course where id=%(course_id)s) as show_number_on_bars,
-    (select current_grade from user where sis_name=%(current_user)s and course_id=%(course_id)s) as current_user_grade
-        from user where course_id=%(course_id)s and enrollment_type='StudentEnrollment';
-                    """
-    df = pd.read_sql(grade_score_sql, conn, params={"current_user": current_user, 'course_id': course_id})
+       (select current_grade from user where sis_name=%(current_user)s and course_id=%(course_id)s) as current_user_grade
+       from user where course_id=%(course_id)s and enrollment_type=%(enrollment_type)s
+       """
+    df = pd.read_sql(grade_score_sql, conn, params={
+            'current_user': current_user,
+            'course_id': course_id,
+            'enrollment_type': 'StudentEnrollment'
+        })
     if df.empty or df.count().current_grade < 6:
         logger.info(f"Not enough students grades (only {df.count().current_grade}) in a course {course_id} to show the view")
         return HttpResponse(json.dumps({}), content_type='application/json')
