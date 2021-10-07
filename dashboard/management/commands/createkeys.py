@@ -25,7 +25,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options: dict):
         configDir: str = os.path.dirname(
-            os.getenv('ENV_FILE', '/secrets/env.json'))
+            os.getenv('ENV_FILE', '/secrets/env.hjson'))
         self.stdout.write('Key files will be written to '
                           f'directory "{configDir}"...')
 

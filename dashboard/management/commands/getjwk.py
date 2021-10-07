@@ -41,7 +41,7 @@ class Command(BaseCommand):
             self.stdout.write(jwksJson)
         else:
             configDir: str = os.path.dirname(
-                os.getenv('ENV_FILE', '/secrets/env.json'))
+                os.getenv('ENV_FILE', '/secrets/env.hjson'))
             self.stdout.write('Key files will be written to '
                               f'directory "{configDir}"...')
 

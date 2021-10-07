@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-import json, os
+import hjson, os
 from typing import Tuple, Union
 
 from django.core.management.utils import get_random_secret_key
@@ -28,12 +28,12 @@ PROJECT_ROOT = os.path.abspath(
 env_json: Union[str, None] = os.getenv('ENV_JSON')
 if env_json:
     # optionally load settings from an environment variable
-    ENV = json.loads(env_json)
+    ENV = hjson.loads(env_json)
 else:
     # else try loading settings from the json config file
     try:
-        with open(os.getenv("ENV_FILE", "/secrets/env.json")) as f:
-            ENV = json.load(f)
+        with open(os.getenv("ENV_FILE", "/secrets/env.hjson")) as f:
+            ENV = hjson.load(f)
     except FileNotFoundError as fnfe:
         print("Default config file or one defined in environment variable ENV_FILE not found. This is normal for the build, should define for operation")
         # Set ENV so collectstatic will still run in the build
@@ -135,6 +135,9 @@ MIDDLEWARE = [
 CRON_CLASSES = [
     "dashboard.cron.DashboardCronJob",
 ]
+# the cron.hjson file contains queries run by MyLA cron job
+CRON_QUERY_FILE = os.path.join(BASE_DIR, ENV.get('CRON_QUERY_FILE', 'config/cron.hjson'))
+
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 CONTEXT_PROCESSORS = [
@@ -421,6 +424,9 @@ CONSTANCE_CONFIG = {
     'SURVEY_URL': ('', 'Full URL to Qualtrics survey. If left blank no survey link will display.', str),
     'SURVEY_TEXT': ('Take Survey', 'Custom text for Qualtrics survey link and title. If left blank will default to "Take Survey". Must also configure SURVEY_URL. For best mobile fit keep this text to under 6 words/30 characters.', str)
 }
+
+# the url strings for Canvas Caliper events
+CANVAS_EVENT_URLS = ENV.get("CANVAS_EVENT_URLS", [])
 
 # IMPORT LOCAL ENV
 # =====================

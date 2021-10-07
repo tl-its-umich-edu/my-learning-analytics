@@ -1,16 +1,16 @@
 import os
-import json
 import logging
+
+import hjson
 import pandas as pd
 from google.cloud import bigquery
 
 
-def run_canvas_query(query_array, query_params):
+def run_canvas_query(query_string, query_params):
 
     # Instantiates a client
     bigquery_client = bigquery.Client()
 
-    query_string = ''.join(query_array)
     print(query_string)
 
     job_config = bigquery.QueryJobConfig()
@@ -25,13 +25,13 @@ def run_canvas_query(query_array, query_params):
     return df
 
 
-def compare_expanded_vs_events_df(expanded_query_array, events_query_array, query_params):
+def compare_expanded_vs_events_df(expanded_query_string, events_query_string, query_params):
 
     expanded_df = run_canvas_query(
-        expanded_query_array, query_params)
+        expanded_query_string, query_params)
 
     events_df = run_canvas_query(
-        events_query_array, query_params)
+        events_query_string, query_params)
 
     # compare the two dataframes
     # print(expanded_df.columns.values)
@@ -49,10 +49,10 @@ def main():
 
     # Set up ENV
     CONFIG_PATH = os.path.join(os.path.dirname(
-        os.path.abspath(__file__)), 'env.json')
+        os.path.abspath(__file__)), 'env.hjson')
     try:
         with open(CONFIG_PATH) as env_file:
-            ENV = json.load(env_file)
+            ENV = hjson.load(env_file)
     except FileNotFoundError:
         logger.error(
             f'Configuration file could not be found; please add file "{CONFIG_PATH}".')
@@ -79,15 +79,15 @@ def main():
     expanded_vs_events_queries_json = ENV["EXPANDED_VS_EVENTS_QUERIES"]
     for event_type in expanded_vs_events_queries_json:
         print(event_type)
-        expanded_query_array = []
-        events_query_array = []
+        expanded_query_string = ''
+        events_query_string = ''
         for attribute, value in expanded_vs_events_queries_json[event_type].items():
-            if attribute == "expanded_query_array":
-                expanded_query_array = value
-            elif attribute == "events_query_array":
-                events_query_array = value
+            if attribute == "expanded_query_string":
+                expanded_query_string = value
+            elif attribute == "events_query_string":
+                events_query_string = value
         compare_expanded_vs_events_df(
-            expanded_query_array, events_query_array, query_params)
+            expanded_query_string, events_query_string, query_params)
 
 
 if __name__ == "__main__":
