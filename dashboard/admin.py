@@ -12,8 +12,10 @@ from pinax.eventlog.admin import LogAdmin
 from pinax.eventlog.models import Log
 from django_cron.admin import CronJobLogAdmin
 from django_cron.models import CronJobLog
+from rangefilter.filters import DateRangeFilter, DateTimeRangeFilter
 
-from import_export.admin import ExportMixin
+
+from import_export.admin import ExportActionMixin
 from import_export import resources
 
 from dashboard.common.db_util import canvas_id_to_incremented_id
@@ -92,9 +94,13 @@ class LogResource(resources.ModelResource):
         model = Log
 
 # This is a local class for LogAdmin that adds in export and disables adding and removing logs
-class MyLALogAdmin(ExportMixin, LogAdmin):
+class MyLALogAdmin(ExportActionMixin, LogAdmin):
+    # Adding a range filter to the date fields
+    list_filter = (
+        ('timestamp', DateRangeFilter), 'action'
+    )
     resource_class = LogResource
-    # Remove adding and editing for logs
+    # Remove adding and editing for log
     @staticmethod
     def has_add_permission(request):
         return False
@@ -108,7 +114,7 @@ class MyLALogAdmin(ExportMixin, LogAdmin):
         return False
 
 # This is local class for CronJobLogAdmin that disables adding and removing cron logs
-class MyLACronJobLogAdmin(CronJobLogAdmin):
+class MyLACronJobLogAdmin(ExportActionMixin, CronJobLogAdmin):
     # Remove adding and editing for cron logs
     @staticmethod
     def has_add_permission(request):

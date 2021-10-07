@@ -16,6 +16,7 @@ django-constance[database]==2.8.0
 django-webpack-loader==1.1.0
 django-csp==3.7
 django-import-export==2.6.0
+django-admin-rangefilter==0.8.1
 
 # graphql
 graphene-django==2.15.0
