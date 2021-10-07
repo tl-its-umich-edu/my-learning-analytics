@@ -162,9 +162,12 @@
             ka.lms_ext_id is not null
         order by id
         ''',
-     /* start_at and conclude_at contain only the date information, with time values truncated */   
+     /* start_at and conclude_at contain only the date information, with time values truncated
+        Mapping all courses with a NULL term into the term called No Term
+     */
     "course":
         '''
+        WITH no_term_temp as (SELECT academic_term_id from entity.academic_term where name = 'No Term')
         SELECT
             cast(co2.lms_int_id as BIGINT) as id,
             cast(co2.lms_ext_id as BIGINT) as canvas_id,
@@ -173,14 +176,18 @@
             co.le_start_date at time zone 'UTC' as start_at,
             co.le_end_date at time zone 'UTC' as conclude_at
         FROM
-            entity.course_offering co,
-            entity.academic_session as3,
+            entity.course_offering co
+            LEFT OUTER JOIN entity.academic_session as3 on (co.academic_session_id = as3.academic_session_id),
             keymap.course_offering co2,
-            keymap.academic_term at2
+            keymap.academic_term at2,
+            no_term_temp
             WHERE co2.lms_int_id = '{course_id}'
             and co.course_offering_id = co2.id
-            and co.academic_session_id = as3.academic_session_id
-            and at2.id = as3.academic_term_id
+            and (
+                (co.academic_session_id is null and at2.id = no_term_temp.academic_term_id)
+            or
+                (co.academic_session_id = as3.academic_session_id and at2.id = as3.academic_term_id)
+          )
         ''',
     "resource":
         '''

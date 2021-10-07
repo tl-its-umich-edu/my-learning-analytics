@@ -94,40 +94,41 @@
     # LTI Configuration
     # LTI is disabled by default
     "STUDENT_DASHBOARD_LTI": false,
-    # LTI 1.3 configuration":"*/",
-    # The first key of LTI_CONFIG is the Canvas URL (production, beta, or test)":"*/",
+    # LTI 1.3 configuration
+    # The first key of LTI_CONFIG is the Canvas URL (production, beta, or test)
     "LTI_CONFIG": {
         "https://canvas.instructure.com": [
             {
-                "/*The default set of variables for LTI validation":"*/",
+                # The default set of variables for LTI validation
                 "default": true,
-                "/*LTI Dev Key from Canvas":"*/",
+                # LTI Dev Key from Canvas
                 "client_id": "17700000000000111",
-                "/*Allowed hosts for the following 3 URLs: canvas.instructure.com, canvas.beta.instructure.com, canvas.test.instructure.com":"*/",
+                # Allowed hosts for the following 3 URLs: canvas.instructure.com, canvas.beta.instructure.com, canvas.test.instructure.com
                 "auth_login_url": "https://canvas.instructure.com/api/lti/authorize_redirect",
                 "auth_token_url": "https://canvas.instructure.com/login/oauth2/token",
                 "key_set_url": "https://canvas.instructure.com/api/lti/security/jwks",
                 "key_set":null,
-                "/*Tools private key for LTI validation":"*/",
+                # Tools private key for LTI validation
                 "private_key_file": "/secrets/private.key",
-                "/*Tools public key for LTI validation":"*/",
+                # Tools public key for LTI validation
                 "public_key_file": "/secrets/public.key",
-                "/*Tools installation id in platform":"*/",
+                # Tools installation id in platform
                 "deployment_ids": ["27297:7db438071375c02373713c12c73869ff2f470b68"]
             }
         ]
     },
-    "/*Full path in container to LTI config template.  If unset or null, defaults to location of 'config/lti_config_template.json' (usually '/code/assets/config/lti_config_template.json' in container)":"*/",
+    /* Full path in container to LTI config template.  If unset or null, defaults to location of 'config/lti_config_template.json' (usually '/code/assets/config/lti_config_template.json' in container)
+    */
     "LTI_CONFIG_TEMPLATE_PATH": null,
-    "/*Disable deployment id validation check for LTI launches.":"*/",
+    # Disable deployment id validation check for LTI launches.
     "LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION": false,
-    "/*Database caching using mysql cache for ltiv1p3":"*/",
+    # Database caching using mysql cache for ltiv1p3
     "DB_CACHE_CONFIGS": {
-        "/*cache timeout":"*/",
+        # cache timeout
         "CACHE_TTL": 7200,
-        "/*Cache type":"*/",
+        # Cache type
         "BACKEND": "django_mysql.cache.MySQLCache",
-        "/*cache tablename as stated in the 0018_adding_mysql_cache migration file":"*/",
+        # cache tablename as stated in the 0018_adding_mysql_cache migration file
         "LOCATION": "django_myla_cache",
         "CACHE_KEY_PREFIX": "myla",
         "CACHE_OPTIONS": {"COMPRESS_MIN_LENGTH": 5000, "COMPRESS_LEVEL": 6}
