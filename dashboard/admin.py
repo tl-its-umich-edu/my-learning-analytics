@@ -12,7 +12,7 @@ from pinax.eventlog.admin import LogAdmin
 from pinax.eventlog.models import Log
 from django_cron.admin import CronJobLogAdmin
 from django_cron.models import CronJobLog
-from rangefilter.filters import DateRangeFilter, DateTimeRangeFilter
+from rangefilter.filters import DateTimeRangeFilter
 
 
 from import_export.admin import ExportActionMixin
@@ -97,7 +97,7 @@ class LogResource(resources.ModelResource):
 class MyLALogAdmin(ExportActionMixin, LogAdmin):
     # Adding a range filter to the date fields
     list_filter = (
-        ('timestamp', DateRangeFilter), 'action'
+        ('timestamp', DateTimeRangeFilter), 'action'
     )
     resource_class = LogResource
     # Remove adding and editing for log
