@@ -394,16 +394,29 @@ def resource_access_within_week(request, course_id=0):
 
     output_df[['resource_id_part','resource_name_part']] = output_df['resource_id_name'].str.split(';', expand=True)
 
-    output_df['resource_name'] = output_df.apply(
-        lambda row:
-            (RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("prefix") +
-            row.resource_id_part +
-            RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("postfix") +
-            CANVAS_FILE_ID_NAME_SEPARATOR +
-            row.resource_name_part + CANVAS_FILE_ID_NAME_SEPARATOR +
-            RESOURCE_VALUES.get(RESOURCE_VALUES_MAP.get(row.resource_type)).get('icon')
-            ),
-        axis=1)
+    # Temporary workaround to include empty links for resources that don't fit resource link pattern
+    # For example, Canvas page views do not fit this convention
+    # <url_prefix> + <resource_id> + <url_postfix>
+    if RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("prefix") is None:
+        output_df['resource_name'] = output_df.apply(
+            lambda row:
+                ('' +
+                CANVAS_FILE_ID_NAME_SEPARATOR +
+                row.resource_name_part + CANVAS_FILE_ID_NAME_SEPARATOR +
+                RESOURCE_VALUES.get(RESOURCE_VALUES_MAP.get(row.resource_type)).get('icon')
+                ),
+            axis=1)
+    else:    
+        output_df['resource_name'] = output_df.apply(
+            lambda row:
+                (RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("prefix") +
+                row.resource_id_part +
+                RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("postfix") +
+                CANVAS_FILE_ID_NAME_SEPARATOR +
+                row.resource_name_part + CANVAS_FILE_ID_NAME_SEPARATOR +
+                RESOURCE_VALUES.get(RESOURCE_VALUES_MAP.get(row.resource_type)).get('icon')
+                ),
+            axis=1)
     # RESOURCE_VALUES_MAP {'canvas': 'files', 'leccap': 'videos', 'mivideo': 'videos'}
     output_df['resource_type'] = output_df['resource_type'].replace(RESOURCE_VALUES_MAP)
     output_df.drop(columns=['resource_id_part', 'resource_name_part', 'resource_id_name'], inplace=True)
