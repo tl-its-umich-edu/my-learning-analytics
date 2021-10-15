@@ -119,6 +119,7 @@ INSTALLED_APPS = [
     'constance',
     'constance.backends.database',
     'import_export',
+    'rangefilter'
 ]
 
 # The order of this MIDDLEWARE is important
@@ -427,6 +428,9 @@ CONSTANCE_CONFIG = {
 
 # the url strings for Canvas Caliper events
 CANVAS_EVENT_URLS = ENV.get("CANVAS_EVENT_URLS", [])
+
+# Only need view permission for exports
+IMPORT_EXPORT_EXPORT_PERMISSION_CODE = 'view'
 
 # IMPORT LOCAL ENV
 # =====================
