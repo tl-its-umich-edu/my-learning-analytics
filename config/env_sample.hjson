@@ -89,7 +89,7 @@
     # strings for construct file download url
     "CANVAS_FILE_PREFIX": "https://example.instructure.com/files/",
     "CANVAS_FILE_POSTFIX": "/download?download_frd=1",
-    # Paths to special login credentials (uses SAML)
+    # Paths to Google BigQuery credential json file
     "GOOGLE_APPLICATION_CREDENTIALS": "/secrets/bq_cred.json",
     # LTI Configuration
     # LTI is disabled by default
@@ -136,28 +136,13 @@
     # Set this to true to enable the backend login/logout URLs.
     # This is enabled by default if no external auth is enabled.
     "ENABLE_BACKEND_LOGIN": false,
-    # SAML Configuration
-    # Set this to true if you plan to use SAML and then configure it
-    "STUDENT_DASHBOARD_SAML": false,
-    # Where your local secrets are stored
-    "SAML2_FILES_BASE": "/secrets/saml/",
-    # Location of remote metadata for SAML
-    "SAML2_REMOTE_METADATA": "",
-    # Local location of pem file that goes with the metadata
-    "SAML2_REMOTE_PEM_FILE": "",
-    # Base for Django to your accounts path
-    "DJANGO_SAML2_URL_BASE": "http://localhost:5001/accounts/",
-    # ACS Redirect
-    "DJANGO_ACS_DEFAULT_REDIRECT": "http://localhost:5001/",
-    # Login Redirect (If SAML enabled)
-    "DJANGO_LOGIN_REDIRECT_URL": "http://localhost:5001/",
+    # Login Redirect, default is /, probably don't need to change.
+    "DJANGO_LOGIN_REDIRECT_URL": "/",
     # Logout redirect (If SAML enabled)
-    # This URL should be configured to the logout URL on SAML host
-    "DJANGO_LOGOUT_REDIRECT_URL": "http://localhost:5001/",
+    # This URL could be configured to the logout, but the default should work fine as LTI doesn't currently have logout.
+    "DJANGO_LOGOUT_REDIRECT_URL": "/",
     # Optional token value to be used for token based authentication
     "DJANGO_WATCHMAN_TOKEN": "",
-    # A single default IDP to use if multiple are present in the SAML metadata (Get from Metadata)
-    "DJANGO_SAML2_DEFAULT_IDP": "",
     # CRON POD SETTINGS
     # 
     # All of these settings go together and need to be enabled for cron job
@@ -173,8 +158,8 @@
     # This should run as frequently or more frequently than RUN_AT_TIMES
     # Use https://crontab.guru to validate your schedule
     "CRONTAB_SCHEDULE": "",
-    # How many values to pass to big query at a time in one run. This is configurable as I don't know what a max safe value is.
-    # "CRON_BQ_IN_LIMIT": 20,
+    # How many values to pass to big query at a time in one run. UMich uses 1000 for this setting
+    # "CRON_BQ_IN_LIMIT": 1000,
     # Change this to set the max default weeks to allow. Default is currently 16. The issue is the end dates in Canvas currently are set 10 years out so it can't calculate the range.
     # "MAX_DEFAULT_WEEKS": 16,
     # DEBUGGER SETTINGS
