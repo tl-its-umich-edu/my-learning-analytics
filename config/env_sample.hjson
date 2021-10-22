@@ -64,7 +64,7 @@
     # Any other logs
     "ROOT_LOG_LEVEL": "INFO",
     # How long to cache some URL's on the client (Defualt 3600 seconds)
-    # CLIENT_CACHE_TIME=3600
+    # "CLIENT_CACHE_TIME": 3600,
     # MySQL Configuration
     "MYSQL": {
         # Mysql Django Engine name
@@ -174,9 +174,9 @@
     # Use https://crontab.guru to validate your schedule
     "CRONTAB_SCHEDULE": "",
     # How many values to pass to big query at a time in one run. This is configurable as I don't know what a max safe value is.
-    # CRON_BQ_IN_LIMIT=20
+    # "CRON_BQ_IN_LIMIT": 20,
     # Change this to set the max default weeks to allow. Default is currently 16. The issue is the end dates in Canvas currently are set 10 years out so it can't calculate the range.
-    # MAX_DEFAULT_WEEKS=16
+    # "MAX_DEFAULT_WEEKS": 16,
     # DEBUGGER SETTINGS
     # Enable Visual Studio Debugging Support (Default False)
     # You must also configure the following options
@@ -269,7 +269,7 @@
         }
     },
     # Disable/Enable courses_enabled api
-    "COURSES_ENABLED" : false,
+    "COURSES_ENABLED": false,
 
     # Path to the hjson file contains cron queries
     "CRON_QUERY_FILE": "config/cron.hjson"
