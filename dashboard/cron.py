@@ -2,6 +2,7 @@ from datetime import datetime
 import logging
 from collections import namedtuple
 from typing import Any, Dict, List, Union
+from urllib.parse import quote_plus
 
 import hjson
 import pandas as pd
@@ -33,7 +34,7 @@ logger.debug("db-user:" + db_user)
 engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}?charset=utf8mb4"
                        .format(db=db_name,  # your mysql database name
                                user=db_user,  # your mysql user for the database
-                               password=db_password,  # password for user
+                               password=quote_plus(db_password),  # password for user
                                host=db_host,
                                port=db_port))
 
