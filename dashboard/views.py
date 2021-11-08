@@ -367,6 +367,7 @@ def resource_access_within_week(request, course_id=0):
                     and a.resource_id = r.resource_id 
                     and u.sis_name=%(current_user)s 
                     and a.course_id = %(course_id)s
+                    and a.course_id = u.course_id
                     group by CONCAT(r.resource_id, ';', r.name)"""
     logger.debug(selfSqlString)
     logger.debug("current_user=" + current_user)
