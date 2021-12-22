@@ -28,12 +28,12 @@ const setAssigmentGoalInputState = (assignmentId, assignments, inputFocus) => {
 }
 
 const setAssignmentGoalGrade = (assignmentId, assignments, goalGrade) => {
-  const assignment = assignments.filter(a => a.id === assignmentId)
-  if (assignment.length !== 1) {
+  const assignment = assignments.filter(a => a.id === assignmentId)[0]
+  if (!assignment) {
     console.error('Error finding unique assignment id')
     return assignments
   } else {
-    const key = assignments.indexOf(assignment[0])
+    const key = assignments.indexOf(assignment)
     return [
       ...assignments.slice(0, key),
       {

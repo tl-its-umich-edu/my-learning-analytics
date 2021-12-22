@@ -19,15 +19,13 @@ import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrad
 import useUserAssignmentSetting from '../hooks/useUserAssignmentSetting'
 import { isTeacherOrAdmin } from '../util/roles'
 import { Helmet } from 'react-helmet'
-import { eventLogExtra } from '../util/object'
+import { createEventLog } from '../util/object'
 import { roundToXDecimals } from '../util/math'
-
 import {
   assignmentStatus,
   clearGoals,
   setAssignmentGoalGrade,
-  setAssignmentGoalLockState,
-  setAssigmentGoalInputState
+  setAssignmentGoalLockState
 } from '../util/assignment'
 
 const styles = theme => ({
@@ -124,22 +122,32 @@ function AssignmentPlanningV2 (props) {
     settingChanged
   })
 
-  const handleAssignmentGoalGrade = (key, assignmentGoalGrade, prevGoalGrade) => {
+  const handleGoalGrade = (goalGrade, prevGoalGrade) => {
+    const v = { courseGoalGrade: goalGrade }
+    if (goalGrade !== '') {
+      v.prevCourseGoalGrade = prevGoalGrade
+    }
+    setEventLog(createEventLog(v, eventLog, currentGrade, maxPossibleGrade))
+    setSettingChanged(true)
+    setGoalGrade(goalGrade)
+  }
+
+  const handleAssignmentGoalGrade = key => (goalGrade, prevGoalGrade) => {
     const v = {
       assignmentId: key,
-      assignGoalGrade: assignmentGoalGrade,
+      assignGoalGrade: goalGrade,
       assignPrevGoalGrade: roundToXDecimals(prevGoalGrade, 1)
     }
-    setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
+    setEventLog(createEventLog(v, eventLog, currentGrade, maxPossibleGrade))
     setSettingChanged(true)
     setAssignments(
-      setAssignmentGoalGrade(key, assignments, assignmentGoalGrade)
+      setAssignmentGoalGrade(key, assignments, goalGrade)
     )
   }
 
   const handleClearGoalGrades = () => {
     const v = { courseGoalGrade: '', prevCourseGoalGrade: goalGrade }
-    setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
+    setEventLog(createEventLog(v, eventLog, currentGrade, maxPossibleGrade))
     setAssignments(clearGoals(assignments))
     setGoalGrade('')
     setSettingChanged(true)
@@ -148,21 +156,9 @@ function AssignmentPlanningV2 (props) {
   const handleAssignmentLock = (key, checkboxState) => {
     const assignment = assignments.filter(a => a.id === key)
     const v = { assignmentId: key, assignGoalGrade: roundToXDecimals(assignment[0].goalGrade, 1), checkboxLockState: checkboxState }
-    setEventLog(eventLogExtra(v, eventLog, currentGrade, maxPossibleGrade))
+    setEventLog(createEventLog(v, eventLog, currentGrade, maxPossibleGrade))
     setAssignments(
       setAssignmentGoalLockState(key, assignments, checkboxState)
-    )
-  }
-
-  const handleInputFocus = key => {
-    setAssignments(
-      setAssigmentGoalInputState(key, assignments, true)
-    )
-  }
-
-  const handleInputBlur = key => {
-    setAssignments(
-      setAssigmentGoalInputState(key, assignments, false)
     )
   }
 
@@ -190,13 +186,7 @@ function AssignmentPlanningV2 (props) {
                             goalGrade={goalGrade}
                             maxPossibleGrade={maxPossibleGrade}
                             eventLog={eventLog}
-                            setEventLog={eventLog => {
-                              setEventLog(eventLog)
-                            }}
-                            setGoalGrade={grade => {
-                              setSettingChanged(true)
-                              setGoalGrade(grade)
-                            }}
+                            setGoalGrade={newGoalGrade => handleGoalGrade(newGoalGrade, goalGrade)}
                             handleClearGoalGrades={handleClearGoalGrades}
                             mathWarning={showMathWarning}
                           />
@@ -258,8 +248,6 @@ function AssignmentPlanningV2 (props) {
                         dateStart={data.course.dateStart}
                         handleAssignmentGoalGrade={handleAssignmentGoalGrade}
                         handleAssignmentLock={handleAssignmentLock}
-                        handleInputFocus={handleInputFocus}
-                        handleInputBlur={handleInputBlur}
                       />
                     </div>
                   )

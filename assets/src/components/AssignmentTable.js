@@ -24,12 +24,12 @@ import SubmittedIcon from '@material-ui/icons/Textsms'
 import ProgressBarV2 from './ProgressBarV2'
 import PopupMessage from './PopupMessage'
 import ConditionalWrapper from './ConditionalWrapper'
-import StyledTextField from './StyledTextField'
 import AlertBanner from '../components/AlertBanner'
 import usePopoverEl from '../hooks/usePopoverEl'
 import { calculateWeekOffset } from '../util/date'
-import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
+import { roundToXDecimals } from '../util/math'
 import { assignmentStatus } from '../util/assignment'
+import GoalInput from './GoalInput'
 
 const headerHeight = 105
 
@@ -110,9 +110,7 @@ function AssignmentTable (props) {
     assignmentGroups,
     dateStart,
     handleAssignmentGoalGrade,
-    handleAssignmentLock,
-    handleInputFocus,
-    handleInputBlur
+    handleAssignmentLock
   } = props
 
   const assignmentStatusNames = Object.values(assignmentStatus)
@@ -122,24 +120,16 @@ function AssignmentTable (props) {
     current state of the various AssignmentTable filters.
   */
   const [filteredAssignments, setFilteredAssignments] = useState(assignments)
-
   const [popoverEl, setPopoverEl, clearPopoverEl] = usePopoverEl()
-
   const [assignmentGroupNames, setAssignmentGroupNames] = useState([])
-
   const [assignmentNameFilter, setAssignmentNameFilter] = useState('')
-
   const [assignmentGroupFilterArray, setAssignmentGroupFilterArray] = useState([])
-
   const [assignmentStatusFilterArray, setAssignmentStatusFilterArray] = useState([])
-
   const [filtersAreClear, setFiltersAreClear] = useState(true)
-
   const [previousWeek, setPreviousWeek] = useState()
 
   const weeksPresent = useRef([])
   const shouldScrollToCurrentWeek = useRef(false)
-
   const tableRef = useRef(null)
   const previousWeekRow = useRef(null)
 
@@ -173,10 +163,6 @@ function AssignmentTable (props) {
       ? filteredAssignments[key - 1].dueDateMonthDay === dueDateMonthDay
       : false
   }
-
-  // Use decimal place of pointsPossible if it's a decimal; otherwise, round to nearest tenth
-  const placeToRoundTo = pointsPossible => (String(pointsPossible).includes('.'))
-    ? getDecimalPlaceOfFloat(pointsPossible) : 1
 
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
@@ -411,25 +397,11 @@ function AssignmentTable (props) {
                             a.graded || a.outOf === 0
                               ? <div className={classes.possiblePointsText}>{a.outOf === 0 ? '0' : `${a.currentUserSubmission.score}`}</div>
                               : (
-                                <StyledTextField
-                                  error={(a.goalGrade / a.pointsPossible) > 1}
+                                <GoalInput
                                   disabled={!courseGoalGradeSet}
-                                  id='standard-number'
-                                  value={roundToXDecimals(a.goalGrade, placeToRoundTo(a.pointsPossible))}
-                                  label={
-                                    !courseGoalGradeSet ? 'Set a goal'
-                                      : (a.goalGrade / a.pointsPossible) > 1
-                                        ? 'Over 100%'
-                                        : 'Set a goal'
-                                  }
-                                  onChange={event => {
-                                    const assignmentGoalGrade = event.target.value
-                                    handleAssignmentGoalGrade(a.id, assignmentGoalGrade, a.goalGrade)
-                                  }}
-                                  type='number'
-                                  className={classes.goalGradeInput}
-                                  onFocus={() => handleInputFocus(a.id)}
-                                  onBlur={() => handleInputBlur(a.id)}
+                                  goalGrade={a.goalGrade}
+                                  pointsPossible={a.pointsPossible}
+                                  handleAssignmentGoalGrade={handleAssignmentGoalGrade(a.id)}
                                 />
                               )
                           }
@@ -454,11 +426,11 @@ function AssignmentTable (props) {
                                   ? [{ color: 'green', value: a.goalGrade, draggable: true }]
                                   : []
                               }
-                              description={`This assignment is worth ${a.percentOfFinalGrade}% of your grade.  
+                              description={`This assignment is worth ${a.percentOfFinalGrade}% of your grade.
                               Points possible: ${a.pointsPossible}.
-                              Your goal: ${(a.goalGrade ? a.goalGrade : 'None')}.  
-                              Your grade: ${(a.grade ? a.grade : 'Not graded')}.  
-                              Class average: ${a.averageGrade}.  
+                              Your goal: ${(a.goalGrade ? a.goalGrade : 'None')}.
+                              Your grade: ${(a.grade ? a.grade : 'Not graded')}.
+                              Class average: ${a.averageGrade}.
                               Rules: ${(a.rules ? a.rules : 'There are no rules for this assignment')}.  `}
                               onBarFocus={el => setPopoverEl(key, el)}
                               onBarBlur={clearPopoverEl}
