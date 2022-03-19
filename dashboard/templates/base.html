@@ -1,4 +1,4 @@
-{% load static %}
+﻿{% load static %}
 {% load tz %}
 
 <!DOCTYPE html>
@@ -47,8 +47,9 @@
                 {% if user.is_superuser and git_version %}
                 <td style="text-align: left">
                     Git version:
-                    <a href="{{ git_version.repo }}/commit/{{ git_version.commit }}">{{ git_version.commit_abbrev }}</a>
-                    (commit), {{ git_version.branch }} (branch)
+                    <a href="{{ git_version.repo }}/commit/{{ git_version.commit }}" target="_blank">{{ git_version.commit_abbrev }}</a>
+                    (commit)
+                    <a href="{{ git_version.repo }}/tree/{{ git_version.branch }}" target="_blank"> {{ git_version.branch }}</a> (branch)
                 </td>
                 {% endif %}
                 <td style="text-align: left">
