@@ -46,7 +46,6 @@ def get_git_version_info() -> Optional[GitInfo]:
 
     return {
         "repo": format_github_url_using_https(repo),
-        "repo_abbrev": format_github_url_using_https(repo)[:-4],
         "branch": branch,
         "commit": commit,
         "commit_abbrev": commit_abbrev
