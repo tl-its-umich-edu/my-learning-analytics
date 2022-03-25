@@ -59,7 +59,7 @@
     "CSRF_COOKIE_SAMESITE": "None",
     # Any logs that django outputs, turn these off for production
     "DJANGO_LOG_LEVEL": "DEBUG",
-    "DJANGO_DEBUG": true,
+    "DJANGO_DEBUG": false,
     "DJANGO_TEMPLATE_DEBUG": true,
     # Any other logs
     "ROOT_LOG_LEVEL": "INFO",

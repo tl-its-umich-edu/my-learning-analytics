@@ -71,7 +71,7 @@ SITE_ID = 1
 SECRET_KEY = ENV.get('DJANGO_SECRET_KEY', get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = ENV.get('DJANGO_DEBUG', True)
+DEBUG = ENV.get('DJANGO_DEBUG', False)
 
 ALLOWED_HOSTS = ENV.get("ALLOWED_HOSTS", ["127.0.0.1", "localhost"])
 
