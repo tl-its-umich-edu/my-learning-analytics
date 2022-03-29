@@ -219,14 +219,14 @@ class Course(models.Model):
         elif self.term is not None and self.term.date_start is not None:
             start = self.term.date_start
         else:
-            logger.info("No date_start value was found for course " + str(self.canvas_id) + " (" + str(self.name) + ") or term; setting to current date and time")
+            logger.info("No date_start value was found for course " + str(self.name) + " (" + str(self.canvas_id) + ") or term; setting to current date and time")
             start = datetime.now(pytz.UTC)
         if self.date_end is not None:
             end = self.date_end
         elif self.term is not None and self.term.date_end is not None:
             end = self.term.get_correct_date_end()
         else:
-            logger.info("No date_start value was found for course " + str(self.canvas_id) + " (" + str(self.name) + ") or term; setting to current date and time")
+            logger.info("No date_start value was found for course " + str(self.name) + " (" + str(self.canvas_id) + ") or term; setting to current date and time")
             end = start + timedelta(weeks=2)
         DateRange = namedtuple("DateRange", ["start", "end"])
         return DateRange(start, end)
