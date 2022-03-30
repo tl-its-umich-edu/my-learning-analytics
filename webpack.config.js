@@ -7,10 +7,10 @@ module.exports = {
   entry: path.join(__dirname, 'assets/src/index'),
   output: {
     path: path.join(__dirname, 'assets/dist'),
-    filename: '[name]-[hash].js'
+    filename: '[name]-[fullhash].js'
   },
   watchOptions: { poll: true },
-  devtool: isDevelopment ? 'inline-source-map' : 'false',
+  devtool: isDevelopment ? 'inline-source-map' : false,
   module: {
     rules: [
       {
