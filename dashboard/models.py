@@ -226,7 +226,7 @@ class Course(models.Model):
         elif self.term is not None and self.term.date_end is not None:
             end = self.term.get_correct_date_end()
         else:
-            logger.info("No date_start value was found for course " + str(self.name) + " (" + str(self.canvas_id) + ") or term; setting to current date and time")
+            logger.info(f"No date_start value was found for course {self.name} ({self.canvas_id}) or term; setting to current date and time")
             end = start + timedelta(weeks=2)
         DateRange = namedtuple("DateRange", ["start", "end"])
         return DateRange(start, end)
