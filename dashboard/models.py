@@ -219,7 +219,7 @@ class Course(models.Model):
         elif self.term is not None and self.term.date_start is not None:
             start = self.term.date_start
         else:
-            logger.info("No date_start value was found for course " + str(self.name) + " (" + str(self.canvas_id) + ") or term; setting to current date and time")
+            logger.info(f"No date_start value was found for course {self.name} ({self.canvas_id}) or term; setting to current date and time")
             start = datetime.now(pytz.UTC)
         if self.date_end is not None:
             end = self.date_end
