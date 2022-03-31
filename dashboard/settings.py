@@ -158,7 +158,7 @@ TEMPLATES = [
         'DIRS': [os.path.join(APPLICATION_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
-            'debug': ENV.get('DJANGO_TEMPLATE_DEBUG', DEBUG),
+            'debug': DEBUG,
             'context_processors': CONTEXT_PROCESSORS,
         },
     },
@@ -302,7 +302,7 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             'propagate': False,
-            'level': ENV.get('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': 'DEBUG' if DEBUG else 'INFO',
         },
         'rules': {
             'handlers': ['console'],
