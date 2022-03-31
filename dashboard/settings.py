@@ -181,7 +181,6 @@ WEBPACK_LOADER = {
 }
 
 NPM_FILE_PATTERNS = {
-    'jquery': ['dist/jquery.min.js'],
     '@fortawesome': ['fontawesome-free/*']
 }
 
