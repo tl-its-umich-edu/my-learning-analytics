@@ -302,7 +302,7 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             'propagate': False,
-            'level': 'DEBUG' if DEBUG else 'INFO',
+             'level': ENV.get('DJANGO_LOG_LEVEL', 'DEBUG' if DEBUG else 'INFO'),
         },
         'rules': {
             'handlers': ['console'],
