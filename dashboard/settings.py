@@ -71,7 +71,7 @@ SITE_ID = 1
 SECRET_KEY = ENV.get('DJANGO_SECRET_KEY', get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = ENV.get('DJANGO_DEBUG', True)
+DEBUG = ENV.get('DJANGO_DEBUG', False)
 
 ALLOWED_HOSTS = ENV.get("ALLOWED_HOSTS", ["127.0.0.1", "localhost"])
 
@@ -158,7 +158,7 @@ TEMPLATES = [
         'DIRS': [os.path.join(APPLICATION_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
-            'debug': ENV.get('DJANGO_TEMPLATE_DEBUG', DEBUG),
+            'debug': DEBUG,
             'context_processors': CONTEXT_PROCESSORS,
         },
     },
@@ -302,7 +302,7 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             'propagate': False,
-            'level': ENV.get('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': ENV.get('DJANGO_LOG_LEVEL', 'DEBUG' if DEBUG else 'INFO'),
         },
         'rules': {
             'handlers': ['console'],

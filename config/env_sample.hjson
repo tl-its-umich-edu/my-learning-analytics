@@ -57,10 +57,10 @@
     # SameSite settings for Session and CSRF (defaults in settings.py should work), if you do want non-string None set to null.
     "SESSION_COOKIE_SAMESITE": "None",
     "CSRF_COOKIE_SAMESITE": "None",
-    # Any logs that django outputs, turn these off for production
-    "DJANGO_LOG_LEVEL": "DEBUG",
-    "DJANGO_DEBUG": true,
-    "DJANGO_TEMPLATE_DEBUG": true,
+    # Warning:
+    # This enables debugging of Django code and should only be enabled in development.
+    # Setting this to true in production may reveal internal information such as settings to a user if they encounter an error.
+    "DJANGO_DEBUG": false,
     # Any other logs
     "ROOT_LOG_LEVEL": "INFO",
     # How long to cache some URL's on the client (Defualt 3600 seconds)
