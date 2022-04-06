@@ -321,7 +321,7 @@ function AssignmentTable (props) {
         </Grid>
       </Grid>
       <TableContainer className={classes.container} ref={tableRef}>
-        <MTable stickyHeader ref={tableRef}>
+        <MTable stickyHeader>
           <TableHead>
             <TableRow>
               {
