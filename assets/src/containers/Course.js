@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { BrowserRouter as Router, Route, withRouter } from 'react-router-dom' // eslint-disable-line
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
 import GradeDistribution from './GradeDistribution'
@@ -83,66 +83,50 @@ function Course (props) {
                   />
                 </Card>
               ) : (
-                <>
-                  <Route
-                    path='/courses/:courseId/'
-                    exact
-                    render={props =>
-                      <IndexPage
-                        {...props}
-                        courseInfo={courseInfo}
-                        courseId={courseId}
-                        enrollmentTypes={enrollmentTypes}
-                        isAdmin={user.admin}
-                      />}
-                  />
-                  <Route
-                    path='/courses/:courseId/grades'
-                    render={props =>
-                      <GradeDistribution
-                        {...props}
-                        disabled={!courseInfo.course_view_options.gd}
-                        courseId={courseId}
-                        user={user}
-                        enrollmentTypes={enrollmentTypes}
-                        isAdmin={user.admin}
-                      />}
-                  />
-                  <Route
-                    path='/courses/:courseId/assignmentsv1'
-                    render={props =>
-                      <AssignmentPlanning
-                        {...props}
-                        disabled={!courseInfo.course_view_options.apv1}
-                        courseId={courseId}
-                        enrollmentTypes={enrollmentTypes}
-                        isAdmin={user.admin}
-                      />}
-                  />
-                  <Route
-                    path='/courses/:courseId/assignments'
-                    render={props =>
-                      <AssignmentPlanningV2
-                        {...props}
-                        disabled={!courseInfo.course_view_options.ap}
-                        courseId={courseId}
-                        enrollmentTypes={enrollmentTypes}
-                        isAdmin={user.admin}
-                      />}
-                  />
-                  <Route
-                    path='/courses/:courseId/resources'
-                    render={props =>
-                      <ResourcesAccessed
-                        {...props}
-                        disabled={!courseInfo.course_view_options.ra}
-                        courseInfo={courseInfo}
-                        courseId={courseId}
-                        enrollmentTypes={enrollmentTypes}
-                        isAdmin={user.admin}
-                      />}
-                  />
-                </>
+                <Switch>
+                  <Route path='/courses/:courseId/' exact>
+                    <IndexPage
+                      courseInfo={courseInfo}
+                      courseId={courseId}
+                      enrollmentTypes={enrollmentTypes}
+                      isAdmin={user.admin}
+                    />
+                  </Route>
+                  <Route path='/courses/:courseId/grades'>
+                    <GradeDistribution
+                      user={user}
+                      disabled={!courseInfo.course_view_options.gd}
+                      courseId={courseId}
+                      enrollmentTypes={enrollmentTypes}
+                      isAdmin={user.admin}
+                    />
+                  </Route>
+                  <Route path='/courses/:courseId/assignmentsv1'>
+                    <AssignmentPlanning
+                      disabled={!courseInfo.course_view_options.apv1}
+                      courseId={courseId}
+                      enrollmentTypes={enrollmentTypes}
+                      isAdmin={user.admin}
+                    />
+                  </Route>
+                  <Route path='/courses/:courseId/assignments'>
+                    <AssignmentPlanningV2
+                      disabled={!courseInfo.course_view_options.ap}
+                      courseId={courseId}
+                      enrollmentTypes={enrollmentTypes}
+                      isAdmin={user.admin}
+                    />
+                  </Route>
+                  <Route path='/courses/:courseId/resources'>
+                    <ResourcesAccessed
+                      disabled={!courseInfo.course_view_options.ra}
+                      courseInfo={courseInfo}
+                      courseId={courseId}
+                      enrollmentTypes={enrollmentTypes}
+                      isAdmin={user.admin}
+                    />
+                  </Route>
+                </Switch>
               )}
           </>
         ) : <Spinner />}

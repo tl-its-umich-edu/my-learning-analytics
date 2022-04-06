@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, withRouter } from 'react-router-dom'
+import { Route, Switch, useLocation } from 'react-router-dom'
 import { matchPath } from 'react-router'
 import GoogleAnalyticsTracking from '../components/GoogleAnalyticsTracking'
 import CourseList from './CourseList'
@@ -8,7 +8,8 @@ import WarningBanner from '../components/WarningBanner'
 import { Helmet } from 'react-helmet'
 
 function App (props) {
-  const { location, user, gaId } = props
+  const location = useLocation()
+  const { user, gaId } = props
 
   if (!user.isLoggedIn) {
     if (user.loginURL === '') {
@@ -23,11 +24,19 @@ function App (props) {
     <>
       <Helmet titleTemplate='%s | My Learning Analytics' title='Courses' />
       <GoogleAnalyticsTracking gaId={gaId} />
-      <Route path='/' exact render={props => <CourseList {...props} user={user} />} />
-      <Route path='/courses' exact render={props => <CourseList {...props} user={user} />} />
-      {courseId ? <Course user={user} courseId={Number(courseId)} {...props} /> : null}
+      <Switch>
+        <Route path='/' exact>
+          <CourseList user={user} />
+        </Route>
+        <Route path='/courses' exact>
+          <CourseList user={user} />
+        </Route>
+        <Route>
+          {courseId ? <Course user={user} courseId={Number(courseId)} {...props} /> : null}
+        </Route>
+      </Switch>
     </>
   )
 }
 
-export default withRouter(App)
+export default App
