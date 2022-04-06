@@ -349,7 +349,7 @@ function AssignmentTable (props) {
             {
               filteredAssignments
                 .map((a, key) => (
-                  <TableRow key={key} ref={a.week === previousWeek ? previousWeekRow : undefined}>
+                  <TableRow key={key} {...(a.week === previousWeek ? { ref: previousWeekRow } : {})}>
                     <TableCell
                       style={{
                         ...isNextWeekTheSame(a.week, key)

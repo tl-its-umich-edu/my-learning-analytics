@@ -126,7 +126,7 @@ function CustomAssignmentTable (props) {
     })
 
   const tableRow = (row, i, isCurrentWeek) => (
-    <TableRow key={i} ref={isCurrentWeek ? currentWeekRow : undefined}>
+    <TableRow key={i} {...(isCurrentWeek ? { ref: currentWeekRow } : {})}>
       {
         row.map((prop, j) => {
           let displayProp = true
