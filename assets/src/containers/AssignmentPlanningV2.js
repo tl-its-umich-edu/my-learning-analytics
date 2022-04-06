@@ -43,10 +43,6 @@ const styles = theme => ({
     paddingBottom: 10,
     paddingTop: 10
   },
-  clearButton: {
-    float: 'right',
-    margin: '30px'
-  },
   mainProgressBar: {
     marginBottom: '2.5rem'
   },
