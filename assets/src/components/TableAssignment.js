@@ -125,8 +125,8 @@ function CustomAssignmentTable (props) {
       return row
     })
 
-  const tableRow = (row, i) => (
-    <TableRow key={i}>
+  const tableRow = (row, i, isCurrentWeek) => (
+    <TableRow key={i} ref={isCurrentWeek ? currentWeekRow : undefined}>
       {
         row.map((prop, j) => {
           let displayProp = true
@@ -218,34 +218,26 @@ function CustomAssignmentTable (props) {
 
   return (
     <div className={classes.tableResponsive}>
-      <RootRef rootRef={tableRef}>
-        <Table ref={tableRef}>
-          {tableHead !== undefined ? (
-            <TableHead>
-              <TableRow>
-                {tableHead.map((prop, key) => {
-                  return (
-                    <TableCell
-                      className={classes.tableCell + ' ' + classes.tableHeadCell}
-                      key={key}
-                    >
-                      {prop}
-                    </TableCell>)
-                })}
-              </TableRow>
-            </TableHead>
-          ) : null}
-          <TableBody>
-            {
-              data.map((row, i) => {
-                return isItFirstCurrentWeekIndicator(i)
-                  ? <RootRef rootRef={currentWeekRow} key={i}>{tableRow(row, i)}</RootRef>
-                  : tableRow(row, i)
-              })
-            }
-          </TableBody>
-        </Table>
-      </RootRef>
+      <Table ref={tableRef}>
+        {tableHead !== undefined ? (
+          <TableHead>
+            <TableRow>
+              {tableHead.map((prop, key) => {
+                return (
+                  <TableCell
+                    className={classes.tableCell + ' ' + classes.tableHeadCell}
+                    key={key}
+                  >
+                    {prop}
+                  </TableCell>)
+              })}
+            </TableRow>
+          </TableHead>
+        ) : null}
+        <TableBody>
+          {data.map((row, i) => tableRow(row, i, isItFirstCurrentWeekIndicator(i)))}
+        </TableBody>
+      </Table>
     </div>
   )
 }
