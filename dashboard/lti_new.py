@@ -227,7 +227,6 @@ def extract_launch_variables_for_tool_use(request, message_launch):
     first_name = launch_data['given_name']
     last_name = launch_data['family_name']
     full_name = launch_data['name']
-    user_sis_id = launch_data['https://purl.imsglobal.org/spec/lti/claim/lis']['person_sourcedid']
 
     # Add user to DB if not there; avoids Django redirection to login page
     try:
@@ -255,7 +254,7 @@ def extract_launch_variables_for_tool_use(request, message_launch):
         if is_instructor:
             MylaUser.objects.create(name=full_name, sis_name=username,
                                     course_id=canvas_course_long_id,
-                                    user_id=canvas_user_long_id, sis_id=user_sis_id,
+                                    user_id=canvas_user_long_id, 
                                     enrollment_type=MylaUser.EnrollmentType.TEACHER)
     return course_id
 

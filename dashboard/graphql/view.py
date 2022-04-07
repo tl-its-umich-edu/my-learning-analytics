@@ -65,7 +65,7 @@ class DashboardGraphQLView(GraphQLView):
         if request.user and request.user.is_authenticated:
             username = request.user.get_username()
             result = User.objects.filter(
-                Q(sis_name=username) | Q(sis_id=username)
+                sis_name=username
             ).first()
             if result:
                 setattr(request, 'canvas_user_id', result.user_id)
