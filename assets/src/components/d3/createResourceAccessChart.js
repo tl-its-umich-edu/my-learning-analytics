@@ -3,7 +3,6 @@ import { adjustViewport } from '../../util/chart'
 import { createResourcesText } from './d3ViewsNarrative'
 import d3tip from 'd3-tip'
 import './createResourceAccessChart.css'
-import '@fortawesome/fontawesome-free'
 import { siteTheme } from '../../globals'
 
 /*
@@ -166,7 +165,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
   main.append('div')
     .attr('aria-live', 'polite')
     .attr('id', 'resource-view-narrative')
-    .attr('class', 'screenreader-only sr-only')
+    .attr('class', 'fa-sr-only')
     .text(d => narrativeTextResources)
 
   const svg = main.append('svg')

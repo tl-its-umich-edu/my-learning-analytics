@@ -55,7 +55,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   main.append('div')
     .attr('aria-live', 'polite')
     .attr('id', 'grade-view-narrative')
-    .attr('class', 'screenreader-only sr-only')
+    .attr('class', 'fa-sr-only')
     .text(d => narrativeTextGrades)
 
   const svg = main.append('svg')

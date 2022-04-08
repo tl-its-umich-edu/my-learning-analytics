@@ -13,7 +13,7 @@ django-su==0.9.0
 django-mysql==3.12.0
 # The alternative to this is redis, but we don't use redis yet
 django-constance[database]==2.8.0
-django-webpack-loader==1.1.0
+django-webpack-loader==1.5.0
 django-csp==3.7
 django-import-export==2.6.0
 django-admin-rangefilter==0.8.1

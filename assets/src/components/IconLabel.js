@@ -1,9 +1,8 @@
 import React from 'react'
-import '@fortawesome/fontawesome-free'
 
 function IconLabel (props) {
   const {
-    icon,
+    icon, // font-awesome class name
     label
   } = props
 
