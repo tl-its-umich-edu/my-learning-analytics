@@ -58,8 +58,9 @@
     "SESSION_COOKIE_SAMESITE": "None",
     "CSRF_COOKIE_SAMESITE": "None",
     # Warning:
-    # This enables debugging of Django code and should only be enabled in development.
-    # Setting this to true in production may reveal internal information such as settings to a user if they encounter an error.
+    # This enables debugging of Django code
+    # Use "true" for local development
+    # Use "false" in production; otherwise, it may reveal internal information such as settings to a user if they encounter an error.
     "DJANGO_DEBUG": false,
     # Any other logs
     "ROOT_LOG_LEVEL": "INFO",
