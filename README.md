@@ -16,7 +16,7 @@ These instructions will get a copy of MyLA up and running on your local machine 
 1. Create a directory in your home directory called "mylasecrets". `mkdir ~/mylasecrets`. This directory is mapped by docker-compose.yml into the container as /secrets/
 1. Copy the config/env_sample.hjson into mylasecrets as env.hjson. `cp config/env_sample.hjson ~/mylasecrets/env.hjson`
 1. Copy the config/cron.hjson file into mylasecrets. `cp config/cron.hjson ~/mylasecrets/cron.hjson`
-1. Examine the `env.hjson` file, you may need to change some of the configuration in it now or later. There are comments to help the configuration.
+1. Examine the `env.hjson` file, you may need to change some of the configuration values for different environments, e.g. localhost vs production deployment. There are comments to help the configuration.
 1. Create a new `.env` file and copy the values from `.env.sample`, which has the suggested default environment variable settings.
 1. Examine the `.env` file. It mostly just has the MySQL information as well as locations of the environment files.
 1. Start the Docker build process (this will take some time). `docker-compose up -d --build`
