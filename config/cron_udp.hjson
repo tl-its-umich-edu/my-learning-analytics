@@ -12,7 +12,6 @@
             case
                 when p.first_name is not null then p.first_name || ' ' || p.last_name
                 else p2.sis_ext_id end as name,
-            '' as sis_id,
             case
                 when pe.email_address is not null then lower(split_part(pe.email_address , '@', 1))
                 else p2.sis_ext_id end as sis_name,

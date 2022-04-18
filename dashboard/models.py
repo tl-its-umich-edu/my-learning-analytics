@@ -373,7 +373,7 @@ class UserQuerySet(models.QuerySet):
 
     def get_user_in_course_id(self, user, course_id):
         return self.filter(
-            Q(sis_name=user.get_username()) | Q(sis_id=user.get_username()),
+            sis_name=user.get_username(),
             course_id=course_id
         )
 
@@ -389,7 +389,6 @@ class User(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
     user_id = models.BigIntegerField(null=False, blank=False, verbose_name="User Id")
     name = models.CharField(max_length=255, verbose_name="Name")
-    sis_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="SIS Id")
     sis_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="SIS Name")
     course_id = models.BigIntegerField(blank=True, null=True, verbose_name="Course Id")
     current_grade = models.FloatField(blank=True, null=True, verbose_name="Current Grade")

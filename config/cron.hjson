@@ -16,7 +16,7 @@
                         u.global_canvas_id, e.type from enroll_data e join user_info u on e.user_id= u.user_id),
         course_fact as (select enrollment_id, current_score, final_score from course_score_fact
                         where course_id='{course_id}'),
-        final as (select cast(u.global_canvas_id as BIGINT) as user_id,u.name, u.sis_user_id as sis_id, u.unique_name as sis_name,
+        final as (select cast(u.global_canvas_id as BIGINT) as user_id,u.name, u.unique_name as sis_name,
                 '{course_id}' as course_id, c.current_score as current_grade, c.final_score as final_grade,
                 u.type as enrollment_type
                 from user_enroll u left join course_fact c on u.enroll_id= c.enrollment_id)
