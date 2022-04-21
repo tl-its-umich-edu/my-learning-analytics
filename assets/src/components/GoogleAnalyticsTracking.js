@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import GoogleAnalytics from 'react-ga'
-import { withRouter } from 'react-router-dom'
 
 function GoogleAnalyticsTracking (props) {
   const {
@@ -26,4 +25,4 @@ function GoogleAnalyticsTracking (props) {
   return null
 }
 
-export default withRouter(GoogleAnalyticsTracking)
+export default GoogleAnalyticsTracking

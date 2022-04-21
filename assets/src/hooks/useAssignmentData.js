@@ -1,9 +1,8 @@
-import { gql } from 'apollo-boost'
-import { useQuery } from '@apollo/react-hooks'
+import { gql, useQuery } from '@apollo/client'
 
-const GET_ASSIGNMENT_PLANNING_DATA = courseId => gql`
-query Assignment{
-  course(canvasId: ${courseId}) {
+const GET_ASSIGNMENT_PLANNING_DATA = gql`
+query Assignment($courseId: ID!) {
+  course(canvasId: $courseId) {
     assignments {
       id
       name
@@ -38,7 +37,7 @@ query Assignment{
 `
 
 const useAssignmentData = courseId => {
-  return useQuery(GET_ASSIGNMENT_PLANNING_DATA(courseId), { variables: { courseId }, fetchPolicy: 'network-only' })
+  return useQuery(GET_ASSIGNMENT_PLANNING_DATA, { variables: { courseId }, fetchPolicy: 'network-only' })
 }
 
 export default useAssignmentData

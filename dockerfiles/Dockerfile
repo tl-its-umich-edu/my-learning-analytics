@@ -1,6 +1,6 @@
 # NOTE: When updating this file, also update Dockerfile.openshift
 # build react components for production mode
-FROM node:14-slim AS node-webpack
+FROM node:16-slim AS node-webpack
 WORKDIR /usr/src/app
 
 # NOTE: package.json and webpack.config.js not likely to change between dev builds

@@ -1,15 +1,30 @@
 import React from 'react'
-import '@fortawesome/fontawesome-free'
+import { Typography, withStyles } from '@material-ui/core'
+
+const styles = () => ({
+  typography: {
+    marginLeft: '5px',
+    marginRight: '5px'
+  },
+  icon: {
+    fontSize: '16px',
+    paddingRight: '10px'
+  }
+})
+
 
 function IconLabel (props) {
   const {
-    icon,
+    classes,
+    icon, // font-awesome class name
     label
   } = props
 
   return (
-    <p><i style={{ fontSize: '14px', padding: '5px 10px 5px 5px' }} className={icon} />{label}</p>
+    <Typography className={classes.typography}>
+      <i className={`${icon} ${classes.icon}`} />{label}
+    </Typography>
   )
 }
 
-export default IconLabel
+export default withStyles(styles)(IconLabel)

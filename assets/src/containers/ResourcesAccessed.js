@@ -40,11 +40,7 @@ const styles = theme => ({
     marginTop: theme.spacing(2)
   },
   controlText: {
-    paddingLeft: 8,
-    paddingRight: 8
-  },
-  checkBox: {
-    marginLeft: 20
+    marginRight: 16
   }
 })
 
@@ -100,7 +96,7 @@ function ResourcesAccessed (props) {
     if (resourceAccessData) {
       if (resourceTypes.length > 1) {
         return (
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: 'center', verticalAlign: 'middle' }}>
             <FormControl>
               <FormGroup row>
                 <p className={classes.controlText}>Select resource types to be viewed:</p>

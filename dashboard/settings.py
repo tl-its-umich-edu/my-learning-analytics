@@ -119,7 +119,8 @@ INSTALLED_APPS = [
     'constance',
     'constance.backends.database',
     'import_export',
-    'rangefilter'
+    'rangefilter',
+    'fontawesomefree'
 ]
 
 # The order of this MIDDLEWARE is important
@@ -178,11 +179,6 @@ WEBPACK_LOADER = {
         'BUNDLE_DIR_NAME': 'dist/',
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
     }
-}
-
-NPM_FILE_PATTERNS = {
-    'jquery': ['dist/jquery.min.js'],
-    '@fortawesome': ['fontawesome-free/*']
 }
 
 ROOT_URLCONF = 'dashboard.urls'
@@ -267,14 +263,11 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 # Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
 
-NPM_ROOT_PATH = BASE_DIR
-
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'npm.finders.NpmFinder',
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
