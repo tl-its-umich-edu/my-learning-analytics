@@ -21,12 +21,13 @@ RUN apt-get update && \
     rm -rf /usr/src/app/assets/src
 
 # build node libraries for production mode
-FROM node:14-slim AS node-prod-deps
+FROM node:16-slim AS node-prod-deps
 
+WORKDIR /usr/src/app
 COPY --from=node-webpack /usr/src/app /usr/src/app
 RUN npm prune --production && \
     # This is needed to clean up the examples files as these cause collectstatic to fail (and take up extra space)
-    find /usr/src/app/node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
+    find node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
 
 # FROM directive instructing base image to build upon
 FROM python:3.8-slim AS app
