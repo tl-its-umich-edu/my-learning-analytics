@@ -3,15 +3,17 @@ version: '3.7'
 services:
 
   mysql:
-    image: mysql:5.7
+    image: mysql/mysql-server:8.0
     restart: on-failure
-    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci', '--socket=/tmp/mysql.sock']
     env_file:
       - .env
+    environment:
+      - MYSQL_ROOT_HOST="0.0.0.0"
     ports:
       - "5306:3306"
     volumes:
-      - ./.data/mysql:/var/lib/mysql:delegated
+      - ./.data/mysql:/var/lib/mysql
     container_name: student_dashboard_mysql
   web:
     build:
@@ -21,7 +23,7 @@ services:
         TZ: ${TZ}
     command: bash -c "./start.sh"
     volumes:
-      - .:/code:cached
+      - .:/code
       # use the container's node_modules folder (don't override)
       - /code/node_modules/
       - /code/static/
@@ -47,7 +49,7 @@ services:
       target: node-webpack
     command: sh -c "tar zxvf node_modules/all_symlinks.tgz && npm run watch"
     volumes:
-      - .:/usr/src/app:cached
+      - .:/usr/src/app
       # use the container's node_modules folder (don't override)
       - /usr/src/app/node_modules/
     container_name: webpack_watcher
