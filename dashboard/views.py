@@ -325,7 +325,6 @@ def resource_access_within_week(request, course_id=0):
             "enrollment_type": 'StudentEnrollment'
         })
     logger.debug(df)
-
     # return if there is no data during this interval
     if (df.empty):
         return HttpResponse("{}")
@@ -352,10 +351,11 @@ def resource_access_within_week(request, course_id=0):
     #df.reset_index(inplace=True)
 
     # zero filled dataframe with resource name as row name, and grade as column name
-    output_df=pd.DataFrame(0.0, index=resource_id_type, columns=['r_name', GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING, RESOURCE_TYPE_STRING])
+    output_df=pd.DataFrame(0.0, index=resource_id_type, columns=['r_id', 'r_name', GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING, RESOURCE_TYPE_STRING])
     output_df=output_df.rename_axis('resource_id_type')
     output_df=output_df.astype({RESOURCE_TYPE_STRING: str})
     output_df=output_df.astype({'r_name': str})
+    output_df=output_df.astype({'r_id': str})
 
 
     for index, row in df.iterrows():
@@ -363,6 +363,7 @@ def resource_access_within_week(request, course_id=0):
         output_df.at[row['resource_id_type'], row['grade']] = row['percent']
         output_df.at[row['resource_id_type'], RESOURCE_TYPE_STRING] = row[RESOURCE_TYPE_STRING]
         output_df.at[row['resource_id_type'], 'r_name'] = row['name']
+        output_df.at[row['resource_id_type'], 'r_id'] = row['resource_id']
     output_df.reset_index(inplace=True)
 
     # now insert person's own viewing records: what resources the user has viewed, and the last access timestamp
@@ -387,6 +388,7 @@ def resource_access_within_week(request, course_id=0):
 
     selfDf['resource_id_type'] = selfDf['resource_id'].astype(str).str.cat(selfDf['resource_type'], sep='') 
     selfDf.drop(columns=['resource_type'], inplace=True)
+
     output_df = output_df.join(selfDf.set_index('resource_id_type'), on=['resource_id_type'], how='left')
     output_df["total_percent"] = output_df.apply(lambda row: row[GRADE_A] + row[GRADE_B] + row[GRADE_C] + row[GRADE_LOW] + row.NO_GRADE, axis=1)
 
@@ -398,9 +400,7 @@ def resource_access_within_week(request, course_id=0):
                 output_df["total_percent"] = output_df[i_grade]
             else:
                 output_df=output_df.drop([i_grade], axis=1)
-
-    logger.info(output_df)
-    logger.info(filter_list)
+    
     output_df=output_df[output_df.resource_type.isin(filter_list)]
 
     # if no checkboxes are checked send nothing
@@ -416,10 +416,11 @@ def resource_access_within_week(request, course_id=0):
     output_df = output_df.round(0)
 
     output_df.fillna(0, inplace=True) #replace null value with 0
+
     output_df['resource_name'] = output_df.apply(
         lambda row:
             (RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("prefix") +
-            str(row.resource_id) +
+            str(row.r_id) +
             RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("postfix") +
             CANVAS_FILE_ID_NAME_SEPARATOR +
             str(row.r_name) + CANVAS_FILE_ID_NAME_SEPARATOR +
