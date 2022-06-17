@@ -57,7 +57,7 @@ def lti_error(error_message: Any) -> JsonResponse:
 class LTIException(Exception):
     def __init__(self, config,
                  message='An error occurred processing the LTI request.'):
-        self.lti_error = LTIError(config)
+        self.lti_error = lti_error(config)
         self.message = message
         super().__init__(self.message)
 
