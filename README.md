@@ -231,5 +231,8 @@ Users that use Safari or Firefox on macOS that would like to enable keyboard nav
 ## Contributing to MyLA
 * [Contribution Guide](CONTRIBUTING.md)
 
+## Contributors to MyLA
+* [List of contributors to this project](CONTRIBUTORS.md)
+
 ## License check
 MyLA is licenced under Apache v2.0. There is a file `myla_licence_compat.ini` that can be used with [Python Licence Check](https://github.com/dhatim/python-license-check) to check any new dependencies and their licences.
