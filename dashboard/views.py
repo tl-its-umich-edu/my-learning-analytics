@@ -386,7 +386,7 @@ def resource_access_within_week(request, course_id=0):
 
     selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user, "course_id": course_id})
 
-    selfDf['resource_id_type'] = selfDf['resource_id'].astype(str).str.cat(selfDf['resource_type'], sep='') 
+    selfDf['resource_id_type'] = selfDf['resource_id'].astype(str).str.cat(selfDf['resource_type'], sep='')
     selfDf.drop(columns=['resource_type'], inplace=True)
 
     output_df = output_df.join(selfDf.set_index('resource_id_type'), on=['resource_id_type'], how='left')
