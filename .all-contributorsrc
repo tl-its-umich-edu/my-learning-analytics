@@ -1,0 +1,302 @@
+{
+  "projectName": "My Learning Analytics",
+  "projectOwner": "tl-its-umich-edu",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "CONTRIBUTORS.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitConvention": "none",
+  "contributors": [
+    {
+      "login": "jonespm",
+      "name": "Code Hugger (Matthew Jones)",
+      "avatar_url": "https://avatars.githubusercontent.com/u/27447?v=4",
+      "profile": "https://github.com/jonespm",
+      "contributions": [
+        "maintenance",
+        "code",
+        "review",
+        "bug",
+        "ideas"
+      ]
+    },
+    {
+      "login": "pushyamig",
+      "name": "Pushyami Gundala",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8579775?v=4",
+      "profile": "https://github.com/pushyamig",
+      "contributions": [
+        "maintenance",
+        "code",
+        "review",
+        "bug",
+        "ideas"
+      ]
+    },
+    {
+      "login": "zqian",
+      "name": "Zhen Qian",
+      "avatar_url": "https://avatars.githubusercontent.com/u/359944?v=4",
+      "profile": "https://github.com/zqian",
+      "contributions": [
+        "maintenance",
+        "code",
+        "review",
+        "bug",
+        "ideas"
+      ]
+    },
+    {
+      "login": "ssciolla",
+      "name": "Sam Sciolla",
+      "avatar_url": "https://avatars.githubusercontent.com/u/35741256?v=4",
+      "profile": "https://github.com/ssciolla",
+      "contributions": [
+        "maintenance",
+        "code",
+        "review",
+        "bug",
+        "ideas"
+      ]
+    },
+    {
+      "login": "justin0022",
+      "name": "Justin Lee",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8836578?v=4",
+      "profile": "https://github.com/justin0022",
+      "contributions": [
+        "bug",
+        "ideas",
+        "design"
+      ]
+    },
+    {
+      "login": "chrisrowland",
+      "name": "Chris Rowland",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11380248?v=4",
+      "profile": "https://github.com/chrisrowland",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "andrew-gardener",
+      "name": "Andrew Gardener",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3082802?v=4",
+      "profile": "https://github.com/andrew-gardener",
+      "contributions": [
+        "bug",
+        "code",
+        "ideas"
+      ]
+    },
+    {
+      "login": "vjcao",
+      "name": "Vincent Cao",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33735083?v=4",
+      "profile": "https://github.com/vjcao",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "lsloan",
+      "name": "Mr. Lance E Sloan «UMich»",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20786?v=4",
+      "profile": "https://github.com/lsloan",
+      "contributions": [
+        "code",
+        "bug"
+      ]
+    },
+    {
+      "login": "johnpj",
+      "name": "John Johnston",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5633290?v=4",
+      "profile": "https://www.linkedin.com/in/john-johnston-9479627/",
+      "contributions": [
+        "ideas",
+        "design"
+      ]
+    },
+    {
+      "login": "Adonais0",
+      "name": "Chuyao Wang",
+      "avatar_url": "https://avatars.githubusercontent.com/u/31697300?v=4",
+      "profile": "https://github.com/Adonais0",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "DanielDugan",
+      "name": "Daniel R. Dugan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7157421?v=4",
+      "profile": "https://www.linkedin.com/in/dugandaniel",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "soohyunkim",
+      "name": "Soo Kim",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15352629?v=4",
+      "profile": "https://soohyunkim.github.io/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "miller11",
+      "name": "Ross Miller",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1325198?v=4",
+      "profile": "https://github.com/miller11",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "saputran",
+      "name": "Natasha Saputra",
+      "avatar_url": "https://avatars.githubusercontent.com/u/44738429?v=4",
+      "profile": "https://github.com/saputran",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "jpyan",
+      "name": "York",
+      "avatar_url": "https://avatars.githubusercontent.com/u/35250601?v=4",
+      "profile": "https://github.com/jpyan",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "tkleepsu",
+      "name": "TK Lee",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3495971?v=4",
+      "profile": "https://github.com/tkleepsu",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "simsmat116",
+      "name": "simsmat116",
+      "avatar_url": "https://avatars.githubusercontent.com/u/46581282?v=4",
+      "profile": "https://github.com/simsmat116",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "codacy-badger",
+      "name": "Codacy Badger",
+      "avatar_url": "https://avatars.githubusercontent.com/u/23704769?v=4",
+      "profile": "https://www.codacy.com/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "yuandrew",
+      "name": "Andrew Yuan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/25187103?v=4",
+      "profile": "https://github.com/yuandrew",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "jacobmal",
+      "name": "jacobmal",
+      "avatar_url": "https://avatars.githubusercontent.com/u/46611530?v=4",
+      "profile": "https://github.com/jacobmal",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "dependabot",
+      "name": "Dependabot",
+      "avatar_url": "https://avatars.githubusercontent.com/u/27347476?v=4",
+      "profile": "https://github.com/features/security",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "jlongland",
+      "name": "Jeff Longland",
+      "avatar_url": "https://avatars.githubusercontent.com/u/211830?v=4",
+      "profile": "https://github.com/jlongland",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "jennlove-um",
+      "name": "Jennifer Love",
+      "avatar_url": "https://avatars.githubusercontent.com/u/39634416?v=4",
+      "profile": "https://github.com/jennlove-um",
+      "contributions": [
+        "doc",
+        "ideas",
+        "research"
+      ]
+    },
+    {
+      "login": "mcrwong",
+      "name": "Michael Wong",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6541192?v=4",
+      "profile": "https://github.com/mcrwong",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "kaaaka1995",
+      "name": "Mengdan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/30205030?v=4",
+      "profile": "https://github.com/kaaaka1995",
+      "contributions": [
+        "bug",
+        "design"
+      ]
+    },
+    {
+      "login": "huntr-helper",
+      "name": "huntr.dev | protect open source software",
+      "avatar_url": "https://avatars.githubusercontent.com/u/61279246?v=4",
+      "profile": "https://www.huntr.dev/",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "GitGators",
+      "name": "GitGators",
+      "avatar_url": "https://avatars.githubusercontent.com/u/81310387?v=4",
+      "profile": "https://github.com/GitGators",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "rpfernandezjr",
+      "name": "rpfernandezjr",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9626715?v=4",
+      "profile": "https://github.com/rpfernandezjr",
+      "contributions": [
+        "bug"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}

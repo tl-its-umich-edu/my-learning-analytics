@@ -91,6 +91,7 @@
     "@babel/register": "~7.17.7",
     "@material-ui/core": "^4.12.4",
     "@material-ui/icons": "^4.11.3",
+    "all-contributors-cli": "^6.20.0",
     "babel-loader": "~8.2.4",
     "css-loader": "~6.7.1",
     "eslint-plugin-react-hooks": "^4.4.0",
