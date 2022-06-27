@@ -373,11 +373,11 @@ def resource_access_within_week(request, course_id=0):
                     CONCAT(r.resource_id, r.resource_type) as resource_id_type,
                     r.name as name,
                     count(*) as self_access_count,
-                    max(a.access_time) as self_access_last_time 
-                    from resource_access a, user u, resource r 
-                    where a.user_id = u.user_id 
-                    and a.resource_id = r.resource_id 
-                    and u.sis_name=%(current_user)s 
+                    max(a.access_time) as self_access_last_time
+                    from resource_access a, user u, resource r
+                    where a.user_id = u.user_id
+                    and a.resource_id = r.resource_id
+                    and u.sis_name=%(current_user)s
                     and a.course_id = %(course_id)s
                     and a.course_id = u.course_id
                     group by r.resource_id, r.resource_type, r.name"""
