@@ -301,6 +301,7 @@ def resource_access_within_week(request, course_id=0):
 
     sqlString = f"""SELECT a.resource_id as resource_id,
                     r.resource_type as resource_type,
+                    CONCAT(r.resource_id, r.resource_type) as resource_id_type,
                     r.name as name,
                     u.current_grade as current_grade,
                     a.user_id as user_id
@@ -329,8 +330,6 @@ def resource_access_within_week(request, course_id=0):
     if (df.empty):
         return HttpResponse("{}")
 
-    # group by resource_id, and resource_type
-    df['resource_id_type'] = df['resource_id'].astype(str).str.cat(df['resource_type'], sep='')
     df.set_index(['resource_id_type'])
     # drop resource records when the resource has been accessed multiple times by one user
     df.drop_duplicates(inplace=True)
