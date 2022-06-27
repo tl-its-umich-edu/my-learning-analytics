@@ -299,7 +299,12 @@ def resource_access_within_week(request, course_id=0):
 
     # get time range based on week number passed in via request
 
-    sqlString = f"""SELECT a.resource_id as resource_id, r.resource_type as resource_type, r.name as resource_name, u.current_grade as current_grade, a.user_id as user_id
+    sqlString = f"""SELECT a.resource_id as resource_id,
+                    r.resource_type as resource_type,
+                    CONCAT(r.resource_id, r.resource_type) as resource_id_type,
+                    r.name as name,
+                    u.current_grade as current_grade,
+                    a.user_id as user_id
                     FROM resource r, resource_access a, user u, course c, academic_terms t
                     WHERE a.resource_id = r.resource_id and a.user_id = u.user_id
                     and a.course_id = c.id and c.term_id = t.id
@@ -321,17 +326,11 @@ def resource_access_within_week(request, course_id=0):
             "enrollment_type": 'StudentEnrollment'
         })
     logger.debug(df)
-
     # return if there is no data during this interval
     if (df.empty):
         return HttpResponse("{}")
 
-    # group by resource_id, and resource_name
-    # reformat for output
-    df['resource_id_name'] = df['resource_id'].astype(str).str.cat(df['resource_name'], sep=';')
-
-    df=df.drop(['resource_id', 'resource_name'], axis=1)
-    df.set_index(['resource_id_name'])
+    df.set_index(['resource_id_type'])
     # drop resource records when the resource has been accessed multiple times by one user
     df.drop_duplicates(inplace=True)
 
@@ -339,42 +338,53 @@ def resource_access_within_week(request, course_id=0):
     df['grade'] = df['current_grade'].map(gpa_map)
 
     # calculate the percentage
-    df['percent'] = df.groupby(['resource_id_name', 'grade'])['resource_id_name'].transform('count') / total_number_student
+    df['percent'] = df.groupby(['resource_id_type', 'grade'])['resource_id_type'].transform('count') / total_number_student
 
     df=df.drop(['current_grade', 'user_id'], axis=1)
     # now only keep the resource access stats by grade level
     df.drop_duplicates(inplace=True)
 
-    resource_id_name=df["resource_id_name"].unique()
+
+    resource_id_type=df["resource_id_type"].unique()
 
     #df.reset_index(inplace=True)
 
     # zero filled dataframe with resource name as row name, and grade as column name
-    output_df=pd.DataFrame(0.0, index=resource_id_name, columns=[GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING, RESOURCE_TYPE_STRING])
-    output_df=output_df.rename_axis('resource_id_name')
+    output_df=pd.DataFrame(0.0, index=resource_id_type, columns=['r_id', 'r_name', GRADE_A, GRADE_B, GRADE_C, GRADE_LOW, NO_GRADE_STRING, RESOURCE_TYPE_STRING])
+    output_df=output_df.rename_axis('resource_id_type')
     output_df=output_df.astype({RESOURCE_TYPE_STRING: str})
+    output_df=output_df.astype({'r_name': str})
+    output_df=output_df.astype({'r_id': str})
+
 
     for index, row in df.iterrows():
         # set value
-        output_df.at[row['resource_id_name'], row['grade']] = row['percent']
-        output_df.at[row['resource_id_name'], RESOURCE_TYPE_STRING] = row[RESOURCE_TYPE_STRING]
+        output_df.at[row['resource_id_type'], row['grade']] = row['percent']
+        output_df.at[row['resource_id_type'], RESOURCE_TYPE_STRING] = row[RESOURCE_TYPE_STRING]
+        output_df.at[row['resource_id_type'], 'r_name'] = row['name']
+        output_df.at[row['resource_id_type'], 'r_id'] = row['resource_id']
     output_df.reset_index(inplace=True)
 
     # now insert person's own viewing records: what resources the user has viewed, and the last access timestamp
-    selfSqlString = f"""select CONCAT(r.resource_id, ';', r.name) as resource_id_name, count(*) as self_access_count, max(a.access_time) as self_access_last_time 
-                    from resource_access a, user u, resource r 
-                    where a.user_id = u.user_id 
-                    and a.resource_id = r.resource_id 
-                    and u.sis_name=%(current_user)s 
+    selfSqlString = f"""
+                    select
+                    r.resource_id as resource_id,
+                    CONCAT(r.resource_id, r.resource_type) as resource_id_type,
+                    r.name as name,
+                    count(*) as self_access_count,
+                    max(a.access_time) as self_access_last_time
+                    from resource_access a, user u, resource r
+                    where a.user_id = u.user_id
+                    and a.resource_id = r.resource_id
+                    and u.sis_name=%(current_user)s
                     and a.course_id = %(course_id)s
                     and a.course_id = u.course_id
-                    group by CONCAT(r.resource_id, ';', r.name)"""
+                    group by r.resource_id, r.resource_type, r.name"""
     logger.debug(selfSqlString)
     logger.debug("current_user=" + current_user)
 
     selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user, "course_id": course_id})
-
-    output_df = output_df.join(selfDf.set_index('resource_id_name'), on='resource_id_name', how='left')
+    output_df = output_df.join(selfDf.set_index('resource_id_type'), on=['resource_id_type'], how='left')
     output_df["total_percent"] = output_df.apply(lambda row: row[GRADE_A] + row[GRADE_B] + row[GRADE_C] + row[GRADE_LOW] + row.NO_GRADE, axis=1)
 
     if (grade != "all"):
@@ -385,7 +395,7 @@ def resource_access_within_week(request, course_id=0):
                 output_df["total_percent"] = output_df[i_grade]
             else:
                 output_df=output_df.drop([i_grade], axis=1)
-
+    
     output_df=output_df[output_df.resource_type.isin(filter_list)]
 
     # if no checkboxes are checked send nothing
@@ -402,24 +412,21 @@ def resource_access_within_week(request, course_id=0):
 
     output_df.fillna(0, inplace=True) #replace null value with 0
 
-    output_df[['resource_id_part','resource_name_part']] = output_df['resource_id_name'].str.split(';', expand=True)
-
     output_df['resource_name'] = output_df.apply(
         lambda row:
             (RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("prefix") +
-            row.resource_id_part +
+            str(row.r_id) +
             RESOURCE_ACCESS_CONFIG.get(row.resource_type).get("urls").get("postfix") +
             CANVAS_FILE_ID_NAME_SEPARATOR +
-            row.resource_name_part + CANVAS_FILE_ID_NAME_SEPARATOR +
+            str(row.r_name) + CANVAS_FILE_ID_NAME_SEPARATOR +
             RESOURCE_VALUES.get(RESOURCE_VALUES_MAP.get(row.resource_type)).get('icon')
             ),
         axis=1)
     # RESOURCE_VALUES_MAP {'canvas': 'files', 'leccap': 'videos', 'mivideo': 'videos'}
     output_df['resource_type'] = output_df['resource_type'].replace(RESOURCE_VALUES_MAP)
-    output_df.drop(columns=['resource_id_part', 'resource_name_part', 'resource_id_name'], inplace=True)
+    output_df.drop(columns=['name', 'resource_id_type'], inplace=True)
 
     logger.debug(output_df.to_json(orient='records'))
-
     return HttpResponse(output_df.to_json(orient='records'),content_type='application/json')
 
 
