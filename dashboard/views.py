@@ -369,7 +369,6 @@ def resource_access_within_week(request, course_id=0):
     selfSqlString = f"""
                     select
                     r.resource_id as resource_id,
-                    r.resource_type as resource_type,
                     CONCAT(r.resource_id, r.resource_type) as resource_id_type,
                     r.name as name,
                     count(*) as self_access_count,
@@ -385,9 +384,6 @@ def resource_access_within_week(request, course_id=0):
     logger.debug("current_user=" + current_user)
 
     selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user, "course_id": course_id})
-
-    selfDf.drop(columns=['resource_type'], inplace=True)
-
     output_df = output_df.join(selfDf.set_index('resource_id_type'), on=['resource_id_type'], how='left')
     output_df["total_percent"] = output_df.apply(lambda row: row[GRADE_A] + row[GRADE_B] + row[GRADE_C] + row[GRADE_LOW] + row.NO_GRADE, axis=1)
 
