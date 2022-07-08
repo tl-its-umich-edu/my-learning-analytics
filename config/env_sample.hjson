@@ -218,6 +218,7 @@
     # resource type for resource view add or remove per institution needs
     "RESOURCE_VALUES": {
         "files":  {"types": ["canvas"], "icon": "fas fa-file fa-lg"},
+        "pages": {"types": ["canvas_pages"],"icon": "fas fa-file-code fa-lg"},
         "videos": {"types": [""], "icon": "fas fa-video fa-lg"}
     },
     # Institute specific urls add or remove to your needs, will be used for Resources view
@@ -252,7 +253,34 @@
                 and membership.id is not null 
                 and REGEXP_EXTRACT(`group`.id, r'.*:(.*)') IN UNNEST(@course_ids)
                 '''
-        }
+        },
+        "canvas_pages": {
+            "query":
+                '''
+                SELECT 'canvas_pages' AS resource_type,
+                REPLACE(JSON_EXTRACT_SCALAR(extensions_json, '$[\'com.instructure.canvas\'][request_url]'), 'https://example.instructure.com/courses', '') as resource_id,
+                CAST(REGEXP_EXTRACT(membership.id, r'.*:(.*)') AS INT64) AS user_id,
+                cast(null as string) AS user_login_name,
+                CAST(REGEXP_EXTRACT(`group`.id, r'.*:(.*)') AS INT64) AS course_id,
+                JSON_EXTRACT_SCALAR(object.extensions, '$[\'com.instructure.canvas\'][asset_name]') as name,
+                datetime(EVENT_TIME) as access_time
+                FROM event_store.expanded
+                where
+                JSON_EXTRACT_SCALAR(ed_app.json, '$.id') IN UNNEST(['http://m.example.instructure.com/', 'http://example.instructure.com/'])
+                and type = 'NavigationEvent'
+                and object.type = 'Page'
+                and action = 'NavigatedTo'
+                and membership.id is not null
+                and not CONTAINS_SUBSTR(JSON_EXTRACT_SCALAR(extensions_json, '$[\'com.instructure.canvas\'][request_url]'), '/api/v1/')
+                and REGEXP_EXTRACT(`group`.id, r'.*:(.*)') IN UNNEST(@course_ids)
+                ''',
+            "app_display_name": "Canvas Files",
+            "canvas_course_id_format": "LONG",
+            "urls": {
+                "prefix": "https://example.instructure.com/courses",
+                "postfix": ""
+            }
+        },
     },
     # Disable/Enable courses_enabled api
     "COURSES_ENABLED": false,
