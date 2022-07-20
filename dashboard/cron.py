@@ -206,7 +206,7 @@ class DashboardCronJob(CronJobBase):
         status += delete_all_records_in_table("unizin_metadata")
 
         # select all student registered for the course
-        metadata_sql = "select key as pkey, value as pvalue from unizin_metadata"
+        metadata_sql = queries['metadata']
 
         logger.debug(metadata_sql)
 

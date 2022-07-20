@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 def compare_udw_vs_udp_df(udw_query_string, udp_query_string, udw_engine, udp_engine):
-
     udw_df = pd.read_sql(
         udw_query_string, udw_engine)
 
@@ -94,16 +93,14 @@ def main():
 
         # from the configuration variable, load the queries based on UDP expanded vs events table
         # run queries and compare the returned dataframes
-        cron_udw_json = ENV_CRON_UDW["CRON_QUERIES"]
-        cron_udp_json = ENV_CRON_UDP["CRON_QUERIES"]
-        for query_type in cron_udw_json:
+        for query_type in ENV_CRON_UDW:
             print(f'\ncomparing type {query_type}:')
-            formatted_udw_query_string = cron_udw_json[query_type].format(
-                course_id=course_id, canvas_data_id_increment=CANVAS_DATA_ID_INCREMENT)
-            formatted_udp_query_string = cron_udp_json[query_type].format(
-                course_id=course_id, canvas_data_id_increment=CANVAS_DATA_ID_INCREMENT)
-            print(formatted_udw_query_string)
-            print(formatted_udp_query_string)
+            formatted_udw_query_string = ENV_CRON_UDW[query_type].format(
+                course_id=course_id, canvas_data_id_increment=CANVAS_DATA_ID_INCREMENT, course_ids=DATA_WAREHOUSE_COURSE_IDS)
+            formatted_udp_query_string = ENV_CRON_UDP[query_type].format(
+                course_id=course_id, canvas_data_id_increment=CANVAS_DATA_ID_INCREMENT, course_ids=DATA_WAREHOUSE_COURSE_IDS)
+            #print(formatted_udw_query_string)
+            #print(formatted_udp_query_string)
 
             compare_udw_vs_udp_df(
                 formatted_udw_query_string, formatted_udp_query_string, udw_engine, udp_engine)
