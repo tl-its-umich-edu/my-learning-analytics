@@ -99,8 +99,8 @@ def main():
                 course_id=course_id, canvas_data_id_increment=CANVAS_DATA_ID_INCREMENT, course_ids=DATA_WAREHOUSE_COURSE_IDS)
             formatted_udp_query_string = ENV_CRON_UDP[query_type].format(
                 course_id=course_id, canvas_data_id_increment=CANVAS_DATA_ID_INCREMENT, course_ids=DATA_WAREHOUSE_COURSE_IDS)
-            #print(formatted_udw_query_string)
-            #print(formatted_udp_query_string)
+            print(formatted_udw_query_string)
+            print(formatted_udp_query_string)
 
             compare_udw_vs_udp_df(
                 formatted_udw_query_string, formatted_udp_query_string, udw_engine, udp_engine)
