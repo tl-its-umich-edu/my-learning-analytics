@@ -258,7 +258,9 @@
             "query":
                 '''
                 SELECT 'canvas_pages' AS resource_type,
-                REPLACE(JSON_EXTRACT_SCALAR(extensions_json, '$[\'com.instructure.canvas\'][request_url]'), 'https://example.instructure.com/courses', '') as resource_id,
+                CONCAT(CAST(REGEXP_EXTRACT(`group`.id, r'.*:(.*)') AS INT64) - @canvas_data_id_increment, 
+        				'/pages/', 
+        				CAST(JSON_EXTRACT_SCALAR(object.extensions, '$[\'com.instructure.canvas\'][entity_id]') as INT64) - @canvas_data_id_increment) as resource_id,
                 CAST(REGEXP_EXTRACT(membership.id, r'.*:(.*)') AS INT64) AS user_id,
                 cast(null as string) AS user_login_name,
                 CAST(REGEXP_EXTRACT(`group`.id, r'.*:(.*)') AS INT64) AS course_id,
@@ -277,7 +279,7 @@
             "app_display_name": "Canvas Files",
             "canvas_course_id_format": "LONG",
             "urls": {
-                "prefix": "https://example.instructure.com/courses",
+                "prefix": "https://example.instructure.com/courses/",
                 "postfix": ""
             }
         },
