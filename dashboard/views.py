@@ -809,7 +809,8 @@ def find_binning_grade_value(grades):
     next_to_fifth_item = grades[5]
     if next_to_fifth_item - fifth_item > 2:
         BinningGrade = get_binning_grade()
-        return BinningGrade(value=fifth_item, index=4, binning_all=False)
+        bin_value = next_to_fifth_item-2
+        return BinningGrade(value=bin_value, index=5, binning_all=False)
     else:
         return binning_logic(grades, fifth_item)
 
@@ -867,7 +868,8 @@ def binning_logic(grades, fifth_item_in_list):
         if check_if_grade_qualifies_for_binning(grade, fifth_item_in_list):
             binning_list.append(grade)
         else:
-            return BinningGrade(max(binning_list), len(binning_list),False)
+            bin_value = grade - 2
+            return BinningGrade(bin_value, len(binning_list), False)
     return BinningGrade(max(binning_list), len(binning_list), True)
 
 
