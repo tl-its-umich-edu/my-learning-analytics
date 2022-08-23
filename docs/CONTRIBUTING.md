@@ -1,8 +1,11 @@
-# How to Contribute To My Learning Analytics
+# Contributing
+
 MyLA is fully open source and being actively developed by [Information and Technology Services, University of Michigan](https://its.umich.edu/) and [Centre for Teaching, Learning and Technology, University of British Columbia](https://ctlt.ubc.ca/). The back-end is written in Python using the Django framework, and the front-end is written in JavaScript using React. We welcome any kind of contribution, from code to improvements in documentation to suggestions for future development.
 
 ## Technology Overview
+
 ### Front-end
+
 The front end of MyLA is written in JavaScript using [React](https://reactjs.org/), with [Material-UI](https://material-ui.com/) as the component library and [D3](https://d3js.org/) for the data visualizations. [Jest](https://jestjs.io/) is used as the testing framework - more information can be found below for running the tests.
 
 The code for the front-end is located under `/assets/src/`. MyLA uses functional components instead of class-based components and uses [React hooks](https://reactjs.org/docs/hooks-intro.html) for state and side-effects.
@@ -12,6 +15,7 @@ The code for the front-end is located under `/assets/src/`. MyLA uses functional
 2. To fix this use `standard --fix`.
 
 ### Back-end
+
 MyLA Backend is build using [Django](https://www.djangoproject.com/) Framework, [MySQL](https://www.mysql.com/) DataBase,
 Cron schedule for getting the Canvas context and event data to the MySQL DB each institution might set this up differently based on the infrastruture support.
 MyLA can only be run as an LTI tool. Previous versions of MyLA supported SAML, but this has been removed with a preference on launching via LTI Advantage.
@@ -19,6 +23,7 @@ MyLA can only be run as an LTI tool. Previous versions of MyLA supported SAML, b
 More info of various institutions infrastructure set up is [here](https://github.com/tl-its-umich-edu/my-learning-analytics/wiki/Myla-institutions-Architecture-flow).
 
 ## Create an issue
+
 Before sending a pull request, please create an [issue](https://github.com/tl-its-umich-edu/my-learning-analytics/issues/new) describing either a problem (i.e. bug) in MyLA or a feature to be contributed. We'll do our best to review the issue in a timely manner to discuss before starting work to address the issue.
 
 ## Tips for working with Git
@@ -34,7 +39,6 @@ Another great option that will save some time is
 This avoids having to [set an upstream everytime](https://www.jvt.me/posts/2019/09/22/git-push-matching/) and make it easier to run `git push`.
 
 Reference these github guides on [Forking Projects](https://guides.github.com/activities/forking/) and [Understanding the Github flow](https://guides.github.com/introduction/flow/) for further information. 
-
 
 ## Making a pull request
 Once the issue has been discussed with one of the project maintainers, please follow these steps for making a [pull request](https://github.com/tl-its-umich-edu/my-learning-analytics/pulls).
@@ -60,11 +64,12 @@ Once the issue has been discussed with one of the project maintainers, please fo
 
     `docker exec student_dashboard pkill -HUP gunicorn`
 
-3. VsCode is supported via DEBUGPY (Formerly PTVSD) for debugging the code running in Docker. See this information here for details https://code.visualstudio.com/docs/python/debugging#_remote-debugging
+3. VsCode is supported via DEBUGPY (Formerly PTVSD) for debugging the code running in Docker.
+See this information here for details https://code.visualstudio.com/docs/python/debugging#_remote-debugging
 
-    A few variables are available to be defined in the .env file to enable this but minimally `DEBUGPY_ENABLE=True` must be set. Currently docker-compose.yml opens 2 ports that can be used current, 3000 and 3001. More may be opened, if needed.   These can be configured with other variables.  See `.env.sample` for examples.
+    A few variables are available to be defined in the `.env` file to enable this but minimally `DEBUGPY_ENABLE=True` must be set. Currently docker-compose.yml opens 2 ports that can be used current, 3000 and 3001. More may be opened, if needed. These can be configured with other variables. See `.env.sample` for examples.
 
-    To connect to the cron job, use a different port because Django uses port 3000 by default.  (Wait for attach.)
+    To connect to the cron job, use a different port because Django uses port 3000 by default. (Wait for attach.)
 
     Set breakpoints then run the command below in the docker instance. Next, connect to the cron container. The job will start running when the debugger is attached.
     `docker exec -it student_dashboard /bin/bash -c "DEBUGPY_WAIT_FOR_ATTACH=True DEBUGPY_ENABLE=TRUE DEBUGPY_REMOTE_PORT=3001 ./manage_debugpy.py runcrons --force"`
