@@ -14,11 +14,11 @@ with more views planned in the future.
 
 ## Outline
 
-    1. [Getting Started](docs/getting_started.md)
-    2. [Configuration](docs/configuration.md)
-    3. [Loading data](docs/loading_data.md)
-    5. [Accessibility](docs/accessibilty.md)
-    4. [Testing](docs/testing.md)
-    5. [Contributing](docs/CONTRIBUTING.md)
-    6. [Contributors](docs/CONTRIBUTORS.md)
-    7. [License](docs/license_info.md)
+1. [Getting Started](docs/getting_started.md)
+2. [Configuration](docs/configuration.md)
+3. [Loading data](docs/loading_data.md)
+5. [Accessibility](docs/accessibilty.md)
+4. [Testing](docs/testing.md)
+5. [Contributing](docs/CONTRIBUTING.md)
+6. [Contributors](docs/CONTRIBUTORS.md)
+7. [License](docs/license_info.md)
