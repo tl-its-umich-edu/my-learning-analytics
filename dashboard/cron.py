@@ -425,8 +425,10 @@ class DashboardCronJob(CronJobBase):
                 engine, params={student_enrollment_type})
             resource_access_df = pd.merge(
                 resource_access_df, student_enrollment_df,
-                on=['user_id', 'course_id'], how='inner')
-
+                on=['user_id', 'course_id'],
+                # use inner merge to keep only resource access event (left)
+                # innitiated by people with student enrollment type (right)
+                how='inner')
             # First, update resource table
             try:
                 dtype = {'resource_id': types.VARCHAR(255)}
