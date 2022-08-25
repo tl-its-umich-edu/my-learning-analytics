@@ -806,6 +806,21 @@ def are_weighted_assignments_hidden(course_id, df):
 
 
 def find_binning_grade_value(grades):
+    """
+    Histogram binning is by 2 [ [0,2], [2,4], [4,6], …..] each item in the list starting number is inclusive and second
+    is exclusive.
+    Binning the last five grades, if grades difference is > 1 else bin all the grades untill we find the difference > 1 
+    Goal is to have the binned grades close to other grades to distribution. So substract by 2 to non-binned grade
+    Case 1: Just last 5 are binned
+    Actual distribution: [69.79, 80.0, 80.5, 88.21, 88.79, 92.71, 92.71, 92.71, 93.14, 94.43]
+    Binning Distribution: [90.71, 90.71, 90.71, 90.71, 90.71, 92.71, 92.71, 92.71, 93.14, 94.43]
+    Case 2: More than last 5 are binned based on histogram binning by count of 2
+    Actual Distribution: [90.77, 93.09, 93.42, 94.85, 94.87, 94.88, 94.9, 95.55, 95.89, 96.28, 96.4, 96.47, 96.49, 96.68]
+    Binning Distribution: [94.89, 94.89, 94.89, 94.89, 94.89, 94.89, 94.89, 94.89, 94.89,96.28, 96.4, 96.47, 96.49, 96.68]
+
+    :param grades: sorted in asc
+    :return: binning grade value applied to all low grades, length of binned grades, bool value indicating whether all grades are being binned
+    """
     fifth_item = grades[4]
     next_to_fifth_item = grades[5]
     if next_to_fifth_item - fifth_item > 2:
@@ -850,18 +865,9 @@ def check_if_grade_qualifies_for_binning(grade, fifthElement):
 
 def binning_logic(grades, fifth_item_in_list):
     """
-    Histogram binning is by 2 [ [0,2], [2,4], [4,6], …..] each item in the list starting number is inclusive and second
-    is exclusive.
-    Case 1: Just last 5 are binned
-    Actual distribution: [69.79, 80.0, 80.5, 88.21, 88.79, 92.71, 92.71, 92.71, 93.14, 94.43]
-    Binning Distribution: [88.79, 88.79, 88.79, 88.79, 88.79, 92.71, 92.71, 92.71, 93.14, 94.43]
-    Case 2: More than last 5 are binned based on histogram binning by count of 2
-    Actual Distribution: [90.77, 93.09, 93.42, 94.85, 94.87, 94.88, 94.9, 95.55, 95.89, 96.28, 96.4, 96.47, 96.49, 96.68]
-    Binning Distribution: [95.89, 95.89, 95.89, 95.89, 95.89, 95.89, 95.89, 95.89, 95.89,96.28, 96.4, 96.47, 96.49, 96.68]
-
     :param grades: sorted in asc
     :param fifth_item_in_list:
-    :return: max grade in the binned list, length of binned grades, bool value indicating whether all grades are being binned
+    :return: binning grade value applied to all low grades, length of binned grades, bool value indicating whether all grades are being binned
     """
     binning_list = grades[:5]
     BinningGrade = get_binning_grade()
