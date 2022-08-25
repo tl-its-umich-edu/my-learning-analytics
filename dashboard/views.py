@@ -809,7 +809,7 @@ def find_binning_grade_value(grades):
     """
     Histogram binning is by 2 [ [0,2], [2,4], [4,6], …..] each item in the list starting number is inclusive and second
     is exclusive.
-    Binning the last five grades, if grades difference is > 1 else bin all the grades untill we find the difference > 1 
+    Binning the last five grades, if grades difference is > 1 else bin all the grades untill we find the difference > 1
     Goal is to have the binned grades close to other grades to distribution. So substract by 2 to non-binned grade
     Case 1: Just last 5 are binned
     Actual distribution: [69.79, 80.0, 80.5, 88.21, 88.79, 92.71, 92.71, 92.71, 93.14, 94.43]
