@@ -467,19 +467,20 @@ def grade_distribution(request, course_id=0):
 
     df.sort_values(by=['current_grade'], inplace=True)
     df.reset_index(drop=True, inplace=True)
+    if df[df['current_grade'] > 100.0].shape[0] > 0:
+        summary['graph_upper_limit'] = int((5 * round(float(df['current_grade'].max()) / 5) + 5))
+    else:
+        df['current_grade'] = df['current_grade'].apply(lambda x: 99.99 if x == 100.00 else x)
+        summary['graph_upper_limit'] = 100
     grades = df['current_grade'].values.tolist()
     logger.debug(f"Grades distribution: {grades}")
+
     BinningGrade = find_binning_grade_value(grades)
     if BinningGrade is not None and not BinningGrade.binning_all:
         scores_to_replace = df['current_grade'].head(BinningGrade.index).to_list()
         df['current_grade'] = df['current_grade'].replace(scores_to_replace, BinningGrade.value)
     summary['show_dash_line'] = show_dashed_line(df['current_grade'].iloc[0], BinningGrade)
     
-    if df[df['current_grade'] > 100.0].shape[0] > 0:
-        summary['graph_upper_limit'] = int((5 * round(float(df['current_grade'].max()) / 5) + 5))
-    else:
-        df['current_grade'] = df['current_grade'].apply(lambda x: 99.99 if x == 100.00 else x)
-        summary['graph_upper_limit'] = 100
 
     grade_view_data['summary'] = summary
     grade_view_data['grades'] = df['current_grade'].values.tolist()
