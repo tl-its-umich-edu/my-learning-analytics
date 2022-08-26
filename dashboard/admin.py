@@ -70,9 +70,15 @@ class TermAdmin(admin.ModelAdmin):
 class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseViewOptionInline, ]
     form = CourseForm
-    list_display = ('canvas_id', 'name', 'term', 'show_grade_counts', 'course_link', '_courseviewoption', 'show_grade_type')
+    list_display = ('canvas_id', 'name', 'term', 'show_grade_counts', 'course_link', '_courseviewoption', 'data_last_updated')
     list_select_related = True
     readonly_fields = ('term', 'data_last_updated',)
+    actions = ['clear_course_updated_dates']
+
+    @admin.action(description='Clear selected Courses updated dates')
+    def clear_course_updated_dates(self, request, queryset):
+        queryset.update(data_last_updated=None)
+        self.message_user(request, "All selected course updated dates are cleared.")
 
     # Need this method to correctly display the line breaks
     def _courseviewoption(self, obj):
