@@ -825,7 +825,7 @@ def find_binning_grade_value(grades):
     next_to_fifth_item = grades[5]
     if next_to_fifth_item - fifth_item > 2:
         BinningGrade = get_binning_grade()
-        bin_value = next_to_fifth_item-2
+        bin_value = next_to_fifth_item - 2
         return BinningGrade(value=bin_value, index=5, binning_all=False)
     else:
         return binning_logic(grades, fifth_item)
