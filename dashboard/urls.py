@@ -78,7 +78,7 @@ urlpatterns = [
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
-if settings.STUDENT_DASHBOARD_LTI:
+if settings.ENABLE_LTI:
     from . import lti_new
     urlpatterns += (
         path('lti/login/', lti_new.login, name='lti_login'),
