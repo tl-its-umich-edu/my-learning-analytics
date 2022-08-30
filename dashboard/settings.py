@@ -134,6 +134,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+# user django session expiriration, defaults to 24hrs
+SESSION_COOKIE_AGE = ENV.get('SESSION_COOKIE_AGE', 86400)
+
+# django Session to expire on browser close (quite), defaults to true
+SESSION_EXPIRE_AT_BROWSER_CLOSE = ENV.get('SESSION_EXPIRE_AT_BROWSER_CLOSE', True)
+
 
 CRON_CLASSES = [
     "dashboard.cron.DashboardCronJob",
