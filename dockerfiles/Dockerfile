@@ -9,10 +9,10 @@ RUN npm install
 
 # NOTE: assets/ likely to change between dev builds
 COPY assets /usr/src/app/assets
-RUN npm run prod 
+RUN npm run prod
 
 # This is to find and remove symlinks that break some Docker builds.
-# We need these later we'll just uncompress them 
+# We need these later we'll just uncompress them
 # Put them in node_modules as this directory isn't masked by docker-compose
 # Also remove src and the symlinks afterward
 RUN apt-get update && \
@@ -40,7 +40,7 @@ WORKDIR /code
 COPY requirements.txt .
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    build-essential default-libmysqlclient-dev  libpq-dev netcat vim-tiny jq python3-dev xmlsec1 cron git && \
+    build-essential default-libmysqlclient-dev libpq-dev netcat jq python3-dev xmlsec1 cron git && \
     apt-get upgrade -y && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
