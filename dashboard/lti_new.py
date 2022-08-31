@@ -234,6 +234,7 @@ def extract_launch_variables_for_tool_use(request, message_launch):
         # update
         user_obj.first_name = first_name
         user_obj.last_name = last_name
+        user_obj.name = full_name
         user_obj.email = email
         user_obj.save()
     except User.DoesNotExist:
