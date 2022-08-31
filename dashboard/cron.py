@@ -234,10 +234,10 @@ class DashboardCronJob(CronJobBase):
         for row in df_attach.itertuples(index=False):
             if row.file_state == 'available':
                 Resource.objects.filter(resource_id=row.id).update(name=row.display_name)
-                status += f"Row {row.id} updated to {row.display_name}\n"
+                logger.debug(f"Row {row.id} updated to {row.display_name}")
             else:
                 Resource.objects.filter(resource_id=row.id).delete()
-                status += f"Row {row.id} removed as it is not available\n"
+                logger.debug(f"Row {row.id} removed as it is not available")
         return status
 
     # update RESOURCE_ACCESS records from BigQuery or LRS data sources
