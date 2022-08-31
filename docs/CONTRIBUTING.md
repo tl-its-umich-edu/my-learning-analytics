@@ -1,4 +1,4 @@
-# Contributing
+## Contributing
 
 MyLA is fully open source and being actively developed by
 [Information and Technology Services, University of Michigan](https://its.umich.edu/) and
@@ -7,9 +7,9 @@ The back-end is written in Python using the Django framework,
 and the front-end is written in JavaScript using React.
 We welcome any kind of contribution, from code to improvements in documentation to suggestions for future development.
 
-## Technology Overview
+### Technology Overview
 
-### Front-end
+#### Front-end
 
 The front end of MyLA is written in JavaScript using [React](https://reactjs.org/), with
 [Material-UI](https://material-ui.com/) as the component library and [D3](https://d3js.org/) for the data visualizations.
@@ -27,7 +27,7 @@ npm install
 standard assets/src
 ```
 
-### Back-end
+#### Back-end
 
 The MyLA backend is build using the [Django](https://www.djangoproject.com/) framework and
 uses [MySQL](https://www.mysql.com/) for a database platform.
@@ -41,14 +41,14 @@ Each institution may need to configure various settings differently based on the
 More info on various institutions' infrastructure set-up is
 [here](https://github.com/tl-its-umich-edu/my-learning-analytics/wiki/Deploy:-Institution-Architectures).
 
-## Create an issue
+### Create an issue
 
 Before sending a pull request, please create an
 [issue](https://github.com/tl-its-umich-edu/my-learning-analytics/issues/new)
 describing either a problem (i.e. bug) in MyLA or a feature to be contributed.
 We'll do our best to review the issue in a timely manner to discuss before starting work to address the issue.
 
-## Creating pull requests
+### Creating pull requests
 
 Once the issue has been discussed with one of the project maintainers, please follow these steps for making a
 [pull request](https://github.com/tl-its-umich-edu/my-learning-analytics/pulls).
@@ -83,12 +83,12 @@ Click this and provide details about the changes, making sure to mention (using 
     git pull upstream master
     ```
 
-## Code review
+### Code review
 
 All contributions must be code reviewed. Contributions may need to be changed before they can be accepted.
 We really appreciate tests as well, so if at all possible please try to add tests.
 
-## Tips for working with Git
+### Tips for working with Git
 
 When working with branches, we
 [recommend](https://randyfay.com/content/simpler-rebasing-avoiding-unintentional-merge-commits)
@@ -105,7 +105,7 @@ and makes it easier to run `git push`.
 Reference these GitHub guides on [Forking Projects](https://guides.github.com/activities/forking/) and
 [Understanding the GitHub flow](https://guides.github.com/introduction/flow/) for further information.
 
-## Development tips
+### Development tips
 
 1. Connect to the Docker container, and edit some files!
 
@@ -139,7 +139,7 @@ See this information [here](https://code.visualstudio.com/docs/python/debugging#
         ./manage_debugpy.py runcrons --force"
     ```
 
-## Database Upgrade in Development
+### Database Upgrade in Development
 
 While working on issues, MyLA's `docker-compose.yml` may need to be updated to use a newer version of MySQL.
 Some new versions may cause MySQL to complain about using an older DB.
