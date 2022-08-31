@@ -1,3 +1,5 @@
+[Back to README](../README.md)
+
 ## Getting Started
 
 These instructions will get a copy of MyLA up and running on your local machine with anonymized/fake student data.

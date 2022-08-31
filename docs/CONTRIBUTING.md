@@ -1,3 +1,5 @@
+[Back to README](../README.md)
+
 ## Contributing
 
 MyLA is fully open source and being actively developed by

@@ -1,3 +1,5 @@
+[Back to README](../README.md)
+
 ## Configuration
 
 Configuration is currently managed via two configuration files, `.env` and `env.hjson`;

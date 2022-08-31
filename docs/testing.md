@@ -1,3 +1,5 @@
+[Back to README](../README.md)
+
 ## Testing
 
 The application currently uses two frameworks for front-end testing: [Jest](https://jestjs.io/) and [Cypress](https://www.cypress.io/). There are plans to implement back-end tests in the future.

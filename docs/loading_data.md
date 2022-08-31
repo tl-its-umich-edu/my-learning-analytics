@@ -1,3 +1,5 @@
+[Back to README](../README.md)
+
 ## Loading data
 
 Context and event data are loaded into the MySQL database using a job defined in [dashboard/cron.py](../dashboard/cron.py).
