@@ -1,21 +1,28 @@
-### Load user, file, file access data into database
-Users and files are loaded now with the cron job. This is run on a separate pod in Openshift when the environment variable `IS_CRON_POD=true`.
+## Loading data
 
-Crons are configured in this project with django-cron. Django-cron is executed whenever `python manage.py runcrons` is run but it is limited via a few environment variables.
+Context and event data are loaded into the MySQL database using a job defined in [dashboard/cron.py](../dashboard/cron.py).
+The job approach leverages the [`django-cron`](https://django-cron.readthedocs.io/en/latest/) library.
 
-The installation notes recommends that you have a Unix crontab scheduled to run every 5 minutes to run this command. https://django-cron.readthedocs.io/en/latest/installation.html
+### Local development
 
-This is configured with these values
-***(Django Cron) Run only at 2AM***
+For local testing, make sure your connection and BiqQuery secrets are added (see [Configuration](configuration.md)) and
+your VPN is active. Then, with the application running, run this command in a separate terminal.
+```
+docker exec -it student_dashboard /bin/bash -c \
+    "python manage.py migrate django_cron && python manage.py runcrons --force"
+```
 
-RUN_AT_TIMES=2:00
+After about 30 to 60 seconds, the cron job should have completed and you should have data! In the admin interface, there is a table where you can check the status of the cron job runs.
 
-***(Unix Cron) - Run every 5 minutes***
+### Deployment
 
-CRONTAB_SCHEDULE=*/5 * * * *
+Note: Cron scheduling functionality settings may be removed in the future,
+since this responsibility is often handed off to other infrastructure, like an automation server.
 
-For local testing, make sure your secrets are added and your VPN is active. Then run this command on a running container to execute the cronjob
-
-`docker exec -it student_dashboard /bin/bash -c "python manage.py migrate django_cron && python manage.py runcrons --force"`
-
-After about 30-60 seconds the crons should have completed and you should have data! In the admin interface there is a table where you can check the status of the cron job runs.
+By setting a few configuration variables in `env.hjson`,
+the application can be started up in a separate container with a Unix crontab schedule.
+To do this, set `IS_CRON_POD` to `true`,and then configure `CRONTAB_SCHEDULE` and `RUN_AT_TIMES`.
+For `CRONTAB_SCHEDULE`, `django-cron` recommends running `python manage.py runcrons` every five minutes,
+which is the default (`*/5 * * * *`) in `env.hjson`.
+`RUN_AT_TIMES` sets when the job will actually kick off.
+See [`start.sh`](../start.sh) and `cron.py` to see the logic.
