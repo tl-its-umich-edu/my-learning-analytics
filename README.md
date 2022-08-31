@@ -12,7 +12,9 @@ It currently has three views
 [Grade Distribution](https://sites.google.com/umich.edu/my-learning-analytics-help/home/grade-distribution)),
 with more views planned in the future.
 
-## Outline
+## Contents
+
+See the pages below to learn more about running, configuring, and deploying MyLA, and how you can contribute.
 
 1. [Getting Started](docs/getting_started.md)
 2. [Configuration](docs/configuration.md)
