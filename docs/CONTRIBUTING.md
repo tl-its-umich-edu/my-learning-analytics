@@ -3,7 +3,8 @@
 MyLA is fully open source and being actively developed by
 [Information and Technology Services, University of Michigan](https://its.umich.edu/) and
 [Centre for Teaching, Learning and Technology, University of British Columbia](https://ctlt.ubc.ca/).
-The back-end is written in Python using the Django framework, and the front-end is written in JavaScript using React.
+The back-end is written in Python using the Django framework,
+and the front-end is written in JavaScript using React.
 We welcome any kind of contribution, from code to improvements in documentation to suggestions for future development.
 
 ## Technology Overview
@@ -13,8 +14,9 @@ We welcome any kind of contribution, from code to improvements in documentation 
 The front end of MyLA is written in JavaScript using [React](https://reactjs.org/), with
 [Material-UI](https://material-ui.com/) as the component library and [D3](https://d3js.org/) for the data visualizations.
 
-The code for the front-end is located under `/assets/src/`. MyLA uses functional components instead of class-based components
-and uses [React hooks](https://reactjs.org/docs/hooks-intro.html) for state and side-effects.
+The code for the front-end is located under `/assets/src/`.
+MyLA uses functional components instead of class-based components and
+uses [React hooks](https://reactjs.org/docs/hooks-intro.html) for state and side-effects.
 [Jest](https://jestjs.io/) is used as the testing framework; see [Testing](testing.md) for more information.
 
 [Standard](https://standardjs.com/) is the JavaScript linter.
@@ -83,7 +85,8 @@ Click this and provide details about the changes, making sure to mention (using 
 
 ## Code review
 
-All contributions must be code reviewed. Contributions may need to be changed before they can be accepted. We really appreciate tests as well, so if at all possible please try to add tests.
+All contributions must be code reviewed. Contributions may need to be changed before they can be accepted.
+We really appreciate tests as well, so if at all possible please try to add tests.
 
 ## Tips for working with Git
 
