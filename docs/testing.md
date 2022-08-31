@@ -12,6 +12,8 @@ To update snapshots, execute `docker exec -it webpack_watcher npm run-script upd
 
 ### Cypress Testing
 
+Note: Cypress tests are still present but have not been maintained and may be removed in the future.
+
 Some front-end tests are implemented using the [Cypress framework](https://www.cypress.io/).
 
 For running Cypress tests locally, it is essential that you have a MyLA instance running locally.
@@ -22,8 +24,8 @@ Then do the following:
 
 1. Install `cypress` and snapshot plugin.
 ```
-npm install cypress
-# npm install cypress-plugin-snapshots -S
+npm install cypress@4.12.1
+npm install cypress-plugin-snapshots -S
 ```
 
 2. Start Cypress.
