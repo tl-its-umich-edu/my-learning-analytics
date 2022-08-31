@@ -192,7 +192,7 @@ def check_if_instructor(roles, username, course_id):
 def course_user_roles(roles, username):
     user_membership_roles = set([role for role in roles if role.find(COURSE_MEMBERSHIP) == 0])
     if not user_membership_roles:
-        logger.info(f'User {username} does not have course membership roles, must be admin {roles}')
+        logger.error(f'User {username} does not have course membership roles, but has {roles} roles')
     elif INSTRUCTOR in user_membership_roles and TA in user_membership_roles:
         logger.info(f'User {username} is a {TA} in the course')
         user_membership_roles.remove(INSTRUCTOR)
