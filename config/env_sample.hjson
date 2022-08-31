@@ -94,7 +94,7 @@
     "GOOGLE_APPLICATION_CREDENTIALS": "/secrets/bq_cred.json",
     # LTI Configuration
     # LTI is disabled by default
-    "STUDENT_DASHBOARD_LTI": false,
+    "ENABLE_LTI": false,
     # LTI 1.3 configuration
     # The first key of LTI_CONFIG is the Canvas URL (production, beta, or test)
     "LTI_CONFIG": {
