@@ -846,7 +846,7 @@ def show_dashed_line(grade, BinningGrade):
     :param BinningGrade:
     :return:
     """
-    if BinningGrade.binning_all or grade > 96 or grade < 2:
+    if BinningGrade.binning_all or grade > 98 or grade < 2:
         return False
     else:
         return True
