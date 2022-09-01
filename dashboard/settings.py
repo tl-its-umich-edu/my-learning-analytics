@@ -134,7 +134,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
-# user django session expiriration, defaults to 24hrs
+# user Django session expiration, defaults to 24 hours
 SESSION_COOKIE_AGE = ENV.get('SESSION_COOKIE_AGE', 86400)
 
 # django Session to expire on browser close (quite), defaults to true
