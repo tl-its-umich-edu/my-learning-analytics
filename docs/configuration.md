@@ -5,10 +5,11 @@
 Configuration is currently managed via two configuration files, `.env` and `env.hjson`;
 some other configuration is handled using the Django admin interface.
 
-The `.env` includes some environment variables, including a path to the `.env.hjson` file;
+The `.env` includes a few environment variables, including a path to the `.env.hjson` file;
 a template is provided at [.env.sample](../.env.sample).
 The `.env.hjson` includes the majority of global settings, including configuration for LTI and resource access queries
-(see the [hjson](https://hjson.github.io/) website for more information on allowed syntax). A template is provided at [config/env_sample.hjson](../config/env_sample.hjson).
+(see the [hjson](https://hjson.github.io/) website for more information on allowed syntax).
+A template is provided at [config/env_sample.hjson](../config/env_sample.hjson).
 Both files include explanatory comments to help determine the proper value for a given use case.
 More details on certain topics are provided below.
 
@@ -26,7 +27,7 @@ In addition, you need to ensure you are using `https` and the `.env.hjson` `CSRF
 with your domain (or `instructure.com`) in `CSRF_TRUSTED_ORIGINS`.
 
 You may optionally disable deployment ID validation by setting `LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION` in `env.hjson`
-to `true` (default `false`).
+to `true` (default is `false`).
 
 ### Content Security Policy
 
@@ -48,13 +49,14 @@ should specify the path to a service account JSON key file for accesssing BigQue
 ### Course view options
 
 Users can control which application views are enabled at the global and course levels.
-If a view is disabled globally, it will be disabled for every course, even if previously enabled at the course level. If a view is not globally disabled, it can still be disabled at the course level.
+If a view is deactivated globally, it will be deactivated for every course, even if previously enabled at the course level.
+If a view is not globally deactivated, it can still be deactivated at the course level.
 Note that by default all views are enabled when a course is added.
 
 The `VIEWS_DISABLED` variable in `env.hjson` controls global settings.
-The value should be a comma-delimited list of views to disable (by default it is empty).
+The value should be a comma-delimited list of views to deactivate (by default it is empty).
 The expected name of the view is the same as the view's column name in the `course_view_option` table.
-For example `VIEWS_DISABLED=show_resources_accessed,show_grade_distribution` will disable both
+For example `VIEWS_DISABLED=show_resources_accessed,show_grade_distribution` will deactivate both
 the Resources Accessed and Grade Distribution views.
 
 ### Primary user interface color
@@ -80,9 +82,11 @@ and then run the following command:
 docker exec -it student_dashboard /bin/bash ./demo_init.sh
 ```
 
-If you have problems, you can connect direct into a specific container with the command
+If you have problems, you can connect directly into the web container:
 
-    docker-compose run web /bin/bash
+```
+docker exec -it student_dashboard /bin/bash
+```
 
 ### Setting up an admin in the deployed application
 
@@ -90,8 +94,8 @@ MyLA is designed to be deployed as an LTI tool. To grant admin privileges to a u
 (i.e. access to the admin UI so they can add courses and otherwise configure the tool),
 do the following:
 
-1. Have the user the tool in Canvas.
-2. Modify their `auth_user` record in the database directly so that `is_staff` and `is_superuser` are true.
+1. Have the user launch the tool in Canvas.
+1. Modify their `auth_user` record in the database directly so that `is_staff` and `is_superuser` are true.
     ```
     # Replace username with the user's Canvas username.
     UPDATE auth_user SET is_staff=1, is_superuser=1 where auth_user.username='username';
@@ -106,8 +110,8 @@ A Django flatpage can be configured for this purpose using the admin UI.
 Do the following to specify a copyright message.
 
 1. In the Django admin UI, click on the "+ Add" icon next to "Flat pages" in the left-hand navigation.
-2. Fill in the form, making sure to use `/copyright/` for the URL (what the `base.html` template expects),
-to enter the desired HTML or basic string under Content, and to click the available site.
+1. Fill in the form, making sure to use `/copyright/` for the URL (what the `base.html` template expects),
+to enter the desired HTML or basic string under "Content", and to click the available site.
 
 ### Additional Resources
 [Video guide](https://www.youtube.com/watch?v=CSQmQtLe594&feature=youtu.be)
