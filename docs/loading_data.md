@@ -18,7 +18,7 @@ After about 30 to 60 seconds, the cron job should have completed and you should 
 
 ### Deployment
 
-Note: Cron scheduling functionality settings may be removed in the future,
+**Note:** Cron scheduling functionality settings may be removed in the future,
 since this responsibility is often handed off to other infrastructure, like an automation server.
 
 By setting a few configuration variables in `env.hjson`,
