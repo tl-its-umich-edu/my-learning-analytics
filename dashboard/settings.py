@@ -134,12 +134,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
-# user Django session expiration, defaults to 24 hours
-SESSION_COOKIE_AGE = ENV.get('SESSION_COOKIE_AGE', 86400)
-
-# Django session to expire on browser close (quit), defaults to true
-SESSION_EXPIRE_AT_BROWSER_CLOSE = ENV.get('SESSION_EXPIRE_AT_BROWSER_CLOSE', True)
-
 
 CRON_CLASSES = [
     "dashboard.cron.DashboardCronJob",
@@ -405,6 +399,9 @@ if CSRF_COOKIE_SECURE:
 # this when new browser versions expect (and the Django version allows) the string "None".
 SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", 'None')
 CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", 'None')
+
+SESSION_COOKIE_AGE = ENV.get('SESSION_COOKIE_AGE', 86400)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = ENV.get('SESSION_EXPIRE_AT_BROWSER_CLOSE', True)
 
 CHECK_ENABLE_BACKEND_LOGIN = False if ENABLE_LTI else True
 

@@ -57,9 +57,9 @@
     # SameSite settings for Session and CSRF (defaults in settings.py should work), if you do want non-string None set to null.
     "SESSION_COOKIE_SAMESITE": "None",
     "CSRF_COOKIE_SAMESITE": "None",
-    # user django session expiriration, defaults to 24hrs matching canvas
+    # user Django session expiration, defaults to 24hrs matching canvas
     "SESSION_COOKIE_AGE": 86400,
-    # django Session to expire on browser close (quite), defaults to true
+    # Django Session to expire on browser close (quit), defaults to true
     "SESSION_EXPIRE_AT_BROWSER_CLOSE": true
     # Warning:
     # This enables debugging of Django code
