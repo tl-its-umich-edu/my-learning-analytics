@@ -182,8 +182,12 @@ def get_cache_config():
     return CacheConfig(is_dummy_cache, launch_data_storage, cache_lifetime)
 
 
+# Checking if user only has Instructor role in a course to enable MyLA in courses. 
+# A TA could be an instructor in an course section so his role will be both TA and Instructor. 
+# we don't want TA to enable the MyLA data extraction step
 def check_if_instructor(roles, username, course_id):
-    if INSTRUCTOR in roles:
+    user_membership_roles = set([role for role in roles if role.find(COURSE_MEMBERSHIP) == 0])
+    if user_membership_roles and INSTRUCTOR in roles and not TA in user_membership_roles:
         logger.info(f'user {username} is Instructor in the course {course_id}')
         return True
     return False
@@ -243,8 +247,7 @@ def extract_launch_variables_for_tool_use(request, message_launch):
                                             last_name=last_name)
     user_obj.backend = 'django.contrib.auth.backends.ModelBackend'
     django.contrib.auth.login(request, user_obj)
-    user_roles = course_user_roles(roles, username)
-    is_instructor = check_if_instructor(user_roles, username, course_id)
+    is_instructor = check_if_instructor(roles, username, course_id)
 
     try:
         Course.objects.get(canvas_id=course_id)
