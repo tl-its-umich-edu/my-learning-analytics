@@ -75,10 +75,10 @@ class CourseAdmin(admin.ModelAdmin):
     readonly_fields = ('term', 'data_last_updated',)
     actions = ['clear_course_updated_dates']
 
-    @admin.action(description='Clear selected Courses updated dates')
+    @admin.action(description='Clear selected last updated values')
     def clear_course_updated_dates(self, request, queryset):
         queryset.update(data_last_updated=None)
-        self.message_user(request, "All selected course updated dates are cleared.")
+        self.message_user(request, "All selected last updated values are cleared.")
 
     # Need this method to correctly display the line breaks
     def _courseviewoption(self, obj):
