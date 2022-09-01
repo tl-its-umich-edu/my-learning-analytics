@@ -473,7 +473,7 @@ def grade_distribution(request, course_id=0):
     else:
         df['current_grade'] = df['current_grade'].apply(lambda x: 99.99 if x == 100.00 else x)
         summary['graph_upper_limit'] = 100
-    grades = df['current_grade'].values.tolist()
+    grades = df['current_grade'].to_list()
     logger.debug(f"Grades distribution: {grades}")
 
     binning_grade = find_binning_grade_value(grades)
