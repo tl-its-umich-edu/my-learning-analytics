@@ -38,19 +38,19 @@ To follow the instructions below, you will at minimum need the following:
     ```
 
 1. Examine the `env.hjson` file. You may need to change some of the configuration values for different environments,
-e.g. localhost vs. a production deployment. There are comments to help the configuration.
+e.g. localhost vs. a production deployment. There are comments to help determine the proper settings.
 See [Configuration](configuration.md) for some additional info.
 
-    *Note*: You may also optionally place the json settings directly into the `ENV_JSON` environment variable
+    **Note:** You may also optionally place the JSON settings directly into the `ENV_JSON` environment variable
     if your deployment environment doesn't easily support mounting the `env.hjson` file into container.
-    When using `ENV_JSON` put the entire contents of `env.hjson` into it as single line string.
+    When using `ENV_JSON`, put the entire contents of `env.hjson` into it as a single-line string.
 
 1. Copy the `.env.sample` file as `.env`. 
     ```
     cp .env.sample .env
     ```
 
-1. Examine the `.env` file. It has the suggested default environment variable settings,
+1. Examine the `.env` file. It will have the suggested default environment variable settings,
 mostly just MySQL information as well as locations of other configuration files.
 
 1. Start the Docker build process (this will take some time).
@@ -58,12 +58,12 @@ mostly just MySQL information as well as locations of other configuration files.
     docker compose build
     ```
 
-1. Start up the web servers and database containers.
+1. Start up the web server and database containers.
     ```
     docker compose up
     ```
 
-    Note: Use `docker compose down` and `^C` at any time to stop and unstage the running containers.
+    **Note:** Use `docker compose down` and `^C` at any time to stop and unstage the running containers.
 
 1. Download the latest SQL file from [this Google Drive link](https://drive.google.com/drive/u/0/folders/1Pj7roNjRPGyumKKal8-h5E6ukUiXTDI9), and move it into the repository.
 
@@ -77,11 +77,7 @@ mostly just MySQL information as well as locations of other configuration files.
 
 #### Logging in as admininstrator
 
-1. Navigate to http://localhost:5001/ and log in as:
-    ```
-    username: root
-    password: root
-    ```
+1. Navigate to http://localhost:5001/ and log in as `root` with password `root`.
 
 As you are now logged in as `root`, there are no courses listed.
 To view a course and the visualizations as an admin, do the following:
@@ -95,7 +91,7 @@ or navigate to http://localhost:5001/admin.
 
 #### Logging in as a student
 
-1. Click on the top-right circle, then click `Logout`.
+1. If you are logged in as `root`, click on the top-right circle, then click "Logout".
 
 1. Connect to the MySQL database.
     ```
@@ -107,18 +103,21 @@ or navigate to http://localhost:5001/admin.
     ```
     
 1. Pick a student `sis_name` from the `user` table to be used in the next step.
-
     ```sql
     SELECT sis_name FROM `user` WHERE enrollment_type = 'StudentEnrollment'
     ```
 
 1. Create an authorized user.
-    ```sh
-    docker exec -it student_dashboard python manage.py createuser --username={insert sis_name} --password={create password} --email=test@test.com
+    ```
+    docker exec -it student_dashboard python manage.py createuser \
+        --username={insert sis_name} \
+        --password={create password} \
+        --email=test@test.com
     ```
     
-    Note: To make a user a superuser, edit the record in `auth_user` to set `is_staff=1` and `is_superuser=1`.
+    **Note:** To make a user a superuser, edit the record in `auth_user` to set `is_staff=1` and `is_superuser=1`.
     
 1. Login using the username and password created.
 
-1. The course(s) enrolled by the student with selected `sis_name` will be displayed. Click on a course to view as the student selected in step 3.
+1. The course(s) the student with the selected `sis_name` are enrolled in will be displayed.
+Click on a course to view as the student selected in step 3.
