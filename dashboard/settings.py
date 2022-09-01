@@ -137,7 +137,7 @@ MIDDLEWARE = [
 # user Django session expiration, defaults to 24 hours
 SESSION_COOKIE_AGE = ENV.get('SESSION_COOKIE_AGE', 86400)
 
-# django Session to expire on browser close (quite), defaults to true
+# Django session to expire on browser close (quit), defaults to true
 SESSION_EXPIRE_AT_BROWSER_CLOSE = ENV.get('SESSION_EXPIRE_AT_BROWSER_CLOSE', True)
 
 
