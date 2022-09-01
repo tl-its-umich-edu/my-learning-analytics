@@ -37,7 +37,7 @@ GRADE_B="80-89"
 GRADE_C="70-79"
 GRADE_LOW="low_grade"
 NO_GRADE_STRING = "NO_GRADE"
-TWO = 2
+OUTLIER_BIN_OFFSET = 2
 
 # string for resource type
 RESOURCE_TYPE_STRING = "resource_type"
@@ -826,7 +826,7 @@ def find_binning_grade_value(grades):
     next_to_fifth_item = grades[5]
     if next_to_fifth_item - fifth_item > 2:
         BinningGrade = get_binning_grade()
-        bin_value = next_to_fifth_item - TWO
+        bin_value = next_to_fifth_item - OUTLIER_BIN_OFFSET
         return BinningGrade(value=bin_value, index=5, binning_all=False)
     else:
         return binning_logic(grades, fifth_item)
@@ -876,7 +876,7 @@ def binning_logic(grades, fifth_item_in_list):
         if check_if_grade_qualifies_for_binning(grade, fifth_item_in_list):
             binning_list.append(grade)
         else:
-            bin_value = grade - TWO
+            bin_value = grade - OUTLIER_BIN_OFFSET
             return BinningGrade(bin_value, len(binning_list), False)
     return BinningGrade(max(binning_list), len(binning_list), True)
 
