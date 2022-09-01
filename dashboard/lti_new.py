@@ -182,9 +182,9 @@ def get_cache_config():
     return CacheConfig(is_dummy_cache, launch_data_storage, cache_lifetime)
 
 
-# Checking if user only has Instructor role in a course to enable MyLA in courses. 
-# A TA could be an instructor in an course section so his role will be both TA and Instructor. 
-# we don't want TA to enable the MyLA data extraction step
+# Checking if user only has Instructor role in a course to enable MyLA in courses.
+# A TA could be an instructor in an course section so his role will be both TA and Instructor.
+# we don't want TA to enable the MyLA data extraction step.
 def check_if_instructor(roles, username, course_id):
     user_membership_roles = set([role for role in roles if role.find(COURSE_MEMBERSHIP) == 0])
     if user_membership_roles and INSTRUCTOR in roles and not TA in user_membership_roles:
