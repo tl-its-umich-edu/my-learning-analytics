@@ -205,7 +205,7 @@ class Course(models.Model):
     GRADING_CHOICES = [('Percent', 'Percent'), ('Point', 'Point'), ]
     show_grade_type = models.CharField(verbose_name="Show Grade Type", max_length=255,
                                          choices=GRADING_CHOICES, default='Percent')
-    data_last_updated = models.DateTimeField(verbose_name="Time data for this course was last updated", null=True, blank=True)
+    data_last_updated = models.DateTimeField(verbose_name="Data last updated", null=True, blank=True)
 
     objects = CourseQuerySet().as_manager()
 
