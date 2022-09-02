@@ -9,8 +9,6 @@
         '''
         select
             ({canvas_data_id_increment} + cast(p2.lms_ext_id as bigint)) as user_id,
-            '' as name,
-            '' as sis_name,
             co.lms_int_id as course_id,
             cg.le_current_score as current_grade,
             cg.le_final_score as final_grade,
