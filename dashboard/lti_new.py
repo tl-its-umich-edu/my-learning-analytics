@@ -38,7 +38,8 @@ DUMMY_CACHE = 'DummyCache'
 # do not require deployment ids if LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION is true
 class ExtendedDjangoMessageLaunch(DjangoMessageLaunch):
     def validate_deployment(self):
-        if settings.LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION:
+        # Check the deployment id is set otherwise the code will raise an exception
+        if settings.LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION and self._get_deployment_id():
             return self
 
         return super().validate_deployment()
@@ -181,22 +182,15 @@ def get_cache_config():
     return CacheConfig(is_dummy_cache, launch_data_storage, cache_lifetime)
 
 
+# Checking if user only has Instructor role in a course to enable MyLA in courses.
+# A TA could be an instructor in an course section so his role will be both TA and Instructor.
+# we don't want TA to enable the MyLA data extraction step.
 def check_if_instructor(roles, username, course_id):
-    if INSTRUCTOR in roles:
+    user_membership_roles = set([role for role in roles if role.find(COURSE_MEMBERSHIP) == 0])
+    if user_membership_roles and INSTRUCTOR in roles and not TA in user_membership_roles:
         logger.info(f'user {username} is Instructor in the course {course_id}')
         return True
     return False
-
-
-def course_user_roles(roles, username):
-    user_membership_roles = set([role for role in roles if role.find(COURSE_MEMBERSHIP) == 0])
-    if not user_membership_roles:
-        logger.info(f'User {username} does not have course membership roles, must be admin {roles}')
-    elif INSTRUCTOR in user_membership_roles and TA in user_membership_roles:
-        logger.info(f'User {username} is a {TA} in the course')
-        user_membership_roles.remove(INSTRUCTOR)
-    return user_membership_roles
-
 
 def short_user_role_list(roles):
     return [role.split('#')[1] for role in roles]
@@ -243,8 +237,7 @@ def extract_launch_variables_for_tool_use(request, message_launch):
                                             last_name=last_name)
     user_obj.backend = 'django.contrib.auth.backends.ModelBackend'
     django.contrib.auth.login(request, user_obj)
-    user_roles = course_user_roles(roles, username)
-    is_instructor = check_if_instructor(user_roles, username, course_id)
+    is_instructor = check_if_instructor(roles, username, course_id)
 
     try:
         Course.objects.get(canvas_id=course_id)

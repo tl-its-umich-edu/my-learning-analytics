@@ -62,7 +62,7 @@ def search_key_for_resource_value(my_dict, search_for):
 
 def get_course_id_from_request_url(path: str) -> Union[None, int]:
     course_id = None
-    if settings.STUDENT_DASHBOARD_LTI:
+    if settings.ENABLE_LTI:
         # Looking for an matching pattern like this /courses/123455
         course_id_from_path = re.findall('/courses/(\d+)\/?', path)
         if len(course_id_from_path) == 1:
