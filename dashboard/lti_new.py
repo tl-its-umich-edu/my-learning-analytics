@@ -3,10 +3,13 @@ import random
 import string
 from collections import namedtuple
 from typing import Any, Dict
+import os
+import hjson
 
 import django.contrib.auth
 from django.conf import settings
 from django.contrib.auth.models import User
+from dashboard.models import User as MyLAUser
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 import logging, string, random
@@ -34,6 +37,22 @@ INSTRUCTOR = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
 TA = 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant'
 COURSE_MEMBERSHIP = 'http://purl.imsglobal.org/vocab/lis/v2/membership'
 DUMMY_CACHE = 'DummyCache'
+
+# get CANVAS_DATA_ID_INCREMENT setting from env file
+env_json: Union[str, None] = os.getenv('ENV_JSON')
+if env_json:
+    # optionally load settings from an environment variable
+    ENV = hjson.loads(env_json)
+else:
+    # else try loading settings from the json config file
+    try:
+        with open(os.getenv("ENV_FILE", "/secrets/env.hjson")) as f:
+            ENV = hjson.load(f)
+    except FileNotFoundError as fnfe:
+        print("Default config file or one defined in environment variable ENV_FILE not found. This is normal for the build, should define for operation")
+        # Set ENV so collectstatic will still run in the build
+        ENV = os.environ
+CANVAS_DATA_ID_INCREMENT = ENV.get("CANVAS_DATA_ID_INCREMENT", 17700000000000000)
 
 # do not require deployment ids if LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION is true
 class ExtendedDjangoMessageLaunch(DjangoMessageLaunch):
@@ -181,7 +200,6 @@ def get_cache_config():
     cache_lifetime = cache_ttl if cache_ttl else 7200
     return CacheConfig(is_dummy_cache, launch_data_storage, cache_lifetime)
 
-
 # Checking if user only has Instructor role in a course to enable MyLA in courses.
 # A TA could be an instructor in an course section so his role will be both TA and Instructor.
 # we don't want TA to enable the MyLA data extraction step.
@@ -235,6 +253,17 @@ def extract_launch_variables_for_tool_use(request, message_launch):
         password = ''.join(random.sample(string.ascii_letters, settings.RANDOM_PASSWORD_DEFAULT_LENGTH))
         user_obj = User.objects.create_user(username=username, email=email, password=password, first_name=first_name,
                                             last_name=last_name)
+
+    # Add username into the MyLA User table, since the data was not pulled in from cron job
+    user_id = CANVAS_DATA_ID_INCREMENT + int(canvas_user_id)
+    try:
+        myla_user_obj = MyLAUser.objects.get(user_id=user_id)
+        # update
+        myla_user_obj.sis_name = username
+        myla_user_obj.save()
+    except MyLAUser.DoesNotExist:
+        logger.warn(f'Cannot find MyLA user {username}')
+
     user_obj.backend = 'django.contrib.auth.backends.ModelBackend'
     django.contrib.auth.login(request, user_obj)
     is_instructor = check_if_instructor(roles, username, course_id)
