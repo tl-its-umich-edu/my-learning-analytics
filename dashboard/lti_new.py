@@ -246,7 +246,6 @@ def extract_launch_variables_for_tool_use(request, message_launch):
         # update
         user_obj.first_name = first_name
         user_obj.last_name = last_name
-        user_obj.name = full_name
         user_obj.email = email
         user_obj.save()
     except User.DoesNotExist:
@@ -259,6 +258,7 @@ def extract_launch_variables_for_tool_use(request, message_launch):
     try:
         myla_user_obj = MyLAUser.objects.get(user_id=user_id)
         # update
+        myla_user_obj.name = full_name
         myla_user_obj.sis_name = username
         myla_user_obj.save()
     except MyLAUser.DoesNotExist:
