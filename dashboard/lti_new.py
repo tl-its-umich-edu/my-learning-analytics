@@ -3,8 +3,6 @@ import random
 import string
 from collections import namedtuple
 from typing import Any, Dict
-import os
-import hjson
 
 import django.contrib.auth
 from django.conf import settings
@@ -37,22 +35,7 @@ INSTRUCTOR = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
 TA = 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant'
 COURSE_MEMBERSHIP = 'http://purl.imsglobal.org/vocab/lis/v2/membership'
 DUMMY_CACHE = 'DummyCache'
-
-# get CANVAS_DATA_ID_INCREMENT setting from env file
-env_json: Union[str, None] = os.getenv('ENV_JSON')
-if env_json:
-    # optionally load settings from an environment variable
-    ENV = hjson.loads(env_json)
-else:
-    # else try loading settings from the json config file
-    try:
-        with open(os.getenv("ENV_FILE", "/secrets/env.hjson")) as f:
-            ENV = hjson.load(f)
-    except FileNotFoundError as fnfe:
-        print("Default config file or one defined in environment variable ENV_FILE not found. This is normal for the build, should define for operation")
-        # Set ENV so collectstatic will still run in the build
-        ENV = os.environ
-CANVAS_DATA_ID_INCREMENT = ENV.get("CANVAS_DATA_ID_INCREMENT", 17700000000000000)
+CANVAS_DATA_ID_INCREMENT = settings.CANVAS_DATA_ID_INCREMENT
 
 # do not require deployment ids if LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION is true
 class ExtendedDjangoMessageLaunch(DjangoMessageLaunch):
