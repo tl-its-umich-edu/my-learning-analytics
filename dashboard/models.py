@@ -139,14 +139,19 @@ class AssignmentWeightConsideration(models.Model):
 
 
 class CourseQuerySet(models.QuerySet):
-    def get_supported_courses(self) -> QuerySet:
+    def get_supported_courses(self, include_last_updated=False) -> QuerySet:
         """Returns the list of supported courses from the database
 
+        :param include_last_updated: Whether or not to include the last updated value in the return, otherwise just returns the id's
         :return: [List of supported course ids]
         :rtype: [list of str (possibly incremented depending on parameter)]
         """
         try:
-            return self.values_list('id', flat=True)
+            # If we want to include the last updated date, otherwise just return a flat set
+            if include_last_updated:
+                return self.values_list('id', 'data_last_updated')
+            else:
+                return self.values_list('id', flat=True)
         except self.model.DoesNotExist:
             logger.info("Courses did not exist", exc_info = True)
         return Course.objects.none()
