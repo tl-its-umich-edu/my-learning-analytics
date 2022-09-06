@@ -239,11 +239,7 @@ def extract_launch_variables_for_tool_use(request, message_launch):
     # Add username into the MyLA User table, since the data was not pulled in from cron job
     user_id = CANVAS_DATA_ID_INCREMENT + int(canvas_user_id)
     try:
-        myla_user_obj = MyLAUser.objects.get(user_id=user_id)
-        # update
-        myla_user_obj.name = full_name
-        myla_user_obj.sis_name = username
-        myla_user_obj.save()
+        MyLAUser.objects.filter(user_id=user_id).update(sis_name = username)
     except MyLAUser.DoesNotExist:
         logger.warn(f'Cannot find MyLA user {username}')
 

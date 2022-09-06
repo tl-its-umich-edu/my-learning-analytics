@@ -388,7 +388,6 @@ class User(models.Model):
 
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
     user_id = models.BigIntegerField(null=False, blank=False, verbose_name="User Id")
-    name = models.CharField(max_length=255, verbose_name="Name")
     sis_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="SIS Name")
     course_id = models.BigIntegerField(blank=True, null=True, verbose_name="Course Id")
     current_grade = models.FloatField(blank=True, null=True, verbose_name="Current Grade")
@@ -398,7 +397,8 @@ class User(models.Model):
     objects = UserQuerySet.as_manager()
 
     def __str__(self):
-        return self.name
+        return f"sis_name {self.sis_name} course_id={self.course_id} user_id={self.user_id}"
+
 
     class Meta:
         db_table = 'user'
