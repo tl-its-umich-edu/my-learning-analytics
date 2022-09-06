@@ -57,6 +57,10 @@
     # SameSite settings for Session and CSRF (defaults in settings.py should work), if you do want non-string None set to null.
     "SESSION_COOKIE_SAMESITE": "None",
     "CSRF_COOKIE_SAMESITE": "None",
+    # user Django session expiration, defaults to 24hrs matching canvas
+    "SESSION_COOKIE_AGE": 86400,
+    # Django Session to expire on browser close (quit), defaults to true
+    "SESSION_EXPIRE_AT_BROWSER_CLOSE": true
     # Warning:
     # This enables debugging of Django code
     # Use "true" for local development
@@ -88,13 +92,13 @@
     # Canvas Configuration
     "CANVAS_USER": "",
     # strings for construct file download url
-    "CANVAS_FILE_PREFIX": "https://example.instructure.com/files/",
+    "CANVAS_FILE_PREFIX": "https://umich.instructure.com/files/",
     "CANVAS_FILE_POSTFIX": "/download?download_frd=1",
     # Paths to Google BigQuery credential json file
     "GOOGLE_APPLICATION_CREDENTIALS": "/secrets/bq_cred.json",
     # LTI Configuration
     # LTI is disabled by default
-    "STUDENT_DASHBOARD_LTI": false,
+    "ENABLE_LTI": false,
     # LTI 1.3 configuration
     # The first key of LTI_CONFIG is the Canvas URL (production, beta, or test)
     "LTI_CONFIG": {
@@ -218,6 +222,7 @@
     # resource type for resource view add or remove per institution needs
     "RESOURCE_VALUES": {
         "files":  {"types": ["canvas"], "icon": "fas fa-file fa-lg"},
+        "pages": {"types": ["canvas_pages"],"icon": "fas fa-file-code fa-lg"},
         "videos": {"types": [""], "icon": "fas fa-video fa-lg"}
     },
     # Institute specific urls add or remove to your needs, will be used for Resources view
@@ -227,7 +232,7 @@
         "canvas": {
             "app_display_name": "Canvas Files",
             "canvas_course_id_format": "LONG",
-            "urls": {"prefix": "https://example.instructure.com/files/", "postfix": "/download?download_frd=1"},
+            "urls": {"prefix": "https://umich.instructure.com/files/", "postfix": "/download?download_frd=1"},
             # BigQuery event queries
             "query": 
                 '''
@@ -252,7 +257,38 @@
                 and membership.id is not null 
                 and REGEXP_EXTRACT(`group`.id, r'.*:(.*)') IN UNNEST(@course_ids)
                 '''
-        }
+        },
+        "canvas_pages": {
+            "query":
+                '''
+                SELECT 'canvas_pages' AS resource_type,
+                CONCAT(IFNULL(SAFE_CAST(REGEXP_EXTRACT(`group`.id, r'.*:(.*)') AS INT64), @canvas_data_id_increment) - @canvas_data_id_increment,
+                        '/pages/',
+                        IFNULL(SAFE_CAST(JSON_EXTRACT_SCALAR(object.extensions, '$[\'com.instructure.canvas\'][entity_id]') as INT64), @canvas_data_id_increment) - @canvas_data_id_increment) as resource_id,
+                CAST(REGEXP_EXTRACT(membership.id, r'.*:(.*)') AS INT64) AS user_id,
+                cast(null as string) AS user_login_name,
+                CAST(REGEXP_EXTRACT(`group`.id, r'.*:(.*)') AS INT64) AS course_id,
+                JSON_EXTRACT_SCALAR(object.extensions, '$[\'com.instructure.canvas\'][asset_name]') as name,
+                datetime(EVENT_TIME) as access_time
+                FROM event_store.expanded
+                where
+                JSON_EXTRACT_SCALAR(ed_app.json, '$.id') IN UNNEST(['http://m.umich.instructure.com/', 'http://umich.instructure.com/'])
+                and type = 'NavigationEvent'
+                and object.type = 'Page'
+                and action = 'NavigatedTo'
+                and membership.id is not null
+                -- filtering out Caliper events with '/api/v1/' substring in request_url field,
+                -- which duplicated the counterpart Caliper events with request_url of pattern 'https://<site_url>/courses/<course_id>/pages/<page_url>'
+                and not CONTAINS_SUBSTR(JSON_EXTRACT_SCALAR(extensions_json, '$[\'com.instructure.canvas\'][request_url]'), '/api/v1/')
+                and REGEXP_EXTRACT(`group`.id, r'.*:(.*)') IN UNNEST(@course_ids)
+                ''',
+            "app_display_name": "Canvas Files",
+            "canvas_course_id_format": "LONG",
+            "urls": {
+                "prefix": "https://umich.instructure.com/courses/",
+                "postfix": ""
+            }
+        },
     },
     # Disable/Enable courses_enabled api
     "COURSES_ENABLED": false,
