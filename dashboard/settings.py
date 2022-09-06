@@ -10,11 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-import hjson, os
+import json, logging, os
 from typing import Tuple, Union
 
+import hjson
 from django.core.management.utils import get_random_secret_key
-from django.utils.module_loading import import_string
+
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level='INFO')
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -34,8 +38,21 @@ else:
     try:
         with open(os.getenv("ENV_FILE", "/secrets/env.hjson")) as f:
             ENV = hjson.load(f)
+        for key, value in ENV.items():
+            if key in os.environ:
+                os_value = os.environ[key]
+                try:
+                    os_value = json.loads(os_value)
+                except json.JSONDecodeError:
+                    pass
+                ENV[key] = os_value
+                logger.info(f'ENV value for "{key}" overridden')
+                logger.debug(f'key: {key}; os_value: {os_value}')
     except FileNotFoundError as fnfe:
-        print("Default config file or one defined in environment variable ENV_FILE not found. This is normal for the build, should define for operation")
+        logger.warn(
+            "Default config file or one defined in environment variable ENV_FILE not found. " +
+            "This is normal for the build; it should be defined when running the server."
+        )
         # Set ENV so collectstatic will still run in the build
         ENV = os.environ
 
