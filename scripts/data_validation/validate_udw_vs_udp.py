@@ -87,8 +87,8 @@ def main():
     ENV_UDP = get_env_file('/secrets/env_udp.hjson', 'hjson')
 
     # Use the config files in this project
-    ENV_CRON_UDW = get_env_file('/code/config/cron_udw.hjson', 'hjson')
-    ENV_CRON_UDP = get_env_file('/code/config/cron.hjson', 'hjson')
+    ENV_CRON_UDW = get_env_file('/code/config/cron.hjson', 'hjson')
+    ENV_CRON_UDP = get_env_file('/code/config/cron_udp.hjson', 'hjson')
     ENV_VALIDATION = get_env_file(
         os.path.join(os.path.dirname(os.path.abspath('__file__')), 'scripts/data_validation/env_validation.hjson'), 'hjson')
 

@@ -8,10 +8,6 @@
         '''
         select
             ({canvas_data_id_increment} + cast(p2.lms_ext_id as bigint)) as user_id,
-            '' as name,
-            case
-                when pe.email_address is not null then lower(split_part(pe.email_address , '@', 1))
-                else p2.sis_ext_id end as sis_name,
             co.lms_int_id as course_id,
             cg.le_current_score as current_grade,
             cg.le_final_score as final_grade,
