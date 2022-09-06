@@ -1,315 +1,180 @@
-## UDP (Unizin Data Platform) queries for MyLA cron job
+## UDW (Unizin Data Warehouse) queries for MyLA cron job
 {
     "metadata":
         '''
-        select 'canvasdatadate' as pkey, min(dag_run) as pvalue from report.publish_info pi2
+        select key as pkey, value as pvalue from unizin_metadata
         ''',
     "user" :
         '''
-        select
-            ({canvas_data_id_increment} + cast(p2.lms_ext_id as bigint)) as user_id,
-            '' as name,
-            case
-                when pe.email_address is not null then lower(split_part(pe.email_address , '@', 1))
-                else p2.sis_ext_id end as sis_name,
-            co.lms_int_id as course_id,
-            cg.le_current_score as current_grade,
-            cg.le_final_score as final_grade,
-            case
-                when cse.role = 'Student' then 'StudentEnrollment'
-                when cse.role = 'TeachingAssistant' then 'TaEnrollment'
-                when cse.role = 'Teacher' then 'TeacherEnrollment'
-                else '' end
-                as enrollment_type
-        from entity.course_section_enrollment cse
-        left join entity.course_section cs
-            on cse.course_section_id = cs.course_section_id
-        left join keymap.course_offering co
-            on cs.course_offering_id = co.id
-        left join entity.person p
-            on cse.person_id = p.person_id
-        left join keymap.person p2
-            on p.person_id = p2.id
-        left join entity.person_email pe
-            on p.person_id = pe.person_id
-        left join entity.course_grade cg
-            on cse.course_section_id = cg.course_section_id and cse.person_id = cg.person_id
-        where
-            co.lms_int_id ='{course_id}'
-            and cse.role in ('Student', 'TeachingAssistant', 'Teacher')
-            and cse.role_status = 'Enrolled'
+        with
+        enroll_data as (select id as enroll_id, user_id, type from enrollment_dim where course_id='{course_id}'
+                        and type in ('StudentEnrollment', 'TaEnrollment', 'TeacherEnrollment') and workflow_state= 'active'),
+        user_info as (select p.unique_name,p.sis_user_id, '' as name, u.id as user_id, u.global_canvas_id
+                    from (SELECT ROW_NUMBER() OVER (PARTITION BY user_id order by sis_user_id asc) AS row_number, * FROM pseudonym_dim) as p
+                    join user_dim u on u.id = p.user_id WHERE row_number = 1),
+        user_enroll as (select u.unique_name, u.sis_user_id, u.name, u.user_id, e.enroll_id,
+                        u.global_canvas_id, e.type from enroll_data e join user_info u on e.user_id= u.user_id),
+        course_fact as (select enrollment_id, current_score, final_score from course_score_fact
+                        where course_id='{course_id}'),
+        final as (select cast(u.global_canvas_id as BIGINT) as user_id,u.name, u.unique_name as sis_name,
+                '{course_id}' as course_id, c.current_score as current_grade, c.final_score as final_grade,
+                u.type as enrollment_type
+                from user_enroll u left join course_fact c on u.enroll_id= c.enrollment_id)
+        select * from final
         order by user_id
         ''',
     "assignment_groups": 
         '''
-        with assignment_details as (
-            select la.due_date, title, la.course_offering_id, la.learner_activity_id, la.points_possible, la.learner_activity_group_id
-            from entity.learner_activity la, keymap.course_offering co
-            where
-                la.visibility = 'everyone'
-                and	la.status = 'published'
-                and la.course_offering_id = co.id
-                and co.lms_int_id = '{course_id}'
-            ), assignment_grp as (
-                select lg.*
-                from entity.learner_activity_group lg, keymap.course_offering co
-                where
-                lg.status = 'available'
-                and lg.course_offering_id = co.id
-                and co.lms_int_id = '{course_id}'
-            ), assign_more as (
-                select distinct(a.learner_activity_group_id), da.group_points
-                from assignment_details a
-                join (
-                    select learner_activity_group_id, sum(points_possible) as group_points
-                    from assignment_details
-                    group by learner_activity_group_id
-                ) as da
-                    on a.learner_activity_group_id = da.learner_activity_group_id
-            ), grp_full as (
-                select a.group_points, b.learner_activity_group_id
-                from assign_more a
-                right join assignment_grp b
-                    on a.learner_activity_group_id = b.learner_activity_group_id
-            ), assign_rules as (
-                select distinct ad.learner_activity_group_id, agr.drop_lowest_amount as drop_lowest, agr.drop_highest_amount as drop_highest
-                from grp_full ad
-                join entity.learner_activity_group agr
-                    on ad.learner_activity_group_id = agr.learner_activity_group_id
-            ), assignment_grp_points as (
-                select ag.*, am.group_points AS group_points, ar.drop_lowest as drop_lowest, ar.drop_highest as drop_highest
-                from assignment_grp ag 
-                join grp_full am on ag.learner_activity_group_id = am.learner_activity_group_id
-                join assign_rules ar on ag.learner_activity_group_id = ar.learner_activity_group_id
-            )
-            select
-            cast(lag_km.lms_int_id as BIGINT) as id,
-            cast(co_km.lms_int_id as BIGINT) as course_id,
-            cast(agp.group_weight as float) as weight,
-            agp.name as name,
-            agp.group_points as group_points,
-            agp.drop_lowest as drop_lowest, 
-            agp.drop_highest as drop_highest
-            from assignment_grp_points agp, 
-            keymap.course_offering co_km, 
-            keymap.learner_activity_group lag_km
-            where agp.course_offering_id = co_km.id
-            and agp.learner_activity_group_id = lag_km.id
-            order by id
-        ''' ,
+        with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{course_id}' and ad.visibility = 'everyone' and ad.workflow_state='published'),
+        assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf on agd.id = agf.assignment_group_id  where agd.course_id='{course_id}' and workflow_state='available'),
+        assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join (select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id ),
+        grp_full as (select a.group_points, b.assignment_group_id from assign_more a right join assignment_grp b on a.assignment_group_id = b.assignment_group_id),
+        assign_rules as (select DISTINCT ad.assignment_group_id,agr.drop_lowest,agr.drop_highest from grp_full ad join assignment_group_rule_dim agr on ad.assignment_group_id=agr.assignment_group_id),
+        assignment_grp_points as (select ag.*, am.group_points AS group_points from assignment_grp ag join grp_full am on ag.assignment_group_id = am.assignment_group_id),
+        assign_final as (select assignment_group_id AS id, course_id AS course_id, group_weight AS weight, name AS name, group_points AS group_points from assignment_grp_points)
+        select g.*, ar.drop_lowest,ar.drop_highest from assign_rules ar join assign_final g on ar.assignment_group_id=g.id
+        order by id;
+        ''',   
     "assignment": 
         '''
         with assignment_info as
-        (
-            select
-                la.due_date as due_date,
-                la.due_date at time zone 'America/Detroit' as local_date,
-                la.title as name,
-                cast(co.lms_int_id as BIGINT) as course_id,
-                cast(la_km.lms_int_id as BIGINT) as id,
-                la.points_possible as points_possible,
-                cast(lag_km.lms_int_id as BIGINT) as assignment_group_id
-            from
-                entity.learner_activity la,
-                keymap.course_offering co,
-                keymap.learner_activity la_km,
-                keymap.learner_activity_group lag_km
-            where
-                la.visibility = 'everyone'
-                and	la.status = 'published'
-                and la.course_offering_id = co.id
-                and co.lms_int_id = '{course_id}'
-                and la.learner_activity_id = la_km.id
-                and la.learner_activity_group_id = lag_km.id
-        )
+            (select ad.due_at AS due_date,ad.due_at at time zone 'America/Detroit' as local_date,
+            ad.title AS name,af.course_id AS course_id,af.assignment_id AS id,
+            af.points_possible AS points_possible,af.assignment_group_id AS assignment_group_id
+            from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{course_id}'
+            and ad.visibility = 'everyone' and ad.workflow_state='published')
         select * from assignment_info
         order by id
         ''',
-    "assignment_weight":
+    "assignment_weight": 
         '''
-        with course as (
-            select 	course_offering_id as course_id,
-                    sum(group_weight) as group_weight
-            from entity.learner_activity_group lag, keymap.course_offering co_km
-            where 
-            lag.course_offering_id = co_km.id
-            and co_km.lms_int_id = '{course_id}'
-            group by course_offering_id
-            having sum(group_weight) > 1
-        )
-        (select case when exists (
-            select *
-            from course
-            where group_weight > 1
-        ) then cast(1 as boolean) else cast(0 as boolean) end)
+        with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact
+        where course_id = '{course_id}' group by course_id having sum(group_weight)>1)
+        (select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)
         ''',
-    "term":
+    "term": 
         '''
-        select
-            cast(ka.lms_int_id as BIGINT) as id,
-            cast(ka.lms_ext_id as BIGINT) as canvas_id,
-            a.name as name,
-            a.le_term_begin_date::timestamp without time zone as date_start,
-            a.le_term_end_date::timestamp without time zone as date_end
-        from
-            entity.academic_term as a
-            left join keymap.academic_term as ka on ka.id = a.academic_term_id
-        where
-            ka.lms_ext_id is not null
-        order by id
+        SELECT id, canvas_id, name, date_start, date_end FROM enrollment_term_dim order by id;
         ''',
-     /* start_at and conclude_at contain only the date information, with time values truncated
-        Mapping all courses with a NULL term into the term called No Term
-     */
-    "course":
+    "course": 
         '''
-        WITH no_term_temp as (SELECT academic_term_id from entity.academic_term where name = 'No Term')
-        SELECT
-            cast(co2.lms_int_id as BIGINT) as id,
-            cast(co2.lms_ext_id as BIGINT) as canvas_id,
-            cast(at2.lms_int_id as BIGINT) as enrollment_term_id,
-            co.le_code as name,
-            co.le_start_date::timestamp without time zone as start_at,
-            co.le_end_date::timestamp without time zone as conclude_at
-        FROM
-            entity.course_offering co
-            LEFT OUTER JOIN entity.academic_session as3 on (co.academic_session_id = as3.academic_session_id),
-            keymap.course_offering co2,
-            keymap.academic_term at2,
-            no_term_temp
-            WHERE co2.lms_int_id = '{course_id}'
-            and co.course_offering_id = co2.id
-            and (
-                (co.academic_session_id is null and co.academic_term_id is not null and (co.academic_term_id = at2.id))
-            or
-                (co.academic_session_id is null and co.academic_term_id is null and at2.id = no_term_temp.academic_term_id)
-            or
-                (co.academic_session_id = as3.academic_session_id and at2.id = as3.academic_term_id)
-            )
+            select id, canvas_id, enrollment_term_id, name, start_at, conclude_at
+            from course_dim c
+            where c.id = '{course_id}'
         ''',
-    "resource":
+    "resource": 
         '''
-        select 
-            cast(f_km.lms_int_id as BIGINT) as id, 
-            f.status as file_state, 
-            f.display_name as display_name
-        from entity.file f, keymap.file f_km, keymap.course_offering co_km
-        where
-            f.course_offering_id = co_km.id
-            and f.file_id = f_km.id
-            and co_km.lms_int_id in %(course_ids)s
-        order by id
-        ''',
-    "submission":
+            select id, file_state, display_name from file_dim 
+            where course_id in %(course_ids)s
+            order by id
+        ''', 
+    "submission": 
         '''
-        with course_assignment as
-        (
-            select
-                la.learner_activity_id as short_assignment_id,
-                la2.lms_int_id as assignment_id,
-                cast(co.lms_int_id as BIGINT) as course_id,
-                la.title as assignment_title
-            from 
-                entity.learner_activity la
-                left join keymap.learner_activity la2 on la.learner_activity_id = la2.id 
-                left join keymap.course_offering co on co.id = la.course_offering_id
-            where 
-                co.lms_int_id = '{course_id}'
-                and la.status = 'published'
-            ),
-            enrollment as 
-        (
-            select
-                distinct cse.person_id as short_user_id
-            from entity.course_section_enrollment cse 
-                left join entity.course_section cs on cse.course_section_id = cs.course_section_id 
-                left join keymap.course_offering co on cs.course_offering_id = co.id
-            where 
-                co.lms_int_id = '{course_id}' 
-                and cse.role_status ='Enrolled' 
-                and cse."role" = 'Student'
-            ),
-            course_assignment_enrollment as 
-            (
-                select * 
-                from
-                course_assignment cross join enrollment
-            ),
-            course_assignment_submission as 
-        (
-        select
-                cast(lar2.lms_int_id as BIGINT) as submission_id,
-                cae.assignment_id as assignment_id,
-                cae.course_id as course_id,
-                lar.published_score as published_score,
-                ({canvas_data_id_increment} + cast(p.lms_ext_id as bigint)) as user_id,
-                lar.response_date as submitted_at,
-                lar.graded_date as graded_at,
-                lar.posted_at at time zone 'America/Detroit' as grade_posted_local_date,
-                (   
-                    case 
-                        when ( lar.grade_state = 'human_graded' or lar.grade_state = 'auto_graded')
-                        then 
-                            'graded'
-                        else
-                            null
-                        end
-                ) as submission_workflow_state,
-                cae.assignment_title as title 
-            from
-                
-                course_assignment_enrollment cae
-                left join entity.learner_activity_result lar on (cae.short_assignment_id = lar.learner_activity_id and cae.short_user_id = lar.person_id )
-                left join keymap.learner_activity_result lar2 on lar.learner_activity_result_id  = lar2.id
-                left join keymap.person p on p.id = cae.short_user_id 
-            order by assignment_id, user_id
-        ),
-        all_assign_sub as 
-        (
-            select
-                cast(submission_id as BIGINT) AS id, 
-                assignment_id AS assignment_id, 
-                course_id, 
-                user_id, 
-                (
-                    case 
-                        when 
-                            (grade_posted_local_date is null or submission_workflow_state != 'graded') 
-                        then
-                            null 
-                        else 
-                            round(published_score,1) 
-                        end
-                ) AS score, 
-                submitted_at AS submitted_at, 
-                graded_at AS graded_date, 
-                grade_posted_local_date 
-            from 
-                course_assignment_submission 
-            order by assignment_id
-        )
-        select 
-            f.id::bigint, 
-            f.assignment_id::bigint, 
-            f.course_id, 
-            f.user_id, 
-            f.score::float, 
-            f.submitted_at, 
-            f.graded_date, 
-            f.grade_posted_local_date,
-            cast(f1.avg_score as float) as avg_score
-        from 
-            all_assign_sub f join 
+            with sub_fact as 
             (
                 select 
-                    assignment_id,
-                    round(avg(score),1) as avg_score
+                    submission_id, 
+                    assignment_id, 
+                    course_id, 
+                    user_id, 
+                    global_canvas_id, 
+                    published_score 
+                from submission_fact sf join user_dim u on sf.user_id = u.id 
+                where course_id = '{course_id}'
+            ),
+            enrollment as 
+            (
+                select
+                    distinct(user_id) 
+                from enrollment_dim 
+                where 
+                    course_id = '{course_id}' 
+                    and workflow_state='active' 
+                    and type = 'StudentEnrollment'
+                ),
+            sub_with_enroll as
+            (
+                select 
+                    sf.* 
+                from sub_fact sf join enrollment e on e.user_id = sf.user_id
+            ),
+            submission_time as 
+            (
+                select 
+                    sd.id, 
+                    sd.submitted_at, 
+                    sd.graded_at, 
+                    sd.posted_at at time zone 'America/Detroit' as grade_posted_local_date, 
+                    sd.workflow_state as submission_workflow_state 
                 from 
-                    all_assign_sub 
-                group by assignment_id
-            ) as f1 
-            on f.assignment_id = f1.assignment_id
-        where f.id is not null
-        order by assignment_id, user_id
+                    submission_dim sd join sub_fact suf on sd.id=suf.submission_id
+            ),
+            assign_fact as 
+            (
+                select 
+                    s.*,a.title 
+                from 
+                    assignment_dim a join sub_with_enroll s on s.assignment_id=a.id 
+                where 
+                    a.course_id='{course_id}' 
+                    and a.workflow_state='published'
+            ),
+            assign_sub_time as 
+            (
+                select 
+                    a.*, 
+                    t.submitted_at, 
+                    t.graded_at, 
+                    t.grade_posted_local_date, 
+                    t.submission_workflow_state 
+                from 
+                    assign_fact a join submission_time t on a.submission_id = t.id
+            ),
+            all_assign_sub as 
+            (
+                select
+                    submission_id AS id, 
+                    assignment_id AS assignment_id, 
+                    course_id, 
+                    global_canvas_id AS user_id, 
+                    (
+                        case 
+                            when 
+                                (grade_posted_local_date is null or submission_workflow_state != 'graded') 
+                            then
+                                null 
+                            else 
+                                round(published_score,1) 
+                            end
+                    ) AS score, 
+                    submitted_at AS submitted_at, 
+                    graded_at AS graded_date, 
+                    grade_posted_local_date 
+                from 
+                    assign_sub_time 
+                order by assignment_id
+            )
+            select 
+                f.id, 
+                f.assignment_id, 
+                f.course_id, 
+                cast(f.user_id as bigint), 
+                f.score, 
+                f.submitted_at, 
+                f.graded_date, 
+                f.grade_posted_local_date,
+                f1.avg_score 
+            from 
+                all_assign_sub f join 
+                (
+                    select 
+                        assignment_id,
+                        round(avg(score),1) as avg_score
+                    from 
+                        all_assign_sub 
+                    group by assignment_id
+                ) as f1 
+                on f.assignment_id = f1.assignment_id
+            order by assignment_id, user_id
         '''
 }
