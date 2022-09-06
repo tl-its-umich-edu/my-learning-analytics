@@ -27,7 +27,7 @@ There are also [text editor plugins](https://standardjs.com/index.html#are-there
 
 ```
 npm install
-standard assets/src
+npx standard assets/src
 ```
 
 #### Backend
@@ -86,6 +86,7 @@ main project repository.
 GitHub will show a button to create a pull request from the forked repository to the main project repository.
 Click this and provide details about the changes in the description,
 making sure to mention (using #) the issue you want to resolve.
+Whenever possible, include a test plan with steps to aid reviewers.
 
 1. When your PR is merged (or when others are), pull from `upstream` to keep your local `master` branch up to date.
     ```
