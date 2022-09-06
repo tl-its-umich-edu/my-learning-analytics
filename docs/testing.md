@@ -15,7 +15,7 @@ To update snapshots, execute `docker exec -it webpack_watcher npm run-script upd
 
 ### Cypress Testing
 
-**Note:** Cypress tests are still present but have not been maintained and may be removed in the future.
+> **Note:** Cypress tests are still present but have not been maintained and may be removed in the future.
 
 Some frontend tests are implemented using the [Cypress framework](https://www.cypress.io/).
 

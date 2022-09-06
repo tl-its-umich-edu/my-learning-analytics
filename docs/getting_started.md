@@ -41,9 +41,9 @@ To follow the instructions below, you will at minimum need the following:
 e.g. localhost vs. a production deployment. There are comments to help determine the proper settings.
 See [Configuration](configuration.md) for some additional info.
 
-    **Note:** You may also optionally place the JSON settings directly into the `ENV_JSON` environment variable
-    if your deployment environment doesn't easily support mounting the `env.hjson` file into container.
-    When using `ENV_JSON`, put the entire contents of `env.hjson` into it as a single-line string.
+    > **Note:** You may also optionally place the JSON settings directly into the `ENV_JSON` environment variable
+    > if your deployment environment doesn't easily support mounting the `env.hjson` file into container.
+    > When using `ENV_JSON`, put the entire contents of `env.hjson` into it as a single-line string.
 
 1. Copy the `.env.sample` file as `.env`. 
     ```
@@ -63,7 +63,7 @@ mostly just MySQL information as well as locations of other configuration files.
     docker compose up
     ```
 
-    **Note:** Use `docker compose down` and `^C` at any time to stop and unstage the running containers.
+    > **Note:** Use `docker compose down` and `^C` at any time to stop and unstage the running containers.
 
 1. Download the latest SQL file from [this Google Drive link](https://drive.google.com/drive/u/0/folders/1Pj7roNjRPGyumKKal8-h5E6ukUiXTDI9), and move it into the repository.
 
@@ -115,7 +115,7 @@ or navigate to http://localhost:5001/admin.
         --email=test@test.com
     ```
     
-    **Note:** To make a user a superuser, edit the record in `auth_user` to set `is_staff=1` and `is_superuser=1`.
+    > **Note:** To make a user a superuser, edit the record in `auth_user` to set `is_staff=1` and `is_superuser=1`.
     
 1. Login using the username and password created.
 

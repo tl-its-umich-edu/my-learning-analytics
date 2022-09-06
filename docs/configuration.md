@@ -13,8 +13,8 @@ A template is provided at [config/env_sample.hjson](../config/env_sample.hjson).
 Both files include explanatory comments to help determine the proper value for a given use case.
 More details on certain topics are provided below.
 
-**Note:** If you were using a prior version of MyLA, there is a utility `env_to_json.py` to help convert your configuration.
-Running `python env_to_json.py > config/env.hjson` should create your new config file from your `.env` file.
+> **Note:** If you were using a prior version of MyLA, there is a utility `env_to_json.py` to help convert your configuration.
+> Running `python env_to_json.py > config/env.hjson` should create your new config file from your `.env` file.
 
 ### LTI v1.3
 

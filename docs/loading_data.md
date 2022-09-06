@@ -20,7 +20,7 @@ In the admin interface, there is a table where you can check the status of the c
 
 ### Cron scheduling for deployment
 
-**Note:** Cron scheduling functionality settings may be removed in the future,
+> **Note:** Cron scheduling functionality settings may be removed in the future,
 since this responsibility is often handed off to other infrastructure, like an automation server.
 
 By setting a few configuration variables in `env.hjson`,
