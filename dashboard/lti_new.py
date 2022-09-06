@@ -7,7 +7,6 @@ from typing import Any, Dict
 import django.contrib.auth
 from django.conf import settings
 from django.contrib.auth.models import User
-from dashboard.models import User as MyLAUser
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 import logging, string, random
