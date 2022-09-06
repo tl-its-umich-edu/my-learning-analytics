@@ -238,8 +238,8 @@ def extract_launch_variables_for_tool_use(request, message_launch):
     # Add username into the MyLA User table, since the data was not pulled in from cron job
     user_id = CANVAS_DATA_ID_INCREMENT + int(canvas_user_id)
     try:
-        MyLAUser.objects.filter(user_id=user_id).update(sis_name = username)
-    except MyLAUser.DoesNotExist:
+        MylaUser.objects.filter(user_id=user_id).update(sis_name = username)
+    except MylaUser.DoesNotExist:
         logger.warn(f'Cannot find MyLA user {username}')
 
     user_obj.backend = 'django.contrib.auth.backends.ModelBackend'
