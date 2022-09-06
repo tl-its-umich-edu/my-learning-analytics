@@ -58,14 +58,10 @@ def split_list(a_list: list, size: int = 20):
 # the util function
 
 
-def util_function(data_warehouse_course_id, sql_string, mysql_table, table_identifier=None, param_object=None):
+def util_function(sql_string, mysql_table, param_object=None, table_identifier=None):
+    logger.debug(f'sql={sql_string}')
+    logger.debug(f'table={mysql_table} param_object={param_object} table_identifier={table_identifier}')
     df = pd.read_sql(sql_string, conns['DATA_WAREHOUSE'], params=param_object)
-    logger.debug(df)
-
-    # Sql returns boolean value so grouping course info along with it so that this could be stored in the DB table.
-    if table_identifier == 'weight' and data_warehouse_course_id:
-        df['course_id'] = data_warehouse_course_id
-        df.columns = ['consider_weight', 'course_id']
 
     # drop duplicates
     df = df.drop_duplicates(keep='first')
@@ -80,7 +76,7 @@ def util_function(data_warehouse_course_id, sql_string, mysql_table, table_ident
         raise
 
     # returns the row size of dataframe
-    return f"{str(df.shape[0])} {mysql_table} : {data_warehouse_course_id}\n"
+    return f"{str(df.shape[0])} {mysql_table} : {param_object}\n"
 
 
 # execute database query
@@ -138,36 +134,23 @@ class DashboardCronJob(CronJobBase):
     def verify_course_ids(self):
         # whether all course ids are valid ids
         invalid_course_id_list = []
-        course_dfs = []
-
         logger.debug("in checking course")
 
-        # loop through multiple course ids
-        for course_id in Course.objects.get_supported_courses():
-            logger.debug(course_id)
-            # select course based on course id
-            course_sql = queries['course'].format(course_id=course_id)
-            logger.debug(course_sql)
+        course_ids = set([str(x) for x in Course.objects.get_supported_courses()])
+        courses_data = pd.read_sql(queries['course'], conns['DATA_WAREHOUSE'], params={'course_ids': tuple(course_ids)})
 
-            course_df = pd.read_sql(course_sql, conns['DATA_WAREHOUSE'])
-            logger.debug(course_df)
-
-            # error out when course id is invalid, otherwise add DataFrame to list
-            if course_df.empty:
-                logger.error(f"""Course {course_id} don't have the entry in data warehouse yet. """)
-                invalid_course_id_list.append(course_id)
-            else:
-                course_dfs.append(course_df)
-
-        if len(course_dfs) > 0:
-            courses_data = pd.concat(course_dfs).reset_index()
-        else:
+        # error out when course id is invalid, otherwise add DataFrame to list
+        invalid_course_id_set = course_ids.difference(set([str(x) for x in courses_data["id"]]))
+        logger.debug(f'course_df={course_ids} set(courses_data["id"]={set(courses_data["id"])} set differece = {invalid_course_id_set}')
+        if len(invalid_course_id_set) > 0:
+            logger.error(f'Course {invalid_course_id_set} do not exist in data warehouse yet. ')
+        if len(courses_data) == 0:
             logger.info("No course records were found in the database.")
             courses_data = pd.DataFrame(
                 columns=["id", "canvas_id", "enrollment_term_id", "name", "start_at", "conclude_at"])
 
         CourseVerification = namedtuple("CourseVerification", ["invalid_course_ids", "course_data"])
-        return CourseVerification(invalid_course_id_list, courses_data)
+        return CourseVerification(invalid_course_id_set, courses_data)
 
     # update USER records from DATA_WAREHOUSE
 
@@ -181,15 +164,13 @@ class DashboardCronJob(CronJobBase):
         # delete all records in the table first
         status += delete_all_records_in_table("user")
 
-        # loop through multiple course ids
-        for course_id in self.valid_locked_course_ids:
-
-            # select all student registered for the course
-            user_sql = queries['user'].format(
-                course_id=course_id, canvas_data_id_increment=settings.CANVAS_DATA_ID_INCREMENT)
-            logger.debug(user_sql)
-
-            status += util_function(course_id, user_sql, 'user')
+        # select all student registered for the course
+        status += util_function(
+                                queries['user'],
+                                'user',
+                                {'course_ids': tuple(self.valid_locked_course_ids),
+                                'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT
+                                })
 
         return status
 
@@ -206,11 +187,11 @@ class DashboardCronJob(CronJobBase):
         status += delete_all_records_in_table("unizin_metadata")
 
         # select all student registered for the course
-        metadata_sql = "select key as pkey, value as pvalue from unizin_metadata"
+        metadata_sql = queries['metadata']
 
         logger.debug(metadata_sql)
 
-        status += util_function("", metadata_sql, 'unizin_metadata')
+        status += util_function(metadata_sql, 'unizin_metadata')
 
         return status
 
@@ -224,10 +205,9 @@ class DashboardCronJob(CronJobBase):
 
         # Select all the files for these courses
         # convert int array to str array
-        course_ids = list(map(str, self.valid_locked_course_ids))
-        file_sql = queries['resource']
-        logger.debug(file_sql)
-        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids': tuple(course_ids)})
+        df_attach = pd.read_sql(queries['resource'],
+                                conns['DATA_WAREHOUSE'],
+                                params={'course_ids': tuple(self.valid_locked_course_ids)})
         logger.debug(df_attach)
         # Update these back again based on the dataframe
         # Remove any rows where file_state is not available!
@@ -473,11 +453,9 @@ class DashboardCronJob(CronJobBase):
         logger.debug("update_assignment_groups(): ")
 
         # loop through multiple course ids
-        for course_id in self.valid_locked_course_ids:
-            assignment_groups_sql = queries['assignment_groups'].format(course_id=course_id)
-            logger.debug(assignment_groups_sql)
-            status += util_function(course_id, assignment_groups_sql,
-                                    'assignment_groups')
+        status += util_function(queries['assignment_groups'],
+                                'assignment_groups',
+                                {'course_ids':tuple(self.valid_locked_course_ids)})
 
         return status
 
@@ -491,11 +469,9 @@ class DashboardCronJob(CronJobBase):
         status += delete_all_records_in_table("assignment")
 
         # loop through multiple course ids
-        for course_id in self.valid_locked_course_ids:
-            assignment_sql = queries['assignment'].format(course_id=course_id)
-            logger.debug(assignment_sql)
-            status += util_function(course_id, assignment_sql,
-                                    'assignment')
+        status += util_function(queries['assignment'],
+                                'assignment',
+                                {'course_ids':tuple(self.valid_locked_course_ids)})
 
         return status
 
@@ -511,12 +487,12 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids
         # filter out not released grades (submission_dim.posted_at date is not null) and partial grades (submission_dim.workflow_state != 'graded')
-        for course_id in self.valid_locked_course_ids:
-            submission_sql = queries['submission'].format(
-                course_id=course_id, canvas_data_id_increment=settings.CANVAS_DATA_ID_INCREMENT)
-            logger.debug(submission_sql)
-            status += util_function(course_id, submission_sql,
-                                    'submission')
+        status += util_function(queries['submission'],
+                                'submission',
+                                {
+                                    'course_ids':tuple(self.valid_locked_course_ids),
+                                    'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT
+                                })
 
         return status
 
@@ -531,13 +507,12 @@ class DashboardCronJob(CronJobBase):
         status += delete_all_records_in_table("assignment_weight_consideration")
 
         # loop through multiple course ids
-        for course_id in self.valid_locked_course_ids:
-            is_weight_considered_sql = queries['assignment_weight'].format(course_id=course_id)
-            logger.debug(is_weight_considered_sql)
-            status += util_function(course_id, is_weight_considered_sql,
-                                    'assignment_weight_consideration', 'weight')
+        status += util_function(queries['assignment_weight'],
+                                'assignment_weight_consideration',
+                                {'course_ids':tuple(self.valid_locked_course_ids)},
+                                'weight')
 
-            logger.debug(status + "\n\n")
+        logger.debug(status + "\n\n")
 
         return status
 
@@ -621,7 +596,7 @@ class DashboardCronJob(CronJobBase):
 
         run_start = datetime.now(pytz.UTC)
         status += f"Start cron: {str(run_start)} UTC\n"
-
+        
         course_verification = self.verify_course_ids()
         invalid_course_id_list = course_verification.invalid_course_ids
         if len(invalid_course_id_list) > 0:
@@ -632,7 +607,8 @@ class DashboardCronJob(CronJobBase):
             return (status,)
 
         # Lock in valid course IDs that data will be pulled for.
-        self.valid_locked_course_ids = course_verification.course_data['id'].to_list()
+        self.valid_locked_course_ids = [str(x) for x in course_verification.course_data['id'].to_list()]
+
         logger.info(f'Valid locked course IDs: {self.valid_locked_course_ids}')
 
         # continue cron tasks

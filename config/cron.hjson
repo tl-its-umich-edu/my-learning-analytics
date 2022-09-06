@@ -7,17 +7,17 @@
     "user" :
         '''
         with
-        enroll_data as (select id as enroll_id, user_id, type from enrollment_dim where course_id='{course_id}'
+        enroll_data as (select id as enroll_id, user_id, type from enrollment_dim where course_id in %(course_ids)s
                         and type in ('StudentEnrollment', 'TaEnrollment', 'TeacherEnrollment') and workflow_state= 'active'),
         user_info as (select p.unique_name,p.sis_user_id, u.name, u.id as user_id, u.global_canvas_id
                     from (SELECT ROW_NUMBER() OVER (PARTITION BY user_id order by sis_user_id asc) AS row_number, * FROM pseudonym_dim) as p
                     join user_dim u on u.id = p.user_id WHERE row_number = 1),
         user_enroll as (select u.unique_name, u.sis_user_id, u.name, u.user_id, e.enroll_id,
                         u.global_canvas_id, e.type from enroll_data e join user_info u on e.user_id= u.user_id),
-        course_fact as (select enrollment_id, current_score, final_score from course_score_fact
-                        where course_id='{course_id}'),
+        course_fact as (select enrollment_id, course_id, current_score, final_score from course_score_fact
+                        where course_id in %(course_ids)s),
         final as (select cast(u.global_canvas_id as BIGINT) as user_id,u.name, u.unique_name as sis_name,
-                '{course_id}' as course_id, c.current_score as current_grade, c.final_score as final_grade,
+                c.course_id as course_id, c.current_score as current_grade, c.final_score as final_grade,
                 u.type as enrollment_type
                 from user_enroll u left join course_fact c on u.enroll_id= c.enrollment_id)
         select * from final
@@ -25,8 +25,8 @@
         ''',
     "assignment_groups": 
         '''
-        with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{course_id}' and ad.visibility = 'everyone' and ad.workflow_state='published'),
-        assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf on agd.id = agf.assignment_group_id  where agd.course_id='{course_id}' and workflow_state='available'),
+        with assignment_details as (select ad.due_at,ad.title,af.course_id ,af.assignment_id,af.points_possible,af.assignment_group_id from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id in %(course_ids)s and ad.visibility = 'everyone' and ad.workflow_state='published'),
+        assignment_grp as (select agf.*, agd.name from assignment_group_dim agd join assignment_group_fact agf on agd.id = agf.assignment_group_id  where agd.course_id in %(course_ids)s and workflow_state='available'),
         assign_more as (select distinct(a.assignment_group_id) ,da.group_points from assignment_details a join (select assignment_group_id, sum(points_possible) as group_points from assignment_details group by assignment_group_id) as da on a.assignment_group_id = da.assignment_group_id ),
         grp_full as (select a.group_points, b.assignment_group_id from assign_more a right join assignment_grp b on a.assignment_group_id = b.assignment_group_id),
         assign_rules as (select DISTINCT ad.assignment_group_id,agr.drop_lowest,agr.drop_highest from grp_full ad join assignment_group_rule_dim agr on ad.assignment_group_id=agr.assignment_group_id),
@@ -41,16 +41,25 @@
             (select ad.due_at AS due_date,ad.due_at at time zone 'America/Detroit' as local_date,
             ad.title AS name,af.course_id AS course_id,af.assignment_id AS id,
             af.points_possible AS points_possible,af.assignment_group_id AS assignment_group_id
-            from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id='{course_id}'
+            from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id in %(course_ids)s
             and ad.visibility = 'everyone' and ad.workflow_state='published')
         select * from assignment_info
         order by id
         ''',
     "assignment_weight": 
         '''
-        with course as (select course_id, sum(group_weight) as group_weight from assignment_group_fact
-        where course_id = '{course_id}' group by course_id having sum(group_weight)>1)
-        (select CASE WHEN EXISTS (SELECT * FROM course WHERE group_weight > 1) THEN CAST(1 AS BOOLEAN) ELSE CAST(0 AS BOOLEAN) END)
+        select
+            course_id,
+            case
+                when sum(group_weight) >1
+            then
+                CAST(1 AS BOOLEAN)
+            else
+                CAST(0 AS BOOLEAN)
+            end as consider_weight
+        from assignment_group_fact
+        where course_id in %(course_ids)s
+        group by course_id
         ''',
     "term": 
         '''
@@ -60,7 +69,7 @@
         '''
             select id, canvas_id, enrollment_term_id, name, start_at, conclude_at
             from course_dim c
-            where c.id = '{course_id}'
+            where c.id in %(course_ids)s
         ''',
     "resource": 
         '''
@@ -80,7 +89,7 @@
                     global_canvas_id, 
                     published_score 
                 from submission_fact sf join user_dim u on sf.user_id = u.id 
-                where course_id = '{course_id}'
+                where course_id in %(course_ids)s
             ),
             enrollment as 
             (
@@ -88,7 +97,7 @@
                     distinct(user_id) 
                 from enrollment_dim 
                 where 
-                    course_id = '{course_id}' 
+                    course_id in %(course_ids)s
                     and workflow_state='active' 
                     and type = 'StudentEnrollment'
                 ),
@@ -116,7 +125,7 @@
                 from 
                     assignment_dim a join sub_with_enroll s on s.assignment_id=a.id 
                 where 
-                    a.course_id='{course_id}' 
+                    a.course_id in %(course_ids)s
                     and a.workflow_state='published'
             ),
             assign_sub_time as 
