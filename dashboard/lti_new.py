@@ -34,7 +34,6 @@ INSTRUCTOR = 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
 TA = 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant'
 COURSE_MEMBERSHIP = 'http://purl.imsglobal.org/vocab/lis/v2/membership'
 DUMMY_CACHE = 'DummyCache'
-CANVAS_DATA_ID_INCREMENT = settings.CANVAS_DATA_ID_INCREMENT
 
 # do not require deployment ids if LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION is true
 class ExtendedDjangoMessageLaunch(DjangoMessageLaunch):
@@ -182,6 +181,7 @@ def get_cache_config():
     cache_lifetime = cache_ttl if cache_ttl else 7200
     return CacheConfig(is_dummy_cache, launch_data_storage, cache_lifetime)
 
+
 # Checking if user only has Instructor role in a course to enable MyLA in courses.
 # A TA could be an instructor in an course section so his role will be both TA and Instructor.
 # we don't want TA to enable the MyLA data extraction step.
@@ -191,6 +191,7 @@ def check_if_instructor(roles, username, course_id):
         logger.info(f'user {username} is Instructor in the course {course_id}')
         return True
     return False
+
 
 def short_user_role_list(roles):
     return [role.split('#')[1] for role in roles]
@@ -236,12 +237,11 @@ def extract_launch_variables_for_tool_use(request, message_launch):
                                             last_name=last_name)
 
     # Add username into the MyLA User table, since the data was not pulled in from cron job
-    user_id = CANVAS_DATA_ID_INCREMENT + int(canvas_user_id)
-    try:
-        MylaUser.objects.filter(user_id=user_id).update(sis_name = username)
-    except MylaUser.DoesNotExist:
-        logger.warn(f'Cannot find MyLA user {username}')
-
+    user_id = settings.CANVAS_DATA_ID_INCREMENT + int(canvas_user_id)
+    enrollment_qs =  MylaUser.objects.filter(user_id=user_id)
+    if enrollment_qs.exists():
+        enrollment_qs.update(sis_name=username)
+    
     user_obj.backend = 'django.contrib.auth.backends.ModelBackend'
     django.contrib.auth.login(request, user_obj)
     is_instructor = check_if_instructor(roles, username, course_id)
