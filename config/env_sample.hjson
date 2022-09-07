@@ -95,8 +95,6 @@
     # strings for construct file download url
     "CANVAS_FILE_PREFIX": "https://umich.instructure.com/files/",
     "CANVAS_FILE_POSTFIX": "/download?download_frd=1",
-    # Paths to Google BigQuery credential json file
-    "GOOGLE_APPLICATION_CREDENTIALS": "/secrets/bq_cred.json",
     # LTI Configuration
     # LTI is disabled by default
     "ENABLE_LTI": false,
