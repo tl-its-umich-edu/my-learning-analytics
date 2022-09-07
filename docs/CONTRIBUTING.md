@@ -25,7 +25,7 @@ uses [React hooks](https://reactjs.org/docs/hooks-intro.html) for state and side
 Please ensure any new code is Standard-complaint by running the linter manually. It is installed as a dev dependency.
 There are also [text editor plugins](https://standardjs.com/index.html#are-there-text-editor-plugins) available.
 
-```
+```sh
 npm install
 npx standard assets/src
 ```
@@ -60,23 +60,23 @@ Once the issue has been discussed with one of the project maintainers, please fo
 `Fork` button in the top-right hand corner of the repository's home page.
 
 1. Clone the forked repository to the local machine.
-    ```
+    ```sh
     git clone https://github.com/{github-username}/my-learning-analytics.git
     ```
 
 1. Add an `upstream` [remote](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes) to the
 main project repository.
-    ```
+    ```sh
     git remote add upstream https://github.com/tl-its-umich-edu/my-learning-analytics.git
     ```
 
 1. Create local branches to keep contributions organized (generally one branch for each issue).
-    ```
+    ```sh
     git checkout -b issue-xxx-fix-a-bug
     ```
 
 1. Make changes and push to your fork (`origin` remote).
-    ```
+    ```sh
     git add .
     git commit -m 'Make some changes'
     git push origin issue-xxx-fix-a-bug
@@ -89,7 +89,7 @@ making sure to mention (using #) the issue you want to resolve.
 Whenever possible, include a test plan with steps to aid reviewers.
 
 1. When your PR is merged (or when others are), pull from `upstream` to keep your local `master` branch up to date.
-    ```
+    ```sh
     git checkout master
     git pull upstream master
     ```
@@ -119,7 +119,7 @@ Reference these GitHub guides on [Forking Projects](https://guides.github.com/ac
 ### Development tips
 
 1. Connect to the Docker container, and edit some files!
-    ```
+    ```sh
     docker exec -it student_dashboard /bin/bash`
     # Then install a text editor like vim
     apt-get -y install vim
@@ -144,7 +144,7 @@ See the [VS Code docs](https://code.visualstudio.com/docs/python/debugging#_remo
     First, start the container as normal with `DEBUGPY_ENABLE` set to `false` in `env.hjson`.
     Then, issue the below command, which enters the container, sets some environment variables, then
     runs the cron. The job will start running when the debugger is attached in VS Code.
-    ```
+    ```sh
     docker exec -it student_dashboard /bin/bash \
         -c "DEBUGPY_WAIT_FOR_ATTACH=True DEBUGPY_ENABLE=TRUE DEBUGPY_REMOTE_PORT=3001 \
         ./manage_debugpy.py runcrons --force"
@@ -163,7 +163,7 @@ InnoDB: Table mysql/innodb_table_stats has length mismatch in the column name ta
 
 This problem can be resolved by running the recommended upgrade in the MySQL container:
 
-```
+```sh
 docker exec -it student_dashboard_mysql mysql_upgrade \
     --user=root --password student_dashboard
 ```

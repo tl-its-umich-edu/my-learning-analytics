@@ -13,27 +13,27 @@ To follow the instructions below, you will at minimum need the following:
 ### Installation and Setup
 
 1. Clone this repo.
-    ```
+    ```sh
     git clone https://github.com/tl-its-umich-edu/my-learning-analytics.git
     ```
 
 1. Then navigate into the repo.
-    ```
+    ```sh
     cd my-learning-analytics
     ```
 
 1. Create a directory in your home directory called `mylasecrets`. This directory is mapped by `docker-compose.yml` into the container as `/secrets/`.
-    ```
+    ```sh
     mkdir ~/mylasecrets
     ```
 
 1. Copy the `config/env_sample.hjson` file into `mylasecrets` as `env.hjson`.
-    ```
+    ```sh
     cp config/env_sample.hjson ~/mylasecrets/env.hjson
     ```
 
 1. Copy the `config/cron.hjson` file into `mylasecrets`.
-    ```
+    ```sh
     cp config/cron.hjson ~/mylasecrets/cron.hjson
     ```
 
@@ -46,7 +46,7 @@ See [Configuration](configuration.md) for some additional info.
     > When using `ENV_JSON`, put the entire contents of `env.hjson` into it as a single-line string.
 
 1. Copy the `.env.sample` file as `.env`. 
-    ```
+    ```sh
     cp .env.sample .env
     ```
 
@@ -54,12 +54,12 @@ See [Configuration](configuration.md) for some additional info.
 mostly just MySQL information as well as locations of other configuration files.
 
 1. Start the Docker build process (this will take some time).
-    ```
+    ```sh
     docker compose build
     ```
 
 1. Start up the web server and database containers.
-    ```
+    ```sh
     docker compose up
     ```
 
@@ -68,7 +68,7 @@ mostly just MySQL information as well as locations of other configuration files.
 1. Download the latest SQL file from [this Google Drive link](https://drive.google.com/drive/u/0/folders/1Pj7roNjRPGyumKKal8-h5E6ukUiXTDI9), and move it into the repository.
 
 1. Load the database with data.
-    ```
+    ```sh
     docker exec -i student_dashboard_mysql mysql \
         -u student_dashboard_user \
         --password=student_dashboard_pw student_dashboard \
@@ -94,7 +94,7 @@ or navigate to http://localhost:5001/admin.
 1. If you are logged in as `root`, click on the top-right circle, then click "Logout".
 
 1. Connect to the MySQL database.
-    ```
+    ```txt
     Host: 127.0.0.1
     Username: student_dashboard_user
     Password: student_dashboard_pw
@@ -108,7 +108,7 @@ or navigate to http://localhost:5001/admin.
     ```
 
 1. Create an authorized user.
-    ```
+    ```sh
     docker exec -it student_dashboard python manage.py createuser \
         --username={insert sis_name} \
         --password={create password} \

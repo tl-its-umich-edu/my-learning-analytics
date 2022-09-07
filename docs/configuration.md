@@ -78,13 +78,13 @@ those of courses relevant to your local institution, providing additional course
 Ensure that the `CANVAS_DATA_ID_INCREMENT` environment variable is set appropriately in `env.hjson`,
 and then run the following command:
 
-```
+```sh
 docker exec -it student_dashboard /bin/bash ./demo_init.sh
 ```
 
 If you have problems, you can connect directly into the web container:
 
-```
+```sh
 docker exec -it student_dashboard /bin/bash
 ```
 

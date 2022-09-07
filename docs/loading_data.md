@@ -10,7 +10,7 @@ The job approach leverages the [`django-cron`](https://django-cron.readthedocs.i
 For local testing, make sure your connection secrets are added (see [Configuration](configuration.md)) and
 your VPN is active. Then, with the application running, run this command in a separate terminal.
 
-```
+```sh
 docker exec -it student_dashboard /bin/bash -c \
     "python manage.py migrate django_cron && python manage.py runcrons --force"
 ```
