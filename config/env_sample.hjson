@@ -52,6 +52,7 @@
     # default password length indicator incase of creating user from command line or LTI auto login
     "RANDOM_PASSWORD_DEFAULT_LENGTH": 32,
     # Enable secure cookies, also set your trusted origin (example of instructure.com)
+    # This needs to be true for deployments or when testing LTI with ngrok or loophole.
     "CSRF_COOKIE_SECURE": false,
     "CSRF_TRUSTED_ORIGINS": ["instructure.com"],
     # SameSite settings for Session and CSRF (defaults in settings.py should work), if you do want non-string None set to null.
