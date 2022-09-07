@@ -1,6 +1,6 @@
-#!/bin/bash 
+#!/bin/bash
 
-# Case insenstive match
+# Case insensitive match
 shopt -s nocaseglob
 
 if [ -z "${ENV_FILE}" ]; then
@@ -48,7 +48,7 @@ else
 fi
 
 echo "Waiting for DB"
-while ! nc -z "${MYSQL_HOST}" "${MYSQL_PORT}"; do   
+while ! nc -z "${MYSQL_HOST}" "${MYSQL_PORT}"; do
   sleep 1 # wait 1 second before check again
 done
 
@@ -89,7 +89,7 @@ if [ "${IS_CRON_POD:-"false"}" == "false" ]; then
         --workers="${GUNICORN_WORKERS}" \
         --timeout="${GUNICORN_TIMEOUT}" \
         ${GUNICORN_RELOAD}
- 
+
 else
     if [ -z "${CRONTAB_SCHEDULE}" ]; then
         echo "CRONTAB_SCHEDULE environment variable not set, crontab cannot be started. Please set this to a crontab acceptable format."
