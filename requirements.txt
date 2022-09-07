@@ -26,13 +26,13 @@ rules==3.0
 
 # These should be okay to update minors
 numpy==1.22.0
-pandas==1.3.1
+pandas==1.4.4
 pangres==2.3.1
 
 SQLAlchemy==1.4.22
 psycopg2==2.9.1
 mysqlclient==2.0.3
-google-cloud-bigquery[pandas]==2.24.0
+google-cloud-bigquery[pandas]==3.3.2
 
 debugpy==1.4.1
 jsonschema==3.2.0
