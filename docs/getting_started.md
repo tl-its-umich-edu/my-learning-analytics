@@ -63,7 +63,7 @@ mostly just MySQL information as well as locations of other configuration files.
     docker compose up
     ```
 
-    > **Note:** Use `docker compose down` and `^C` at any time to stop and unstage the running containers.
+    > **Note:** Use `docker compose down` and `^C` at any time to stop the running containers.
 
 1. Download the latest SQL file from [this Google Drive link](https://drive.google.com/drive/u/0/folders/1Pj7roNjRPGyumKKal8-h5E6ukUiXTDI9), and move it into the repository.
 
@@ -104,7 +104,7 @@ or navigate to http://localhost:5001/admin.
     
 1. Pick a student `sis_name` from the `user` table to be used in the next step.
     ```sql
-    SELECT sis_name FROM `user` WHERE enrollment_type = 'StudentEnrollment'
+    SELECT sis_name FROM `user` WHERE enrollment_type = 'StudentEnrollment';
     ```
 
 1. Create an authorized user.

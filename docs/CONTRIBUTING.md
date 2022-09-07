@@ -57,7 +57,7 @@ Once the issue has been discussed with one of the project maintainers, please fo
 [pull request](https://github.com/tl-its-umich-edu/my-learning-analytics/pulls).
 
 1. Fork [this project](https://github.com/tl-its-umich-edu/my-learning-analytics) on GitHub by pressing the
-`Fork` button in the top-right hand corner of the repository's home page.
+"Fork" button in the top-right hand corner of the repository's home page.
 
 1. Clone the forked repository to the local machine.
     ```sh
