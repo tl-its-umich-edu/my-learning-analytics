@@ -259,7 +259,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = ENV.get("TIME_ZONE", ENV.get("TZ", "America/Detroit"))
+TIME_ZONE = ENV.get("TIME_ZONE", os.getenv("TZ", "America/Detroit"))
 
 USE_I18N = True
 
