@@ -204,9 +204,9 @@ To update snapshots, execute `docker exec -it webpack_watcher npm run-script upd
 
 Data validation scripts are in scripts/data_validation folder. To run the data validation scripts, follow the steps below:
 
-1. Copy env.hjson file from env_sample.hjson file
+1. Copy env_validation.hjson file from env_sample.hjson file
    ```sh
-   cp scripts/data_validation/env_sample.hjson scripts/data_validation/env.hjson
+   cp scripts/data_validation/env_sample.hjson scripts/data_validation/env_validation.hjson
    ```
 2. Update the configuration values. Note the hard-coded Michigan specific filters in various query strings. Please adjust those values for your institution usage.
 

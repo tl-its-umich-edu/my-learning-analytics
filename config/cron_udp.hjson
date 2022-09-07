@@ -1,20 +1,13 @@
 ## UDP (Unizin Data Platform) queries for MyLA cron job
 {
     "metadata":
-        ## placeholder query before the unizin_metadata table is implemented in UDP
         '''
-        select "learner_activity" as pkey, max(updated_date) as pvalue from entity.learner_activity
+        select 'canvasdatadate' as pkey, min(dag_run) as pvalue from report.publish_info pi2
         ''',
     "user" :
         '''
         select
             ({canvas_data_id_increment} + cast(p2.lms_ext_id as bigint)) as user_id,
-            case
-                when p.first_name is not null then p.first_name || ' ' || p.last_name
-                else p2.sis_ext_id end as name,
-            case
-                when pe.email_address is not null then lower(split_part(pe.email_address , '@', 1))
-                else p2.sis_ext_id end as sis_name,
             co.lms_int_id as course_id,
             cg.le_current_score as current_grade,
             cg.le_final_score as final_grade,
@@ -152,8 +145,8 @@
             cast(ka.lms_int_id as BIGINT) as id,
             cast(ka.lms_ext_id as BIGINT) as canvas_id,
             a.name as name,
-            a.le_term_begin_date at time zone 'UTC' as date_start,
-            a.le_term_end_date at time zone 'UTC' as date_end
+            a.le_term_begin_date::timestamp without time zone as date_start,
+            a.le_term_end_date::timestamp without time zone as date_end
         from
             entity.academic_term as a
             left join keymap.academic_term as ka on ka.id = a.academic_term_id
@@ -171,9 +164,9 @@
             cast(co2.lms_int_id as BIGINT) as id,
             cast(co2.lms_ext_id as BIGINT) as canvas_id,
             cast(at2.lms_int_id as BIGINT) as enrollment_term_id,
-            co.title as name, -- different than Canvas course name
-            co.le_start_date at time zone 'UTC' as start_at,
-            co.le_end_date at time zone 'UTC' as conclude_at
+            co.le_code as name,
+            co.le_start_date::timestamp without time zone as start_at,
+            co.le_end_date::timestamp without time zone as conclude_at
         FROM
             entity.course_offering co
             LEFT OUTER JOIN entity.academic_session as3 on (co.academic_session_id = as3.academic_session_id),
@@ -183,10 +176,12 @@
             WHERE co2.lms_int_id = '{course_id}'
             and co.course_offering_id = co2.id
             and (
-                (co.academic_session_id is null and at2.id = no_term_temp.academic_term_id)
+                (co.academic_session_id is null and co.academic_term_id is not null and (co.academic_term_id = at2.id))
+            or
+                (co.academic_session_id is null and co.academic_term_id is null and at2.id = no_term_temp.academic_term_id)
             or
                 (co.academic_session_id = as3.academic_session_id and at2.id = as3.academic_term_id)
-          )
+            )
         ''',
     "resource":
         '''
@@ -310,6 +305,7 @@
                 group by assignment_id
             ) as f1 
             on f.assignment_id = f1.assignment_id
+        where f.id is not null
         order by assignment_id, user_id
         '''
 }
