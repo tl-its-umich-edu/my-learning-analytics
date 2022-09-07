@@ -96,7 +96,7 @@ do the following:
 
 1. Have the user launch the tool in Canvas.
 1. Modify their `auth_user` record in the database directly so that `is_staff` and `is_superuser` are true.
-    ```
+    ```sql
     # Replace username with the user's Canvas username.
     UPDATE auth_user SET is_staff=1, is_superuser=1 where auth_user.username='username';
     ```

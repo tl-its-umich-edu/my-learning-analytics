@@ -47,7 +47,7 @@ Data validation scripts are in `scripts/data_validation` folder.
 To run the data validation scripts, follow the steps below:
 
 1. Copy `env_validation.hjson` file from `env_sample.hjson` file
-    ```sh
+    ```
     cp scripts/data_validation/env_sample.hjson scripts/data_validation/env_validation.hjson
     ```
 
@@ -59,7 +59,7 @@ Please adjust those values based on your institution's needs.
     - Validate queries using UDP BigQuery Expanded Table:
     This script will validate queries against the UDP BigQuery `expanded` table,
     and compare whether the data results are identical with those returned from the `events` table queries.
-        ```sh
+        ```
         docker exec -it student_dashboard /bin/bash -c \
             "python scripts/data_validation/validate_udp_events_vs_expanded.py"
         ```
@@ -68,7 +68,7 @@ Please adjust those values based on your institution's needs.
     compare whether the data results are identical with those returned from Unizin Data Warehouse (UDW) tables.
     Before running this queries, please make sure there are two cron queries files in the `~/mylasecrets` folder,
     named `cron.hjson` (for UDW queries) and `cron_udp.hjson` (for UDP queries).
-        ```sh
+        ```
         docker exec -it student_dashboard /bin/bash -c \
             "python scripts/data_validation/validate_udw_vs_udp.py"
         ```

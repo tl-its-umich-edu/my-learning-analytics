@@ -163,7 +163,7 @@ InnoDB: Table mysql/innodb_table_stats has length mismatch in the column name ta
 
 This problem can be resolved by running the recommended upgrade in the MySQL container:
 
-```sh
+```
 docker exec -it student_dashboard_mysql mysql_upgrade \
     --user=root --password student_dashboard
 ```
