@@ -11,14 +11,14 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import json, logging, os
-from typing import Tuple, Union
+from typing import Any, Dict, Tuple, Union
 
 import hjson
 from django.core.management.utils import get_random_secret_key
 
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level='INFO')
+logging.basicConfig(level=os.getenv('ROOT_LOG_LEVEL', 'INFO'))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,6 +29,26 @@ PROJECT_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), ".."),
 )
 
+
+def apply_env_overrides(env: Dict[str, Any], environ: os._Environ) -> Dict[str, Any]:
+    """
+    Replaces values for any keys in env found in the environment
+    """
+    env_copy = env.copy()
+    for key in env_copy.keys():
+        if key in environ:
+            os_value = environ[key]
+            try:
+                os_value = json.loads(os_value)
+                logger.debug('Value was valid JSON; saved parsed data in env object.')
+            except json.JSONDecodeError:
+                pass
+            ENV[key] = os_value
+            logger.info(f'ENV value for "{key}" overridden')
+            logger.debug(f'key: {key}; os_value: {os_value}')
+    return env_copy
+
+
 env_json: Union[str, None] = os.getenv('ENV_JSON')
 if env_json:
     # optionally load settings from an environment variable
@@ -38,16 +58,7 @@ else:
     try:
         with open(os.getenv("ENV_FILE", "/secrets/env.hjson")) as f:
             ENV = hjson.load(f)
-        for key, value in ENV.items():
-            if key in os.environ:
-                os_value = os.environ[key]
-                try:
-                    os_value = json.loads(os_value)
-                except json.JSONDecodeError:
-                    pass
-                ENV[key] = os_value
-                logger.info(f'ENV value for "{key}" overridden')
-                logger.debug(f'key: {key}; os_value: {os_value}')
+        ENV = apply_env_overrides(ENV, os.environ)
     except FileNotFoundError as fnfe:
         logger.warn(
             "Default config file or one defined in environment variable ENV_FILE not found. " +
