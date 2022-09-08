@@ -44,7 +44,7 @@ def apply_env_overrides(env: Dict[str, Any], environ: os._Environ) -> Dict[str, 
             except json.JSONDecodeError:
                 pass
             ENV[key] = os_value
-            logger.info(f'ENV value for "{key}" overridden')
+            logger.debug(f'ENV value for "{key}" overridden')
             logger.debug(f'key: {key}; os_value: {os_value}')
     return env_copy
 
