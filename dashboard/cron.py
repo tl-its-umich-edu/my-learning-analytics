@@ -154,7 +154,7 @@ class DashboardCronJob(CronJobBase):
 
             # error out when course id is invalid, otherwise add DataFrame to list
             if course_df.empty:
-                # Check if the course was ever locally updated. If it was updated it is invalid, otherwise don't consider this an error and skip it.
+                # Check if the course was ever updated by cron. If it was updated it is invalid, otherwise don't consider this an error and skip it.
                 if data_last_updated:
                     logger.error(f"""Course {course_id} doesn't have an entry in data warehouse yet. It has local data, so marking invalid.""")
                     invalid_course_id_list.append(course_id)
