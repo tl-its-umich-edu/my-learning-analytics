@@ -1,6 +1,7 @@
 from datetime import datetime
 import logging
 from collections import namedtuple
+from operator import truediv
 from typing import Any, Dict, List, Union
 from urllib.parse import quote_plus
 
@@ -136,8 +137,8 @@ class DashboardCronJob(CronJobBase):
         invalid_course_id_list = []
         logger.debug("in checking course")
         supported_courses = Course.objects.get_supported_courses()
-        courses_data = pd.read_sql(queries['course'], conns['DATA_WAREHOUSE'], params={'course_ids': tuple(supported_courses.values_list('id'))})
-
+        course_ids = [str(x) for x in supported_courses.values_list('id', flat=True)]
+        courses_data = pd.read_sql(queries['course'], conns['DATA_WAREHOUSE'], params={'course_ids': tuple(course_ids)})
         # error out when course id is invalid, otherwise add DataFrame to list
         for course_id, data_last_updated in supported_courses:
             if course_id not in list(courses_data['id']):

@@ -12,7 +12,7 @@
             +
             cast(p2.lms_ext_id as bigint)
             ) as user_id,
-            co.lms_int_id as course_id,
+            cast(co.lms_int_id as bigint) as course_id,
             cg.le_current_score as current_grade,
             cg.le_final_score as final_grade,
             case
@@ -128,7 +128,7 @@
     "assignment_weight":
         '''
         select
-            co_km.lms_int_id as course_id,
+            cast(co_km.lms_int_id as bigint) as course_id,
             case when sum(group_weight) > 1
             then
                 cast(1 as boolean)
