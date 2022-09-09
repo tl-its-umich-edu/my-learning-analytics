@@ -22,7 +22,7 @@ def compare_udw_vs_udp_df(udw_query_string, udp_query_string, udw_engine, udp_en
     # Debug out the data frames
     logger.debug("UDW Dataframe:")
     logger.debug(format_df(udw_df))
-    logger.debug("UDP Dataframe:")
+    logger.debug("\n\nUDP Dataframe:")
     logger.debug(format_df(udp_df))
 
     # print diff records
@@ -99,27 +99,19 @@ def main():
 
     CANVAS_DATA_ID_INCREMENT = ENV_VALIDATION["CANVAS_DATA_ID_INCREMENT"]
 
-    # loop through course ids
-    for course_id in DATA_WAREHOUSE_COURSE_IDS:
-        logger.info(f'Validating course id {course_id}:')
+    # from the configuration variable
+    # load the queries based on UDP and UDW tables
+    # run queries and compare the returned dataframes
+    for query_type in ENV_CRON_UDW:
+        logger.info('\n\n ------------------------')
+        logger.info(f'Comparing query {query_type}:')
+        query_params = {
+            "course_ids": tuple(DATA_WAREHOUSE_COURSE_IDS),
+            'canvas_data_id_increment': ENV_VALIDATION["CANVAS_DATA_ID_INCREMENT"]
+        }
 
-        # from the configuration variable, load the queries based on UDP expanded vs events table
-        # run queries and compare the returned dataframes
-        for query_type in ENV_CRON_UDW:
-            logger.info(f'Comparing query {query_type}:')
-
-            formatted_udw_query_string = ENV_CRON_UDW[query_type].format(
-                course_id=course_id, canvas_data_id_increment=CANVAS_DATA_ID_INCREMENT)
-            formatted_udp_query_string = ENV_CRON_UDP[query_type].format(
-                course_id=course_id, canvas_data_id_increment=CANVAS_DATA_ID_INCREMENT)
-            logger.debug(formatted_udw_query_string)
-            logger.debug(formatted_udp_query_string)
-            query_params = {
-                "course_ids": tuple(DATA_WAREHOUSE_COURSE_IDS)
-            }
-
-            compare_udw_vs_udp_df(
-                formatted_udw_query_string, formatted_udp_query_string, udw_engine, udp_engine, query_params)
+        compare_udw_vs_udp_df(
+            ENV_CRON_UDW[query_type], ENV_CRON_UDP[query_type], udw_engine, udp_engine, query_params)
 
 
 if __name__ == "__main__":
