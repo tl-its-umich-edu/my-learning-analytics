@@ -40,8 +40,9 @@ def apply_env_overrides(env: Dict[str, Any], environ: os._Environ) -> Dict[str, 
             os_value = environ[key]
             try:
                 os_value = json.loads(os_value)
-                logger.debug('Value was valid JSON; saved parsed data in env object.')
+                logger.debug('Value was valid JSON; replaced value with parsed data.')
             except json.JSONDecodeError:
+                logger.debug('Value was not JSON; kept the value as is.')
                 pass
             env_copy[key] = os_value
             logger.debug(f'ENV value for "{key}" overridden')
