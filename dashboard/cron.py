@@ -1,7 +1,6 @@
 from datetime import datetime
 import logging
 from collections import namedtuple
-from operator import truediv
 from typing import Any, Dict, List, Union
 from urllib.parse import quote_plus
 
@@ -602,7 +601,6 @@ class DashboardCronJob(CronJobBase):
 
         run_start = datetime.now(pytz.UTC)
         status += f"Start cron: {str(run_start)} UTC\n"
-        
         course_verification = self.verify_course_ids()
         invalid_course_id_list = course_verification.invalid_course_ids
         if len(invalid_course_id_list) > 0:
