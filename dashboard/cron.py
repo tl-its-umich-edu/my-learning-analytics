@@ -135,7 +135,6 @@ class DashboardCronJob(CronJobBase):
         # whether all course ids are valid ids
         invalid_course_id_list = []
         logger.debug("in checking course")
-        
         course_ids = set([str(x) for x in Course.objects.get_supported_courses()])
         courses_data = pd.read_sql(queries['course'], conns['DATA_WAREHOUSE'], params={'course_ids': tuple(course_ids)})
 
