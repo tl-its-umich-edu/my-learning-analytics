@@ -142,11 +142,11 @@ class CourseQuerySet(models.QuerySet):
     def get_supported_courses(self) -> QuerySet:
         """Returns the list of supported courses from the database
 
-        :return: [List of supported course ids]
-        :rtype: [list of str (possibly incremented depending on parameter)]
+        :return: [List of supported course ids and data_last_updated]
+        :rtype: [CourseQuerySet containing a list of tuples, int and datetime]
         """
         try:
-            return self.values_list('id', flat=True)
+            return self.values_list('id', 'data_last_updated')
         except self.model.DoesNotExist:
             logger.info("Courses did not exist", exc_info = True)
         return Course.objects.none()

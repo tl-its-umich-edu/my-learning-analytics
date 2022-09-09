@@ -143,7 +143,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in checking course")
 
         # loop through multiple course ids
-        for course_id in Course.objects.get_supported_courses():
+        for course_id, data_last_updated in Course.objects.get_supported_courses():
             logger.debug(course_id)
             # select course based on course id
             course_sql = queries['course'].format(course_id=course_id)
@@ -154,8 +154,12 @@ class DashboardCronJob(CronJobBase):
 
             # error out when course id is invalid, otherwise add DataFrame to list
             if course_df.empty:
-                logger.error(f"""Course {course_id} don't have the entry in data warehouse yet. """)
-                invalid_course_id_list.append(course_id)
+                # Check if the course was ever updated by cron. If it was updated it is invalid, otherwise don't consider this an error and skip it.
+                if data_last_updated:
+                    logger.error(f"Course {course_id} doesn't have an entry in data warehouse yet. It has local data, so marking invalid.")
+                    invalid_course_id_list.append(course_id)
+                else:
+                    logger.info(f"Course {course_id} doesn't have an entry in data warehouse yet. It hasn't been updated locally, so skipping.")
             else:
                 course_dfs.append(course_df)
 
@@ -673,7 +677,7 @@ class DashboardCronJob(CronJobBase):
             status += self.update_unizin_metadata()
 
         courses_added_during_cron: List[int] = list(
-            set(Course.objects.get_supported_courses()) - set(self.valid_locked_course_ids))
+            set(Course.objects.get_supported_courses().values_list('id', flat=True)) - set(self.valid_locked_course_ids))
         if courses_added_during_cron:
             logger.warning(
                 f'During the run, users added {len(courses_added_during_cron)} course(s): {courses_added_during_cron}')
