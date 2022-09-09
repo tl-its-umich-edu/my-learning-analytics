@@ -135,21 +135,27 @@ class DashboardCronJob(CronJobBase):
         # whether all course ids are valid ids
         invalid_course_id_list = []
         logger.debug("in checking course")
-        course_ids = set([str(x) for x in Course.objects.get_supported_courses()])
-        courses_data = pd.read_sql(queries['course'], conns['DATA_WAREHOUSE'], params={'course_ids': tuple(course_ids)})
+        supported_courses = Course.objects.get_supported_courses()
+        courses_data = pd.read_sql(queries['course'], conns['DATA_WAREHOUSE'], params={'course_ids': tuple(supported_courses.values_list('id'))})
 
         # error out when course id is invalid, otherwise add DataFrame to list
-        invalid_course_id_set = course_ids.difference(set([str(x) for x in courses_data["id"]]))
-        logger.debug(f'course_df={course_ids} set(courses_data["id"]={set(courses_data["id"])} set differece = {invalid_course_id_set}')
-        if len(invalid_course_id_set) > 0:
-            logger.error(f'Course {invalid_course_id_set} do not exist in data warehouse yet. ')
+        for course_id, data_last_updated in supported_courses:
+            if course_id not in list(courses_data['id']):
+                # Check if the course was ever updated by cron. If it was updated it is invalid, otherwise don't consider this an error and skip it.
+                if data_last_updated:
+                    logger.error(f"Course {course_id} doesn't have an entry in data warehouse yet. It has local data, so marking invalid.")
+                    invalid_course_id_list.append(course_id)
+                else:
+                    logger.info(f"Course {course_id} doesn't have an entry in data warehouse yet. It hasn't been updated locally, so skipping.")
+        if len(invalid_course_id_list) > 0:
+            logger.error(f'Course {invalid_course_id_list} do not exist in data warehouse yet. ')
         if len(courses_data) == 0:
             logger.info("No course records were found in the database.")
             courses_data = pd.DataFrame(
                 columns=["id", "canvas_id", "enrollment_term_id", "name", "start_at", "conclude_at"])
 
         CourseVerification = namedtuple("CourseVerification", ["invalid_course_ids", "course_data"])
-        return CourseVerification(invalid_course_id_set, courses_data)
+        return CourseVerification(invalid_course_id_list, courses_data)
 
     # update USER records from DATA_WAREHOUSE
 
