@@ -135,7 +135,7 @@ class DashboardCronJob(CronJobBase):
         # whether all course ids are valid ids
         invalid_course_id_list = []
         logger.debug("in checking course")
-
+        
         course_ids = set([str(x) for x in Course.objects.get_supported_courses()])
         courses_data = pd.read_sql(queries['course'], conns['DATA_WAREHOUSE'], params={'course_ids': tuple(course_ids)})
 
@@ -214,10 +214,10 @@ class DashboardCronJob(CronJobBase):
         for row in df_attach.itertuples(index=False):
             if row.file_state == 'available':
                 Resource.objects.filter(resource_id=row.id).update(name=row.display_name)
-                status += f"Row {row.id} updated to {row.display_name}\n"
+                logger.debug(f"Row {row.id} updated to {row.display_name}")
             else:
                 Resource.objects.filter(resource_id=row.id).delete()
-                status += f"Row {row.id} removed as it is not available\n"
+                logger.debug(f"Row {row.id} removed as it is not available")
         return status
 
     # update RESOURCE_ACCESS records from BigQuery or LRS data sources
@@ -649,7 +649,7 @@ class DashboardCronJob(CronJobBase):
             status += self.update_unizin_metadata()
 
         courses_added_during_cron: List[int] = list(
-            set(Course.objects.get_supported_courses()) - set(self.valid_locked_course_ids))
+            set(Course.objects.get_supported_courses().values_list('id', flat=True)) - set(self.valid_locked_course_ids))
         if courses_added_during_cron:
             logger.warning(
                 f'During the run, users added {len(courses_added_during_cron)} course(s): {courses_added_during_cron}')
