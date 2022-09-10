@@ -235,14 +235,12 @@
             from
             course_assignment cross join enrollment
         ),
-        course_assignment_submission as
+        course_assignment_submission_sub as
         (
             select
-                cast(lar2.lms_int_id as BIGINT) as submission_id,
                 cae.assignment_id as assignment_id,
                 cae.course_id as course_id,
                 lar.published_score as published_score,
-                (cast(%(canvas_data_id_increment)s as bigint) + cast(p.lms_ext_id as bigint)) as user_id,
                 lar.response_date as submitted_at,
                 lar.graded_date as graded_at,
                 lar.posted_at at time zone 'America/Detroit' as grade_posted_local_date,
@@ -255,13 +253,23 @@
                             null
                         end
                 ) as submission_workflow_state,
-                cae.assignment_title as title 
+                cae.assignment_title as title,
+                lar.learner_activity_result_id as learner_activity_result_id,
+                cae.short_user_id as short_user_id
             from
-                
                 course_assignment_enrollment cae
-                left join entity.learner_activity_result lar on (cae.short_assignment_id = lar.learner_activity_id and cae.short_user_id = lar.person_id )
-                left join keymap.learner_activity_result lar2 on lar.learner_activity_result_id  = lar2.id
-                left join keymap.person p on p.id = cae.short_user_id 
+                left join entity.learner_activity_result lar on (cae.short_assignment_id = lar.learner_activity_id and cae.short_user_id = lar.person_id)
+        ),
+        course_assignment_submission as
+        (
+            select
+                cast(lar2.lms_int_id as BIGINT) as submission_id,
+                (cast(%(canvas_data_id_increment)s as bigint) + cast(p.lms_ext_id as bigint)) as user_id,
+                cass.*
+            from
+                course_assignment_submission_sub cass
+                join keymap.learner_activity_result lar2 on cass.learner_activity_result_id  = lar2.id
+                join keymap.person p on p.id = cass.short_user_id
             order by assignment_id, user_id
         ),
         all_assign_sub as 
