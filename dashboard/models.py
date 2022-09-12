@@ -7,17 +7,17 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from __future__ import unicode_literals
 
-from django.db import models
-from django.db.models import Q, QuerySet
+import logging
+from datetime import datetime, timedelta
+from typing import Optional, Union
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
+from django.db.models import QuerySet
 from django.urls import reverse
-
-from datetime import datetime, timedelta
-import logging
 import pytz
-from typing import Optional, Union
+
 
 logger = logging.getLogger(__name__)
 
