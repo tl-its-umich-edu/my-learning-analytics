@@ -16,6 +16,14 @@ More details on certain topics are provided below.
 > **Note:** If you were using a prior version of MyLA, there is a utility `env_to_json.py` to help convert your configuration.
 > Running `python env_to_json.py > config/env.hjson` should create your new config file from your `.env` file.
 
+There are two other ways to control configuration in `env.hjson` using environment variables.
+1. Set the environment variable `ENV_JSON` to be a valid JSON document
+containing all the desired key-value pairs.
+2. Override individual values by setting an environment variable with a given key name.
+Note that only outermost keys are supported.
+If the value you want to change is in a nested object or array,
+you will have to provide a new version of all the nested data as a JSON string for the override value.
+
 ### LTI v1.3
 
 MyLA supports LTI 1.3, using [pylti1.3](https://github.com/dmitry-viskov/pylti1.3).

@@ -10,11 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-import hjson, os
-from typing import Tuple, Union
+import json, logging, os
+from typing import Any, Dict, Tuple, Union
 
+import hjson
 from django.core.management.utils import get_random_secret_key
-from django.utils.module_loading import import_string
+
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=os.getenv('ROOT_LOG_LEVEL', 'INFO'))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,6 +29,26 @@ PROJECT_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), ".."),
 )
 
+
+def apply_env_overrides(env: Dict[str, Any], environ: os._Environ) -> Dict[str, Any]:
+    """
+    Replaces values for any keys in env found in the environment
+    """
+    env_copy = env.copy()
+    for key in env_copy.keys():
+        if key in environ:
+            os_value = environ[key]
+            try:
+                os_value = json.loads(os_value)
+                logger.debug('Value was valid JSON; replaced value with parsed data.')
+            except json.JSONDecodeError:
+                logger.debug('Value was not JSON; kept the value as is.')
+            env_copy[key] = os_value
+            logger.debug(f'ENV value for "{key}" overridden')
+            logger.debug(f'key: {key}; os_value: {os_value}')
+    return env_copy
+
+
 env_json: Union[str, None] = os.getenv('ENV_JSON')
 if env_json:
     # optionally load settings from an environment variable
@@ -34,8 +58,12 @@ else:
     try:
         with open(os.getenv("ENV_FILE", "/secrets/env.hjson")) as f:
             ENV = hjson.load(f)
+        ENV = apply_env_overrides(ENV, os.environ)
     except FileNotFoundError as fnfe:
-        print("Default config file or one defined in environment variable ENV_FILE not found. This is normal for the build, should define for operation")
+        logger.warn(
+            "Default config file or one defined in environment variable ENV_FILE not found. " +
+            "This is normal for the build; it should be defined when running the server."
+        )
         # Set ENV so collectstatic will still run in the build
         ENV = os.environ
 
@@ -242,7 +270,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = ENV.get("TIME_ZONE", ENV.get("TZ", "America/Detroit"))
+TIME_ZONE = ENV.get("TIME_ZONE", os.getenv("TZ", "America/Detroit"))
 
 USE_I18N = True
 
