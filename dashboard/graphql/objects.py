@@ -216,10 +216,10 @@ class CourseType(DjangoObjectType):
         return info.context.academic_term_by_id_loader.load(parent.term_id) if parent.term_id else None
 
     def resolve_date_start(parent, info):
-        return parent.get_date_start()
+        return parent.determine_date_start()
 
     def resolve_date_end(parent, info):
-        return parent.get_date_end()
+        return parent.determine_date_end()
 
     class Meta:
         model = Course

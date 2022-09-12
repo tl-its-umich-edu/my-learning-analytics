@@ -212,7 +212,7 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
-    def get_date_start(self) -> datetime:
+    def determine_date_start(self) -> datetime:
         if self.date_start is not None:
             start = self.date_start
         elif self.term is not None and self.term.date_start is not None:
@@ -222,21 +222,24 @@ class Course(models.Model):
             start = datetime.now(pytz.UTC)
         return start
 
-    def get_date_end(self, start: Union[datetime, None] = None) -> datetime:
+    def determine_date_end(self, start: Union[datetime, None] = None) -> datetime:
         if self.date_end is not None:
             end = self.date_end
         elif self.term is not None and self.term.date_end is not None:
             end = self.term.get_correct_date_end()
         else:
-            logger.info(f"No date_end value was found for course {self.name} ({self.canvas_id}) or term; setting to two weeks past start date.")
-            start = start if start else self.get_date_start()
-            end = self.get_date_start() + timedelta(weeks=2)
+            logger.info(
+                f"No date_end value was found for course {self.name} ({self.canvas_id}) or term; " +
+                "setting to two weeks past start date."
+            )
+            date_start = start if start else self.determine_date_start()
+            end = date_start + timedelta(weeks=2)
         return end
 
     @property
     def course_date_range(self):
-        start = self.get_date_start()
-        end = self.get_date_end(start)
+        start = self.determine_date_start()
+        end = self.determine_date_end(start)
         DateRange = namedtuple("DateRange", ["start", "end"])
         date_range = DateRange(start, end)
         return date_range
