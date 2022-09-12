@@ -14,7 +14,6 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 
-from collections import namedtuple
 from datetime import datetime, timedelta
 import logging
 import pytz
@@ -157,12 +156,12 @@ class CourseQuerySet(models.QuerySet):
         :return: Earliest start date of courses in the QuerySet, or None if no course dates found
         :rtype: datetime
         """
-        sorted_courses = sorted(self.all(), key=lambda course: course.course_date_range.start)
+        sorted_courses = sorted(self.all(), key=lambda course: course.determine_date_start())
 
         earliest_start = None
         if len(sorted_courses) > 0:
             earliest_course = sorted_courses[0]
-            earliest_start = earliest_course.course_date_range.start
+            earliest_start = earliest_course.determine_date_start()
             logger.info(f"Earliest start datetime for CourseQuerySet: {earliest_start.isoformat()} found in course {earliest_course.canvas_id}")
         else:
             logger.info(f"No courses in CourseQuerySet; returning None as the earliest_start_datetime")
@@ -235,14 +234,6 @@ class Course(models.Model):
             date_start = start if start else self.determine_date_start()
             end = date_start + timedelta(weeks=2)
         return end
-
-    @property
-    def course_date_range(self):
-        start = self.determine_date_start()
-        end = self.determine_date_end(start)
-        DateRange = namedtuple("DateRange", ["start", "end"])
-        date_range = DateRange(start, end)
-        return date_range
 
     @property
     def absolute_url(self):

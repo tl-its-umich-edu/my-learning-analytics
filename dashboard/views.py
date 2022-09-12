@@ -135,7 +135,8 @@ def get_course_info(request, course_id=0):
 
     resp = model_to_dict(course)
 
-    course_start, course_end = course.course_date_range
+    course_start = course.determine_date_start()
+    course_end = course.determine_date_end(course_start)
 
     current_week_number = math.ceil((today - course_start).days/7)
     total_weeks = math.ceil((course_end - course_start).days/7)
