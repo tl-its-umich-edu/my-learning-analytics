@@ -18,7 +18,7 @@ from collections import namedtuple
 from datetime import datetime, timedelta
 import logging
 import pytz
-from typing import Optional
+from typing import Optional, Union
 
 logger = logging.getLogger(__name__)
 
@@ -212,8 +212,7 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
-    @property
-    def course_date_range(self):
+    def get_date_start(self) -> datetime:
         if self.date_start is not None:
             start = self.date_start
         elif self.term is not None and self.term.date_start is not None:
@@ -221,15 +220,26 @@ class Course(models.Model):
         else:
             logger.info(f"No date_start value was found for course {self.name} ({self.canvas_id}) or term; setting to current date and time")
             start = datetime.now(pytz.UTC)
+        return start
+
+    def get_date_end(self, start: Union[datetime, None] = None) -> datetime:
         if self.date_end is not None:
             end = self.date_end
         elif self.term is not None and self.term.date_end is not None:
             end = self.term.get_correct_date_end()
         else:
             logger.info(f"No date_end value was found for course {self.name} ({self.canvas_id}) or term; setting to two weeks past start date.")
-            end = start + timedelta(weeks=2)
+            start = start if start else self.get_date_start()
+            end = self.get_date_start() + timedelta(weeks=2)
+        return end
+
+    @property
+    def course_date_range(self):
+        start = self.get_date_start()
+        end = self.get_date_end(start)
         DateRange = namedtuple("DateRange", ["start", "end"])
-        return DateRange(start, end)
+        date_range = DateRange(start, end)
+        return date_range
 
     @property
     def absolute_url(self):
