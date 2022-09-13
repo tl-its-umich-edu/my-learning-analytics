@@ -105,7 +105,6 @@ def generate_config_json(request: HttpRequest) -> \
             [request.scheme, request.get_host()] + 3 * ['']),
         'login_url_suffix': reverse('lti_login'),
         'launch_url_suffix': reverse('lti_launch'),
-        'jwks_url_suffix': reverse('lti_get_jwks'),
     }
 
     template_path: str
