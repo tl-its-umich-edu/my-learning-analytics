@@ -153,6 +153,7 @@ def check_if_instructor(roles, username, course_id):
         return True
     return False
 
+
 def short_user_role_list(roles):
     return [role.split('#')[1] for role in roles]
 
@@ -195,6 +196,13 @@ def extract_launch_variables_for_tool_use(request, message_launch):
         password = ''.join(random.sample(string.ascii_letters, settings.RANDOM_PASSWORD_DEFAULT_LENGTH))
         user_obj = User.objects.create_user(username=username, email=email, password=password, first_name=first_name,
                                             last_name=last_name)
+
+    # Add username into the MyLA User table, since the data was not pulled in from cron job
+    user_id = settings.CANVAS_DATA_ID_INCREMENT + int(canvas_user_id)
+    enrollment_qs =  MylaUser.objects.filter(user_id=user_id)
+    if enrollment_qs.exists():
+        enrollment_qs.update(sis_name=username)
+    
     user_obj.backend = 'django.contrib.auth.backends.ModelBackend'
     django.contrib.auth.login(request, user_obj)
     is_instructor = check_if_instructor(roles, username, course_id)
@@ -206,7 +214,7 @@ def extract_launch_variables_for_tool_use(request, message_launch):
             Course.objects.create(id=canvas_course_long_id, canvas_id=course_id, name=course_name)
             CourseViewOption.objects.create(course_id=canvas_course_long_id)
         if is_instructor:
-            MylaUser.objects.create(name=full_name, sis_name=username,
+            MylaUser.objects.create(sis_name=username,
                                     course_id=canvas_course_long_id,
                                     user_id=canvas_user_long_id,
                                     enrollment_type=MylaUser.EnrollmentType.TEACHER)
