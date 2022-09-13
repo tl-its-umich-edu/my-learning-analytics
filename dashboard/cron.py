@@ -38,6 +38,11 @@ engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}?cha
                                host=db_host,
                                port=db_port))
 
+data_warehouse_engine = create_engine(
+    'postgresql://{user}:{password}@{host}:{port}/{database}'
+    .format(**(conns['DATA_WAREHOUSE'].get_connection_params())))
+
+
 # Set up queries array from configuration file
 CRON_QUERY_FILE = settings.CRON_QUERY_FILE
 logger.info(CRON_QUERY_FILE)
@@ -61,7 +66,7 @@ def split_list(a_list: list, size: int = 20):
 def util_function(sql_string, mysql_table, param_object=None, table_identifier=None):
     logger.debug(f'sql={sql_string}')
     logger.debug(f'table={mysql_table} param_object={param_object} table_identifier={table_identifier}')
-    df = pd.read_sql(sql_string, conns['DATA_WAREHOUSE'], params=param_object)
+    df = pd.read_sql(sql_string, data_warehouse_engine, params=param_object)
 
     # drop duplicates
     df = df.drop_duplicates(keep='first')
@@ -137,7 +142,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in checking course")
         supported_courses = Course.objects.get_supported_courses()
         course_ids = [str(x) for x in supported_courses.values_list('id', flat=True)]
-        courses_data = pd.read_sql(queries['course'], conns['DATA_WAREHOUSE'], params={'course_ids': tuple(course_ids)})
+        courses_data = pd.read_sql(queries['course'], data_warehouse_engine, params={'course_ids': tuple(course_ids)})
         # error out when course id is invalid, otherwise add DataFrame to list
         for course_id, data_last_updated in supported_courses:
             if course_id not in list(courses_data['id']):
@@ -211,7 +216,7 @@ class DashboardCronJob(CronJobBase):
         # Select all the files for these courses
         # convert int array to str array
         df_attach = pd.read_sql(queries['resource'],
-                                conns['DATA_WAREHOUSE'],
+                                data_warehouse_engine,
                                 params={'course_ids': tuple(self.valid_locked_course_ids)})
         logger.debug(df_attach)
         # Update these back again based on the dataframe
@@ -530,7 +535,8 @@ class DashboardCronJob(CronJobBase):
 
         term_sql: str = queries['term']
         logger.debug(term_sql)
-        warehouse_term_df: pd.DataFrame = pd.read_sql(term_sql, conns['DATA_WAREHOUSE'])
+        warehouse_term_df: pd.DataFrame = pd.read_sql(term_sql,
+                                                      data_warehouse_engine)
 
         existing_terms_ids: List[int] = [term.id for term in list(AcademicTerms.objects.all())]
         new_term_ids: List[int] = [int(id) for id in warehouse_term_df['id'].to_list() if id not in existing_terms_ids]
