@@ -7,18 +7,17 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from __future__ import unicode_literals
 
-from django.db import models
-from django.db.models import Q, QuerySet
+import logging
+from datetime import datetime, timedelta
+from typing import Optional, Union
 
+import pytz
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
+from django.db.models import QuerySet
 from django.urls import reverse
 
-from collections import namedtuple
-from datetime import datetime, timedelta
-import logging
-import pytz
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -157,12 +156,12 @@ class CourseQuerySet(models.QuerySet):
         :return: Earliest start date of courses in the QuerySet, or None if no course dates found
         :rtype: datetime
         """
-        sorted_courses = sorted(self.all(), key=lambda course: course.course_date_range.start)
+        sorted_courses = sorted(self.all(), key=lambda course: course.determine_date_start())
 
         earliest_start = None
         if len(sorted_courses) > 0:
             earliest_course = sorted_courses[0]
-            earliest_start = earliest_course.course_date_range.start
+            earliest_start = earliest_course.determine_date_start()
             logger.info(f"Earliest start datetime for CourseQuerySet: {earliest_start.isoformat()} found in course {earliest_course.canvas_id}")
         else:
             logger.info(f"No courses in CourseQuerySet; returning None as the earliest_start_datetime")
@@ -212,24 +211,29 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
-    @property
-    def course_date_range(self):
+    def determine_date_start(self) -> datetime:
         if self.date_start is not None:
-            start = self.date_start
+            date_start = self.date_start
         elif self.term is not None and self.term.date_start is not None:
-            start = self.term.date_start
+            date_start = self.term.date_start
         else:
             logger.info(f"No date_start value was found for course {self.name} ({self.canvas_id}) or term; setting to current date and time")
-            start = datetime.now(pytz.UTC)
+            date_start = datetime.now(pytz.UTC)
+        return date_start
+
+    def determine_date_end(self, start: Union[datetime, None] = None) -> datetime:
         if self.date_end is not None:
-            end = self.date_end
+            date_end = self.date_end
         elif self.term is not None and self.term.date_end is not None:
-            end = self.term.get_correct_date_end()
+            date_end = self.term.get_correct_date_end()
         else:
-            logger.info(f"No date_end value was found for course {self.name} ({self.canvas_id}) or term; setting to two weeks past start date.")
-            end = start + timedelta(weeks=2)
-        DateRange = namedtuple("DateRange", ["start", "end"])
-        return DateRange(start, end)
+            logger.info(
+                f"No date_end value was found for course {self.name} ({self.canvas_id}) or term; " +
+                "setting to two weeks past start date."
+            )
+            date_start = start if start else self.determine_date_start()
+            date_end = date_start + timedelta(weeks=2)
+        return date_end
 
     @property
     def absolute_url(self):
