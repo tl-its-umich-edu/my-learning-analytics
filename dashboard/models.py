@@ -213,27 +213,27 @@ class Course(models.Model):
 
     def determine_date_start(self) -> datetime:
         if self.date_start is not None:
-            start = self.date_start
+            date_start = self.date_start
         elif self.term is not None and self.term.date_start is not None:
-            start = self.term.date_start
+            date_start = self.term.date_start
         else:
             logger.info(f"No date_start value was found for course {self.name} ({self.canvas_id}) or term; setting to current date and time")
-            start = datetime.now(pytz.UTC)
-        return start
+            date_start = datetime.now(pytz.UTC)
+        return date_start
 
     def determine_date_end(self, start: Union[datetime, None] = None) -> datetime:
         if self.date_end is not None:
-            end = self.date_end
+            date_end = self.date_end
         elif self.term is not None and self.term.date_end is not None:
-            end = self.term.get_correct_date_end()
+            date_end = self.term.get_correct_date_end()
         else:
             logger.info(
                 f"No date_end value was found for course {self.name} ({self.canvas_id}) or term; " +
                 "setting to two weeks past start date."
             )
             date_start = start if start else self.determine_date_start()
-            end = date_start + timedelta(weeks=2)
-        return end
+            date_end = date_start + timedelta(weeks=2)
+        return date_end
 
     @property
     def absolute_url(self):
