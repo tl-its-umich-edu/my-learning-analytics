@@ -10,11 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-import hjson, os
-from typing import Tuple, Union
+import json, logging, os
+from typing import Any, Dict, Tuple, Union
 
+import hjson
 from django.core.management.utils import get_random_secret_key
-from django.utils.module_loading import import_string
+
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=os.getenv('ROOT_LOG_LEVEL', 'INFO'))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,6 +29,26 @@ PROJECT_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), ".."),
 )
 
+
+def apply_env_overrides(env: Dict[str, Any], environ: os._Environ) -> Dict[str, Any]:
+    """
+    Replaces values for any keys in env found in the environment
+    """
+    env_copy = env.copy()
+    for key in env_copy.keys():
+        if key in environ:
+            os_value = environ[key]
+            try:
+                os_value = json.loads(os_value)
+                logger.debug('Value was valid JSON; replaced value with parsed data.')
+            except json.JSONDecodeError:
+                logger.debug('Value was not JSON; kept the value as is.')
+            env_copy[key] = os_value
+            logger.debug(f'ENV value for "{key}" overridden')
+            logger.debug(f'key: {key}; os_value: {os_value}')
+    return env_copy
+
+
 env_json: Union[str, None] = os.getenv('ENV_JSON')
 if env_json:
     # optionally load settings from an environment variable
@@ -34,8 +58,12 @@ else:
     try:
         with open(os.getenv("ENV_FILE", "/secrets/env.hjson")) as f:
             ENV = hjson.load(f)
+        ENV = apply_env_overrides(ENV, os.environ)
     except FileNotFoundError as fnfe:
-        print("Default config file or one defined in environment variable ENV_FILE not found. This is normal for the build, should define for operation")
+        logger.warn(
+            "Default config file or one defined in environment variable ENV_FILE not found. " +
+            "This is normal for the build; it should be defined when running the server."
+        )
         # Set ENV so collectstatic will still run in the build
         ENV = os.environ
 
@@ -84,7 +112,8 @@ WATCHMAN_DATABASES = ('default',)
 
 # courses_enabled api
 COURSES_ENABLED = ENV.get('COURSES_ENABLED', False)
-STUDENT_DASHBOARD_LTI = ENV.get('STUDENT_DASHBOARD_LTI', False)
+# Fall back to the old config name
+ENABLE_LTI = ENV.get('ENABLE_LTI', ENV.get('STUDENT_DASHBOARD_LTI', False))
 
 # Defaults for DEBUGPY
 DEBUGPY_ENABLE = ENV.get("DEBUGPY_ENABLE", False)
@@ -241,7 +270,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = ENV.get("TIME_ZONE", ENV.get("TZ", "America/Detroit"))
+TIME_ZONE = ENV.get("TIME_ZONE", os.getenv("TZ", "America/Detroit"))
 
 USE_I18N = True
 
@@ -343,7 +372,7 @@ AUTHENTICATION_BACKENDS: Tuple[str, ...] = (
     'django_su.backends.SuBackend',
 )
 
-if STUDENT_DASHBOARD_LTI:
+if ENABLE_LTI:
     LTI_CONFIG = ENV.get('LTI_CONFIG', {})
     LTI_CONFIG_TEMPLATE_PATH = ENV.get('LTI_CONFIG_TEMPLATE_PATH')
     LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION = ENV.get('LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION', False)
@@ -400,7 +429,10 @@ if CSRF_COOKIE_SECURE:
 SESSION_COOKIE_SAMESITE = ENV.get("SESSION_COOKIE_SAMESITE", 'None')
 CSRF_COOKIE_SAMESITE = ENV.get("CSRF_COOKIE_SAMESITE", 'None')
 
-CHECK_ENABLE_BACKEND_LOGIN = False if STUDENT_DASHBOARD_LTI else True
+SESSION_COOKIE_AGE = ENV.get('SESSION_COOKIE_AGE', 86400)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = ENV.get('SESSION_EXPIRE_AT_BROWSER_CLOSE', True)
+
+CHECK_ENABLE_BACKEND_LOGIN = False if ENABLE_LTI else True
 
 # Allow for ENABLE_BACKEND_LOGIN override
 ENABLE_BACKEND_LOGIN = ENV.get("ENABLE_BACKEND_LOGIN", CHECK_ENABLE_BACKEND_LOGIN)
@@ -408,7 +440,7 @@ ENABLE_BACKEND_LOGIN = ENV.get("ENABLE_BACKEND_LOGIN", CHECK_ENABLE_BACKEND_LOGI
 SHOW_LOGOUT_LINK = True if ENABLE_BACKEND_LOGIN else False
 
 # If backend login is still enabled or LTI is used (since it uses this), enable the ModelBackend
-if ENABLE_BACKEND_LOGIN or STUDENT_DASHBOARD_LTI:
+if ENABLE_BACKEND_LOGIN or ENABLE_LTI:
     AUTHENTICATION_BACKENDS += (
         'django.contrib.auth.backends.ModelBackend',
     )

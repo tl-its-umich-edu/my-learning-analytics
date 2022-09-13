@@ -1,21 +1,18 @@
 ## UDP (Unizin Data Platform) queries for MyLA cron job
 {
     "metadata":
-        ## placeholder query before the unizin_metadata table is implemented in UDP
         '''
-        select "learner_activity" as pkey, max(updated_date) as pvalue from entity.learner_activity
+        select 'canvasdatadate' as pkey, min(dag_run) as pvalue from report.publish_info pi2
         ''',
     "user" :
         '''
         select
-            ({canvas_data_id_increment} + cast(p2.lms_ext_id as bigint)) as user_id,
-            case
-                when p.first_name is not null then p.first_name || ' ' || p.last_name
-                else p2.sis_ext_id end as name,
-            case
-                when pe.email_address is not null then lower(split_part(pe.email_address , '@', 1))
-                else p2.sis_ext_id end as sis_name,
-            co.lms_int_id as course_id,
+            (
+            cast(%(canvas_data_id_increment)s as bigint)
+            +
+            cast(p2.lms_ext_id as bigint)
+            ) as user_id,
+            cast(co.lms_int_id as bigint) as course_id,
             cg.le_current_score as current_grade,
             cg.le_final_score as final_grade,
             case
@@ -38,7 +35,7 @@
         left join entity.course_grade cg
             on cse.course_section_id = cg.course_section_id and cse.person_id = cg.person_id
         where
-            co.lms_int_id ='{course_id}'
+            co.lms_int_id in %(course_ids)s
             and cse.role in ('Student', 'TeachingAssistant', 'Teacher')
             and cse.role_status = 'Enrolled'
         order by user_id
@@ -52,14 +49,14 @@
                 la.visibility = 'everyone'
                 and	la.status = 'published'
                 and la.course_offering_id = co.id
-                and co.lms_int_id = '{course_id}'
+                and co.lms_int_id in %(course_ids)s
             ), assignment_grp as (
                 select lg.*
                 from entity.learner_activity_group lg, keymap.course_offering co
                 where
                 lg.status = 'available'
                 and lg.course_offering_id = co.id
-                and co.lms_int_id = '{course_id}'
+                and co.lms_int_id in %(course_ids)s
             ), assign_more as (
                 select distinct(a.learner_activity_group_id), da.group_points
                 from assignment_details a
@@ -121,7 +118,7 @@
                 la.visibility = 'everyone'
                 and	la.status = 'published'
                 and la.course_offering_id = co.id
-                and co.lms_int_id = '{course_id}'
+                and co.lms_int_id in %(course_ids)s
                 and la.learner_activity_id = la_km.id
                 and la.learner_activity_group_id = lag_km.id
         )
@@ -130,21 +127,21 @@
         ''',
     "assignment_weight":
         '''
-        with course as (
-            select 	course_offering_id as course_id,
-                    sum(group_weight) as group_weight
-            from entity.learner_activity_group lag, keymap.course_offering co_km
-            where 
+        select
+            cast(co_km.lms_int_id as bigint) as course_id,
+            case when sum(group_weight) > 1
+            then
+                cast(1 as boolean)
+            else
+                cast(0 as boolean)
+            end as consider_weight
+        from
+            entity.learner_activity_group lag,
+            keymap.course_offering co_km
+        where
             lag.course_offering_id = co_km.id
-            and co_km.lms_int_id = '{course_id}'
-            group by course_offering_id
-            having sum(group_weight) > 1
-        )
-        (select case when exists (
-            select *
-            from course
-            where group_weight > 1
-        ) then cast(1 as boolean) else cast(0 as boolean) end)
+            and co_km.lms_int_id in %(course_ids)s
+            group by co_km.lms_int_id
         ''',
     "term":
         '''
@@ -152,8 +149,8 @@
             cast(ka.lms_int_id as BIGINT) as id,
             cast(ka.lms_ext_id as BIGINT) as canvas_id,
             a.name as name,
-            a.le_term_begin_date at time zone 'UTC' as date_start,
-            a.le_term_end_date at time zone 'UTC' as date_end
+            a.le_term_begin_date::timestamp without time zone as date_start,
+            a.le_term_end_date::timestamp without time zone as date_end
         from
             entity.academic_term as a
             left join keymap.academic_term as ka on ka.id = a.academic_term_id
@@ -171,22 +168,24 @@
             cast(co2.lms_int_id as BIGINT) as id,
             cast(co2.lms_ext_id as BIGINT) as canvas_id,
             cast(at2.lms_int_id as BIGINT) as enrollment_term_id,
-            co.title as name, -- different than Canvas course name
-            co.le_start_date at time zone 'UTC' as start_at,
-            co.le_end_date at time zone 'UTC' as conclude_at
+            co.le_code as name,
+            co.le_start_date::timestamp without time zone as start_at,
+            co.le_end_date::timestamp without time zone as conclude_at
         FROM
             entity.course_offering co
             LEFT OUTER JOIN entity.academic_session as3 on (co.academic_session_id = as3.academic_session_id),
             keymap.course_offering co2,
             keymap.academic_term at2,
             no_term_temp
-            WHERE co2.lms_int_id = '{course_id}'
+            WHERE co2.lms_int_id in %(course_ids)s
             and co.course_offering_id = co2.id
             and (
-                (co.academic_session_id is null and at2.id = no_term_temp.academic_term_id)
+                (co.academic_session_id is null and co.academic_term_id is not null and (co.academic_term_id = at2.id))
+            or
+                (co.academic_session_id is null and co.academic_term_id is null and at2.id = no_term_temp.academic_term_id)
             or
                 (co.academic_session_id = as3.academic_session_id and at2.id = as3.academic_term_id)
-          )
+            )
         ''',
     "resource":
         '''
@@ -215,10 +214,10 @@
                 left join keymap.learner_activity la2 on la.learner_activity_id = la2.id 
                 left join keymap.course_offering co on co.id = la.course_offering_id
             where 
-                co.lms_int_id = '{course_id}'
+                co.lms_int_id in %(course_ids)s
                 and la.status = 'published'
-            ),
-            enrollment as 
+        ),
+        enrollment as
         (
             select
                 distinct cse.person_id as short_user_id
@@ -226,24 +225,24 @@
                 left join entity.course_section cs on cse.course_section_id = cs.course_section_id 
                 left join keymap.course_offering co on cs.course_offering_id = co.id
             where 
-                co.lms_int_id = '{course_id}' 
+                co.lms_int_id in %(course_ids)s
                 and cse.role_status ='Enrolled' 
                 and cse."role" = 'Student'
-            ),
-            course_assignment_enrollment as 
-            (
-                select * 
-                from
-                course_assignment cross join enrollment
-            ),
-            course_assignment_submission as 
+        ),
+        course_assignment_enrollment as
         (
-        select
+            select *
+            from
+            course_assignment cross join enrollment
+        ),
+        course_assignment_submission as
+        (
+            select
                 cast(lar2.lms_int_id as BIGINT) as submission_id,
                 cae.assignment_id as assignment_id,
                 cae.course_id as course_id,
                 lar.published_score as published_score,
-                ({canvas_data_id_increment} + cast(p.lms_ext_id as bigint)) as user_id,
+                (cast(%(canvas_data_id_increment)s as bigint) + cast(p.lms_ext_id as bigint)) as user_id,
                 lar.response_date as submitted_at,
                 lar.graded_date as graded_at,
                 lar.posted_at at time zone 'America/Detroit' as grade_posted_local_date,
@@ -310,6 +309,7 @@
                 group by assignment_id
             ) as f1 
             on f.assignment_id = f1.assignment_id
+        where f.id is not null
         order by assignment_id, user_id
         '''
 }
