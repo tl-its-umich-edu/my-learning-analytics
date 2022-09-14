@@ -1,7 +1,7 @@
 # Some utility functions used by other classes in this project
 import logging
 from datetime import datetime
-from typing import Dict, List, TypedDict, Union, Literal
+from typing import Dict, List, Literal, TypedDict, Union
 from urllib.parse import quote_plus
 
 import django
@@ -29,11 +29,11 @@ def create_sqlalchemy_engine(db_params: DBParams, type: Literal['mysql', 'postgr
     new_db_params: DBParams = db_params.copy()
     new_db_params['PASSWORD'] = quote_plus(db_params['PASSWORD'])
 
-    core = '{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}'.format(**new_db_params)
+    core_string = '{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}'.format(**new_db_params)
     if type == 'mysql':
-        return create_engine(f'mysql+mysqldb://{core}?charset=utf8mb4')
+        return create_engine(f'mysql+mysqldb://{core_string}?charset=utf8mb4')
     else:
-        return create_engine('postgresql://' + core)
+        return create_engine('postgresql://' + core_string)
 
 
 def canvas_id_to_incremented_id(canvas_id):
