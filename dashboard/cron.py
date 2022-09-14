@@ -14,7 +14,7 @@ from django.db import connections as conns, models
 from django.db.models import QuerySet
 from django_cron import CronJobBase, Schedule
 from google.cloud import bigquery
-from sqlalchemy import create_engine, types
+from sqlalchemy import types
 from sqlalchemy.engine import ResultProxy
 
 from dashboard.common import db_util, utils
@@ -31,17 +31,8 @@ db_port = settings.DATABASES['default']['PORT']
 logger.debug("db-name:" + db_name)
 logger.debug("db-user:" + db_user)
 
-engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}?charset=utf8mb4"
-                       .format(db=db_name,  # your mysql database name
-                               user=db_user,  # your mysql user for the database
-                               password=quote_plus(db_password),  # password for user
-                               host=db_host,
-                               port=db_port))
-
-data_warehouse_engine = create_engine(
-    'postgresql://{user}:{password}@{host}:{port}/{database}'
-    .format(**(conns['DATA_WAREHOUSE'].get_connection_params())))
-
+engine = db_util.create_sqlalchemy_engine(settings.DATABASES['default'], 'mysql')
+data_warehouse_engine = db_util.create_sqlalchemy_engine(settings.DATABASES['DATA_WAREHOUSE'], 'postgres')
 
 # Set up queries array from configuration file
 CRON_QUERY_FILE = settings.CRON_QUERY_FILE

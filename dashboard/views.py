@@ -11,7 +11,6 @@ import pandas as pd
 from django.conf import settings
 from django.contrib import auth
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import connection as conn
 from django.forms.models import model_to_dict
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect, render
@@ -20,7 +19,7 @@ from pinax.eventlog.models import log as eventlog
 from rules.contrib.views import permission_required, objectgetter
 
 from dashboard.common import utils
-from dashboard.common.db_util import canvas_id_to_incremented_id
+from dashboard.common.db_util import canvas_id_to_incremented_id, create_sqlalchemy_engine
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
 from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection, User
 from dashboard.settings import COURSES_ENABLED, RESOURCE_VALUES, RESOURCE_VALUES_MAP, \
@@ -43,6 +42,10 @@ OUTLIER_BIN_OFFSET = 2
 RESOURCE_TYPE_STRING = "resource_type"
 
 BinningGrade = namedtuple('BinningGrade', ['value', 'index', 'binning_all'])
+
+db_params = settings.DATABASES['default']
+
+app_engine = create_sqlalchemy_engine(settings.DATABASES['default'], 'mysql')
 
 
 def gpa_map(grade):
@@ -284,7 +287,7 @@ def resource_access_within_week(request, course_id=0):
     elif (grade == GRADE_C):
         total_number_student_sql += " and current_grade >= 70 and current_grade < 80"
 
-    total_number_student_df = pd.read_sql(total_number_student_sql, conn, params={
+    total_number_student_df = pd.read_sql(total_number_student_sql, app_engine, params={
         "course_id": course_id,
         "enrollment_type": "StudentEnrollment"
         })
@@ -322,7 +325,7 @@ def resource_access_within_week(request, course_id=0):
     endTimeString = end.strftime('%Y%m%d') + "000000"
     logger.debug(sqlString)
     logger.debug("start time=" + startTimeString + " end_time=" + endTimeString)
-    df = pd.read_sql(sqlString, conn, params={
+    df = pd.read_sql(sqlString, app_engine, params={
             "start_time": startTimeString,
             "end_time": endTimeString,
             "course_id": course_id,
@@ -386,7 +389,7 @@ def resource_access_within_week(request, course_id=0):
     logger.debug(selfSqlString)
     logger.debug("current_user=" + current_user)
 
-    selfDf= pd.read_sql(selfSqlString, conn, params={"current_user":current_user, "course_id": course_id})
+    selfDf= pd.read_sql(selfSqlString, app_engine, params={"current_user":current_user, "course_id": course_id})
     output_df = output_df.join(selfDf.set_index('resource_id_type'), on=['resource_id_type'], how='left')
     output_df["total_percent"] = output_df.apply(lambda row: row[GRADE_A] + row[GRADE_B] + row[GRADE_C] + row[GRADE_LOW] + row.NO_GRADE, axis=1)
 
@@ -447,7 +450,7 @@ def grade_distribution(request, course_id=0):
        (select current_grade from user where sis_name=%(current_user)s and course_id=%(course_id)s) as current_user_grade
        from user where course_id=%(course_id)s and enrollment_type=%(enrollment_type)s
        """
-    df = pd.read_sql(grade_score_sql, conn, params={
+    df = pd.read_sql(grade_score_sql, app_engine, params={
             'current_user': current_user,
             'course_id': course_id,
             'enrollment_type': 'StudentEnrollment'
@@ -662,7 +665,7 @@ def get_course_assignments(course_id):
             (select distinct assignment_id,avg_score from submission where course_id=%(course_id)s) as sub on sub.assignment_id = assign.assignment_id
             """
 
-    assignments_in_course = pd.read_sql(sql,conn,params={'course_id': course_id}, parse_dates={'due_date': '%Y-%m-%d'})
+    assignments_in_course = pd.read_sql(sql, app_engine, params={'course_id': course_id}, parse_dates={'due_date': '%Y-%m-%d'})
     # No assignments found in the course
     if assignments_in_course.empty or (assignments_in_course['assignment_id'] == 0).all():
         logger.info('The course %s don\'t seems to have assignment data' % course_id)
@@ -696,7 +699,7 @@ def get_course_assignments(course_id):
 def get_user_assignment_submission(current_user,assignments_in_course_df, course_id):
     sql = "select assignment_id, submitted_at, score, graded_date from submission where " \
           "user_id=(select user_id from user where sis_name = %(current_user)s and course_id = %(course_id)s ) and course_id = %(course_id)s"
-    assignment_submissions = pd.read_sql(sql, conn, params={'course_id': course_id, "current_user": current_user})
+    assignment_submissions = pd.read_sql(sql, app_engine, params={'course_id': course_id, "current_user": current_user})
     if assignment_submissions.empty:
         logger.info('The user %s seems to be a not student in the course.' % current_user)
         # manually adding the columns for display in UI
@@ -771,7 +774,7 @@ def find_current_week(row):
 
 def is_weight_considered(course_id):
     url = "select consider_weight from assignment_weight_consideration where course_id=%(course_id)s"
-    df = pd.read_sql(url, conn, params={"course_id": course_id})
+    df = pd.read_sql(url, app_engine, params={"course_id": course_id})
     value = df['consider_weight'].iloc[0]
     return value
 
