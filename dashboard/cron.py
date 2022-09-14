@@ -518,8 +518,7 @@ class DashboardCronJob(CronJobBase):
 
         term_sql: str = queries['term']
         logger.debug(term_sql)
-        warehouse_term_df: pd.DataFrame = pd.read_sql(term_sql,
-                                                      data_warehouse_engine)
+        warehouse_term_df: pd.DataFrame = pd.read_sql(term_sql, data_warehouse_engine)
 
         existing_terms_ids: List[int] = [term.id for term in list(AcademicTerms.objects.all())]
         new_term_ids: List[int] = [int(id) for id in warehouse_term_df['id'].to_list() if id not in existing_terms_ids]
