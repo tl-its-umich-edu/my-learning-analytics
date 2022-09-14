@@ -403,7 +403,7 @@ class DashboardCronJob(CronJobBase):
             # First, update resource table
             try:
                 dtype = {'resource_id': types.VARCHAR(255)}
-                pangres.upsert(engine=engine, df=resource_df,
+                pangres.upsert(con=engine, df=resource_df,
                                table_name='resource', if_row_exists='update',
                                create_schema=False, add_new_columns=False,
                                dtype=dtype)
