@@ -2,7 +2,6 @@ from datetime import datetime
 import logging
 from collections import namedtuple
 from typing import Any, Dict, List, Union
-from urllib.parse import quote_plus
 
 import hjson
 import pandas as pd
