@@ -23,14 +23,6 @@ from dashboard.models import Course, Resource, AcademicTerms, User
 
 logger = logging.getLogger(__name__)
 
-db_name = settings.DATABASES['default']['NAME']
-db_user = settings.DATABASES['default']['USER']
-db_password = settings.DATABASES['default']['PASSWORD']
-db_host = settings.DATABASES['default']['HOST']
-db_port = settings.DATABASES['default']['PORT']
-logger.debug("db-name:" + db_name)
-logger.debug("db-user:" + db_user)
-
 engine = db_util.create_sqlalchemy_engine(settings.DATABASES['default'], 'mysql')
 data_warehouse_engine = db_util.create_sqlalchemy_engine(settings.DATABASES['DATA_WAREHOUSE'], 'postgres')
 
