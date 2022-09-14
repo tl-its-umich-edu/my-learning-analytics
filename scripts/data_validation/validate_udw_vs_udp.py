@@ -3,9 +3,7 @@ import logging
 
 import hjson, json
 import pandas as pd
-
-from dashboard.common.db_util import create_sqlalchemy_engine
-
+from sqlalchemy import create_engine
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -42,6 +40,20 @@ def compare_udw_vs_udp_df(udw_query_string, udp_query_string, udw_engine, udp_en
         pd.testing.assert_frame_equal(udw_df, udp_df, check_dtype=False, check_exact=False, rtol=1e-02, atol=1e-03)
     except AssertionError as e:
         logger.error(e)
+
+def get_db_engine(connection_json):
+    db_name = connection_json['NAME']
+    db_user = connection_json['USER']
+    db_password = connection_json['PASSWORD']
+    db_host = connection_json['HOST']
+    db_port = connection_json['PORT']
+    db_engine = create_engine("postgresql://{user}:{password}@{host}:{port}/{db}"
+                              .format(db=db_name,
+                                      user=db_user,
+                                      password=db_password,
+                                      host=db_host,
+                                      port=db_port))
+    return db_engine
 
 
 def get_env_file(env_file_name, json_or_hjson):
@@ -80,8 +92,8 @@ def main():
     ENV_VALIDATION = get_env_file(
         os.path.join(os.path.dirname(os.path.abspath('__file__')), 'scripts/data_validation/env_validation.hjson'), 'hjson')
 
-    udw_engine = create_sqlalchemy_engine(ENV_UDW['DATA_WAREHOUSE'])
-    udp_engine = create_sqlalchemy_engine(ENV_UDP['DATA_WAREHOUSE'])
+    udw_engine = get_db_engine(ENV_UDW['DATA_WAREHOUSE'])
+    udp_engine = get_db_engine(ENV_UDP['DATA_WAREHOUSE'])
 
     DATA_WAREHOUSE_COURSE_IDS = ENV_VALIDATION["DATA_WAREHOUSE_COURSE_IDS"]
 
