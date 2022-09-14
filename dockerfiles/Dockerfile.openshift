@@ -29,7 +29,7 @@ RUN npm prune --production && \
     find node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
 
 # FROM directive instructing base image to build upon
-FROM docker-registry.default.svc:5000/openshift/python:3.8-slim AS app
+FROM docker-registry.default.svc:5000/openshift/python:3.10-slim AS app
 
 # EXPOSE port 5000 to allow communication to/from server
 EXPOSE 5000

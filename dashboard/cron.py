@@ -2,7 +2,6 @@ from datetime import datetime
 import logging
 from collections import namedtuple
 from typing import Any, Dict, List, Union
-from urllib.parse import quote_plus
 
 import hjson
 import pandas as pd
@@ -14,7 +13,7 @@ from django.db import connections as conns, models
 from django.db.models import QuerySet
 from django_cron import CronJobBase, Schedule
 from google.cloud import bigquery
-from sqlalchemy import create_engine, types
+from sqlalchemy import types
 from sqlalchemy.engine import ResultProxy
 
 from dashboard.common import db_util, utils
@@ -23,20 +22,8 @@ from dashboard.models import Course, Resource, AcademicTerms, ResourceAccess
 
 logger = logging.getLogger(__name__)
 
-db_name = settings.DATABASES['default']['NAME']
-db_user = settings.DATABASES['default']['USER']
-db_password = settings.DATABASES['default']['PASSWORD']
-db_host = settings.DATABASES['default']['HOST']
-db_port = settings.DATABASES['default']['PORT']
-logger.debug("db-name:" + db_name)
-logger.debug("db-user:" + db_user)
-
-engine = create_engine("mysql+mysqldb://{user}:{password}@{host}:{port}/{db}?charset=utf8mb4"
-                       .format(db=db_name,  # your mysql database name
-                               user=db_user,  # your mysql user for the database
-                               password=quote_plus(db_password),  # password for user
-                               host=db_host,
-                               port=db_port))
+engine = db_util.create_sqlalchemy_engine(settings.DATABASES['default'])
+data_warehouse_engine = db_util.create_sqlalchemy_engine(settings.DATABASES['DATA_WAREHOUSE'])
 
 # Set up queries array from configuration file
 CRON_QUERY_FILE = settings.CRON_QUERY_FILE
@@ -59,7 +46,7 @@ def split_list(a_list: list, size: int = 20):
 
 
 def util_function(data_warehouse_course_id, sql_string, mysql_table, table_identifier=None, param_object=None):
-    df = pd.read_sql(sql_string, conns['DATA_WAREHOUSE'], params=param_object)
+    df = pd.read_sql(sql_string, data_warehouse_engine, params=param_object)
     logger.debug(df)
 
     # Sql returns boolean value so grouping course info along with it so that this could be stored in the DB table.
@@ -149,7 +136,7 @@ class DashboardCronJob(CronJobBase):
             course_sql = queries['course'].format(course_id=course_id)
             logger.debug(course_sql)
 
-            course_df = pd.read_sql(course_sql, conns['DATA_WAREHOUSE'])
+            course_df = pd.read_sql(course_sql, data_warehouse_engine)
             logger.debug(course_df)
 
             # error out when course id is invalid, otherwise add DataFrame to list
@@ -227,7 +214,7 @@ class DashboardCronJob(CronJobBase):
         course_ids = list(map(str, self.valid_locked_course_ids))
         file_sql = queries['resource']
         logger.debug(file_sql)
-        df_attach = pd.read_sql(file_sql, conns['DATA_WAREHOUSE'], params={'course_ids': tuple(course_ids)})
+        df_attach = pd.read_sql(file_sql, data_warehouse_engine, params={'course_ids': tuple(course_ids)})
         logger.debug(df_attach)
         # Update these back again based on the dataframe
         # Remove any rows where file_state is not available!
@@ -421,7 +408,7 @@ class DashboardCronJob(CronJobBase):
             # First, update resource table
             try:
                 dtype = {'resource_id': types.VARCHAR(255)}
-                pangres.upsert(engine=engine, df=resource_df,
+                pangres.upsert(con=engine, df=resource_df,
                                table_name='resource', if_row_exists='update',
                                create_schema=False, add_new_columns=False,
                                dtype=dtype)
@@ -540,7 +527,7 @@ class DashboardCronJob(CronJobBase):
 
         term_sql: str = queries['term']
         logger.debug(term_sql)
-        warehouse_term_df: pd.DataFrame = pd.read_sql(term_sql, conns['DATA_WAREHOUSE'])
+        warehouse_term_df: pd.DataFrame = pd.read_sql(term_sql, data_warehouse_engine)
 
         existing_terms_ids: List[int] = [term.id for term in list(AcademicTerms.objects.all())]
         new_term_ids: List[int] = [int(id) for id in warehouse_term_df['id'].to_list() if id not in existing_terms_ids]

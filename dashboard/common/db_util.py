@@ -1,18 +1,43 @@
 # Some utility functions used by other classes in this project
 import logging
 from datetime import datetime
-from typing import Dict, List, TypedDict, Union
+from typing import Dict, List, Literal, TypedDict, Union
+from urllib.parse import quote_plus
 
-from dateutil.parser import parse
 import django
+from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
+from dateutil.parser import parse
 from django.conf import settings
+from django.contrib.auth.models import User as DjangoUser
 from django_cron.models import CronJobLog
 
 from dashboard.models import Course, User
 
-from django.contrib.auth.models import User as DjangoUser
 
 logger = logging.getLogger(__name__)
+
+BACKENDS_PATH = 'django.db.backends.'
+
+
+class DjangoDBParams(TypedDict):
+    ENGINE: Literal['django.db.backends.mysql', 'django.db.backends.postgresql']
+    NAME: str
+    USER: str
+    PASSWORD: str
+    HOST: str
+    PORT: int
+
+
+def create_sqlalchemy_engine(db_params: DjangoDBParams) -> Engine:
+    new_db_params: DjangoDBParams = db_params.copy()
+    new_db_params['PASSWORD'] = quote_plus(db_params['PASSWORD'])
+
+    core_string = '{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}'.format(**new_db_params)
+    if new_db_params['ENGINE'] == (BACKENDS_PATH + 'mysql'):
+        return create_engine(f'mysql+mysqldb://{core_string}?charset=utf8mb4')
+    else:
+        return create_engine('postgresql://' + core_string)
 
 
 def canvas_id_to_incremented_id(canvas_id):
