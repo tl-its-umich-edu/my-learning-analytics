@@ -43,8 +43,6 @@ RESOURCE_TYPE_STRING = "resource_type"
 
 BinningGrade = namedtuple('BinningGrade', ['value', 'index', 'binning_all'])
 
-db_params = settings.DATABASES['default']
-
 app_engine = create_sqlalchemy_engine(settings.DATABASES['default'], 'mysql')
 
 
