@@ -80,8 +80,8 @@ def main():
     ENV_VALIDATION = get_env_file(
         os.path.join(os.path.dirname(os.path.abspath('__file__')), 'scripts/data_validation/env_validation.hjson'), 'hjson')
 
-    udw_engine = create_sqlalchemy_engine(ENV_UDW['DATA_WAREHOUSE'], 'postgres')
-    udp_engine = create_sqlalchemy_engine(ENV_UDP['DATA_WAREHOUSE'], 'postgres')
+    udw_engine = create_sqlalchemy_engine(ENV_UDW['DATA_WAREHOUSE'])
+    udp_engine = create_sqlalchemy_engine(ENV_UDP['DATA_WAREHOUSE'])
 
     DATA_WAREHOUSE_COURSE_IDS = ENV_VALIDATION["DATA_WAREHOUSE_COURSE_IDS"]
 

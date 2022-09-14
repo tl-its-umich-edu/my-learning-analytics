@@ -22,8 +22,8 @@ from dashboard.models import Course, Resource, AcademicTerms, User
 
 logger = logging.getLogger(__name__)
 
-engine = db_util.create_sqlalchemy_engine(settings.DATABASES['default'], 'mysql')
-data_warehouse_engine = db_util.create_sqlalchemy_engine(settings.DATABASES['DATA_WAREHOUSE'], 'postgres')
+engine = db_util.create_sqlalchemy_engine(settings.DATABASES['default'])
+data_warehouse_engine = db_util.create_sqlalchemy_engine(settings.DATABASES['DATA_WAREHOUSE'])
 
 # Set up queries array from configuration file
 CRON_QUERY_FILE = settings.CRON_QUERY_FILE

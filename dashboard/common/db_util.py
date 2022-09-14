@@ -14,10 +14,14 @@ from django_cron.models import CronJobLog
 
 from dashboard.models import Course, User
 
+
 logger = logging.getLogger(__name__)
 
+BACKENDS_PATH = 'django.db.backends.'
 
-class DBParams(TypedDict):
+
+class DjangoDBParams(TypedDict):
+    ENGINE: Literal['django.db.backends.mysql', 'django.db.backends.postgresql']
     NAME: str
     USER: str
     PASSWORD: str
@@ -25,12 +29,12 @@ class DBParams(TypedDict):
     PORT: int
 
 
-def create_sqlalchemy_engine(db_params: DBParams, type: Literal['mysql', 'postgres']) -> Engine:
-    new_db_params: DBParams = db_params.copy()
+def create_sqlalchemy_engine(db_params: DjangoDBParams) -> Engine:
+    new_db_params: DjangoDBParams = db_params.copy()
     new_db_params['PASSWORD'] = quote_plus(db_params['PASSWORD'])
 
     core_string = '{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}'.format(**new_db_params)
-    if type == 'mysql':
+    if new_db_params['ENGINE'] == (BACKENDS_PATH + 'mysql'):
         return create_engine(f'mysql+mysqldb://{core_string}?charset=utf8mb4')
     else:
         return create_engine('postgresql://' + core_string)

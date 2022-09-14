@@ -43,7 +43,7 @@ RESOURCE_TYPE_STRING = "resource_type"
 
 BinningGrade = namedtuple('BinningGrade', ['value', 'index', 'binning_all'])
 
-app_engine = create_sqlalchemy_engine(settings.DATABASES['default'], 'mysql')
+app_engine = create_sqlalchemy_engine(settings.DATABASES['default'])
 
 
 def gpa_map(grade):
