@@ -244,15 +244,7 @@
                 lar.response_date as submitted_at,
                 lar.graded_date as graded_at,
                 lar.posted_at at time zone 'America/Detroit' as grade_posted_local_date,
-                (   
-                    case 
-                        when ( lar.grade_state = 'human_graded' or lar.grade_state = 'auto_graded')
-                        then 
-                            'graded'
-                        else
-                            null
-                        end
-                ) as submission_workflow_state,
+                lar.grading_status as submission_workflow_state,
                 cae.assignment_title as title,
                 lar.learner_activity_result_id as learner_activity_result_id,
                 cae.short_user_id as short_user_id
