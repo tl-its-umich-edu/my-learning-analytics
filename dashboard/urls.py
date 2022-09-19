@@ -83,6 +83,7 @@ if settings.ENABLE_LTI:
     urlpatterns += (
         path('lti/login/', lti_new.login, name='lti_login'),
         path('lti/launch/', lti_new.launch, name='lti_launch'),
+        path('lti/jwks/', lti_new.get_jwks, name='lti_get_jwks'),
         path('lti/config/', lti_new.generate_config_json,
              name=lti_new.generate_config_json.__name__),
     )
