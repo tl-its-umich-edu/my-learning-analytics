@@ -456,9 +456,9 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     const name = d.split('|')[1]
     const resourceDataIndex = resourceData.filter(rd => rd.resource_name === d)[0].index
     const a = d3.select(this.parentNode).append('a')
-      .attr('xlink:title', name)
+      .attr('title', name)
       .attr('target', '_blank')
-      .attr('xlink:href', link)
+      .attr('href', link)
       .attr('text-anchor', 'start')
       .attr('tabindex', resourceDataIndex * 10)
     a.node().appendChild(this)
