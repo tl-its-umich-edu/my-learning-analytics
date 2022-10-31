@@ -40,7 +40,7 @@ WORKDIR /code
 COPY requirements.txt .
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    build-essential default-libmysqlclient-dev libpq-dev netcat jq python3-dev xmlsec1 cron git && \
+    build-essential libpq-dev netcat jq python3-dev xmlsec1 cron git && \
     apt-get upgrade -y && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*

@@ -21,7 +21,7 @@ BACKENDS_PATH = 'django.db.backends.'
 
 
 class DjangoDBParams(TypedDict):
-    ENGINE: Literal['django.db.backends.mysql', 'django.db.backends.postgresql']
+    ENGINE: Literal['mysql.connector.django', 'django.db.backends.postgresql']
     NAME: str
     USER: str
     PASSWORD: str

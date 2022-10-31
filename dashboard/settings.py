@@ -221,7 +221,7 @@ WSGI_APPLICATION = 'dashboard.wsgi.application'
 DATABASES = {
     'default': {
         **{
-            'ENGINE': 'django.db.backends.mysql',
+            'ENGINE': 'mysql.connector.django',
             'NAME': 'student_dashboard',
             'USER': 'student_dashboard_user',
             'PASSWORD': 'student_dashboard_password',
