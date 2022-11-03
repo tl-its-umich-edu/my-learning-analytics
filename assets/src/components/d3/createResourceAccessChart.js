@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
 import { createResourcesText } from './d3ViewsNarrative'
-import d3tip from 'd3-tip'
+import { tip as d3tip } from 'd3-v6-tip'
 import './createResourceAccessChart.css'
 import { siteTheme } from '../../globals'
 
@@ -31,9 +31,10 @@ const resourceToolTipText = (resource) => {
   }
 }
 
-const toolTip = d3tip().attr('class', 'd3-tip')
+const tip = d3tip()
+const toolTip = tip.attr('class', 'd3-tip')
   .direction('n').offset([-5, 5])
-  .html(d => {
+  .html((event, d) => {
     return resourceToolTipText(d)
   })
 
@@ -230,7 +231,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     bar.exit().remove()
   }
 
-  function scroll () {
+  function scroll (event) {
     // Mouse scroll on the chart
     const selection = d3.brushSelection(gBrush.node())
     const size = selection[1] - selection[0]
@@ -239,7 +240,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     const y1 = d3.max(range) + miniYScale.bandwidth()
     // eslint-disable-next-line no-undef
     const direction = event.webkitDirectionInvertedFromDevice
-    let dy = -d3.event.deltaY
+    let dy = -event.deltaY
     if (direction < 0) {
       dy *= -1
     }
@@ -250,17 +251,17 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
         : selection[0] - dy
 
     // Make sure the page doesnt scroll
-    d3.event.stopPropagation()
+    event.stopPropagation()
     // Move the brush
     gBrush.call(brush.move, [topSection, topSection + size])
   }
 
-  function brushmove () {
+  function brushmove (event) {
     const fullRange = mainYZoom.range()
-    const selection = d3.event
-      ? d3.event.selection[1] === 0 // prevents [0, 0] from being returned, which causes bug
-        ? [0, 0.1]
-        : d3.event.selection
+    const selection = event
+      ? event.selection[1] === 0 // prevents [0, 0] from being returned, which causes bug
+          ? [0, 0.1]
+          : event.selection
       : defaultSelection
 
     // Update the axes
@@ -306,16 +307,16 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     update()
   }
 
-  function brushcenter () {
-    const target = d3.event.target
+  function brushcenter (event) {
+    const target = event.target
     const selection = d3.brushSelection(gBrush.node())
     const size = selection[1] - selection[0]
     const range = miniYScale.range()
     const y0 = d3.min(range) + size / 2
     const y1 = d3.max(range) + miniYScale.bandwidth() - size / 2
-    const center = Math.max(y0, Math.min(y1, d3.mouse(target)[1]))
+    const center = Math.max(y0, Math.min(y1, d3.pointer(target)[1]))
 
-    d3.event.stopPropagation()
+    event.stopPropagation()
     gBrush.call(brush.move, [center - size / 2, center + size / 2])
   }
 

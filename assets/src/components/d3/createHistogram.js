@@ -28,7 +28,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     .domain([0, maxGrade]).nice()
     .range([margin.left, aWidth - margin.right])
 
-  const bins = d3.histogram()
+  const bins = d3.bin()
     .domain(x.domain())
     .thresholds(x.ticks(40))(data)
 
