@@ -165,7 +165,7 @@
             )
             select 
                 f.id, 
-                f.assignment_id, 
+                cast(f.assignment_id as bigint),
                 f.course_id, 
                 cast(f.user_id as bigint), 
                 f.score, 
