@@ -4,8 +4,7 @@ import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 import { tip as d3tip } from 'd3-v6-tip'
 
-export const AssignmentPlanningTooltip = classes => d3tip().html((event, d) => {
-  return renderToString(
+export const AssignmentPlanningTooltip = classes => d3tip().html((event, d) => { return renderToString(
   <Paper className={classes.paper}>
     <Typography>
       Assignment: <strong>{d.name}</strong><br />

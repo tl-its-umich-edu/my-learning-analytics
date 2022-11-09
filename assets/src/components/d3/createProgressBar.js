@@ -47,7 +47,7 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
   }
 
   bar.append('rect')
-    .attr('width', d => x(d.percent_gotten) - margin.left)
+    .attr('width', d => d.percent_gotten === null ? 0 : (x(d.percent_gotten) - margin.left))
     .attr('x', (_, i) => x(calculatePercentSoFar(i)))
     .attr('height', y.bandwidth())
     .attr('y', margin.top)

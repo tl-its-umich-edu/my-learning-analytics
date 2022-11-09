@@ -260,8 +260,8 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     const fullRange = mainYZoom.range()
     const selection = event
       ? event.selection[1] === 0 // prevents [0, 0] from being returned, which causes bug
-          ? [0, 0.1]
-          : event.selection
+        ? [0, 0.1]
+        : event.selection
       : defaultSelection
 
     // Update the axes
