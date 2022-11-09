@@ -38,5 +38,5 @@ debugpy==1.4.1
 jsonschema==3.2.0
 pinax-eventlog==5.1.1
 pycryptodome==3.10.1
-PyLTI1p3==1.9.1
+PyLTI1p3==1.12.1
 hjson==3.0.1
