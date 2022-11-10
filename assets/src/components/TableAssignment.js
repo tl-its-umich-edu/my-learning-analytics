@@ -1,7 +1,6 @@
 // modified from https://demos.creative-tim.com/material-dashboard-react/?_ga=2.12819711.913135977.1549993496-494583875.1549993496#/table
 
 import React, { useRef, useEffect } from 'react'
-import RootRef from '@material-ui/core/RootRef'
 import withStyles from '@material-ui/core/styles/withStyles'
 import Table from '@material-ui/core/Table'
 import TableHead from '@material-ui/core/TableHead'
@@ -9,9 +8,9 @@ import TableRow from '@material-ui/core/TableRow'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import HorizontalBar from '../components/HorizontalBar'
-import createToolTip from '../util/createToolTip'
 import { renderToString } from 'react-dom/server'
 import Paper from '@material-ui/core/Paper'
+import { tip as d3tip } from 'd3-v6-tip'
 import Typography from '@material-ui/core/Typography'
 
 const tableStyle = theme => ({
@@ -98,7 +97,7 @@ function CustomAssignmentTable (props) {
           data={[{ label: 'grade', data: percentOfFinalGrade, graded, submitted, pointsPossible, score, dropLowest, dropHighest }]}
           width={200}
           height={20}
-          tip={createToolTip(d =>
+          tip={d3tip().html((event, d) =>
             renderToString(
               <Paper className={classes.paper}>
                 <Typography component='p'>Score: {toolTipContent(d)}</Typography>

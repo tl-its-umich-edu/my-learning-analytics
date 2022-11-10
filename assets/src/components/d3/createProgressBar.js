@@ -47,7 +47,7 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
   }
 
   bar.append('rect')
-    .attr('width', d => x(d.percent_gotten) - margin.left)
+    .attr('width', d => d.percent_gotten === null ? 0 : (x(d.percent_gotten) - margin.left))
     .attr('x', (_, i) => x(calculatePercentSoFar(i)))
     .attr('height', y.bandwidth())
     .attr('y', margin.top)
@@ -56,8 +56,8 @@ function createProgressBar ({ data, width, height, domElement, tip }) {
     .style('outline-color', 'rgb(255, 255, 255)')
     .style('outline-style', 'solid')
     .style('outline-width', '1px')
-    .on('mouseover', function () {
-      const x = d3.mouse(this)[0]
+    .on('mouseover', function (event) {
+      const x = d3.pointer(event)[0]
       const percentVariation = ((aWidth - x) / aWidth) * 100
       if (percentVariation < 7) {
         tipPosition('sw')
