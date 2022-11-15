@@ -25,7 +25,7 @@
         left join entity.course_section cs
             on cse.course_section_id = cs.course_section_id
         left join keymap.course_offering co
-            on cs.course_offering_id = co.id
+            on cs.le_current_course_offering_id = co.id
         left join entity.person p
             on cse.person_id = p.person_id
         left join keymap.person p2
@@ -38,6 +38,7 @@
             co.lms_int_id in %(course_ids)s
             and cse.role in ('Student', 'TeachingAssistant', 'Teacher')
             and cse.role_status = 'Enrolled'
+            and cse.enrollment_status = 'Active'
         order by user_id
         ''',
     "assignment_groups": 
@@ -202,75 +203,58 @@
         ''',
     "submission":
         '''
-        with course_assignment as
+        with enrollment as
         (
             select
-                la.learner_activity_id as short_assignment_id,
-                la2.lms_int_id as assignment_id,
-                cast(co.lms_int_id as BIGINT) as course_id,
-                la.title as assignment_title
-            from 
-                entity.learner_activity la
-                left join keymap.learner_activity la2 on la.learner_activity_id = la2.id 
-                left join keymap.course_offering co on co.id = la.course_offering_id
-            where 
-                co.lms_int_id in %(course_ids)s
-                and la.status = 'published'
-        ),
-        enrollment as
-        (
-            select
-                distinct cse.person_id as short_user_id
+                distinct cse.person_id as user_id
             from entity.course_section_enrollment cse 
-                left join entity.course_section cs on cse.course_section_id = cs.course_section_id 
-                left join keymap.course_offering co on cs.course_offering_id = co.id
+                left join entity.course_section cs
+                    on cse.course_section_id = cs.course_section_id
+                left join keymap.course_offering co
+                    on cs.le_current_course_offering_id = co.id
             where 
                 co.lms_int_id in %(course_ids)s
                 and cse.role_status ='Enrolled' 
                 and cse."role" = 'Student'
+                and cse.enrollment_status = 'Active'
         ),
-        course_assignment_enrollment as
-        (
-            select *
-            from
-            course_assignment cross join enrollment
-        ),
-        course_assignment_submission_sub as
+        submission as
         (
             select
-                cae.assignment_id as assignment_id,
-                cae.course_id as course_id,
+                la.status,
+                la.visibility,
+                la2.lms_int_id as assignment_id,
+                cast(co.lms_int_id as BIGINT) as course_id,
+                la.title as assignment_title,
                 lar.published_score as published_score,
                 lar.response_date as submitted_at,
                 lar.graded_date as graded_at,
                 lar.posted_at at time zone 'America/Detroit' as grade_posted_local_date,
                 lar.grading_status as submission_workflow_state,
-                cae.assignment_title as title,
+                la.title as title,
                 lar.learner_activity_result_id as learner_activity_result_id,
-                cae.short_user_id as short_user_id
-            from
-                course_assignment_enrollment cae
-                left join entity.learner_activity_result lar on (cae.short_assignment_id = lar.learner_activity_id and cae.short_user_id = lar.person_id)
-        ),
-        course_assignment_submission as
-        (
-            select
+                lar.person_id as short_user_id,
                 cast(lar2.lms_int_id as BIGINT) as submission_id,
-                (cast(%(canvas_data_id_increment)s as bigint) + cast(p.lms_ext_id as bigint)) as user_id,
-                cass.*
-            from
-                course_assignment_submission_sub cass
-                join keymap.learner_activity_result lar2 on cass.learner_activity_result_id  = lar2.id
-                join keymap.person p on p.id = cass.short_user_id
-            order by assignment_id, user_id
-        ),
+                (cast(%(canvas_data_id_increment)s as bigint) + cast(p.lms_ext_id as bigint)) as canvas_user_id
+            from entity.learner_activity_result lar
+            join enrollment on lar.person_id= enrollment.user_id
+            join enrollment e on lar.person_id = e.user_id
+            join keymap.learner_activity_result lar2 on lar.learner_activity_result_id = lar2.id
+            left join entity.learner_activity la on lar.learner_activity_id = la.learner_activity_id
+                left join keymap.learner_activity la2 on la.learner_activity_id = la2.id
+                left join keymap.course_offering co on co.id = la.course_offering_id
+                join keymap.person p on p.id = lar.person_id
+            where
+                co.lms_int_id in %(course_ids)s
+                and la.status = 'published'
+		),
         all_assign_sub as 
         (
             select
                 cast(submission_id as BIGINT) AS id, 
                 assignment_id AS assignment_id, 
                 course_id, 
-                user_id, 
+                canvas_user_id,
                 (
                     case 
                         when 
@@ -285,17 +269,17 @@
                 graded_at AS graded_date, 
                 grade_posted_local_date 
             from 
-                course_assignment_submission 
+                submission
             order by assignment_id
         )
         select 
-            f.id::bigint, 
-            f.assignment_id::bigint, 
-            f.course_id, 
-            f.user_id, 
-            f.score::float, 
-            f.submitted_at, 
-            f.graded_date, 
+            f.id::bigint,
+            f.assignment_id::bigint assignment_id,
+            f.course_id,
+            f.canvas_user_id::bigint as user_id,
+            f.score::float,
+            f.submitted_at,
+            f.graded_date,
             f.grade_posted_local_date,
             cast(f1.avg_score as float) as avg_score
         from 
