@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   mysql:
-    image: mysql:5.7.22
+    image: mysql:8.0
     restart: on-failure
     environment:
       - MYSQL_HOST=${MYSQL_HOST}
