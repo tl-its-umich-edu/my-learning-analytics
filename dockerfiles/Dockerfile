@@ -49,7 +49,7 @@ RUN curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | bash && \
     apt install -y --no-install-recommends libmariadb-dev
 
 # Clean up anything we don't need anymore
-RUN apt-get purge -y curl libcurl4 libcurl3-gnutls && \
+RUN apt-get purge -y curl libcurl4 && \
     apt autoremove -y && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
