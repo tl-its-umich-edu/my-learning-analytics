@@ -74,7 +74,10 @@ RUN bash -l -c 'GIT_REPO="$(git config --local remote.origin.url)"; \
 RUN apt-get purge -y git curl libcurl4 libcurl3-gnutls && \
     apt autoremove -y && \
     apt-get clean -y && \
-    rm -rf /var/lib/apt/lists/* .git
+    rm -rf /var/lib/apt/lists/*
+
+# TODO: May want to remove the .git directory but don't do it in this file only Dockerfile.openshift
+# Removing it here will remove it from the linked directory which isn't good
 
 RUN python manage.py collectstatic --verbosity 0 --noinput
 
