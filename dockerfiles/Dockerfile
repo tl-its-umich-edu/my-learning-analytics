@@ -40,8 +40,17 @@ WORKDIR /code
 COPY requirements.txt .
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    build-essential default-libmysqlclient-dev libpq-dev netcat jq python3-dev xmlsec1 cron git && \
-    apt-get upgrade -y && \
+        build-essential curl apt-transport-https libpq-dev netcat jq python3-dev xmlsec1 cron git && \
+    apt-get upgrade -y
+
+# Install MariaDB from the mariadb repository rather than using Debians 
+# https://mariadb.com/kb/en/mariadb-package-repository-setup-and-usage/
+RUN curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | bash && \
+    apt install -y --no-install-recommends libmariadb-dev
+
+# Clean up anything we don't need anymore
+RUN apt-get purge -y curl libcurl4 libcurl3-gnutls && \
+    apt autoremove -y && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
 
