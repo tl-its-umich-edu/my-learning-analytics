@@ -170,3 +170,5 @@ docker exec -it student_dashboard_mysql mysql_upgrade \
 
 When prompted, specify the password for the root MySQL user.
 It should be found in the `MYSQL.ROOT_PASSWORD` property of `env.hjson`.
+
+[Next: Contributors](../docs/CONTRIBUTORS.md)
