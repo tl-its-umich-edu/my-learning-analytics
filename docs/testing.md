@@ -73,4 +73,4 @@ Please adjust those values based on your institution's needs.
             "python scripts/data_validation/validate_udw_vs_udp.py"
         ```
 
-[Next: Testing](../docs/testing.md)
+[Next: Contributing](../docs/CONTRIBUTING.md)
