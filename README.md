@@ -7,9 +7,9 @@ My Learning Analytics (MyLA) is a [learning analytics](https://en.wikipedia.org/
 designed for students to view their own learning data generated in the
 [Canvas Learning Management System](https://www.instructure.com/canvas/?newhome=canvas).
 It currently has three views
-([Resources Accessed](https://sites.google.com/umich.edu/my-learning-analytics-help/home/resources-accessed),
-[Assignment Planning](https://sites.google.com/umich.edu/my-learning-analytics-help/home/assignment-planning), and
-[Grade Distribution](https://sites.google.com/umich.edu/my-learning-analytics-help/home/grade-distribution)),
+([Resources Accessed](https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/resources-accessed),
+[Assignment Planning](https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/assignment-planning-goals), and
+[Grade Distribution](https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/grade-distribution)),
 with more views planned in the future.
 
 ## Contents
