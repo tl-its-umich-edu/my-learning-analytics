@@ -124,3 +124,5 @@ to enter the desired HTML or basic string under "Content", and to click the avai
 ### Additional Resources
 [Video guide](https://www.youtube.com/watch?v=CSQmQtLe594&feature=youtu.be)
 to setting up courses in the My Learning Analytics admin tool.
+
+[Next: Loading Data](../docs/loading_data.md)
