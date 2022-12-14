@@ -30,3 +30,5 @@ For `CRONTAB_SCHEDULE`, `django-cron` recommends running `python manage.py runcr
 which is the default (`*/5 * * * *`) in `env.hjson`.
 `RUN_AT_TIMES` sets when the job will actually kick off.
 See [`start.sh`](../start.sh) and `cron.py` to see the logic.
+
+[Next: Accessibility](../docs/accessibility.md)
