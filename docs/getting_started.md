@@ -121,3 +121,5 @@ or navigate to http://localhost:5001/admin.
 
 1. The course(s) the student with the selected `sis_name` are enrolled in will be displayed.
 Click on a course to view as the student selected in step 3.
+
+[Next: Configuration](../docs/configuration.md)
