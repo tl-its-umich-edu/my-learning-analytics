@@ -206,6 +206,7 @@
         ''',
     "submission":
         '''
+        create temporary table all_assign_sub as (
         with enrollment as
         (
             select
@@ -250,9 +251,7 @@
             where
                 co.lms_int_id in %(course_ids)s
                 and la.status = 'published'
-		),
-        all_assign_sub as 
-        (
+		)
             select
                 cast(submission_id as BIGINT) AS id, 
                 assignment_id AS assignment_id, 
@@ -271,10 +270,9 @@
                 submitted_at AS submitted_at, 
                 graded_at AS graded_date, 
                 grade_posted_local_date 
-            from 
-                submission
-            order by assignment_id
-        )
+        from 
+            submission
+        );
         select 
             f.id::bigint,
             f.assignment_id::bigint assignment_id,
@@ -297,6 +295,6 @@
             ) as f1 
             on f.assignment_id = f1.assignment_id
         where f.id is not null
-        order by assignment_id, user_id
+        order by assignment_id, user_id;
         '''
 }
