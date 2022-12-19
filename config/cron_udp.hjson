@@ -295,6 +295,6 @@
             ) as f1 
             on f.assignment_id = f1.assignment_id
         where f.id is not null
-        order by assignment_id, user_id;
+        order by assignment_id, user_id
         '''
 }
