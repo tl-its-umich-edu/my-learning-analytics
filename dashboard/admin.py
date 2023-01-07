@@ -94,7 +94,7 @@ class CourseAdmin(admin.ModelAdmin):
     def course_link(self, obj):
         return format_html('<a href="{}">Link</a>', obj.absolute_url)
 
-    def change_view(self, request, object_id, extra_content=None):
+    def change_view(self, request, object_id, form_url='', extra_content=None):
         self.readonly_fields = self.readonly_fields + ('canvas_id',)
         return super(CourseAdmin, self).change_view(request, object_id)
 
