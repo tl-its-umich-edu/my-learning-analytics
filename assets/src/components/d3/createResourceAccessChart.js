@@ -201,7 +201,9 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
         ? accessedResourceColor
         : notAccessedResourceColor
       )
+      .on('focus', toolTip.show)
       .on('mouseover', toolTip.show)
+      .on('blur', toolTip.hide)
       .on('mouseout', toolTip.hide)
       .append('foreignObject')
       .append('div')
