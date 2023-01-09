@@ -308,13 +308,12 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
   }
 
   function brushcenter (event) {
-    const target = event.target
     const selection = d3.brushSelection(gBrush.node())
     const size = selection[1] - selection[0]
     const range = miniYScale.range()
     const y0 = d3.min(range) + size / 2
     const y1 = d3.max(range) + miniYScale.bandwidth() - size / 2
-    const center = Math.max(y0, Math.min(y1, d3.pointer(target)[1]))
+    const center = Math.max(y0, Math.min(y1, d3.pointer(event)[1]))
 
     event.stopPropagation()
     gBrush.call(brush.move, [center - size / 2, center + size / 2])
