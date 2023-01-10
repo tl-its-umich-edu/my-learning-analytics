@@ -70,6 +70,7 @@ class TermAdmin(admin.ModelAdmin):
 class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseViewOptionInline, ]
     form = CourseForm
+    fields = ('canvas_id', 'name', 'term', 'date_start', 'date_end', 'show_grade_counts', 'show_grade_type', 'data_last_updated')
     list_display = ('canvas_id', 'name', 'term', 'show_grade_counts', 'course_link', '_courseviewoption', 'data_last_updated')
     list_select_related = True
     readonly_fields = ('term', 'data_last_updated',)
@@ -92,6 +93,10 @@ class CourseAdmin(admin.ModelAdmin):
 
     def course_link(self, obj):
         return format_html('<a href="{}">Link</a>', obj.absolute_url)
+
+    def change_view(self, request, object_id, form_url='', extra_content=None):
+        self.readonly_fields = self.readonly_fields + ('canvas_id',)
+        return super(CourseAdmin, self).change_view(request, object_id)
 
     # When saving the course, update the id based on canvas id
     def save_model(self, request, obj, form, change):
