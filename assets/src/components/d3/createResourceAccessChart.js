@@ -192,7 +192,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
 
     bar.enter()
       .append('rect')
-      .attr('tabindex', d => d.index * 10 + 1)
+      .attr('tabindex', 0)
       .attr('y', d => mainYScale(d.resource_name))
       .attr('width', d => mainXScale(d.total_percent))
       .attr('height', mainYScale.bandwidth())
@@ -415,7 +415,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     .text('Percentage of All Students in the Selected Grade Range')
     .style('font-size', '14px')
 
-  mainGroup.append('g')
+  mainGroup.insert('g', ':first-child')
     .attr('class', 'axis--y black-axis-line')
     .attr('transform', 'translate(0,0)')
     .call(mainYAxis)
@@ -456,13 +456,12 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     // Have to use ES5 function to correctly use `this` keyword
     const link = d.split('|')[0]
     const name = d.split('|')[1]
-    const resourceDataIndex = resourceData.filter(rd => rd.resource_name === d)[0].index
     const a = d3.select(this.parentNode).append('a')
       .attr('title', name)
       .attr('target', '_blank')
       .attr('href', link)
       .attr('text-anchor', 'start')
-      .attr('tabindex', resourceDataIndex * 10)
+      .attr('tabindex', 0)
     a.node().appendChild(this)
 
     const icon = d.split('|')[2]
