@@ -201,7 +201,10 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
         ? accessedResourceColor
         : notAccessedResourceColor
       )
-      .on('focus', toolTip.show)
+      .on('focus', (e, d) => {
+        moveBrushOnFocus(e, d.resource_name)
+        toolTip.show(e, d)
+      })
       .on('mouseover', toolTip.show)
       .on('blur', toolTip.hide)
       .on('mouseout', toolTip.hide)
@@ -262,8 +265,8 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     const fullRange = mainYZoom.range()
     const selection = event
       ? event.selection[1] === 0 // prevents [0, 0] from being returned, which causes bug
-        ? [0, 0.1]
-        : event.selection
+          ? [0, 0.1]
+          : event.selection
       : defaultSelection
 
     // Update the axes
@@ -316,9 +319,18 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     const y0 = d3.min(range) + size / 2
     const y1 = d3.max(range) + miniYScale.bandwidth() - size / 2
     const center = Math.max(y0, Math.min(y1, d3.pointer(event)[1]))
-
     event.stopPropagation()
     gBrush.call(brush.move, [center - size / 2, center + size / 2])
+  }
+
+  function moveBrushOnFocus (event, dataKey) {
+    const selection = d3.brushSelection(gBrush.node())
+    const size = selection[1] - selection[0]
+    const miniY = miniYScale(dataKey) + miniYScale.step()
+    const newY = miniY > size ? miniY : size
+    const newSelection = [newY - size, newY]
+    event.stopPropagation()
+    gBrush.call(brush.move, newSelection)
   }
 
   // Main chart group
@@ -452,7 +464,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     .call(truncate, resourceLabelWidth)
 
   // Add links and icons to Y axis
-  d3.selectAll('.axis--y .tick').each(function (d) {
+  d3.selectAll('.axis--y .tick').each(function (d, i) {
     // Have to use ES5 function to correctly use `this` keyword
     const link = d.split('|')[0]
     const name = d.split('|')[1]
@@ -462,6 +474,8 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
       .attr('href', link)
       .attr('text-anchor', 'start')
       .attr('tabindex', 0)
+      .attr('data-index', i)
+      .on('focus', (e) => moveBrushOnFocus(e, d))
     a.node().appendChild(this)
 
     const icon = d.split('|')[2]
