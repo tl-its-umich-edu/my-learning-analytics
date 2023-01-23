@@ -24,7 +24,7 @@ services:
     command: bash -c "./start.sh"
     volumes:
       - .:/code
-      # use the container's node_modules folder (don't override)
+      # Use the container's node_modules and static folder (don't override)
       - /code/node_modules/
       - /code/static/
       - ${HOME}/mylasecrets:/secrets

@@ -43,9 +43,6 @@ RUN apt-get update && \
         build-essential curl apt-transport-https libpq-dev netcat jq python3-dev xmlsec1 cron git && \
     apt-get upgrade -y
 
-
-
-
 # Install MariaDB from the mariadb repository rather than using Debians 
 # https://mariadb.com/kb/en/mariadb-package-repository-setup-and-usage/
 RUN curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | bash && \
@@ -63,21 +60,13 @@ COPY --from=node-prod-deps /usr/src/app/node_modules node_modules
 COPY . .
 
 # Generate git version information
-RUN bash -l -c 'GIT_REPO="$(git config --local remote.origin.url)"; \
-                GIT_COMMIT="$(git rev-parse HEAD)"; \ 
-                GIT_BRANCH="$(git name-rev "$GIT_COMMIT" --name-only)"; \
-                echo "export GIT_REPO=$GIT_REPO" > /etc/git.version; \
-                echo "export GIT_COMMIT=$GIT_COMMIT" >> /etc/git.version; \
-                echo "export GIT_BRANCH=$GIT_BRANCH" >> /etc/git.version'
+RUN /code/scripts/git_version_info.sh
 
 # Clean up anything we don't need anymore
 RUN apt-get purge -y git curl libcurl4 libcurl3-gnutls && \
     apt autoremove -y && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
-
-# TODO: May want to remove the .git directory but don't do it in this file only Dockerfile.openshift
-# Removing it here will remove it from the linked directory which isn't good
 
 RUN python manage.py collectstatic --verbosity 0 --noinput
 
