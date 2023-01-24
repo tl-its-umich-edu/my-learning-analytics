@@ -65,7 +65,6 @@ RUN bash -l -c ./scripts/git_version_info.sh
 RUN apt-get purge -y git curl libcurl4 libcurl3-gnutls && \
     apt autoremove -y && \
     apt-get clean -y && \
-# Clean up the apt files and remove the .git directory from the container
     rm -rf /var/lib/apt/lists/*
 
 RUN python manage.py collectstatic --verbosity 0 --noinput
