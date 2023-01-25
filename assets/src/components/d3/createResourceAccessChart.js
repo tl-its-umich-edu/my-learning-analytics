@@ -474,7 +474,6 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
       .attr('href', link)
       .attr('text-anchor', 'start')
       .attr('tabindex', 0)
-      .attr('data-index', i)
       .on('focus', (e) => moveBrushOnFocus(e, d))
     a.node().appendChild(this)
 
