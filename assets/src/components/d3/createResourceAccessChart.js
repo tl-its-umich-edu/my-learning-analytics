@@ -326,8 +326,18 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
   function moveBrushOnFocus (event, dataKey) {
     const selection = d3.brushSelection(gBrush.node())
     const size = selection[1] - selection[0]
-    const miniY = miniYScale(dataKey) + miniYScale.step()
-    const newY = miniY > size ? miniY : size
+    const miniY = miniYScale(dataKey)
+    const step = miniYScale.step()
+    // Start brush at bar if brush size is less than two steps, otherwise put at the end minus steps
+    const newY = size < (step * 2)
+      ? miniY + size
+      // Use size if size is greater than or equal to bar plus two steps, otherwise use bar plus steps
+      : (miniY + step * 2) <= size
+          ? size
+          // Use two steps after bar if there is space, otherwise use one step
+          : miniY <= miniYScale.range()[1] - step
+            ? miniY + step * 2
+            : miniY + step
     const newSelection = [newY - size, newY]
     event.stopPropagation()
     gBrush.call(brush.move, newSelection)
