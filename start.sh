@@ -6,7 +6,7 @@ shopt -s nocaseglob
 # Load in git version information
 source /etc/git.version
 
-echo "Git tag is $GIT_BRANCH"
+echo "Loaded Git information: ${GIT_REPO} ${GIT_BRANCH} ${GIT_COMMIT}"
 
 if [ -z "${ENV_FILE}" ]; then
     ENV_FILE="/secrets/env.hjson"
