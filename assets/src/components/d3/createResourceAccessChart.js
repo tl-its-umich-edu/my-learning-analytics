@@ -474,7 +474,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     .call(truncate, resourceLabelWidth)
 
   // Add links and icons to Y axis
-  d3.selectAll('.axis--y .tick').each(function (d, i) {
+  d3.selectAll('.axis--y .tick').each(function (d) {
     // Have to use ES5 function to correctly use `this` keyword
     const link = d.split('|')[0]
     const name = d.split('|')[1]
