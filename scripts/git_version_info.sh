@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 # Store the version information from the .git into a file so it can be used later at runtime after removing git
 
 GIT_REPO=$(git config --local remote.origin.url)
