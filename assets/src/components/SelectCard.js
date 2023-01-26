@@ -141,7 +141,7 @@ const SelectCard = props => {
     if (cardData && cardData.image) {
       return (
         <>
-          <Link className={classes.viewLink} tabIndex={-1} to={cardData.path}>
+          <Link className={classes.viewLink} tabIndex={0} to={cardData.path}>
             <CardMedia className={classes.media} image={cardData.image} title={cardData.title} />
           </Link>
         </>
@@ -195,7 +195,7 @@ const SelectCard = props => {
   return (
     <>
       <Card className={classes.card} elevation={2}>
-        <CardActionArea>
+        <CardActionArea tabIndex={-1}>
           {getLinkContents(cardData)}
         </CardActionArea>
         {
