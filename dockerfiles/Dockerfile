@@ -48,12 +48,6 @@ RUN apt-get update && \
 RUN curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | bash && \
     apt install -y --no-install-recommends libmariadb-dev
 
-# Clean up anything we don't need anymore
-RUN apt-get purge -y curl libcurl4 && \
-    apt autoremove -y && \
-    apt-get clean -y && \
-    rm -rf /var/lib/apt/lists/*
-
 RUN pip install --no-cache-dir -r requirements.txt
 
 # copy built react and node libraries for production mode
@@ -64,6 +58,15 @@ COPY --from=node-prod-deps /usr/src/app/node_modules node_modules
 
 # NOTE: project files likely to change between dev builds
 COPY . .
+
+# Generate git version information
+RUN /code/scripts/git_version_info.sh
+
+# Clean up anything we don't need anymore
+RUN apt-get purge -y git curl libcurl4 libcurl3-gnutls && \
+    apt autoremove -y && \
+    apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN python manage.py collectstatic --verbosity 0 --noinput
 
