@@ -17,8 +17,7 @@ import PropTypes from 'prop-types'
 
 const styles = theme => ({
   card: {
-    margin: theme.spacing(3),
-    position: 'relative'
+    margin: theme.spacing(3)
   },
   media: {
     height: 140,
@@ -173,7 +172,7 @@ const SelectCard = props => {
     const cardContent = (
       <CardContent className={classes.content}>
         <Grid container className={classes.titleArea}>
-          <Grid item>
+          <Grid item xs={10}>
             <Typography gutterBottom variant='h5' component='h2' className={classes.title}>
               {cardData.title}
             </Typography>
