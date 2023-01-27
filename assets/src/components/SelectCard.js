@@ -17,7 +17,8 @@ import PropTypes from 'prop-types'
 
 const styles = theme => ({
   card: {
-    margin: theme.spacing(3)
+    margin: theme.spacing(3),
+    position: 'relative'
   },
   media: {
     height: 140,
@@ -52,11 +53,14 @@ const styles = theme => ({
   infoLink: {
     color: 'white'
   },
-  viewLink: {
-    outline: 'none',
-    textDecoration: 'none',
-    color: 'white',
-    height: '100%'
+  help: {
+    position: 'absolute',
+    zIndex: 1,
+    bottom: '21.5%',
+    right: '5%'
+  },
+  mainCardContainer: {
+    position: 'relative'
   },
   wrapper: {
     margin: theme.spacing(1),
@@ -119,7 +123,7 @@ const SelectCard = props => {
     )
   }
 
-  var saveAsync = function (isEnabled) {
+  const saveAsync = function (isEnabled) {
     const payload = Object()
     payload[viewCode] = { enabled: isEnabled }
     const dataURL = `/api/v1/courses/${courseId}/update_info/`
@@ -140,11 +144,7 @@ const SelectCard = props => {
   function getCardImage (cardData) {
     if (cardData && cardData.image) {
       return (
-        <>
-          <Link className={classes.viewLink} tabIndex={0} to={cardData.path}>
-            <CardMedia className={classes.media} image={cardData.image} title={cardData.title} />
-          </Link>
-        </>
+        <CardMedia className={classes.media} image={cardData.image} title={cardData.title} />
       )
     } else {
       return null
@@ -154,13 +154,15 @@ const SelectCard = props => {
   function getHelpLink (cardData) {
     if (cardData.helpUrl) {
       return (
-        <Typography gutterBottom variant='h5' component='p' className={classes.title + ' ' + classes.titleIcon}>
-          <Tooltip title={'About ' + cardData.title}>
-            <MUILink className={classes.infoLink} href={cardData.helpUrl} target='_blank' rel='noopener noreferrer'>
-              <InfoIcon fontSize='large' />
-            </MUILink>
-          </Tooltip>
-        </Typography>
+        <div class={classes.help}>
+          <Typography gutterBottom variant='h5' component='p'>
+            <Tooltip title={'About ' + cardData.title}>
+              <MUILink className={classes.infoLink} href={cardData.helpUrl} target='_blank' rel='noopener noreferrer'>
+                <InfoIcon fontSize='large' />
+              </MUILink>
+            </Tooltip>
+          </Typography>
+        </div>
       )
     }
   }
@@ -171,23 +173,17 @@ const SelectCard = props => {
     const cardContent = (
       <CardContent className={classes.content}>
         <Grid container className={classes.titleArea}>
-          <Grid item xs={10}>
-            <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
-              <Typography gutterBottom variant='h5' component='h2' className={classes.title}>
-                {cardData.title}
-              </Typography>
-            </Link>
-          </Grid>
-          <Grid item xs={2}>
-            {getHelpLink(cardData)}
+          <Grid item>
+            <Typography gutterBottom variant='h5' component='h2' className={classes.title}>
+              {cardData.title}
+            </Typography>
           </Grid>
         </Grid>
-        <Link tabIndex={-1} to={cardData.path} className={classes.viewLink}>
-          <Typography component='p' className={classes.description}>
-            {cardData.description}
-          </Typography>
-        </Link>
-      </CardContent>)
+        <Typography component='p' className={classes.description}>
+          {cardData.description}
+        </Typography>
+      </CardContent>
+    )
 
     return <>{cardImage}{cardContent}</>
   }
@@ -195,9 +191,12 @@ const SelectCard = props => {
   return (
     <>
       <Card className={classes.card} elevation={2}>
-        <CardActionArea tabIndex={-1}>
-          {getLinkContents(cardData)}
-        </CardActionArea>
+        <div class={classes.mainCardContainer}>
+          <CardActionArea component={Link} to={cardData.path}>
+            {getLinkContents(cardData)}
+          </CardActionArea>
+          {getHelpLink(cardData)}
+        </div>
         {
           isTeacherOrAdmin(props.isAdmin, props.enrollmentTypes)
             ? (
@@ -228,7 +227,8 @@ const SelectCard = props => {
                   {enabled ? 'Enabled' : 'Disabled'}
                 </CardActions>
               </>
-            ) : null
+              )
+            : null
         }
       </Card>
 
