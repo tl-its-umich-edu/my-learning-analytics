@@ -44,9 +44,6 @@ const styles = theme => ({
     color: 'black',
     height: '100%'
   },
-  titleIcon: {
-    paddingBottom: '0px'
-  },
   titleLink: {
     color: 'white'
   },
@@ -56,8 +53,8 @@ const styles = theme => ({
   help: {
     position: 'absolute',
     zIndex: 1,
-    bottom: '21.5%',
-    right: '5%'
+    bottom: '21%',
+    right: '5.5%'
   },
   mainCardContainer: {
     position: 'relative'
