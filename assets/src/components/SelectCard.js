@@ -21,7 +21,8 @@ const styles = theme => ({
   },
   media: {
     height: 140,
-    backgroundSize: 'auto'
+    backgroundSize: 'auto',
+    objectFit: 'scale-down'
   },
   content: {
     height: 110,
@@ -143,7 +144,14 @@ const SelectCard = props => {
   function getCardImage (cardData) {
     if (cardData && cardData.image) {
       return (
-        <CardMedia className={classes.media} image={cardData.image} title={cardData.title} />
+        <div>
+          <CardMedia
+            component='img'
+            className={classes.media}
+            src={cardData.image}
+            alt={`Image of ${cardData.title} chart`}
+          />
+        </div>
       )
     } else {
       return null
@@ -151,12 +159,19 @@ const SelectCard = props => {
   }
 
   function getHelpLink (cardData) {
+    const label = 'About ' + cardData.title
     if (cardData.helpUrl) {
       return (
         <div class={classes.help}>
           <Typography gutterBottom variant='h5' component='p'>
-            <Tooltip title={'About ' + cardData.title}>
-              <MUILink className={classes.infoLink} href={cardData.helpUrl} target='_blank' rel='noopener noreferrer'>
+            <Tooltip title={label}>
+              <MUILink
+                className={classes.infoLink}
+                href={cardData.helpUrl}
+                target='_blank'
+                rel='noopener noreferrer'
+                aria-label={label}
+              >
                 <InfoIcon fontSize='large' />
               </MUILink>
             </Tooltip>
