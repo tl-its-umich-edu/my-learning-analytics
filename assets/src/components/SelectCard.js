@@ -221,7 +221,7 @@ const SelectCard = props => {
                     <div className={classes.wrapper}>
                       <Fab
                         size='small'
-                        aria-label='save'
+                        aria-label={`Enable ${cardData.title} view`}
                         color='primary'
                         className={buttonClassname}
                         onClick={() => { save(!enabled) }}
