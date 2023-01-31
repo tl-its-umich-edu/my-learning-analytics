@@ -115,7 +115,7 @@ class DashboardCronJob(CronJobBase):
     def __init__(self) -> None:
         """Constructor to be used to declare valid_locked_course_ids instance variable."""
         super().__init__()
-        self.valid_locked_course_ids: List[int]
+        self.valid_locked_course_ids: List[str]
 
     # verify whether course ids are valid
     def verify_course_ids(self):
@@ -447,7 +447,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         status += util_function(queries['assignment_groups'],
                                 'assignment_groups',
-                                {'course_ids':tuple(self.valid_locked_course_ids)})
+                                {'course_ids': tuple(self.valid_locked_course_ids)})
 
         return status
 
@@ -463,7 +463,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         status += util_function(queries['assignment'],
                                 'assignment',
-                                {'course_ids':tuple(self.valid_locked_course_ids)})
+                                {'course_ids': tuple(self.valid_locked_course_ids)})
 
         return status
 
@@ -482,7 +482,7 @@ class DashboardCronJob(CronJobBase):
         status += util_function(queries['submission'],
                                 'submission',
                                 {
-                                    'course_ids':tuple(self.valid_locked_course_ids),
+                                    'course_ids': tuple(self.valid_locked_course_ids),
                                     'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT
                                 })
 
@@ -501,7 +501,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         status += util_function(queries['assignment_weight'],
                                 'assignment_weight_consideration',
-                                {'course_ids':tuple(self.valid_locked_course_ids)},
+                                {'course_ids': tuple(self.valid_locked_course_ids)},
                                 'weight')
 
         logger.debug(status + "\n\n")
@@ -581,7 +581,7 @@ class DashboardCronJob(CronJobBase):
                 status += f'Course {course.id}: updated {", ".join(updated_fields)}\n'
         return status
 
-    def do(self):
+    def do(self) -> str:
         logger.info("** MyLA cron tab")
 
         status = ""
@@ -595,7 +595,7 @@ class DashboardCronJob(CronJobBase):
             status += f"ERROR: Those course ids are invalid: {invalid_course_id_list}\n"
             status += "End cron: " + str(datetime.now()) + "\n"
             logger.info("************ total status=" + status + "/n/n")
-            return (status,)
+            return status
 
         # Lock in valid course IDs that data will be pulled for.
         self.valid_locked_course_ids = [str(x) for x in course_verification.course_data['id'].to_list()]
@@ -639,12 +639,14 @@ class DashboardCronJob(CronJobBase):
             logger.info("** informational")
             status += self.update_unizin_metadata()
 
-        courses_added_during_cron: List[int] = list(
-            set(Course.objects.get_supported_courses().values_list('id', flat=True)) - set(self.valid_locked_course_ids))
+        all_str_course_ids = set(
+            str(x) for x in Course.objects.get_supported_courses().values_list('id', flat=True)
+        )
+        courses_added_during_cron: List[str] = list(all_str_course_ids - set(self.valid_locked_course_ids))
         if courses_added_during_cron:
-            logger.warning(
+            logger.debug(
                 f'During the run, users added {len(courses_added_during_cron)} course(s): {courses_added_during_cron}')
-            logger.warning(f'No data was pulled for these courses.')
+            logger.debug(f'No data was pulled for these courses.')
 
         # Set all of the courses to have been updated now (this is the same set update_course runs on)
         if not exception_in_run:
