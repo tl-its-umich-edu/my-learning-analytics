@@ -116,6 +116,7 @@ class DashboardCronJob(CronJobBase):
         """Constructor to be used to declare valid_locked_course_ids instance variable."""
         super().__init__()
         self.valid_locked_course_ids: List[int]
+        self.valid_locked_str_course_ids: List[str]
 
     # verify whether course ids are valid
     def verify_course_ids(self):
@@ -160,7 +161,7 @@ class DashboardCronJob(CronJobBase):
         status += util_function(
                                 queries['user'],
                                 'user',
-                                {'course_ids': tuple(self.valid_locked_course_ids),
+                                {'course_ids': tuple(self.valid_locked_str_course_ids),
                                 'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT
                                 })
 
@@ -199,7 +200,7 @@ class DashboardCronJob(CronJobBase):
         # convert int array to str array
         df_attach = pd.read_sql(queries['resource'],
                                 data_warehouse_engine,
-                                params={'course_ids': tuple(self.valid_locked_course_ids)})
+                                params={'course_ids': tuple(self.valid_locked_str_course_ids)})
         logger.debug(df_attach)
         # Update these back again based on the dataframe
         # Remove any rows where file_state is not available!
@@ -447,7 +448,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         status += util_function(queries['assignment_groups'],
                                 'assignment_groups',
-                                {'course_ids':tuple(self.valid_locked_course_ids)})
+                                {'course_ids': tuple(self.valid_locked_str_course_ids)})
 
         return status
 
@@ -463,7 +464,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         status += util_function(queries['assignment'],
                                 'assignment',
-                                {'course_ids':tuple(self.valid_locked_course_ids)})
+                                {'course_ids': tuple(self.valid_locked_str_course_ids)})
 
         return status
 
@@ -482,7 +483,7 @@ class DashboardCronJob(CronJobBase):
         status += util_function(queries['submission'],
                                 'submission',
                                 {
-                                    'course_ids':tuple(self.valid_locked_course_ids),
+                                    'course_ids': tuple(self.valid_locked_str_course_ids),
                                     'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT
                                 })
 
@@ -501,7 +502,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         status += util_function(queries['assignment_weight'],
                                 'assignment_weight_consideration',
-                                {'course_ids':tuple(self.valid_locked_course_ids)},
+                                {'course_ids': tuple(self.valid_locked_str_course_ids)},
                                 'weight')
 
         logger.debug(status + "\n\n")
@@ -598,7 +599,8 @@ class DashboardCronJob(CronJobBase):
             return (status,)
 
         # Lock in valid course IDs that data will be pulled for.
-        self.valid_locked_course_ids = [str(x) for x in course_verification.course_data['id'].to_list()]
+        self.valid_locked_course_ids = [x for x in course_verification.course_data['id'].to_list()]
+        self.valid_locked_str_course_ids = [str(x) for x in self.valid_locked_course_ids]
 
         logger.info(f'Valid locked course IDs: {self.valid_locked_course_ids}')
 
