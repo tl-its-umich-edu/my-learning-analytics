@@ -173,7 +173,6 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     .attr('class', 'svgWrapper')
     .attr('width', availWidth)
     .attr('height', availHeight)
-    .attr('aria-hidden', 'true')
     .attr('transform', `translate(${margin.left}, ${margin.top})`)
     .on('wheel.zoom', scroll, { passive: true })
     .on('mousedown.zoom', null) // Override the center selection
