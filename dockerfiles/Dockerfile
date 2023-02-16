@@ -62,8 +62,12 @@ COPY . .
 # Generate git version information
 RUN /code/scripts/git_version_info.sh
 
-# Clean up anything we don't need anymore
+# Clean up anything we don't need anymore.
+# Some of these can be purged completely, some of these just remove the package
 RUN apt-get purge -y git curl libcurl4 libcurl3-gnutls && \
+    apt-get remove -y linux-libc-dev && \
+# Keep these packages
+    apt-mark manual libmariadb3 mariadb-common && \
     apt autoremove -y && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
