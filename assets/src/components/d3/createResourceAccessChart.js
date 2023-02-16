@@ -173,7 +173,6 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     .attr('class', 'svgWrapper')
     .attr('width', availWidth)
     .attr('height', availHeight)
-    .attr('aria-hidden', 'true')
     .attr('transform', `translate(${margin.left}, ${margin.top})`)
     .on('wheel.zoom', scroll, { passive: true })
     .on('mousedown.zoom', null) // Override the center selection
@@ -192,7 +191,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
 
     bar.enter()
       .append('rect')
-      .attr('tabindex', d => d.index * 10 + 1)
+      .attr('tabindex', 0)
       .attr('y', d => mainYScale(d.resource_name))
       .attr('width', d => mainXScale(d.total_percent))
       .attr('height', mainYScale.bandwidth())
@@ -201,7 +200,12 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
         ? accessedResourceColor
         : notAccessedResourceColor
       )
+      .on('focus', (e, d) => {
+        moveBrushOnFocus(e, d.resource_name)
+        toolTip.show(e, d)
+      })
       .on('mouseover', toolTip.show)
+      .on('blur', toolTip.hide)
       .on('mouseout', toolTip.hide)
       .append('foreignObject')
       .append('div')
@@ -260,8 +264,8 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     const fullRange = mainYZoom.range()
     const selection = event
       ? event.selection[1] === 0 // prevents [0, 0] from being returned, which causes bug
-        ? [0, 0.1]
-        : event.selection
+          ? [0, 0.1]
+          : event.selection
       : defaultSelection
 
     // Update the axes
@@ -314,9 +318,28 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     const y0 = d3.min(range) + size / 2
     const y1 = d3.max(range) + miniYScale.bandwidth() - size / 2
     const center = Math.max(y0, Math.min(y1, d3.pointer(event)[1]))
-
     event.stopPropagation()
     gBrush.call(brush.move, [center - size / 2, center + size / 2])
+  }
+
+  function moveBrushOnFocus (event, dataKey) {
+    const selection = d3.brushSelection(gBrush.node())
+    const size = selection[1] - selection[0]
+    const miniY = miniYScale(dataKey)
+    const step = miniYScale.step()
+    // Start brush at bar if brush size is less than two steps, otherwise put at the end minus steps
+    const newY = size < (step * 2)
+      ? miniY + size
+      // Use size if size is greater than or equal to bar plus two steps, otherwise use bar plus steps
+      : (miniY + step * 2) <= size
+          ? size
+          // Use two steps after bar if there is space, otherwise use one step
+          : miniY <= miniYScale.range()[1] - step
+            ? miniY + step * 2
+            : miniY + step
+    const newSelection = [newY - size, newY]
+    event.stopPropagation()
+    gBrush.call(brush.move, newSelection)
   }
 
   // Main chart group
@@ -413,7 +436,7 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     .text('Percentage of All Students in the Selected Grade Range')
     .style('font-size', '14px')
 
-  mainGroup.append('g')
+  mainGroup.insert('g', ':first-child')
     .attr('class', 'axis--y black-axis-line')
     .attr('transform', 'translate(0,0)')
     .call(mainYAxis)
@@ -454,13 +477,13 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
     // Have to use ES5 function to correctly use `this` keyword
     const link = d.split('|')[0]
     const name = d.split('|')[1]
-    const resourceDataIndex = resourceData.filter(rd => rd.resource_name === d)[0].index
     const a = d3.select(this.parentNode).append('a')
       .attr('title', name)
       .attr('target', '_blank')
       .attr('href', link)
       .attr('text-anchor', 'start')
-      .attr('tabindex', resourceDataIndex * 10)
+      .attr('tabindex', 0)
+      .on('focus', (e) => moveBrushOnFocus(e, d))
     a.node().appendChild(this)
 
     const icon = d.split('|')[2]
