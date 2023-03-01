@@ -3,6 +3,7 @@ import { adjustViewport } from '../../util/chart'
 import { roundToXDecimals } from '../../util/math'
 import { siteTheme } from '../../globals'
 import { createGradesText } from './d3ViewsNarrative'
+import { html } from 'd3'
 
 function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, gradesSummary }) {
   const maxGrade = gradesSummary.graph_upper_limit
@@ -36,6 +37,14 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
 
   const narrativeTextGrades = createGradesText(data, bins, gradesSummary, myGrade, firstGradeAfterBinnedGrade)
 
+  // const ulElement = d3.select(html`<ul></ul>`)
+  const getName = (d) => { return d.name }
+  // const lis = ulElement.selectAll('li')
+  //   .data(narrativeTextGrades)
+  //   .enter()
+  //   .append('li')
+  //   .text(getName)
+
   // getting the first bin that has some grades in them, accessing the x1(higher bin) value
   const dashLine = () => {
     for (const bin in bins) {
@@ -52,11 +61,18 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   // SVG Components
   const main = d3.select(domElement).append('div')
 
-  main.append('div')
+  const narrativeDiv = main.append('div')
     .attr('aria-live', 'polite')
     .attr('id', 'grade-view-narrative')
     .attr('class', 'fa-sr-only')
-    .text(d => narrativeTextGrades)
+    .text(d => 'Following paragraphs provide a text description for graphical bar-chart on this page')
+
+  narrativeDiv.append('ul').selectAll('li')
+    .data(narrativeTextGrades)
+    .enter()
+    .append('li')
+    // .text(getName)
+    .text(d => d)
 
   const svg = main.append('svg')
     .attr('width', aWidth)

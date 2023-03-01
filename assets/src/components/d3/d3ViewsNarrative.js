@@ -47,7 +47,29 @@ const createGradesText = (data, bins, gradesSummary, myGrade, firstGradeAfterBin
       }
     }
   }
-  return narrativeTextGrades.courseStats.concat(narrativeTextGrades.binnedGradeText, narrativeTextGrades.courseGrades.toString())
+
+  const narrTextGrades = []
+  const courseStats = `Course information: Class size = ${gradesSummary.tot_students}, Average grade = ${gradesSummary.grade_avg}%, Median grade = ${gradesSummary.median_grade}%.`
+  narrTextGrades.push(courseStats)
+  narrTextGrades.push(isBinningUsed ? binningNarrativeText() : '')
+  for (const gradeBin in bins) {
+    if (bins[gradeBin].length > 0) {
+      const binLowerLimit = bins[gradeBin].x0
+      const binUpperLimit = bins[gradeBin].x1
+      if (isInRange(myGrade, binLowerLimit, binUpperLimit) && myGrade) {
+        narrTextGrades.push(`${bins[gradeBin].length} grades are in the ${binLowerLimit} to ${binUpperLimit}% range, and your grade ${myGrade}% is in this range. `)
+      } else {
+        narrTextGrades.push(`${bins[gradeBin].length} grades are in the ${binLowerLimit} to ${binUpperLimit}% range. `)
+      }
+    }
+  }
+  console.log(narrTextGrades)
+  // console.log(narrativeTextGrades)
+  // const myData = [{ name: 'John', age: 37, height: 1.93 }, { name: 'Mafe', age: 36, height: 1.73 }, { name: 'Santi', age: 9, height: 1.2 }, { name: 'David', age: 3, height: 0.7 }, { name: 'Sonia', age: 73, height: 1.5 }]
+  // return myData
+  return narrTextGrades
+  // return narrativeTextGrades
+  // return narrativeTextGrades.courseStats.concat(narrativeTextGrades.binnedGradeText, narrativeTextGrades.courseGrades.toString())
 }
 export {
   createResourcesText,
