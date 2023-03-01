@@ -3,7 +3,6 @@ import { adjustViewport } from '../../util/chart'
 import { roundToXDecimals } from '../../util/math'
 import { siteTheme } from '../../globals'
 import { createGradesText } from './d3ViewsNarrative'
-import { html } from 'd3'
 
 function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLabel, myGrade, gradesSummary }) {
   const maxGrade = gradesSummary.graph_upper_limit
@@ -38,7 +37,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   const narrativeTextGrades = createGradesText(data, bins, gradesSummary, myGrade, firstGradeAfterBinnedGrade)
 
   // const ulElement = d3.select(html`<ul></ul>`)
-  const getName = (d) => { return d.name }
+  // const getName = (d) => { return d.name }
   // const lis = ulElement.selectAll('li')
   //   .data(narrativeTextGrades)
   //   .enter()

@@ -3,10 +3,11 @@ import { isInRange, isOutOfRange } from '../../util/math'
 const createResourcesText = (resourceData, resourceType, gradeSelection, weekRange) => {
   const unAccessedResources = resourceData.filter(resource => resource.self_access_count === 0)
   const accessedResources = resourceData.filter(resource => resource.self_access_count >= 1)
+  console.log(accessedResources)
   const narrativeTextResources = {}
-  narrativeTextResources.weekRange = `Resources accessed from week ${weekRange[0]} to ${weekRange[1]}. `
-  narrativeTextResources.resourceType = `Selected resource type(s) ${resourceType.length === 1 ? 'is' : 'are'} ${resourceType}. `
-  narrativeTextResources.gradeFilter = gradeSelection.toUpperCase() !== 'ALL' ? `Filtering on grades ${gradeSelection}. ` : ''
+  narrativeTextResources.weekRange1 = `Resources accessed from week ${weekRange[0]} to ${weekRange[1]}. `
+  narrativeTextResources.resourceType1 = `Selected resource type(s) ${resourceType.length === 1 ? 'is' : 'are'} ${resourceType}. `
+  narrativeTextResources.gradeFilter = gradeSelection.toUpperCase() !== 'ALL' ? `Filtering on grades ${gradeSelection}. ` : 'Getting resources across all grades.'
   narrativeTextResources.resourcesUnaccessCount = `You have not yet accessed ${unAccessedResources.length} of ${resourceData.length} resources.  `
   narrativeTextResources.resourcesAccessCount = accessedResources.length !== 0 ? `. You have accessed ${accessedResources.length} of ${resourceData.length} resources.  ` : ''
   narrativeTextResources.resourcesUnAccessList = unAccessedResources.map(x =>
@@ -16,11 +17,35 @@ const createResourcesText = (resourceData, resourceType, gradeSelection, weekRan
   )
   narrativeTextResources.resourceAccessList = accessedResources.map(x =>
     resourceType.length === 1
-      ? `${x.resource_name.split('|')[1]} has been accessed by ${x.total_percent}% of students. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`
-      : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`)
-  return narrativeTextResources.weekRange.concat(narrativeTextResources.resourceType,
-    narrativeTextResources.gradeFilter, narrativeTextResources.resourcesUnaccessCount,
-    narrativeTextResources.resourcesUnAccessList, narrativeTextResources.resourcesAccessCount, narrativeTextResources.resourceAccessList)
+      ? `${x.resource_name.split('|')[1]} has been accessed by ${x.total_percent}% of students and you accessed ${x.self_access_count} times. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`
+      : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students and you accessed ${x.self_access_count} times. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`)
+  console.log(narrativeTextResources)
+  // const narrTextResources = []
+  // narrTextResources.push(`Resources accessed from week ${weekRange[0]} to ${weekRange[1]}. `)
+  // narrTextResources.push(`Selected resource type(s) ${resourceType.length === 1 ? 'is' : 'are'} ${resourceType}. `)
+  // narrTextResources.push(gradeSelection.toUpperCase() !== 'ALL' ? `Filtering on grades ${gradeSelection}. ` : '')
+  // narrTextResources.push(`You have not yet accessed ${unAccessedResources.length} of ${resourceData.length} resources. Below is the list of resources `)
+
+  // const ab = unAccessedResources.map(x =>
+  //   resourceType.length === 1
+  //     ? `${x.resource_name.split('|')[1]} has been accessed by ${x.total_percent}% of students.`
+  //     : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students.`
+  // )
+  // ab.forEach(unaccessedResourceItem => { narrTextResources.push(unaccessedResourceItem) })
+  // narrTextResources.push(accessedResources.length !== 0 ? `. You have accessed ${accessedResources.length} of ${resourceData.length} resources. Below is the list of resources  ` : '')
+
+  // const cd = accessedResources.map(x =>
+  //   resourceType.length === 1
+  //     ? `${x.resource_name.split('|')[1]} has been accessed by ${x.total_percent}% of students. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`
+  //     : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`)
+  // cd.forEach(accessedResourceItem => { narrTextResources.push(accessedResourceItem) })
+
+  // console.log(narrTextResources)
+  // return('Hello')
+  return narrativeTextResources
+  // return narrativeTextResources.weekRange.concat(narrativeTextResources.resourceType,
+  //   narrativeTextResources.gradeFilter, narrativeTextResources.resourcesUnaccessCount,
+  //   narrativeTextResources.resourcesUnAccessList, narrativeTextResources.resourcesAccessCount, narrativeTextResources.resourceAccessList)
 }
 
 const createGradesText = (data, bins, gradesSummary, myGrade, firstGradeAfterBinnedGrade) => {
@@ -64,11 +89,7 @@ const createGradesText = (data, bins, gradesSummary, myGrade, firstGradeAfterBin
     }
   }
   console.log(narrTextGrades)
-  // console.log(narrativeTextGrades)
-  // const myData = [{ name: 'John', age: 37, height: 1.93 }, { name: 'Mafe', age: 36, height: 1.73 }, { name: 'Santi', age: 9, height: 1.2 }, { name: 'David', age: 3, height: 0.7 }, { name: 'Sonia', age: 73, height: 1.5 }]
-  // return myData
   return narrTextGrades
-  // return narrativeTextGrades
   // return narrativeTextGrades.courseStats.concat(narrativeTextGrades.binnedGradeText, narrativeTextGrades.courseGrades.toString())
 }
 export {
