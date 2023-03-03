@@ -72,25 +72,7 @@ const createGradesText = (data, bins, gradesSummary, myGrade, firstGradeAfterBin
       }
     }
   }
-
-  const narrTextGrades = []
-  const courseStats = `Course information: Class size = ${gradesSummary.tot_students}, Average grade = ${gradesSummary.grade_avg}%, Median grade = ${gradesSummary.median_grade}%.`
-  narrTextGrades.push(courseStats)
-  narrTextGrades.push(isBinningUsed ? binningNarrativeText() : '')
-  for (const gradeBin in bins) {
-    if (bins[gradeBin].length > 0) {
-      const binLowerLimit = bins[gradeBin].x0
-      const binUpperLimit = bins[gradeBin].x1
-      if (isInRange(myGrade, binLowerLimit, binUpperLimit) && myGrade) {
-        narrTextGrades.push(`${bins[gradeBin].length} grades are in the ${binLowerLimit} to ${binUpperLimit}% range, and your grade ${myGrade}% is in this range. `)
-      } else {
-        narrTextGrades.push(`${bins[gradeBin].length} grades are in the ${binLowerLimit} to ${binUpperLimit}% range. `)
-      }
-    }
-  }
-  console.log(narrTextGrades)
-  return narrTextGrades
-  // return narrativeTextGrades.courseStats.concat(narrativeTextGrades.binnedGradeText, narrativeTextGrades.courseGrades.toString())
+  return narrativeTextGrades
 }
 export {
   createResourcesText,

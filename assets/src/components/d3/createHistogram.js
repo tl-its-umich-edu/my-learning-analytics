@@ -36,14 +36,6 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
 
   const narrativeTextGrades = createGradesText(data, bins, gradesSummary, myGrade, firstGradeAfterBinnedGrade)
 
-  // const ulElement = d3.select(html`<ul></ul>`)
-  // const getName = (d) => { return d.name }
-  // const lis = ulElement.selectAll('li')
-  //   .data(narrativeTextGrades)
-  //   .enter()
-  //   .append('li')
-  //   .text(getName)
-
   // getting the first bin that has some grades in them, accessing the x1(higher bin) value
   const dashLine = () => {
     for (const bin in bins) {
@@ -65,12 +57,13 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     .attr('id', 'grade-view-narrative')
     .attr('class', 'fa-sr-only')
     .text(d => 'Following paragraphs provide a text description for graphical bar-chart on this page')
-
-  narrativeDiv.append('ul').selectAll('li')
-    .data(narrativeTextGrades)
+  narrativeDiv.append('span').text(d => narrativeTextGrades.courseStats)
+  narrativeDiv.append('span').text(d => narrativeTextGrades.binnedGradeText)
+  narrativeDiv.append('span').attr('aria-labelledby', 'grades-bins').text(d => 'Below is number of students in each grade range')
+  narrativeDiv.append('ul').attr('id', 'grades-bins').selectAll('li')
+    .data(narrativeTextGrades.courseGrades)
     .enter()
     .append('li')
-    // .text(getName)
     .text(d => d)
 
   const svg = main.append('svg')
