@@ -92,7 +92,9 @@ function truncate (selection, labelWidth) {
 }
 
 function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceType, width, height, domElement }) {
+  // This should already be sorted by percent from the backend, but try to sort it again
   const resourceData = data.sort((a, b) => b.total_percent - a.total_percent)
+
   /* Assign an index to each resource.  This is used to assist with keyboard navigation
   To set the tab sequence to go from resource name to its corresponding bar graph we use
   tabindex of index*10 for the file name and index*10+1 for the bar

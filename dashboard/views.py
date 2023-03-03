@@ -5,9 +5,11 @@ from collections import namedtuple
 from datetime import timedelta
 from json import JSONDecodeError
 
+from constance import config
 import jsonschema
 import numpy as np
 import pandas as pd
+
 from django.conf import settings
 from django.contrib import auth
 from django.core.exceptions import ObjectDoesNotExist
@@ -429,10 +431,22 @@ def resource_access_within_week(request, course_id=0):
         axis=1)
     # RESOURCE_VALUES_MAP {'canvas': 'files', 'leccap': 'videos', 'mivideo': 'videos'}
     output_df['resource_type'] = output_df['resource_type'].replace(RESOURCE_VALUES_MAP)
+ 
+     # Limit the number of results for large courses
+    total_rows = df.shape[0]
+    if total_rows > config.RESOURCE_LIMIT:
+        output_df = output_df.sort_values("total_percent", ascending=False).head(config.RESOURCE_LIMIT)
     output_df.drop(columns=['name', 'resource_id_type'], inplace=True)
 
     logger.debug(output_df.to_json(orient='records'))
-    return HttpResponse(output_df.to_json(orient='records'),content_type='application/json')
+    response = HttpResponse(output_df.to_json(orient='records'), content_type='application/json')
+
+    # Add in this header if needed to pass that we limited this to the frontend
+    if total_rows > config.RESOURCE_LIMIT:
+        response['Resources-Limit'] = config.RESOURCE_LIMIT
+        response['Access-Control-Expose-Headers'] = 'Resources-Limit'
+
+    return response 
 
 
 @permission_required('dashboard.grade_distribution',
@@ -885,9 +899,12 @@ def binning_logic(grades, fifth_item_in_list):
 
 
 def df_default_display_settings():
-    pd.set_option('display.max_column', None)
-    pd.set_option('display.max_rows', None)
-    pd.set_option('display.max_seq_items', None)
+    # Only display maximum values when in debug mode
+    if settings.DEBUG:
+        pd.set_option('display.max_column', None)
+        pd.set_option('display.max_rows', None)
+        pd.set_option('display.max_seq_items', None)
+
     pd.set_option('display.max_colwidth', 500)
     pd.set_option('expand_frame_repr', True)
 

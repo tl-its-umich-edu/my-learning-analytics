@@ -67,6 +67,7 @@ function ResourcesAccessed (props) {
   // this is the filter setting last saved by the user
   const [userSavedFilterSetting, setUserSavedFilterSetting] = useState(resourceGradeFilter)
   const [resourceAccessData, setResourceAccessData] = useState('')
+  const [resourcesLimit, setResourcesLimit] = useState(0)
   const [dataControllerLoad, setDataControllerLoad] = useState(0)
 
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'resource')
@@ -178,11 +179,14 @@ function ResourcesAccessed (props) {
   useEffect(() => {
     // Fetch data once all the setting data is fetched
     if (dataControllerLoad === 2 && !(resourceTypeFilter.length === 0)) {
-      const dataURL = `/api/v1/courses/${courseId}/resource_access_within_week?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${resourceGradeFilter}&resource_type=${resourceTypeFilter}`
+      const dataURL = `/api/v1/courses/${courseId}/resource_access_within_week/?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${resourceGradeFilter}&resource_type=${resourceTypeFilter}`
       const fetchOptions = { method: 'get', ...defaultFetchOptions }
       fetch(dataURL, fetchOptions)
         .then(handleError)
-        .then(res => res.json())
+        .then((response) => {
+          setResourcesLimit(response.headers.get("Resources-Limit"))
+          return response.json()
+        })
         .then(data => {
           setResourceAccessData(data)
           setDataLoaded(true)
@@ -213,21 +217,29 @@ function ResourcesAccessed (props) {
     }
   }
 
-  const ResourceAccessChartBuilder = (resourceData) => {
+  const ResourceAccessChartBuilder = (resourceData, resourcesLimit) => {
     if (resourceTypeFilter.length === 0) {
       return (<AlertBanner>Please select a resource type to display data.</AlertBanner>)
     } else if (!resourceData || Object.keys(resourceData).length === 0) {
       return (<AlertBanner>Resource data for your selections is not available.</AlertBanner>)
     } else {
       return (
-        <ResourceAccessChart
-          data={resourceData}
-          weekRange={weekRange}
-          gradeSelection={resourceGradeFilter}
-          resourceType={resourceTypeFilter}
-          aspectRatio={0.3}
-          minHeight={350}
-        />
+        <>
+          <div style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+            {typeof resourcesLimit === 'undefined' ? <div>Displaying all available resources in this course</div> :
+              <div>Displaying top {resourcesLimit} most accessed resources in this course</div>
+            }
+          </div>
+
+          <ResourceAccessChart
+            data={resourceData}
+            weekRange={weekRange}
+            gradeSelection={resourceGradeFilter}
+            resourceType={resourceTypeFilter}
+            aspectRatio={0.3}
+            minHeight={350}
+          />
+        </>
       )
     }
   }
@@ -294,7 +306,7 @@ function ResourcesAccessed (props) {
                 successMessage='Resource filter setting saved!'
               />
               {(resourceAccessData && dataLoaded) || resourceTypeFilter.length === 0
-                ? ResourceAccessChartBuilder(resourceAccessData)
+                ? ResourceAccessChartBuilder(resourceAccessData, resourcesLimit)
                 : <Spinner />}
             </Paper>
           </Grid>
