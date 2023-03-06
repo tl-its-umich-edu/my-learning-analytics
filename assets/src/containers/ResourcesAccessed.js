@@ -217,7 +217,7 @@ function ResourcesAccessed (props) {
     }
   }
 
-  const ResourceAccessChartBuilder = (resourceData, resourcesLimit) => {
+  const resourceAccessChartBuilder = (resourceData, resourcesLimit) => {
     if (resourceTypeFilter.length === 0) {
       return (<AlertBanner>Please select a resource type to display data.</AlertBanner>)
     } else if (!resourceData || Object.keys(resourceData).length === 0) {
@@ -306,7 +306,7 @@ function ResourcesAccessed (props) {
                 successMessage='Resource filter setting saved!'
               />
               {(resourceAccessData && dataLoaded) || resourceTypeFilter.length === 0
-                ? ResourceAccessChartBuilder(resourceAccessData, resourcesLimit)
+                ? resourceAccessChartBuilder(resourceAccessData, resourcesLimit)
                 : <Spinner />}
             </Paper>
           </Grid>

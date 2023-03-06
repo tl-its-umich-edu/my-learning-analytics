@@ -446,7 +446,7 @@ def resource_access_within_week(request, course_id=0):
         response['Resources-Limit'] = config.RESOURCE_LIMIT
         response['Access-Control-Expose-Headers'] = 'Resources-Limit'
 
-    return response 
+    return response
 
 
 @permission_required('dashboard.grade_distribution',
