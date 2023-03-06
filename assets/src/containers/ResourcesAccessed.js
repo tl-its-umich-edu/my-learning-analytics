@@ -15,6 +15,7 @@ import AlertBanner from '../components/AlertBanner'
 import IconLabel from '../components/IconLabel'
 import RangeSlider from '../components/RangeSlider'
 import ResourceAccessChart from '../components/ResourceAccessChart'
+import ResourceChartNarrative from '../components/ResourceChartNarrative'
 import Spinner from '../components/Spinner'
 import UserSettingSnackbar from '../components/UserSettingSnackbar'
 import ViewHeader from '../components/ViewHeader'
@@ -238,11 +239,14 @@ function ResourcesAccessed (props) {
           <Typography style={{ textAlign: 'center' }} gutterBottom>
             {`Displaying ${resourcesLimit ?? 'all available'} resources in this course`}
           </Typography>
-          <ResourceAccessChart
+          <ResourceChartNarrative
             data={resourceData}
             weekRange={weekRange}
             gradeSelection={resourceGradeFilter}
             resourceType={resourceTypeFilter}
+          />
+          <ResourceAccessChart
+            data={resourceData}
             aspectRatio={0.3}
             minHeight={350}
           />
@@ -270,8 +274,8 @@ function ResourcesAccessed (props) {
                       min={minMaxWeek[0]}
                       max={minMaxWeek[1]}
                       onWeekChange={onWeekChangeHandler}
-                    />
-                  ) : ''
+                    />)
+                  : ''
               }
               <div className={classes.formController}>
                 <p className={classes.controlText}>Resources accessed from week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now) ' : ''}</b> by students with these grades:</p>
@@ -298,8 +302,7 @@ function ResourcesAccessed (props) {
                         onChange={() => setSaveSettingClicked(!saveSettingClicked)}
                         value='checked'
                         color='secondary'
-                      />
-                    )
+                      />)
                     : <div style={{ padding: '10px' }} />
                 }
                 <div style={{ padding: '15px 2px' }}>{saveLabel}</div>

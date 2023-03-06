@@ -90,8 +90,7 @@ function truncate (selection, labelWidth) {
   })
 }
 
-function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceType, width, height, domElement }) {
-  // This should already be sorted by percent from the backend, but try to sort it again
+function createResourceAccessChart ({ data, width, height, domElement }) {
   const resourceData = data.sort((a, b) => b.total_percent - a.total_percent)
 
   /* Assign an index to each resource.  This is used to assist with keyboard navigation
@@ -159,32 +158,8 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
   const miniYScale = d3.scaleBand().range([0, miniHeight])
 
   const textScale = d3.scaleLinear().range([12, 6]).domain([15, 50]).clamp(true)
-  // d3 graph narrative text
-  // const { weekRange1, resourceType1, gradeFilter, resourcesAccessCount, resourcesUnaccessCount, resourceAccessList, resourcesUnAccessList } = createResourcesText(resourceData, resourceType, gradeSelection, weekRange)
   // Build the chart
   const main = d3.select(domElement).append('div')
-
-  // const narrativeResDiv = main.append('div')
-  //   .attr('aria-live', 'polite')
-  //   .attr('id', 'resource-view-narrative')
-  //   .attr('class', 'fa-sr-only')
-  //   .text(d => 'Following paragraphs provide a text description for graphical bar-chart on this page')
-
-  // narrativeResDiv.append('span').text(d => weekRange1)
-  // narrativeResDiv.append('span').text(d => resourceType1)
-  // narrativeResDiv.append('span').text(d => gradeFilter)
-  // narrativeResDiv.append('span').text(d => resourcesAccessCount)
-  // narrativeResDiv.append('span').text(d => resourcesUnaccessCount)
-  // narrativeResDiv.append('ul').text(d => 'List of Unaccessed resources').selectAll('li')
-  //   .data(resourcesUnAccessList)
-  //   .enter()
-  //   .append('li')
-  //   .text(d => d)
-  // narrativeResDiv.append('ul').text(d => 'List of Accessed resources').selectAll('li')
-  //   .data(resourceAccessList)
-  //   .enter()
-  //   .append('li')
-  //   .text(d => d)
 
   const svg = main.append('svg')
     .attr('class', 'svgWrapper')
