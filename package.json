@@ -31,7 +31,6 @@
     "watch": "BABEL_ENV=development webpack --config webpack.config.js --watch --mode development",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "cypress:open": "cypress open",
     "update-snapshot": "jest --updateSnapshot"
   },
   "browserslist": [
