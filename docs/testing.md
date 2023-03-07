@@ -2,7 +2,7 @@
 
 ## Testing
 
-The application currently uses frameworks for frontend testing: [Jest](https://jestjs.io/). There are plans to implement back-end tests in the future.
+The application currently uses one framework for frontend testing: [Jest](https://jestjs.io/). There are plans to implement back-end tests in the future.
 
 ### Jest Testing
 
