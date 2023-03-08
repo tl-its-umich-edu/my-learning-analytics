@@ -25,11 +25,11 @@ function ResourceChartNarrative ({ data, weekRange, gradeSelection, resourceType
       <p>{narrativeTextResources.weekSelection}</p>
       <p>{narrativeTextResources.typeOfResource}</p>
       <p>{narrativeTextResources.gradeFilter}</p>
-      <p aria-labelledby='unaccessedResources'>'List of unaccessed resources'</p>
+      <p aria-labelledby='unaccessedResources'>List of resources you have not accessed</p>
       <ul id='unaccessedResources'>
         {narrativeTextResources.resourcesUnAccessList.map((item, key) => <li key={key}>{item}</li>)}
       </ul>
-      <p aria-labelledby='accessedResources'>'List of accessed resources'</p>
+      <p aria-labelledby='accessedResources'>List of resources you have accessed</p>
       <ul id='accessedResources'>
         {narrativeTextResources.resourceAccessList.map((item, key) => <li key={key}>{item}</li>)}
       </ul>
