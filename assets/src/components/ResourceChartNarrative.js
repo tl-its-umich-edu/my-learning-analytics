@@ -21,7 +21,7 @@ function ResourceChartNarrative ({ data, weekRange, gradeSelection, resourceType
       : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students and you accessed ${x.self_access_count} times. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`)
   return (
     <div id='resource-view-narrative' className='fa-sr-only' aria-live='polite'>
-      <p>Following paragraphs provide a text description for graphical bar-chart on this page</p>
+      <p>The following paragraphs provide a text description for the graphical bar-chart on this page:</p>
       <p>{narrativeTextResources.weekSelection}</p>
       <p>{narrativeTextResources.typeOfResource}</p>
       <p>{narrativeTextResources.gradeFilter}</p>
