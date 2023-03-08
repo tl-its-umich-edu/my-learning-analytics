@@ -56,7 +56,7 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
     .attr('aria-live', 'polite')
     .attr('id', 'grade-view-narrative')
     .attr('class', 'fa-sr-only')
-    .text(d => 'Following paragraphs provide a text description for graphical bar-chart on this page')
+    .text(d => 'The following paragraphs provide a text description for the graphical bar-chart on this page:')
   narrativeDiv.append('span').text(d => narrativeTextGrades.courseStats)
   narrativeDiv.append('span').text(d => narrativeTextGrades.binnedGradeText)
   narrativeDiv.append('span').attr('aria-labelledby', 'grades-bins').text(d => 'Below is number of students in each grade range')
