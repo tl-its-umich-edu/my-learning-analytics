@@ -17,7 +17,7 @@ function ResourceChartNarrative ({ data, weekRange, gradeSelection, resourceType
   )
   narrativeTextResources.resourceAccessList = accessedResources.map(x =>
     resourceType.length === 1
-      ? `${x.resource_name.split('|')[1]} has been accessed by ${x.total_percent}% of students and you accessed ${x.self_access_count} times. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`
+      ? `${x.resource_name.split('|')[1]} has been accessed by ${x.total_percent}% of students, and you accessed it ${x.self_access_count} times. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`
       : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students and you accessed ${x.self_access_count} times. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`)
   return (
     <div id='resource-view-narrative' className='fa-sr-only' aria-live='polite'>
