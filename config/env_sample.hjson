@@ -28,7 +28,7 @@
         # You should set your domain as the DEFAULT_SRC
         "DEFAULT_SRC": ["'self'","example.edu"],
         "SCRIPT_SRC": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "www.googletagmanager.com"],
-        "IMG_SRC": ["'self'", "data:", "www.google-analytics.com"],
+        "IMG_SRC": ["'self'", "data:", "www.googletagmanager.com"],
         "OBJECT_SRC": [],
         "MEDIA_SRC": [],
         # If you're embedding in Canvas you may need to include instructure.com as FRAME_SRC
