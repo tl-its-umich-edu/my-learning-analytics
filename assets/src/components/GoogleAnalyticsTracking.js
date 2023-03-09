@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import GoogleAnalytics from 'react-ga'
+import GoogleAnalytics from 'react-ga4'
 
 function GoogleAnalyticsTracking (props) {
   const {
@@ -18,7 +18,7 @@ function GoogleAnalyticsTracking (props) {
     const page = window.location.pathname + window.location.search + window.location.hash
     if (gaId && page !== previousPage) {
       setPreviousPage(page)
-      GoogleAnalytics.pageview(page)
+      GoogleAnalytics.send({ hitType: 'pageview', page })
     }
   })
 
