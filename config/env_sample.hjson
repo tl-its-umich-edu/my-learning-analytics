@@ -27,7 +27,7 @@
         "REPORT_ONLY": true,
         # You should set your domain as the DEFAULT_SRC
         "DEFAULT_SRC": ["'self'","example.edu"],
-        "SCRIPT_SRC": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "www.googletagmanager.com"],
+        "SCRIPT_SRC": ["'self'", "www.googletagmanager.com"],
         "IMG_SRC": ["'self'", "data:", "www.googletagmanager.com"],
         "OBJECT_SRC": [],
         "MEDIA_SRC": [],
