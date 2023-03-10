@@ -47,7 +47,7 @@
         "REQUIRE_SRI_FOR": [],
         "UPGRADE_INSECURE_REQUESTS": false,
         "BLOCK_ALL_MIXED_CONTENT": false,
-        "INCLUDE_NONCE_IN": []
+        "INCLUDE_NONCE_IN": ["script-src"]
     },
     # default password length indicator incase of creating user from command line or LTI auto login
     "RANDOM_PASSWORD_DEFAULT_LENGTH": 32,

@@ -9,7 +9,7 @@ import { Helmet } from 'react-helmet'
 
 function App (props) {
   const location = useLocation()
-  const { user, gaId } = props
+  const { user, gaId, cspNonce } = props
 
   if (!user.isLoggedIn) {
     if (user.loginURL === '') {
@@ -23,7 +23,7 @@ function App (props) {
   return (
     <>
       <Helmet titleTemplate='%s | My Learning Analytics' title='Courses' />
-      <GoogleAnalyticsTracking gaId={gaId} />
+      <GoogleAnalyticsTracking {...{ gaId, cspNonce }} />
       <Switch>
         <Route path='/' exact>
           <CourseList user={user} />

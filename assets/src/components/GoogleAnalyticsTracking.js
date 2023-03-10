@@ -2,16 +2,17 @@ import { useState, useEffect } from 'react'
 import GoogleAnalytics from 'react-ga4'
 
 function GoogleAnalyticsTracking (props) {
-  const {
-    gaId
-  } = props
+  const { gaId, cspNonce } = props
 
   const [initialized, setInitialized] = useState(false)
   const [previousPage, setPreviousPage] = useState(null)
 
   if (gaId && !initialized) {
     setInitialized(true)
-    GoogleAnalytics.initialize(gaId)
+    GoogleAnalytics.initialize([{
+      trackingId: gaId,
+      gaOptions: { nonce: cspNonce }
+    }])
   }
 
   useEffect(() => {
