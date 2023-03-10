@@ -5,11 +5,10 @@ from collections import namedtuple
 from datetime import timedelta
 from json import JSONDecodeError
 
-from constance import config
 import jsonschema
 import numpy as np
 import pandas as pd
-
+from constance import config
 from django.conf import settings
 from django.contrib import auth
 from django.core.exceptions import ObjectDoesNotExist
