@@ -235,12 +235,8 @@ function ResourcesAccessed (props) {
     } else {
       return (
         <>
-          <Typography style={{ textAlign: 'center', verticalAlign: 'middle' }} gutterBottom>
-            {
-              resourcesLimit === undefined
-                ? 'Displaying all available resources in this course'
-                : `Displaying top ${resourcesLimit} most accessed resources in this course`
-            }
+          <Typography style={{ textAlign: 'center' }} gutterBottom>
+            {`Displaying ${resourcesLimit ?? 'all available'} resources in this course`}
           </Typography>
           <ResourceAccessChart
             data={resourceData}
