@@ -39,7 +39,7 @@
         '''
         with assignment_info as
             (select ad.due_at AS due_date,
-            timezone(%(time_zone)s, ad.due_at) as local_date,
+            timezone(%(time_zone)s, ad.due_at AT TIME ZONE 'UTC') as local_date,
             ad.title AS name,af.course_id AS course_id,af.assignment_id AS id,
             af.points_possible AS points_possible,af.assignment_group_id AS assignment_group_id
             from assignment_fact af inner join assignment_dim ad on af.assignment_id = ad.id where af.course_id in %(course_ids)s
@@ -114,7 +114,7 @@
                     sd.id, 
                     sd.submitted_at, 
                     sd.graded_at, 
-                    timezone(%(time_zone)s, sd.posted_at) as grade_posted_local_date,
+                    timezone(%(time_zone)s, sd.posted_at AT TIME ZONE 'UTC') as grade_posted_local_date,
                     sd.workflow_state as submission_workflow_state 
                 from 
                     submission_dim sd join sub_fact suf on sd.id=suf.submission_id
