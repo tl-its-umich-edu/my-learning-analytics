@@ -10,6 +10,7 @@ import Grid from '@material-ui/core/Grid'
 import MenuItem from '@material-ui/core/MenuItem'
 import Paper from '@material-ui/core/Paper'
 import Select from '@material-ui/core/Select'
+import Typography from '@material-ui/core/Typography'
 import AlertBanner from '../components/AlertBanner'
 import IconLabel from '../components/IconLabel'
 import RangeSlider from '../components/RangeSlider'
@@ -67,7 +68,8 @@ function ResourcesAccessed (props) {
   // this is the filter setting last saved by the user
   const [userSavedFilterSetting, setUserSavedFilterSetting] = useState(resourceGradeFilter)
   const [resourceAccessData, setResourceAccessData] = useState('')
-  const [resourcesLimit, setResourcesLimit] = useState(0)
+  const [resourcesLimit, setResourcesLimit] = useState(undefined)
+
   const [dataControllerLoad, setDataControllerLoad] = useState(0)
 
   const [userSettingLoaded, userSetting] = useUserSetting(courseId, 'resource')
@@ -184,7 +186,9 @@ function ResourcesAccessed (props) {
       fetch(dataURL, fetchOptions)
         .then(handleError)
         .then((response) => {
-          setResourcesLimit(response.headers.get("Resources-Limit"))
+          if (response.headers.has('Resources-Limit')) {
+            setResourcesLimit(response.headers.get('Resources-Limit'))
+          }
           return response.json()
         })
         .then(data => {
@@ -225,12 +229,13 @@ function ResourcesAccessed (props) {
     } else {
       return (
         <>
-          <div style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-            {typeof resourcesLimit === 'undefined' ? <div>Displaying all available resources in this course</div> :
-              <div>Displaying top {resourcesLimit} most accessed resources in this course</div>
+          <Typography style={{ textAlign: 'center', verticalAlign: 'middle' }} gutterBottom>
+            {
+              resourcesLimit === undefined
+                ? 'Displaying all available resources in this course'
+                : `Displaying top ${resourcesLimit} most accessed resources in this course`
             }
-          </div>
-
+          </Typography>
           <ResourceAccessChart
             data={resourceData}
             weekRange={weekRange}
