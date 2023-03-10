@@ -181,7 +181,13 @@ function ResourcesAccessed (props) {
   useEffect(() => {
     // Fetch data once all the setting data is fetched
     if (dataControllerLoad === 2 && !(resourceTypeFilter.length === 0)) {
-      const dataURL = `/api/v1/courses/${courseId}/resource_access_within_week/?week_num_start=${weekRange[0]}&week_num_end=${weekRange[1]}&grade=${resourceGradeFilter}&resource_type=${resourceTypeFilter}`
+      const params = new URLSearchParams({
+        week_num_start: weekRange[0],
+        week_num_end: weekRange[1],
+        grade: resourceGradeFilter,
+        resource_type: resourceTypeFilter
+      })
+      const dataURL = `/api/v1/courses/${courseId}/resource_access_within_week/?${params.toString()}`
       const fetchOptions = { method: 'get', ...defaultFetchOptions }
       fetch(dataURL, fetchOptions)
         .then(handleError)
