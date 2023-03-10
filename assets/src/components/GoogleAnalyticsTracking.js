@@ -11,7 +11,7 @@ function GoogleAnalyticsTracking (props) {
     setInitialized(true)
     GoogleAnalytics.initialize([{
       trackingId: gaId,
-      gaOptions: { nonce: cspNonce }
+      gaOptions: { nonce: cspNonce, cookieFlags: 'SameSite=None; Secure' }
     }])
   }
 
