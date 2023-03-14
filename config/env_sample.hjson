@@ -34,7 +34,7 @@
         # If you're embedding in Canvas you may need to include instructure.com as FRAME_SRC
         "FRAME_SRC": [],
         "FONT_SRC": ["'self'", "fonts.gstatic.com"],
-        "CONNECT_SRC": ["*.google-analytics.com", "*.analytics.google.com", "*.googletagmanager.com"],
+        "CONNECT_SRC": ["'self'", "*.google-analytics.com", "*.analytics.google.com", "*.googletagmanager.com"],
         "STYLE_SRC": ["'self'", "'unsafe-inline'"],
         "BASE_URI": [],
         "FRAME_ANCESTORS": [],
