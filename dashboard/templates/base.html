@@ -7,6 +7,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csp-nonce" content="{{ request.csp_nonce }}">
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" type="text/css" href="{% static 'fontawesomefree/css/all.min.css' %}">
     <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>

@@ -27,14 +27,14 @@
         "REPORT_ONLY": true,
         # You should set your domain as the DEFAULT_SRC
         "DEFAULT_SRC": ["'self'","example.edu"],
-        "SCRIPT_SRC": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "www.google-analytics.com"],
-        "IMG_SRC": ["'self'", "data:", "www.google-analytics.com"],
+        "SCRIPT_SRC": ["'self'", "'unsafe-inline'", "*.googletagmanager.com"],
+        "IMG_SRC": ["'self'", "data:", "*.google-analytics.com", "*.googletagmanager.com"],
         "OBJECT_SRC": [],
         "MEDIA_SRC": [],
         # If you're embedding in Canvas you may need to include instructure.com as FRAME_SRC
         "FRAME_SRC": [],
         "FONT_SRC": ["'self'", "fonts.gstatic.com"],
-        "CONNECT_SRC": [],
+        "CONNECT_SRC": ["'self'", "*.google-analytics.com", "*.analytics.google.com", "*.googletagmanager.com"],
         "STYLE_SRC": ["'self'", "'unsafe-inline'"],
         "BASE_URI": [],
         "FRAME_ANCESTORS": [],
@@ -47,7 +47,7 @@
         "REQUIRE_SRI_FOR": [],
         "UPGRADE_INSECURE_REQUESTS": false,
         "BLOCK_ALL_MIXED_CONTENT": false,
-        "INCLUDE_NONCE_IN": []
+        "INCLUDE_NONCE_IN": ["script-src"]
     },
     # default password length indicator incase of creating user from command line or LTI auto login
     "RANDOM_PASSWORD_DEFAULT_LENGTH": 32,

@@ -1,24 +1,25 @@
 import { useState, useEffect } from 'react'
-import GoogleAnalytics from 'react-ga'
+import GoogleAnalytics from 'react-ga4'
 
 function GoogleAnalyticsTracking (props) {
-  const {
-    gaId
-  } = props
+  const { gaId, cspNonce } = props
 
   const [initialized, setInitialized] = useState(false)
   const [previousPage, setPreviousPage] = useState(null)
 
   if (gaId && !initialized) {
     setInitialized(true)
-    GoogleAnalytics.initialize(gaId)
+    GoogleAnalytics.initialize([{
+      trackingId: gaId,
+      gaOptions: { nonce: cspNonce, cookieFlags: 'SameSite=None; Secure' }
+    }])
   }
 
   useEffect(() => {
     const page = window.location.pathname + window.location.search + window.location.hash
     if (gaId && page !== previousPage) {
       setPreviousPage(page)
-      GoogleAnalytics.pageview(page)
+      GoogleAnalytics.send({ hitType: 'pageview', page })
     }
   })
 
