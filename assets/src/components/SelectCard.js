@@ -159,7 +159,7 @@ const SelectCard = props => {
     const label = 'About ' + cardData.title
     if (cardData.helpUrl) {
       return (
-        <div class={classes.help}>
+        <div className={classes.help}>
           <Typography gutterBottom variant='h5' component='p'>
             <Tooltip title={label}>
               <MUILink
@@ -202,7 +202,7 @@ const SelectCard = props => {
   return (
     <>
       <Card className={classes.card} elevation={2}>
-        <div class={classes.mainCardContainer}>
+        <div className={classes.mainCardContainer}>
           <CardActionArea component={Link} to={cardData.path}>
             {getLinkContents(cardData)}
           </CardActionArea>
