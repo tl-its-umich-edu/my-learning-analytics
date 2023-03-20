@@ -1,15 +1,14 @@
 import React from 'react'
 
 function ResourceChartNarrative ({ data, weekRange, gradeSelection, resourceType }) {
-  const resourceData = data.sort((a, b) => b.total_percent - a.total_percent)
-  const unAccessedResources = resourceData.filter(resource => resource.self_access_count === 0)
-  const accessedResources = resourceData.filter(resource => resource.self_access_count >= 1)
+  const unAccessedResources = data.filter(resource => resource.self_access_count === 0)
+  const accessedResources = data.filter(resource => resource.self_access_count >= 1)
   const narrativeTextResources = {}
   narrativeTextResources.weekSelection = `Resources accessed from week ${weekRange[0]} to ${weekRange[1]}. `
   narrativeTextResources.typeOfResource = `Selected resource type(s) ${resourceType.length === 1 ? 'is' : 'are'} ${resourceType}. `
   narrativeTextResources.gradeFilter = gradeSelection.toUpperCase() !== 'ALL' ? `Filtering on grades ${gradeSelection}.` : 'Getting resources across all grades.'
-  narrativeTextResources.resourcesUnaccessCount = `You have not yet accessed ${unAccessedResources.length} of ${resourceData.length} resources.  `
-  narrativeTextResources.resourcesAccessCount = accessedResources.length !== 0 ? `. You have accessed ${accessedResources.length} of ${resourceData.length} resources.  ` : ''
+  narrativeTextResources.resourcesUnaccessCount = `You have not yet accessed ${unAccessedResources.length} of ${data.length} resources.`
+  narrativeTextResources.resourcesAccessCount = `You have accessed ${accessedResources.length} of ${data.length} resources.`
   narrativeTextResources.resourcesUnAccessList = unAccessedResources.map(x =>
     resourceType.length === 1
       ? `${x.resource_name.split('|')[1]} has been accessed by ${x.total_percent}% of students.`
@@ -20,19 +19,19 @@ function ResourceChartNarrative ({ data, weekRange, gradeSelection, resourceType
       ? `${x.resource_name.split('|')[1]} has been accessed by ${x.total_percent}% of students, and you accessed it ${x.self_access_count} times. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`
       : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students, and you accessed it ${x.self_access_count} times. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`)
   return (
-    <div id='resource-view-narrative' className='fa-sr-only' aria-live='polite'>
+    <div id='resource-view-narrative' className='fa-sr-only' aria-live='polite' aria-atomic='true'>
       <p>The following paragraphs provide a text description for the graphical bar-chart on this page:</p>
       <p>{narrativeTextResources.weekSelection}</p>
       <p>{narrativeTextResources.typeOfResource}</p>
       <p>{narrativeTextResources.gradeFilter}</p>
       <p>{narrativeTextResources.resourcesUnaccessCount}</p>
-      <p aria-labelledby='unaccessedResources'>List of resources you have not accessed</p>
-      <ul id='unaccessedResources'>
+      <p id='unaccessedResources'>List of resources you have not accessed</p>
+      <ul aria-labelledby='unaccessedResources'>
         {narrativeTextResources.resourcesUnAccessList.map((item, key) => <li key={key}>{item}</li>)}
       </ul>
       <p>{narrativeTextResources.resourcesAccessCount}</p>
-      <p aria-labelledby='accessedResources'>List of resources you have accessed</p>
-      <ul id='accessedResources'>
+      <p id='accessedResources'>List of resources you have accessed</p>
+      <ul aria-labelledby='accessedResources'>
         {narrativeTextResources.resourceAccessList.map((item, key) => <li key={key}>{item}</li>)}
       </ul>
     </div>

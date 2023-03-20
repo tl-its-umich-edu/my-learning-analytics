@@ -229,9 +229,11 @@ function ResourcesAccessed (props) {
   }
 
   const resourceAccessChartBuilder = (resourceData, resourcesLimit) => {
+    console.log(resourceData)
+    const resourceDataSorted = resourceData.sort((a, b) => b.total_percent - a.total_percent)
     if (resourceTypeFilter.length === 0) {
       return (<AlertBanner>Please select a resource type to display data.</AlertBanner>)
-    } else if (!resourceData || Object.keys(resourceData).length === 0) {
+    } else if (!resourceDataSorted || Object.keys(resourceDataSorted).length === 0) {
       return (<AlertBanner>Resource data for your selections is not available.</AlertBanner>)
     } else {
       return (
@@ -240,13 +242,13 @@ function ResourcesAccessed (props) {
             {`Displaying ${resourcesLimit ?? 'all available'} resources in this course`}
           </Typography>
           <ResourceChartNarrative
-            data={resourceData}
+            data={resourceDataSorted}
             weekRange={weekRange}
             gradeSelection={resourceGradeFilter}
             resourceType={resourceTypeFilter}
           />
           <ResourceAccessChart
-            data={resourceData}
+            data={resourceDataSorted}
             aspectRatio={0.3}
             minHeight={350}
           />
