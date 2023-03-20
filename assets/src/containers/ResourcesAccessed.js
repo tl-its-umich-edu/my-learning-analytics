@@ -229,7 +229,6 @@ function ResourcesAccessed (props) {
   }
 
   const resourceAccessChartBuilder = (resourceData, resourcesLimit) => {
-    console.log(resourceData)
     const resourceDataSorted = resourceData.sort((a, b) => b.total_percent - a.total_percent)
     if (resourceTypeFilter.length === 0) {
       return (<AlertBanner>Please select a resource type to display data.</AlertBanner>)
