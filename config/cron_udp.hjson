@@ -107,7 +107,7 @@
         (
             select
                 la.due_date as due_date,
-                la.due_date at time zone 'America/Detroit' as local_date,
+                timezone(%(time_zone)s, la.due_date AT TIME ZONE 'UTC') as local_date,
                 la.title as name,
                 cast(co.lms_int_id as BIGINT) as course_id,
                 cast(la_km.lms_int_id as BIGINT) as id,
@@ -233,7 +233,7 @@
                 lar.published_score as published_score,
                 lar.response_date as submitted_at,
                 lar.graded_date as graded_at,
-                lar.posted_at at time zone 'America/Detroit' as grade_posted_local_date,
+                timezone(%(time_zone)s, lar.posted_at AT TIME ZONE 'UTC') as grade_posted_local_date,
                 lar.grading_status as submission_workflow_state,
                 la.title as title,
                 lar.learner_activity_result_id as learner_activity_result_id,

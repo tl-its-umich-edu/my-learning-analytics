@@ -463,7 +463,8 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         status += util_function(queries['assignment'],
                                 'assignment',
-                                {'course_ids': tuple(self.valid_locked_course_ids)})
+                                {'course_ids': tuple(self.valid_locked_course_ids),
+                                 'time_zone': settings.TIME_ZONE})
 
         return status
 
@@ -483,7 +484,8 @@ class DashboardCronJob(CronJobBase):
                                 'submission',
                                 {
                                     'course_ids': tuple(self.valid_locked_course_ids),
-                                    'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT
+                                    'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT,
+                                    'time_zone': settings.TIME_ZONE
                                 })
 
         return status
