@@ -7,7 +7,7 @@ function ResourceChartNarrative ({ data, weekRange, gradeSelection, resourceType
   const narrativeTextResources = {}
   narrativeTextResources.weekSelection = `Resources accessed from week ${weekRange[0]} to ${weekRange[1]}. `
   narrativeTextResources.typeOfResource = `Selected resource type(s) ${resourceType.length === 1 ? 'is' : 'are'} ${resourceType}. `
-  narrativeTextResources.gradeFilter = gradeSelection.toUpperCase() !== 'ALL' ? `Filtering on grades ${gradeSelection}. ` : 'Getting resources across all grades.'
+  narrativeTextResources.gradeFilter = gradeSelection.toUpperCase() !== 'ALL' ? `Filtering on grades ${gradeSelection}.` : 'Getting resources across all grades.'
   narrativeTextResources.resourcesUnaccessCount = `You have not yet accessed ${unAccessedResources.length} of ${resourceData.length} resources.  `
   narrativeTextResources.resourcesAccessCount = accessedResources.length !== 0 ? `. You have accessed ${accessedResources.length} of ${resourceData.length} resources.  ` : ''
   narrativeTextResources.resourcesUnAccessList = unAccessedResources.map(x =>
