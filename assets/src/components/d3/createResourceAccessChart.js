@@ -1,6 +1,5 @@
 import * as d3 from 'd3'
 import { adjustViewport } from '../../util/chart'
-import { createResourcesText } from './d3ViewsNarrative'
 import { tip as d3tip } from 'd3-v6-tip'
 import './createResourceAccessChart.css'
 import { siteTheme } from '../../globals'
@@ -91,8 +90,7 @@ function truncate (selection, labelWidth) {
   })
 }
 
-function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceType, width, height, domElement }) {
-  // This should already be sorted by percent from the backend, but try to sort it again
+function createResourceAccessChart ({ data, width, height, domElement }) {
   const resourceData = data.sort((a, b) => b.total_percent - a.total_percent)
 
   /* Assign an index to each resource.  This is used to assist with keyboard navigation
@@ -160,16 +158,8 @@ function createResourceAccessChart ({ data, weekRange, gradeSelection, resourceT
   const miniYScale = d3.scaleBand().range([0, miniHeight])
 
   const textScale = d3.scaleLinear().range([12, 6]).domain([15, 50]).clamp(true)
-  // d3 graph narrative text
-  const narrativeTextResources = createResourcesText(resourceData, resourceType, gradeSelection, weekRange)
   // Build the chart
   const main = d3.select(domElement).append('div')
-
-  main.append('div')
-    .attr('aria-live', 'polite')
-    .attr('id', 'resource-view-narrative')
-    .attr('class', 'fa-sr-only')
-    .text(d => narrativeTextResources)
 
   const svg = main.append('svg')
     .attr('class', 'svgWrapper')

@@ -1,28 +1,5 @@
 import { isInRange, isOutOfRange } from '../../util/math'
 
-const createResourcesText = (resourceData, resourceType, gradeSelection, weekRange) => {
-  const unAccessedResources = resourceData.filter(resource => resource.self_access_count === 0)
-  const accessedResources = resourceData.filter(resource => resource.self_access_count >= 1)
-  const narrativeTextResources = {}
-  narrativeTextResources.weekRange = `Resources accessed from week ${weekRange[0]} to ${weekRange[1]}. `
-  narrativeTextResources.resourceType = `Selected resource type(s) ${resourceType.length === 1 ? 'is' : 'are'} ${resourceType}. `
-  narrativeTextResources.gradeFilter = gradeSelection.toUpperCase() !== 'ALL' ? `Filtering on grades ${gradeSelection}. ` : ''
-  narrativeTextResources.resourcesUnaccessCount = `You have not yet accessed ${unAccessedResources.length} of ${resourceData.length} resources.  `
-  narrativeTextResources.resourcesAccessCount = accessedResources.length !== 0 ? `. You have accessed ${accessedResources.length} of ${resourceData.length} resources.  ` : ''
-  narrativeTextResources.resourcesUnAccessList = unAccessedResources.map(x =>
-    resourceType.length === 1
-      ? `${x.resource_name.split('|')[1]} has been accessed by ${x.total_percent}% of students.`
-      : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students.`
-  )
-  narrativeTextResources.resourceAccessList = accessedResources.map(x =>
-    resourceType.length === 1
-      ? `${x.resource_name.split('|')[1]} has been accessed by ${x.total_percent}% of students. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`
-      : `${x.resource_name.split('|')[1]} of type ${x.resource_type} has been accessed by ${x.total_percent}% of students. The last time you accessed this resource was on ${new Date(x.self_access_last_time).toDateString()}`)
-  return narrativeTextResources.weekRange.concat(narrativeTextResources.resourceType,
-    narrativeTextResources.gradeFilter, narrativeTextResources.resourcesUnaccessCount,
-    narrativeTextResources.resourcesUnAccessList, narrativeTextResources.resourcesAccessCount, narrativeTextResources.resourceAccessList)
-}
-
 const createGradesText = (data, bins, gradesSummary, myGrade, firstGradeAfterBinnedGrade) => {
   const isBinningUsed = new Set(data.slice(0, 5)).size === 1
   const binningNarrativeText = () => {
@@ -47,9 +24,8 @@ const createGradesText = (data, bins, gradesSummary, myGrade, firstGradeAfterBin
       }
     }
   }
-  return narrativeTextGrades.courseStats.concat(narrativeTextGrades.binnedGradeText, narrativeTextGrades.courseGrades.toString())
+  return narrativeTextGrades
 }
 export {
-  createResourcesText,
   createGradesText
 }

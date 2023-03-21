@@ -52,11 +52,19 @@ function createHistogram ({ data, width, height, domElement, xAxisLabel, yAxisLa
   // SVG Components
   const main = d3.select(domElement).append('div')
 
-  main.append('div')
+  const narrativeDiv = main.append('div')
     .attr('aria-live', 'polite')
     .attr('id', 'grade-view-narrative')
     .attr('class', 'fa-sr-only')
-    .text(d => narrativeTextGrades)
+    .text(d => 'The following paragraphs provide a text description for the graphical bar-chart on this page:')
+  narrativeDiv.append('span').text(d => narrativeTextGrades.courseStats)
+  narrativeDiv.append('span').text(d => narrativeTextGrades.binnedGradeText)
+  narrativeDiv.append('span').attr('id', 'grades-bins').text(d => 'List describing the number of students in each grade range')
+  narrativeDiv.append('ul').attr('aria-labelledby', 'grades-bins').selectAll('li')
+    .data(narrativeTextGrades.courseGrades)
+    .enter()
+    .append('li')
+    .text(d => d)
 
   const svg = main.append('svg')
     .attr('width', aWidth)
