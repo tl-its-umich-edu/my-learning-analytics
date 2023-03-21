@@ -229,12 +229,12 @@ function ResourcesAccessed (props) {
   }
 
   const resourceAccessChartBuilder = (resourceData, resourcesLimit) => {
-    const resourceDataSorted = resourceData.sort((a, b) => b.total_percent - a.total_percent)
     if (resourceTypeFilter.length === 0) {
       return (<AlertBanner>Please select a resource type to display data.</AlertBanner>)
-    } else if (!resourceDataSorted || Object.keys(resourceDataSorted).length === 0) {
+    } else if (!resourceData || Object.keys(resourceData).length === 0) {
       return (<AlertBanner>Resource data for your selections is not available.</AlertBanner>)
     } else {
+      const resourceDataSorted = resourceData.sort((a, b) => b.total_percent - a.total_percent)
       return (
         <>
           <Typography style={{ textAlign: 'center' }} gutterBottom>
