@@ -167,7 +167,6 @@
      */
     "course":
         '''
-        WITH no_term_temp as (SELECT academic_term_id from entity.academic_term where name = 'No Term')
         SELECT
             cast(co2.lms_int_id as BIGINT) as id,
             cast(co2.lms_ext_id as BIGINT) as canvas_id,
@@ -177,19 +176,12 @@
             co.le_end_date::timestamp without time zone as conclude_at
         FROM
             entity.course_offering co
-            LEFT OUTER JOIN entity.academic_session as3 on (co.academic_session_id = as3.academic_session_id),
+            LEFT OUTER JOIN entity.academic_term at1 on (co.academic_term_id = at1.academic_term_id),
             keymap.course_offering co2,
-            keymap.academic_term at2,
-            no_term_temp
+            keymap.academic_term at2
             WHERE co2.lms_int_id in %(course_ids)s
             and co.course_offering_id = co2.id
-            and (
-                (co.academic_session_id is null and co.academic_term_id is not null and (co.academic_term_id = at2.id))
-            or
-                (co.academic_session_id is null and co.academic_term_id is null and at2.id = no_term_temp.academic_term_id)
-            or
-                (co.academic_session_id = as3.academic_session_id and at2.id = as3.academic_term_id)
-            )
+            and at1.academic_term_id = at2.id
         ''',
     "resource":
         '''
