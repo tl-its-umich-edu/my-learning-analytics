@@ -1,6 +1,9 @@
 ## UDP (Unizin Data Platform) queries for MyLA cron job
 {
     "metadata":
+        // The dag_run date inside publish_info report would reflect when the data was loaded into the UDP context_store by batch-ingest ETL process,
+        // and it wouldn’t reflect when the data was actually dumped from canvas.
+        // More info on UDP's batch-ingest DAG process can be found here: https://resources.unizin.org/display/UDP/Batch-ingest+application
         '''
         select 'canvasdatadate' as pkey, min(dag_run) as pvalue from report.publish_info pi2
         ''',
