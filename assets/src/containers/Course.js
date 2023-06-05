@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
 import GradeDistribution from './GradeDistribution'
-import AssignmentPlanning from './AssignmentPlanning'
 import AssignmentPlanningV2 from './AssignmentPlanningV2'
 import ResourcesAccessed from './ResourcesAccessed'
 import IndexPage from './IndexPage'
@@ -96,14 +95,6 @@ function Course (props) {
                     <GradeDistribution
                       user={user}
                       disabled={!courseInfo.course_view_options.gd}
-                      courseId={courseId}
-                      enrollmentTypes={enrollmentTypes}
-                      isAdmin={user.admin}
-                    />
-                  </Route>
-                  <Route path='/courses/:courseId/assignmentsv1'>
-                    <AssignmentPlanning
-                      disabled={!courseInfo.course_view_options.apv1}
                       courseId={courseId}
                       enrollmentTypes={enrollmentTypes}
                       isAdmin={user.admin}
