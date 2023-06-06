@@ -295,5 +295,5 @@
     "COURSES_ENABLED": false,
 
     # Path to the hjson file contains cron queries
-    "CRON_QUERY_FILE": "config/cron.hjson"
+    "CRON_QUERY_FILE": "config/cron_udp.hjson"
 }
