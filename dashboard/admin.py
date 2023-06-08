@@ -51,10 +51,11 @@ class CourseForm(forms.ModelForm):
         exclude = ()
 
     def clean(self):
-        canvas_id = self.cleaned_data.get('canvas_id')
-        if not canvas_id or not str(canvas_id).isdigit():
-            raise forms.ValidationError(
-                f"Course ID {canvas_id} must be an integer value")
+        # Only validate canvas_id on initial course creation
+        if self.instance.canvas_id is None:
+            canvas_id = self.cleaned_data.get('canvas_id')
+            if not str(canvas_id).isdigit():
+                raise forms.ValidationError('Canvas ID must be a positive integer value.')
         return self.cleaned_data
 
 
