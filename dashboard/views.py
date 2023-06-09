@@ -460,7 +460,7 @@ def grade_distribution(request, course_id=0):
             'course_id': course_id,
             'enrollment_type': 'StudentEnrollment'
         })
-    if df.empty or df.count().current_grade < 6:
+    if df.empty or df.count().current_grade < 6 or config.GRADE_DISTRIBUTION_LIMIT > len(df):
         logger.info(f"Not enough students grades (only {df.count().current_grade}) in a course {course_id} to show the view")
         return HttpResponse(json.dumps({}), content_type='application/json')
 
