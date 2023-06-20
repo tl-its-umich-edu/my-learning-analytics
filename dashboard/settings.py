@@ -166,8 +166,8 @@ MIDDLEWARE = [
 CRON_CLASSES = [
     "dashboard.cron.DashboardCronJob",
 ]
-# the cron.hjson file contains queries run by MyLA cron job
-CRON_QUERY_FILE = os.path.join(BASE_DIR, ENV.get('CRON_QUERY_FILE', 'config/cron.hjson'))
+# the cron_udp.hjson file contains queries run by MyLA cron job
+CRON_QUERY_FILE = os.path.join(BASE_DIR, ENV.get('CRON_QUERY_FILE', 'config/cron_udp.hjson'))
 
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

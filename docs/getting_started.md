@@ -32,9 +32,9 @@ To follow the instructions below, you will at minimum need the following:
     cp config/env_sample.hjson ~/mylasecrets/env.hjson
     ```
 
-1. Copy the `config/cron.hjson` file into `mylasecrets`.
+1. Copy the `config/cron_udp.hjson` file into `mylasecrets`. This step is Optional, since the MyLA cron query file path defaults to `config/cron_udp.hjson`.
     ```sh
-    cp config/cron.hjson ~/mylasecrets/cron.hjson
+    cp config/cron_udp.hjson ~/mylasecrets/cron_udp.hjson
     ```
 
 1. Examine the `env.hjson` file. You may need to change some of the configuration values for different environments,

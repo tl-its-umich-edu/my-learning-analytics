@@ -35,13 +35,4 @@ Please adjust those values based on your institution's needs.
             "python scripts/data_validation/validate_udp_events_vs_expanded.py"
         ```
 
-    - Validate UDP context store queries: This script will validate queries against the UDP `context_store` tables, and
-    compare whether the data results are identical with those returned from Unizin Data Warehouse (UDW) tables.
-    Before running this queries, please make sure there are two cron queries files in the `~/mylasecrets` folder,
-    named `cron.hjson` (for UDW queries) and `cron_udp.hjson` (for UDP queries).
-        ```sh
-        docker exec -it student_dashboard /bin/bash -c \
-            "python scripts/data_validation/validate_udw_vs_udp.py"
-        ```
-
 [Next: Contributing](../docs/CONTRIBUTING.md)
