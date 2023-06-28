@@ -1,9 +1,10 @@
-from typing import Tuple
+from typing import Any, Tuple
 
 from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.forms.models import ModelForm
+from django.http.request import HttpRequest
 from django.template.defaultfilters import linebreaksbr
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -54,8 +55,15 @@ class CourseForm(forms.ModelForm):
         # Only validate canvas_id on initial course creation
         if self.instance.canvas_id is None:
             canvas_id = self.cleaned_data.get('canvas_id')
-            if not str(canvas_id).isdigit():
-                raise forms.ValidationError('Canvas ID must be a positive integer value.')
+            exception = forms.ValidationError(
+                f"Canvas Course ID {canvas_id} must be a positive integer value."
+            )
+            try:
+                canvas_id_int = int(canvas_id)
+            except TypeError:
+                raise exception
+            if canvas_id_int < 1:
+                raise exception
         return self.cleaned_data
 
 
@@ -95,9 +103,11 @@ class CourseAdmin(admin.ModelAdmin):
     def course_link(self, obj):
         return format_html('<a href="{}">Link</a>', obj.absolute_url)
 
-    def change_view(self, request, object_id, form_url='', extra_content=None):
-        self.readonly_fields = self.readonly_fields + ('canvas_id',)
-        return super(CourseAdmin, self).change_view(request, object_id)
+    def get_readonly_fields(self, request: HttpRequest, obj: Any | None = ...) -> tuple[str, ...]:
+        readonly_fields: tuple[str, ...] = self.readonly_fields
+        if obj is not None:
+            readonly_fields += ('canvas_id',)
+        return readonly_fields
 
     # When saving the course, update the id based on canvas id
     def save_model(self, request, obj, form, change):
