@@ -6,7 +6,6 @@ from datetime import timedelta
 from json import JSONDecodeError
 
 import jsonschema
-import numpy as np
 import pandas as pd
 from constance import config
 from django.conf import settings
@@ -22,7 +21,7 @@ from rules.contrib.views import permission_required, objectgetter
 from dashboard.common import utils
 from dashboard.common.db_util import canvas_id_to_incremented_id, create_sqlalchemy_engine
 from dashboard.event_logs_types.event_logs_types import EventLogTypes
-from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection, User
+from dashboard.models import Course, CourseViewOption, Resource, UserDefaultSelection
 from dashboard.settings import COURSES_ENABLED, RESOURCE_VALUES, RESOURCE_VALUES_MAP, \
     RESOURCE_ACCESS_CONFIG
 
