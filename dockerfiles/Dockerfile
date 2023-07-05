@@ -1,6 +1,6 @@
 # NOTE: When updating this file, also update Dockerfile.openshift
 # build react components for production mode
-FROM node:16-slim AS node-webpack
+FROM node:18-bullseye-slim AS node-webpack
 WORKDIR /usr/src/app
 
 # NOTE: package.json and webpack.config.js not likely to change between dev builds
@@ -21,7 +21,7 @@ RUN apt-get update && \
     rm -rf /usr/src/app/assets/src
 
 # build node libraries for production mode
-FROM node:16-slim AS node-prod-deps
+FROM node:18-bullseye-slim AS node-prod-deps
 
 WORKDIR /usr/src/app
 COPY --from=node-webpack /usr/src/app /usr/src/app
