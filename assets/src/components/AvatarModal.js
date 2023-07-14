@@ -99,8 +99,6 @@ function AvatarModal (props) {
       let target
       if (url.includes('grades')) {
         target = viewHelpURLs.gd
-      } else if (url.includes('assignmentsv1')) {
-        target = viewHelpURLs.apv1
       } else if (url.includes('assignments')) {
         target = viewHelpURLs.ap
       } else if (url.includes('resources')) {

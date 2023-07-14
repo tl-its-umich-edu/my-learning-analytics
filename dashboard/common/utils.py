@@ -115,7 +115,6 @@ def get_myla_globals(request):
         "google_analytics_id": google_analytics_id,
         "view_help_urls": {
             'ra': settings.URL_VIEW_RESOURCES_ACCESSED,
-            'apv1': settings.URL_VIEW_ASSIGNMENT_PLANNING_V1,
             'ap': settings.URL_VIEW_ASSIGNMENT_PLANNING,
             'gd': settings.URL_VIEW_GRADE_DISTRIBUTION,
             'home': settings.HELP_URL

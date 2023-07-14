@@ -13,7 +13,6 @@
     "HELP_URL": "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics",
     # Help for views. Specify URLs to overide defaults
     # URL_VIEW_RESOURCES_ACCESSED
-    # URL_VIEW_ASSIGNMENT_PLANNING_V1
     # URL_VIEW_ASSIGNMENT_PLANNING
     # URL_VIEW_GRADE_DISTRIBUTION
     # ID for your Google Analytics, defaults to nothing/disabled

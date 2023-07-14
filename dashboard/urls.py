@@ -56,8 +56,6 @@ urlpatterns = [
         login_required(views.grade_distribution), name='grade_distribution'),
     path('api/v1/courses/<int:course_id>/resource_access_within_week/',
         login_required(views.resource_access_within_week), name='resource_access_within_week'),
-    path('api/v1/courses/<int:course_id>/assignments/',
-        login_required(views.assignments), name='assignments'),
     path('api/v1/courses/<int:course_id>/get_user_default_selection/',
         login_required(views.get_user_default_selection), name='get_user_default_selection'),
     path('api/v1/courses/<int:course_id>/info/',

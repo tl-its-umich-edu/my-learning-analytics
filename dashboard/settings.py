@@ -72,7 +72,6 @@ LOGOUT_URL = '/accounts/logout/'
 HELP_URL = ENV.get("HELP_URL", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics")
 
 URL_VIEW_RESOURCES_ACCESSED = ENV.get("URL_VIEW_RESOURCES_ACCESSED", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/resources-accessed")
-URL_VIEW_ASSIGNMENT_PLANNING_V1 = ENV.get("URL_VIEW_ASSIGNMENT_PLANNING_V1", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/assignment-planning")
 URL_VIEW_ASSIGNMENT_PLANNING = ENV.get("URL_VIEW_ASSIGNMENT_PLANNING", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/assignment-planning-goals")
 URL_VIEW_GRADE_DISTRIBUTION = ENV.get("URL_VIEW_GRADE_DISTRIBUTION", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/grade-distribution")
 
