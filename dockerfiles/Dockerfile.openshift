@@ -1,5 +1,5 @@
 # build react components for production mode
-FROM docker-registry.default.svc:5000/openshift/node:18-bullseye-slim AS node-webpack
+FROM image-registry.openshift-image-registry.svc:5000/openshift/node:18-bullseye-slim AS node-webpack
 WORKDIR /usr/src/app
 
 # NOTE: package.json and webpack.config.js not likely to change between dev builds
@@ -20,7 +20,7 @@ RUN apt-get update && \
     rm -rf /usr/src/app/assets/src
 
 # build node libraries for production mode
-FROM docker-registry.default.svc:5000/openshift/node:18-bullseye-slim AS node-prod-deps
+FROM image-registry.openshift-image-registry.svc:5000/openshift/node:18-bullseye-slim AS node-prod-deps
 
 WORKDIR /usr/src/app
 COPY --from=node-webpack /usr/src/app /usr/src/app
@@ -29,7 +29,7 @@ RUN npm prune --production && \
     find node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
 
 # FROM directive instructing base image to build upon
-FROM docker-registry.default.svc:5000/openshift/python:3.10-slim-bullseye AS app
+FROM image-registry.openshift-image-registry.svc:5000/openshift/python:3.10-slim-bullseye AS app
 
 # EXPOSE port 5000 to allow communication to/from server
 EXPOSE 5000
