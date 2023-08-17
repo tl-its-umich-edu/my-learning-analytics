@@ -3,7 +3,7 @@
     # Run the code here to generate https://raw.githubusercontent.com/openwisp/ansible-openwisp2/master/files/generate_django_secret_key.py
     "DJANGO_SECRET_KEY": "<Generate Secret Key>",
     # Sets the time zone for Django (defaults to environment variable TZ, which defaults to "America/Detroit")
-    # "TIME_ZONE": "America/Detroit",
+    "TIME_ZONE": "America/Detroit",
     # CSV List of hosts allowed, no spaces in between commas
     "ALLOWED_HOSTS": [
         "127.0.0.1",
