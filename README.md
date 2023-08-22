@@ -24,3 +24,4 @@ See the pages below to learn more about running, configuring, and deploying MyLA
 6. [Contributing](docs/CONTRIBUTING.md)
 7. [Contributors](docs/CONTRIBUTORS.md)
 8. [License](docs/license_info.md)
+9. [GitHub Action](docs/github_actions.md)
