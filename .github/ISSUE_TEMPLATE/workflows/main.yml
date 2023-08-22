@@ -19,6 +19,3 @@ jobs:
         run: |
           docker build . --tag ghcr.io/tl-its-umich-edu/my-learning-analytics:latest
           docker push ghcr.io/tl-its-umich-edu/my-learning-analytics:latest
-        
-   
-      
