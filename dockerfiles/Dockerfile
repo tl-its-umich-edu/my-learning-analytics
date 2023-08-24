@@ -4,7 +4,7 @@ FROM node:18-bullseye-slim AS node-webpack
 WORKDIR /usr/src/app
 
 # NOTE: package.json and webpack.config.js not likely to change between dev builds
-COPY package.json webpack.config.js /usr/src/app/
+COPY package.json webpack.config.js package-lock.json /usr/src/app/
 RUN npm install
 
 # NOTE: assets/ likely to change between dev builds
