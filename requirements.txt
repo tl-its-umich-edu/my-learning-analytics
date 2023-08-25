@@ -1,6 +1,6 @@
 gunicorn==20.1.0
 
-Django==3.2.19
+Django==3.2.20
 whitenoise==5.3.0
 
 # No update since 2018
