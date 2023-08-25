@@ -7,7 +7,6 @@ on:
 env:
   IMAGE_TAG: latest
   REPO_URL: ${{ github.repository }}
-  BASE_REF: ${{ github.base_ref }}
     
 jobs:
   build:
