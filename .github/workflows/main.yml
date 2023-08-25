@@ -3,19 +3,36 @@ name: Docker image CI
 on:
   push:
     branches: ['dynamic_repo']
-  workflow_dispatch:
+  
+env:
+  IMAGE_TAG: latest
+  REPO_URL: ${{ github.repository }}
+  BASE_REF: ${{ github.base_ref }}
+    
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+  
+      - name: Checkout code 
+        uses: actions/checkout@v3
+    
+      - name: Extract branch name
+        id: extract_branch
+        run: echo "BRANCH_NAME=$(basename ${{ github.ref }})" >> $GITHUB_ENV
+      
+      - name: build Docker image
+        run: |
+          docker build . --tag ghcr.io/${{ env.REPO_URL }}:${{ env.IMAGE_TAG }}-${BRANCH_NAME}
+      
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
             registry: ghcr.io
             username: ${{ github.actor }}
             password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build Docker Image
+      
+      - name: Push Docker image to GitHub Container Registry
         run: |
-          docker build . --tag ghcr.io/${{ GITHUB_REPOSITORY }}:latest
-          docker push ghcr.io/${{ GITHUB_REPOSITORY }}:latest
+          docker push ghcr.io/${{ env.REPO_URL }}:${{ env.IMAGE_TAG }}-${BRANCH_NAME}
+      
