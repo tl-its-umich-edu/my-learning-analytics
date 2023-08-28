@@ -3,7 +3,7 @@ name: Docker image CI
 on:
   push:
     # takes muliple branch names
-    branches: ['master', 'dynamic_repo']
+    branches: ['master']
   
 env:
   IMAGE_TAG: latest
