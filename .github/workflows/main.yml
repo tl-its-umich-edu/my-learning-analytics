@@ -10,6 +10,7 @@ env:
     
 jobs:
   build:
+    if: github.repository_owner == 'tl-its-umich-edu'
     runs-on: ubuntu-latest
     steps:
   
