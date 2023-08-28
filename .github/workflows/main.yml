@@ -2,6 +2,7 @@ name: Docker image CI
 
 on:
   push:
+    # takes muliple branch names
     branches: ['master', 'dynamic_repo']
   
 env:
@@ -10,7 +11,8 @@ env:
     
 jobs:
   build:
-    if: github.repository_owner == 'pushyamig'
+    # to test a feature, change the repo name to your github id
+    if: github.repository_owner == 'tl-its-umich-edu'
     runs-on: ubuntu-latest
     steps:
   
