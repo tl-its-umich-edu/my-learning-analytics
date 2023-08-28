@@ -2,7 +2,7 @@ name: Docker image CI
 
 on:
   push:
-    branches: ['master']
+    branches: ['master', 'dynamic_repo']
   
 env:
   IMAGE_TAG: latest
@@ -10,7 +10,7 @@ env:
     
 jobs:
   build:
-    if: github.repository_owner == 'tl-its-umich-edu'
+    if: github.repository_owner == 'pushyamig'
     runs-on: ubuntu-latest
     steps:
   
