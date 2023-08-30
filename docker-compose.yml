@@ -18,7 +18,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile
+      dockerfile: Dockerfile
       args:
         TZ: ${TZ}
     command: bash -c "./start.sh"
@@ -45,7 +45,7 @@ services:
   webpack_watcher:
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile
+      dockerfile: Dockerfile
       target: node-webpack
     command: sh -c "tar zxvf node_modules/all_symlinks.tgz && npm run watch"
     volumes:
