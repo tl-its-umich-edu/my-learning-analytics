@@ -76,16 +76,14 @@ function AssignmentGoalInput (props) {
         variant='outlined'
         style={{ marginRight: '10px', width: '25ch' }}
       />
-      {
-        <Button
-          variant='contained'
-          className={classes.clearButton}
-          onClick={handleClearGoalGrades}
-          aria-label='clear'
-        >
-          Clear
-        </Button>
-      }
+      <Button
+        variant='contained'
+        className={classes.clearButton}
+        onClick={handleClearGoalGrades}
+        aria-label='clear'
+      >
+        Clear
+      </Button>
     </Grid>
   )
 }
