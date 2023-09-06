@@ -100,6 +100,8 @@ SECRET_KEY = ENV.get('DJANGO_SECRET_KEY', get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = ENV.get('DJANGO_DEBUG', False)
 
+print(f"DEBUG: {DEBUG}")
+
 ALLOWED_HOSTS = ENV.get("ALLOWED_HOSTS", ["127.0.0.1", "localhost"])
 
 WATCHMAN_TOKEN = ENV.get('DJANGO_WATCHMAN_TOKEN', None)
@@ -203,7 +205,7 @@ GRAPHENE = {
 
 WEBPACK_LOADER = {
     'DEFAULT': {
-        'CACHE': not DEBUG,
+        'CACHE': DEBUG,
         'BUNDLE_DIR_NAME': 'dist/',
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
     }
