@@ -27,7 +27,7 @@ from dashboard.graphql.view import DashboardGraphQLView
 
 from django.views.decorators.cache import cache_page
 
-from dashboard.middleware.disableintro import DisableIntrospectionMiddleware
+from dashboard.middleware.disableintrospection import DisableIntrospectionMiddleware
 
 from . import views
 

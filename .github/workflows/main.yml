@@ -2,7 +2,7 @@ name: Docker image CI
 
 on:
   push:
-    branches: ['GQL_2']
+    branches: ['master']
   workflow_dispatch:
 jobs:
   build:
@@ -17,5 +17,5 @@ jobs:
             password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Docker Image
         run: |
-          docker build . --tag ghcr.io/pushyamig/my-learning-analytics:gql
-          docker push ghcr.io/pushyamig/my-learning-analytics:gql
+          docker build . --tag ghcr.io/tl-its-umich-edu/my-learning-analytics:latest
+          docker push ghcr.io/tl-its-umich-edu/my-learning-analytics:latest
