@@ -2,7 +2,12 @@ from graphql import GraphQLField, GraphQLObjectType, GraphQLSchema, GraphQLStrin
 
 
 class IntrospectionDisabledException(Exception):
-    pass
+     """
+     Disabling introspection in production mode
+     """
+     def __init__(self, message="Introspection is disabled."):
+        self.message = message
+        super().__init__(self.message)
 
 class DisableIntrospectionMiddleware:
     """
