@@ -461,8 +461,9 @@ def grade_distribution(request, course_id=0):
             'enrollment_type': 'StudentEnrollment'
         })
     if len(df) <= config.GRADE_DISTRIBUTION_MINIMUM:
-        logger.error(f"Course enrollment count {len(df)} is lower than the minimum required to display the Grade Distribution visualization {config.GRADE_DISTRIBUTION_MINIMUM}")
-        return HttpResponse(json.dumps({'gd_disable':'true','gd_msg': f'Grade Distribution view is disabled because the course enrollment is less than {config.GRADE_DISTRIBUTION_MINIMUM}'}), content_type='application/json')
+        grade_distribution_limit_msg = f'Grade Distribution view is disabled because the course enrollment is less than {config.GRADE_DISTRIBUTION_MINIMUM}'
+        logger.error(f"Course enrollment count {len(df)} Hence the {grade_distribution_limit_msg}")
+        return HttpResponse(json.dumps({'gd_disable':'true','gd_msg': grade_distribution_limit_msg}), content_type='application/json')
     if df.empty or df.count().current_grade < 6 :
         logger.info(f"Not enough students grades (only {df.count().current_grade}) in a course {course_id} to show the view")
         return HttpResponse(json.dumps({}), content_type='application/json')
