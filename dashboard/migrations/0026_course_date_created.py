@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='course',
-            name='created_date',
+            name='dated_created',
             field=models.DateTimeField(default=datetime.datetime.now, verbose_name='Created Date'),
         ),
     ]
