@@ -1,5 +1,5 @@
 from graphene_django.views import GraphQLView
-import json
+from django.contrib.auth.mixins import LoginRequiredMixin
 from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.graphql.loaders import AssignmentsByCourseIdLoader, \
     SubmissionsByAssignmentIdLoader, SubmissionByAssignmentIdAndUserIdLoader, \
@@ -17,7 +17,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class DashboardGraphQLView(GraphQLView):
+class DashboardGraphQLView(LoginRequiredMixin, GraphQLView):
     def get_context(self, request):
         loaders = {
             'assignment_weight_consideration_by_course_id_loader': AssignmentWeightConsiderationByCourseIdLoader(
