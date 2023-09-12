@@ -1,6 +1,3 @@
-from graphql import GraphQLField, GraphQLObjectType, GraphQLSchema, GraphQLString
-
-
 class IntrospectionDisabledException(Exception):
      """
      Disabling introspection in production mode
