@@ -13,7 +13,7 @@ import UserSettingSnackbar from '../components/UserSettingSnackbar'
 import ViewHeader from '../components/ViewHeader'
 import { roundToXDecimals } from '../util/math'
 import { useGradeData } from '../service/api'
-import { isObjectEmpty } from '../util/object'
+import { isObjectEmpty, isObjectGDLimit } from '../util/object'
 import useSetUserSetting from '../hooks/useSetUserSetting'
 import useUserSetting from '../hooks/useUserSetting'
 import { isTeacherOrAdmin } from '../util/roles'
@@ -122,6 +122,8 @@ function GradeDistribution (props) {
   let gradeContent
   if (gradeLoaded && isObjectEmpty(gradeData)) {
     gradeContent = (<AlertBanner>Grade data is not available.</AlertBanner>)
+  } else if (gradeLoaded && isObjectGDLimit(gradeData)) {
+    gradeContent = (<AlertBanner>{gradeData.gd_msg}</AlertBanner>)
   } else {
     gradeContent = gradeLoaded
       ? (<BuildGradeView />)

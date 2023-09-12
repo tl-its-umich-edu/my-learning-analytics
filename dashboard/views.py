@@ -450,6 +450,8 @@ def grade_distribution(request, course_id=0):
 
     current_user = request.user.get_username()
 
+    MINIMUM_GRADE_DISTRIBUTION_SCORES = 6
+
     grade_score_sql = f"""select current_grade,
        (select show_grade_counts From course where id=%(course_id)s) as show_number_on_bars,
        (select current_grade from user where sis_name=%(current_user)s and course_id=%(course_id)s) as current_user_grade
@@ -460,7 +462,11 @@ def grade_distribution(request, course_id=0):
             'course_id': course_id,
             'enrollment_type': 'StudentEnrollment'
         })
-    if df.empty or df.count().current_grade < 6:
+    if len(df) <= config.GRADE_DISTRIBUTION_MINIMUM:
+        grade_distribution_limit_msg = f'Grade Distribution view is disabled because the course enrollment is less than {config.GRADE_DISTRIBUTION_MINIMUM}'
+        logger.error(f"Course enrollment count {len(df)} Hence the {grade_distribution_limit_msg}")
+        return HttpResponse(json.dumps({'gd_disable':'true','gd_msg': grade_distribution_limit_msg}), content_type='application/json')
+    if df.empty or df.count().current_grade < MINIMUM_GRADE_DISTRIBUTION_SCORES :
         logger.info(f"Not enough students grades (only {df.count().current_grade}) in a course {course_id} to show the view")
         return HttpResponse(json.dumps({}), content_type='application/json')
 
