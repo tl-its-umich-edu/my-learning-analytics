@@ -79,10 +79,10 @@ class TermAdmin(admin.ModelAdmin):
 class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseViewOptionInline, ]
     form = CourseForm
-    fields = ('canvas_id', 'name', 'term', 'date_start', 'date_end', 'show_grade_counts', 'show_grade_type', 'data_last_updated')
-    list_display = ('canvas_id', 'name', 'term', 'show_grade_counts', 'course_link', '_courseviewoption', 'data_last_updated')
+    fields = ('canvas_id', 'name', 'term', 'date_start', 'date_end', 'show_grade_counts', 'show_grade_type', 'data_last_updated', 'date_created')
+    list_display = ('canvas_id', 'name', 'term', 'show_grade_counts', 'course_link', '_courseviewoption', 'data_last_updated', 'date_created')
     list_select_related = True
-    readonly_fields = ('term', 'data_last_updated',)
+    readonly_fields = ('term', 'data_last_updated', 'date_created')
     actions = ['clear_course_updated_dates']
 
     def view_on_site(self, obj):
