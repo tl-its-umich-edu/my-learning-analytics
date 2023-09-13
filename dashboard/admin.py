@@ -16,8 +16,9 @@ from django_cron.models import CronJobLog
 from rangefilter.filters import DateTimeRangeFilter
 
 
-from import_export.admin import ExportActionMixin
 from import_export import resources
+from import_export.admin import ExportActionMixin
+from import_export.fields import Field
 
 from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.models import AcademicTerms, Course, CourseViewOption
@@ -115,8 +116,14 @@ class CourseAdmin(admin.ModelAdmin):
         return super(CourseAdmin, self).save_model(request, obj, form, change)
 
 class LogResource(resources.ModelResource):
+
+    # This field is used to get the username from the auth_user model
+    username = Field(attribute='user__username', column_name='username')
     class Meta:
         model = Log
+        # Show the same fields in the UI
+        fields = ('id', 'timestamp', 'username', 'action', 'extra')
+        export_order = fields
 
 # This is a local class for LogAdmin that adds in export and disables adding and removing logs
 class MyLALogAdmin(ExportActionMixin, LogAdmin):
