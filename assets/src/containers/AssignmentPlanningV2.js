@@ -257,8 +257,7 @@ function AssignmentPlanningV2 (props) {
                         handleInputFocus={handleInputFocus}
                         handleInputBlur={handleInputBlur}
                       />
-                    </div>
-                  )
+                    </div>)
               }
               <UserSettingSnackbar
                 saved={!mutationError && !mutationLoading && settingChanged}
