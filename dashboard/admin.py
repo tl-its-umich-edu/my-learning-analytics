@@ -117,7 +117,7 @@ class CourseAdmin(admin.ModelAdmin):
 
 class LogResource(resources.ModelResource):
 
-    # This field is used to get the username from the user model
+    # This field is used to get the username from the auth_user model
     username = Field(attribute='user__username', column_name='username')
     class Meta:
         model = Log
