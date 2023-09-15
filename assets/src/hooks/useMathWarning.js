@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 
 // this is the case when either few assignments are graded or few has goal grade.
-// if an assignment is graded then it won't have goal grade and vice versa.
+// if an assignment is graded then it won't have goal grade.
 const isFewAssignmentsAreGradedOrHasGoalGrade = assignments =>
   assignments.filter(a => !(a.graded || a.goalGradeSetByUser)).length === 0
 
-// this is the case when all assignments are graded and design will won't assignment goal setting but course grade is allowed
+// this is the case when all assignments are graded and design won't allow assignment goal setting but course grade is allowed
 const allAssignmentsAreGraded = assignments => assignments.filter(a => !(a.graded)).length === 0
 
 const useMathWarning = assignments => {
