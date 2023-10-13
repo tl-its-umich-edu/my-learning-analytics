@@ -1,4 +1,3 @@
-# NOTE: When updating this file, also update Dockerfile.openshift
 # build react components for production mode
 FROM node:18-bullseye-slim AS node-webpack
 WORKDIR /usr/src/app
