@@ -1,6 +1,5 @@
-# NOTE: When updating this file, also update Dockerfile.openshift
 # build react components for production mode
-FROM node:18-bullseye-slim AS node-webpack
+FROM node:18-bookworm-slim AS node-webpack
 WORKDIR /usr/src/app
 
 # NOTE: package.json and webpack.config.js not likely to change between dev builds
@@ -21,7 +20,7 @@ RUN apt-get update && \
     rm -rf /usr/src/app/assets/src
 
 # build node libraries for production mode
-FROM node:18-bullseye-slim AS node-prod-deps
+FROM node:18-bookworm-slim AS node-prod-deps
 
 WORKDIR /usr/src/app
 COPY --from=node-webpack /usr/src/app /usr/src/app
@@ -30,7 +29,7 @@ RUN npm prune --production && \
     find node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
 
 # FROM directive instructing base image to build upon
-FROM python:3.10-slim-bullseye AS app
+FROM python:3.10-slim-bookworm AS app
 
 # EXPOSE port 5000 to allow communication to/from server
 EXPOSE 5000
@@ -40,7 +39,7 @@ WORKDIR /code
 COPY requirements.txt .
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        build-essential curl apt-transport-https libpq-dev netcat jq python3-dev xmlsec1 cron git && \
+        build-essential curl apt-transport-https libpq-dev netcat-traditional jq python3-dev xmlsec1 cron git && \
     apt-get upgrade -y
 
 # Install MariaDB from the mariadb repository rather than using Debians 
