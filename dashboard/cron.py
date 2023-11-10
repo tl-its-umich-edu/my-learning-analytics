@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Union
 
 import hjson
 import pandas as pd
-import pytz
+from zoneinfo import ZoneInfo 
 import pangres
 
 from django.conf import settings
@@ -13,7 +13,7 @@ from django.db import connections as conns, models
 from django.db.models import QuerySet
 from django_cron import CronJobBase, Schedule
 from google.cloud import bigquery
-from sqlalchemy import types
+from sqlalchemy import types, text
 from sqlalchemy.engine import ResultProxy
 
 from dashboard.common import db_util, utils
@@ -68,12 +68,12 @@ def util_function(sql_string, mysql_table, param_object=None, table_identifier=N
 
 # execute database query
 def execute_db_query(query: str, params: List = None) -> ResultProxy:
-    with engine.connect() as connection:
+    with engine.begin() as connection:
         connection.detach()
         if params:
-            return connection.execute(query, params)
+            return connection.execute(text(query), params)
         else:
-            return connection.execute(query)
+            return connection.execute(text(query))
 
 
 # remove all records inside the specified table
@@ -99,7 +99,7 @@ def soft_update_datetime_field(
             f'Skipped update of {field_name} for {model_name} instance ({model_inst.id}); existing value was found')
     else:
         if warehouse_field_value:
-            warehouse_field_value = warehouse_field_value.replace(tzinfo=pytz.UTC)
+            warehouse_field_value = warehouse_field_value.replace(tzinfo=ZoneInfo('UTC'))
             setattr(model_inst, field_name, warehouse_field_value)
             logger.info(f'Updated {field_name} for {model_name} instance ({model_inst.id})')
             return [field_name]
@@ -124,7 +124,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in checking course")
         supported_courses = Course.objects.get_supported_courses()
         course_ids = [str(x) for x in supported_courses.values_list('id', flat=True)]
-        courses_data = pd.read_sql(queries['course'], data_warehouse_engine, params={'course_ids': tuple(course_ids)})
+        courses_data = pd.read_sql(queries['course'], data_warehouse_engine, params={'course_ids': course_ids})
         # error out when course id is invalid, otherwise add DataFrame to list
         for course_id, data_last_updated in supported_courses:
             if course_id not in list(courses_data['id']):
@@ -151,7 +151,7 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
-        logger.debug("in update with data warehouse user")
+        logger.info("in update with data warehouse user")
 
         # delete all records in the table first
         status += delete_all_records_in_table("user")
@@ -160,7 +160,7 @@ class DashboardCronJob(CronJobBase):
         status += util_function(
                                 queries['user'],
                                 'user',
-                                {'course_ids': tuple(self.valid_locked_course_ids),
+                                {'course_ids': self.valid_locked_course_ids,
                                 'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT
                                 })
 
@@ -193,13 +193,13 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
-        logger.debug("in update canvas resource")
+        logger.info("in update canvas resource")
 
         # Select all the files for these courses
         # convert int array to str array
         df_attach = pd.read_sql(queries['resource'],
                                 data_warehouse_engine,
-                                params={'course_ids': tuple(self.valid_locked_course_ids)})
+                                params={'course_ids': self.valid_locked_course_ids })
         logger.debug(df_attach)
         # Update these back again based on the dataframe
         # Remove any rows where file_state is not available!
@@ -216,6 +216,8 @@ class DashboardCronJob(CronJobBase):
     def update_resource_access(self):
         # cron status
         status = ""
+
+        logger.info("in update resource access")
 
         # return string with concatenated SQL insert result
         return_string = ""
@@ -437,6 +439,8 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
+        logger.info("update_groups(): ")
+
         # delete all records in assignment_group table
         status += delete_all_records_in_table("assignment_groups")
 
@@ -447,7 +451,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         status += util_function(queries['assignment_groups'],
                                 'assignment_groups',
-                                {'course_ids': tuple(self.valid_locked_course_ids)})
+                                {'course_ids': self.valid_locked_course_ids})
 
         return status
 
@@ -463,7 +467,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         status += util_function(queries['assignment'],
                                 'assignment',
-                                {'course_ids': tuple(self.valid_locked_course_ids),
+                                {'course_ids': self.valid_locked_course_ids,
                                  'time_zone': settings.TIME_ZONE})
 
         return status
@@ -483,7 +487,7 @@ class DashboardCronJob(CronJobBase):
         status += util_function(queries['submission'],
                                 'submission',
                                 {
-                                    'course_ids': tuple(self.valid_locked_course_ids),
+                                    'course_ids': self.valid_locked_course_ids,
                                     'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT,
                                     'time_zone': settings.TIME_ZONE
                                 })
@@ -503,7 +507,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         status += util_function(queries['assignment_weight'],
                                 'assignment_weight_consideration',
-                                {'course_ids': tuple(self.valid_locked_course_ids)},
+                                {'course_ids': self.valid_locked_course_ids },
                                 'weight')
 
         logger.debug(status + "\n\n")
@@ -543,7 +547,7 @@ class DashboardCronJob(CronJobBase):
         Updates course records with data returned from verify_course_ids, only making changes when necessary.
         """
         status: str = ''
-        logger.debug('update_course()')
+        logger.info('update_course()')
 
         logger.debug(warehouse_courses_data.to_json(orient='records'))
         courses: QuerySet = Course.objects.filter(id__in=self.valid_locked_course_ids)
@@ -588,7 +592,7 @@ class DashboardCronJob(CronJobBase):
 
         status = ""
 
-        run_start = datetime.now(pytz.UTC)
+        run_start = datetime.now(ZoneInfo('UTC'))
         status += f"Start cron: {str(run_start)} UTC\n"
         course_verification = self.verify_course_ids()
         invalid_course_id_list = course_verification.invalid_course_ids
@@ -616,16 +620,16 @@ class DashboardCronJob(CronJobBase):
             # Update the date unless there is an exception
             exception_in_run = False
             logger.info("** course")
-            status += self.update_course(course_verification.course_data)
+            # status += self.update_course(course_verification.course_data)
 
             logger.info("** user")
-            status += self.update_user()
+            # status += self.update_user()
 
             logger.info("** assignment")
-            status += self.update_groups()
-            status += self.update_assignment()
-            status += self.submission()
-            status += self.weight_consideration()
+            # status += self.update_groups()
+            # status += self.update_assignment()
+            # status += self.submission()
+            # status += self.weight_consideration()
 
             logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
@@ -639,7 +643,7 @@ class DashboardCronJob(CronJobBase):
 
         if settings.DATABASES.get('DATA_WAREHOUSE', {}).get('IS_UNIZIN'):
             logger.info("** informational")
-            status += self.update_unizin_metadata()
+            # status += self.update_unizin_metadata()
 
         all_str_course_ids = set(
             str(x) for x in Course.objects.get_supported_courses().values_list('id', flat=True)
