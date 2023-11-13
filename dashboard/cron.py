@@ -7,7 +7,7 @@ import hjson
 import pandas as pd
 from zoneinfo import ZoneInfo 
 import pangres
-
+import psycopg
 from django.conf import settings
 from django.db import connections as conns, models
 from django.db.models import QuerySet
@@ -44,6 +44,9 @@ def split_list(a_list: list, size: int = 20):
 
 # the util function
 
+def util_submission_function(sql_string, mysql_table, param_object=None, table_identifier=None):
+    pass
+
 
 def util_function(sql_string, mysql_table, param_object=None, table_identifier=None):
     logger.debug(f'sql={sql_string}')
@@ -67,7 +70,7 @@ def util_function(sql_string, mysql_table, param_object=None, table_identifier=N
 
 
 # execute database query
-def execute_db_query(query: str, params: List = None) -> ResultProxy:
+def execute_db_query(query: str, params: Dict = None) -> ResultProxy:
     with engine.begin() as connection:
         connection.detach()
         if params:
@@ -77,7 +80,7 @@ def execute_db_query(query: str, params: List = None) -> ResultProxy:
 
 
 # remove all records inside the specified table
-def delete_all_records_in_table(table_name: str, where_clause: str = "", where_params: List = None):
+def delete_all_records_in_table(table_name: str, where_clause: str = "", where_params: Dict = None):
     # delete all records in the table first, can have an optional where clause
     result_proxy = execute_db_query(f"delete from {table_name} {where_clause}", where_params)
     return(f"\n{result_proxy.rowcount} rows deleted from {table_name}\n")
@@ -233,7 +236,7 @@ class DashboardCronJob(CronJobBase):
 
         logger.info(f"Deleting all records in resource_access after {data_last_updated}")
 
-        status += delete_all_records_in_table("resource_access", f"WHERE access_time > %s", [data_last_updated, ])
+        status += delete_all_records_in_table("resource_access", f"WHERE access_time > :data_last_updated", {'data_last_updated': data_last_updated })
 
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
@@ -395,7 +398,7 @@ class DashboardCronJob(CronJobBase):
             student_enrollment_type = User.EnrollmentType.STUDENT
             student_enrollment_df = pd.read_sql(
                 'select user_id, course_id from user where enrollment_type= %s',
-                engine, params={student_enrollment_type})
+                engine, params=[(str(student_enrollment_type),)])
             resource_access_df = pd.merge(
                 resource_access_df, student_enrollment_df,
                 on=['user_id', 'course_id'],
@@ -628,14 +631,15 @@ class DashboardCronJob(CronJobBase):
             logger.info("** assignment")
             # status += self.update_groups()
             # status += self.update_assignment()
-            # status += self.submission()
+            status += self.submission()
             # status += self.weight_consideration()
 
             logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
                 try:
-                    status += self.update_resource_access()
-                    status += self.update_canvas_resource()
+                    # status += self.update_resource_access()
+                    # status += self.update_canvas_resource()
+                    pass
                 except Exception as e:
                     logger.error(f"Exception running BigQuery update: {str(e)}")
                     status += str(e)
