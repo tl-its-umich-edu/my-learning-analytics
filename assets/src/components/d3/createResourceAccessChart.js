@@ -38,14 +38,14 @@ const toolTip = tip.attr('class', 'd3-tip')
   })
 
 function appendLegend (svg) {
-  const legendBoxLength = 10
-  const legendBoxTextInterval = 15
+  const legendBoxLength = 13
+  const legendBoxTextInterval = 20
   const legendInterval = 20
   const legendY = -50
 
   const legendLabels = [
-    ['Resources I haven\'t viewed', notAccessedResourceColor],
-    ['Resources I\'ve viewed', accessedResourceColor]
+    ['Resources I haven\'t viewed', 'url(#not-accessed-pattern)'],
+    ['Resources I\'ve viewed', 'url(#accessed-pattern)']
   ]
 
   const legend = svg.select('.mainGroupWrapper').append('g')
@@ -189,8 +189,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('height', mainYScale.bandwidth())
       .attr('class', 'bar')
       .attr('fill', d => d.self_access_count > 0
-        ? accessedResourceColor
-        : notAccessedResourceColor
+        ? 'url(#accessed-pattern)'
+        : 'url(#not-accessed-pattern)'
       )
       .on('focus', (e, d) => {
         moveBrushOnFocus(e, d.resource_name)
@@ -210,7 +210,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .enter()
       .append('text')
       .attr('class', 'label')
-      .attr('x', d => mainXScale(d.total_percent) + 3 + mainMargin.left)
+      .attr('x', d => mainXScale(d.total_percent) + 40 + mainMargin.left)
       .attr('y', d => mainYScale(d.resource_name) + mainYScale.bandwidth() / 2 + mainMargin.top)
       .attr('dx', -10)
       .attr('dy', '.35em')
@@ -285,8 +285,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
     d3.select('.miniGroup').selectAll('.bar')
       .style('fill', d => d.self_access_count > 0
-        ? accessedResourceColor
-        : notAccessedResourceColor
+        ? 'url(#accessed-pattern)'
+        : 'url(#not-accessed-pattern)'
       )
       .style('opacity', d => selected.includes(d.resource_name)
         ? 1
@@ -393,14 +393,61 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .on('mousedown.brush', brushcenter)
     .on('touchstart.brush', brushcenter, { passive: true })
 
+  let defs = svg.append('defs');
+
   // Clips
-  svg.append('defs')
+  defs.append('defs')
     .append('clipPath')
     .attr('id', 'clip')
     .append('rect')
     .attr('x', -mainMargin.left)
     .attr('width', mainWidth + mainMargin.left)
     .attr('height', mainHeight)
+
+  // Pattern
+  defs.append('pattern')
+    .attr('id', 'accessed-pattern')
+    // .attr('width', 10)
+    // .attr('height', 10)
+    // .attr('patternUnits', 'userSpaceOnUse')
+    // .attr('patternTransform', 'rotate(45)')
+    // .append('rect')
+    // .attr('width', 15)
+    // .attr('height', 10)
+    // .attr('stroke', 'white')
+    // .attr('stroke-width',2)
+    // .attr('transform', 'translate(-2,0)')
+    .attr('width', 8)
+    .attr('height', 8)
+    .attr('patternUnits', 'userSpaceOnUse')
+    .append('rect')
+    .attr('width', 8)
+    .attr('height', 8)
+    .attr('fill', accessedResourceColor)
+  defs.select('#accessed-pattern')
+    .append('rect')
+    .attr('width', 2.5)
+    .attr('height', 2.5)
+    .attr('fill', 'white')
+    .attr('transform', 'translate(0,2)')
+
+  defs.append('pattern')
+    .attr('id', 'not-accessed-pattern')
+    .attr('width', 10)
+    .attr('height', 10)
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('patternTransform', 'rotate(45)')
+    .append('rect')
+    .attr('width', 10)
+    .attr('height', 10)
+    .attr('fill', notAccessedResourceColor) 
+  defs.select('#not-accessed-pattern')
+    .append('rect')
+    .attr('width', 2)
+    .attr('height', 10)
+    .attr('fill', 'black')
+
+
 
   // Inject data
   // Domain
@@ -444,8 +491,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('height', miniYScale.bandwidth())
     .attr('class', 'bar')
     .attr('fill', d => d.self_access_count > 0
-      ? accessedResourceColor
-      : notAccessedResourceColor
+      ? 'url(#accessed-pattern)'
+      : 'url(#not-accessed-pattern)'
     )
 
   // Add brush to main chart
