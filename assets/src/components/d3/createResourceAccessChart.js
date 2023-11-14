@@ -404,19 +404,9 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('width', mainWidth + mainMargin.left)
     .attr('height', mainHeight)
 
-  // Pattern
+  // Pattern for accessed: white dots on blue background
   defs.append('pattern')
     .attr('id', 'accessed-pattern')
-    // .attr('width', 10)
-    // .attr('height', 10)
-    // .attr('patternUnits', 'userSpaceOnUse')
-    // .attr('patternTransform', 'rotate(45)')
-    // .append('rect')
-    // .attr('width', 15)
-    // .attr('height', 10)
-    // .attr('stroke', 'white')
-    // .attr('stroke-width',2)
-    // .attr('transform', 'translate(-2,0)')
     .attr('width', 8)
     .attr('height', 8)
     .attr('patternUnits', 'userSpaceOnUse')
@@ -431,6 +421,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('fill', 'white')
     .attr('transform', 'translate(0,2)')
 
+  // Pattern for not accessed: black stripes on gray background
   defs.append('pattern')
     .attr('id', 'not-accessed-pattern')
     .attr('width', 10)
@@ -446,8 +437,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('width', 2)
     .attr('height', 10)
     .attr('fill', 'black')
-
-
 
   // Inject data
   // Domain
