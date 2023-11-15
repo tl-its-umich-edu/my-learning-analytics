@@ -45,7 +45,7 @@ function appendLegend (svg) {
 
   const legendLabels = [
     ['Resources I haven\'t viewed', 'url(#not-accessed-pattern)'],
-    ['Resources I\'ve viewed', 'url(#accessed-pattern)']
+    ['Resources I\'ve viewed', accessedResourceColor]
   ]
 
   const legend = svg.select('.mainGroupWrapper').append('g')
@@ -189,7 +189,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('height', mainYScale.bandwidth())
       .attr('class', 'bar')
       .attr('fill', d => d.self_access_count > 0
-        ? 'url(#accessed-pattern)'
+        ? accessedResourceColor
         : 'url(#not-accessed-pattern)'
       )
       .on('focus', (e, d) => {
@@ -285,7 +285,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
     d3.select('.miniGroup').selectAll('.bar')
       .style('fill', d => d.self_access_count > 0
-        ? 'url(#accessed-pattern)'
+        ? accessedResourceColor
         : 'url(#not-accessed-pattern)'
       )
       .style('opacity', d => selected.includes(d.resource_name)
@@ -404,23 +404,6 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('width', mainWidth + mainMargin.left)
     .attr('height', mainHeight)
 
-  // Pattern for accessed: white dots on blue background
-  defs.append('pattern')
-    .attr('id', 'accessed-pattern')
-    .attr('width', 8)
-    .attr('height', 8)
-    .attr('patternUnits', 'userSpaceOnUse')
-    .append('rect')
-    .attr('width', 8)
-    .attr('height', 8)
-    .attr('fill', accessedResourceColor)
-  defs.select('#accessed-pattern')
-    .append('rect')
-    .attr('width', 2.5)
-    .attr('height', 2.5)
-    .attr('fill', 'white')
-    .attr('transform', 'translate(0,2)')
-
   // Pattern for not accessed: black stripes on gray background
   defs.append('pattern')
     .attr('id', 'not-accessed-pattern')
@@ -480,7 +463,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('height', miniYScale.bandwidth())
     .attr('class', 'bar')
     .attr('fill', d => d.self_access_count > 0
-      ? 'url(#accessed-pattern)'
+      ? accessedResourceColor
       : 'url(#not-accessed-pattern)'
     )
 
