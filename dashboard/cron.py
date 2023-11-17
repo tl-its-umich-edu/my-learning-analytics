@@ -2,10 +2,10 @@ from datetime import datetime
 import logging
 from collections import namedtuple
 from typing import Any, Dict, List, Union
+from zoneinfo import ZoneInfo
 
 import hjson
 import pandas as pd
-from zoneinfo import ZoneInfo 
 import pangres
 
 from django.conf import settings
@@ -504,15 +504,11 @@ class DashboardCronJob(CronJobBase):
                 df.to_sql(con=engine, name='submission', if_exists='append', index=False)
 
         except Exception as e:
-            logger.exception('Error running sql on table submission', e)
+            logger.exception('Error running sql on table submission', str(e))
             raise
         status+=f"{str(df.shape[0])} submission: {query_params}\n"
 
     # returns the row size of dataframe
-        return status
-        
-        
-
         return status
 
     def weight_consideration(self):

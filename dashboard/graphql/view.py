@@ -1,5 +1,6 @@
 from graphene_django.views import GraphQLView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from graphql_core_promise import PromiseExecutionContext
 from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.graphql.loaders import AssignmentsByCourseIdLoader, \
     SubmissionsByAssignmentIdLoader, SubmissionByAssignmentIdAndUserIdLoader, \
@@ -8,7 +9,6 @@ from dashboard.graphql.loaders import AssignmentsByCourseIdLoader, \
     AssignmentGroupByCourseIdAndIdLoader, AssignmentWeightConsiderationByCourseIdLoader, \
     UserDefaultSelectionsByCourseIdAndUserLoader, UserDefaultSelectionByCourseIdAndUserAndViewTypeLoader, \
     AcademicTermByIdLoader
-from graphql_core_promise import PromiseExecutionContext
 from django.db.models import Q
 from dashboard.models import User
 from pinax.eventlog.models import log as eventlog

@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from dashboard.models import Course, CourseViewOption, AcademicTerms
 from dashboard.common.db_util import canvas_id_to_incremented_id
 from datetime import datetime
-from zoneinfo import ZoneInfo 
+from zoneinfo import ZoneInfo
 
 class Command(BaseCommand):
     def add_arguments(self, parser):

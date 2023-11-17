@@ -11,7 +11,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import Optional, Union
 
-from zoneinfo import ZoneInfo 
+from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
