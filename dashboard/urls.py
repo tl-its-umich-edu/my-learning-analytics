@@ -27,8 +27,6 @@ from dashboard.graphql.view import DashboardGraphQLView
 
 from django.views.decorators.cache import cache_page
 
-from dashboard.middleware.disableintrospection import DisableIntrospectionMiddleware
-
 from . import views
 
 import watchman.views
@@ -44,7 +42,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Note the absence of a trailing slash; adding one breaks the GraphQL implementation.
-    path('graphql', DashboardGraphQLView.as_view( middleware=[] if settings.DEBUG else [DisableIntrospectionMiddleware],graphiql=settings.DEBUG)),
+    path('graphql', DashboardGraphQLView.as_view(graphiql=settings.DEBUG)),
 
     # This is the courses catch-all. Most user-initiated requests will match the regular expression; then the React
     # front-end will manage any additional routing.

@@ -18,6 +18,12 @@ docker exec -it student_dashboard /bin/bash -c \
 After about 30 to 60 seconds, the cron job should have completed and you should have data!
 In the admin interface, there is a table where you can check the status of the cron job runs.
 
+debugging cron use the following command. Once you run this command then go to VSCode and start the 'MyLA Docker Cron'. Add some 
+Breakpoint to debug at desired location.
+```sh
+docker exec -it student_dashboard /bin/bash -c "DEBUGPY_WAIT_FOR_ATTACH=True DEBUGPY_ENABLE=TRUE DEBUGPY_REMOTE_PORT=3001 ./manage_debugpy.py runcrons --force"
+```
+
 ### Cron scheduling for deployment
 
 > **Note:** Cron scheduling functionality settings may be removed in the future,

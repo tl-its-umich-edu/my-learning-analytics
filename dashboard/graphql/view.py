@@ -8,7 +8,7 @@ from dashboard.graphql.loaders import AssignmentsByCourseIdLoader, \
     AssignmentGroupByCourseIdAndIdLoader, AssignmentWeightConsiderationByCourseIdLoader, \
     UserDefaultSelectionsByCourseIdAndUserLoader, UserDefaultSelectionByCourseIdAndUserAndViewTypeLoader, \
     AcademicTermByIdLoader
-
+from graphql_core_promise import PromiseExecutionContext
 from django.db.models import Q
 from dashboard.models import User
 from pinax.eventlog.models import log as eventlog
@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class DashboardGraphQLView(LoginRequiredMixin, GraphQLView):
+    execution_context_class = PromiseExecutionContext
     def get_context(self, request):
         loaders = {
             'assignment_weight_consideration_by_course_id_loader': AssignmentWeightConsiderationByCourseIdLoader(

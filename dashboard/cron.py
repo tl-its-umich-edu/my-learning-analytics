@@ -15,6 +15,7 @@ from django_cron import CronJobBase, Schedule
 from google.cloud import bigquery
 from sqlalchemy import types, text
 from sqlalchemy.engine import ResultProxy
+from sqlalchemy.orm import Session, sessionmaker
 
 from dashboard.common import db_util, utils
 from dashboard.models import Course, Resource, AcademicTerms, User
@@ -487,13 +488,33 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids
         # filter out not released grades (submission_dim.posted_at date is not null) and partial grades (submission_dim.workflow_state != 'graded')
-        status += util_function(queries['submission'],
-                                'submission',
-                                {
-                                    'course_ids': self.valid_locked_course_ids,
-                                    'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT,
-                                    'time_zone': settings.TIME_ZONE
-                                })
+        query_params = {
+                        'course_ids': self.valid_locked_course_ids,
+                         'time_zone': settings.TIME_ZONE,
+                        'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT,
+                        }
+        Session = sessionmaker(bind=data_warehouse_engine)
+        try:
+    # Create a session
+            with Session() as session:
+                # Execute the first query to create the temporary table
+                session.execute(text(queries['submission']).bindparams(**query_params))
+
+                # Execute the second query using the temporary table
+                result = session.execute(text(queries['submission_with_avg_score']))
+                df = pd.DataFrame(result.fetchall(), columns=result.keys())
+                df = df.drop_duplicates(keep='first')
+                df.to_sql(con=engine, name='submission', if_exists='append', index=False)
+
+        except Exception as e:
+            logger.exception('Error running sql on table submission', e)
+            raise
+        status+=f"{str(df.shape[0])} submission: {query_params}\n"
+
+    # returns the row size of dataframe
+        return status
+        
+        
 
         return status
 
@@ -623,23 +644,22 @@ class DashboardCronJob(CronJobBase):
             # Update the date unless there is an exception
             exception_in_run = False
             logger.info("** course")
-            # status += self.update_course(course_verification.course_data)
+            status += self.update_course(course_verification.course_data)
 
             logger.info("** user")
-            # status += self.update_user()
+            status += self.update_user()
 
             logger.info("** assignment")
-            # status += self.update_groups()
-            # status += self.update_assignment()
+            status += self.update_groups()
+            status += self.update_assignment()
             status += self.submission()
-            # status += self.weight_consideration()
+            status += self.weight_consideration()
 
             logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
                 try:
-                    # status += self.update_resource_access()
-                    # status += self.update_canvas_resource()
-                    pass
+                    status += self.update_resource_access()
+                    status += self.update_canvas_resource()
                 except Exception as e:
                     logger.error(f"Exception running BigQuery update: {str(e)}")
                     status += str(e)
@@ -647,7 +667,7 @@ class DashboardCronJob(CronJobBase):
 
         if settings.DATABASES.get('DATA_WAREHOUSE', {}).get('IS_UNIZIN'):
             logger.info("** informational")
-            # status += self.update_unizin_metadata()
+            status += self.update_unizin_metadata()
 
         all_str_course_ids = set(
             str(x) for x in Course.objects.get_supported_courses().values_list('id', flat=True)
