@@ -7,7 +7,7 @@ import hjson
 import pandas as pd
 from zoneinfo import ZoneInfo 
 import pangres
-import psycopg
+
 from django.conf import settings
 from django.db import connections as conns, models
 from django.db.models import QuerySet
@@ -15,9 +15,9 @@ from django_cron import CronJobBase, Schedule
 from google.cloud import bigquery
 from sqlalchemy import types, text
 from sqlalchemy.engine import ResultProxy
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
-from dashboard.common import db_util, utils
+from dashboard.common import db_util
 from dashboard.models import Course, Resource, AcademicTerms, User
 
 
@@ -44,9 +44,6 @@ def split_list(a_list: list, size: int = 20):
     return [a_list[i:i + size] for i in range(0, len(a_list), size)]
 
 # the util function
-
-def util_submission_function(sql_string, mysql_table, param_object=None, table_identifier=None):
-    pass
 
 
 def util_function(sql_string, mysql_table, param_object=None, table_identifier=None):
