@@ -44,7 +44,7 @@ function appendLegend (svg) {
   const legendY = -50
 
   const legendLabels = [
-    ['Resources I haven\'t viewed', 'url(#not-accessed-pattern)'],
+    ['Resources I haven\'t viewed', 'url(#notAccessedPattern)'],
     ['Resources I\'ve viewed', accessedResourceColor]
   ]
 
@@ -190,7 +190,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('class', 'bar')
       .attr('fill', d => d.self_access_count > 0
         ? accessedResourceColor
-        : 'url(#not-accessed-pattern)'
+        : 'url(#notAccessedPattern)'
       )
       .on('focus', (e, d) => {
         moveBrushOnFocus(e, d.resource_name)
@@ -286,7 +286,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     d3.select('.miniGroup').selectAll('.bar')
       .style('fill', d => d.self_access_count > 0
         ? accessedResourceColor
-        : 'url(#not-accessed-pattern)'
+        : 'url(#notAccessedPattern)'
       )
       .style('opacity', d => selected.includes(d.resource_name)
         ? 1
@@ -393,7 +393,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .on('mousedown.brush', brushcenter)
     .on('touchstart.brush', brushcenter, { passive: true })
 
-  let defs = svg.append('defs');
+  const defs = svg.append('defs')
 
   // Clips
   defs.append('defs')
@@ -406,7 +406,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
 
   // Pattern for not accessed: black stripes on gray background
   defs.append('pattern')
-    .attr('id', 'not-accessed-pattern')
+    .attr('id', 'notAccessedPattern')
     .attr('width', 10)
     .attr('height', 10)
     .attr('patternUnits', 'userSpaceOnUse')
@@ -414,8 +414,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .append('rect')
     .attr('width', 10)
     .attr('height', 10)
-    .attr('fill', notAccessedResourceColor) 
-  defs.select('#not-accessed-pattern')
+    .attr('fill', notAccessedResourceColor)
+  defs.select('#notAccessedPattern')
     .append('rect')
     .attr('width', 2)
     .attr('height', 10)
@@ -464,7 +464,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('class', 'bar')
     .attr('fill', d => d.self_access_count > 0
       ? accessedResourceColor
-      : 'url(#not-accessed-pattern)'
+      : 'url(#notAccessedPattern)'
     )
 
   // Add brush to main chart
