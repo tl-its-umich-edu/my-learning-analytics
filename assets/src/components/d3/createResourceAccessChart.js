@@ -396,7 +396,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   const svgDefinitions = svg.append('defs')
 
   // Clips
-  svgDefinitions.append('defs')
+  svgDefinitions
     .append('clipPath')
     .attr('id', 'clip')
     .append('rect')
@@ -405,7 +405,8 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('height', mainHeight)
 
   // Pattern for not accessed: black stripes on gray background
-  svgDefinitions.append('pattern')
+  svgDefinitions
+    .append('pattern')
     .attr('id', 'notAccessedPattern')
     .attr('width', 10)
     .attr('height', 10)
@@ -415,7 +416,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('width', 10)
     .attr('height', 10)
     .attr('fill', notAccessedResourceColor)
-  defs.select('#notAccessedPattern')
+  svgDefinitions.select('#notAccessedPattern')
     .append('rect')
     .attr('width', 2)
     .attr('height', 10)
