@@ -38,13 +38,13 @@ const toolTip = tip.attr('class', 'd3-tip')
   })
 
 function appendLegend (svg) {
-  const legendBoxLength = 10
-  const legendBoxTextInterval = 15
+  const legendBoxLength = 13
+  const legendBoxTextInterval = 20
   const legendInterval = 20
   const legendY = -50
 
   const legendLabels = [
-    ['Resources I haven\'t viewed', notAccessedResourceColor],
+    ['Resources I haven\'t viewed', 'url(#notAccessedPattern)'],
     ['Resources I\'ve viewed', accessedResourceColor]
   ]
 
@@ -190,7 +190,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('class', 'bar')
       .attr('fill', d => d.self_access_count > 0
         ? accessedResourceColor
-        : notAccessedResourceColor
+        : 'url(#notAccessedPattern)'
       )
       .on('focus', (e, d) => {
         moveBrushOnFocus(e, d.resource_name)
@@ -210,7 +210,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .enter()
       .append('text')
       .attr('class', 'label')
-      .attr('x', d => mainXScale(d.total_percent) + 3 + mainMargin.left)
+      .attr('x', d => mainXScale(d.total_percent) + 40 + mainMargin.left)
       .attr('y', d => mainYScale(d.resource_name) + mainYScale.bandwidth() / 2 + mainMargin.top)
       .attr('dx', -10)
       .attr('dy', '.35em')
@@ -286,7 +286,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     d3.select('.miniGroup').selectAll('.bar')
       .style('fill', d => d.self_access_count > 0
         ? accessedResourceColor
-        : notAccessedResourceColor
+        : 'url(#notAccessedPattern)'
       )
       .style('opacity', d => selected.includes(d.resource_name)
         ? 1
@@ -393,14 +393,34 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .on('mousedown.brush', brushcenter)
     .on('touchstart.brush', brushcenter, { passive: true })
 
+  const svgDefinitions = svg.append('defs')
+
   // Clips
-  svg.append('defs')
+  svgDefinitions
     .append('clipPath')
     .attr('id', 'clip')
     .append('rect')
     .attr('x', -mainMargin.left)
     .attr('width', mainWidth + mainMargin.left)
     .attr('height', mainHeight)
+
+  // Pattern for not accessed: black stripes on gray background
+  svgDefinitions
+    .append('pattern')
+    .attr('id', 'notAccessedPattern')
+    .attr('width', 10)
+    .attr('height', 10)
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('patternTransform', 'rotate(45)')
+    .append('rect')
+    .attr('width', 10)
+    .attr('height', 10)
+    .attr('fill', notAccessedResourceColor)
+  svgDefinitions.select('#notAccessedPattern')
+    .append('rect')
+    .attr('width', 2)
+    .attr('height', 10)
+    .attr('fill', 'black')
 
   // Inject data
   // Domain
@@ -445,7 +465,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
     .attr('class', 'bar')
     .attr('fill', d => d.self_access_count > 0
       ? accessedResourceColor
-      : notAccessedResourceColor
+      : 'url(#notAccessedPattern)'
     )
 
   // Add brush to main chart
