@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import Paper from '@material-ui/core/Paper'
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
-import Checkbox from '@material-ui/core/Checkbox'
+import withStyles from '@mui/styles/withStyles'
+import Paper from '@mui/material/Paper'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
+import Checkbox from '@mui/material/Checkbox'
 import AlertBanner from '../components/AlertBanner'
 import WarningBanner from '../components/WarningBanner'
 import Histogram from '../components/Histogram'
@@ -70,7 +70,7 @@ function GradeDistribution (props) {
       ['Class Size', <strong key={2}>{gradeData.summary.tot_students}</strong>],
       !user.admin && showGrade
         ? ([
-          'My grade',
+            'My grade',
           <strong key={0}>
             {
               gradeData.summary.current_user_grade
@@ -78,25 +78,25 @@ function GradeDistribution (props) {
                 : 'There are no grades yet for you in this course'
             }
           </strong>
-        ])
+          ])
         : []
     ]
 
     const gradeCheckbox = !user.admin
       ? userSettingLoaded
-        ? (
-          <Typography align='right'>{'Show my grade'}
-            <Checkbox
-              color='secondary'
-              checked={showGrade}
-              onChange={() => {
-                setSettingChanged(true)
-                setShowGrade(!showGrade)
-              }}
-            />
-          </Typography>
-        )
-        : <Spinner />
+          ? (
+            <Typography align='right'>Show my grade
+              <Checkbox
+                color='secondary'
+                checked={showGrade}
+                onChange={() => {
+                  setSettingChanged(true)
+                  setShowGrade(!showGrade)
+                }}
+              />
+            </Typography>
+            )
+          : <Spinner />
       : null
 
     return (

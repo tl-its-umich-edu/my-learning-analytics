@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
-import { withStyles } from '@material-ui/core/styles'
+import withStyles from '@mui/styles/withStyles'
 import { withRouter, Link } from 'react-router-dom'
-import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import IconButton from '@material-ui/core/IconButton'
-import MenuIcon from '@material-ui/icons/Menu'
-import Avatar from '@material-ui/core/Avatar'
-import Popover from '@material-ui/core/Popover'
+import AppBar from '@mui/material/AppBar'
+import Toolbar from '@mui/material/Toolbar'
+import IconButton from '@mui/material/IconButton'
+import MenuIcon from '@mui/icons-material/Menu'
+import Avatar from '@mui/material/Avatar'
+import Popover from '@mui/material/Popover'
 import AvatarModal from '../components/AvatarModal'
 import SurveyModal from '../components/SurveyModal'
 import { surveyLink } from '../globals'
@@ -62,6 +62,7 @@ function DashboardAppBar (props) {
             className={classes.menuButton}
             color='inherit'
             aria-label='Menu'
+            size='large'
           >
             <MenuIcon />
           </IconButton>
@@ -79,6 +80,7 @@ function DashboardAppBar (props) {
             color='inherit'
             aria-haspopup='true'
             variant='contained'
+            size='large'
           >
             <Avatar>{user.initials}</Avatar>
           </IconButton>

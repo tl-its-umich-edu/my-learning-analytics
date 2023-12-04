@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import AppBar from '@material-ui/core/AppBar'
-import Avatar from '@material-ui/core/Avatar'
-import Grid from '@material-ui/core/Grid'
-import IconButton from '@material-ui/core/IconButton'
-import MuiLink from '@material-ui/core/Link'
-import Popover from '@material-ui/core/Popover'
-import Toolbar from '@material-ui/core/Toolbar'
-import Typography from '@material-ui/core/Typography'
+import withStyles from '@mui/styles/withStyles'
+import AppBar from '@mui/material/AppBar'
+import Avatar from '@mui/material/Avatar'
+import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
+import MuiLink from '@mui/material/Link'
+import Popover from '@mui/material/Popover'
+import Toolbar from '@mui/material/Toolbar'
+import Typography from '@mui/material/Typography'
 import { siteTheme } from '../globals'
 import AlertBanner from '../components/AlertBanner'
 import AvatarModal from '../components/AvatarModal'
@@ -55,6 +55,7 @@ function CourseList (props) {
             color='inherit'
             aria-haspopup='true'
             variant='contained'
+            size='large'
           >
             <Avatar>{user.initials}</Avatar>
           </IconButton>
@@ -84,7 +85,7 @@ function CourseList (props) {
                 Visit the <MuiLink href={user.helpURL} style={{ color: siteTheme.palette.link.main }}>Help site</MuiLink> for
                 more information about this tool.
               </AlertBanner>
-            )
+              )
             : (
               <Grid container spacing={2}>
                 <Grid item xs={12} />
@@ -96,7 +97,7 @@ function CourseList (props) {
                   ))
                 }
               </Grid>
-            )
+              )
         }
       </div>
     </>

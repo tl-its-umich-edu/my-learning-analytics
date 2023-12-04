@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { BrowserRouter as Router } from 'react-router-dom'
-import { ThemeProvider } from '@material-ui/core/styles'
+import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles'
 import './index.css'
 import App from './containers/App'
 import client from './service/client'
@@ -12,9 +12,11 @@ import { user, siteTheme, gaId, cspNonce } from './globals'
 ReactDOM.render(
   <Router basename='/'>
     <ApolloProvider client={client}>
-      <ThemeProvider theme={siteTheme}>
-        <App user={user} gaId={gaId} cspNonce={cspNonce} />
-      </ThemeProvider>
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={siteTheme}>
+          <App user={user} gaId={gaId} cspNonce={cspNonce} />
+        </ThemeProvider>
+      </StyledEngineProvider>
     </ApolloProvider>
   </Router>
   , document.getElementById('root')

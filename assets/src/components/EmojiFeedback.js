@@ -1,6 +1,6 @@
 import React, { useEffect, memo } from 'react'
 import emojiFeedback from '@justin0022/emoji-feedback'
-import { withStyles } from '@material-ui/core/styles'
+import withStyles from '@mui/styles/withStyles'
 import withPopover from './withPopover'
 import compose from '../util/compose'
 

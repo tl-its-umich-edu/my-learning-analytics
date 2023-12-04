@@ -1,5 +1,7 @@
 import React from 'react'
-import { Typography, withStyles } from '@material-ui/core'
+import { Typography } from '@mui/material'
+
+import withStyles from '@mui/styles/withStyles'
 
 const styles = () => ({
   typography: {
@@ -11,7 +13,6 @@ const styles = () => ({
     paddingRight: '10px'
   }
 })
-
 
 function IconLabel (props) {
   const {

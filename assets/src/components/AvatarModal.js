@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import Grid from '@material-ui/core/Grid'
-import Divider from '@material-ui/core/Divider'
-import Typography from '@material-ui/core/Typography'
-import Avatar from '@material-ui/core/Avatar'
-import Link from '@material-ui/core/Link'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import ListItemText from '@material-ui/core/ListItemText'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import Dialog from '@material-ui/core/Dialog'
-import LogoutIcon from '@material-ui/icons/ExitToApp'
-import HelpIcon from '@material-ui/icons/HelpOutline'
-import Lock from '@material-ui/icons/Lock'
-import Launch from '@material-ui/icons/Launch'
+import withStyles from '@mui/styles/withStyles'
+import Grid from '@mui/material/Grid'
+import Divider from '@mui/material/Divider'
+import Typography from '@mui/material/Typography'
+import Avatar from '@mui/material/Avatar'
+import Link from '@mui/material/Link'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import DialogTitle from '@mui/material/DialogTitle'
+import Dialog from '@mui/material/Dialog'
+import LogoutIcon from '@mui/icons-material/ExitToApp'
+import HelpIcon from '@mui/icons-material/HelpOutline'
+import Lock from '@mui/icons-material/Lock'
+import Launch from '@mui/icons-material/Launch'
 import { viewHelpURLs } from '../globals'
 
 const styles = theme => ({
@@ -135,7 +135,7 @@ function AvatarModal (props) {
         <Grid item xs={12}>
           <List>
             <Divider />
-            <Link style={{ textDecoration: 'none' }} href={helpURL} target='_blank' rel='noopener'>
+            <Link style={{ textDecoration: 'none' }} href={helpURL} target='_blank' rel='noopener noreferrer'>
               <ListItem button>
                 <ListItemIcon>
                   <HelpIcon />
@@ -165,7 +165,7 @@ function AvatarModal (props) {
                       <ListItemText inset primary='Logout' className={classes.text} />
                     </ListItem>
                   </Link>
-                )
+                  )
                 : null
             }
           </List>

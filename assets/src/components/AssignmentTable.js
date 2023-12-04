@@ -1,25 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import Button from '@material-ui/core/Button'
-import Checkbox from '@material-ui/core/Checkbox'
-import FormControl from '@material-ui/core/FormControl'
-import Grid from '@material-ui/core/Grid'
-import InputLabel from '@material-ui/core/InputLabel'
-import Input from '@material-ui/core/Input'
-import ListItemText from '@material-ui/core/ListItemText'
-import MenuItem from '@material-ui/core/MenuItem'
-import MTable from '@material-ui/core/Table'
-import Popover from '@material-ui/core/Popover'
-import Select from '@material-ui/core/Select'
-import TableBody from '@material-ui/core/TableBody'
-import TableCell from '@material-ui/core/TableCell'
-import TableContainer from '@material-ui/core/TableContainer'
-import TableHead from '@material-ui/core/TableHead'
-import TableRow from '@material-ui/core/TableRow'
-import Tooltip from '@material-ui/core/Tooltip'
-import GradedIcon from '@material-ui/icons/Done'
-import UnsubmittedIcon from '@material-ui/icons/Remove'
-import SubmittedIcon from '@material-ui/icons/Textsms'
+import withStyles from '@mui/styles/withStyles'
+import Button from '@mui/material/Button'
+import Checkbox from '@mui/material/Checkbox'
+import FormControl from '@mui/material/FormControl'
+import Grid from '@mui/material/Grid'
+import InputLabel from '@mui/material/InputLabel'
+import Input from '@mui/material/Input'
+import ListItemText from '@mui/material/ListItemText'
+import MenuItem from '@mui/material/MenuItem'
+import MTable from '@mui/material/Table'
+import Popover from '@mui/material/Popover'
+import Select from '@mui/material/Select'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import Tooltip from '@mui/material/Tooltip'
+import GradedIcon from '@mui/icons-material/Done'
+import UnsubmittedIcon from '@mui/icons-material/Remove'
+import SubmittedIcon from '@mui/icons-material/Textsms'
 import ProgressBarV2 from './ProgressBarV2'
 import PopupMessage from './PopupMessage'
 import StyledTextField from './StyledTextField'
@@ -174,7 +174,8 @@ function AssignmentTable (props) {
 
   // Use decimal place of pointsPossible if it's a decimal; otherwise, round to nearest tenth
   const placeToRoundTo = pointsPossible => (String(pointsPossible).includes('.'))
-    ? getDecimalPlaceOfFloat(pointsPossible) : 1
+    ? getDecimalPlaceOfFloat(pointsPossible)
+    : 1
 
   // this effect scrolls to current week of assignments if it exists
   useEffect(() => {
@@ -364,8 +365,8 @@ function AssignmentTable (props) {
                       {
                         a.week
                           ? isPreviousWeekTheSame(a.week, key)
-                            ? ''
-                            : `Week ${a.week}`
+                              ? ''
+                              : `Week ${a.week}`
                           : 'No due date'
                       }
                     </TableCell>
@@ -380,8 +381,8 @@ function AssignmentTable (props) {
                       {
                         a.week
                           ? isPreviousDayTheSame(a.dueDateMonthDay, key)
-                            ? ''
-                            : a.dueDateMonthDay
+                              ? ''
+                              : a.dueDateMonthDay
                           : ''
                       }
                     </TableCell>
@@ -399,83 +400,84 @@ function AssignmentTable (props) {
                       {`${roundToXDecimals(a.percentOfFinalGrade, 1)}%`}
                     </TableCell>
                     <TableCell style={{ minWidth: '200px' }}>
-                      {
-                        a.graded || a.outOf === 0
-                          ? <div className={classes.possiblePointsText}>{a.outOf === 0 ? '0' : `${a.currentUserSubmission.score}`}</div>
-                          : (
-                            <StyledTextField
-                              error={(a.goalGrade / a.pointsPossible) > 1}
-                              disabled={!courseGoalGradeSet}
-                              id='standard-number'
-                              value={roundToXDecimals(a.goalGrade, placeToRoundTo(a.pointsPossible))}
-                              label={
-                                !courseGoalGradeSet ? 'Set a goal'
-                                  : (a.goalGrade / a.pointsPossible) > 1
-                                    ? 'Over 100%'
-                                    : 'Set a goal'
-                              }
-                              onChange={event => {
-                                const assignmentGoalGrade = event.target.value
-                                handleAssignmentGoalGrade(a.id, assignmentGoalGrade, a.goalGrade)
-                              }}
-                              type='number'
-                              className={classes.goalGradeInput}
-                              onFocus={() => handleInputFocus(a.id)}
-                              onBlur={() => handleInputBlur(a.id)}
-                            />
-                          )
-                      }
-                      {
+                      <>
+                        {
+                          a.graded || a.outOf === 0
+                            ? <div className={classes.possiblePointsText}>{a.outOf === 0 ? '0' : `${a.currentUserSubmission.score}`}</div>
+                            : (
+                              <StyledTextField
+                                error={(a.goalGrade / a.pointsPossible) > 1}
+                                disabled={!courseGoalGradeSet}
+                                id='standard-number'
+                                value={roundToXDecimals(a.goalGrade, placeToRoundTo(a.pointsPossible))}
+                                label={
+                                  !courseGoalGradeSet
+                                    ? 'Set a goal'
+                                    : (a.goalGrade / a.pointsPossible) > 1
+                                        ? 'Over 100%'
+                                        : 'Set a goal'
+                                }
+                                onChange={event => {
+                                  const assignmentGoalGrade = event.target.value
+                                  handleAssignmentGoalGrade(a.id, assignmentGoalGrade, a.goalGrade)
+                                }}
+                                type='number'
+                                className={classes.goalGradeInput}
+                                onFocus={() => handleInputFocus(a.id)}
+                                onBlur={() => handleInputBlur(a.id)}
+                              />
+                              )
+                        }
                         <div className={classes.possiblePointsText}>
                           {` / ${a.outOf}`}
                         </div>
-                      }
-                      <div
-                        onMouseEnter={event => setPopoverEl(key, event.currentTarget)}
-                        onMouseLeave={clearPopoverEl}
-                      >
-                        <ProgressBarV2
-                          score={a.currentUserSubmission ? a.currentUserSubmission.score : 0}
-                          submitted={a.currentUserSubmission ? a.currentUserSubmission.submittedAt : ''}
-                          outOf={a.outOf}
-                          goalGrade={a.goalGrade}
-                          percentWidth={a.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
-                          displayLabel
-                          lines={
-                            a.goalGrade !== ''
-                              ? [{ color: 'green', value: a.goalGrade, draggable: true }]
-                              : []
-                          }
-                          description={`This assignment is worth ${a.percentOfFinalGrade}% of your grade.  
-                          Points possible: ${a.pointsPossible}.
-                          Your goal: ${(a.goalGrade ? a.goalGrade : 'None')}.  
-                          Your grade: ${(a.grade ? a.grade : 'Not graded')}.  
-                          Class average: ${a.averageGrade}.  
-                          Rules: ${(a.rules ? a.rules : 'There are no rules for this assignment')}.  `}
-                          onBarFocus={el => setPopoverEl(key, el)}
-                          onBarBlur={clearPopoverEl}
-                        />
-                        <Popover
-                          className={classes.popover}
-                          classes={{ paper: classes.paper }}
-                          anchorEl={popoverEl.anchorEl}
-                          open={popoverEl.popoverId === key}
-                          onClose={clearPopoverEl}
-                          anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'left'
-                          }}
-                          transformOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left'
-                          }}
-                          disableRestoreFocus
-                          disableAutoFocus
-                          disableEnforceFocus
+                        <div
+                          onMouseEnter={event => setPopoverEl(key, event.currentTarget)}
+                          onMouseLeave={clearPopoverEl}
                         >
-                          <PopupMessage a={a} assignmentGroups={assignmentGroups} />
-                        </Popover>
-                      </div>
+                          <ProgressBarV2
+                            score={a.currentUserSubmission ? a.currentUserSubmission.score : 0}
+                            submitted={a.currentUserSubmission ? a.currentUserSubmission.submittedAt : ''}
+                            outOf={a.outOf}
+                            goalGrade={a.goalGrade}
+                            percentWidth={a.percentOfFinalGrade / maxPercentOfFinalGrade * 70}
+                            displayLabel
+                            lines={
+                              a.goalGrade !== ''
+                                ? [{ color: 'green', value: a.goalGrade, draggable: true }]
+                                : []
+                            }
+                            description={`This assignment is worth ${a.percentOfFinalGrade}% of your grade.  
+                            Points possible: ${a.pointsPossible}.
+                            Your goal: ${(a.goalGrade ? a.goalGrade : 'None')}.  
+                            Your grade: ${(a.grade ? a.grade : 'Not graded')}.  
+                            Class average: ${a.averageGrade}.  
+                            Rules: ${(a.rules ? a.rules : 'There are no rules for this assignment')}.  `}
+                            onBarFocus={el => setPopoverEl(key, el)}
+                            onBarBlur={clearPopoverEl}
+                          />
+                          <Popover
+                            className={classes.popover}
+                            classes={{ paper: classes.paper }}
+                            anchorEl={popoverEl.anchorEl}
+                            open={popoverEl.popoverId === key}
+                            onClose={clearPopoverEl}
+                            anchorOrigin={{
+                              vertical: 'top',
+                              horizontal: 'left'
+                            }}
+                            transformOrigin={{
+                              vertical: 'bottom',
+                              horizontal: 'left'
+                            }}
+                            disableRestoreFocus
+                            disableAutoFocus
+                            disableEnforceFocus
+                          >
+                            <PopupMessage a={a} assignmentGroups={assignmentGroups} />
+                          </Popover>
+                        </div>
+                      </>
                     </TableCell>
                     <TableCell className={classes.veryNarrowCell}>
                       <Tooltip title={a.graded ? assignmentStatus.GRADED : a.submitted ? assignmentStatus.SUBMITTED : assignmentStatus.UNSUBMITTED}>

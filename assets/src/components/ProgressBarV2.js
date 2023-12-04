@@ -1,6 +1,6 @@
 import React from 'react'
 import Line from './Line'
-import { withStyles } from '@material-ui/core/styles'
+import withStyles from '@mui/styles/withStyles'
 
 const styles = theme => ({
   gradedBar: {
@@ -54,11 +54,11 @@ function ProgressBarV2 (props) {
           {
             lines.length > 0
               ? lines.filter(line => line.value || line.value === 0) // filter any lines without value
-                .map((line, key) => (
-                  <div key={key}>
-                    <Line {...line} barHeight={height} outOf={outOf} />
-                  </div>
-                ))
+                  .map((line, key) => (
+                    <div key={key}>
+                      <Line {...line} barHeight={height} outOf={outOf} />
+                    </div>
+                  ))
               : null
           }
           {
@@ -73,7 +73,7 @@ function ProgressBarV2 (props) {
                     height: `${height}px`
                   }}
                 />
-              )
+                )
               : null
           }
         </div>

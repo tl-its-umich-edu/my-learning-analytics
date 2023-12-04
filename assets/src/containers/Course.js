@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
 import GradeDistribution from './GradeDistribution'
@@ -10,8 +10,8 @@ import Spinner from '../components/Spinner'
 import { isObjectEmpty } from '../util/object'
 import { useCourseInfo } from '../service/api'
 import WarningBanner from '../components/WarningBanner'
-import { CardMedia, Card } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { CardMedia, Card } from '@mui/material'
+import withStyles from '@mui/styles/withStyles'
 import { Helmet } from 'react-helmet'
 
 const styles = theme => ({
@@ -81,7 +81,8 @@ function Course (props) {
                     alt={notLoadedAltMessage}
                   />
                 </Card>
-              ) : (
+                )
+              : (
                 <Switch>
                   <Route path='/courses/:courseId/' exact>
                     <IndexPage
@@ -118,9 +119,10 @@ function Course (props) {
                     />
                   </Route>
                 </Switch>
-              )}
+                )}
           </>
-        ) : <Spinner />}
+          )
+        : <Spinner />}
     </>
   )
 }

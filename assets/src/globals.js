@@ -1,4 +1,4 @@
-import { createTheme } from '@material-ui/core/styles'
+import { createTheme, adaptV4Theme } from '@mui/material/styles'
 import defaultPalette from './defaultPalette'
 
 // The fallback to an empty object is needed to not break tests using siteTheme.
@@ -50,10 +50,10 @@ const componentSettings = {
   }
 }
 
-const siteTheme = createTheme({
+const siteTheme = createTheme(adaptV4Theme({
   palette: sitePalette,
   props: componentSettings
-})
+}))
 const gaId = mylaGlobals.google_analytics_id
 
 export { user, siteTheme, gaId, cspNonce, viewHelpURLs, surveyLink }

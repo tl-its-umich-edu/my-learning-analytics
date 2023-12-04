@@ -1,15 +1,15 @@
 /* global fetch */
 import React, { useState } from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import { Card, CardActionArea, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Link as MUILink, Snackbar, Tooltip, Typography } from '@material-ui/core'
-import CheckBoxIcon from '@material-ui/icons/CheckBox'
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank'
-import CloseIcon from '@material-ui/icons/Close'
-import InfoIcon from '@material-ui/icons/Info'
-import SaveIcon from '@material-ui/icons/Save'
+import withStyles from '@mui/styles/withStyles'
+import { Card, CardActionArea, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Link as MUILink, Snackbar, Tooltip, Typography } from '@mui/material'
+import CheckBoxIcon from '@mui/icons-material/CheckBox'
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank'
+import CloseIcon from '@mui/icons-material/Close'
+import InfoIcon from '@mui/icons-material/Info'
+import SaveIcon from '@mui/icons-material/Save'
 import { Link } from 'react-router-dom'
-import Grid from '@material-ui/core/Grid'
-import { yellow, grey } from '@material-ui/core/colors'
+import Grid from '@mui/material/Grid'
+import { yellow, grey } from '@mui/material/colors'
 import clsx from 'clsx'
 import { defaultFetchOptions, handleError } from '../util/data'
 import { isTeacherOrAdmin } from '../util/roles'
@@ -258,6 +258,7 @@ const SelectCard = props => {
             aria-label='close'
             color='inherit'
             onClick={() => setSnackbarOpen(false)}
+            size='large'
           >
             <CloseIcon />
           </IconButton>
