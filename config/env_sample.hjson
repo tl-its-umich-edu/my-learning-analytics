@@ -289,6 +289,31 @@
                 "postfix": ""
             }
         },
+        # replace "mivideo" with Kaltura brand name inside your institution
+        "mivideo": {
+           "query":
+            '''
+                SELECT 'mivideo' AS resource_type,
+                replace(object.id, 'https://aakaf.mivideo.it.umich.edu/caliper/info/media/'  , '') AS resource_id,
+                cast(-1 as INT64) AS user_id,
+                replace(
+                replace(actor.id, 'https://aakaf.mivideo.it.umich.edu/caliper/info/user/' , ''), '+', '@'
+                ) AS user_login_name,
+                @canvas_data_id_increment + CAST(JSON_EXTRACT_SCALAR(object.extensions, '$.kaf:course_id') AS INT64) AS course_id,
+                object.name AS name,
+                datetime(EVENT_TIME) AS access_time
+                FROM event_store.expanded
+                WHERE
+                ed_app.id = 'https://aakaf.mivideo.it.umich.edu/caliper/info/app/KafEdApp'
+                AND TYPE = 'MediaEvent'
+                AND action = 'Started'
+                AND JSON_EXTRACT_SCALAR(object.extensions, '$.kaf:course_id') IN UNNEST(@course_ids_short)
+            ''',
+             "app_display_name": "MiVideo",
+             "/* mention if the caliper event data is providing long or short canvas id and change the query to store long id as in this case": "*/",
+             "canvas_course_id_format": "SHORT",
+             "urls": {"prefix": "https://aakaf.mivideo.it.umich.edu/caliper/info/media/" , "postfix": ""}
+        }
     },
     # Disable/Enable courses_enabled api
     "COURSES_ENABLED": false,
