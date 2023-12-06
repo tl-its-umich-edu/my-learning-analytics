@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import withStyles from '@mui/styles/withStyles'
+import { styled } from '@mui/material/styles'
 import Grid from '@mui/material/Grid'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
@@ -17,32 +17,50 @@ import Lock from '@mui/icons-material/Lock'
 import Launch from '@mui/icons-material/Launch'
 import { viewHelpURLs } from '../globals'
 
-const styles = theme => ({
-  root: {
+const PREFIX = 'AvatarModal'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  typography: `${PREFIX}-typography`,
+  avatar: `${PREFIX}-avatar`,
+  link: `${PREFIX}-link`,
+  text: `${PREFIX}-text`
+}
+
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`&.${classes.root}`]: {
     flexGrow: 1
   },
-  typography: {
+
+  [`& .${classes.typography}`]: {
     marginTop: theme.spacing(2)
   },
-  avatar: {
+
+  [`& .${classes.avatar}`]: {
     padding: '10px',
     marginTop: '10px',
     marginBottom: '10px',
     marginLeft: 'auto',
     marginRight: 'auto'
   },
-  link: {
+
+  [`& .${classes.link}`]: {
     textDecoration: 'none',
     marginLeft: 0
   },
-  text: {
+
+  [`& .${classes.text}`]: {
     paddingLeft: 0,
     color: 'black'
   }
-})
+}))
 
 function AvatarModal (props) {
-  const { classes, user } = props
+  const { user } = props
 
   const url = window.location.href
 
@@ -113,7 +131,7 @@ function AvatarModal (props) {
   }, [url])
 
   return (
-    <div className={classes.root}>
+    <Root className={classes.root}>
       <Grid container>
         <Grid item xs={4}>
           <Avatar className={classes.avatar}>
@@ -171,8 +189,8 @@ function AvatarModal (props) {
           </List>
         </Grid>
       </Grid>
-    </div>
+    </Root>
   )
 }
 
-export default withStyles(styles)(AvatarModal)
+export default (AvatarModal)

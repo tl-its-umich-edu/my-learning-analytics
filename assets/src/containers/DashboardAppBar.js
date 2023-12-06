@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import withStyles from '@mui/styles/withStyles'
+import { styled } from '@mui/material/styles'
 import { withRouter, Link } from 'react-router-dom'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
@@ -11,37 +11,56 @@ import AvatarModal from '../components/AvatarModal'
 import SurveyModal from '../components/SurveyModal'
 import { surveyLink } from '../globals'
 
-const styles = theme => ({
-  root: {
+const PREFIX = 'DashboardAppBar'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  button: `${PREFIX}-button`,
+  grow: `${PREFIX}-grow`,
+  menuButton: `${PREFIX}-menuButton`,
+  homeButton: `${PREFIX}-homeButton`,
+  roundButton: `${PREFIX}-roundButton`
+}
+
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.root}`]: {
     flexGrow: 1
   },
-  button: {
+
+  [`& .${classes.button}`]: {
     margin: theme.spacing(1)
   },
-  grow: {
+
+  [`& .${classes.grow}`]: {
     flexGrow: 1
   },
-  menuButton: {
+
+  [`& .${classes.menuButton}`]: {
     marginLeft: -12,
     marginRight: 20
   },
-  homeButton: {
+
+  [`& .${classes.homeButton}`]: {
     textDecoration: 'none',
     color: 'white',
     textTransform: 'capitalize',
     padding: 4,
     fontSize: '1.25rem'
   },
-  roundButton: {
+
+  [`& .${classes.roundButton}`]: {
     borderRadius: '50%',
     padding: '12px',
     color: 'white'
   }
-})
+}))
 
 function DashboardAppBar (props) {
   const {
-    classes,
     onMenuBarClick,
     user,
     courseId,
@@ -54,7 +73,7 @@ function DashboardAppBar (props) {
   const showSurveyLink = Boolean(surveyLink.text.length && surveyLink.url.length)
 
   return (
-    <div>
+    <Root>
       <AppBar className={classes.root} position='fixed'>
         <Toolbar>
           <IconButton
@@ -102,8 +121,8 @@ function DashboardAppBar (props) {
         </Toolbar>
       </AppBar>
       <Toolbar />
-    </div>
+    </Root>
   )
 }
 
-export default withRouter(withStyles(styles)(DashboardAppBar))
+export default withRouter(DashboardAppBar)

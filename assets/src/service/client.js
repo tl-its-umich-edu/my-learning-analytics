@@ -4,6 +4,7 @@ import Cookie from 'js-cookie'
 export default new ApolloClient({
   uri: '/graphql',
   cache: new InMemoryCache(),
+  assumeImmutableResults: false,
   headers: {
     Accept: 'application/json',
     'X-Requested-With': 'XMLHttpRequest',

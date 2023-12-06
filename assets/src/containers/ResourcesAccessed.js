@@ -1,7 +1,7 @@
 /* global fetch */
 
 import React, { useEffect, useState } from 'react'
-import withStyles from '@mui/styles/withStyles'
+import { styled } from '@mui/material/styles'
 import Checkbox from '@mui/material/Checkbox'
 import FormControl from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
@@ -26,32 +26,49 @@ import { handleError, defaultFetchOptions } from '../util/data'
 import { isTeacherOrAdmin } from '../util/roles'
 import { Helmet } from 'react-helmet'
 
-const styles = theme => ({
-  root: {
+const PREFIX = 'ResourcesAccessed'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  paper: `${PREFIX}-paper`,
+  formController: `${PREFIX}-formController`,
+  controlText: `${PREFIX}-controlText`
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.root}`]: {
     flexGrow: 1,
     padding: 8
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     color: theme.palette.text.secondary,
     padding: theme.spacing(2)
   },
-  formController: {
+
+  [`& .${classes.formController}`]: {
     alignItems: 'center',
     display: 'flex',
     justifyContent: 'center',
     marginTop: theme.spacing(2)
   },
-  controlText: {
+
+  [`& .${classes.controlText}`]: {
     marginRight: 16
   }
-})
+}))
 
 const currentSetting = 'My current setting'
 const rememberSetting = 'Remember my setting'
 const settingNotUpdated = 'Setting not updated'
 
 function ResourcesAccessed (props) {
-  const { classes, courseInfo, courseId, disabled, isAdmin, enrollmentTypes } = props
+  const { courseInfo, courseId, disabled, isAdmin, enrollmentTypes } = props
   if (disabled && !isTeacherOrAdmin(isAdmin, enrollmentTypes)) return (<AlertBanner>The Resources Accessed view is hidden for this course.</AlertBanner>)
   const resourceTypes = courseInfo.resource_types.length === 0
     ? [{ label: 'Files', icon: 'fas fa-file fa-lg' }]
@@ -236,7 +253,7 @@ function ResourcesAccessed (props) {
     } else {
       const resourceDataSorted = resourceData.sort((a, b) => b.total_percent - a.total_percent)
       return (
-        <>
+        <Root>
           <Typography style={{ textAlign: 'center' }} gutterBottom>
             {`Displaying ${resourcesLimit ?? 'all available'} resources in this course`}
           </Typography>
@@ -251,7 +268,7 @@ function ResourcesAccessed (props) {
             aspectRatio={0.3}
             minHeight={350}
           />
-        </>
+        </Root>
       )
     }
   }
@@ -327,4 +344,4 @@ function ResourcesAccessed (props) {
   )
 }
 
-export default withStyles(styles)(ResourcesAccessed)
+export default (ResourcesAccessed)

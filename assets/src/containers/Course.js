@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { styled } from '@mui/material/styles'
 import { Route, Switch } from 'react-router-dom'
 import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
@@ -11,24 +12,36 @@ import { isObjectEmpty } from '../util/object'
 import { useCourseInfo } from '../service/api'
 import WarningBanner from '../components/WarningBanner'
 import { CardMedia, Card } from '@mui/material'
-import withStyles from '@mui/styles/withStyles'
 import { Helmet } from 'react-helmet'
 
-const styles = theme => ({
-  card: {
+const PREFIX = 'Course'
+
+const classes = {
+  card: `${PREFIX}-card`,
+  notLoadedMedia: `${PREFIX}-notLoadedMedia`
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.card}`]: {
     margin: theme.spacing(3)
   },
-  notLoadedMedia: {
+
+  [`& .${classes.notLoadedMedia}`]: {
     maxWidth: '50%',
     marginLeft: 'auto',
     marginRight: 'auto',
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2)
   }
-})
+}))
 
 function Course (props) {
-  const { courseId, user, classes } = props
+  const { courseId, user } = props
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
@@ -50,7 +63,7 @@ function Course (props) {
   const notLoadedAltMessage = 'Mouse running on wheel with text "Course Data Being Processed, Try Back in 24 Hours"'
 
   return (
-    <>
+    <Root>
       {loaded
         ? (
           <>
@@ -123,8 +136,8 @@ function Course (props) {
           </>
           )
         : <Spinner />}
-    </>
+    </Root>
   )
 }
 
-export default withStyles(styles)(Course)
+export default (Course)

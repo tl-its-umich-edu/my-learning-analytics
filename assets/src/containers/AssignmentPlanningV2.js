@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import withStyles from '@mui/styles/withStyles'
+import { styled } from '@mui/material/styles'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
@@ -30,48 +30,77 @@ import {
   setAssigmentGoalInputState
 } from '../util/assignment'
 
-const styles = theme => ({
-  root: {
+const PREFIX = 'AssignmentPlanningV2'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  paper: `${PREFIX}-paper`,
+  section: `${PREFIX}-section`,
+  mainProgressBar: `${PREFIX}-mainProgressBar`,
+  assignStatus: `${PREFIX}-assignStatus`,
+  legendItem: `${PREFIX}-legendItem`,
+  legendItemLabel: `${PREFIX}-legendItemLabel`,
+  graded: `${PREFIX}-graded`,
+  ungraded: `${PREFIX}-ungraded`,
+  unsubmitted: `${PREFIX}-unsubmitted`
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.root}`]: {
     flexGrow: 1,
     padding: 8
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     padding: theme.spacing(2),
     color: theme.palette.text.secondary
   },
-  section: {
+
+  [`& .${classes.section}`]: {
     paddingBottom: 10,
     paddingTop: 10
   },
-  mainProgressBar: {
+
+  [`& .${classes.mainProgressBar}`]: {
     marginBottom: '2.5rem'
   },
-  assignStatus: {
+
+  [`& .${classes.assignStatus}`]: {
     width: '10px',
     height: '10px',
     display: 'inline-block'
   },
-  legendItem: {
+
+  [`& .${classes.legendItem}`]: {
     display: 'inline-block',
     marginRight: '14px'
   },
-  legendItemLabel: {
+
+  [`& .${classes.legendItemLabel}`]: {
     display: 'inline',
     marginLeft: '6px'
   },
-  graded: {
+
+  [`& .${classes.graded}`]: {
     background: theme.palette.secondary.main
   },
-  ungraded: {
+
+  [`& .${classes.ungraded}`]: {
     background: theme.palette.info.main
   },
-  unsubmitted: {
+
+  [`& .${classes.unsubmitted}`]: {
     background: theme.palette.negative.main
   }
-})
+}))
 
 function AssignmentPlanningV2 (props) {
-  const { classes, disabled, courseId, isAdmin, enrollmentTypes } = props
+  const { disabled, courseId, isAdmin, enrollmentTypes } = props
   if (disabled && !isTeacherOrAdmin(isAdmin, enrollmentTypes)) return (<AlertBanner>The Assignment Planning view is hidden for this course.</AlertBanner>)
 
   const [assignments, setAssignments] = useState([])
@@ -165,7 +194,7 @@ function AssignmentPlanningV2 (props) {
   if (error) return (<WarningBanner />)
 
   return (
-    <>
+    <Root>
       <Helmet title='Assignment Planning' />
       {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
       <div className={classes.root}>
@@ -267,8 +296,8 @@ function AssignmentPlanningV2 (props) {
           </Grid>
         </Grid>
       </div>
-    </>
+    </Root>
   )
 }
 
-export default withStyles(styles)(AssignmentPlanningV2)
+export default (AssignmentPlanningV2)

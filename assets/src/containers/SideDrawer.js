@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import withStyles from '@mui/styles/withStyles'
+import { styled } from '@mui/material/styles'
 import Drawer from '@mui/material/Drawer'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -11,24 +11,32 @@ import routes from '../routes/routes'
 import Spinner from '../components/Spinner'
 import { isTeacherOrAdmin } from '../util/roles'
 
-const styles = {
-  list: {
+const PREFIX = 'SideDrawer'
+
+const classes = {
+  list: `${PREFIX}-list`,
+  fullList: `${PREFIX}-fullList`,
+  sideDrawerLinks: `${PREFIX}-sideDrawerLinks`,
+  text: `${PREFIX}-text`
+}
+
+const Root = styled('div')({
+  [`&.${classes.list}`]: {
     width: 250
   },
-  fullList: {
+  [`& .${classes.fullList}`]: {
     width: 'auto'
   },
-  sideDrawerLinks: {
+  [`& .${classes.sideDrawerLinks}`]: {
     textDecoration: 'none'
   },
-  text: {
+  [`& .${classes.text}`]: {
     color: 'black'
   }
-}
+})
 
 function SideDrawer (props) {
   const {
-    classes,
     toggleDrawer,
     courseId,
     courseInfo,
@@ -39,7 +47,7 @@ function SideDrawer (props) {
   const [selectedIndex, setSelectedIndex] = useState(false)
 
   const sideList = (
-    <div
+    <Root
       className={classes.list}
       onClick={toggleDrawer(false)}
       role='button'
@@ -65,7 +73,7 @@ function SideDrawer (props) {
           </ListItem>
         ))}
       </List>
-    </div>
+    </Root>
   )
 
   return (
@@ -79,4 +87,4 @@ function SideDrawer (props) {
   )
 }
 
-export default withRouter(withStyles(styles)(SideDrawer))
+export default withRouter(SideDrawer)

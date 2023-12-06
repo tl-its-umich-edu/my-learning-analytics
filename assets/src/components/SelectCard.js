@@ -1,6 +1,6 @@
 /* global fetch */
 import React, { useState } from 'react'
-import withStyles from '@mui/styles/withStyles'
+import { styled } from '@mui/material/styles'
 import { Card, CardActionArea, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Link as MUILink, Snackbar, Tooltip, Typography } from '@mui/material'
 import CheckBoxIcon from '@mui/icons-material/CheckBox'
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank'
@@ -15,77 +15,116 @@ import { defaultFetchOptions, handleError } from '../util/data'
 import { isTeacherOrAdmin } from '../util/roles'
 import PropTypes from 'prop-types'
 
-const styles = theme => ({
-  card: {
+const PREFIX = 'SelectCard'
+
+const classes = {
+  card: `${PREFIX}-card`,
+  media: `${PREFIX}-media`,
+  content: `${PREFIX}-content`,
+  title: `${PREFIX}-title`,
+  titleArea: `${PREFIX}-titleArea`,
+  description: `${PREFIX}-description`,
+  titleLink: `${PREFIX}-titleLink`,
+  infoLink: `${PREFIX}-infoLink`,
+  help: `${PREFIX}-help`,
+  mainCardContainer: `${PREFIX}-mainCardContainer`,
+  wrapper: `${PREFIX}-wrapper`,
+  fabProgress: `${PREFIX}-fabProgress`,
+  buttonEnabled: `${PREFIX}-buttonEnabled`,
+  buttonDisabled: `${PREFIX}-buttonDisabled`,
+  checkbox: `${PREFIX}-checkbox`
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.card}`]: {
     margin: theme.spacing(3)
   },
-  media: {
+
+  [`& .${classes.media}`]: {
     height: 140,
     backgroundSize: 'auto',
     objectFit: 'scale-down'
   },
-  content: {
+
+  [`& .${classes.content}`]: {
     height: 110,
     padding: 0
   },
-  title: {
+
+  [`& .${classes.title}`]: {
     boxSizing: 'border-box',
     padding: theme.spacing(1),
     color: 'white',
     marginBottom: 0,
     backgroundColor: theme.palette.primary.main
   },
-  titleArea: {
+
+  [`& .${classes.titleArea}`]: {
     color: 'white',
     backgroundColor: theme.palette.primary.main
   },
-  description: {
+
+  [`& .${classes.description}`]: {
     padding: theme.spacing(1),
     color: 'black',
     height: '100%'
   },
-  titleLink: {
+
+  [`& .${classes.titleLink}`]: {
     color: 'white'
   },
-  infoLink: {
+
+  [`& .${classes.infoLink}`]: {
     color: 'white'
   },
-  help: {
+
+  [`& .${classes.help}`]: {
     position: 'absolute',
     zIndex: 1,
     bottom: '21%',
     right: '5.5%'
   },
-  mainCardContainer: {
+
+  [`& .${classes.mainCardContainer}`]: {
     position: 'relative'
   },
-  wrapper: {
+
+  [`& .${classes.wrapper}`]: {
     margin: theme.spacing(1),
     position: 'relative'
   },
-  fabProgress: {
+
+  [`& .${classes.fabProgress}`]: {
     color: yellow[500],
     position: 'absolute',
     top: -6,
     left: -6,
     zIndex: 1
   },
-  buttonEnabled: {
+
+  [`& .${classes.buttonEnabled}`]: {
 
   },
-  buttonDisabled: {
+
+  [`& .${classes.buttonDisabled}`]: {
     backgroundColor: grey[500],
     '&:hover': {
       backgroundColor: grey[700]
     }
   },
-  checkbox: {
+
+  [`& .${classes.checkbox}`]: {
     backgroundColor: 'transparent'
   }
-})
+}))
 
 const SelectCard = props => {
-  const { classes, cardData, courseId } = props
+  const { cardData, courseId } = props
   const { viewCode } = cardData
   const [enabled, setEnabled] = useState(props.courseInfo.course_view_options[viewCode])
   const [snackbarMessage, setResponseMessage] = useState('Saved')
@@ -196,7 +235,7 @@ const SelectCard = props => {
       </CardContent>
     )
 
-    return <>{cardImage}{cardContent}</>
+    return <Root>{cardImage}{cardContent}</Root>
   }
 
   return (
@@ -282,4 +321,4 @@ SelectCard.propTypes = {
 
 SelectCard.defaultProps = {}
 
-export default withStyles(styles)(SelectCard)
+export default (SelectCard)

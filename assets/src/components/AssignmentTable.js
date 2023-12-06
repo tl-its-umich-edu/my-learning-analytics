@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import withStyles from '@mui/styles/withStyles'
+import { styled } from '@mui/material/styles'
 import Button from '@mui/material/Button'
 import Checkbox from '@mui/material/Checkbox'
 import FormControl from '@mui/material/FormControl'
@@ -29,80 +29,123 @@ import { calculateWeekOffset } from '../util/date'
 import { roundToXDecimals, getDecimalPlaceOfFloat } from '../util/math'
 import { assignmentStatus } from '../util/assignment'
 
-const headerHeight = 105
+const PREFIX = 'AssignmentTable'
 
-const styles = theme => ({
-  root: {
+const classes = {
+  root: `${PREFIX}-root`,
+  paper: `${PREFIX}-paper`,
+  container: `${PREFIX}-container`,
+  sliderCell: `${PREFIX}-sliderCell`,
+  goalGradeInput: `${PREFIX}-goalGradeInput`,
+  tableCell: `${PREFIX}-tableCell`,
+  tableHeadCell: `${PREFIX}-tableHeadCell`,
+  popover: `${PREFIX}-popover`,
+  narrowCell: `${PREFIX}-narrowCell`,
+  veryNarrowCell: `${PREFIX}-veryNarrowCell`,
+  possiblePointsText: `${PREFIX}-possiblePointsText`,
+  formControl: `${PREFIX}-formControl`,
+  filterArea: `${PREFIX}-filterArea`,
+  graded: `${PREFIX}-graded`,
+  ungraded: `${PREFIX}-ungraded`,
+  unsubmitted: `${PREFIX}-unsubmitted`,
+  assignmentName: `${PREFIX}-assignmentName`,
+  filterButton: `${PREFIX}-filterButton`
+}
+
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.root}`]: {
     flexGrow: 1,
     padding: 8
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     padding: theme.spacing(2),
     color: theme.palette.text.secondary
   },
-  container: {
+
+  [`& .${classes.container}`]: {
     maxHeight: 500
   },
-  sliderCell: {
+
+  [`& .${classes.sliderCell}`]: {
     minWidth: '150px'
   },
-  goalGradeInput: {
+
+  [`& .${classes.goalGradeInput}`]: {
     marginTop: 0,
     width: 100,
     marginBottom: '10px'
   },
-  tableCell: {
+
+  [`& .${classes.tableCell}`]: {
     border: 'none'
   },
-  tableHeadCell: {
+
+  [`& .${classes.tableHeadCell}`]: {
     fontSize: '1em',
     height: headerHeight + 'px'
   },
-  popover: {
+
+  [`& .${classes.popover}`]: {
     pointerEvents: 'none'
   },
-  narrowCell: {
+
+  [`& .${classes.narrowCell}`]: {
     width: '120px'
   },
-  veryNarrowCell: {
+
+  [`& .${classes.veryNarrowCell}`]: {
     width: '60px'
   },
-  possiblePointsText: {
+
+  [`& .${classes.possiblePointsText}`]: {
     margin: 'auto',
     display: 'inline-block',
     paddingTop: '22px',
     paddingLeft: '5px',
     verticalAlign: 'middle'
   },
-  formControl: {
+
+  [`& .${classes.formControl}`]: {
     margin: theme.spacing(1),
     width: '95%'
   },
-  filterArea: {
+
+  [`& .${classes.filterArea}`]: {
     alignItems: 'center',
     marginBottom: '2px',
     backgroundColor: '#F4F4F4'
   },
-  graded: {
+
+  [`& .${classes.graded}`]: {
     color: theme.palette.secondary.main
   },
-  ungraded: {
+
+  [`& .${classes.ungraded}`]: {
     color: theme.palette.info.main
   },
-  unsubmitted: {
+
+  [`& .${classes.unsubmitted}`]: {
     color: theme.palette.negative.main
   },
-  assignmentName: {
+
+  [`& .${classes.assignmentName}`]: {
     whiteSpace: 'nowrap '
   },
-  filterButton: {
+
+  [`& .${classes.filterButton}`]: {
     textTransform: 'none'
   }
-})
+}))
+
+const headerHeight = 105
 
 function AssignmentTable (props) {
   const {
-    classes,
     courseGoalGradeSet,
     assignments,
     assignmentGroups,
@@ -259,7 +302,7 @@ function AssignmentTable (props) {
   }
 
   return (
-    <div>
+    <Root>
       <Grid container className={classes.filterArea}>
         <Grid item xs={12} sm={4}>
           <FormControl className={classes.formControl}>
@@ -353,12 +396,8 @@ function AssignmentTable (props) {
                   <TableRow key={key} {...(a.week === previousWeek ? { ref: previousWeekRow } : {})}>
                     <TableCell
                       style={{
-                        ...isNextWeekTheSame(a.week, key)
-                          ? { borderBottom: 'none' }
-                          : {},
-                        ...a.week === currentWeek
-                          ? { color: 'orange' }
-                          : {}
+                        ...(isNextWeekTheSame(a.week, key) ? { borderBottom: 'none' } : {}),
+                        ...(a.week === currentWeek ? { color: 'orange' } : {})
                       }}
                       className={classes.narrowCell}
                     >
@@ -372,9 +411,7 @@ function AssignmentTable (props) {
                     </TableCell>
                     <TableCell
                       style={{
-                        ...isNextDayTheSame(a.dueDateMonthDay, key)
-                          ? { borderBottom: 'none' }
-                          : {}
+                        ...(isNextDayTheSame(a.dueDateMonthDay, key) ? { borderBottom: 'none' } : {})
                       }}
                       className={classes.narrowCell}
                     >
@@ -499,8 +536,8 @@ function AssignmentTable (props) {
         </MTable>
       </TableContainer>
       {assignments.length > 0 && filteredAssignments.length === 0 && <AlertBanner>No assignments match your filter selections.</AlertBanner>}
-    </div>
+    </Root>
   )
 }
 
-export default withStyles(styles)(AssignmentTable)
+export default (AssignmentTable)
