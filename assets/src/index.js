@@ -1,7 +1,7 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter as Router } from 'react-router-dom'
-import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles'
+import { ThemeProvider } from '@mui/material/styles'
 import './index.css'
 import App from './containers/App'
 import client from './service/client'
@@ -14,11 +14,9 @@ const root = createRoot(container)
 root.render(
   <Router basename='/'>
     <ApolloProvider client={client}>
-      <StyledEngineProvider injectFirst>
-        <ThemeProvider theme={siteTheme}>
-          <App user={user} gaId={gaId} cspNonce={cspNonce} />
-        </ThemeProvider>
-      </StyledEngineProvider>
+      <ThemeProvider theme={siteTheme}>
+        <App user={user} gaId={gaId} cspNonce={cspNonce} />
+      </ThemeProvider>
     </ApolloProvider>
   </Router>
 )
