@@ -109,8 +109,7 @@
         with assignment_info as
         (
             select
-                la.due_date as due_date,
-                timezone(%(time_zone)s, la.due_date AT TIME ZONE 'UTC') as local_date,
+                la.due_date AT TIME ZONE 'UTC' as due_date,
                 la.title as name,
                 cast(co.lms_int_id as BIGINT) as course_id,
                 cast(la_km.lms_int_id as BIGINT) as id,
@@ -228,7 +227,7 @@
                 lar.published_score as published_score,
                 lar.response_date as submitted_at,
                 lar.graded_date as graded_at,
-                timezone(%(time_zone)s, lar.posted_at AT TIME ZONE 'UTC') as grade_posted_local_date,
+                lar.posted_at as grade_posted,
                 lar.grading_status as submission_workflow_state,
                 la.title as title,
                 lar.learner_activity_result_id as learner_activity_result_id,
@@ -255,7 +254,7 @@
                 (
                     case 
                         when 
-                            (grade_posted_local_date is null or submission_workflow_state != 'graded') 
+                            (grade_posted is null or submission_workflow_state != 'graded') 
                         then
                             null 
                         else 
@@ -264,7 +263,7 @@
                 ) AS score, 
                 submitted_at AS submitted_at, 
                 graded_at AS graded_date, 
-                grade_posted_local_date 
+                grade_posted 
         from 
             submission
         );
@@ -276,7 +275,7 @@
             f.score::float,
             f.submitted_at,
             f.graded_date,
-            f.grade_posted_local_date,
+            f.grade_posted,
             cast(f1.avg_score as float) as avg_score
         from 
             all_assign_sub f join 
