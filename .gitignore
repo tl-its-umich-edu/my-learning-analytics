@@ -104,6 +104,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+venv_*
 
 # Spyder project settings
 .spyderproject
@@ -125,3 +126,6 @@ dmypy.json
 node_modules/
 
 webpack-stats.json
+
+.history/
+.*
