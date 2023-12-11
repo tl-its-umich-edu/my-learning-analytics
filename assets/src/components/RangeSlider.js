@@ -1,6 +1,6 @@
 import React from 'react'
 import 'rc-slider/assets/index.css'
-import { Range } from 'rc-slider'
+import Slider, { Range } from 'rc-slider'
 import { siteTheme } from '../globals'
 
 const rangeSlider = props => {
@@ -31,7 +31,8 @@ const rangeSlider = props => {
   return (
     <div style={wrapperStyle}>
       <p style={{ textAlign: 'center' }}>Select a start and end week</p>
-      <Range
+      <Slider
+        range
         activeDotStyle={activeDotStyle}
         dotStyle={dotStyle}
         handleStyle={[activeDotStyle, activeDotStyle]}
