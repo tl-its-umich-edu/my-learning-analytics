@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { styled } from '@mui/material/styles'
-import { Route, Switch } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
 import GradeDistribution from './GradeDistribution'
@@ -96,43 +96,46 @@ function Course (props) {
                 </Card>
                 )
               : (
-                <Switch>
-                  <Route path='/courses/:courseId/' exact>
-                    <IndexPage
-                      courseInfo={courseInfo}
-                      courseId={courseId}
-                      enrollmentTypes={enrollmentTypes}
-                      isAdmin={user.admin}
+                <Routes>
+                  <Route path='/'>  
+                    <Route index= {true} element={
+                      <IndexPage
+                        courseInfo={courseInfo}
+                        courseId={courseId}
+                        enrollmentTypes={enrollmentTypes}
+                        isAdmin={user.admin}
+                      /> }
+                    />
+                    <Route path='grades'  element={
+                      <GradeDistribution
+                        user={user}
+                        disabled={!courseInfo.course_view_options.gd}
+                        courseId={courseId}
+                        enrollmentTypes={enrollmentTypes}
+                        isAdmin={user.admin}
+                      /> }
+                    />
+                    <Route path='assignments'  element={
+                      <AssignmentPlanningV2
+                        disabled={!courseInfo.course_view_options.ap}
+                        courseId={courseId}
+                        enrollmentTypes={enrollmentTypes}
+                        isAdmin={user.admin}
+                      /> }
+                    />
+                    <Route path='resources'  element={
+                      <ResourcesAccessed
+                        disabled={!courseInfo.course_view_options.ra}
+                        courseInfo={courseInfo}
+                        courseId={courseId}
+                        enrollmentTypes={enrollmentTypes}
+                        isAdmin={user.admin}
+                      /> }
                     />
                   </Route>
-                  <Route path='/courses/:courseId/grades'>
-                    <GradeDistribution
-                      user={user}
-                      disabled={!courseInfo.course_view_options.gd}
-                      courseId={courseId}
-                      enrollmentTypes={enrollmentTypes}
-                      isAdmin={user.admin}
-                    />
-                  </Route>
-                  <Route path='/courses/:courseId/assignments'>
-                    <AssignmentPlanningV2
-                      disabled={!courseInfo.course_view_options.ap}
-                      courseId={courseId}
-                      enrollmentTypes={enrollmentTypes}
-                      isAdmin={user.admin}
-                    />
-                  </Route>
-                  <Route path='/courses/:courseId/resources'>
-                    <ResourcesAccessed
-                      disabled={!courseInfo.course_view_options.ra}
-                      courseInfo={courseInfo}
-                      courseId={courseId}
-                      enrollmentTypes={enrollmentTypes}
-                      isAdmin={user.admin}
-                    />
-                  </Route>
-                </Switch>
-                )}
+                </Routes>
+                 )
+            }
           </>
           )
         : <Spinner />}

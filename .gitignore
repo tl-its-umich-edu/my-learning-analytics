@@ -127,5 +127,5 @@ node_modules/
 
 webpack-stats.json
 
+# VSCode
 .history/
-.*

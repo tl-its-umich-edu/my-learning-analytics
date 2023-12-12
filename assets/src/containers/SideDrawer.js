@@ -5,11 +5,12 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import { Link, withRouter } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { siteTheme } from '../globals'
 import routes from '../routes/routes'
 import Spinner from '../components/Spinner'
 import { isTeacherOrAdmin } from '../util/roles'
+import withRouter from './WithRouter'
 
 const PREFIX = 'SideDrawer'
 

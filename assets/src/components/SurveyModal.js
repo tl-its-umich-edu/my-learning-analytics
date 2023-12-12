@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { styled } from '@mui/material/styles'
-import { useLocation } from 'react-router'
+import { useLocation } from 'react-router-dom'
 import Button from '@mui/material/Button'
 import DialogTitle from '@mui/material/DialogTitle'
 import IconButton from '@mui/material/IconButton'
