@@ -1,14 +1,10 @@
 import * as React from 'react'
-import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles'
+import { ThemeProvider } from '@mui/material/styles'
 
 import { siteTheme } from '../globals'
 
 function TestThemeProvider ({ children }) {
-  return (
-    <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={siteTheme}>{children}</ThemeProvider>
-    </StyledEngineProvider>
-  )
+  return <ThemeProvider theme={siteTheme}>{children}</ThemeProvider>
 }
 
 export default TestThemeProvider
