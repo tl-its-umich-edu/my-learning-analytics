@@ -18,15 +18,17 @@ function App (props) {
   }
   const coursePageMatch = useMatch('/courses/:courseId/*')
   const courseId = coursePageMatch ? coursePageMatch.params.courseId : null
-  
   return (
     <>
       <Helmet titleTemplate='%s | My Learning Analytics' title='Courses' />
       <GoogleAnalyticsTracking {...{ gaId, cspNonce }} />
       <Routes>
         <Route path='/' element={<CourseList user={user} />} />
-        <Route path='/courses' element={ <CourseList user={user} />} />
-        <Route path='/courses/:courseId/*' element={courseId ? <Course user={user} courseId={Number(courseId)} {...props} /> : <AlertBanner>Application Launch did not happened properely</AlertBanner>} />
+        <Route path='/courses' element={<CourseList user={user} />} />
+        <Route
+          path='/courses/:courseId/*'
+          element={courseId ? <Course user={user} courseId={Number(courseId)} {...props} /> : <AlertBanner>Application Launch did not happened properely</AlertBanner>}
+        />
       </Routes>
     </>
   )

@@ -97,45 +97,46 @@ function Course (props) {
                 )
               : (
                 <Routes>
-                  <Route path='/'>  
-                    <Route index= {true} element={
-                      <IndexPage
-                        courseInfo={courseInfo}
-                        courseId={courseId}
-                        enrollmentTypes={enrollmentTypes}
-                        isAdmin={user.admin}
-                      /> }
-                    />
-                    <Route path='grades'  element={
-                      <GradeDistribution
-                        user={user}
-                        disabled={!courseInfo.course_view_options.gd}
-                        courseId={courseId}
-                        enrollmentTypes={enrollmentTypes}
-                        isAdmin={user.admin}
-                      /> }
-                    />
-                    <Route path='assignments'  element={
-                      <AssignmentPlanningV2
-                        disabled={!courseInfo.course_view_options.ap}
-                        courseId={courseId}
-                        enrollmentTypes={enrollmentTypes}
-                        isAdmin={user.admin}
-                      /> }
-                    />
-                    <Route path='resources'  element={
-                      <ResourcesAccessed
-                        disabled={!courseInfo.course_view_options.ra}
-                        courseInfo={courseInfo}
-                        courseId={courseId}
-                        enrollmentTypes={enrollmentTypes}
-                        isAdmin={user.admin}
-                      /> }
-                    />
-                  </Route>
+                  <Route
+                    path='/'
+                    element={<IndexPage
+                      courseInfo={courseInfo}
+                      courseId={courseId}
+                      enrollmentTypes={enrollmentTypes}
+                      isAdmin={user.admin}
+                             />}
+                  />
+                  <Route
+                    path='grades'
+                    element={<GradeDistribution
+                      user={user}
+                      disabled={!courseInfo.course_view_options.gd}
+                      courseId={courseId}
+                      enrollmentTypes={enrollmentTypes}
+                      isAdmin={user.admin}
+                             />}
+                  />
+                  <Route
+                    path='assignments'
+                    element={<AssignmentPlanningV2
+                      disabled={!courseInfo.course_view_options.ap}
+                      courseId={courseId}
+                      enrollmentTypes={enrollmentTypes}
+                      isAdmin={user.admin}
+                             />}
+                  />
+                  <Route
+                    path='resources'
+                    element={<ResourcesAccessed
+                      disabled={!courseInfo.course_view_options.ra}
+                      courseInfo={courseInfo}
+                      courseId={courseId}
+                      enrollmentTypes={enrollmentTypes}
+                      isAdmin={user.admin}
+                             />}
+                  />
                 </Routes>
-                 )
-            }
+                )}
           </>
           )
         : <Spinner />}

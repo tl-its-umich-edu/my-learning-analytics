@@ -1,6 +1,6 @@
 import React from 'react'
 import 'rc-slider/assets/index.css'
-import Slider, { Range } from 'rc-slider'
+import Slider from 'rc-slider'
 import { siteTheme } from '../globals'
 
 const rangeSlider = props => {
@@ -35,15 +35,17 @@ const rangeSlider = props => {
         range
         activeDotStyle={activeDotStyle}
         dotStyle={dotStyle}
-        handleStyle={[activeDotStyle, activeDotStyle]}
-        railStyle={unselectedStyle}
-        trackStyle={[selectedStyle]}
         allowCross={false}
         min={props.min}
         max={props.max}
         onChange={props.onWeekChange}
         defaultValue={[props.startWeek, props.endWeek]}
         marks={marks}
+        styles={{
+          handle: activeDotStyle,
+          rail: unselectedStyle,
+          track: selectedStyle
+        }}
       />
     </div>
   )

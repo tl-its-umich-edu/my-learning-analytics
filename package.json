@@ -102,6 +102,7 @@
     "mini-css-extract-plugin": "2.6.0",
     "react-app-polyfill": "3.0.0",
     "react-test-renderer": "18.2.0",
+    "standard": "17.1.0",
     "style-loader": "3.3.1",
     "typeface-roboto": "1.1.13",
     "url-loader": "4.1.1",
