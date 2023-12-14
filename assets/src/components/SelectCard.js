@@ -235,11 +235,11 @@ const SelectCard = props => {
       </CardContent>
     )
 
-    return <Root>{cardImage}{cardContent}</Root>
+    return <>{cardImage}{cardContent}</>
   }
 
   return (
-    <>
+    <Root>
       <Card className={classes.card} elevation={2}>
         <div className={classes.mainCardContainer}>
           <CardActionArea component={Link} to={cardData.path}>
@@ -303,7 +303,7 @@ const SelectCard = props => {
           </IconButton>
         ]}
       />
-    </>
+    </Root>
   )
 }
 

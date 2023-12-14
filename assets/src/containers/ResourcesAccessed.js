@@ -253,7 +253,7 @@ function ResourcesAccessed (props) {
     } else {
       const resourceDataSorted = resourceData.sort((a, b) => b.total_percent - a.total_percent)
       return (
-        <Root>
+        <>
           <Typography style={{ textAlign: 'center' }} gutterBottom>
             {`Displaying ${resourcesLimit ?? 'all available'} resources in this course`}
           </Typography>
@@ -268,12 +268,12 @@ function ResourcesAccessed (props) {
             aspectRatio={0.3}
             minHeight={350}
           />
-        </Root>
+        </>
       )
     }
   }
   return (
-    <>
+    <Root>
       <Helmet title='Resources Accessed' />
       {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
       <div className={classes.root}>
@@ -340,7 +340,7 @@ function ResourcesAccessed (props) {
           </Grid>
         </Grid>
       </div>
-    </>
+    </Root>
   )
 }
 

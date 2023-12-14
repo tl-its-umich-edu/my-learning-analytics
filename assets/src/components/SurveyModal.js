@@ -92,7 +92,7 @@ export default function SurveyModal (props) {
   const toggleOpen = () => setOpen(!open)
 
   const body = (
-    <Root className={`${classes.paper} ${classes.modal}`}>
+    <div className={`${classes.paper} ${classes.modal}`}>
       <DialogTitle className={classes.dialogTitle}>
         <h4 id='survey-modal-title'>{props.surveyLink.text}</h4>
         <IconButton onClick={toggleOpen} size='large'>
@@ -105,11 +105,11 @@ export default function SurveyModal (props) {
           <iframe className={classes.iframe} src={`${props.surveyLink.url}?${searchParams.toString()}`} height='600px' width='400px' />
         </div>
       </div>
-    </Root>
+    </div>
   )
 
   return (
-    <div>
+    <Root>
       <Button variant='contained' className={classes.surveyButton} onClick={toggleOpen}>{props.surveyLink.text}</Button>
       <Modal
         open={open}
@@ -119,6 +119,6 @@ export default function SurveyModal (props) {
       >
         {body}
       </Modal>
-    </div>
+    </Root>
   )
 }
