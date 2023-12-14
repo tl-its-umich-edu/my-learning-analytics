@@ -22,7 +22,7 @@
     "react-dom": "18.2.0",
     "react-ga4": "2.1.0",
     "react-helmet": "6.1.0",
-    "react-router-dom": "6.20.1"
+    "react-router-dom": "6.21.0"
   },
   "babel": {
     "presets": [
