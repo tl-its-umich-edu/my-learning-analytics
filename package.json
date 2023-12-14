@@ -26,9 +26,8 @@
   },
   "babel": {
     "presets": [
-      "@babel/preset-env",
-      "@babel/preset-react"
-    ]
+      ["@babel/preset-env",{"targets": {"esmodules": true}}],
+      ["@babel/preset-react",{"runtime": "automatic"}]]
   },
   "scripts": {
     "prod": "BABEL_ENV=production webpack --config webpack.config.js --mode production",
