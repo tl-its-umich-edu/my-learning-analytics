@@ -41,8 +41,8 @@
         left join entity.course_grade cg
             on cse.course_section_id = cg.course_section_id and cse.person_id = cg.person_id
         where
-            co.lms_int_id in %(course_ids)s
-            and cse.role in ('Student', 'TeachingAssistant', 'Teacher')
+            co.lms_int_id = ANY(%(course_ids)s)
+            and cse.role = ANY(ARRAY['Student', 'Teacher', 'TeachingAssistant']::text[])
             and cse.role_status = 'Enrolled'
             and cse.enrollment_status = 'Active'
         order by user_id
@@ -56,14 +56,14 @@
                 la.visibility = 'everyone'
                 and	la.status = 'published'
                 and la.course_offering_id = co.id
-                and co.lms_int_id in %(course_ids)s
+                and co.lms_int_id = ANY(%(course_ids)s)
             ), assignment_grp as (
                 select lg.*
                 from entity.learner_activity_group lg, keymap.course_offering co
                 where
                 lg.status = 'available'
                 and lg.course_offering_id = co.id
-                and co.lms_int_id in %(course_ids)s
+                and co.lms_int_id = ANY(%(course_ids)s)
             ), assign_more as (
                 select distinct(a.learner_activity_group_id), da.group_points
                 from assignment_details a
@@ -125,7 +125,7 @@
                 la.visibility = 'everyone'
                 and	la.status = 'published'
                 and la.course_offering_id = co.id
-                and co.lms_int_id in %(course_ids)s
+                and co.lms_int_id = ANY(%(course_ids)s)
                 and la.learner_activity_id = la_km.id
                 and la.learner_activity_group_id = lag_km.id
         )
@@ -147,7 +147,7 @@
             keymap.course_offering co_km
         where
             lag.course_offering_id = co_km.id
-            and co_km.lms_int_id in %(course_ids)s
+            and co_km.lms_int_id = ANY(%(course_ids)s)
             group by co_km.lms_int_id
         ''',
     "term":
@@ -182,7 +182,7 @@
             LEFT OUTER JOIN entity.academic_term at1 on (co.academic_term_id = at1.academic_term_id),
             keymap.course_offering co2,
             keymap.academic_term at2
-            WHERE co2.lms_int_id in %(course_ids)s
+            WHERE co2.lms_int_id = ANY(%(course_ids)s)
             and co.course_offering_id = co2.id
             and at1.academic_term_id = at2.id
         ''',
@@ -196,7 +196,7 @@
         where
             f.course_offering_id = co_km.id
             and f.file_id = f_km.id
-            and co_km.lms_int_id in %(course_ids)s
+            and co_km.lms_int_id = ANY(%(course_ids)s)
         order by id
         ''',
     "submission":
@@ -212,7 +212,7 @@
                 left join keymap.course_offering co
                     on cs.le_current_course_offering_id = co.id
             where 
-                co.lms_int_id in %(course_ids)s
+                co.lms_int_id = ANY(:course_ids)
                 and cse.role_status ='Enrolled' 
                 and cse."role" = 'Student'
                 and cse.enrollment_status = 'Active'
@@ -228,13 +228,13 @@
                 lar.published_score as published_score,
                 lar.response_date as submitted_at,
                 lar.graded_date as graded_at,
-                timezone(%(time_zone)s, lar.posted_at AT TIME ZONE 'UTC') as grade_posted_local_date,
+                timezone(:time_zone, lar.posted_at AT TIME ZONE 'UTC') as grade_posted_local_date,
                 lar.grading_status as submission_workflow_state,
                 la.title as title,
                 lar.learner_activity_result_id as learner_activity_result_id,
                 lar.person_id as short_user_id,
                 cast(lar2.lms_int_id as BIGINT) as submission_id,
-                (cast(%(canvas_data_id_increment)s as bigint) + cast(p.lms_ext_id as bigint)) as canvas_user_id
+                (cast(:canvas_data_id_increment as bigint) + cast(p.lms_ext_id as bigint)) as canvas_user_id
             from entity.learner_activity_result lar
             join enrollment on lar.person_id= enrollment.user_id
             join enrollment e on lar.person_id = e.user_id
@@ -244,7 +244,7 @@
                 left join keymap.course_offering co on co.id = la.course_offering_id
                 join keymap.person p on p.id = lar.person_id
             where
-                co.lms_int_id in %(course_ids)s
+                co.lms_int_id = ANY(:course_ids)
                 and la.status = 'published'
 		)
             select
@@ -267,7 +267,10 @@
                 grade_posted_local_date 
         from 
             submission
-        );
+        )
+        ''',
+    "submission_with_avg_score": 
+        '''
         select 
             f.id::bigint,
             f.assignment_id::bigint assignment_id,

@@ -1,5 +1,6 @@
 from graphene_django.views import GraphQLView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from graphql_core_promise import PromiseExecutionContext
 from dashboard.common.db_util import canvas_id_to_incremented_id
 from dashboard.graphql.loaders import AssignmentsByCourseIdLoader, \
     SubmissionsByAssignmentIdLoader, SubmissionByAssignmentIdAndUserIdLoader, \
@@ -8,7 +9,6 @@ from dashboard.graphql.loaders import AssignmentsByCourseIdLoader, \
     AssignmentGroupByCourseIdAndIdLoader, AssignmentWeightConsiderationByCourseIdLoader, \
     UserDefaultSelectionsByCourseIdAndUserLoader, UserDefaultSelectionByCourseIdAndUserAndViewTypeLoader, \
     AcademicTermByIdLoader
-
 from django.db.models import Q
 from dashboard.models import User
 from pinax.eventlog.models import log as eventlog
@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class DashboardGraphQLView(LoginRequiredMixin, GraphQLView):
+    execution_context_class = PromiseExecutionContext
     def get_context(self, request):
         loaders = {
             'assignment_weight_consideration_by_course_id_loader': AssignmentWeightConsiderationByCourseIdLoader(

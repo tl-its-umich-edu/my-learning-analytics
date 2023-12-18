@@ -3,7 +3,7 @@ import graphene
 
 from dashboard.models import Course
 from dashboard.graphql.objects import CourseType
-from dashboard.rules import is_admin_or_enrolled_in_course, is_admin
+from dashboard.rules import is_admin_or_enrolled_in_course
 from graphql import GraphQLError
 
 import logging

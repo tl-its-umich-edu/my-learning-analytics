@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from dashboard.models import Course, CourseViewOption, AcademicTerms
 from dashboard.common.db_util import canvas_id_to_incremented_id
 from datetime import datetime
-import pytz
+from zoneinfo import ZoneInfo
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -18,10 +18,10 @@ class Command(BaseCommand):
         name = options.get('name')
         date_start = options.get('date_start')
         if date_start is not None:
-            date_start = datetime.strptime(date_start, '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.UTC)
+            date_start = datetime.strptime(date_start, '%Y-%m-%d %H:%M:%S').replace(tzinfo=ZoneInfo('UTC'))
         date_end = options.get('date_end')
         if date_end is not None:
-            date_end = datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S').replace(tzinfo=pytz.UTC)
+            date_end = datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S').replace(tzinfo=ZoneInfo('UTC'))
 
         prefixed_course_id = canvas_id_to_incremented_id(course_id)
         if term_id is not None:

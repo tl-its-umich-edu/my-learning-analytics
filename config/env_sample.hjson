@@ -53,7 +53,7 @@
     # Enable secure cookies, also set your trusted origin (example of instructure.com)
     # This needs to be true for deployments or when testing LTI with ngrok or loophole.
     "CSRF_COOKIE_SECURE": false,
-    "CSRF_TRUSTED_ORIGINS": ["instructure.com"],
+    "CSRF_TRUSTED_ORIGINS": ["https://*.instructure.com", "https://*.umich.edu"],
     # If you have a proxy that sets this header then set this to true. Default is false
     "USE_X_FORWARDED_HOST": false,
     # SameSite settings for Session and CSRF (defaults in settings.py should work), if you do want non-string None set to null.

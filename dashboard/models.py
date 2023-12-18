@@ -11,7 +11,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import Optional, Union
 
-import pytz
+from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
@@ -219,7 +219,7 @@ class Course(models.Model):
             date_start = self.term.date_start
         else:
             logger.info(f"No date_start value was found for course {self.name} ({self.canvas_id}) or term; setting to current date and time")
-            date_start = datetime.now(pytz.UTC)
+            date_start = datetime.now(ZoneInfo('UTC'))
         return date_start
 
     def determine_date_end(self, start: Union[datetime, None] = None) -> datetime:
