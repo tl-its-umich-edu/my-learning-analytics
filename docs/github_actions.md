@@ -8,3 +8,5 @@
     oc tag ghcr.io/tl-its-umich-edu/my-learning-analytics:latest my-learning-analytics:latest --scheduled --reference-policy=local
     ```
     See the OpenShift documentation "[Managing image streams: Configuring periodic importing of image stream tags](https://docs.openshift.com/container-platform/4.11/openshift_images/image-streams-manage.html#images-imagestream-import_image-streams-managing)" for details.
+
+    `reference-policy=local` : If you want to instruct OpenShift Container Platform to always fetch the tagged image from the [integrated registry](https://docs.openshift.com/container-platform/4.11/openshift_images/managing_images/tagging-images.html#images-add-tags-to-imagestreams_tagging-images)
