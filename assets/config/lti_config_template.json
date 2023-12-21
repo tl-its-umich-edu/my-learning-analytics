@@ -39,7 +39,8 @@
   "custom_fields": {
     "user_username": "$User.username",
     "canvas_user_id": "$Canvas.user.id",
-    "canvas_course_id": "$Canvas.course.id"
+    "canvas_course_id": "$Canvas.course.id",
+    "person_address_timezone": "$Person.address.timezone"
   },
   "public_jwk_url": "%(base_url)s%(jwks_url_suffix)s",
   "target_link_uri": "%(base_url)s%(launch_url_suffix)s",
