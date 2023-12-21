@@ -1,22 +1,19 @@
 import logging
 import random
 import string
+import urllib.parse
 from collections import namedtuple
-from typing import Any, Dict
+from datetime import datetime
+from typing import Dict
+from typing import Union, Any
 
 import django.contrib.auth
+import django.contrib.auth
+import pytz
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import JsonResponse
-import logging, string, random
-import urllib.parse
-from datetime import datetime
-from typing import Mapping, MutableSequence, Union, Any
-
-import django.contrib.auth
 from django.contrib.staticfiles import finders
-
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
