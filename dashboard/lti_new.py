@@ -224,7 +224,11 @@ def extract_launch_variables_for_tool_use(request, message_launch):
     username = custom_params['user_username']
     course_id = custom_params['canvas_course_id']
     canvas_user_id = custom_params['canvas_user_id']
-    time_zone = custom_params['person_address_timezone']
+    time_zone = custom_params.get('person_address_timezone',
+                                  settings.TIME_ZONE).strip()
+
+    if time_zone not in pytz.all_timezones:
+        time_zone = settings.TIME_ZONE  # default zone from `env.hjson`
 
     canvas_course_long_id = canvas_id_to_incremented_id(course_id)
     canvas_user_long_id = canvas_id_to_incremented_id(canvas_user_id)
