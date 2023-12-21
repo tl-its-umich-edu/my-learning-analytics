@@ -393,6 +393,8 @@ class User(models.Model):
     current_grade = models.FloatField(blank=True, null=True, verbose_name="Current Grade")
     final_grade = models.FloatField(blank=True, null=True, verbose_name="Final Grade")
     enrollment_type = models.CharField(max_length=50, choices=EnrollmentType.choices, blank=True, null=True, verbose_name="Enrollment Type")
+    time_zone = models.CharField(
+        max_length=1024, blank=True, null=True, verbose_name='Time zone')
 
     objects = UserQuerySet.as_manager()
 
