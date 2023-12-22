@@ -68,6 +68,7 @@ class CourseForm(forms.ModelForm):
         return self.cleaned_data
 
 
+@admin.register(AcademicTerms)
 class TermAdmin(admin.ModelAdmin):
     exclude = ('id',)
     list_display = ('canvas_id', 'name', 'date_start', 'date_end')
@@ -77,6 +78,7 @@ class TermAdmin(admin.ModelAdmin):
         return False
 
 
+@admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseViewOptionInline, ]
     form = CourseForm
@@ -95,11 +97,13 @@ class CourseAdmin(admin.ModelAdmin):
         self.message_user(request, "All selected last updated values cleared.")
 
     # Need this method to correctly display the line breaks
+    @admin.display(
+        description="Course View Option(s)"
+    )
     def _courseviewoption(self, obj):
         return mark_safe(linebreaksbr(obj.courseviewoption))
 
     # Known mypy issue: https://github.com/python/mypy/issues/708
-    _courseviewoption.short_description = "Course View Option(s)" # type: ignore[attr-defined]
 
     def course_link(self, obj):
         return format_html('<a href="{}">Link</a>', obj.absolute_url)
@@ -160,8 +164,6 @@ class MyLACronJobLogAdmin(ExportActionMixin, CronJobLogAdmin):
     def has_delete_permission(request, obj=None):
         return False
 
-admin.site.register(AcademicTerms, TermAdmin)
-admin.site.register(Course, CourseAdmin)
 
 # Remove the pinax LogAdmin and add ours
 admin.site.unregister(Log)

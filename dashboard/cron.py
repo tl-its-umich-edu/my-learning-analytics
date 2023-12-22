@@ -2,10 +2,10 @@ from datetime import datetime
 import logging
 from collections import namedtuple
 from typing import Any, Dict, List, Union
+from zoneinfo import ZoneInfo
 
 import hjson
 import pandas as pd
-import pytz
 import pangres
 
 from django.conf import settings
@@ -13,10 +13,11 @@ from django.db import connections as conns, models
 from django.db.models import QuerySet
 from django_cron import CronJobBase, Schedule
 from google.cloud import bigquery
-from sqlalchemy import types
+from sqlalchemy import types, text
 from sqlalchemy.engine import ResultProxy
+from sqlalchemy.orm import sessionmaker
 
-from dashboard.common import db_util, utils
+from dashboard.common import db_util
 from dashboard.models import Course, Resource, AcademicTerms, User
 
 
@@ -67,17 +68,17 @@ def util_function(sql_string, mysql_table, param_object=None, table_identifier=N
 
 
 # execute database query
-def execute_db_query(query: str, params: List = None) -> ResultProxy:
-    with engine.connect() as connection:
+def execute_db_query(query: str, params: Dict = None) -> ResultProxy:
+    with engine.begin() as connection:
         connection.detach()
         if params:
-            return connection.execute(query, params)
+            return connection.execute(text(query), params)
         else:
-            return connection.execute(query)
+            return connection.execute(text(query))
 
 
 # remove all records inside the specified table
-def delete_all_records_in_table(table_name: str, where_clause: str = "", where_params: List = None):
+def delete_all_records_in_table(table_name: str, where_clause: str = "", where_params: Dict = None):
     # delete all records in the table first, can have an optional where clause
     result_proxy = execute_db_query(f"delete from {table_name} {where_clause}", where_params)
     return(f"\n{result_proxy.rowcount} rows deleted from {table_name}\n")
@@ -99,7 +100,7 @@ def soft_update_datetime_field(
             f'Skipped update of {field_name} for {model_name} instance ({model_inst.id}); existing value was found')
     else:
         if warehouse_field_value:
-            warehouse_field_value = warehouse_field_value.replace(tzinfo=pytz.UTC)
+            warehouse_field_value = warehouse_field_value.replace(tzinfo=ZoneInfo('UTC'))
             setattr(model_inst, field_name, warehouse_field_value)
             logger.info(f'Updated {field_name} for {model_name} instance ({model_inst.id})')
             return [field_name]
@@ -124,7 +125,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in checking course")
         supported_courses = Course.objects.get_supported_courses()
         course_ids = [str(x) for x in supported_courses.values_list('id', flat=True)]
-        courses_data = pd.read_sql(queries['course'], data_warehouse_engine, params={'course_ids': tuple(course_ids)})
+        courses_data = pd.read_sql(queries['course'], data_warehouse_engine, params={'course_ids': course_ids})
         # error out when course id is invalid, otherwise add DataFrame to list
         for course_id, data_last_updated in supported_courses:
             if course_id not in list(courses_data['id']):
@@ -151,7 +152,7 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
-        logger.debug("in update with data warehouse user")
+        logger.info("in update with data warehouse user")
 
         # delete all records in the table first
         status += delete_all_records_in_table("user")
@@ -160,7 +161,7 @@ class DashboardCronJob(CronJobBase):
         status += util_function(
                                 queries['user'],
                                 'user',
-                                {'course_ids': tuple(self.valid_locked_course_ids),
+                                {'course_ids': self.valid_locked_course_ids,
                                 'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT
                                 })
 
@@ -193,13 +194,13 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
-        logger.debug("in update canvas resource")
+        logger.info("in update canvas resource")
 
         # Select all the files for these courses
         # convert int array to str array
         df_attach = pd.read_sql(queries['resource'],
                                 data_warehouse_engine,
-                                params={'course_ids': tuple(self.valid_locked_course_ids)})
+                                params={'course_ids': self.valid_locked_course_ids })
         logger.debug(df_attach)
         # Update these back again based on the dataframe
         # Remove any rows where file_state is not available!
@@ -217,6 +218,8 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
+        logger.info("in update resource access")
+
         # return string with concatenated SQL insert result
         return_string = ""
 
@@ -231,7 +234,7 @@ class DashboardCronJob(CronJobBase):
 
         logger.info(f"Deleting all records in resource_access after {data_last_updated}")
 
-        status += delete_all_records_in_table("resource_access", f"WHERE access_time > %s", [data_last_updated, ])
+        status += delete_all_records_in_table("resource_access", f"WHERE access_time > :data_last_updated", {'data_last_updated': data_last_updated })
 
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
@@ -393,7 +396,7 @@ class DashboardCronJob(CronJobBase):
             student_enrollment_type = User.EnrollmentType.STUDENT
             student_enrollment_df = pd.read_sql(
                 'select user_id, course_id from user where enrollment_type= %s',
-                engine, params={student_enrollment_type})
+                engine, params=[(str(student_enrollment_type),)])
             resource_access_df = pd.merge(
                 resource_access_df, student_enrollment_df,
                 on=['user_id', 'course_id'],
@@ -437,6 +440,8 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
+        logger.info("update_groups(): ")
+
         # delete all records in assignment_group table
         status += delete_all_records_in_table("assignment_groups")
 
@@ -447,7 +452,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         status += util_function(queries['assignment_groups'],
                                 'assignment_groups',
-                                {'course_ids': tuple(self.valid_locked_course_ids)})
+                                {'course_ids': self.valid_locked_course_ids})
 
         return status
 
@@ -463,7 +468,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         status += util_function(queries['assignment'],
                                 'assignment',
-                                {'course_ids': tuple(self.valid_locked_course_ids),
+                                {'course_ids': self.valid_locked_course_ids,
                                  'time_zone': settings.TIME_ZONE})
 
         return status
@@ -480,14 +485,30 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids
         # filter out not released grades (submission_dim.posted_at date is not null) and partial grades (submission_dim.workflow_state != 'graded')
-        status += util_function(queries['submission'],
-                                'submission',
-                                {
-                                    'course_ids': tuple(self.valid_locked_course_ids),
-                                    'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT,
-                                    'time_zone': settings.TIME_ZONE
-                                })
+        query_params = {
+                        'course_ids': self.valid_locked_course_ids,
+                         'time_zone': settings.TIME_ZONE,
+                        'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT,
+                        }
+        Session = sessionmaker(bind=data_warehouse_engine)
+        try:
+    # Create a session
+            with Session() as session:
+                # Execute the first query to create the temporary table
+                session.execute(text(queries['submission']).bindparams(**query_params))
 
+                # Execute the second query using the temporary table
+                result = session.execute(text(queries['submission_with_avg_score']))
+                df = pd.DataFrame(result.fetchall(), columns=result.keys())
+                df = df.drop_duplicates(keep='first')
+                df.to_sql(con=engine, name='submission', if_exists='append', index=False)
+
+        except Exception as e:
+            logger.exception('Error running sql on table submission', str(e))
+            raise
+        status+=f"{str(df.shape[0])} submission: {query_params}\n"
+
+    # returns the row size of dataframe
         return status
 
     def weight_consideration(self):
@@ -503,7 +524,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         status += util_function(queries['assignment_weight'],
                                 'assignment_weight_consideration',
-                                {'course_ids': tuple(self.valid_locked_course_ids)},
+                                {'course_ids': self.valid_locked_course_ids },
                                 'weight')
 
         logger.debug(status + "\n\n")
@@ -543,7 +564,7 @@ class DashboardCronJob(CronJobBase):
         Updates course records with data returned from verify_course_ids, only making changes when necessary.
         """
         status: str = ''
-        logger.debug('update_course()')
+        logger.info('update_course()')
 
         logger.debug(warehouse_courses_data.to_json(orient='records'))
         courses: QuerySet = Course.objects.filter(id__in=self.valid_locked_course_ids)
@@ -588,7 +609,7 @@ class DashboardCronJob(CronJobBase):
 
         status = ""
 
-        run_start = datetime.now(pytz.UTC)
+        run_start = datetime.now(ZoneInfo('UTC'))
         status += f"Start cron: {str(run_start)} UTC\n"
         course_verification = self.verify_course_ids()
         invalid_course_id_list = course_verification.invalid_course_ids

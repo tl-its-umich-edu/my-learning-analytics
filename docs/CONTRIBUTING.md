@@ -172,3 +172,7 @@ When prompted, specify the password for the root MySQL user.
 It should be found in the `MYSQL.ROOT_PASSWORD` property of `env.hjson`.
 
 [Next: Contributors](../docs/CONTRIBUTORS.md)
+
+### Dependency Upgrade
+
+ For Auto-upgrade django to future version, use the helpful library called [django-upgrade](https://github.com/adamchainz/django-upgrade )

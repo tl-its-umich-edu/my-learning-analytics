@@ -39,7 +39,7 @@ WORKDIR /code
 COPY requirements.txt .
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        build-essential curl apt-transport-https libpq-dev netcat-traditional jq python3-dev xmlsec1 cron git && \
+        build-essential curl apt-transport-https libpq-dev netcat-traditional default-libmysqlclient-dev pkg-config jq python3-dev xmlsec1 cron git && \
     apt-get upgrade -y
 
 # Install MariaDB from the mariadb repository rather than using Debians 

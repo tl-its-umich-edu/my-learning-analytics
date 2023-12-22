@@ -169,7 +169,11 @@ CRON_CLASSES = [
 CRON_QUERY_FILE = os.path.join(BASE_DIR, ENV.get('CRON_QUERY_FILE', 'config/cron_udp.hjson'))
 
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 CONTEXT_PROCESSORS = [
     'django.contrib.auth.context_processors.auth',
     'django.template.context_processors.debug',
@@ -273,7 +277,6 @@ TIME_ZONE = ENV.get("TIME_ZONE", os.getenv("TZ", "America/Detroit"))
 
 USE_I18N = True
 
-USE_L10N = True
 
 USE_TZ = True
 

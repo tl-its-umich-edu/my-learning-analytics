@@ -37,7 +37,7 @@ def create_sqlalchemy_engine(db_params: DjangoDBParams) -> Engine:
     if new_db_params['ENGINE'] == (BACKENDS_PATH + 'mysql'):
         return create_engine(f'mysql+mysqldb://{core_string}?charset=utf8mb4')
     else:
-        return create_engine('postgresql://' + core_string)
+        return create_engine('postgresql+psycopg://' + core_string)
 
 
 def canvas_id_to_incremented_id(canvas_id):
