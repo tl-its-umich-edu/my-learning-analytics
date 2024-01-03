@@ -57,7 +57,7 @@ function ProgressBarV2 (props) {
             width: `${percentWidth}%`,
             height: `${height}px`,
             position: 'relative',
-            margin: margin
+            margin
           }}
           onFocus={(event) => { if (onBarFocus) onBarFocus(event.currentTarget) }}
           onBlur={(event) => { if (onBarBlur) onBarBlur() }}

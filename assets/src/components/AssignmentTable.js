@@ -33,7 +33,7 @@ const PREFIX = 'AssignmentTable'
 
 const classes = {
   root: `${PREFIX}-root`,
-  paper: `${PREFIX}-paper`,
+  messageWrapper: `${PREFIX}-messageWrapper`,
   container: `${PREFIX}-container`,
   sliderCell: `${PREFIX}-sliderCell`,
   goalGradeInput: `${PREFIX}-goalGradeInput`,
@@ -60,11 +60,6 @@ const Root = styled('div')((
   [`& .${classes.root}`]: {
     flexGrow: 1,
     padding: 8
-  },
-
-  [`& .${classes.paper}`]: {
-    padding: theme.spacing(2),
-    color: theme.palette.text.secondary
   },
 
   [`& .${classes.container}`]: {
@@ -139,6 +134,14 @@ const Root = styled('div')((
 
   [`& .${classes.filterButton}`]: {
     textTransform: 'none'
+  }
+}))
+
+// separate styles for child of opened popover
+const StyledPopoverMessage = styled('div')(({ theme }) => ({
+  [`& .${classes.messageWrapper}`]: {
+    padding: theme.spacing(2),
+    color: theme.palette.text.secondary
   }
 }))
 
@@ -404,8 +407,8 @@ function AssignmentTable (props) {
                       {
                         a.week
                           ? isPreviousWeekTheSame(a.week, key)
-                              ? ''
-                              : `Week ${a.week}`
+                            ? ''
+                            : `Week ${a.week}`
                           : 'No due date'
                       }
                     </TableCell>
@@ -418,8 +421,8 @@ function AssignmentTable (props) {
                       {
                         a.week
                           ? isPreviousDayTheSame(a.dueDateMonthDay, key)
-                              ? ''
-                              : a.dueDateMonthDay
+                            ? ''
+                            : a.dueDateMonthDay
                           : ''
                       }
                     </TableCell>
@@ -495,9 +498,11 @@ function AssignmentTable (props) {
                           />
                           <Popover
                             className={classes.popover}
-                            classes={{ paper: classes.paper }}
                             anchorEl={popoverEl.anchorEl}
                             open={popoverEl.popoverId === key}
+                            sx={{
+                              pointerEvents: 'none'
+                            }}
                             onClose={clearPopoverEl}
                             anchorOrigin={{
                               vertical: 'top',
@@ -511,7 +516,11 @@ function AssignmentTable (props) {
                             disableAutoFocus
                             disableEnforceFocus
                           >
-                            <PopupMessage a={a} assignmentGroups={assignmentGroups} />
+                            <StyledPopoverMessage>
+                              <div className={classes.messageWrapper}>
+                                <PopupMessage a={a} assignmentGroups={assignmentGroups} />
+                              </div>
+                            </StyledPopoverMessage>
                           </Popover>
                         </div>
                       </>

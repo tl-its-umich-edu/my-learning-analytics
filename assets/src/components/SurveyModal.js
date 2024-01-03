@@ -18,11 +18,8 @@ const classes = {
   surveyButton: `${PREFIX}-surveyButton`
 }
 
-const Root = styled('div')((
-  {
-    theme
-  }
-) => ({
+// styling within the modal (root styling doesn't apply to portal elements)
+const StyledModalBody = styled('div')(({ theme }) => ({
   [`& .${classes.modal}`]: {
     top: '10%',
     left: '50%',
@@ -61,11 +58,14 @@ const Root = styled('div')((
     right: 0,
     width: '100%',
     height: '100%'
-  },
+  }
+}))
 
-  [`& .${classes.surveyButton}`]: {
-    color: theme.palette.primary.main,
-    background: theme.palette.getContrastText(theme.palette.primary.main)
+const ColoredButton = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.getContrastText(theme.palette.primary.main),
+  color: theme.palette.primary.main,
+  '&:hover': {
+    backgroundColor: '#D5D5D5'
   }
 }))
 
@@ -109,16 +109,16 @@ export default function SurveyModal (props) {
   )
 
   return (
-    <Root>
-      <Button variant='contained' className={classes.surveyButton} onClick={toggleOpen}>{props.surveyLink.text}</Button>
+    <>
+      <ColoredButton variant='contained' onClick={toggleOpen}>{props.surveyLink.text}</ColoredButton>
       <Modal
         open={open}
         onClose={toggleOpen}
         aria-labelledby='survey-modal-title'
         aria-describedby='survey-modal-description'
       >
-        {body}
+        <StyledModalBody>{body}</StyledModalBody>
       </Modal>
-    </Root>
+    </>
   )
 }

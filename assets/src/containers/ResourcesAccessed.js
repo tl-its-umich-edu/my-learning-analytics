@@ -297,7 +297,7 @@ function ResourcesAccessed (props) {
               }
               <div className={classes.formController}>
                 <p className={classes.controlText}>Resources accessed from week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now) ' : ''}</b> by students with these grades:</p>
-                <FormControl>
+                <FormControl variant='standard'>
                   <Select
                     value={resourceGradeFilter}
                     onChange={handleResourceGradeFilter}

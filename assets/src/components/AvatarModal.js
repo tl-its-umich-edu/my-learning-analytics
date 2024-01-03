@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography'
 import Avatar from '@mui/material/Avatar'
 import Link from '@mui/material/Link'
 import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
+import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import DialogTitle from '@mui/material/DialogTitle'
@@ -70,12 +70,12 @@ function AvatarModal (props) {
   const Admin = () => (
     <>
       <Link style={{ textDecoration: 'none' }} href='/admin'>
-        <ListItem button>
+        <ListItemButton>
           <ListItemIcon>
             <Lock />
           </ListItemIcon>
           <ListItemText inset primary='Admin' className={classes.text} />
-        </ListItem>
+        </ListItemButton>
       </Link>
       <Divider />
     </>
@@ -83,12 +83,12 @@ function AvatarModal (props) {
 
   const SwitchCourses = () => (
     <>
-      <ListItem button onClick={() => setOpenChangeCourseDialog(true)}>
+      <ListItemButton onClick={() => setOpenChangeCourseDialog(true)}>
         <ListItemIcon>
           <Launch />
         </ListItemIcon>
         <ListItemText inset primary='Switch courses' className={classes.text} />
-      </ListItem>
+      </ListItemButton>
       <Dialog
         onClose={() => setOpenChangeCourseDialog(false)}
         open={openChangeCourseDialog}
@@ -101,9 +101,9 @@ function AvatarModal (props) {
               href={`/courses/${course.course_id}`}
               key={i}
             >
-              <ListItem button>
+              <ListItemButton>
                 <ListItemText inset primary={course.course_name} className={classes.text} />
-              </ListItem>
+              </ListItemButton>
             </Link>
           ))}
         </List>
@@ -154,12 +154,12 @@ function AvatarModal (props) {
           <List>
             <Divider />
             <Link style={{ textDecoration: 'none' }} href={helpURL} target='_blank' rel='noopener noreferrer'>
-              <ListItem button>
+              <ListItemButton>
                 <ListItemIcon>
                   <HelpIcon />
                 </ListItemIcon>
                 <ListItemText inset primary='Help' className={classes.text} />
-              </ListItem>
+              </ListItemButton>
             </Link>
             <Divider />
             {
@@ -176,12 +176,12 @@ function AvatarModal (props) {
               user.logoutURL !== ''
                 ? (
                   <Link style={{ textDecoration: 'none' }} href={user.logoutURL}>
-                    <ListItem button>
+                    <ListItemButton>
                       <ListItemIcon>
                         <LogoutIcon />
                       </ListItemIcon>
                       <ListItemText inset primary='Logout' className={classes.text} />
-                    </ListItem>
+                    </ListItemButton>
                   </Link>
                   )
                 : null

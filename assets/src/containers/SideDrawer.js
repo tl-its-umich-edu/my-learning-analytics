@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { styled } from '@mui/material/styles'
 import Drawer from '@mui/material/Drawer'
 import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
+import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import { Link } from 'react-router-dom'
@@ -55,8 +55,7 @@ function SideDrawer (props) {
     >
       <List>
         {routes(courseId, courseInfo.course_view_options, !isTeacherOrAdmin(isAdmin, enrollmentTypes)).map((props, key) => (
-          <ListItem
-            button
+          <ListItemButton
             component={Link}
             to={props.path}
             key={key}
@@ -71,7 +70,7 @@ function SideDrawer (props) {
               }
             </ListItemIcon>
             <ListItemText primary={props.title} className={classes.text} />
-          </ListItem>
+          </ListItemButton>
         ))}
       </List>
     </Root>
