@@ -6,6 +6,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import IconButton from '@mui/material/IconButton'
 import Modal from '@mui/material/Modal'
 import CloseIcon from '@mui/icons-material/Close'
+import Typography from '@mui/material/Typography'
 
 const PREFIX = 'SurveyModal'
 
@@ -94,7 +95,7 @@ export default function SurveyModal (props) {
   const body = (
     <div className={`${classes.paper} ${classes.modal}`}>
       <DialogTitle className={classes.dialogTitle}>
-        <h4 id='survey-modal-title'>{props.surveyLink.text}</h4>
+        <span><Typography variant='h6' id='survey-modal-title'>{props.surveyLink.text}</Typography></span>
         <IconButton onClick={toggleOpen} size='large'>
           <CloseIcon />
         </IconButton>
