@@ -99,19 +99,19 @@ function GradeDistribution (props) {
 
     const gradeCheckbox = !user.admin
       ? userSettingLoaded
-          ? (
-            <Typography align='right'>Show my grade
-              <Checkbox
-                color='secondary'
-                checked={showGrade}
-                onChange={() => {
-                  setSettingChanged(true)
-                  setShowGrade(!showGrade)
-                }}
-              />
-            </Typography>
-            )
-          : <Spinner />
+        ? (
+          <Typography align='right'>Show my grade
+            <Checkbox
+              color='secondary'
+              checked={showGrade}
+              onChange={() => {
+                setSettingChanged(true)
+                setShowGrade(!showGrade)
+              }}
+            />
+          </Typography>
+          )
+        : <Spinner />
       : null
 
     return (
