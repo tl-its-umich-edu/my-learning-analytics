@@ -230,6 +230,8 @@ def extract_launch_variables_for_tool_use(request, message_launch):
     if time_zone not in pytz.all_timezones:
         time_zone = settings.TIME_ZONE  # default zone from `env.hjson`
 
+    request.session['time_zone'] = time_zone
+
     canvas_course_long_id = canvas_id_to_incremented_id(course_id)
     canvas_user_long_id = canvas_id_to_incremented_id(canvas_user_id)
 
