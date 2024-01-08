@@ -1,3 +1,4 @@
+import pytz
 from graphene_django import DjangoObjectType
 import graphene
 import numpy as np
@@ -142,7 +143,14 @@ class AssignmentType(DjangoObjectType):
         return info.context.submissions_by_assignment_id_loader.load(parent.id).then(
             lambda submissions: AssignmentType._median_grade_lambda(parent, info, submissions)
         )
-
+    
+    def resolve_due_date(parent, info):
+        original_due_date = parent.due_date
+        if original_due_date is None:
+            return None
+        new_timezone = pytz.timezone(info.context.session.get('time_zone'))
+        return original_due_date.astimezone(new_timezone)
+    
     class Meta:
         model = Assignment
         only_fields = (

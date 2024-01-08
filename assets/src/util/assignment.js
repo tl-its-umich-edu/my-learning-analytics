@@ -214,8 +214,6 @@ const createAssignmentFields = (
       } = a
 
       a.week = calculateWeekOffset(courseStartDate, dueDate)
-      console.log('dueDate: ' + dueDate)
-      console.log('localDate '+ new Date(dueDate).toLocaleDateString())
       a.percentOfFinalGrade = roundToXDecimals(
         (
           assignmentWeightConsideration
