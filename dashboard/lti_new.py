@@ -251,9 +251,9 @@ def extract_launch_variables_for_tool_use(request, message_launch):
     # Add user to MyLA's `user` table,
     # since data wasn't pulled from scheduled job
     user_id = settings.CANVAS_DATA_ID_INCREMENT + int(canvas_user_id)
-    enrollment_qs =  MylaUser.objects.filter(user_id=user_id)
+    enrollment_qs = MylaUser.objects.filter(user_id=user_id)
     if enrollment_qs.exists():
-        enrollment_qs.update(sis_name=username, time_zone=time_zone)
+        enrollment_qs.update(sis_name=username)
 
     user_obj.backend = 'django.contrib.auth.backends.ModelBackend'
     django.contrib.auth.login(request, user_obj)
