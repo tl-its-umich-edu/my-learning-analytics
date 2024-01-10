@@ -1,15 +1,27 @@
 import React from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import Grid from '@material-ui/core/Grid'
-import Paper from '@material-ui/core/Paper'
-import Typography from '@material-ui/core/Typography'
+import { styled } from '@mui/material/styles'
+import Grid from '@mui/material/Grid'
+import Paper from '@mui/material/Paper'
+import Typography from '@mui/material/Typography'
 
-const styles = theme => ({
-  root: {
+const PREFIX = 'Banner'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  paper: `${PREFIX}-paper`
+}
+
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`&.${classes.root}`]: {
     flexGrow: 1,
     padding: 8
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     align: 'center',
     padding: theme.spacing(2),
     opacity: 0.9,
@@ -18,10 +30,10 @@ const styles = theme => ({
             '0px 4px 5px 0px rgba(0,0,0,0.14), ' +
             '0px 1px 10px 0px rgba(0,0,0,0.12)'
   }
-})
+}))
 
 function Banner (props) {
-  const { classes, settings, children } = props
+  const { settings, children } = props
 
   const paperStyle = {
     background: settings.backgroundColor,
@@ -35,7 +47,7 @@ function Banner (props) {
   }
 
   return (
-    <div className={classes.root}>
+    <Root className={classes.root}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper className={classes.paper} style={paperStyle}>
@@ -45,8 +57,8 @@ function Banner (props) {
           </Paper>
         </Grid>
       </Grid>
-    </div>
+    </Root>
   )
 }
 
-export default withStyles(styles)(Banner)
+export default (Banner)

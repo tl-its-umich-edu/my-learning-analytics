@@ -1,34 +1,43 @@
 import React, { useState } from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import Drawer from '@material-ui/core/Drawer'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import ListItemText from '@material-ui/core/ListItemText'
-import { Link, withRouter } from 'react-router-dom'
+import { styled } from '@mui/material/styles'
+import Drawer from '@mui/material/Drawer'
+import List from '@mui/material/List'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import { Link } from 'react-router-dom'
 import { siteTheme } from '../globals'
 import routes from '../routes/routes'
 import Spinner from '../components/Spinner'
 import { isTeacherOrAdmin } from '../util/roles'
+import withRouter from './WithRouter'
 
-const styles = {
-  list: {
+const PREFIX = 'SideDrawer'
+
+const classes = {
+  list: `${PREFIX}-list`,
+  fullList: `${PREFIX}-fullList`,
+  sideDrawerLinks: `${PREFIX}-sideDrawerLinks`,
+  text: `${PREFIX}-text`
+}
+
+const Root = styled('div')({
+  [`&.${classes.list}`]: {
     width: 250
   },
-  fullList: {
+  [`& .${classes.fullList}`]: {
     width: 'auto'
   },
-  sideDrawerLinks: {
+  [`& .${classes.sideDrawerLinks}`]: {
     textDecoration: 'none'
   },
-  text: {
+  [`& .${classes.text}`]: {
     color: 'black'
   }
-}
+})
 
 function SideDrawer (props) {
   const {
-    classes,
     toggleDrawer,
     courseId,
     courseInfo,
@@ -39,15 +48,14 @@ function SideDrawer (props) {
   const [selectedIndex, setSelectedIndex] = useState(false)
 
   const sideList = (
-    <div
+    <Root
       className={classes.list}
       onClick={toggleDrawer(false)}
       role='button'
     >
       <List>
         {routes(courseId, courseInfo.course_view_options, !isTeacherOrAdmin(isAdmin, enrollmentTypes)).map((props, key) => (
-          <ListItem
-            button
+          <ListItemButton
             component={Link}
             to={props.path}
             key={key}
@@ -62,10 +70,10 @@ function SideDrawer (props) {
               }
             </ListItemIcon>
             <ListItemText primary={props.title} className={classes.text} />
-          </ListItem>
+          </ListItemButton>
         ))}
       </List>
-    </div>
+    </Root>
   )
 
   return (
@@ -79,4 +87,4 @@ function SideDrawer (props) {
   )
 }
 
-export default withRouter(withStyles(styles)(SideDrawer))
+export default withRouter(SideDrawer)

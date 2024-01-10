@@ -1,5 +1,5 @@
 import React from 'react'
-import Grid from '@material-ui/core/Grid'
+import Grid from '@mui/material/Grid'
 import SelectCard from '../components/SelectCard'
 import { isObjectEmpty, getObjectValues } from '../util/object'
 import WarningBanner from '../components/WarningBanner'
@@ -22,7 +22,7 @@ function IndexPage (props) {
   }
 
   return (
-    <Grid container>
+    <Grid container spacing={3}>
       {
         routes(courseId, views, !teacherOrAdmin).map((p, key) => (
           <Grid item xs={12} sm={6} lg={4} key={key}>

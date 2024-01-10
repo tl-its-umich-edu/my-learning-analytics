@@ -1,16 +1,16 @@
 /* global fetch */
 
 import React, { useEffect, useState } from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import Checkbox from '@material-ui/core/Checkbox'
-import FormControl from '@material-ui/core/FormControl'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import FormGroup from '@material-ui/core/FormGroup'
-import Grid from '@material-ui/core/Grid'
-import MenuItem from '@material-ui/core/MenuItem'
-import Paper from '@material-ui/core/Paper'
-import Select from '@material-ui/core/Select'
-import Typography from '@material-ui/core/Typography'
+import { styled } from '@mui/material/styles'
+import Checkbox from '@mui/material/Checkbox'
+import FormControl from '@mui/material/FormControl'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import FormGroup from '@mui/material/FormGroup'
+import Grid from '@mui/material/Grid'
+import MenuItem from '@mui/material/MenuItem'
+import Paper from '@mui/material/Paper'
+import Select from '@mui/material/Select'
+import Typography from '@mui/material/Typography'
 import AlertBanner from '../components/AlertBanner'
 import IconLabel from '../components/IconLabel'
 import RangeSlider from '../components/RangeSlider'
@@ -26,32 +26,49 @@ import { handleError, defaultFetchOptions } from '../util/data'
 import { isTeacherOrAdmin } from '../util/roles'
 import { Helmet } from 'react-helmet'
 
-const styles = theme => ({
-  root: {
+const PREFIX = 'ResourcesAccessed'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  paper: `${PREFIX}-paper`,
+  formController: `${PREFIX}-formController`,
+  controlText: `${PREFIX}-controlText`
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.root}`]: {
     flexGrow: 1,
     padding: 8
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     color: theme.palette.text.secondary,
     padding: theme.spacing(2)
   },
-  formController: {
+
+  [`& .${classes.formController}`]: {
     alignItems: 'center',
     display: 'flex',
     justifyContent: 'center',
     marginTop: theme.spacing(2)
   },
-  controlText: {
+
+  [`& .${classes.controlText}`]: {
     marginRight: 16
   }
-})
+}))
 
 const currentSetting = 'My current setting'
 const rememberSetting = 'Remember my setting'
 const settingNotUpdated = 'Setting not updated'
 
 function ResourcesAccessed (props) {
-  const { classes, courseInfo, courseId, disabled, isAdmin, enrollmentTypes } = props
+  const { courseInfo, courseId, disabled, isAdmin, enrollmentTypes } = props
   if (disabled && !isTeacherOrAdmin(isAdmin, enrollmentTypes)) return (<AlertBanner>The Resources Accessed view is hidden for this course.</AlertBanner>)
   const resourceTypes = courseInfo.resource_types.length === 0
     ? [{ label: 'Files', icon: 'fas fa-file fa-lg' }]
@@ -256,7 +273,7 @@ function ResourcesAccessed (props) {
     }
   }
   return (
-    <>
+    <Root>
       <Helmet title='Resources Accessed' />
       {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
       <div className={classes.root}>
@@ -280,7 +297,7 @@ function ResourcesAccessed (props) {
               }
               <div className={classes.formController}>
                 <p className={classes.controlText}>Resources accessed from week <b>{weekRange[0]} {weekRange[0] === curWeek ? ' (Now)' : ''}</b> to <b>{weekRange[1]}{weekRange[1] === curWeek ? ' (Now) ' : ''}</b> by students with these grades:</p>
-                <FormControl>
+                <FormControl variant='standard'>
                   <Select
                     value={resourceGradeFilter}
                     onChange={handleResourceGradeFilter}
@@ -323,8 +340,8 @@ function ResourcesAccessed (props) {
           </Grid>
         </Grid>
       </div>
-    </>
+    </Root>
   )
 }
 
-export default withStyles(styles)(ResourcesAccessed)
+export default (ResourcesAccessed)

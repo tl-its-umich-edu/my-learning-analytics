@@ -1,4 +1,4 @@
-import { createTheme } from '@material-ui/core/styles'
+import { createTheme } from '@mui/material/styles'
 import defaultPalette from './defaultPalette'
 
 // The fallback to an empty object is needed to not break tests using siteTheme.

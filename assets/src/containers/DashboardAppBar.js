@@ -1,47 +1,67 @@
 import React, { useState } from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import { withRouter, Link } from 'react-router-dom'
-import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import IconButton from '@material-ui/core/IconButton'
-import MenuIcon from '@material-ui/icons/Menu'
-import Avatar from '@material-ui/core/Avatar'
-import Popover from '@material-ui/core/Popover'
+import { styled } from '@mui/material/styles'
+import { Link } from 'react-router-dom'
+import AppBar from '@mui/material/AppBar'
+import Toolbar from '@mui/material/Toolbar'
+import IconButton from '@mui/material/IconButton'
+import MenuIcon from '@mui/icons-material/Menu'
+import Avatar from '@mui/material/Avatar'
+import Popover from '@mui/material/Popover'
 import AvatarModal from '../components/AvatarModal'
 import SurveyModal from '../components/SurveyModal'
 import { surveyLink } from '../globals'
+import withRouter from './WithRouter'
 
-const styles = theme => ({
-  root: {
+const PREFIX = 'DashboardAppBar'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  button: `${PREFIX}-button`,
+  grow: `${PREFIX}-grow`,
+  menuButton: `${PREFIX}-menuButton`,
+  homeButton: `${PREFIX}-homeButton`,
+  roundButton: `${PREFIX}-roundButton`
+}
+
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.root}`]: {
     flexGrow: 1
   },
-  button: {
+
+  [`& .${classes.button}`]: {
     margin: theme.spacing(1)
   },
-  grow: {
+
+  [`& .${classes.grow}`]: {
     flexGrow: 1
   },
-  menuButton: {
+
+  [`& .${classes.menuButton}`]: {
     marginLeft: -12,
     marginRight: 20
   },
-  homeButton: {
+
+  [`& .${classes.homeButton}`]: {
     textDecoration: 'none',
     color: 'white',
     textTransform: 'capitalize',
     padding: 4,
     fontSize: '1.25rem'
   },
-  roundButton: {
+
+  [`& .${classes.roundButton}`]: {
     borderRadius: '50%',
     padding: '12px',
     color: 'white'
   }
-})
+}))
 
 function DashboardAppBar (props) {
   const {
-    classes,
     onMenuBarClick,
     user,
     courseId,
@@ -54,7 +74,7 @@ function DashboardAppBar (props) {
   const showSurveyLink = Boolean(surveyLink.text.length && surveyLink.url.length)
 
   return (
-    <div>
+    <Root>
       <AppBar className={classes.root} position='fixed'>
         <Toolbar>
           <IconButton
@@ -62,6 +82,7 @@ function DashboardAppBar (props) {
             className={classes.menuButton}
             color='inherit'
             aria-label='Menu'
+            size='large'
           >
             <MenuIcon />
           </IconButton>
@@ -79,6 +100,7 @@ function DashboardAppBar (props) {
             color='inherit'
             aria-haspopup='true'
             variant='contained'
+            size='large'
           >
             <Avatar>{user.initials}</Avatar>
           </IconButton>
@@ -100,8 +122,8 @@ function DashboardAppBar (props) {
         </Toolbar>
       </AppBar>
       <Toolbar />
-    </div>
+    </Root>
   )
 }
 
-export default withRouter(withStyles(styles)(DashboardAppBar))
+export default withRouter(DashboardAppBar)

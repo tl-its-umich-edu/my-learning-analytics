@@ -1,5 +1,5 @@
 import React from 'react'
-import { Typography } from '@material-ui/core'
+import { Typography } from '@mui/material'
 import { getDecimalPlaceOfFloat, roundToXDecimals } from '../util/math'
 
 function PopupMessage ({ a, assignmentGroups }) {
@@ -7,11 +7,11 @@ function PopupMessage ({ a, assignmentGroups }) {
     const assignmentGroup = assignmentGroups.find(ag => ag.id === a.assignmentGroupId)
     return assignmentGroup
       ? (
-        {
-          dropLowest: assignmentGroup.dropLowest,
-          dropHighest: assignmentGroup.dropHighest
-        }
-      )
+          {
+            dropLowest: assignmentGroup.dropLowest,
+            dropHighest: assignmentGroup.dropHighest
+          }
+        )
       : false
   }
 
