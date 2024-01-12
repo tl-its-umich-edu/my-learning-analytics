@@ -227,7 +227,7 @@ const createAssignmentFields = (
       // filter out null values
       a.graded = (currentUserSubmission !== null) && (currentUserSubmission.gradedDate !== null) && (currentUserSubmission.score !== null)
       a.submitted = !!currentUserSubmission && !!currentUserSubmission.submittedAt
-      a.dueDateMonthDay = dateToMonthDay(dueDate)
+      a.dueDateMonthDay = dueDate && dateToMonthDay(dueDate)
       a.goalGrade = ''
       a.goalGradeSetByUser = false
       a.inputFocus = false
