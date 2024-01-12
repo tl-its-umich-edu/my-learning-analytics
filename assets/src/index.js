@@ -1,7 +1,7 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { BrowserRouter as Router } from 'react-router-dom'
-import { ThemeProvider } from '@material-ui/core/styles'
+import { ThemeProvider } from '@mui/material/styles'
 import './index.css'
 import App from './containers/App'
 import client from './service/client'
@@ -9,7 +9,9 @@ import { ApolloProvider } from '@apollo/client'
 import { user, siteTheme, gaId, cspNonce } from './globals'
 // import * as serviceWorker from './serviceWorker'
 
-ReactDOM.render(
+const container = document.getElementById('root')
+const root = createRoot(container)
+root.render(
   <Router basename='/'>
     <ApolloProvider client={client}>
       <ThemeProvider theme={siteTheme}>
@@ -17,7 +19,6 @@ ReactDOM.render(
       </ThemeProvider>
     </ApolloProvider>
   </Router>
-  , document.getElementById('root')
 )
 
 // If you want your app to work offline and load faster, you can change

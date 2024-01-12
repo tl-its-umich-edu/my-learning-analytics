@@ -1,19 +1,33 @@
 import React, { useState } from 'react'
-import { useLocation } from 'react-router'
-import { makeStyles } from '@material-ui/core/styles'
-import Button from '@material-ui/core/Button'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import IconButton from '@material-ui/core/IconButton'
-import Modal from '@material-ui/core/Modal'
-import CloseIcon from '@material-ui/icons/Close'
+import { styled } from '@mui/material/styles'
+import { useLocation } from 'react-router-dom'
+import Button from '@mui/material/Button'
+import DialogTitle from '@mui/material/DialogTitle'
+import IconButton from '@mui/material/IconButton'
+import Modal from '@mui/material/Modal'
+import CloseIcon from '@mui/icons-material/Close'
+import Typography from '@mui/material/Typography'
 
-const useStyles = makeStyles((theme) => ({
-  modal: {
+const PREFIX = 'SurveyModal'
+
+const classes = {
+  modal: `${PREFIX}-modal`,
+  paper: `${PREFIX}-paper`,
+  dialogTitle: `${PREFIX}-dialogTitle`,
+  iframeContainer: `${PREFIX}-iframeContainer`,
+  iframe: `${PREFIX}-iframe`,
+  surveyButton: `${PREFIX}-surveyButton`
+}
+
+// styling within the modal (root styling doesn't apply to portal elements)
+const StyledModalBody = styled('div')(({ theme }) => ({
+  [`& .${classes.modal}`]: {
     top: '10%',
     left: '50%',
     transform: 'translate(-50%)'
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     position: 'absolute',
     width: 400,
     backgroundColor: theme.palette.background.paper,
@@ -21,20 +35,23 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3)
   },
-  dialogTitle: {
+
+  [`& .${classes.dialogTitle}`]: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '0px'
   },
-  iframeContainer: {
+
+  [`& .${classes.iframeContainer}`]: {
     position: 'relative',
     overflow: 'hidden',
     width: '100%',
     paddingTop: '150%'
   },
+
   /* Then style the iframe to fit in the container div with full height and width */
-  iframe: {
+  [`& .${classes.iframe}`]: {
     position: 'absolute',
     top: 0,
     left: 0,
@@ -42,15 +59,18 @@ const useStyles = makeStyles((theme) => ({
     right: 0,
     width: '100%',
     height: '100%'
-  },
-  surveyButton: {
-    color: theme.palette.primary.main,
-    background: theme.palette.getContrastText(theme.palette.primary.main)
+  }
+}))
+
+const ColoredButton = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.getContrastText(theme.palette.primary.main),
+  color: theme.palette.primary.main,
+  '&:hover': {
+    backgroundColor: '#D5D5D5'
   }
 }))
 
 export default function SurveyModal (props) {
-  const classes = useStyles()
   const location = useLocation()
   const [open, setOpen] = useState(false)
 
@@ -74,9 +94,9 @@ export default function SurveyModal (props) {
 
   const body = (
     <div className={`${classes.paper} ${classes.modal}`}>
-      <DialogTitle disableTypography className={classes.dialogTitle}>
-        <h4 id='survey-modal-title'>{props.surveyLink.text}</h4>
-        <IconButton onClick={toggleOpen}>
+      <DialogTitle className={classes.dialogTitle}>
+        <span><Typography variant='h6' id='survey-modal-title'>{props.surveyLink.text}</Typography></span>
+        <IconButton onClick={toggleOpen} size='large'>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -90,16 +110,16 @@ export default function SurveyModal (props) {
   )
 
   return (
-    <div>
-      <Button variant='contained' className={classes.surveyButton} onClick={toggleOpen}>{props.surveyLink.text}</Button>
+    <>
+      <ColoredButton variant='contained' onClick={toggleOpen}>{props.surveyLink.text}</ColoredButton>
       <Modal
         open={open}
         onClose={toggleOpen}
         aria-labelledby='survey-modal-title'
         aria-describedby='survey-modal-description'
       >
-        {body}
+        <StyledModalBody>{body}</StyledModalBody>
       </Modal>
-    </div>
+    </>
   )
 }

@@ -1,13 +1,19 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { withStyles } from '@material-ui/core'
-import Grid from '@material-ui/core/Grid'
-import Button from '@material-ui/core/Button'
+import { styled } from '@mui/material/styles'
+import Grid from '@mui/material/Grid'
+import Button from '@mui/material/Button'
 import StyledTextField from './StyledTextField'
 import debounce from 'lodash.debounce'
 import { eventLogExtra } from '../util/object'
 
-const styles = ({
-  goalGradeInput: {
+const PREFIX = 'AssignmentGoalInput'
+
+const classes = {
+  goalGradeInput: `${PREFIX}-goalGradeInput`
+}
+
+const StyledGrid = styled(Grid)({
+  [`& .${classes.goalGradeInput}`]: {
     marginTop: 0,
     width: 150
   }
@@ -22,8 +28,7 @@ function AssignmentGoalInput (props) {
     setEventLog,
     eventLog,
     handleClearGoalGrades,
-    mathWarning,
-    classes
+    mathWarning
   } = props
 
   const [goalGradeInternal, setGoalGradeInternal] = useState(goalGrade)
@@ -44,7 +49,7 @@ function AssignmentGoalInput (props) {
   }, [goalGrade])
 
   return (
-    <Grid item>
+    <StyledGrid item>
       <StyledTextField
         error={goalGradeInternal > 100 || mathWarning || goalGradeInternal > maxPossibleGrade}
         id='standard-number'
@@ -84,8 +89,8 @@ function AssignmentGoalInput (props) {
       >
         Clear
       </Button>
-    </Grid>
+    </StyledGrid>
   )
 }
 
-export default withStyles(styles)(AssignmentGoalInput)
+export default (AssignmentGoalInput)

@@ -1,48 +1,67 @@
 import React, { useState } from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import AppBar from '@material-ui/core/AppBar'
-import Avatar from '@material-ui/core/Avatar'
-import Grid from '@material-ui/core/Grid'
-import IconButton from '@material-ui/core/IconButton'
-import MuiLink from '@material-ui/core/Link'
-import Popover from '@material-ui/core/Popover'
-import Toolbar from '@material-ui/core/Toolbar'
-import Typography from '@material-ui/core/Typography'
+import { styled } from '@mui/material/styles'
+import AppBar from '@mui/material/AppBar'
+import Avatar from '@mui/material/Avatar'
+import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
+import MuiLink from '@mui/material/Link'
+import Popover from '@mui/material/Popover'
+import Toolbar from '@mui/material/Toolbar'
+import Typography from '@mui/material/Typography'
 import { siteTheme } from '../globals'
 import AlertBanner from '../components/AlertBanner'
 import AvatarModal from '../components/AvatarModal'
-import CourseListCard from '../components/CourseListCard/CourseListCard'
+import CourseListCard from '../components/CourseListCard'
 
-const styles = theme => ({
-  root: {
+const PREFIX = 'CourseList'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  paper: `${PREFIX}-paper`,
+  content: `${PREFIX}-content`,
+  container: `${PREFIX}-container`,
+  grow: `${PREFIX}-grow`
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.root}`]: {
     flexGrow: 1
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     padding: theme.spacing(2),
     color: theme.palette.text.secondary,
     display: 'flex'
   },
-  content: {
+
+  [`& .${classes.content}`]: {
     flexGrow: 1,
     padding: 8
   },
-  container: {
+
+  [`& .${classes.container}`]: {
     display: 'flex',
     justifyContent: 'center'
   },
-  grow: {
+
+  [`& .${classes.grow}`]: {
     flexGrow: 1
   }
-})
+}))
 
 function CourseList (props) {
-  const { classes, user } = props
+  const { user } = props
 
   const [avatarEl, setAvatarEl] = useState(null)
   const avatarOpen = Boolean(avatarEl)
 
   return (
-    <>
+    <Root>
       <AppBar className={classes.root} position='static'>
         <Toolbar>
           <Typography variant='h6' color='inherit' className={classes.grow}>
@@ -84,7 +103,7 @@ function CourseList (props) {
                 Visit the <MuiLink href={user.helpURL} style={{ color: siteTheme.palette.link.main }}>Help site</MuiLink> for
                 more information about this tool.
               </AlertBanner>
-            )
+              )
             : (
               <Grid container spacing={2}>
                 <Grid item xs={12} />
@@ -96,11 +115,11 @@ function CourseList (props) {
                   ))
                 }
               </Grid>
-            )
+              )
         }
       </div>
-    </>
+    </Root>
   )
 }
 
-export default withStyles(styles)(CourseList)
+export default (CourseList)

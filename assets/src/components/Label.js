@@ -5,17 +5,17 @@ const getHorizontalStyles = (value) => {
   return (
     value > alignThreshold
       ? {
-        left: '0',
-        right: value + '%',
-        width: value + '%',
-        textAlign: 'right'
-      }
+          left: '0',
+          right: value + '%',
+          width: value + '%',
+          textAlign: 'right'
+        }
       : {
-        left: value + '%',
-        right: '0',
-        width: '',
-        textAlign: 'left'
-      }
+          left: value + '%',
+          right: '0',
+          width: '',
+          textAlign: 'left'
+        }
   )
 }
 

@@ -168,16 +168,18 @@ const sumAssignmentGoalGrade = assignments => sum(
 
 // assignmentGroup.name can be null
 const sortByAssignmentGroupName = assignments => assignments.sort((a, b) => {
-  return (a.assignmentGroup.name === null && b.assignmentGroup.name === null) ? 0
-    : a.assignmentGroup.name ? a.assignmentGroup.name.localeCompare(b.assignmentGroup.name)
+  return (a.assignmentGroup.name === null && b.assignmentGroup.name === null)
+    ? 0
+    : a.assignmentGroup.name
+      ? a.assignmentGroup.name.localeCompare(b.assignmentGroup.name)
       : b.assignmentGroup.name.localeCompare(a.assignmentGroup.name)
 })
 
 // name can be null
 const sortByAssignmentName = assignments => assignments.sort((a, b) => {
-  return (a.name === null && b.name === null) ? 0
-    : a.name ? a.name.localeCompare(b.name)
-      : b.name.localeCompare(a.name)
+  return (a.name === null && b.name === null)
+    ? 0
+    : a.name ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
 })
 
 // Sort columns with precedence due date, assignment group name, assignment name

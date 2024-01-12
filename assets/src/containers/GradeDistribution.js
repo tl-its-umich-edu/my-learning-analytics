@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import Paper from '@material-ui/core/Paper'
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
-import Checkbox from '@material-ui/core/Checkbox'
+import { styled } from '@mui/material/styles'
+import Paper from '@mui/material/Paper'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
+import Checkbox from '@mui/material/Checkbox'
 import AlertBanner from '../components/AlertBanner'
 import WarningBanner from '../components/WarningBanner'
 import Histogram from '../components/Histogram'
@@ -19,22 +19,37 @@ import useUserSetting from '../hooks/useUserSetting'
 import { isTeacherOrAdmin } from '../util/roles'
 import { Helmet } from 'react-helmet'
 
-const styles = theme => ({
-  root: {
+const PREFIX = 'GradeDistribution'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  paper: `${PREFIX}-paper`,
+  table: `${PREFIX}-table`
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.root}`]: {
     flexGrow: 1,
     padding: 8
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     padding: theme.spacing(2),
     color: theme.palette.text.secondary
   },
-  table: {
+
+  [`& .${classes.table}`]: {
     width: '300px'
   }
-})
+}))
 
 function GradeDistribution (props) {
-  const { classes, disabled, courseId, user, isAdmin, enrollmentTypes } = props
+  const { disabled, courseId, user, isAdmin, enrollmentTypes } = props
   if (disabled && !isTeacherOrAdmin(isAdmin, enrollmentTypes)) return (<AlertBanner>The Grade Distribution view is hidden for this course.</AlertBanner>)
 
   const [gradeLoaded, gradeError, gradeData] = useGradeData(courseId)
@@ -70,7 +85,7 @@ function GradeDistribution (props) {
       ['Class Size', <strong key={2}>{gradeData.summary.tot_students}</strong>],
       !user.admin && showGrade
         ? ([
-          'My grade',
+            'My grade',
           <strong key={0}>
             {
               gradeData.summary.current_user_grade
@@ -78,14 +93,14 @@ function GradeDistribution (props) {
                 : 'There are no grades yet for you in this course'
             }
           </strong>
-        ])
+          ])
         : []
     ]
 
     const gradeCheckbox = !user.admin
       ? userSettingLoaded
         ? (
-          <Typography align='right'>{'Show my grade'}
+          <Typography align='right'>Show my grade
             <Checkbox
               color='secondary'
               checked={showGrade}
@@ -95,7 +110,7 @@ function GradeDistribution (props) {
               }}
             />
           </Typography>
-        )
+          )
         : <Spinner />
       : null
 
@@ -131,7 +146,7 @@ function GradeDistribution (props) {
   }
 
   return (
-    <>
+    <Root>
       <Helmet title='Grade Distribution' />
       {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
       <div className={classes.root}>
@@ -148,8 +163,8 @@ function GradeDistribution (props) {
           </Grid>
         </Grid>
       </div>
-    </>
+    </Root>
   )
 }
 
-export default withStyles(styles)(GradeDistribution)
+export default (GradeDistribution)

@@ -1,48 +1,66 @@
 import React, { useState, useEffect } from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import Grid from '@material-ui/core/Grid'
-import Divider from '@material-ui/core/Divider'
-import Typography from '@material-ui/core/Typography'
-import Avatar from '@material-ui/core/Avatar'
-import Link from '@material-ui/core/Link'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import ListItemText from '@material-ui/core/ListItemText'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import Dialog from '@material-ui/core/Dialog'
-import LogoutIcon from '@material-ui/icons/ExitToApp'
-import HelpIcon from '@material-ui/icons/HelpOutline'
-import Lock from '@material-ui/icons/Lock'
-import Launch from '@material-ui/icons/Launch'
+import { styled } from '@mui/material/styles'
+import Grid from '@mui/material/Grid'
+import Divider from '@mui/material/Divider'
+import Typography from '@mui/material/Typography'
+import Avatar from '@mui/material/Avatar'
+import Link from '@mui/material/Link'
+import List from '@mui/material/List'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import DialogTitle from '@mui/material/DialogTitle'
+import Dialog from '@mui/material/Dialog'
+import LogoutIcon from '@mui/icons-material/ExitToApp'
+import HelpIcon from '@mui/icons-material/HelpOutline'
+import Lock from '@mui/icons-material/Lock'
+import Launch from '@mui/icons-material/Launch'
 import { viewHelpURLs } from '../globals'
 
-const styles = theme => ({
-  root: {
+const PREFIX = 'AvatarModal'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  typography: `${PREFIX}-typography`,
+  avatar: `${PREFIX}-avatar`,
+  link: `${PREFIX}-link`,
+  text: `${PREFIX}-text`
+}
+
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`&.${classes.root}`]: {
     flexGrow: 1
   },
-  typography: {
+
+  [`& .${classes.typography}`]: {
     marginTop: theme.spacing(2)
   },
-  avatar: {
+
+  [`& .${classes.avatar}`]: {
     padding: '10px',
     marginTop: '10px',
     marginBottom: '10px',
     marginLeft: 'auto',
     marginRight: 'auto'
   },
-  link: {
+
+  [`& .${classes.link}`]: {
     textDecoration: 'none',
     marginLeft: 0
   },
-  text: {
+
+  [`& .${classes.text}`]: {
     paddingLeft: 0,
     color: 'black'
   }
-})
+}))
 
 function AvatarModal (props) {
-  const { classes, user } = props
+  const { user } = props
 
   const url = window.location.href
 
@@ -52,12 +70,12 @@ function AvatarModal (props) {
   const Admin = () => (
     <>
       <Link style={{ textDecoration: 'none' }} href='/admin'>
-        <ListItem button>
+        <ListItemButton>
           <ListItemIcon>
             <Lock />
           </ListItemIcon>
           <ListItemText inset primary='Admin' className={classes.text} />
-        </ListItem>
+        </ListItemButton>
       </Link>
       <Divider />
     </>
@@ -65,12 +83,12 @@ function AvatarModal (props) {
 
   const SwitchCourses = () => (
     <>
-      <ListItem button onClick={() => setOpenChangeCourseDialog(true)}>
+      <ListItemButton onClick={() => setOpenChangeCourseDialog(true)}>
         <ListItemIcon>
           <Launch />
         </ListItemIcon>
         <ListItemText inset primary='Switch courses' className={classes.text} />
-      </ListItem>
+      </ListItemButton>
       <Dialog
         onClose={() => setOpenChangeCourseDialog(false)}
         open={openChangeCourseDialog}
@@ -83,9 +101,9 @@ function AvatarModal (props) {
               href={`/courses/${course.course_id}`}
               key={i}
             >
-              <ListItem button>
+              <ListItemButton>
                 <ListItemText inset primary={course.course_name} className={classes.text} />
-              </ListItem>
+              </ListItemButton>
             </Link>
           ))}
         </List>
@@ -113,7 +131,7 @@ function AvatarModal (props) {
   }, [url])
 
   return (
-    <div className={classes.root}>
+    <Root className={classes.root}>
       <Grid container>
         <Grid item xs={4}>
           <Avatar className={classes.avatar}>
@@ -135,13 +153,13 @@ function AvatarModal (props) {
         <Grid item xs={12}>
           <List>
             <Divider />
-            <Link style={{ textDecoration: 'none' }} href={helpURL} target='_blank' rel='noopener'>
-              <ListItem button>
+            <Link style={{ textDecoration: 'none' }} href={helpURL} target='_blank' rel='noopener noreferrer'>
+              <ListItemButton>
                 <ListItemIcon>
                   <HelpIcon />
                 </ListItemIcon>
                 <ListItemText inset primary='Help' className={classes.text} />
-              </ListItem>
+              </ListItemButton>
             </Link>
             <Divider />
             {
@@ -158,21 +176,21 @@ function AvatarModal (props) {
               user.logoutURL !== ''
                 ? (
                   <Link style={{ textDecoration: 'none' }} href={user.logoutURL}>
-                    <ListItem button>
+                    <ListItemButton>
                       <ListItemIcon>
                         <LogoutIcon />
                       </ListItemIcon>
                       <ListItemText inset primary='Logout' className={classes.text} />
-                    </ListItem>
+                    </ListItemButton>
                   </Link>
-                )
+                  )
                 : null
             }
           </List>
         </Grid>
       </Grid>
-    </div>
+    </Root>
   )
 }
 
-export default withStyles(styles)(AvatarModal)
+export default (AvatarModal)
