@@ -151,12 +151,13 @@ class AssignmentType(DjangoObjectType):
             return None
         new_timezone = pytz.timezone(info.context.session.get('time_zone', settings.TIME_ZONE))
         return original_due_date.astimezone(new_timezone)
-    
+
     class Meta:
         model = Assignment
         only_fields = (
             'id', 'name', 'due_date', 'local_date', 'points_possible', 'course_id', 'assignment_group_id'
         )
+
 AssignmentGroupType.assignments = graphene.List(AssignmentType)
 AssignmentGroupType.assignments = graphene.List(AssignmentType)
 
