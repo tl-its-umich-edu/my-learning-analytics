@@ -144,7 +144,7 @@ class AssignmentType(DjangoObjectType):
         return info.context.submissions_by_assignment_id_loader.load(parent.id).then(
             lambda submissions: AssignmentType._median_grade_lambda(parent, info, submissions)
         )
-    
+
     def resolve_due_date(parent, info):
         original_due_date = parent.due_date
         if original_due_date is None:
