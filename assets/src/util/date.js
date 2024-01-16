@@ -12,8 +12,8 @@ const calculateWeekOffset = (startDateTime, targetDateTime) => {
   return Math.ceil((differenceInDays + 1) / 7)
 }
 
-// Get month day format of date string without timezone conversions
-// eg. timezone 2022-06-23T23:59:00 to 6/23
+// Return date as a formatted "month/day" string
+// eg. 2022-06-23T23:59:00 to 6/23
 const dateToMonthDay = date => {
   const [, month, day] = date.split('T')[0].split('-')
 
