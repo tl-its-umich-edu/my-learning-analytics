@@ -468,8 +468,7 @@ class DashboardCronJob(CronJobBase):
         # loop through multiple course ids
         status += util_function(queries['assignment'],
                                 'assignment',
-                                {'course_ids': self.valid_locked_course_ids,
-                                 'time_zone': settings.TIME_ZONE})
+                                {'course_ids': self.valid_locked_course_ids})
 
         return status
 
@@ -487,7 +486,6 @@ class DashboardCronJob(CronJobBase):
         # filter out not released grades (submission_dim.posted_at date is not null) and partial grades (submission_dim.workflow_state != 'graded')
         query_params = {
                         'course_ids': self.valid_locked_course_ids,
-                         'time_zone': settings.TIME_ZONE,
                         'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT,
                         }
         Session = sessionmaker(bind=data_warehouse_engine)

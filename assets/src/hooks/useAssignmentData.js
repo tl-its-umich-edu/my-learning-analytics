@@ -6,7 +6,7 @@ query Assignment($courseId: ID!) {
     assignments {
       id
       name
-      localDate
+      dueDate
       pointsPossible
       averageGrade
       assignmentGroupId
