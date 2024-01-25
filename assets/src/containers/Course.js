@@ -55,14 +55,14 @@ function Course (props) {
     setSideDrawerState(open)
   }
 
-  if (error.message === 'Not Found' || (error.message === "")) {
+  if (error.message === '404' || error.message === 'Not Found') {
     return (
       <WarningBanner>
         Course {courseId} has not been set up in MyLA. Contact your instructor, who can enable the visualizations by clicking on MyLA in the course navigation.
       </WarningBanner>
     )
   }
-  else if (error.message === 'Forbidden') {
+  else if (error.message === '403' || error.message === 'Forbidden') {
     return (
       <WarningBanner>
         You do not have access to course {courseId}.
