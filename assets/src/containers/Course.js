@@ -55,7 +55,7 @@ function Course (props) {
     setSideDrawerState(open)
   }
 
-  if (error.message === 'Not Found') return (<WarningBanner>Course {courseId} has not been set up in MyLA. Contact your instructor, who can enable the visualizations by clicking on MyLA in the course navigation.</WarningBanner>)
+  if (error.message === 'Not Found' || (error.message === '')) return (<WarningBanner>Course {courseId} has not been set up in MyLA. Contact your instructor, who can enable the visualizations by clicking on MyLA in the course navigation.</WarningBanner>)
   else if (error.message === 'Forbidden') return (<WarningBanner>You do not have access to course {courseId}.</WarningBanner>)
   else if (error) return (<WarningBanner />)
   if (loaded && isObjectEmpty(courseInfo)) return (<WarningBanner>My Learning Analytics is not enabled for this course.</WarningBanner>)
