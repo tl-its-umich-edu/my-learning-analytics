@@ -1,7 +1,11 @@
 import Cookie from 'js-cookie'
 
 const handleError = res => {
-  if (!res.ok) throw Error(res.statusText)
+  if (!res.ok) {
+      // Return the statusText or if it's empty just return the status
+      // This is to preserve existing behavior where statusText was returned but isn't always available
+      throw Error(res.statusText || res.status.toString())
+  }
   return res
 }
 
