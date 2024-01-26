@@ -39,6 +39,7 @@ google-cloud-bigquery[pandas]==3.13.0
 debugpy==1.8.0
 jsonschema==4.19.2
 pinax-eventlog==5.1.1  #no updates
-pycryptodome==3.19.0
+pycryptodome==3.19.1
 PyLTI1p3==2.0.0 #no further update Nov 2022)
 hjson==3.1.0
+pytz==2023.3.post1

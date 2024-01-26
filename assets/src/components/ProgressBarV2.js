@@ -1,24 +1,35 @@
 import React from 'react'
+import { styled } from '@mui/material/styles'
 import Line from './Line'
-import { withStyles } from '@material-ui/core/styles'
+const PREFIX = 'ProgressBarV2'
 
-const styles = theme => ({
-  gradedBar: {
+const classes = {
+  gradedBar: `${PREFIX}-gradedBar`,
+  ungradedBar: `${PREFIX}-ungradedBar`,
+  outOfBar: `${PREFIX}-outOfBar`
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.gradedBar}`]: {
     backgroundColor: theme.palette.secondary.main
   },
 
-  ungradedBar: {
+  [`& .${classes.ungradedBar}`]: {
     backgroundColor: theme.palette.info.main
   },
 
-  outOfBar: {
+  [`& .${classes.outOfBar}`]: {
     backgroundColor: theme.palette.negative.main
   }
-})
+}))
 
 function ProgressBarV2 (props) {
   const {
-    classes,
     score,
     outOf,
     submitted,
@@ -36,7 +47,7 @@ function ProgressBarV2 (props) {
     : null
 
   return (
-    <>
+    <Root>
       {
         <div
           tabIndex='0'
@@ -46,7 +57,7 @@ function ProgressBarV2 (props) {
             width: `${percentWidth}%`,
             height: `${height}px`,
             position: 'relative',
-            margin: margin
+            margin
           }}
           onFocus={(event) => { if (onBarFocus) onBarFocus(event.currentTarget) }}
           onBlur={(event) => { if (onBarBlur) onBarBlur() }}
@@ -73,13 +84,13 @@ function ProgressBarV2 (props) {
                     height: `${height}px`
                   }}
                 />
-              )
+                )
               : null
           }
         </div>
       }
-    </>
+    </Root>
   )
 }
 
-export default withStyles(styles)(ProgressBarV2)
+export default (ProgressBarV2)

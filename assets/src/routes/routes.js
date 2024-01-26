@@ -1,4 +1,4 @@
-import { Grade } from '@material-ui/icons'
+import { Grade } from '@mui/icons-material'
 import { viewHelpURLs } from '../globals'
 
 const routes = (courseId, activeViews, activeOnly = true) => {

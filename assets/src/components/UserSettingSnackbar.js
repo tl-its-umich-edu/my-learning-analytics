@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import Snackbar from '@material-ui/core/Snackbar'
-import IconButton from '@material-ui/core/IconButton'
-import CloseIcon from '@material-ui/icons/Close'
-import Slide from '@material-ui/core/Slide'
+import Snackbar from '@mui/material/Snackbar'
+import IconButton from '@mui/material/IconButton'
+import CloseIcon from '@mui/icons-material/Close'
+import Slide from '@mui/material/Slide'
 
 function SlideTransition (props) {
   return <Slide {...props} direction='up' />
@@ -53,6 +53,7 @@ function UserSettingSnackbar (props) {
           aria-label='close'
           color='inherit'
           onClick={() => setSavedSnackbarOpen(false)}
+          size='large'
         >
           <CloseIcon />
         </IconButton>

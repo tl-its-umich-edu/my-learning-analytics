@@ -1,50 +1,72 @@
 import React from 'react'
+import { styled } from '@mui/material/styles'
 import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/core/styles'
-import { Card, CardContent, Typography } from '@material-ui/core'
+import { Card, CardContent, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
 
-const styles = theme => ({
-  root: {
+const PREFIX = 'CourseListCard'
+
+const classes = {
+  root: `${PREFIX}-root`,
+  paper: `${PREFIX}-paper`,
+  container: `${PREFIX}-container`,
+  grow: `${PREFIX}-grow`,
+  card: `${PREFIX}-card`,
+  content: `${PREFIX}-content`,
+  title: `${PREFIX}-title`,
+  description: `${PREFIX}-description`
+}
+
+const StyledCard = styled(Card)((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.root}`]: {
     flexGrow: 1
   },
-  paper: {
+
+  [`& .${classes.paper}`]: {
     padding: theme.spacing(2),
     color: theme.palette.text.secondary,
     display: 'flex'
   },
-  container: {
+
+  [`& .${classes.container}`]: {
     display: 'flex',
     justifyContent: 'center'
   },
-  grow: {
+
+  [`& .${classes.grow}`]: {
     flexGrow: 1
   },
-  card: {
+
+  [`&.${classes.card}`]: {
     margin: theme.spacing(3)
   },
-  content: {
+
+  [`& .${classes.content}`]: {
     height: 110,
     padding: 0
   },
-  title: {
+
+  [`& .${classes.title}`]: {
     boxSizing: 'border-box',
     padding: theme.spacing(1),
     color: 'white',
     marginBottom: 0,
     backgroundColor: theme.palette.primary.main
   },
-  description: {
+
+  [`& .${classes.description}`]: {
     padding: theme.spacing(1),
     color: 'black'
   }
-})
+}))
 
 const CourseListCard = (props) => {
-  const { classes } = props
-
   return (
-    <Card className={classes.card} elevation={2}>
+    <StyledCard className={classes.card} elevation={2}>
       <Link tabIndex={-1} style={{ textDecoration: 'none' }} to={props.path}>
         <CardContent className={classes.content}>
           <Typography gutterBottom variant='h5' component='h4' className={classes.title}>
@@ -55,7 +77,7 @@ const CourseListCard = (props) => {
           </Typography>
         </CardContent>
       </Link>
-    </Card>
+    </StyledCard>
   )
 }
 
@@ -67,4 +89,4 @@ CourseListCard.propTypes = {
 
 CourseListCard.defaultProps = {}
 
-export default withStyles(styles)(CourseListCard)
+export default (CourseListCard)

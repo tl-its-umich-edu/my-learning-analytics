@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { styled } from '@mui/material/styles'
+import { Route, Routes } from 'react-router-dom'
 import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
 import GradeDistribution from './GradeDistribution'
@@ -10,25 +11,37 @@ import Spinner from '../components/Spinner'
 import { isObjectEmpty } from '../util/object'
 import { useCourseInfo } from '../service/api'
 import WarningBanner from '../components/WarningBanner'
-import { CardMedia, Card } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { CardMedia, Card } from '@mui/material'
 import { Helmet } from 'react-helmet'
 
-const styles = theme => ({
-  card: {
+const PREFIX = 'Course'
+
+const classes = {
+  card: `${PREFIX}-card`,
+  notLoadedMedia: `${PREFIX}-notLoadedMedia`
+}
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled('div')((
+  {
+    theme
+  }
+) => ({
+  [`& .${classes.card}`]: {
     margin: theme.spacing(3)
   },
-  notLoadedMedia: {
+
+  [`& .${classes.notLoadedMedia}`]: {
     maxWidth: '50%',
     marginLeft: 'auto',
     marginRight: 'auto',
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2)
   }
-})
+}))
 
 function Course (props) {
-  const { courseId, user, classes } = props
+  const { courseId, user } = props
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
 
@@ -42,15 +55,30 @@ function Course (props) {
     setSideDrawerState(open)
   }
 
-  if (error.message === 'Not Found') return (<WarningBanner>Course {courseId} has not been set up in MyLA. Contact your instructor, who can enable the visualizations by clicking on MyLA in the course navigation.</WarningBanner>)
-  else if (error.message === 'Forbidden') return (<WarningBanner>You do not have access to course {courseId}.</WarningBanner>)
-  else if (error) return (<WarningBanner />)
+  if (error.message === '404' || error.message === 'Not Found') {
+    return (
+      <WarningBanner>
+        Course {courseId} has not been set up in MyLA. Contact your instructor, who can enable the visualizations by clicking on MyLA in the course navigation.
+      </WarningBanner>
+    )
+  }
+  else if (error.message === '403' || error.message === 'Forbidden') {
+    return (
+      <WarningBanner>
+        You do not have access to course {courseId}.
+      </WarningBanner>
+    )
+  }
+  else if (error) {
+    return (<WarningBanner />)
+  }
+  
   if (loaded && isObjectEmpty(courseInfo)) return (<WarningBanner>My Learning Analytics is not enabled for this course.</WarningBanner>)
 
   const notLoadedAltMessage = 'Mouse running on wheel with text "Course Data Being Processed, Try Back in 24 Hours"'
 
   return (
-    <>
+    <Root>
       {loaded
         ? (
           <>
@@ -81,48 +109,54 @@ function Course (props) {
                     alt={notLoadedAltMessage}
                   />
                 </Card>
-              ) : (
-                <Switch>
-                  <Route path='/courses/:courseId/' exact>
-                    <IndexPage
+                )
+              : (
+                <Routes>
+                  <Route
+                    path='/'
+                    element={<IndexPage
                       courseInfo={courseInfo}
                       courseId={courseId}
                       enrollmentTypes={enrollmentTypes}
                       isAdmin={user.admin}
-                    />
-                  </Route>
-                  <Route path='/courses/:courseId/grades'>
-                    <GradeDistribution
+                             />}
+                  />
+                  <Route
+                    path='grades'
+                    element={<GradeDistribution
                       user={user}
                       disabled={!courseInfo.course_view_options.gd}
                       courseId={courseId}
                       enrollmentTypes={enrollmentTypes}
                       isAdmin={user.admin}
-                    />
-                  </Route>
-                  <Route path='/courses/:courseId/assignments'>
-                    <AssignmentPlanningV2
+                             />}
+                  />
+                  <Route
+                    path='assignments'
+                    element={<AssignmentPlanningV2
                       disabled={!courseInfo.course_view_options.ap}
                       courseId={courseId}
                       enrollmentTypes={enrollmentTypes}
                       isAdmin={user.admin}
-                    />
-                  </Route>
-                  <Route path='/courses/:courseId/resources'>
-                    <ResourcesAccessed
+                             />}
+                  />
+                  <Route
+                    path='resources'
+                    element={<ResourcesAccessed
                       disabled={!courseInfo.course_view_options.ra}
                       courseInfo={courseInfo}
                       courseId={courseId}
                       enrollmentTypes={enrollmentTypes}
                       isAdmin={user.admin}
-                    />
-                  </Route>
-                </Switch>
-              )}
+                             />}
+                  />
+                </Routes>
+                )}
           </>
-        ) : <Spinner />}
-    </>
+          )
+        : <Spinner />}
+    </Root>
   )
 }
 
-export default withStyles(styles)(Course)
+export default (Course)

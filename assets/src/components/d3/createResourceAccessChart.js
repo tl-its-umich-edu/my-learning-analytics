@@ -215,7 +215,7 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
       .attr('dx', -10)
       .attr('dy', '.35em')
       .attr('font-size', '12px')
-      .style('fill', d => d.self_access_count > 0 ? 'white' : 'black')
+      .style('fill', 'black')
       .attr('text-anchor', 'end')
       .text(d => (
         ((mainYScale(d.resource_name) + mainYScale.bandwidth() / 2) < mainHeight) &&

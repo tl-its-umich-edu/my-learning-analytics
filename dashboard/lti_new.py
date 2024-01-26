@@ -1,22 +1,19 @@
 import logging
 import random
 import string
+import urllib.parse
 from collections import namedtuple
-from typing import Any, Dict
+from datetime import datetime
+from typing import Dict
+from typing import Union, Any
 
 import django.contrib.auth
+import django.contrib.auth
+import pytz
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import JsonResponse
-import logging, string, random
-import urllib.parse
-from datetime import datetime
-from typing import Mapping, MutableSequence, Union, Any
-
-import django.contrib.auth
 from django.contrib.staticfiles import finders
-
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -200,30 +197,45 @@ def short_user_role_list(roles):
 def extract_launch_variables_for_tool_use(request, message_launch):
     launch_data = message_launch.get_launch_data()
     logger.debug(f'lti launch data {launch_data}')
-    custom_params = launch_data['https://purl.imsglobal.org/spec/lti/claim/custom']
-    logger.debug(f'lti_custom_param {custom_params}')
-    if not custom_params:
-        raise Exception(
-            f'You need to have custom parameters configured on your LTI Launch. Please see the LTI installation guide on the Github Wiki for more information.'
-        )
-    course_name = launch_data['https://purl.imsglobal.org/spec/lti/claim/context']['title']
-    roles = launch_data['https://purl.imsglobal.org/spec/lti/claim/roles']
-    username = custom_params['user_username']
-    course_id = custom_params['canvas_course_id']
-    canvas_course_long_id = canvas_id_to_incremented_id(course_id)
-    canvas_user_id = custom_params['canvas_user_id']
-    canvas_user_long_id = canvas_id_to_incremented_id(canvas_user_id)
+
     if 'email' not in launch_data.keys():
-        logger.info('Possibility that LTI launch by Instructor/admin becoming Canvas Test Student')
-        error_message = 'Student view is not available for My Learning Analytics.'
+        logger.info('Possible LTI launch by instructor/admin becoming '
+                    'Canvas Test Student')
+        error_message = ('Student view is not available for '
+                         'My Learning Analytics.')
         raise Exception(error_message)
 
     email = launch_data['email']
     first_name = launch_data['given_name']
     last_name = launch_data['family_name']
-    full_name = launch_data['name']
+    course_name = launch_data[
+        'https://purl.imsglobal.org/spec/lti/claim/context']['title']
+    roles = launch_data['https://purl.imsglobal.org/spec/lti/claim/roles']
 
-    # Add user to DB if not there; avoids Django redirection to login page
+    custom_params = launch_data[
+        'https://purl.imsglobal.org/spec/lti/claim/custom']
+    logger.debug(f'lti_custom_param {custom_params}')
+
+    if not custom_params:
+        raise Exception('Custom parameters must be configured for LTI '
+                        'launches. Please see the LTI installation guide on '
+                        'the GitHub wiki for more information.')
+
+    username = custom_params['user_username']
+    course_id = custom_params['canvas_course_id']
+    canvas_user_id = custom_params['canvas_user_id']
+    time_zone = custom_params.get('person_address_timezone',
+                                  settings.TIME_ZONE).strip()
+
+    if time_zone not in pytz.all_timezones:
+        time_zone = settings.TIME_ZONE  # default zone from `env.hjson`
+
+    request.session['time_zone'] = time_zone
+
+    canvas_course_long_id = canvas_id_to_incremented_id(course_id)
+    canvas_user_long_id = canvas_id_to_incremented_id(canvas_user_id)
+
+    # Add user to Django's `auth_user` DB table if not there; avoids Django redirection to login page
     try:
         user_obj = User.objects.get(username=username)
         # update
@@ -236,12 +248,13 @@ def extract_launch_variables_for_tool_use(request, message_launch):
         user_obj = User.objects.create_user(username=username, email=email, password=password, first_name=first_name,
                                             last_name=last_name)
 
-    # Add username into the MyLA User table, since the data was not pulled in from cron job
+    # Add user to MyLA's `user` table,
+    # since data wasn't pulled from scheduled job
     user_id = settings.CANVAS_DATA_ID_INCREMENT + int(canvas_user_id)
-    enrollment_qs =  MylaUser.objects.filter(user_id=user_id)
+    enrollment_qs = MylaUser.objects.filter(user_id=user_id)
     if enrollment_qs.exists():
         enrollment_qs.update(sis_name=username)
-    
+
     user_obj.backend = 'django.contrib.auth.backends.ModelBackend'
     django.contrib.auth.login(request, user_obj)
     is_instructor = check_if_instructor(roles, username, course_id)
@@ -267,7 +280,7 @@ def login(request):
         return lti_error(config)
     target_link_uri = request.POST.get('target_link_uri', request.GET.get('target_link_uri'))
     if not target_link_uri:
-        error_message = 'LTI Login failed due to missing "target_link_uri" param'
+        error_message = 'LTI login failed; missing "target_link_uri" param'
         return lti_error(error_message)
     CacheConfig = get_cache_config()
     oidc_login = DjangoOIDCLogin(request, config, launch_data_storage=CacheConfig.launch_data_storage)
@@ -283,11 +296,12 @@ def launch(request):
     CacheConfig = get_cache_config()
     message_launch = ExtendedDjangoMessageLaunch(request, config, launch_data_storage=CacheConfig.launch_data_storage)
     if not CacheConfig.is_dummy_cache:
-        # fetch platform's public key from cache instead of calling the API will speed up the launch process
+        # platform's public key from cache instead of calling API speeds up launch process
         message_launch.set_public_key_caching(CacheConfig.launch_data_storage,
                                               cache_lifetime=CacheConfig.cache_lifetime)
     else:
-        logger.info('DummyCache is set up, recommended atleast to us Mysql DB cache for LTI advantage services')
+        logger.info('DummyCache is configured; MySQL DB cache '
+                    'recommended for LTI Advantage services.')
 
     try:
         course_id = extract_launch_variables_for_tool_use(request, message_launch)

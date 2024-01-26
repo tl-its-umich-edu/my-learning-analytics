@@ -30,6 +30,9 @@ const defaultPalette = {
       needs their attention. */
   warning: {
     main: '#D84315'
+  },
+  test: {
+    main: '#FAFF00'
   }
 }
 

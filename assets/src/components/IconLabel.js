@@ -1,30 +1,37 @@
 import React from 'react'
-import { Typography, withStyles } from '@material-ui/core'
+import { styled } from '@mui/material/styles'
+import { Typography } from '@mui/material'
 
-const styles = () => ({
-  typography: {
+const PREFIX = 'IconLabel'
+
+const classes = {
+  typography: `${PREFIX}-typography`,
+  icon: `${PREFIX}-icon`
+}
+
+const StyledTypography = styled(Typography)(() => ({
+  [`&.${classes.typography}`]: {
     marginLeft: '5px',
     marginRight: '5px'
   },
-  icon: {
+
+  [`& .${classes.icon}`]: {
     fontSize: '16px',
     paddingRight: '10px'
   }
-})
-
+}))
 
 function IconLabel (props) {
   const {
-    classes,
     icon, // font-awesome class name
     label
   } = props
 
   return (
-    <Typography className={classes.typography}>
+    <StyledTypography className={classes.typography}>
       <i className={`${icon} ${classes.icon}`} />{label}
-    </Typography>
+    </StyledTypography>
   )
 }
 
-export default withStyles(styles)(IconLabel)
+export default (IconLabel)

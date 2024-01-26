@@ -12,13 +12,12 @@ const calculateWeekOffset = (startDateTime, targetDateTime) => {
   return Math.ceil((differenceInDays + 1) / 7)
 }
 
+// Return date as a formatted "month/day" string
+// eg. 2022-06-23T23:59:00 to 6/23
 const dateToMonthDay = date => {
-  const dateObj = new Date(date)
+  const [, month, day] = date.split('T')[0].split('-')
 
-  const month = dateObj.getMonth() + 1
-  const day = dateObj.getUTCDate()
-
-  return `${month}/${day}`
+  return `${Number(month)}/${Number(day)}`
 }
 
 export {

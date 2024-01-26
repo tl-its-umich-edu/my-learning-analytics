@@ -168,16 +168,18 @@ const sumAssignmentGoalGrade = assignments => sum(
 
 // assignmentGroup.name can be null
 const sortByAssignmentGroupName = assignments => assignments.sort((a, b) => {
-  return (a.assignmentGroup.name === null && b.assignmentGroup.name === null) ? 0
-    : a.assignmentGroup.name ? a.assignmentGroup.name.localeCompare(b.assignmentGroup.name)
+  return (a.assignmentGroup.name === null && b.assignmentGroup.name === null)
+    ? 0
+    : a.assignmentGroup.name
+      ? a.assignmentGroup.name.localeCompare(b.assignmentGroup.name)
       : b.assignmentGroup.name.localeCompare(a.assignmentGroup.name)
 })
 
 // name can be null
 const sortByAssignmentName = assignments => assignments.sort((a, b) => {
-  return (a.name === null && b.name === null) ? 0
-    : a.name ? a.name.localeCompare(b.name)
-      : b.name.localeCompare(a.name)
+  return (a.name === null && b.name === null)
+    ? 0
+    : a.name ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
 })
 
 // Sort columns with precedence due date, assignment group name, assignment name
@@ -186,7 +188,7 @@ const sortAssignments = assignments => {
 
   const assignmentsWithDueDates = initialSortedAssignments
     .filter(a => a.week)
-    .sort((a, b) => new Date(a.localDate).getTime() - new Date(b.localDate).getTime())
+    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
 
   const assignmentsWithoutDueDates = initialSortedAssignments
     .filter(a => !a.week)
@@ -207,13 +209,13 @@ const createAssignmentFields = (
   return sortAssignments(
     assignments.map(a => {
       const {
-        localDate,
+        dueDate,
         pointsPossible,
         assignmentGroupId,
         currentUserSubmission
       } = a
 
-      a.week = calculateWeekOffset(courseStartDate, localDate)
+      a.week = calculateWeekOffset(courseStartDate, dueDate)
       a.percentOfFinalGrade = roundToXDecimals(
         (
           assignmentWeightConsideration
@@ -225,7 +227,7 @@ const createAssignmentFields = (
       // filter out null values
       a.graded = (currentUserSubmission !== null) && (currentUserSubmission.gradedDate !== null) && (currentUserSubmission.score !== null)
       a.submitted = !!currentUserSubmission && !!currentUserSubmission.submittedAt
-      a.dueDateMonthDay = dateToMonthDay(localDate)
+      a.dueDateMonthDay = dueDate && dateToMonthDay(dueDate)
       a.goalGrade = ''
       a.goalGradeSetByUser = false
       a.inputFocus = false
