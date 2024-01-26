@@ -122,11 +122,11 @@ function createResourceAccessChart ({ data, width, height, domElement }) {
   mainMargin.top = miniMargin.top, mainHeight = miniHeight, mainMargin.bottom = miniMargin.bottom
   */
 
-  const mainWidth = availWidth * 0.55
+  const mainWidth = availWidth * 0.525
   const mainHeight = availHeight * 0.7
   const mainMargin = {
     top: availHeight * 0.15,
-    right: 0,
+    right: availWidth * 0.025,
     bottom: availHeight * 0.15,
     left: availWidth * 0.225
   }
