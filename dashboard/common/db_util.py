@@ -11,6 +11,8 @@ from dateutil.parser import parse
 from django.conf import settings
 from django.contrib.auth.models import User as DjangoUser
 from django_cron.models import CronJobLog
+from google.cloud import bigquery
+from typing import Any, Dict, List
 
 from dashboard.models import Course, User
 
@@ -195,3 +197,49 @@ def get_canvas_data_date() -> Union[datetime, None]:
     except Exception:
         logger.info("Value could not be found from metadata", exc_info = True)
     return None
+
+def map_dict_to_query_job_config(param_dict: Dict[str, Any]) -> bigquery.QueryJobConfig:
+    """
+    Create a BigQuery QueryJobConfig object with the specified query parameters.
+    This only currently supports ArrayQueryParameter and ScalarQueryParameter.
+
+    Args:
+        param_dict (dict): The dictionary representing the query parameters.
+
+    Returns:
+        bigquery.QueryJobConfig: The QueryJobConfig object with the specified query parameters.
+    """
+    # Define query parameters
+    query_params = []
+
+    for name, value in param_dict.items():
+        param_type = infer_bigquery_parameter_type(type(value))
+        if param_type == bigquery.ArrayQueryParameter:
+            element_type = infer_bigquery_parameter_type(type(value[0])) if value else bigquery.ScalarQueryParameterType("STRING")
+            query_params.append(bigquery.ArrayQueryParameter(name, element_type, value))
+        else:
+            query_params.append(bigquery.ScalarQueryParameter(name, param_type, value))
+
+
+    return query_params
+
+def infer_bigquery_parameter_type(value_type: type) -> bigquery.ScalarQueryParameterType:
+    """
+    Infer BigQuery parameter type based on Python value type.
+
+    Args:
+        value_type (type): The type of the value.
+
+    Returns:
+        bigquery.ScalarQueryParameterType: The BigQuery parameter type.
+    """
+    if value_type == list:
+        return bigquery.ArrayQueryParameter
+
+    else:
+        return {
+            int: bigquery.ScalarQueryParameterType("INT64"),
+            float: bigquery.ScalarQueryParameterType("FLOAT64"),
+            bool: bigquery.ScalarQueryParameterType("BOOL"),
+            str: bigquery.ScalarQueryParameterType("STRING")
+        }.get(value_type, bigquery.ScalarQueryParameterType("STRING"))  # Default to STRING if type not found

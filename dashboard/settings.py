@@ -266,6 +266,9 @@ if not LRS_IS_BIGQUERY:
         **ENV.get('LRS', {})
     }
 
+# TODO: Replace this with a more generic value
+EXTERNAL_CONTEXT_STORE = ENV.get("EXTERNAL_CONTEXT_STORE", "udp-umich-prod.us.context_store")
+
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Internationalization
@@ -365,7 +368,7 @@ CACHES = {
 # IMPORT LOCAL ENV
 # =====================
 try:
-    from settings_local import *
+    from settings_local import * # type: ignore
 except ImportError:
     pass
 
@@ -465,6 +468,6 @@ IMPORT_EXPORT_EXPORT_PERMISSION_CODE = 'view'
 # IMPORT LOCAL ENV
 # =====================
 try:
-    from settings_local import *
+    from settings_local import * #type: ignore
 except ImportError:
     pass
