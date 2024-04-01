@@ -23,7 +23,7 @@ BACKENDS_PATH = 'django.db.backends.'
 
 
 class DjangoDBParams(TypedDict):
-    ENGINE: Literal['django.db.backends.mysql', 'django.db.backends.postgresql']
+    ENGINE: Literal['django.db.backends.mysql']
     NAME: str
     USER: str
     PASSWORD: str
@@ -39,7 +39,7 @@ def create_sqlalchemy_engine(db_params: DjangoDBParams) -> Engine:
     if new_db_params['ENGINE'] == (BACKENDS_PATH + 'mysql'):
         return create_engine(f'mysql+mysqldb://{core_string}?charset=utf8mb4')
     else:
-        return create_engine('postgresql+psycopg://' + core_string)
+        raise Exception("Only mysql is supported")
 
 
 def canvas_id_to_incremented_id(canvas_id):
