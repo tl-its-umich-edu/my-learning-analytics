@@ -58,7 +58,7 @@ class DashboardCronJob(CronJobBase):
         self.valid_locked_course_ids: List[str]
 
     # Split a list into *size* shorter pieces
-    def split_list(a_list: list, size: int = 20):
+    def split_list(self, a_list: list, size: int = 20):
         return [a_list[i:i + size] for i in range(0, len(a_list), size)]
 
 
@@ -300,8 +300,8 @@ class DashboardCronJob(CronJobBase):
                 bq_job = self.bigquery_client.query(final_query, location='US', job_config=job_config)
                 # This is the call that could result in an exception
                 resource_access_df: pd.DataFrame = bq_job.to_dataframe()
-                total_bytes_billed += bq_job.total_bytes_billed
-                logger.debug(total_bytes_billed)
+                self.total_bytes_billed += bq_job.total_bytes_billed
+                logger.debug(self.total_bytes_billed)
             else:
                 query_params = {
                     'course_ids': data_warehouse_course_ids,
@@ -447,7 +447,7 @@ class DashboardCronJob(CronJobBase):
             logger.info(return_string)
 
         if settings.LRS_IS_BIGQUERY:
-            total_tbytes_billed = total_bytes_billed / 1024 / 1024 / 1024 / 1024
+            total_tbytes_billed = self.total_bytes_billed / 1024 / 1024 / 1024 / 1024
             # $5 per TB as of Feb 2019 https://cloud.google.com/bigquery/pricing
             total_tbytes_price = round(5 * total_tbytes_billed, 2)
             status += (f'TBytes billed for BQ: {total_tbytes_billed} = '
@@ -648,11 +648,11 @@ class DashboardCronJob(CronJobBase):
             status += self.update_user()
 
             logger.info("** assignment")
+            """
             status += self.update_groups()
             status += self.update_assignment()
             status += self.submission()
             status += self.weight_consideration()
-
             logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
                 try:
@@ -662,6 +662,7 @@ class DashboardCronJob(CronJobBase):
                     logger.error(f"Exception running BigQuery update: {str(e)}")
                     status += str(e)
                     exception_in_run = True
+            """
 
         if settings.DATABASES.get('DATA_WAREHOUSE', {}).get('IS_UNIZIN'):
             logger.info("** informational")
