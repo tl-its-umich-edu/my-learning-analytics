@@ -97,14 +97,20 @@ class DashboardCronJob(CronJobBase):
                 # Convert to bq schema object
                 query_params= db_util.map_dict_to_query_job_config(params)
                 query_job_config = bigquery.QueryJobConfig(query_parameters=query_params)
-                return self.bigquery_client.query(query, job_config=query_job_config).result()
+                query_job = self.bigquery_client.query(query, job_config=query_job_config)
+            
+                self.total_bytes_billed += query_job.total_bytes_billed
+                logger.debug(self.total_bytes_billed)
+                return query_job.result()
             except Exception as e:
-                logger.error(f"Error in setting up schema for query ({str(e)}). Running without parameters")
-                logger.info(query)
-                return self.bigquery_client.query(query).result()
+                logger.error(f"Error ({str(e)}) in setting up schema for query {query}.")
+                raise Exception(e)
         else:
-            return self.bigquery_client.query(query).result()
-    
+            query_job = self.bigquery_client.query(query)
+            self.total_bytes_billed += query_job.total_bytes_billed
+            logger.debug(self.total_bytes_billed)
+            return query_job.result()
+
     # Execute a query against the MyLA database
     def execute_myla_query(self, query: str, params: Dict = None) -> ResultProxy:
         with self.myla_engine.begin() as connection:
@@ -446,12 +452,6 @@ class DashboardCronJob(CronJobBase):
                     map(repr, data_warehouse_course_ids)) + ']\n'
             logger.info(return_string)
 
-        if settings.LRS_IS_BIGQUERY:
-            total_tbytes_billed = self.total_bytes_billed / 1024 / 1024 / 1024 / 1024
-            # $5 per TB as of Feb 2019 https://cloud.google.com/bigquery/pricing
-            total_tbytes_price = round(5 * total_tbytes_billed, 2)
-            status += (f'TBytes billed for BQ: {total_tbytes_billed} = '
-                       f'${total_tbytes_price}\n')
         return status
 
     def update_groups(self):
@@ -648,7 +648,6 @@ class DashboardCronJob(CronJobBase):
             status += self.update_user()
 
             logger.info("** assignment")
-            """
             status += self.update_groups()
             status += self.update_assignment()
             status += self.submission()
@@ -662,7 +661,6 @@ class DashboardCronJob(CronJobBase):
                     logger.error(f"Exception running BigQuery update: {str(e)}")
                     status += str(e)
                     exception_in_run = True
-            """
 
         if settings.DATABASES.get('DATA_WAREHOUSE', {}).get('IS_UNIZIN'):
             logger.info("** informational")
@@ -687,5 +685,11 @@ class DashboardCronJob(CronJobBase):
         status += "End cron: " + str(datetime.now()) + "\n"
 
         logger.info("************ total status=" + status + "\n")
+        if settings.LRS_IS_BIGQUERY:
+            total_tbytes_billed = self.total_bytes_billed / 1024 / 1024 / 1024 / 1024
+            # $6.25 per TB as of Feb 2024 https://cloud.google.com/bigquery/pricing
+            total_tbytes_price = round(6.25 * total_tbytes_billed, 2)
+            status += (f'TBytes billed for BQ: {total_tbytes_billed} = '
+                       f'${total_tbytes_price}\n')
 
         return status
