@@ -229,13 +229,13 @@
                 lar.published_score as published_score,
                 lar.response_date as submitted_at,
                 lar.graded_date as graded_at,
-                lar.posted_at as grade_posted_local_date,
+                lar.posted_at as grade_posted,
                 lar.grading_status as submission_workflow_state,
                 la.title as title,
                 lar.learner_activity_result_id as learner_activity_result_id,
                 lar.person_id as short_user_id,
                 lar2.lms_int_id as submission_id,
-                (@canvas_data_id_increment) + p.lms_ext_id as bigint as canvas_user_id
+                CAST(@canvas_data_id_increment AS INT64) + CAST(p.lms_ext_id AS INT64) as canvas_user_id
             from context_store_entity.learner_activity_result lar
             join enrollment on lar.person_id= enrollment.user_id
             join enrollment e on lar.person_id = e.user_id
@@ -258,7 +258,7 @@
                 (
                     case 
                         when 
-                            (grade_posted_local_date is null or submission_workflow_state != 'graded') 
+                            (grade_posted is null or submission_workflow_state != 'graded') 
                         then
                             null 
                         else 
@@ -267,7 +267,7 @@
                 ) AS score, 
                 submitted_at AS submitted_at, 
                 graded_at AS graded_date, 
-                grade_posted_local_date 
+                grade_posted 
             from 
                 submission
             order by assignment_id

@@ -506,25 +506,14 @@ class DashboardCronJob(CronJobBase):
                         'course_ids': self.valid_locked_course_ids,
                         'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT,
                         }
-        Session = sessionmaker(bind=data_warehouse_engine)
-        try:
-    # Create a session
-            with Session() as session:
-                # Execute the first query to create the temporary table
-                session.execute(text(self.queries['submission']).bindparams(**query_params))
 
-                # Execute the second query using the temporary table
-                result = session.execute(text(self.queries['submission_with_avg_score']))
-                df = pd.DataFrame(result.fetchall(), columns=result.keys())
-                df = df.drop_duplicates(keep='first')
-                df.to_sql(con=self.myla_engine, name='submission', if_exists='append', index=False)
+        df = result = self.execute_bq_query(self.queries['submission'], query_params).to_dataframe()
+        df = df.drop_duplicates(keep='first')
+        df.to_sql(con=self.myla_engine, name='submission', if_exists='append', index=False)
 
-        except Exception as e:
-            logger.exception('Error running sql on table submission', str(e))
-            raise
         status+=f"{str(df.shape[0])} submission: {query_params}\n"
 
-    # returns the row size of dataframe
+        # returns the row size of dataframe
         return status
 
     def weight_consideration(self):
