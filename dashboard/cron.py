@@ -98,18 +98,20 @@ class DashboardCronJob(CronJobBase):
                 query_params= db_util.map_dict_to_query_job_config(params)
                 query_job_config = bigquery.QueryJobConfig(query_parameters=query_params)
                 query_job = self.bigquery_client.query(query, job_config=query_job_config)
+                query_job_result = query_job.result()
             
                 self.total_bytes_billed += query_job.total_bytes_billed
-                logger.debug(self.total_bytes_billed)
-                return query_job.result()
+                logger.debug(f"This job had {query_job.total_bytes_billed} bytes. Total: {self.total_bytes_billed}")
+                return query_job_result
             except Exception as e:
                 logger.error(f"Error ({str(e)}) in setting up schema for query {query}.")
                 raise Exception(e)
         else:
             query_job = self.bigquery_client.query(query)
+            query_job_result = query_job.result()
             self.total_bytes_billed += query_job.total_bytes_billed
-            logger.debug(self.total_bytes_billed)
-            return query_job.result()
+            logger.debug(f"This job had {query_job.total_bytes_billed} bytes. Total: {self.total_bytes_billed}")
+            return query_job_result
 
     # Execute a query against the MyLA database
     def execute_myla_query(self, query: str, params: Dict = None) -> ResultProxy:
@@ -682,9 +684,7 @@ class DashboardCronJob(CronJobBase):
         else:
             logger.warn("data_last_updated not updated because of an Exception during this run")
 
-        status += "End cron: " + str(datetime.now()) + "\n"
 
-        logger.info("************ total status=" + status + "\n")
         if settings.LRS_IS_BIGQUERY:
             total_tbytes_billed = self.total_bytes_billed / 1024 / 1024 / 1024 / 1024
             # $6.25 per TB as of Feb 2024 https://cloud.google.com/bigquery/pricing
@@ -692,4 +692,6 @@ class DashboardCronJob(CronJobBase):
             status += (f'TBytes billed for BQ: {total_tbytes_billed} = '
                        f'${total_tbytes_price}\n')
 
+        status += "End cron: " + str(datetime.now()) + "\n"
+        logger.info("************ total status=" + status + "\n")
         return status
