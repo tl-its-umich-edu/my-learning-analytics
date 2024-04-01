@@ -1,7 +1,7 @@
 # Some utility functions used by other classes in this project
 import logging
 from datetime import datetime
-from typing import Dict, List, Literal, TypedDict, Union
+from typing import Any, Dict, List, Literal, TypedDict, Union
 from urllib.parse import quote_plus
 
 import django
@@ -12,7 +12,6 @@ from django.conf import settings
 from django.contrib.auth.models import User as DjangoUser
 from django_cron.models import CronJobLog
 from google.cloud import bigquery
-from typing import Any, Dict, List
 
 from dashboard.models import Course, User
 

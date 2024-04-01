@@ -253,9 +253,6 @@ if not LRS_IS_BIGQUERY:
         **ENV.get('LRS', {})
     }
 
-# TODO: Replace this with a more generic value
-EXTERNAL_CONTEXT_STORE = ENV.get("EXTERNAL_CONTEXT_STORE", "udp-umich-prod.us.context_store")
-
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Internationalization

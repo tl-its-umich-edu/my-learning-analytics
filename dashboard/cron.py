@@ -53,8 +53,6 @@ class DashboardCronJob(CronJobBase):
         self.myla_engine = db_util.create_sqlalchemy_engine(settings.DATABASES['default'])
         self.setup_bigquery()
         self.setup_queries()
-
-        queries = dict()
         self.valid_locked_course_ids: List[str]
 
     # Split a list into *size* shorter pieces
@@ -88,18 +86,17 @@ class DashboardCronJob(CronJobBase):
     # Execute a query against the bigquery database
 
     def execute_bq_query(self, query: str, params: Dict = None):
-        ext_context_store = settings.EXTERNAL_CONTEXT_STORE
         # Remove the newlines from the query
         query = query.replace("\n", " ")
 
         if params:
-            try: 
+            try:
                 # Convert to bq schema object
                 query_params= db_util.map_dict_to_query_job_config(params)
                 query_job_config = bigquery.QueryJobConfig(query_parameters=query_params)
                 query_job = self.bigquery_client.query(query, job_config=query_job_config)
                 query_job_result = query_job.result()
-            
+
                 self.total_bytes_billed += query_job.total_bytes_billed
                 logger.debug(f"This job had {query_job.total_bytes_billed} bytes. Total: {self.total_bytes_billed}")
                 return query_job_result
@@ -509,7 +506,7 @@ class DashboardCronJob(CronJobBase):
                         'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT,
                         }
 
-        df = result = self.execute_bq_query(self.queries['submission'], query_params).to_dataframe()
+        df = self.execute_bq_query(self.queries['submission'], query_params).to_dataframe()
         df = df.drop_duplicates(keep='first')
         df.to_sql(con=self.myla_engine, name='submission', if_exists='append', index=False)
 
