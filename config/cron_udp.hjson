@@ -67,12 +67,15 @@
             ), assign_more as (
                 select distinct(a.learner_activity_group_id), da.group_points
                 from assignment_details a
-                joIN UNNEST(
-                    select learner_activity_group_id, sum(points_possible) as group_points
-                    from assignment_details
-                    group by learner_activity_group_id
-                ) as da
-                    on a.learner_activity_group_id = da.learner_activity_group_id
+                JOIN UNNEST((
+                    SELECT ARRAY_AGG(STRUCT(learner_activity_group_id, group_points))
+                    FROM (
+                        select learner_activity_group_id, sum(points_possible) as group_points
+                        from assignment_details
+                        group by learner_activity_group_id
+                    )
+                )) as da
+                on a.learner_activity_group_id = da.learner_activity_group_id
             ), grp_full as (
                 select a.group_points, b.learner_activity_group_id
                 from assign_more a
@@ -90,9 +93,9 @@
                 join assign_rules ar on ag.learner_activity_group_id = ar.learner_activity_group_id
             )
             select
-            cast(lag_km.lms_int_id as BIGINT) as id,
-            cast(co_km.lms_int_id as BIGINT) as course_id,
-            cast(agp.group_weight as float) as weight,
+            cast(lag_km.lms_int_id as INT64) as id,
+            cast(co_km.lms_int_id as INT64) as course_id,
+            cast(agp.group_weight as FLOAT64) as weight,
             agp.name as name,
             agp.group_points as group_points,
             agp.drop_lowest as drop_lowest, 
@@ -109,12 +112,12 @@
         with assignment_info as
         (
             select
-                la.due_date AT TIME ZONE 'UTC' as due_date,
+                la.due_date as due_date,
                 la.title as name,
-                cast(co.lms_int_id as BIGINT) as course_id,
-                cast(la_km.lms_int_id as BIGINT) as id,
+                cast(co.lms_int_id as INT64) as course_id,
+                cast(la_km.lms_int_id as INT64) as id,
                 la.points_possible as points_possible,
-                cast(lag_km.lms_int_id as BIGINT) as assignment_group_id
+                cast(lag_km.lms_int_id as INT64) as assignment_group_id
             from
                 context_store_entity.learner_activity la,
                 context_store_keymap.course_offering co,
@@ -152,8 +155,8 @@
     "term":
         '''
         select
-            cast(ka.lms_int_id as BIGINT) as id,
-            cast(ka.lms_ext_id as BIGINT) as canvas_id,
+            cast(ka.lms_int_id as INT64) as id,
+            cast(ka.lms_ext_id as INT64) as canvas_id,
             a.name as name,
             a.le_term_begin_date as date_start,
             a.le_term_end_date as date_end
@@ -170,9 +173,9 @@
     "course":
         '''
         SELECT
-            cast(co2.lms_int_id as BIGINT) as id,
-            cast(co2.lms_ext_id as BIGINT) as canvas_id,
-            cast(at2.lms_int_id as BIGINT) as enrollment_term_id,
+            cast(co2.lms_int_id as INT64) as id,
+            cast(co2.lms_ext_id as INT64) as canvas_id,
+            cast(at2.lms_int_id as INT64) as enrollment_term_id,
             co.le_code as name,
             co.le_start_date as start_at,
             co.le_end_date as conclude_at
@@ -200,7 +203,6 @@
         ''',
     "submission":
         '''
-        create temporary table all_assign_sub as (
         with enrollment as
         (
             select
@@ -211,9 +213,9 @@
                 left join context_store_keymap.course_offering co
                     on cs.le_current_course_offering_id = co.id
             where 
-                co.lms_int_id IN UNNEST(:course_ids)
+                co.lms_int_id in UNNEST(@course_ids)
                 and cse.role_status ='Enrolled' 
-                and cse."role" = 'Student'
+                and cse.role = 'Student'
                 and cse.enrollment_status = 'Active'
         ),
         submission as
@@ -222,18 +224,18 @@
                 la.status,
                 la.visibility,
                 la2.lms_int_id as assignment_id,
-                cast(co.lms_int_id as BIGINT) as course_id,
+                co.lms_int_id  as course_id,
                 la.title as assignment_title,
                 lar.published_score as published_score,
                 lar.response_date as submitted_at,
                 lar.graded_date as graded_at,
-                lar.posted_at as grade_posted,
+                lar.posted_at as grade_posted_local_date,
                 lar.grading_status as submission_workflow_state,
                 la.title as title,
                 lar.learner_activity_result_id as learner_activity_result_id,
                 lar.person_id as short_user_id,
-                cast(lar2.lms_int_id as BIGINT) as submission_id,
-                (cast(:canvas_data_id_increment as bigint) + cast(p.lms_ext_id as bigint)) as canvas_user_id
+                lar2.lms_int_id as submission_id,
+                (@canvas_data_id_increment) + p.lms_ext_id as bigint as canvas_user_id
             from context_store_entity.learner_activity_result lar
             join enrollment on lar.person_id= enrollment.user_id
             join enrollment e on lar.person_id = e.user_id
@@ -243,18 +245,20 @@
                 left join context_store_keymap.course_offering co on co.id = la.course_offering_id
                 join context_store_keymap.person p on p.id = lar.person_id
             where
-                co.lms_int_id IN UNNEST(:course_ids)
+                co.lms_int_id in UNNEST(@course_ids)
                 and la.status = 'published'
-		)
+		),
+        all_assign_sub as 
+        (
             select
-                cast(submission_id as BIGINT) AS id, 
+                submission_id AS id, 
                 assignment_id AS assignment_id, 
                 course_id, 
                 canvas_user_id,
                 (
                     case 
                         when 
-                            (grade_posted is null or submission_workflow_state != 'graded') 
+                            (grade_posted_local_date is null or submission_workflow_state != 'graded') 
                         then
                             null 
                         else 
@@ -263,13 +267,11 @@
                 ) AS score, 
                 submitted_at AS submitted_at, 
                 graded_at AS graded_date, 
-                grade_posted 
-        from 
-            submission
+                grade_posted_local_date 
+            from 
+                submission
+            order by assignment_id
         )
-        ''',
-    "submission_with_avg_score": 
-        '''
         select 
             f.id,
             CAST(f.assignment_id AS INT64) AS assignment_id,
