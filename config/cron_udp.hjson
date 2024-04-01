@@ -11,12 +11,12 @@
         '''
         select
             (
-            cast(%(canvas_data_id_increment)s as bigint)
+            cast(@canvas_data_id_increment as bigint)
             +
             cast(p2.lms_ext_id as bigint)
             ) as user_id,
             case
-                when pe.email_address is not null then lower(split_part(pe.email_address , '@', 1))
+                WHEN pe.email_address IS NOT NULL THEN LOWER(REGEXP_EXTRACT(pe.email_address, r'^([^@]+)'))
                 else p2.sis_ext_id end as sis_name,
             cast(co.lms_int_id as bigint) as course_id,
             cg.le_current_score as current_grade,
@@ -27,22 +27,22 @@
                 when cse.role = 'Teacher' then 'TeacherEnrollment'
                 else '' end
                 as enrollment_type
-        from entity.course_section_enrollment cse
-        left join entity.course_section cs
+        from context_store_entity.course_section_enrollment cse
+        left join context_store_entity.course_section cs
             on cse.course_section_id = cs.course_section_id
-        left join keymap.course_offering co
+        left join context_store_keymap.course_offering co
             on cs.le_current_course_offering_id = co.id
-        left join entity.person p
+        left join context_store_entity.person p
             on cse.person_id = p.person_id
-        left join keymap.person p2
+        left join context_store_keymap.person p2
             on p.person_id = p2.id
-        left join entity.person_email pe
+        left join context_store_entity.person_email pe
             on p.person_id = pe.person_id
-        left join entity.course_grade cg
+        left join context_store_entity.course_grade cg
             on cse.course_section_id = cg.course_section_id and cse.person_id = cg.person_id
         where
-            co.lms_int_id = ANY(%(course_ids)s)
-            and cse.role = ANY(ARRAY['Student', 'Teacher', 'TeachingAssistant']::text[])
+            co.lms_int_id IN UNNEST(@course_ids)
+            and cse.role IN UNNEST(ARRAY['Student', 'Teacher', 'TeachingAssistant'])
             and cse.role_status = 'Enrolled'
             and cse.enrollment_status = 'Active'
         order by user_id
@@ -51,23 +51,23 @@
         '''
         with assignment_details as (
             select la.due_date, title, la.course_offering_id, la.learner_activity_id, la.points_possible, la.learner_activity_group_id
-            from entity.learner_activity la, keymap.course_offering co
+            from context_store_entity.learner_activity la, context_store_keymap.course_offering co
             where
                 la.visibility = 'everyone'
                 and	la.status = 'published'
                 and la.course_offering_id = co.id
-                and co.lms_int_id = ANY(%(course_ids)s)
+                and co.lms_int_id IN UNNEST(@course_ids)
             ), assignment_grp as (
                 select lg.*
-                from entity.learner_activity_group lg, keymap.course_offering co
+                from context_store_entity.learner_activity_group lg, context_store_keymap.course_offering co
                 where
                 lg.status = 'available'
                 and lg.course_offering_id = co.id
-                and co.lms_int_id = ANY(%(course_ids)s)
+                and co.lms_int_id IN UNNEST(@course_ids)
             ), assign_more as (
                 select distinct(a.learner_activity_group_id), da.group_points
                 from assignment_details a
-                join (
+                joIN UNNEST(
                     select learner_activity_group_id, sum(points_possible) as group_points
                     from assignment_details
                     group by learner_activity_group_id
@@ -81,7 +81,7 @@
             ), assign_rules as (
                 select distinct ad.learner_activity_group_id, agr.drop_lowest_amount as drop_lowest, agr.drop_highest_amount as drop_highest
                 from grp_full ad
-                join entity.learner_activity_group agr
+                join context_store_entity.learner_activity_group agr
                     on ad.learner_activity_group_id = agr.learner_activity_group_id
             ), assignment_grp_points as (
                 select ag.*, am.group_points AS group_points, ar.drop_lowest as drop_lowest, ar.drop_highest as drop_highest
@@ -98,8 +98,8 @@
             agp.drop_lowest as drop_lowest, 
             agp.drop_highest as drop_highest
             from assignment_grp_points agp, 
-            keymap.course_offering co_km, 
-            keymap.learner_activity_group lag_km
+            context_store_keymap.course_offering co_km, 
+            context_store_keymap.learner_activity_group lag_km
             where agp.course_offering_id = co_km.id
             and agp.learner_activity_group_id = lag_km.id
             order by id
@@ -116,15 +116,15 @@
                 la.points_possible as points_possible,
                 cast(lag_km.lms_int_id as BIGINT) as assignment_group_id
             from
-                entity.learner_activity la,
-                keymap.course_offering co,
-                keymap.learner_activity la_km,
-                keymap.learner_activity_group lag_km
+                context_store_entity.learner_activity la,
+                context_store_keymap.course_offering co,
+                context_store_keymap.learner_activity la_km,
+                context_store_keymap.learner_activity_group lag_km
             where
                 la.visibility = 'everyone'
                 and	la.status = 'published'
                 and la.course_offering_id = co.id
-                and co.lms_int_id = ANY(%(course_ids)s)
+                and co.lms_int_id IN UNNEST(@course_ids)
                 and la.learner_activity_id = la_km.id
                 and la.learner_activity_group_id = lag_km.id
         )
@@ -142,11 +142,11 @@
                 cast(0 as boolean)
             end as consider_weight
         from
-            entity.learner_activity_group lag,
-            keymap.course_offering co_km
+            context_store_entity.learner_activity_group lag,
+            context_store_keymap.course_offering co_km
         where
             lag.course_offering_id = co_km.id
-            and co_km.lms_int_id = ANY(%(course_ids)s)
+            and co_km.lms_int_id IN UNNEST(@course_ids)
             group by co_km.lms_int_id
         ''',
     "term":
@@ -155,11 +155,11 @@
             cast(ka.lms_int_id as BIGINT) as id,
             cast(ka.lms_ext_id as BIGINT) as canvas_id,
             a.name as name,
-            a.le_term_begin_date::timestamp without time zone as date_start,
-            a.le_term_end_date::timestamp without time zone as date_end
+            a.le_term_begin_date as date_start,
+            a.le_term_end_date as date_end
         from
-            entity.academic_term as a
-            left join keymap.academic_term as ka on ka.id = a.academic_term_id
+            context_store_entity.academic_term as a
+            left join context_store_keymap.academic_term as ka on ka.id = a.academic_term_id
         where
             ka.lms_ext_id is not null
         order by id
@@ -174,14 +174,14 @@
             cast(co2.lms_ext_id as BIGINT) as canvas_id,
             cast(at2.lms_int_id as BIGINT) as enrollment_term_id,
             co.le_code as name,
-            co.le_start_date::timestamp without time zone as start_at,
-            co.le_end_date::timestamp without time zone as conclude_at
+            co.le_start_date as start_at,
+            co.le_end_date as conclude_at
         FROM
-            entity.course_offering co
-            LEFT OUTER JOIN entity.academic_term at1 on (co.academic_term_id = at1.academic_term_id),
-            keymap.course_offering co2,
-            keymap.academic_term at2
-            WHERE co2.lms_int_id = ANY(%(course_ids)s)
+            context_store_entity.course_offering co
+            LEFT OUTER JOIN context_store_entity.academic_term at1 on (co.academic_term_id = at1.academic_term_id),
+            context_store_keymap.course_offering co2,
+            context_store_keymap.academic_term at2
+            WHERE co2.lms_int_id IN UNNEST(@course_ids)
             and co.course_offering_id = co2.id
             and at1.academic_term_id = at2.id
         ''',
@@ -191,11 +191,11 @@
             cast(f_km.lms_int_id as BIGINT) as id, 
             f.status as file_state, 
             f.display_name as display_name
-        from entity.file f, keymap.file f_km, keymap.course_offering co_km
+        from context_store_entity.file f, context_store_keymap.file f_km, context_store_keymap.course_offering co_km
         where
             f.course_offering_id = co_km.id
             and f.file_id = f_km.id
-            and co_km.lms_int_id = ANY(%(course_ids)s)
+            and co_km.lms_int_id IN UNNEST(@course_ids)
         order by id
         ''',
     "submission":
@@ -205,13 +205,13 @@
         (
             select
                 distinct cse.person_id as user_id
-            from entity.course_section_enrollment cse 
-                left join entity.course_section cs
+            from context_store_entity.course_section_enrollment cse 
+                left join context_store_entity.course_section cs
                     on cse.course_section_id = cs.course_section_id
-                left join keymap.course_offering co
+                left join context_store_keymap.course_offering co
                     on cs.le_current_course_offering_id = co.id
             where 
-                co.lms_int_id = ANY(:course_ids)
+                co.lms_int_id IN UNNEST(:course_ids)
                 and cse.role_status ='Enrolled' 
                 and cse."role" = 'Student'
                 and cse.enrollment_status = 'Active'
@@ -234,16 +234,16 @@
                 lar.person_id as short_user_id,
                 cast(lar2.lms_int_id as BIGINT) as submission_id,
                 (cast(:canvas_data_id_increment as bigint) + cast(p.lms_ext_id as bigint)) as canvas_user_id
-            from entity.learner_activity_result lar
+            from context_store_entity.learner_activity_result lar
             join enrollment on lar.person_id= enrollment.user_id
             join enrollment e on lar.person_id = e.user_id
-            join keymap.learner_activity_result lar2 on lar.learner_activity_result_id = lar2.id
-            left join entity.learner_activity la on lar.learner_activity_id = la.learner_activity_id
-                left join keymap.learner_activity la2 on la.learner_activity_id = la2.id
-                left join keymap.course_offering co on co.id = la.course_offering_id
-                join keymap.person p on p.id = lar.person_id
+            join context_store_keymap.learner_activity_result lar2 on lar.learner_activity_result_id = lar2.id
+            left join context_store_entity.learner_activity la on lar.learner_activity_id = la.learner_activity_id
+                left join context_store_keymap.learner_activity la2 on la.learner_activity_id = la2.id
+                left join context_store_keymap.course_offering co on co.id = la.course_offering_id
+                join context_store_keymap.person p on p.id = lar.person_id
             where
-                co.lms_int_id = ANY(:course_ids)
+                co.lms_int_id IN UNNEST(:course_ids)
                 and la.status = 'published'
 		)
             select
@@ -271,15 +271,15 @@
     "submission_with_avg_score": 
         '''
         select 
-            f.id::bigint,
-            f.assignment_id::bigint assignment_id,
+            f.id,
+            CAST(f.assignment_id AS INT64) AS assignment_id,
             f.course_id,
-            f.canvas_user_id::bigint as user_id,
-            f.score::float,
+            CAST(f.canvas_user_id AS INT64) AS user_id,
+            CAST(f.score AS FLOAT64) AS score,
             f.submitted_at,
             f.graded_date,
             f.grade_posted,
-            cast(f1.avg_score as float) as avg_score
+            CAST(f1.avg_score AS FLOAT64) AS avg_score
         from 
             all_assign_sub f join 
             (

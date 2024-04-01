@@ -67,7 +67,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug(f'sql={sql_string}')
         logger.debug(f'table={mysql_table} params={params} table_identifier={table_identifier}')
 
-        self.execute_bq_query(sql_string, params).to_dataframe()
+        df = self.execute_bq_query(sql_string, params).to_dataframe()
 
         # drop duplicates
         df = df.drop_duplicates(keep='first')
@@ -89,7 +89,8 @@ class DashboardCronJob(CronJobBase):
 
     def execute_bq_query(self, query: str, params: Dict = None):
         ext_context_store = settings.EXTERNAL_CONTEXT_STORE
-        query = "SELECT * FROM EXTERNAL_QUERY(\"" + ext_context_store + "\", \"" + query.replace("\n", " ") + "\")"
+        # Remove the newlines from the query
+        query = query.replace("\n", " ")
 
         if params:
             try: 
@@ -151,8 +152,7 @@ class DashboardCronJob(CronJobBase):
         course_ids = [str(x) for x in supported_courses.values_list('id', flat=True)]
         courses_data = self.execute_bq_query(self.queries['course'], 
                                              params={'course_ids': course_ids})
-                                                      
-        courses_data.to_dataframe()
+        courses_data = courses_data.to_dataframe()
         # error out when course id is invalid, otherwise add DataFrame to list
         for course_id, data_last_updated in supported_courses:
             if course_id not in list(courses_data['id']):
@@ -605,12 +605,12 @@ class DashboardCronJob(CronJobBase):
                 updated_fields.append('term')
 
             warehouse_date_start: Union[datetime, None] = (
-                warehouse_course_dict['start_at'].to_pydatetime() if pd.notna(
+                warehouse_course_dict['start_at'] if pd.notna(
                     warehouse_course_dict['start_at']) else None
             )
             updated_fields += self.soft_update_datetime_field(course, 'date_start', warehouse_date_start)
             warehouse_date_end: Union[datetime, None] = (
-                warehouse_course_dict['conclude_at'].to_pydatetime() if pd.notna(
+                warehouse_course_dict['conclude_at'] if pd.notna(
                     warehouse_course_dict['conclude_at']) else None
             )
             updated_fields += self.soft_update_datetime_field(course, 'date_end', warehouse_date_end)
@@ -661,9 +661,8 @@ class DashboardCronJob(CronJobBase):
             logger.info("** assignment")
             status += self.update_groups()
             status += self.update_assignment()
-# Submission needs session support 
-#           status += self.submission()
-#           status += self.weight_consideration()
+            status += self.submission()
+            status += self.weight_consideration()
 
             logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
