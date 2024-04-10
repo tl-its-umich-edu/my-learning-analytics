@@ -120,9 +120,9 @@ class DashboardCronJob(CronJobBase):
                 return connection.execute(text(query))
 
     # remove all records inside the specified table
-    def delete_all_records_in_table(self, table_name: str, where_clause: str = "", where_params: Dict = None):
+    def execute_myla_delete_query(self, query: str, params: Optional[Dict[str,str]] = None) -> str:
         # delete all records in the table first, can have an optional where clause
-        result_proxy = self.execute_myla_query(f"delete from {table_name} {where_clause}", where_params)
+        result_proxy = self.execute_myla_query(query, params)
         return(f"\n{result_proxy.rowcount} rows deleted from {table_name}\n")
 
     def soft_update_datetime_field(
@@ -155,7 +155,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in checking course")
         supported_courses = Course.objects.get_supported_courses()
         course_ids = [str(x) for x in supported_courses.values_list('id', flat=True)]
-        courses_data = self.execute_bq_query(self.queries['course'], 
+        courses_data = self.execute_bq_query(self.queries['course'],
                                              params={'course_ids': course_ids})
         courses_data = courses_data.to_dataframe()
         # error out when course id is invalid, otherwise add DataFrame to list
@@ -187,7 +187,7 @@ class DashboardCronJob(CronJobBase):
         logger.info("in update with data warehouse user")
 
         # delete all records in the table first
-        status += self.delete_all_records_in_table("user")
+        status += self.execute_myla_delete_query("DELETE FROM user")
 
         # select all student registered for the course
         status += self.util_function(
@@ -209,7 +209,7 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in update unizin metadata")
 
         # delete all records in the table first
-        status += self.delete_all_records_in_table("unizin_metadata")
+        status += self.execute_myla_delete_query("DELETE FROM unizin_metadata")
 
         # select all student registered for the course
         metadata_sql = self.queries['metadata']
@@ -257,7 +257,7 @@ class DashboardCronJob(CronJobBase):
 
         logger.info(f"Deleting all records in resource_access after {data_last_updated}")
 
-        status += self.delete_all_records_in_table("resource_access", f"WHERE access_time > :data_last_updated", {'data_last_updated': data_last_updated })
+        status += self.execute_myla_delete_query("DELETE FROM resource_access WHERE access_time > :data_last_updated", {'data_last_updated': data_last_updated })
 
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
@@ -460,7 +460,7 @@ class DashboardCronJob(CronJobBase):
         logger.info("update_groups(): ")
 
         # delete all records in assignment_group table
-        status += self.delete_all_records_in_table("assignment_groups")
+        status += self.execute_myla_delete_query("DELETE FROM assignment_groups")
 
         # update groups
         # Loading the assignment groups inforamtion along with weight/points associated ith arn assignment
@@ -480,7 +480,7 @@ class DashboardCronJob(CronJobBase):
         logger.info("update_assignment(): ")
 
         # delete all records in assignment table
-        status += self.delete_all_records_in_table("assignment")
+        status += self.execute_myla_delete_query("DELETE FROM assignment")
 
         # loop through multiple course ids
         status += self.util_function(self.queries['assignment'],
@@ -496,8 +496,8 @@ class DashboardCronJob(CronJobBase):
 
         logger.info("update_submission(): ")
 
-        # delete all records in resource_access table
-        status += self.delete_all_records_in_table("submission")
+        # delete all records in submission table
+        status += self.execute_myla_delete_query("DELETE FROM submission")
 
         # loop through multiple course ids
         # filter out not released grades (submission_dim.posted_at date is not null) and partial grades (submission_dim.workflow_state != 'graded')
@@ -523,7 +523,7 @@ class DashboardCronJob(CronJobBase):
         logger.info("weight_consideration()")
 
         # delete all records in assignment_weight_consideration table
-        status += self.delete_all_records_in_table("assignment_weight_consideration")
+        status += self.execute_myla_delete_query("DELETE FROM assignment_weight_consideration")
 
         # loop through multiple course ids
         status += self.util_function(self.queries['assignment_weight'],
