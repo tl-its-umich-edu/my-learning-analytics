@@ -123,7 +123,7 @@ class DashboardCronJob(CronJobBase):
     def execute_myla_delete_query(self, query: str, params: Optional[Dict[str,str]] = None) -> str:
         # delete all records in the table first, can have an optional where clause
         result_proxy = self.execute_myla_query(query, params)
-        return(f"\n{result_proxy.rowcount} rows deleted from {table_name}\n")
+        return(f"\n{result_proxy.rowcount} rows deleted from {query}\n")
 
     def soft_update_datetime_field(
         self,
