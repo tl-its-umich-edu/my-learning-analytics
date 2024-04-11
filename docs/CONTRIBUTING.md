@@ -171,8 +171,23 @@ docker exec -it student_dashboard_mysql mysql_upgrade \
 When prompted, specify the password for the root MySQL user.
 It should be found in the `MYSQL.ROOT_PASSWORD` property of `env.hjson`.
 
-[Next: Contributors](../docs/CONTRIBUTORS.md)
+### Backing up the development database
+
+To backup the development databaes with the default settings, use this command
+```sh
+docker exec student_dashboard_mysql mysqldump --socket=/tmp/mysql.sock -uroot -pstudent_dashboard_root_pw student_dashboard > student_dashboard2.sql
+```
+
+To restore this database 
+```sh
+docker exec -i student_dashboard_mysql mysql -uroot -pstudent_dashboard_root_pw student_dashboard_new < student_dashboard.sql`
+```
+
+Note: It's possible you may need to recreate the database (delete the .data directory) if your value in docker-compose was `MYSQL_ROOT_HOST="0.0.0.0"` which makes it difficult to connect to MySQL. 
 
 ### Dependency Upgrade
 
  For Auto-upgrade django to future version, use the helpful library called [django-upgrade](https://github.com/adamchainz/django-upgrade )
+
+[Next: Contributors](../docs/CONTRIBUTORS.md)
+
