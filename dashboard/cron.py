@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 from collections import namedtuple
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 from zoneinfo import ZoneInfo
 
 import hjson
