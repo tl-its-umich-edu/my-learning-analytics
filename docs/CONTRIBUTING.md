@@ -175,7 +175,7 @@ It should be found in the `MYSQL.ROOT_PASSWORD` property of `env.hjson`.
 
 To backup the development databaes with the default settings, use this command
 ```sh
-docker exec student_dashboard_mysql mysqldump --socket=/tmp/mysql.sock -uroot -pstudent_dashboard_root_pw student_dashboard > student_dashboard2.sql
+docker exec student_dashboard_mysql mysqldump --socket=/tmp/mysql.sock -uroot -pstudent_dashboard_root_pw student_dashboard > student_dashboard.sql
 ```
 
 To restore this database 
