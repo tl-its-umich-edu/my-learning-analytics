@@ -178,7 +178,8 @@ To backup the development databaes with the default settings, use this command
 docker exec student_dashboard_mysql mysqldump --socket=/tmp/mysql.sock -uroot -pstudent_dashboard_root_pw student_dashboard > student_dashboard.sql
 ```
 
-To restore this database 
+To restore this database to a new database you had created as an admin called student_dashboard_new (CREATE database student_dashboard_new). You can also just restore it to the same database (student_dashboard).
+
 ```sh
 docker exec -i student_dashboard_mysql mysql -uroot -pstudent_dashboard_root_pw student_dashboard_new < student_dashboard.sql`
 ```
