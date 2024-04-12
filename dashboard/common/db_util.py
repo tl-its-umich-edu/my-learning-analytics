@@ -1,6 +1,6 @@
 # Some utility functions used by other classes in this project
 import logging
-from datetime import datetime
+import datetime
 from typing import Any, Dict, List, Literal, TypedDict, Union
 from urllib.parse import quote_plus
 
@@ -172,7 +172,7 @@ def get_user_courses_info(username: str, course_id: Union[int, None] = None) -> 
     return enrollments
 
 
-def get_last_cronjob_run() -> Union[datetime, None]:
+def get_last_cronjob_run() -> Union[datetime.datetime, None]:
     try:
         c = CronJobLog.objects.filter(is_success=1).latest('end_time')
         end_time = c.end_time
@@ -182,7 +182,7 @@ def get_last_cronjob_run() -> Union[datetime, None]:
     return None
 
 
-def get_canvas_data_date() -> Union[datetime, None]:
+def get_canvas_data_date() -> Union[datetime.datetime, None]:
     if not settings.DATABASES.get('DATA_WAREHOUSE', {}).get('IS_UNIZIN'):
         return get_last_cronjob_run()
 
@@ -240,5 +240,7 @@ def infer_bigquery_parameter_type(value_type: type) -> bigquery.ScalarQueryParam
             int: bigquery.ScalarQueryParameterType("INT64"),
             float: bigquery.ScalarQueryParameterType("FLOAT64"),
             bool: bigquery.ScalarQueryParameterType("BOOL"),
-            str: bigquery.ScalarQueryParameterType("STRING")
+            str: bigquery.ScalarQueryParameterType("STRING"),
+            datetime.date: bigquery.ScalarQueryParameterType("DATE"),
+            datetime.datetime: bigquery.ScalarQueryParameterType("DATETIME")
         }.get(value_type, bigquery.ScalarQueryParameterType("STRING"))  # Default to STRING if type not found
