@@ -142,7 +142,6 @@ class DashboardCronJob(CronJobBase):
                 f'Skipped update of {field_name} for {model_name} instance ({model_inst.id}); existing value was found')
         else:
             if warehouse_field_value:
-                warehouse_field_value = warehouse_field_value.replace(tzinfo=ZoneInfo('UTC'))
                 setattr(model_inst, field_name, warehouse_field_value)
                 logger.info(f'Updated {field_name} for {model_name} instance ({model_inst.id})')
                 return [field_name]

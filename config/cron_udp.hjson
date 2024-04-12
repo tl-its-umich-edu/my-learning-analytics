@@ -177,8 +177,8 @@
             cast(co2.lms_ext_id as INT64) as canvas_id,
             cast(at2.lms_int_id as INT64) as enrollment_term_id,
             co.le_code as name,
-            co.le_start_date as start_at,
-            co.le_end_date as conclude_at
+            TIMESTAMP(co.le_start_date) as start_at,
+            TIMESTAMP(co.le_end_date) as conclude_at
         FROM
             context_store_entity.course_offering co
             LEFT OUTER JOIN context_store_entity.academic_term at1 on (co.academic_term_id = at1.academic_term_id),
