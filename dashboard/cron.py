@@ -61,11 +61,11 @@ class DashboardCronJob(CronJobBase):
 
 
     # This util_function is used to run a query against the context store and insert the result into a MySQL table
-    def util_function(self, sql_string, mysql_table, params=None, table_identifier=None):
+    def util_function(self, sql_string, mysql_table, bq_job_config:Optional[bigquery.QueryJobConfig]=None, table_identifier=None):
         logger.debug(f'sql={sql_string}')
-        logger.debug(f'table={mysql_table} params={params} table_identifier={table_identifier}')
+        logger.debug(f'table={mysql_table} params={bq_job_config} table_identifier={table_identifier}')
 
-        df = self.execute_bq_query(sql_string, params).to_dataframe()
+        df = self.execute_bq_query(sql_string, bq_job_config).to_dataframe()
 
         # drop duplicates
         df = df.drop_duplicates(keep='first')
@@ -80,21 +80,19 @@ class DashboardCronJob(CronJobBase):
             raise
 
         # returns the row size of dataframe
-        return f"{str(df.shape[0])} {mysql_table} : {params}\n"
+        return f"{str(df.shape[0])} {mysql_table}\n"
 
 
     # Execute a query against the bigquery database
 
-    def execute_bq_query(self, query: str, params: Dict = None):
+    def execute_bq_query(self, query: str, bq_job_config: Optional[bigquery.QueryJobConfig] = None):
         # Remove the newlines from the query
         query = query.replace("\n", " ")
 
-        if params:
+        if bq_job_config:
             try:
                 # Convert to bq schema object
-                query_params= db_util.map_dict_to_query_job_config(params)
-                query_job_config = bigquery.QueryJobConfig(query_parameters=query_params)
-                query_job = self.bigquery_client.query(query, job_config=query_job_config)
+                query_job = self.bigquery_client.query(query, job_config=bq_job_config)
                 query_job_result = query_job.result()
 
                 self.total_bytes_billed += query_job.total_bytes_billed
@@ -111,7 +109,7 @@ class DashboardCronJob(CronJobBase):
             return query_job_result
 
     # Execute a query against the MyLA database
-    def execute_myla_query(self, query: str, params: Dict = None) -> ResultProxy:
+    def execute_myla_query(self, query: str, params: Optional[Dict] = None) -> ResultProxy:
         with self.myla_engine.begin() as connection:
             connection.detach()
             if params:
@@ -154,8 +152,13 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in checking course")
         supported_courses = Course.objects.get_supported_courses()
         course_ids = [str(x) for x in supported_courses.values_list('id', flat=True)]
-        courses_data = self.execute_bq_query(self.queries['course'],
-                                             params={'course_ids': course_ids})
+
+        courses_data = self.execute_bq_query(
+            self.queries['course'],
+            bigquery.QueryJobConfig(query_parameters=[
+                bigquery.ArrayQueryParameter('course_ids', 'STRING', course_ids),
+            ])
+        )
         courses_data = courses_data.to_dataframe()
         # error out when course id is invalid, otherwise add DataFrame to list
         for course_id, data_last_updated in supported_courses:
@@ -190,11 +193,13 @@ class DashboardCronJob(CronJobBase):
 
         # select all student registered for the course
         status += self.util_function(
-                                self.queries['user'],
-                                'user',
-                                {'course_ids': self.valid_locked_course_ids,
-                                'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT
-                                })
+            self.queries['user'],
+            'user',
+            bigquery.QueryJobConfig(query_parameters=[
+                bigquery.ArrayQueryParameter('course_ids', 'STRING', self.valid_locked_course_ids,),
+                bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT),
+            ])
+        )
 
         return status
 
@@ -229,7 +234,13 @@ class DashboardCronJob(CronJobBase):
 
         # Select all the files for these courses
         # convert int array to str array
-        df_attach = self.execute_bq_query(self.queries['resource'], params={'course_ids': self.valid_locked_course_ids}).to_dataframe()
+        df_attach = self.execute_bq_query(
+            self.queries['resource'], 
+            bigquery.QueryJobConfig(query_parameters=[
+                bigquery.ArrayQueryParameter('course_ids', 'STRING', self.valid_locked_course_ids,),
+            ])
+        ).to_dataframe()
+
         logger.debug(df_attach)
         # Update these back again based on the dataframe
         # Remove any rows where file_state is not available!
@@ -466,9 +477,13 @@ class DashboardCronJob(CronJobBase):
         logger.debug("update_assignment_groups(): ")
 
         # loop through multiple course ids
-        status += self.util_function(self.queries['assignment_groups'],
-                                'assignment_groups',
-                                {'course_ids': self.valid_locked_course_ids})
+        status += self.util_function(
+            self.queries['assignment_groups'],
+            'assignment_groups',
+            bigquery.QueryJobConfig(query_parameters=[
+                bigquery.ArrayQueryParameter('course_ids', 'STRING', self.valid_locked_course_ids,),
+            ]),
+        )
 
         return status
 
@@ -482,9 +497,13 @@ class DashboardCronJob(CronJobBase):
         status += self.execute_myla_delete_query("DELETE FROM assignment")
 
         # loop through multiple course ids
-        status += self.util_function(self.queries['assignment'],
-                                    'assignment',
-                                    {'course_ids': self.valid_locked_course_ids})
+        status += self.util_function(
+            self.queries['assignment'],
+            'assignment',
+            bigquery.QueryJobConfig(query_parameters=[
+                bigquery.ArrayQueryParameter('course_ids', 'STRING', self.valid_locked_course_ids,),
+            ]),
+        )
 
         return status
 
@@ -500,16 +519,16 @@ class DashboardCronJob(CronJobBase):
 
         # loop through multiple course ids
         # filter out not released grades (submission_dim.posted_at date is not null) and partial grades (submission_dim.workflow_state != 'graded')
-        query_params = {
-                        'course_ids': self.valid_locked_course_ids,
-                        'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT,
-                        }
+        bq_job_config = bigquery.QueryJobConfig(query_parameters=[
+            bigquery.ArrayQueryParameter('course_ids', 'STRING', self.valid_locked_course_ids,),
+            bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT),
+        ])
 
-        df = self.execute_bq_query(self.queries['submission'], query_params).to_dataframe()
+        df = self.execute_bq_query(self.queries['submission'], bq_job_config).to_dataframe()
         df = df.drop_duplicates(keep='first')
         df.to_sql(con=self.myla_engine, name='submission', if_exists='append', index=False)
 
-        status+=f"{str(df.shape[0])} submission: {query_params}\n"
+        status+=f"{str(df.shape[0])} submission\n"
 
         # returns the row size of dataframe
         return status
@@ -525,10 +544,13 @@ class DashboardCronJob(CronJobBase):
         status += self.execute_myla_delete_query("DELETE FROM assignment_weight_consideration")
 
         # loop through multiple course ids
-        status += self.util_function(self.queries['assignment_weight'],
-                                    'assignment_weight_consideration',
-                                    {'course_ids': self.valid_locked_course_ids },
-                                    'weight')
+        status += self.util_function(
+            self.queries['assignment_weight'],
+            'assignment_weight_consideration',
+            bigquery.QueryJobConfig(query_parameters=[
+                bigquery.ArrayQueryParameter('course_ids', 'STRING', self.valid_locked_course_ids,),
+            ]),
+            'weight')
 
         logger.debug(status + "\n\n")
 
