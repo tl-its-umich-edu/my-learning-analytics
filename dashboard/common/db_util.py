@@ -183,9 +183,6 @@ def get_last_cronjob_run() -> Union[datetime.datetime, None]:
 
 
 def get_canvas_data_date() -> Union[datetime.datetime, None]:
-    if not settings.DATABASES.get('DATA_WAREHOUSE', {}).get('IS_UNIZIN'):
-        return get_last_cronjob_run()
-
     try:
         with django.db.connection.cursor() as cursor:
             cursor.execute("SELECT pvalue from unizin_metadata where pkey = 'canvasdatadate'")

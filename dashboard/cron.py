@@ -42,7 +42,6 @@ class DashboardCronJob(CronJobBase):
     def setup_bigquery(self):
         # Instantiates a client
         self.bigquery_client = bigquery.Client()
-#        self.bigquery_client = bigquery.Client.from_service_account_json(settings.BIGQUERY_SERVICE_ACCOUNT_JSON)
 
         # BQ Total Bytes Billed to report to status
         self.total_bytes_billed = 0
@@ -179,8 +178,7 @@ class DashboardCronJob(CronJobBase):
         CourseVerification = namedtuple("CourseVerification", ["invalid_course_ids", "course_data"])
         return CourseVerification(invalid_course_id_list, courses_data)
 
-    # update USER records from DATA_WAREHOUSE
-
+    # Update the user table with the data from the data warehouse
     def update_user(self):
 
         # cron status
@@ -203,7 +201,7 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
-    # update unizin metadata from DATA_WAREHOUSE
+    # update unizin metadata from data in the data warehouse
 
     def update_unizin_metadata(self):
 
@@ -682,9 +680,8 @@ class DashboardCronJob(CronJobBase):
                     status += str(e)
                     exception_in_run = True
 
-        if settings.DATABASES.get('DATA_WAREHOUSE', {}).get('IS_UNIZIN'):
-            logger.info("** informational")
-            status += self.update_unizin_metadata()
+        logger.info("** informational")
+        status += self.update_unizin_metadata()
 
         all_str_course_ids = set(
             str(x) for x in Course.objects.get_supported_courses().values_list('id', flat=True)
