@@ -1,4 +1,4 @@
-import * as d3 from 'd3'
+import * as d3 from 'd3/dist/d3.min'
 import { adjustViewport } from '../../util/chart'
 import { roundToXDecimals } from '../../util/math'
 import { siteTheme } from '../../globals'
