@@ -181,7 +181,7 @@ docker exec student_dashboard_mysql mysqldump --socket=/tmp/mysql.sock -uroot -p
 To restore this database to a new database you had created as an admin called student_dashboard_new (CREATE database student_dashboard_new). You can also just restore it to the same database (student_dashboard).
 
 ```sh
-docker exec -i student_dashboard_mysql mysql -uroot -pstudent_dashboard_root_pw student_dashboard < student_dashboard.sql`
+docker exec -i student_dashboard_mysql mysql -uroot -pstudent_dashboard_root_pw student_dashboard < student_dashboard.sql
 ```
 
 Note: It's possible you may need to recreate the database (delete the .data directory) if your value in docker-compose was `MYSQL_ROOT_HOST="0.0.0.0"` which makes it difficult to connect to MySQL. 
