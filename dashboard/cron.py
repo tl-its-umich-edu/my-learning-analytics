@@ -233,7 +233,7 @@ class DashboardCronJob(CronJobBase):
         # Select all the files for these courses
         # convert int array to str array
         df_attach = self.execute_bq_query(
-            self.queries['resource'], 
+            self.queries['resource'],
             bigquery.QueryJobConfig(query_parameters=[
                 bigquery.ArrayQueryParameter('course_ids', 'STRING', self.valid_locked_course_ids,),
             ])
