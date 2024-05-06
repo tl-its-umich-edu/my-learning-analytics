@@ -1,6 +1,6 @@
 # Some utility functions used by other classes in this project
 import logging
-from datetime import datetime
+import datetime
 from typing import Dict, List, Literal, TypedDict, Union
 from urllib.parse import quote_plus
 
@@ -21,7 +21,7 @@ BACKENDS_PATH = 'django.db.backends.'
 
 
 class DjangoDBParams(TypedDict):
-    ENGINE: Literal['django.db.backends.mysql', 'django.db.backends.postgresql']
+    ENGINE: Literal['django.db.backends.mysql']
     NAME: str
     USER: str
     PASSWORD: str
@@ -37,7 +37,7 @@ def create_sqlalchemy_engine(db_params: DjangoDBParams) -> Engine:
     if new_db_params['ENGINE'] == (BACKENDS_PATH + 'mysql'):
         return create_engine(f'mysql+mysqldb://{core_string}?charset=utf8mb4')
     else:
-        return create_engine('postgresql+psycopg://' + core_string)
+        raise Exception("Only mysql is supported")
 
 
 def canvas_id_to_incremented_id(canvas_id):
@@ -171,7 +171,7 @@ def get_user_courses_info(username: str, course_id: Union[int, None] = None) -> 
     return enrollments
 
 
-def get_last_cronjob_run() -> Union[datetime, None]:
+def get_last_cronjob_run() -> Union[datetime.datetime, None]:
     try:
         c = CronJobLog.objects.filter(is_success=1).latest('end_time')
         end_time = c.end_time
@@ -181,10 +181,7 @@ def get_last_cronjob_run() -> Union[datetime, None]:
     return None
 
 
-def get_canvas_data_date() -> Union[datetime, None]:
-    if not settings.DATABASES.get('DATA_WAREHOUSE', {}).get('IS_UNIZIN'):
-        return get_last_cronjob_run()
-
+def get_canvas_data_date() -> Union[datetime.datetime, None]:
     try:
         with django.db.connection.cursor() as cursor:
             cursor.execute("SELECT pvalue from unizin_metadata where pkey = 'canvasdatadate'")

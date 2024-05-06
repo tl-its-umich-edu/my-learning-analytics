@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 from collections import namedtuple
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 from zoneinfo import ZoneInfo
 
 import hjson
@@ -23,100 +23,126 @@ from dashboard.models import Course, Resource, AcademicTerms, User
 
 logger = logging.getLogger(__name__)
 
-engine = db_util.create_sqlalchemy_engine(settings.DATABASES['default'])
-data_warehouse_engine = db_util.create_sqlalchemy_engine(settings.DATABASES['DATA_WAREHOUSE'])
-
-# Set up queries array from configuration file
-CRON_QUERY_FILE = settings.CRON_QUERY_FILE
-logger.info(CRON_QUERY_FILE)
-try:
-    with open(CRON_QUERY_FILE) as cron_query_file:
-        queries = hjson.load(cron_query_file)
-except FileNotFoundError:
-    logger.error(
-        f'Cannot find cron queries file "{CRON_QUERY_FILE}".')
-    queries = dict()
-
-# Split a list into *size* shorter pieces
-
-
-def split_list(a_list: list, size: int = 20):
-    return [a_list[i:i + size] for i in range(0, len(a_list), size)]
-
-# the util function
-
-
-def util_function(sql_string, mysql_table, param_object=None, table_identifier=None):
-    logger.debug(f'sql={sql_string}')
-    logger.debug(f'table={mysql_table} param_object={param_object} table_identifier={table_identifier}')
-    df = pd.read_sql(sql_string, data_warehouse_engine, params=param_object)
-
-    # drop duplicates
-    df = df.drop_duplicates(keep='first')
-
-    logger.debug(" table: " + mysql_table + " insert size: " + str(df.shape[0]))
-
-    # write to MySQL
-    try:
-        df.to_sql(con=engine, name=mysql_table, if_exists='append', index=False)
-    except Exception as e:
-        logger.exception(f"Error running to_sql on table {mysql_table}")
-        raise
-
-    # returns the row size of dataframe
-    return f"{str(df.shape[0])} {mysql_table} : {param_object}\n"
-
-
-# execute database query
-def execute_db_query(query: str, params: Dict = None) -> ResultProxy:
-    with engine.begin() as connection:
-        connection.detach()
-        if params:
-            return connection.execute(text(query), params)
-        else:
-            return connection.execute(text(query))
-
-
-# remove all records inside the specified table
-def delete_all_records_in_table(table_name: str, where_clause: str = "", where_params: Dict = None):
-    # delete all records in the table first, can have an optional where clause
-    result_proxy = execute_db_query(f"delete from {table_name} {where_clause}", where_params)
-    return(f"\n{result_proxy.rowcount} rows deleted from {table_name}\n")
-
-
-def soft_update_datetime_field(
-    model_inst: models.Model,
-    field_name: str,
-    warehouse_field_value: Union[datetime, None],
-) -> List[str]:
-    """
-    Uses Django ORM to update DateTime field of model instance if the field value is null and the warehouse data is non-null.
-    """
-    model_name: str = model_inst.__class__.__name__
-    current_field_value: Union[datetime, None] = getattr(model_inst, field_name)
-    # Skipping update if the field already has a value, provided by a previous cron run or administrator
-    if current_field_value is not None:
-        logger.info(
-            f'Skipped update of {field_name} for {model_name} instance ({model_inst.id}); existing value was found')
-    else:
-        if warehouse_field_value:
-            warehouse_field_value = warehouse_field_value.replace(tzinfo=ZoneInfo('UTC'))
-            setattr(model_inst, field_name, warehouse_field_value)
-            logger.info(f'Updated {field_name} for {model_name} instance ({model_inst.id})')
-            return [field_name]
-    return []
-
-
 # cron job to populate course and user tables
 class DashboardCronJob(CronJobBase):
 
     schedule = Schedule(run_at_times=settings.RUN_AT_TIMES)
     code = 'dashboard.DashboardCronJob'    # a unique code
 
+    def setup_queries(self):
+        # Set up queries array from configuration file
+        CRON_QUERY_FILE = settings.CRON_QUERY_FILE
+        logger.info(CRON_QUERY_FILE)
+        try:
+            with open(CRON_QUERY_FILE) as cron_query_file:
+                self.queries = hjson.load(cron_query_file)
+        except FileNotFoundError:
+            logger.error(f'Cannot find cron queries file "{CRON_QUERY_FILE}".')
+
+    def setup_bigquery(self):
+        # Instantiates a client
+        self.bigquery_client = bigquery.Client()
+
+        # BQ Total Bytes Billed to report to status
+        self.total_bytes_billed = 0
+
     def __init__(self) -> None:
         """Constructor to be used to declare valid_locked_course_ids instance variable."""
         super().__init__()
+        self.myla_engine = db_util.create_sqlalchemy_engine(settings.DATABASES['default'])
+        self.setup_bigquery()
+        self.setup_queries()
         self.valid_locked_course_ids: List[str]
+
+    # Split a list into *size* shorter pieces
+    def split_list(self, a_list: list, size: int = 20):
+        return [a_list[i:i + size] for i in range(0, len(a_list), size)]
+
+
+    # This util_function is used to run a query against the context store and insert the result into a MySQL table
+    def util_function(self, sql_string, mysql_table, bq_job_config:Optional[bigquery.QueryJobConfig]=None, table_identifier=None):
+        logger.debug(f'sql={sql_string}')
+        logger.debug(f'table={mysql_table} params={bq_job_config} table_identifier={table_identifier}')
+
+        df = self.execute_bq_query(sql_string, bq_job_config).to_dataframe()
+
+        # drop duplicates
+        df = df.drop_duplicates(keep='first')
+
+        logger.debug(" table: " + mysql_table + " insert size: " + str(df.shape[0]))
+
+        # write to MySQL
+        try:
+            df.to_sql(con=self.myla_engine, name=mysql_table, if_exists='append', index=False)
+        except Exception as e:
+            logger.exception(f"Error running to_sql on table {mysql_table}")
+            raise
+
+        # returns the row size of dataframe
+        return f"{str(df.shape[0])} {mysql_table}\n"
+
+
+    # Execute a query against the bigquery database
+
+    def execute_bq_query(self, query: str, bq_job_config: Optional[bigquery.QueryJobConfig] = None):
+        # Remove the newlines from the query
+        query = query.replace("\n", " ")
+
+        if bq_job_config:
+            try:
+                # Convert to bq schema object
+                query_job = self.bigquery_client.query(query, job_config=bq_job_config)
+                query_job_result = query_job.result()
+
+                self.total_bytes_billed += query_job.total_bytes_billed
+                logger.debug(f"This job had {query_job.total_bytes_billed} bytes. Total: {self.total_bytes_billed}")
+                return query_job_result
+            except Exception as e:
+                logger.error(f"Error ({str(e)}) in setting up schema for query {query}.")
+                raise Exception(e)
+        else:
+            query_job = self.bigquery_client.query(query)
+            query_job_result = query_job.result()
+            self.total_bytes_billed += query_job.total_bytes_billed
+            logger.debug(f"This job had {query_job.total_bytes_billed} bytes. Total: {self.total_bytes_billed}")
+            return query_job_result
+
+    # Execute a query against the MyLA database
+    def execute_myla_query(self, query: str, params: Optional[Dict] = None) -> ResultProxy:
+        with self.myla_engine.begin() as connection:
+            connection.detach()
+            if params:
+                return connection.execute(text(query), params)
+            else:
+                return connection.execute(text(query))
+
+    # remove all records inside the specified table
+    def execute_myla_delete_query(self, query: str, params: Optional[Dict[str,str]] = None) -> str:
+        # delete all records in the table first, can have an optional where clause
+        result_proxy = self.execute_myla_query(query, params)
+        return(f"\n{result_proxy.rowcount} rows deleted from {query}\n")
+
+    def soft_update_datetime_field(
+        self,
+        model_inst: models.Model,
+        field_name: str,
+        warehouse_field_value: Union[datetime, None],
+    ) -> List[str]:
+        """
+        Uses Django ORM to update DateTime field of model instance if the field value is null and the warehouse data is non-null.
+        """
+        model_name: str = model_inst.__class__.__name__
+        current_field_value: Union[datetime, None] = getattr(model_inst, field_name)
+        # Skipping update if the field already has a value, provided by a previous cron run or administrator
+        if current_field_value is not None:
+            logger.info(
+                f'Skipped update of {field_name} for {model_name} instance ({model_inst.id}); existing value was found')
+        else:
+            if warehouse_field_value:
+                setattr(model_inst, field_name, warehouse_field_value)
+                logger.info(f'Updated {field_name} for {model_name} instance ({model_inst.id})')
+                return [field_name]
+        return []
 
     # verify whether course ids are valid
     def verify_course_ids(self):
@@ -125,7 +151,14 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in checking course")
         supported_courses = Course.objects.get_supported_courses()
         course_ids = [str(x) for x in supported_courses.values_list('id', flat=True)]
-        courses_data = pd.read_sql(queries['course'], data_warehouse_engine, params={'course_ids': course_ids})
+
+        courses_data = self.execute_bq_query(
+            self.queries['course'],
+            bigquery.QueryJobConfig(query_parameters=[
+                bigquery.ArrayQueryParameter('course_ids', 'STRING', course_ids),
+            ])
+        )
+        courses_data = courses_data.to_dataframe()
         # error out when course id is invalid, otherwise add DataFrame to list
         for course_id, data_last_updated in supported_courses:
             if course_id not in list(courses_data['id']):
@@ -145,8 +178,7 @@ class DashboardCronJob(CronJobBase):
         CourseVerification = namedtuple("CourseVerification", ["invalid_course_ids", "course_data"])
         return CourseVerification(invalid_course_id_list, courses_data)
 
-    # update USER records from DATA_WAREHOUSE
-
+    # Update the user table with the data from the data warehouse
     def update_user(self):
 
         # cron status
@@ -155,19 +187,21 @@ class DashboardCronJob(CronJobBase):
         logger.info("in update with data warehouse user")
 
         # delete all records in the table first
-        status += delete_all_records_in_table("user")
+        status += self.execute_myla_delete_query("DELETE FROM user")
 
         # select all student registered for the course
-        status += util_function(
-                                queries['user'],
-                                'user',
-                                {'course_ids': self.valid_locked_course_ids,
-                                'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT
-                                })
+        status += self.util_function(
+            self.queries['user'],
+            'user',
+            bigquery.QueryJobConfig(query_parameters=[
+                bigquery.ArrayQueryParameter('course_ids', 'STRING', self.valid_locked_course_ids,),
+                bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT),
+            ])
+        )
 
         return status
 
-    # update unizin metadata from DATA_WAREHOUSE
+    # update unizin metadata from data in the data warehouse
 
     def update_unizin_metadata(self):
 
@@ -177,14 +211,14 @@ class DashboardCronJob(CronJobBase):
         logger.debug("in update unizin metadata")
 
         # delete all records in the table first
-        status += delete_all_records_in_table("unizin_metadata")
+        status += self.execute_myla_delete_query("DELETE FROM unizin_metadata")
 
         # select all student registered for the course
-        metadata_sql = queries['metadata']
+        metadata_sql = self.queries['metadata']
 
         logger.debug(metadata_sql)
 
-        status += util_function(metadata_sql, 'unizin_metadata')
+        status += self.util_function(metadata_sql, 'unizin_metadata')
 
         return status
 
@@ -198,9 +232,13 @@ class DashboardCronJob(CronJobBase):
 
         # Select all the files for these courses
         # convert int array to str array
-        df_attach = pd.read_sql(queries['resource'],
-                                data_warehouse_engine,
-                                params={'course_ids': self.valid_locked_course_ids })
+        df_attach = self.execute_bq_query(
+            self.queries['resource'],
+            bigquery.QueryJobConfig(query_parameters=[
+                bigquery.ArrayQueryParameter('course_ids', 'STRING', self.valid_locked_course_ids,),
+            ])
+        ).to_dataframe()
+
         logger.debug(df_attach)
         # Update these back again based on the dataframe
         # Remove any rows where file_state is not available!
@@ -223,22 +261,15 @@ class DashboardCronJob(CronJobBase):
         # return string with concatenated SQL insert result
         return_string = ""
 
-        if settings.LRS_IS_BIGQUERY:
-            # Instantiates a client
-            bigquery_client = bigquery.Client()
-
-            # BQ Total Bytes Billed to report to status
-            total_bytes_billed = 0
-
         data_last_updated = Course.objects.filter(id__in=self.valid_locked_course_ids).get_data_earliest_date()
 
         logger.info(f"Deleting all records in resource_access after {data_last_updated}")
 
-        status += delete_all_records_in_table("resource_access", f"WHERE access_time > :data_last_updated", {'data_last_updated': data_last_updated })
+        status += self.execute_myla_delete_query("DELETE FROM resource_access WHERE access_time > :data_last_updated", {'data_last_updated': data_last_updated })
 
         # loop through multiple course ids, 20 at a time
         # (This is set by the CRON_BQ_IN_LIMIT from settings)
-        for data_warehouse_course_ids in split_list(self.valid_locked_course_ids, settings.CRON_BQ_IN_LIMIT):
+        for data_warehouse_course_ids in self.split_list(self.valid_locked_course_ids, settings.CRON_BQ_IN_LIMIT):
             # query to retrieve all file access events for one course
             # There is no catch if this query fails, event_store.events needs to exist
             final_query = []
@@ -279,11 +310,11 @@ class DashboardCronJob(CronJobBase):
                 job_config.query_parameters = query_params
 
                 # Location must match that of the dataset(s) referenced in the query.
-                bq_job = bigquery_client.query(final_query, location='US', job_config=job_config)
+                bq_job = self.bigquery_client.query(final_query, location='US', job_config=job_config)
                 # This is the call that could result in an exception
-                resource_access_df: pd.DataFrame = bq_job.result().to_dataframe()
-                total_bytes_billed += bq_job.total_bytes_billed
-                logger.debug(total_bytes_billed)
+                resource_access_df: pd.DataFrame = bq_job.to_dataframe()
+                self.total_bytes_billed += bq_job.total_bytes_billed
+                logger.debug(self.total_bytes_billed)
             else:
                 query_params = {
                     'course_ids': data_warehouse_course_ids,
@@ -326,7 +357,7 @@ class DashboardCronJob(CronJobBase):
                         'select sis_name as user_login_name,'
                         'cast(user_id as char) as user_id_str '
                         f'from user where sis_name in ({login_names})',
-                        engine)
+                        self.myla_engine)
 
                     logger.debug(f'user_id_df:\n'
                                  f'{user_id_df}\n'
@@ -396,7 +427,7 @@ class DashboardCronJob(CronJobBase):
             student_enrollment_type = User.EnrollmentType.STUDENT
             student_enrollment_df = pd.read_sql(
                 'select user_id, course_id from user where enrollment_type= %s',
-                engine, params=[(str(student_enrollment_type),)])
+                self.myla_engine, params=[(str(student_enrollment_type),)])
             resource_access_df = pd.merge(
                 resource_access_df, student_enrollment_df,
                 on=['user_id', 'course_id'],
@@ -406,7 +437,7 @@ class DashboardCronJob(CronJobBase):
             # First, update resource table
             try:
                 dtype = {'resource_id': types.VARCHAR(255)}
-                pangres.upsert(con=engine, df=resource_df,
+                pangres.upsert(con=self.myla_engine, df=resource_df,
                                table_name='resource', if_row_exists='update',
                                create_schema=False, add_new_columns=False,
                                dtype=dtype)
@@ -416,7 +447,7 @@ class DashboardCronJob(CronJobBase):
 
             # Next, update resource_access table
             try:
-                resource_access_df.to_sql(con=engine, name='resource_access',
+                resource_access_df.to_sql(con=self.myla_engine, name='resource_access',
                                           if_exists='append', index=False)
             except Exception as e:
                 logger.exception('Error running to_sql on table '
@@ -428,12 +459,6 @@ class DashboardCronJob(CronJobBase):
                     map(repr, data_warehouse_course_ids)) + ']\n'
             logger.info(return_string)
 
-        if settings.LRS_IS_BIGQUERY:
-            total_tbytes_billed = total_bytes_billed / 1024 / 1024 / 1024 / 1024
-            # $5 per TB as of Feb 2019 https://cloud.google.com/bigquery/pricing
-            total_tbytes_price = round(5 * total_tbytes_billed, 2)
-            status += (f'TBytes billed for BQ: {total_tbytes_billed} = '
-                       f'${total_tbytes_price}\n')
         return status
 
     def update_groups(self):
@@ -443,16 +468,20 @@ class DashboardCronJob(CronJobBase):
         logger.info("update_groups(): ")
 
         # delete all records in assignment_group table
-        status += delete_all_records_in_table("assignment_groups")
+        status += self.execute_myla_delete_query("DELETE FROM assignment_groups")
 
         # update groups
         # Loading the assignment groups inforamtion along with weight/points associated ith arn assignment
         logger.debug("update_assignment_groups(): ")
 
         # loop through multiple course ids
-        status += util_function(queries['assignment_groups'],
-                                'assignment_groups',
-                                {'course_ids': self.valid_locked_course_ids})
+        status += self.util_function(
+            self.queries['assignment_groups'],
+            'assignment_groups',
+            bigquery.QueryJobConfig(query_parameters=[
+                bigquery.ArrayQueryParameter('course_ids', 'STRING', self.valid_locked_course_ids,),
+            ]),
+        )
 
         return status
 
@@ -463,12 +492,16 @@ class DashboardCronJob(CronJobBase):
         logger.info("update_assignment(): ")
 
         # delete all records in assignment table
-        status += delete_all_records_in_table("assignment")
+        status += self.execute_myla_delete_query("DELETE FROM assignment")
 
         # loop through multiple course ids
-        status += util_function(queries['assignment'],
-                                'assignment',
-                                {'course_ids': self.valid_locked_course_ids})
+        status += self.util_function(
+            self.queries['assignment'],
+            'assignment',
+            bigquery.QueryJobConfig(query_parameters=[
+                bigquery.ArrayQueryParameter('course_ids', 'STRING', self.valid_locked_course_ids,),
+            ]),
+        )
 
         return status
 
@@ -479,34 +512,23 @@ class DashboardCronJob(CronJobBase):
 
         logger.info("update_submission(): ")
 
-        # delete all records in resource_access table
-        status += delete_all_records_in_table("submission")
+        # delete all records in submission table
+        status += self.execute_myla_delete_query("DELETE FROM submission")
 
         # loop through multiple course ids
         # filter out not released grades (submission_dim.posted_at date is not null) and partial grades (submission_dim.workflow_state != 'graded')
-        query_params = {
-                        'course_ids': self.valid_locked_course_ids,
-                        'canvas_data_id_increment': settings.CANVAS_DATA_ID_INCREMENT,
-                        }
-        Session = sessionmaker(bind=data_warehouse_engine)
-        try:
-    # Create a session
-            with Session() as session:
-                # Execute the first query to create the temporary table
-                session.execute(text(queries['submission']).bindparams(**query_params))
+        bq_job_config = bigquery.QueryJobConfig(query_parameters=[
+            bigquery.ArrayQueryParameter('course_ids', 'STRING', self.valid_locked_course_ids,),
+            bigquery.ScalarQueryParameter('canvas_data_id_increment', 'INT64', settings.CANVAS_DATA_ID_INCREMENT),
+        ])
 
-                # Execute the second query using the temporary table
-                result = session.execute(text(queries['submission_with_avg_score']))
-                df = pd.DataFrame(result.fetchall(), columns=result.keys())
-                df = df.drop_duplicates(keep='first')
-                df.to_sql(con=engine, name='submission', if_exists='append', index=False)
+        df = self.execute_bq_query(self.queries['submission'], bq_job_config).to_dataframe()
+        df = df.drop_duplicates(keep='first')
+        df.to_sql(con=self.myla_engine, name='submission', if_exists='append', index=False)
 
-        except Exception as e:
-            logger.exception('Error running sql on table submission', str(e))
-            raise
-        status+=f"{str(df.shape[0])} submission: {query_params}\n"
+        status+=f"{str(df.shape[0])} submission\n"
 
-    # returns the row size of dataframe
+        # returns the row size of dataframe
         return status
 
     def weight_consideration(self):
@@ -517,13 +539,16 @@ class DashboardCronJob(CronJobBase):
         logger.info("weight_consideration()")
 
         # delete all records in assignment_weight_consideration table
-        status += delete_all_records_in_table("assignment_weight_consideration")
+        status += self.execute_myla_delete_query("DELETE FROM assignment_weight_consideration")
 
         # loop through multiple course ids
-        status += util_function(queries['assignment_weight'],
-                                'assignment_weight_consideration',
-                                {'course_ids': self.valid_locked_course_ids },
-                                'weight')
+        status += self.util_function(
+            self.queries['assignment_weight'],
+            'assignment_weight_consideration',
+            bigquery.QueryJobConfig(query_parameters=[
+                bigquery.ArrayQueryParameter('course_ids', 'STRING', self.valid_locked_course_ids,),
+            ]),
+            'weight')
 
         logger.debug(status + "\n\n")
 
@@ -536,9 +561,9 @@ class DashboardCronJob(CronJobBase):
         status: str = ''
         logger.info('update_term()')
 
-        term_sql: str = queries['term']
+        term_sql: str = self.queries['term']
         logger.debug(term_sql)
-        warehouse_term_df: pd.DataFrame = pd.read_sql(term_sql, data_warehouse_engine)
+        warehouse_term_df: pd.DataFrame = self.execute_bq_query(term_sql).to_dataframe()
 
         existing_terms_ids: List[int] = [term.id for term in list(AcademicTerms.objects.all())]
         new_term_ids: List[int] = [int(id) for id in warehouse_term_df['id'].to_list() if id not in existing_terms_ids]
@@ -548,7 +573,7 @@ class DashboardCronJob(CronJobBase):
         else:
             new_term_df: pd.DataFrame = warehouse_term_df.loc[warehouse_term_df['id'].isin(new_term_ids)]
             try:
-                new_term_df.to_sql(con=engine, name='academic_terms', if_exists='append', index=False)
+                new_term_df.to_sql(con=self.myla_engine, name='academic_terms', if_exists='append', index=False)
                 term_message: str = f'Added {len(new_term_df)} new records to academic_terms table: {new_term_ids}'
                 logger.info(term_message)
                 status += term_message + '\n'
@@ -587,15 +612,15 @@ class DashboardCronJob(CronJobBase):
                 updated_fields.append('term')
 
             warehouse_date_start: Union[datetime, None] = (
-                warehouse_course_dict['start_at'].to_pydatetime() if pd.notna(
+                warehouse_course_dict['start_at'] if pd.notna(
                     warehouse_course_dict['start_at']) else None
             )
-            updated_fields += soft_update_datetime_field(course, 'date_start', warehouse_date_start)
+            updated_fields += self.soft_update_datetime_field(course, 'date_start', warehouse_date_start)
             warehouse_date_end: Union[datetime, None] = (
-                warehouse_course_dict['conclude_at'].to_pydatetime() if pd.notna(
+                warehouse_course_dict['conclude_at'] if pd.notna(
                     warehouse_course_dict['conclude_at']) else None
             )
-            updated_fields += soft_update_datetime_field(course, 'date_end', warehouse_date_end)
+            updated_fields += self.soft_update_datetime_field(course, 'date_end', warehouse_date_end)
 
             if updated_fields:
                 course.save()
@@ -645,7 +670,6 @@ class DashboardCronJob(CronJobBase):
             status += self.update_assignment()
             status += self.submission()
             status += self.weight_consideration()
-
             logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
                 try:
@@ -656,9 +680,8 @@ class DashboardCronJob(CronJobBase):
                     status += str(e)
                     exception_in_run = True
 
-        if settings.DATABASES.get('DATA_WAREHOUSE', {}).get('IS_UNIZIN'):
-            logger.info("** informational")
-            status += self.update_unizin_metadata()
+        logger.info("** informational")
+        status += self.update_unizin_metadata()
 
         all_str_course_ids = set(
             str(x) for x in Course.objects.get_supported_courses().values_list('id', flat=True)
@@ -676,8 +699,14 @@ class DashboardCronJob(CronJobBase):
         else:
             logger.warn("data_last_updated not updated because of an Exception during this run")
 
+
+        if settings.LRS_IS_BIGQUERY:
+            total_tbytes_billed = self.total_bytes_billed / 1024 / 1024 / 1024 / 1024
+            # $6.25 per TB as of Feb 2024 https://cloud.google.com/bigquery/pricing
+            total_tbytes_price = round(6.25 * total_tbytes_billed, 2)
+            status += (f'TBytes billed for BQ: {total_tbytes_billed} = '
+                       f'${total_tbytes_price}\n')
+
         status += "End cron: " + str(datetime.now()) + "\n"
-
         logger.info("************ total status=" + status + "\n")
-
         return status

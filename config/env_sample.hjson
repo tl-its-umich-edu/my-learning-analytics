@@ -185,26 +185,8 @@
     # By default this is empty and no views are disabled
     # options are as described in course_view_options table column names [\"show_assignment_planning\", \"show_grade_distribution\"]
     "VIEWS_DISABLED": "",
-    # Data Warehouse configuration
-    # Uncomment these variables and fill them in if you're using cron to load
-    # from a data warehouse. These are optional
-    # Database engine driver
-    "DATA_WAREHOUSE": {
-        "ENGINE": "django.db.backends.postgresql",
-        # database name
-        "NAME": "",
-        # database user
-        "USER": "",
-        # database password
-        "PASSWORD": "",
-        # database host
-        "HOST": "",
-        # database port
-        "PORT": 5432,
-        # Enable/Disable Unizin Date Warehouse specific features/data
-        "IS_UNIZIN": true
-    },
-    # Learning Record Store configuration
+    # Data Warehoue and Learning Record Store configuration
+    # The warehouse and LRS are combined now in the same data source
     "LRS": {
         # LRS database engine driver (use `google.cloud.bigquery` for bigquery). no other LRS settings needed
         "ENGINE": "google.cloud.bigquery",

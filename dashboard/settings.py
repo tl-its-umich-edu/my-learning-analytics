@@ -235,20 +235,7 @@ DATABASES = {
             },
         },
         **ENV.get('MYSQL', {})
-    },
-    'DATA_WAREHOUSE': {
-        **{
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': '',
-            'USER': '',
-            'PASSWORD': '',
-            'HOST': '',
-            'PORT': 5432,
-            'OPTIONS': {},
-            'IS_UNIZIN': True
-        },
-        **ENV.get('DATA_WAREHOUSE', {})
-    },
+    }
 }
 # optionally set LRS data source
 LRS_IS_BIGQUERY = ENV.get('LRS', {}).get('ENGINE', 'google.cloud.bigquery') == 'google.cloud.bigquery'
@@ -365,7 +352,7 @@ CACHES = {
 # IMPORT LOCAL ENV
 # =====================
 try:
-    from settings_local import *
+    from settings_local import * # type: ignore
 except ImportError:
     pass
 
@@ -465,6 +452,6 @@ IMPORT_EXPORT_EXPORT_PERMISSION_CODE = 'view'
 # IMPORT LOCAL ENV
 # =====================
 try:
-    from settings_local import *
+    from settings_local import * #type: ignore
 except ImportError:
     pass
