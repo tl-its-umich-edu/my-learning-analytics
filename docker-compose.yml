@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     environment:
-      - MYSQL_ROOT_HOST="0.0.0.0"
+      - MYSQL_ROOT_HOST=%
     ports:
       - "5306:3306"
     volumes:
