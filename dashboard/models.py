@@ -330,7 +330,7 @@ class ResourceAccess(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="Table Id")
     resource_id = models.ForeignKey(Resource, on_delete=models.CASCADE, to_field='resource_id', db_column='resource_id')
     course_id = models.ForeignKey(Course, null=True, default=None, on_delete=models.CASCADE, db_column='course_id')
-    user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id')
+    user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id', db_index=True)
     access_time = models.DateTimeField(verbose_name="Access Time")
 
     def __str__(self):
