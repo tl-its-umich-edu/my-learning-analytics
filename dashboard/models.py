@@ -326,38 +326,6 @@ class Resource(models.Model):
     class Meta:
         db_table = 'resource'
 
-class ResourceAccess(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name="Table Id")
-    resource_id = models.ForeignKey(Resource, on_delete=models.CASCADE, to_field='resource_id', db_column='resource_id')
-    course_id = models.ForeignKey(Course, null=True, default=None, on_delete=models.CASCADE, db_column='course_id')
-    user_id = models.BigIntegerField(blank=True, null=False, verbose_name='User Id', db_index=True)
-    access_time = models.DateTimeField(verbose_name="Access Time")
-
-    def __str__(self):
-        return f"Resource {self.resource_id} accessed by {self.user_id}"
-
-    class Meta:
-        db_table = 'resource_access'
-
-class Submission(models.Model):
-    id = models.BigIntegerField(primary_key=True, verbose_name="Submission Id")
-    assignment_id = models.BigIntegerField(verbose_name="Assignment Id")
-    course_id = models.BigIntegerField(verbose_name="Course Id")
-    user_id = models.BigIntegerField(verbose_name="User Id")
-    # Timestamp of when the submission was submitted.
-    submitted_at = models.DateTimeField(blank=True, null=True, verbose_name="Submitted DateTime")
-    score = models.FloatField(blank=True, null=True, verbose_name="Score")
-    graded_date = models.DateTimeField(blank=True, null=True, verbose_name="Graded DateTime")
-    # This is used for tracking of grade posted date and not used in Assignment view hence making it CharField
-    grade_posted = models.DateTimeField(blank=True, null=True, verbose_name="Posted Grade DateTime")
-    avg_score = models.FloatField(blank=True, null=True, verbose_name="Average Grade")
-
-    def __str__(self):
-        return f"Submission Id {self.id} for assignment id {self.assignment_id} for course id {self.course_id} for user id {self.user_id}"
-
-    class Meta:
-        db_table = 'submission'
-
 
 class UnizinMetadata(models.Model):
     pkey = models.CharField(primary_key=True, max_length=20, verbose_name="Key")
@@ -403,3 +371,35 @@ class User(models.Model):
     class Meta:
         db_table = 'user'
         unique_together = (('id', 'course_id'),)
+
+class ResourceAccess(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name="Table Id")
+    resource_id = models.ForeignKey(Resource, on_delete=models.CASCADE, to_field='resource_id', db_column='resource_id')
+    course_id = models.ForeignKey(Course, null=True, default=None, on_delete=models.CASCADE, db_column='course_id')
+    user_id = models.ForeignKey(User, null=True, default=None, on_delete=models.CASCADE, db_column='user_id')
+    access_time = models.DateTimeField(verbose_name="Access Time")
+
+    def __str__(self):
+        return f"Resource {self.resource_id} accessed by {self.user_id}"
+
+    class Meta:
+        db_table = 'resource_access'
+
+class Submission(models.Model):
+    id = models.BigIntegerField(primary_key=True, verbose_name="Submission Id")
+    assignment_id = models.BigIntegerField(verbose_name="Assignment Id")
+    course_id = models.BigIntegerField(verbose_name="Course Id")
+    user_id = models.ForeignKey(User, null=True, default=None, on_delete=models.CASCADE, db_column='user_id')
+    # Timestamp of when the submission was submitted.
+    submitted_at = models.DateTimeField(blank=True, null=True, verbose_name="Submitted DateTime")
+    score = models.FloatField(blank=True, null=True, verbose_name="Score")
+    graded_date = models.DateTimeField(blank=True, null=True, verbose_name="Graded DateTime")
+    # This is used for tracking of grade posted date and not used in Assignment view hence making it CharField
+    grade_posted = models.DateTimeField(blank=True, null=True, verbose_name="Posted Grade DateTime")
+    avg_score = models.FloatField(blank=True, null=True, verbose_name="Average Grade")
+
+    def __str__(self):
+        return f"Submission Id {self.id} for assignment id {self.assignment_id} for course id {self.course_id} for user id {self.user_id}"
+
+    class Meta:
+        db_table = 'submission'
