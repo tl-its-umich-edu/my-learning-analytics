@@ -86,7 +86,7 @@ if [ "${IS_CRON_POD:-"false"}" == "false" ]; then
         --timeout="${GUNICORN_TIMEOUT}" \
         --access-logfile='-' \
         --error-logfile='-' \
-        --access-logformat='%({x-forwarded-for}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s %(L)s' \
+        --access-logformat='%(t)s [HTTP:%(s)s] [%({x-forwarded-for}i)s] "%(r)s" %(L)s' \
         ${GUNICORN_RELOAD}
 
 else
