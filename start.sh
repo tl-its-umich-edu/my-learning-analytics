@@ -84,6 +84,7 @@ if [ "${IS_CRON_POD:-"false"}" == "false" ]; then
         --bind 0.0.0.0:${GUNICORN_PORT} \
         --workers="${GUNICORN_WORKERS}" \
         --timeout="${GUNICORN_TIMEOUT}" \
+        --access-logformat='%({x-forwarded-for}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s %(L)s' \
         ${GUNICORN_RELOAD}
 
 else
