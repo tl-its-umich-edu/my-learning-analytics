@@ -7,7 +7,7 @@ const mylaGlobals = mylaGlobalsEl ? JSON.parse(mylaGlobalsEl.textContent) : {}
 
 let cspNonce
 const cspMetaEl = document.querySelector('meta[name="csp-nonce"]')
-if (cspMetaEl !== null & cspMetaEl.hasAttribute('content')) {
+if (cspMetaEl !== null && cspMetaEl.hasAttribute('content')) {
   cspNonce = cspMetaEl.getAttribute('content')
 }
 
