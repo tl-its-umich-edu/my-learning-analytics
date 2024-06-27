@@ -25,9 +25,9 @@ logger = logging.getLogger(__name__)
 class AcademicTerms(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Term Id")
     canvas_id = models.BigIntegerField(verbose_name="Canvas Id")
-    name = models.CharField(max_length=255)
-    date_start = models.DateTimeField(verbose_name="Start Date and Time", blank=True, null=True)
-    date_end = models.DateTimeField(verbose_name="End Date and Time", blank=True, null=True)
+    name = models.CharField(max_length=255, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
+    date_start = models.DateTimeField(verbose_name="Start Date and Time", blank=True, null=True, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
+    date_end = models.DateTimeField(verbose_name="End Date and Time", blank=True, null=True, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
 
     def __str__(self):
         return self.name
@@ -195,15 +195,15 @@ class Course(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Course Id", db_column='id', editable=False)
     canvas_id = models.BigIntegerField(verbose_name="Canvas Course Id", db_column='canvas_id')
     term = models.ForeignKey(AcademicTerms, on_delete=models.SET_NULL, db_column="term_id", null=True, db_constraint=False)
-    name = models.CharField(max_length=255)
-    date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
-    date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)
+    name = models.CharField(max_length=255, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
+    date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
+    date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
     show_grade_counts = models.BooleanField(blank=False, null=False, default=False, verbose_name=
                                          "Show Grade Counts")
     GRADING_CHOICES = [('Percent', 'Percent'), ('Point', 'Point'), ]
     show_grade_type = models.CharField(verbose_name="Show Grade Type", max_length=255,
                                          choices=GRADING_CHOICES, default='Percent')
-    data_last_updated = models.DateTimeField(null=True, blank=True)
+    data_last_updated = models.DateTimeField(null=True, blank=True, help_text="This is the last time the cron was run and can be reset on the main courses page with the dropdown")
     date_created = models.DateTimeField(verbose_name="Date course was created", default=datetime.now, null=True, blank=True)
 
     objects = CourseQuerySet().as_manager()
