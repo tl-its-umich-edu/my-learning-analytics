@@ -168,7 +168,7 @@ def update_course_info(request, course_id=0):
     :param course_id: Integer Canvas course ID number, typically six digits or less.
     :return: JsonResponse containing `{"default": "success"}` or `{"default": "fail"}`
     """
-    logger.info(update_course_info.__name__)
+    logger.debug(update_course_info.__name__)
 
     if (request.method != 'PUT'):
         return JsonResponse({'error': 'Invalid request method.'}, status=400)
@@ -285,7 +285,7 @@ def resource_access_within_week(request, course_id=0):
         "enrollment_type": "StudentEnrollment"
         })
     total_number_student = total_number_student_df.iloc[0,0]
-    logger.info(f"course_id {course_id} total student={total_number_student}")
+    logger.debug(f"course_id {course_id} total student={total_number_student}")
     if total_number_student == 0:
         logger.info(f"There are no students in the percent grade range {grade} for course {course_id}")
         return HttpResponse("{}")
@@ -444,7 +444,7 @@ def resource_access_within_week(request, course_id=0):
 @permission_required('dashboard.grade_distribution',
     fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def grade_distribution(request, course_id=0):
-    logger.info(grade_distribution.__name__)
+    logger.debug(grade_distribution.__name__)
 
     course_id = canvas_id_to_incremented_id(course_id)
 
@@ -521,7 +521,7 @@ def update_user_default_selection_for_views(request, course_id=0):
     :param course_id: Integer Canvas course ID number, typically six digits or less.
     :return: HttpResponse containing `{"default": "success"}` or `{"default": "fail"}`
     """
-    logger.info(update_user_default_selection_for_views.__name__)
+    logger.debug(update_user_default_selection_for_views.__name__)
     course_id = canvas_id_to_incremented_id(course_id)
     current_user = request.user.get_username()
     default_selection = json.loads(request.body.decode("utf-8"))
@@ -553,7 +553,7 @@ def update_user_default_selection_for_views(request, course_id=0):
 @permission_required('dashboard.get_user_default_selection',
     fn=objectgetter(Course, 'course_id','canvas_id'), raise_exception=True)
 def get_user_default_selection(request, course_id=0):
-    logger.info(get_user_default_selection.__name__)
+    logger.debug(get_user_default_selection.__name__)
     course_id = canvas_id_to_incremented_id(course_id)
     user_sis_name = request.user.get_username()
     default_view_type = request.GET.get('default_type')
@@ -583,7 +583,7 @@ def user_percent(row):
 
 
 def get_course_date_start(course_id):
-    logger.info(get_course_date_start.__name__)
+    logger.debug(get_course_date_start.__name__)
     course_date_start = Course.objects.get(id=course_id).determine_date_start()
     return course_date_start
 

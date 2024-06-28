@@ -465,7 +465,7 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
-        logger.info("update_groups(): ")
+        logger.debug("update_groups(): ")
 
         # delete all records in assignment_group table
         status += self.execute_myla_delete_query("DELETE FROM assignment_groups")
@@ -489,7 +489,7 @@ class DashboardCronJob(CronJobBase):
         # Load the assignment info w.r.t to a course such as due_date, points etc
         status = ""
 
-        logger.info("update_assignment(): ")
+        logger.debug("update_assignment(): ")
 
         # delete all records in assignment table
         status += self.execute_myla_delete_query("DELETE FROM assignment")
@@ -510,7 +510,7 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
-        logger.info("update_submission(): ")
+        logger.debug("update_submission(): ")
 
         # delete all records in submission table
         status += self.execute_myla_delete_query("DELETE FROM submission")
@@ -536,7 +536,7 @@ class DashboardCronJob(CronJobBase):
         # the result of it return boolean indicating weight is considered in table calculation or not
         status = ""
 
-        logger.info("weight_consideration()")
+        logger.debug("weight_consideration()")
 
         # delete all records in assignment_weight_consideration table
         status += self.execute_myla_delete_query("DELETE FROM assignment_weight_consideration")
@@ -559,7 +559,7 @@ class DashboardCronJob(CronJobBase):
         Searches warehouse data for new terms and adds them while leaving existing terms as they are.
         """
         status: str = ''
-        logger.info('update_term()')
+        logger.debug('update_term()')
 
         term_sql: str = self.queries['term']
         logger.debug(term_sql)
@@ -587,7 +587,7 @@ class DashboardCronJob(CronJobBase):
         Updates course records with data returned from verify_course_ids, only making changes when necessary.
         """
         status: str = ''
-        logger.info('update_course()')
+        logger.debug('update_course()')
 
         logger.debug(warehouse_courses_data.to_json(orient='records'))
         courses: QuerySet = Course.objects.filter(id__in=self.valid_locked_course_ids)
