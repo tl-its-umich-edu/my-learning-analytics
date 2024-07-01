@@ -23,8 +23,8 @@ logger = logging.getLogger(__name__)
 
 
 class AcademicTerms(models.Model):
-    id = models.BigIntegerField(primary_key=True, verbose_name="Term Id")
-    canvas_id = models.BigIntegerField(verbose_name="Canvas Id")
+    id = models.BigIntegerField(primary_key=True, verbose_name="Academic Term Id")
+    canvas_id = models.BigIntegerField(verbose_name="Academic Term Canvas Id")
     name = models.CharField(max_length=255, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
     date_start = models.DateTimeField(verbose_name="Start Date and Time", blank=True, null=True, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
     date_end = models.DateTimeField(verbose_name="End Date and Time", blank=True, null=True, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
