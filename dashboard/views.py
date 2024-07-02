@@ -525,7 +525,7 @@ def update_user_default_selection_for_views(request, course_id=0):
     course_id = canvas_id_to_incremented_id(course_id)
     current_user = request.user.get_username()
     default_selection = json.loads(request.body.decode("utf-8"))
-    logger.info(default_selection)
+    logger.info(default_selection) # could be debug message
     default_type = list(default_selection.keys())[0]
     default_type_value = default_selection.get(default_type)
     logger.info(f"request to set default for type: {default_type} and default_type value: {default_type_value}")

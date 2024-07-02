@@ -167,7 +167,7 @@ def get_user_courses_info(username: str, course_id: Union[int, None] = None) -> 
     for course in courses:
         course_enrollments[course.canvas_id]['course_name'] = course.name
     enrollments = list(course_enrollments.values())
-    logger.info(f'User {username} is enrolled in these courses: {enrollments}')
+    logger.debug(f'User {username} is enrolled in these courses: {enrollments}')
     return enrollments
 
 
