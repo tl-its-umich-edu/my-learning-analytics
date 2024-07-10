@@ -23,6 +23,16 @@ from dashboard.models import Course, Resource, AcademicTerms, User
 
 logger = logging.getLogger(__name__)
 
+# Decorator to clean up function call logging
+def log_function_call(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        logging.info(f"Calling function: {func.__name__}")
+        result = func(*args, **kwargs)
+        logging.info(f"Function {func.__name__} completed")
+        return result
+    return wrapper
+
 # cron job to populate course and user tables
 class DashboardCronJob(CronJobBase):
 
@@ -461,6 +471,7 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
+    @log_function_call
     def update_groups(self):
         # cron status
         status = ""
@@ -485,6 +496,7 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
+    @log_function_call
     def update_assignment(self):
         # Load the assignment info w.r.t to a course such as due_date, points etc
         status = ""
@@ -505,6 +517,7 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
+    @log_function_call
     def submission(self):
         # student submission information for assignments
         # cron status
@@ -531,6 +544,7 @@ class DashboardCronJob(CronJobBase):
         # returns the row size of dataframe
         return status
 
+    @log_function_call
     def weight_consideration(self):
         # load the assignment weight consider information with in a course. Some assignments don't have weight consideration
         # the result of it return boolean indicating weight is considered in table calculation or not
@@ -554,6 +568,7 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
+    @log_function_call
     def update_term(self) -> str:
         """
         Searches warehouse data for new terms and adds them while leaving existing terms as they are.
@@ -582,6 +597,7 @@ class DashboardCronJob(CronJobBase):
                 raise
         return status
 
+    @log_function_call
     def update_course(self, warehouse_courses_data: pd.DataFrame) -> str:
         """
         Updates course records with data returned from verify_course_ids, only making changes when necessary.
