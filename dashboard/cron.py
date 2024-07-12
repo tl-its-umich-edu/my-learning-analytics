@@ -158,7 +158,7 @@ class DashboardCronJob(CronJobBase):
     def verify_course_ids(self):
         # whether all course ids are valid ids
         invalid_course_id_list = []
-        logger.debug("in checking course")
+        logger.debug("in checking course") # maybe remove
         supported_courses = Course.objects.get_supported_courses()
         course_ids = [str(x) for x in supported_courses.values_list('id', flat=True)]
 
@@ -194,7 +194,7 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
-        logger.info("in update with data warehouse user")
+        logger.info("in update with data warehouse user") # maybe remove
 
         # delete all records in the table first
         status += self.execute_myla_delete_query("DELETE FROM user")
@@ -218,7 +218,7 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
-        logger.debug("in update unizin metadata")
+        logger.debug("in update unizin metadata") # maybe remove
 
         # delete all records in the table first
         status += self.execute_myla_delete_query("DELETE FROM unizin_metadata")
@@ -238,7 +238,7 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
-        logger.info("in update canvas resource")
+        logger.info("in update canvas resource") # maybe remove
 
         # Select all the files for these courses
         # convert int array to str array
@@ -266,7 +266,7 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
-        logger.info("in update resource access")
+        logger.info("in update resource access") # maybe remove
 
         # return string with concatenated SQL insert result
         return_string = ""
@@ -476,8 +476,6 @@ class DashboardCronJob(CronJobBase):
         # cron status
         status = ""
 
-        logger.debug("update_groups(): ")
-
         # delete all records in assignment_group table
         status += self.execute_myla_delete_query("DELETE FROM assignment_groups")
 
@@ -501,8 +499,6 @@ class DashboardCronJob(CronJobBase):
         # Load the assignment info w.r.t to a course such as due_date, points etc
         status = ""
 
-        logger.debug("update_assignment(): ")
-
         # delete all records in assignment table
         status += self.execute_myla_delete_query("DELETE FROM assignment")
 
@@ -522,8 +518,6 @@ class DashboardCronJob(CronJobBase):
         # student submission information for assignments
         # cron status
         status = ""
-
-        logger.debug("update_submission(): ")
 
         # delete all records in submission table
         status += self.execute_myla_delete_query("DELETE FROM submission")
@@ -550,8 +544,6 @@ class DashboardCronJob(CronJobBase):
         # the result of it return boolean indicating weight is considered in table calculation or not
         status = ""
 
-        logger.debug("weight_consideration()")
-
         # delete all records in assignment_weight_consideration table
         status += self.execute_myla_delete_query("DELETE FROM assignment_weight_consideration")
 
@@ -574,7 +566,6 @@ class DashboardCronJob(CronJobBase):
         Searches warehouse data for new terms and adds them while leaving existing terms as they are.
         """
         status: str = ''
-        logger.debug('update_term()')
 
         term_sql: str = self.queries['term']
         logger.debug(term_sql)
@@ -603,7 +594,6 @@ class DashboardCronJob(CronJobBase):
         Updates course records with data returned from verify_course_ids, only making changes when necessary.
         """
         status: str = ''
-        logger.debug('update_course()')
 
         logger.debug(warehouse_courses_data.to_json(orient='records'))
         courses: QuerySet = Course.objects.filter(id__in=self.valid_locked_course_ids)
