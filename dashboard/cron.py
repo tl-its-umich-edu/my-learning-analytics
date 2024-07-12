@@ -155,10 +155,10 @@ class DashboardCronJob(CronJobBase):
         return []
 
     # verify whether course ids are valid
+    @log_function_call
     def verify_course_ids(self):
         # whether all course ids are valid ids
         invalid_course_id_list = []
-        logger.debug("in checking course") # maybe remove
         supported_courses = Course.objects.get_supported_courses()
         course_ids = [str(x) for x in supported_courses.values_list('id', flat=True)]
 
@@ -189,12 +189,11 @@ class DashboardCronJob(CronJobBase):
         return CourseVerification(invalid_course_id_list, courses_data)
 
     # Update the user table with the data from the data warehouse
+    @log_function_call
     def update_user(self):
 
         # cron status
         status = ""
-
-        logger.info("in update with data warehouse user") # maybe remove
 
         # delete all records in the table first
         status += self.execute_myla_delete_query("DELETE FROM user")
@@ -212,13 +211,11 @@ class DashboardCronJob(CronJobBase):
         return status
 
     # update unizin metadata from data in the data warehouse
-
+    @log_function_call
     def update_unizin_metadata(self):
 
         # cron status
         status = ""
-
-        logger.debug("in update unizin metadata") # maybe remove
 
         # delete all records in the table first
         status += self.execute_myla_delete_query("DELETE FROM unizin_metadata")
@@ -233,12 +230,10 @@ class DashboardCronJob(CronJobBase):
         return status
 
     # update file records from Canvas that don't have names provided
-
+    @log_function_call
     def update_canvas_resource(self):
         # cron status
         status = ""
-
-        logger.info("in update canvas resource") # maybe remove
 
         # Select all the files for these courses
         # convert int array to str array
@@ -262,11 +257,10 @@ class DashboardCronJob(CronJobBase):
         return status
 
     # update RESOURCE_ACCESS records from BigQuery or LRS data sources
+    @log_function_call
     def update_resource_access(self):
         # cron status
         status = ""
-
-        logger.info("in update resource access") # maybe remove
 
         # return string with concatenated SQL insert result
         return_string = ""
@@ -656,7 +650,6 @@ class DashboardCronJob(CronJobBase):
 
         # continue cron tasks
 
-        logger.info("** term")
         status += self.update_term()
 
         if len(self.valid_locked_course_ids) == 0:
@@ -665,18 +658,14 @@ class DashboardCronJob(CronJobBase):
         else:
             # Update the date unless there is an exception
             exception_in_run = False
-            logger.info("** course")
             status += self.update_course(course_verification.course_data)
 
-            logger.info("** user")
             status += self.update_user()
 
-            logger.info("** assignment")
             status += self.update_groups()
             status += self.update_assignment()
             status += self.submission()
             status += self.weight_consideration()
-            logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
                 try:
                     status += self.update_resource_access()
@@ -686,7 +675,6 @@ class DashboardCronJob(CronJobBase):
                     status += str(e)
                     exception_in_run = True
 
-        logger.info("** informational")
         status += self.update_unizin_metadata()
 
         all_str_course_ids = set(
