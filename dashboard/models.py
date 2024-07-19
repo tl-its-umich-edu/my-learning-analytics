@@ -23,11 +23,11 @@ logger = logging.getLogger(__name__)
 
 
 class AcademicTerms(models.Model):
-    id = models.BigIntegerField(primary_key=True, verbose_name="Term Id")
-    canvas_id = models.BigIntegerField(verbose_name="Canvas Id")
-    name = models.CharField(max_length=255, verbose_name="Name")
-    date_start = models.DateTimeField(verbose_name="Start Date and Time", blank=True, null=True)
-    date_end = models.DateTimeField(verbose_name="End Date and Time", blank=True, null=True)
+    id = models.BigIntegerField(primary_key=True, verbose_name="Academic Term Id")
+    canvas_id = models.BigIntegerField(verbose_name="Academic Term Canvas Id")
+    name = models.CharField(max_length=255, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
+    date_start = models.DateTimeField(verbose_name="Start Date and Time", blank=True, null=True, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
+    date_end = models.DateTimeField(verbose_name="End Date and Time", blank=True, null=True, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
 
     def __str__(self):
         return self.name
@@ -97,7 +97,7 @@ class UserDefaultSelection(models.Model):
 
 class Assignment(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Assignment Id")
-    name = models.CharField(max_length=255, verbose_name="Name", default='')
+    name = models.CharField(max_length=255, default='')
     due_date = models.DateTimeField(blank=True, null=True, verbose_name="Due DateTime")
     points_possible = models.FloatField(blank=True, null=True, verbose_name="Points Possible")
     course_id = models.BigIntegerField(verbose_name="Course Id")
@@ -112,8 +112,8 @@ class Assignment(models.Model):
 
 class AssignmentGroups(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Assignment Group Id")
-    name = models.CharField(max_length=255, verbose_name="Name", default='')
-    weight = models.FloatField(blank=True, null=True, verbose_name="Weight")
+    name = models.CharField(max_length=255, default='')
+    weight = models.FloatField(blank=True, null=True)
     group_points = models.FloatField(blank=True, null=True, verbose_name="Group Points")
     course_id = models.BigIntegerField(verbose_name="Course Id")
     drop_lowest = models.IntegerField(blank=True, null=True, verbose_name="Drop Lowest")
@@ -194,16 +194,16 @@ class CourseQuerySet(models.QuerySet):
 class Course(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Course Id", db_column='id', editable=False)
     canvas_id = models.BigIntegerField(verbose_name="Canvas Course Id", db_column='canvas_id')
-    term = models.ForeignKey(AcademicTerms, verbose_name="Term", on_delete=models.SET_NULL, db_column="term_id", null=True, db_constraint=False)
-    name = models.CharField(max_length=255, verbose_name="Name")
-    date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True)
-    date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True)
+    term = models.ForeignKey(AcademicTerms, on_delete=models.SET_NULL, db_column="term_id", null=True, db_constraint=False)
+    name = models.CharField(max_length=255, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
+    date_start = models.DateTimeField(verbose_name="Start Date and Time", null=True, blank=True, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
+    date_end = models.DateTimeField(verbose_name="End Date and Time", null=True, blank=True, help_text="This field will be automatically populated by cron to match Canvas but can be adjusted if desired")
     show_grade_counts = models.BooleanField(blank=False, null=False, default=False, verbose_name=
                                          "Show Grade Counts")
     GRADING_CHOICES = [('Percent', 'Percent'), ('Point', 'Point'), ]
     show_grade_type = models.CharField(verbose_name="Show Grade Type", max_length=255,
                                          choices=GRADING_CHOICES, default='Percent')
-    data_last_updated = models.DateTimeField(verbose_name="Data last updated", null=True, blank=True)
+    data_last_updated = models.DateTimeField(null=True, blank=True, help_text="This is the last time the cron was run and can be reset on the main courses page with the dropdown")
     date_created = models.DateTimeField(verbose_name="Date course was created", default=datetime.now, null=True, blank=True)
 
     objects = CourseQuerySet().as_manager()
@@ -346,7 +346,7 @@ class Submission(models.Model):
     user_id = models.BigIntegerField(verbose_name="User Id")
     # Timestamp of when the submission was submitted.
     submitted_at = models.DateTimeField(blank=True, null=True, verbose_name="Submitted DateTime")
-    score = models.FloatField(blank=True, null=True, verbose_name="Score")
+    score = models.FloatField(blank=True, null=True)
     graded_date = models.DateTimeField(blank=True, null=True, verbose_name="Graded DateTime")
     # This is used for tracking of grade posted date and not used in Assignment view hence making it CharField
     grade_posted = models.DateTimeField(blank=True, null=True, verbose_name="Posted Grade DateTime")
