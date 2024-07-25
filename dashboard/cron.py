@@ -52,7 +52,7 @@ class DashboardCronJob(CronJobBase):
 
     def setup_bigquery(self):
         # Instantiates a client
-        self.bigquery_client = bigquery.Client()
+        self.bigquery_client = bigquery.Client(project="udp-umich-prod")
 
         # BQ Total Bytes Billed to report to status
         self.total_bytes_billed = 0
@@ -653,6 +653,7 @@ class DashboardCronJob(CronJobBase):
 
         status += self.update_term()
 
+        exception_in_run = False
         if len(self.valid_locked_course_ids) == 0:
             logger.info("Skipping course-related table updates...")
             status += "Skipped course-related table updates.\n"
@@ -676,6 +677,7 @@ class DashboardCronJob(CronJobBase):
                     status += str(e)
                     exception_in_run = True
 
+        logger.info("** informational")
         status += self.update_unizin_metadata()
 
         all_str_course_ids = set(
