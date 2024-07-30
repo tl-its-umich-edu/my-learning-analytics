@@ -5,7 +5,7 @@
         // and it wouldn’t reflect when the data was actually dumped from canvas.
         // More info on UDP's batch-ingest DAG process can be found here: https://resources.unizin.org/display/UDP/Batch-ingest+application
         '''
-            SELECT * FROM EXTERNAL_QUERY("unizin-shared.context_store", "select 'canvasdatadate' as pkey, min(dag_run) as pvalue from report.publish_info pi2");        
+            SELECT * FROM EXTERNAL_QUERY("context_store", "select 'canvasdatadate' as pkey, min(dag_run) as pvalue from report.publish_info pi2");        
         ''',
     "user" :
         '''
@@ -27,18 +27,18 @@
                 when cse.role = 'Teacher' then 'TeacherEnrollment'
                 else '' end
                 as enrollment_type
-        from unizin-shared.context_store_entity.course_section_enrollment cse
-        left join unizin-shared.context_store_entity.course_section cs
+        from context_store_entity.course_section_enrollment cse
+        left join context_store_entity.course_section cs
             on cse.course_section_id = cs.course_section_id
-        left join unizin-shared.context_store_keymap.course_offering co
+        left join context_store_keymap.course_offering co
             on cs.le_current_course_offering_id = co.id
-        left join unizin-shared.context_store_entity.person p
+        left join context_store_entity.person p
             on cse.person_id = p.person_id
-        left join unizin-shared.context_store_keymap.person p2
+        left join context_store_keymap.person p2
             on p.person_id = p2.id
-        left join unizin-shared.context_store_entity.person_email pe
+        left join context_store_entity.person_email pe
             on p.person_id = pe.person_id
-        left join unizin-shared.context_store_entity.course_grade cg
+        left join context_store_entity.course_grade cg
             on cse.course_section_id = cg.course_section_id and cse.person_id = cg.person_id
         where
             co.lms_int_id IN UNNEST(@course_ids)
@@ -51,7 +51,7 @@
         '''
         with assignment_details as (
             select la.due_date, title, la.course_offering_id, la.learner_activity_id, la.points_possible, la.learner_activity_group_id
-            from unizin-shared.context_store_entity.learner_activity la, unizin-shared.context_store_keymap.course_offering co
+            from context_store_entity.learner_activity la, context_store_keymap.course_offering co
             where
                 la.visibility = 'everyone'
                 and	la.status = 'published'
@@ -59,7 +59,7 @@
                 and co.lms_int_id IN UNNEST(@course_ids)
             ), assignment_grp as (
                 select lg.*
-                from unizin-shared.context_store_entity.learner_activity_group lg, unizin-shared.context_store_keymap.course_offering co
+                from context_store_entity.learner_activity_group lg, context_store_keymap.course_offering co
                 where
                 lg.status = 'available'
                 and lg.course_offering_id = co.id
@@ -84,7 +84,7 @@
             ), assign_rules as (
                 select distinct ad.learner_activity_group_id, agr.drop_lowest_amount as drop_lowest, agr.drop_highest_amount as drop_highest
                 from grp_full ad
-                join unizin-shared.context_store_entity.learner_activity_group agr
+                join context_store_entity.learner_activity_group agr
                     on ad.learner_activity_group_id = agr.learner_activity_group_id
             ), assignment_grp_points as (
                 select ag.*, am.group_points AS group_points, ar.drop_lowest as drop_lowest, ar.drop_highest as drop_highest
@@ -101,8 +101,8 @@
             agp.drop_lowest as drop_lowest, 
             agp.drop_highest as drop_highest
             from assignment_grp_points agp, 
-            unizin-shared.context_store_keymap.course_offering co_km, 
-            unizin-shared.context_store_keymap.learner_activity_group lag_km
+            context_store_keymap.course_offering co_km, 
+            context_store_keymap.learner_activity_group lag_km
             where agp.course_offering_id = co_km.id
             and agp.learner_activity_group_id = lag_km.id
             order by id
@@ -119,10 +119,10 @@
                 la.points_possible as points_possible,
                 cast(lag_km.lms_int_id as INT64) as assignment_group_id
             from
-                unizin-shared.context_store_entity.learner_activity la,
-                unizin-shared.context_store_keymap.course_offering co,
-                unizin-shared.context_store_keymap.learner_activity la_km,
-                unizin-shared.context_store_keymap.learner_activity_group lag_km
+                context_store_entity.learner_activity la,
+                context_store_keymap.course_offering co,
+                context_store_keymap.learner_activity la_km,
+                context_store_keymap.learner_activity_group lag_km
             where
                 la.visibility = 'everyone'
                 and	la.status = 'published'
@@ -145,8 +145,8 @@
                 cast(0 as boolean)
             end as consider_weight
         from
-            unizin-shared.context_store_entity.learner_activity_group lag,
-            unizin-shared.context_store_keymap.course_offering co_km
+            context_store_entity.learner_activity_group lag,
+            context_store_keymap.course_offering co_km
         where
             lag.course_offering_id = co_km.id
             and co_km.lms_int_id IN UNNEST(@course_ids)
@@ -161,8 +161,8 @@
             a.le_term_begin_date as date_start,
             a.le_term_end_date as date_end
         from
-            unizin-shared.context_store_entity.academic_term as a
-            left join unizin-shared.context_store_keymap.academic_term as ka on ka.id = a.academic_term_id
+            context_store_entity.academic_term as a
+            left join context_store_keymap.academic_term as ka on ka.id = a.academic_term_id
         where
             ka.lms_ext_id is not null
         order by id
@@ -180,10 +180,10 @@
             TIMESTAMP(co.le_start_date) as start_at,
             TIMESTAMP(co.le_end_date) as conclude_at
         FROM
-            unizin-shared.context_store_entity.course_offering co
-            LEFT OUTER JOIN unizin-shared.context_store_entity.academic_term at1 on (co.academic_term_id = at1.academic_term_id),
-            unizin-shared.context_store_keymap.course_offering co2,
-            unizin-shared.context_store_keymap.academic_term at2
+            context_store_entity.course_offering co
+            LEFT OUTER JOIN context_store_entity.academic_term at1 on (co.academic_term_id = at1.academic_term_id),
+            context_store_keymap.course_offering co2,
+            context_store_keymap.academic_term at2
             WHERE co2.lms_int_id IN UNNEST(@course_ids)
             and co.course_offering_id = co2.id
             and at1.academic_term_id = at2.id
@@ -194,7 +194,7 @@
             cast(f_km.lms_int_id as BIGINT) as id, 
             f.status as file_state, 
             f.display_name as display_name
-        from unizin-shared.context_store_entity.file f, unizin-shared.context_store_keymap.file f_km, unizin-shared.context_store_keymap.course_offering co_km
+        from context_store_entity.file f, context_store_keymap.file f_km, context_store_keymap.course_offering co_km
         where
             f.course_offering_id = co_km.id
             and f.file_id = f_km.id
@@ -207,10 +207,10 @@
         (
             select
                 distinct cse.person_id as user_id
-            from unizin-shared.context_store_entity.course_section_enrollment cse
-                left join unizin-shared.context_store_entity.course_section cs
+            from context_store_entity.course_section_enrollment cse
+                left join context_store_entity.course_section cs
                     on cse.course_section_id = cs.course_section_id
-                left join unizin-shared.context_store_keymap.course_offering co
+                left join context_store_keymap.course_offering co
                     on cs.le_current_course_offering_id = co.id
             where 
                 co.lms_int_id in UNNEST(@course_ids)
@@ -236,14 +236,14 @@
                 lar.person_id as short_user_id,
                 lar2.lms_int_id as submission_id,
                 CAST(@canvas_data_id_increment AS INT64) + CAST(p.lms_ext_id AS INT64) as canvas_user_id
-            from unizin-shared.context_store_entity.learner_activity_result lar
+            from context_store_entity.learner_activity_result lar
             join enrollment on lar.person_id= enrollment.user_id
             join enrollment e on lar.person_id = e.user_id
-            join unizin-shared.context_store_keymap.learner_activity_result lar2 on lar.learner_activity_result_id = lar2.id
-            left join unizin-shared.context_store_entity.learner_activity la on lar.learner_activity_id = la.learner_activity_id
-                left join unizin-shared.context_store_keymap.learner_activity la2 on la.learner_activity_id = la2.id
-                left join unizin-shared.context_store_keymap.course_offering co on co.id = la.course_offering_id
-                join unizin-shared.context_store_keymap.person p on p.id = lar.person_id
+            join context_store_keymap.learner_activity_result lar2 on lar.learner_activity_result_id = lar2.id
+            left join context_store_entity.learner_activity la on lar.learner_activity_id = la.learner_activity_id
+                left join context_store_keymap.learner_activity la2 on la.learner_activity_id = la2.id
+                left join context_store_keymap.course_offering co on co.id = la.course_offering_id
+                join context_store_keymap.person p on p.id = lar.person_id
             where
                 co.lms_int_id in UNNEST(@course_ids)
                 and la.status = 'published'

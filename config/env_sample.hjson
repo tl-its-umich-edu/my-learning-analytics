@@ -304,5 +304,11 @@
     "COURSES_ENABLED": false,
 
     # Path to the hjson file contains cron queries
-    "CRON_QUERY_FILE": "config/cron_udp.hjson"
+    "CRON_QUERY_FILE": "config/cron_udp.hjson",
+
+    # Change the default Bigquery Project ID
+    "DEFAULT_PROJECT_ID": "udp-umich-prod",
+    # Change the dataset project ID where queries are run against
+    "DATASET_PROJECT_ID": "unizin-shared"
+    
 }
