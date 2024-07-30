@@ -90,7 +90,7 @@
         "ROOT_PASSWORD": "student_dashboard_root_pw"
     },
     # Default Canvas Data id increment for course id, user id, etc
-    "CANVAS_DATA_ID_INCREMENT": 17700000000000000,
+    "CANVAS_DATA_ID_INCREMENT": 1000000000000,
     # Canvas Configuration
     "CANVAS_USER": "",
     # strings for construct file download url
