@@ -100,24 +100,24 @@ class DashboardCronJob(CronJobBase):
         # Remove the newlines from the query
         query = query.replace("\n", " ")
 
-        if bq_job_config:
-            try:
-                # Convert to bq schema object
-                query_job = self.bigquery_client.query(query, job_config=bq_job_config)
-                query_job_result = query_job.result()
+        # Create a new QueryJobConfig if none is provided
+        if bq_job_config is None:
+            bq_job_config = bigquery.QueryJobConfig()
 
-                self.total_bytes_billed += query_job.total_bytes_billed
-                logger.debug(f"This job had {query_job.total_bytes_billed} bytes. Total: {self.total_bytes_billed}")
-                return query_job_result
-            except Exception as e:
-                logger.error(f"Error ({str(e)}) in setting up schema for query {query}.")
-                raise Exception(e)
-        else:
-            query_job = self.bigquery_client.query(query)
+        # Add the dataset_project_id connection property to the job config
+        bq_job_config.connection_properties = [bigquery.ConnectionProperty("dataset_project_id", settings.DATASET_PROJECT_ID)]
+
+        try:
+            # Convert to bq schema object
+            query_job = self.bigquery_client.query(query, job_config=bq_job_config)
             query_job_result = query_job.result()
             self.total_bytes_billed += query_job.total_bytes_billed
             logger.debug(f"This job had {query_job.total_bytes_billed} bytes. Total: {self.total_bytes_billed}")
-            return query_job_result
+        except Exception as e:
+            logger.error(f"Error ({str(e)}) in setting up schema for query {query}.")
+            raise Exception(e)
+
+        return query_job_result
 
     # Execute a query against the MyLA database
     def execute_myla_query(self, query: str, params: Optional[Dict] = None) -> ResultProxy:
@@ -314,6 +314,7 @@ class DashboardCronJob(CronJobBase):
                         'canvas_event_urls', 'STRING', settings.CANVAS_EVENT_URLS))
                 job_config = bigquery.QueryJobConfig()
                 job_config.query_parameters = query_params
+                job_config.connection_properties = [bigquery.ConnectionProperty("dataset_project_id", settings.DATASET_PROJECT_ID)]
 
                 # Location must match that of the dataset(s) referenced in the query.
                 bq_job = self.bigquery_client.query(final_query, location='US', job_config=job_config)
