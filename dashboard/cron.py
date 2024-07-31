@@ -52,7 +52,8 @@ class DashboardCronJob(CronJobBase):
 
     def setup_bigquery(self):
         # Instantiates a client
-        self.bigquery_client = bigquery.Client(project="udp-umich-prod")
+        # self.bigquery_client = bigquery.Client(project="udp-umich-prod")
+        self.bigquery_client = bigquery.Client(project="unizin-shared")
 
         # BQ Total Bytes Billed to report to status
         self.total_bytes_billed = 0
