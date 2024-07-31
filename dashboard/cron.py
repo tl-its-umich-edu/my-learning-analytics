@@ -3,6 +3,7 @@ import logging
 from collections import namedtuple
 from typing import Any, Dict, List, Optional, Union
 from zoneinfo import ZoneInfo
+from functools import wraps
 
 import hjson
 import pandas as pd
@@ -19,8 +20,6 @@ from sqlalchemy.orm import sessionmaker
 
 from dashboard.common import db_util
 from dashboard.models import Course, Resource, AcademicTerms, User
-
-from functools import wraps
 
 
 logger = logging.getLogger(__name__)
