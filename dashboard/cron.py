@@ -20,6 +20,8 @@ from sqlalchemy.orm import sessionmaker
 from dashboard.common import db_util
 from dashboard.models import Course, Resource, AcademicTerms, User
 
+from functools import wraps
+
 
 logger = logging.getLogger(__name__)
 
