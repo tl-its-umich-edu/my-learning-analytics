@@ -90,6 +90,7 @@
         "ROOT_PASSWORD": "student_dashboard_root_pw"
     },
     # Default Canvas Data id increment for course id, user id, etc
+    # for Unizin synthetic data, the value is 1000000000000
     "CANVAS_DATA_ID_INCREMENT": 1000000000000,
     # Canvas Configuration
     "CANVAS_USER": "",
