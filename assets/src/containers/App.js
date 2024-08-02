@@ -8,8 +8,8 @@ import { Helmet } from 'react-helmet'
 import useGoogleAnalytics from 'react-ga-onetrust-consent'
 
 function App (props) {
-  const { user, gaId, cspNonce } = props
-  useGoogleAnalytics({ googleAnalyticsId: gaId, nonce: cspNonce })
+  const { user, gaId, cspNonce, oneTrustScriptDomain } = props
+  useGoogleAnalytics({ googleAnalyticsId: gaId, nonce: cspNonce, oneTrustScriptDomain})
 
   if (!user.isLoggedIn) {
     if (user.loginURL === '') {
