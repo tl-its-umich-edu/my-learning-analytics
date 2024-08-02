@@ -6,7 +6,7 @@ import './index.css'
 import App from './containers/App'
 import client from './service/client'
 import { ApolloProvider } from '@apollo/client'
-import { user, siteTheme, gaId, cspNonce, oneTrustScriptDomain } from './globals'
+import { user, siteTheme, gaId, cspNonce } from './globals'
 // import * as serviceWorker from './serviceWorker'
 
 const container = document.getElementById('root')
@@ -15,7 +15,7 @@ root.render(
   <Router basename='/'>
     <ApolloProvider client={client}>
       <ThemeProvider theme={siteTheme}>
-        <App user={user} gaId={gaId} cspNonce={cspNonce} oneTrustScriptDomain={oneTrustScriptDomain} />
+        <App user={user} gaId={gaId} cspNonce={cspNonce} />
       </ThemeProvider>
     </ApolloProvider>
   </Router>

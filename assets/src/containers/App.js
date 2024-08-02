@@ -1,15 +1,14 @@
 import React from 'react'
 import { Route, Routes, useMatch } from 'react-router-dom'
+import GoogleAnalyticsTracking from '../components/GoogleAnalyticsTracking'
 import CourseList from './CourseList'
 import Course from './Course'
 import WarningBanner from '../components/WarningBanner'
 import AlertBanner from '../components/AlertBanner'
 import { Helmet } from 'react-helmet'
-import useGoogleAnalytics from 'react-ga-onetrust-consent'
 
 function App (props) {
-  const { user, gaId, cspNonce, oneTrustScriptDomain } = props
-  useGoogleAnalytics({ googleAnalyticsId: gaId, nonce: cspNonce, oneTrustScriptDomain})
+  const { user, gaId, cspNonce } = props
 
   if (!user.isLoggedIn) {
     if (user.loginURL === '') {
@@ -22,6 +21,7 @@ function App (props) {
   return (
     <>
       <Helmet titleTemplate='%s | My Learning Analytics' title='Courses' />
+      <GoogleAnalyticsTracking {...{ gaId, cspNonce }} />
       <Routes>
         <Route path='/' element={<CourseList user={user} />} />
         <Route path='/courses' element={<CourseList user={user} />} />
