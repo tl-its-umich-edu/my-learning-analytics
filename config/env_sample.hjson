@@ -11,15 +11,12 @@
     ],
     # The URL of a generic help or documentation site, to be used in the front end's drop-down menu
     "HELP_URL": "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics",
-    "PRIVACY_REDIRECT_URL": "https://umich.edu/about/privacy/"
     # Help for views. Specify URLs to overide defaults
     # URL_VIEW_RESOURCES_ACCESSED
     # URL_VIEW_ASSIGNMENT_PLANNING
     # URL_VIEW_GRADE_DISTRIBUTION
     # ID for your Google Analytics, defaults to nothing/disabled
     "GA_ID": "",
-    # ID of OneTrust script domain, used for google analytics integration
-    "OT_SCRIPT_DOMAIN": ""
     # The hex value to be used in the front end for the primary color of the palette and theme
     "PRIMARY_UI_COLOR": "#00274C",
     # Configuration of CSP see https://django-csp.readthedocs.io/en/latest/configuration.html
