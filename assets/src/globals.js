@@ -55,6 +55,5 @@ const siteTheme = createTheme({
   props: componentSettings
 })
 const gaId = mylaGlobals.google_analytics_id
-const oneTrustScriptDomain = mylaGlobals.one_trust_script_domain
 
-export { user, siteTheme, gaId, cspNonce,oneTrustScriptDomain, viewHelpURLs, surveyLink }
+export { user, siteTheme, gaId, cspNonce, viewHelpURLs, surveyLink }
