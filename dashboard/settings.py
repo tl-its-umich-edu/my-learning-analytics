@@ -449,6 +449,12 @@ CANVAS_EVENT_URLS = ENV.get("CANVAS_EVENT_URLS", [])
 # Only need view permission for exports
 IMPORT_EXPORT_EXPORT_PERMISSION_CODE = 'view'
 
+# Change the default project ID for BigQuery if needed (This is typically the one that quotas are run against and logged into)
+DEFAULT_PROJECT_ID = ENV.get("DEFAULT_PROJECT_ID", None)
+
+# Override the default project ID for BigQuery if needed, like to unizin-shared
+DATASET_PROJECT_ID = ENV.get("DATASET_PROJECT_ID", None)
+
 # IMPORT LOCAL ENV
 # =====================
 try:
