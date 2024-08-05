@@ -3,6 +3,7 @@ import logging
 from collections import namedtuple
 from typing import Any, Dict, List, Optional, Union
 from zoneinfo import ZoneInfo
+from functools import wraps
 
 import hjson
 import pandas as pd
@@ -22,6 +23,16 @@ from dashboard.models import Course, Resource, AcademicTerms, User
 
 
 logger = logging.getLogger(__name__)
+
+# Decorator to clean up function call logging
+def log_function_call(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        logging.info(f"Calling function: {func.__name__}")
+        result = func(*args, **kwargs)
+        logging.info(f"Function {func.__name__} completed")
+        return result
+    return wrapper
 
 # cron job to populate course and user tables
 class DashboardCronJob(CronJobBase):
@@ -145,10 +156,10 @@ class DashboardCronJob(CronJobBase):
         return []
 
     # verify whether course ids are valid
+    @log_function_call
     def verify_course_ids(self):
         # whether all course ids are valid ids
         invalid_course_id_list = []
-        logger.debug("in checking course")
         supported_courses = Course.objects.get_supported_courses()
         course_ids = [str(x) for x in supported_courses.values_list('id', flat=True)]
 
@@ -179,12 +190,11 @@ class DashboardCronJob(CronJobBase):
         return CourseVerification(invalid_course_id_list, courses_data)
 
     # Update the user table with the data from the data warehouse
+    @log_function_call
     def update_user(self):
 
         # cron status
         status = ""
-
-        logger.info("in update with data warehouse user")
 
         # delete all records in the table first
         status += self.execute_myla_delete_query("DELETE FROM user")
@@ -202,13 +212,11 @@ class DashboardCronJob(CronJobBase):
         return status
 
     # update unizin metadata from data in the data warehouse
-
+    @log_function_call
     def update_unizin_metadata(self):
 
         # cron status
         status = ""
-
-        logger.debug("in update unizin metadata")
 
         # delete all records in the table first
         status += self.execute_myla_delete_query("DELETE FROM unizin_metadata")
@@ -223,12 +231,10 @@ class DashboardCronJob(CronJobBase):
         return status
 
     # update file records from Canvas that don't have names provided
-
+    @log_function_call
     def update_canvas_resource(self):
         # cron status
         status = ""
-
-        logger.info("in update canvas resource")
 
         # Select all the files for these courses
         # convert int array to str array
@@ -252,11 +258,10 @@ class DashboardCronJob(CronJobBase):
         return status
 
     # update RESOURCE_ACCESS records from BigQuery or LRS data sources
+    @log_function_call
     def update_resource_access(self):
         # cron status
         status = ""
-
-        logger.info("in update resource access")
 
         # return string with concatenated SQL insert result
         return_string = ""
@@ -461,11 +466,10 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
+    @log_function_call
     def update_groups(self):
         # cron status
         status = ""
-
-        logger.info("update_groups(): ")
 
         # delete all records in assignment_group table
         status += self.execute_myla_delete_query("DELETE FROM assignment_groups")
@@ -485,11 +489,10 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
+    @log_function_call
     def update_assignment(self):
         # Load the assignment info w.r.t to a course such as due_date, points etc
         status = ""
-
-        logger.info("update_assignment(): ")
 
         # delete all records in assignment table
         status += self.execute_myla_delete_query("DELETE FROM assignment")
@@ -505,12 +508,11 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
+    @log_function_call
     def submission(self):
         # student submission information for assignments
         # cron status
         status = ""
-
-        logger.info("update_submission(): ")
 
         # delete all records in submission table
         status += self.execute_myla_delete_query("DELETE FROM submission")
@@ -531,12 +533,11 @@ class DashboardCronJob(CronJobBase):
         # returns the row size of dataframe
         return status
 
+    @log_function_call
     def weight_consideration(self):
         # load the assignment weight consider information with in a course. Some assignments don't have weight consideration
         # the result of it return boolean indicating weight is considered in table calculation or not
         status = ""
-
-        logger.info("weight_consideration()")
 
         # delete all records in assignment_weight_consideration table
         status += self.execute_myla_delete_query("DELETE FROM assignment_weight_consideration")
@@ -554,12 +555,12 @@ class DashboardCronJob(CronJobBase):
 
         return status
 
+    @log_function_call
     def update_term(self) -> str:
         """
         Searches warehouse data for new terms and adds them while leaving existing terms as they are.
         """
         status: str = ''
-        logger.info('update_term()')
 
         term_sql: str = self.queries['term']
         logger.debug(term_sql)
@@ -582,12 +583,12 @@ class DashboardCronJob(CronJobBase):
                 raise
         return status
 
+    @log_function_call
     def update_course(self, warehouse_courses_data: pd.DataFrame) -> str:
         """
         Updates course records with data returned from verify_course_ids, only making changes when necessary.
         """
         status: str = ''
-        logger.info('update_course()')
 
         logger.debug(warehouse_courses_data.to_json(orient='records'))
         courses: QuerySet = Course.objects.filter(id__in=self.valid_locked_course_ids)
@@ -650,7 +651,6 @@ class DashboardCronJob(CronJobBase):
 
         # continue cron tasks
 
-        logger.info("** term")
         status += self.update_term()
 
         if len(self.valid_locked_course_ids) == 0:
@@ -659,18 +659,14 @@ class DashboardCronJob(CronJobBase):
         else:
             # Update the date unless there is an exception
             exception_in_run = False
-            logger.info("** course")
             status += self.update_course(course_verification.course_data)
 
-            logger.info("** user")
             status += self.update_user()
 
-            logger.info("** assignment")
             status += self.update_groups()
             status += self.update_assignment()
             status += self.submission()
             status += self.weight_consideration()
-            logger.info("** resources")
             if 'show_resources_accessed' not in settings.VIEWS_DISABLED:
                 try:
                     status += self.update_resource_access()
@@ -680,7 +676,6 @@ class DashboardCronJob(CronJobBase):
                     status += str(e)
                     exception_in_run = True
 
-        logger.info("** informational")
         status += self.update_unizin_metadata()
 
         all_str_course_ids = set(
