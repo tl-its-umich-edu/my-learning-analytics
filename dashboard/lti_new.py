@@ -98,7 +98,7 @@ def get_tool_conf():
 
 def is_config_valid(config: ToolConfDict):
     if isinstance(config, ToolConfDict):
-        logger.info('LTI configuration valid.')
+        logger.debug('LTI configuration valid.')
         return True
     else:
         logger.error(f'Invalid LTI configuration: "{config}"')

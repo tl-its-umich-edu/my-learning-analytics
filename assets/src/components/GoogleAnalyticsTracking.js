@@ -27,3 +27,4 @@ function GoogleAnalyticsTracking (props) {
 }
 
 export default GoogleAnalyticsTracking
+	
