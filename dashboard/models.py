@@ -338,6 +338,9 @@ class ResourceAccess(models.Model):
 
     class Meta:
         db_table = 'resource_access'
+        indexes = [
+            models.Index(fields=['user_id'], name='user_id_idx'),
+        ]
 
 class Submission(models.Model):
     id = models.BigIntegerField(primary_key=True, verbose_name="Submission Id")
