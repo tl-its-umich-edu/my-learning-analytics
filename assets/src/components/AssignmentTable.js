@@ -448,7 +448,7 @@ function AssignmentTable (props) {
                               <StyledTextField
                                 error={(a.goalGrade / a.pointsPossible) > 1}
                                 disabled={!courseGoalGradeSet}
-                                id={`goal-grade-${key}}`}
+                                id={`goal-grade-${key}`}
                                 value={roundToXDecimals(a.goalGrade, placeToRoundTo(a.pointsPossible))}
                                 label={
                                   !courseGoalGradeSet
