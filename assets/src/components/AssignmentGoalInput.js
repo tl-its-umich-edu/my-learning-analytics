@@ -52,7 +52,7 @@ function AssignmentGoalInput (props) {
     <StyledGrid item>
       <StyledTextField
         error={goalGradeInternal > 100 || mathWarning || goalGradeInternal > maxPossibleGrade}
-        id='standard-number'
+        id='minimum-goal'
         value={goalGradeInternal}
         label={
           mathWarning
