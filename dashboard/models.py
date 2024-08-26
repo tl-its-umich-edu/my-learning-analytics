@@ -205,7 +205,7 @@ class Course(models.Model):
                                          choices=GRADING_CHOICES, default='Percent')
     data_last_updated = models.DateTimeField(null=True, blank=True, help_text="This is the last time the cron was run and can be reset on the main courses page with the dropdown")
     date_created = models.DateTimeField(verbose_name="Date course was created", default=datetime.now, null=True, blank=True)
-
+    last_accessed_date = models.DateTimeField(blank=True, null=True, help_text='The last time this course was accessed')
     objects = CourseQuerySet().as_manager()
 
     def __str__(self):
