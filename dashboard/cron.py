@@ -226,7 +226,10 @@ class DashboardCronJob(CronJobBase):
 
         logger.debug(metadata_sql)
 
-        status += self.util_function(metadata_sql, 'unizin_metadata')
+        try:
+            status += self.util_function(metadata_sql, 'unizin_metadata')
+        except Exception as e:
+            logger.warn(f"Could not directly access metadata, this is likely just an issue when using synthetic data.")
 
         return status
 
@@ -652,6 +655,7 @@ class DashboardCronJob(CronJobBase):
 
         # continue cron tasks
 
+        logger.info("** term")
         status += self.update_term()
 
         exception_in_run = False

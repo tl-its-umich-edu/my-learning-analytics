@@ -5,7 +5,7 @@
         // and it wouldn’t reflect when the data was actually dumped from canvas.
         // More info on UDP's batch-ingest DAG process can be found here: https://resources.unizin.org/display/UDP/Batch-ingest+application
         '''
-            SELECT * FROM EXTERNAL_QUERY("context_store", "select 'canvasdatadate' as pkey, min(dag_run) as pvalue from report.publish_info pi2");        
+            SELECT * FROM EXTERNAL_QUERY("us.context_store", "select 'canvasdatadate' as pkey, min(dag_run) as pvalue from report.publish_info pi2");        
         ''',
     "user" :
         '''
