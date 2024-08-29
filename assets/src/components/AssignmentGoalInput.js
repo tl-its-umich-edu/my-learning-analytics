@@ -85,9 +85,9 @@ function AssignmentGoalInput (props) {
         variant='contained'
         className={classes.clearButton}
         onClick={handleClearGoalGrades}
-        aria-label='clear'
+        aria-label='clear minimum goal'
       >
-        Clear
+        Clear minimum goal
       </Button>
     </StyledGrid>
   )
