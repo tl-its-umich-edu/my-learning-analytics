@@ -527,7 +527,7 @@ function AssignmentTable (props) {
                     </TableCell>
                     <TableCell className={classes.veryNarrowCell}>
                       <Tooltip title={a.graded ? assignmentStatus.GRADED : a.submitted ? assignmentStatus.SUBMITTED : assignmentStatus.UNSUBMITTED}>
-                        {a.graded ? <GradedIcon className={classes.graded} titleAccess='Graded' /> : a.submitted ? <SubmittedIcon className={classes.ungraded} titleAccess='Pending Grade' /> : <UnsubmittedIcon className={classes.unsubmitted}  titleAccess='Unsubmitted'/>}
+                        {a.graded ? <GradedIcon className={classes.graded} titleAccess='Graded' /> : a.submitted ? <SubmittedIcon className={classes.ungraded} titleAccess='Pending Grade' /> : <UnsubmittedIcon className={classes.unsubmitted} titleAccess='Unsubmitted' />}
                       </Tooltip>
                     </TableCell>
                     <TableCell>
