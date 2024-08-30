@@ -11,7 +11,7 @@ def is_admin(self, user):
     if self.context.get(user.id):
         return self.context.get(user.id)
 
-    result = user.is_superuser
+    result = user.is_staff
 
     # set cache
     self.context[user.id] = result
