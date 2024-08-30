@@ -5,7 +5,7 @@ import Course from './Course'
 import WarningBanner from '../components/WarningBanner'
 import AlertBanner from '../components/AlertBanner'
 import { Helmet } from 'react-helmet'
-import useGoogleAnalytics from 'react-ga-onetrust-consent'
+import useGoogleAnalytics from '@tl-its-umich-edu/react-ga-onetrust-consent'
 
 function App (props) {
   const { user, gaId, cspNonce, oneTrustScriptDomain } = props
