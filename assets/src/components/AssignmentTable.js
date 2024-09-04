@@ -487,12 +487,12 @@ function AssignmentTable (props) {
                                 ? [{ color: 'green', value: a.goalGrade, draggable: true }]
                                 : []
                             }
-                            description={`This assignment is worth ${a.percentOfFinalGrade}% of your grade.  
-                            Points possible: ${a.pointsPossible}.
-                            Your goal: ${(a.goalGrade ? a.goalGrade : 'None')}.  
-                            Your grade: ${(a.grade ? a.grade : 'Not graded')}.  
-                            Class average: ${a.averageGrade}.  
-                            Rules: ${(a.rules ? a.rules : 'There are no rules for this assignment')}.  `}
+                            description={`Your goal: ${(a.goalGradeSetByUser ? roundToXDecimals(a.goalGrade, placeToRoundTo(a.outOf)) : 'None')}.
+                            Points possible: ${a.pointsPossible}. Rules: ${(a.rules ? a.rules : 'There are no rules for this assignment')}.
+                            ${a.graded
+                              ? `Your grade: ${roundToXDecimals(a.currentUserSubmission.score, placeToRoundTo(a.outOf))}. 
+                                Class average: ${roundToXDecimals(a.averageGrade, placeToRoundTo(a.outOf))}.`
+                                        : ''}`}
                             onBarFocus={el => setPopoverEl(key, el)}
                             onBarBlur={clearPopoverEl}
                           />
