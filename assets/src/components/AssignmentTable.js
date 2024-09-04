@@ -309,7 +309,7 @@ function AssignmentTable (props) {
       <Grid container className={classes.filterArea}>
         <Grid item xs={12} sm={4}>
           <FormControl className={classes.formControl}>
-            <InputLabel>Filter by Type</InputLabel>
+            <InputLabel id='assignment-group-checkbox-label'>Filter by Type</InputLabel>
             <Select
               labelId='assignment-group-checkbox-label'
               id='assignment-group-mutiple-checkbox'
@@ -338,7 +338,7 @@ function AssignmentTable (props) {
         </Grid>
         <Grid item xs={12} sm={3}>
           <FormControl className={classes.formControl}>
-            <InputLabel>Filter by Status</InputLabel>
+            <InputLabel id='assignment-status-checkbox-label'>Filter by Status</InputLabel>
             <Select
               labelId='assignment-status-checkbox-label'
               id='assignment-status-mutiple-checkbox'
