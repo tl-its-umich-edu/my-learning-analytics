@@ -79,7 +79,7 @@ def get_course_name_from_id(course_id):
 
 
 def get_course_view_options (course_id):
-    logger.info(get_course_view_options.__name__)
+    logger.debug(get_course_view_options.__name__)
     course_id = canvas_id_to_incremented_id(course_id)
     logger.debug("course_id=" + str(course_id))
     course_view_option = ""
@@ -102,7 +102,7 @@ def get_default_user_course_id(user_id):
     :return: [Canvas Course ID]
     :rtype: [str]
     """
-    logger.info(get_default_user_course_id.__name__)
+    logger.debug(get_default_user_course_id.__name__)
     course_id = ""
     with django.db.connection.cursor() as cursor:
         cursor.execute("SELECT course_id FROM user WHERE sis_name= %s ORDER BY course_id DESC LIMIT 1", [user_id])
@@ -137,7 +137,7 @@ def get_user_courses_info(username: str, course_id: Union[int, None] = None) -> 
     :param username: user sis_name
     :return: [{`course_id`: 1233, `course_name`: 'COURSES WN 2020', `enrollment_types`: ['StudentEnrollment'] }]
     """
-    logger.info(get_user_courses_info.__name__)
+    logger.debug(get_user_courses_info.__name__)
     course_enrollments: Dict[int, CourseEnrollment] = {}
     if course_id:
         user_enrollments = User.objects.filter(course_id=canvas_id_to_incremented_id(course_id),
@@ -167,7 +167,7 @@ def get_user_courses_info(username: str, course_id: Union[int, None] = None) -> 
     for course in courses:
         course_enrollments[course.canvas_id]['course_name'] = course.name
     enrollments = list(course_enrollments.values())
-    logger.info(f'User {username} is enrolled in these courses: {enrollments}')
+    logger.debug(f'User {username} is enrolled in these courses: {enrollments}')
     return enrollments
 
 

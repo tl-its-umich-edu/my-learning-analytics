@@ -52,7 +52,7 @@ function AssignmentGoalInput (props) {
     <StyledGrid item>
       <StyledTextField
         error={goalGradeInternal > 100 || mathWarning || goalGradeInternal > maxPossibleGrade}
-        id='standard-number'
+        id='minimum-goal'
         value={goalGradeInternal}
         label={
           mathWarning
@@ -85,9 +85,9 @@ function AssignmentGoalInput (props) {
         variant='contained'
         className={classes.clearButton}
         onClick={handleClearGoalGrades}
-        aria-label='clear'
+        aria-label='clear minimum goal'
       >
-        Clear
+        Clear minimum goal
       </Button>
     </StyledGrid>
   )
