@@ -101,10 +101,8 @@ def get_myla_globals(request):
         login_url = settings.LOGIN_URL
         logout_url = settings.LOGOUT_URL
 
-    if settings.GA_ID:
-        google_analytics_id = settings.GA_ID
-    if settings.OT_SCRIPT_DOMAIN:
-        one_trust_script_domain = settings.OT_SCRIPT_DOMAIN
+    google_analytics_id = settings.GA_ID if settings.GA_ID else ""
+    one_trust_script_domain = settings.OT_SCRIPT_DOMAIN if settings.OT_SCRIPT_DOMAIN else ""
     primary_ui_color = settings.PRIMARY_UI_COLOR
 
     myla_globals = {

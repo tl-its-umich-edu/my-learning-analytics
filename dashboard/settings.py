@@ -70,7 +70,7 @@ else:
 LOGIN_URL = '/accounts/login/'
 LOGOUT_URL = '/accounts/logout/'
 HELP_URL = ENV.get("HELP_URL", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics")
-PRIVACY_REDIRECT_URL = ENV.get("PRIVACY_REDIRECT_URL","https://umich.edu/about/privacy/")
+PRIVACY_REDIRECT_URL = ENV.get('PRIVACY_REDIRECT_URL','')
 
 URL_VIEW_RESOURCES_ACCESSED = ENV.get("URL_VIEW_RESOURCES_ACCESSED", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/resources-accessed")
 URL_VIEW_ASSIGNMENT_PLANNING = ENV.get("URL_VIEW_ASSIGNMENT_PLANNING", "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics/support/assignment-planning-goals")
