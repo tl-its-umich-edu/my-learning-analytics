@@ -678,6 +678,8 @@ def logout(request):
     auth.logout(request)
     return redirect(settings.LOGOUT_REDIRECT_URL)
 
+def privacy_policy_redirect(request):
+    return redirect(settings.PRIVACY_REDIRECT_URL)
 
 def courses_enabled(request):
     """ Returns json for all courses we currently support and are enabled """

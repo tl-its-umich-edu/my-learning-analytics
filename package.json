@@ -10,6 +10,7 @@
     "@emotion/styled": "11.11.0",
     "@mui/icons-material": "5.15.3",
     "@mui/material": "5.15.3",
+    "@tl-its-umich-edu/react-ga-onetrust-consent": "github:tl-its-umich-edu/react-ga-onetrust-consent#v1.0.0",
     "clsx": "2.1.0",
     "d3": "7.8.5",
     "d3-v6-tip": "1.0.9",
@@ -18,11 +19,10 @@
     "lodash.debounce": "4.0.8",
     "lodash.isequal": "4.5.0",
     "rc-slider": "10.5.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-ga4": "2.1.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "react-helmet": "6.1.0",
-    "react-router-dom": "6.21.1"
+    "react-router-dom": "6.25.1"
   },
   "babel": {
     "presets": [

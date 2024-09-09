@@ -101,8 +101,8 @@ def get_myla_globals(request):
         login_url = settings.LOGIN_URL
         logout_url = settings.LOGOUT_URL
 
-    if settings.GA_ID:
-        google_analytics_id = settings.GA_ID
+    google_analytics_id = settings.GA_ID if settings.GA_ID else ""
+    one_trust_script_domain = settings.OT_SCRIPT_DOMAIN if settings.OT_SCRIPT_DOMAIN else ""
     primary_ui_color = settings.PRIMARY_UI_COLOR
 
     myla_globals = {
@@ -115,6 +115,7 @@ def get_myla_globals(request):
         "logout": logout_url,
         "primary_ui_color": primary_ui_color,
         "google_analytics_id": google_analytics_id,
+        "one_trust_script_domain": one_trust_script_domain,
         "view_help_urls": {
             'ra': settings.URL_VIEW_RESOURCES_ACCESSED,
             'ap': settings.URL_VIEW_ASSIGNMENT_PLANNING,
