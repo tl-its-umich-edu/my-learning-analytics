@@ -207,55 +207,57 @@ function AssignmentPlanningV2 (props) {
                   ? <Spinner />
                   : (
                     <div>
-                      <Grid container alignContent='center' className={classes.section}>
-                        <Grid item lg={4} md={5} xs={12}>
-                          <Typography variant='h6' gutterBottom>My Minimum Goal (%)</Typography>
-                          <AssignmentGoalInput
-                            currentGrade={currentGrade}
-                            goalGrade={goalGrade}
-                            maxPossibleGrade={maxPossibleGrade}
-                            eventLog={eventLog}
-                            setEventLog={eventLog => {
-                              setEventLog(eventLog)
-                            }}
-                            setGoalGrade={grade => {
-                              setSettingChanged(true)
-                              setGoalGrade(grade)
-                            }}
-                            handleClearGoalGrades={handleClearGoalGrades}
-                            mathWarning={showMathWarning}
-                          />
+                      <div role='region' aria-label='goal and progress'>
+                        <Grid container alignContent='center' className={classes.section}>
+                          <Grid item lg={4} md={5} xs={12}>
+                            <Typography variant='h6' gutterBottom>My Minimum Goal (%)</Typography>
+                            <AssignmentGoalInput
+                              currentGrade={currentGrade}
+                              goalGrade={goalGrade}
+                              maxPossibleGrade={maxPossibleGrade}
+                              eventLog={eventLog}
+                              setEventLog={eventLog => {
+                                setEventLog(eventLog)
+                              }}
+                              setGoalGrade={grade => {
+                                setSettingChanged(true)
+                                setGoalGrade(grade)
+                              }}
+                              handleClearGoalGrades={handleClearGoalGrades}
+                              mathWarning={showMathWarning}
+                            />
+                          </Grid>
+                          <Grid item lg={8} md={7} xs={12} className={classes.mainProgressBar}>
+                            <Typography variant='h6' gutterBottom>Grade Progress</Typography>
+                            <ProgressBarV2
+                              score={currentGrade}
+                              lines={[
+                                {
+                                  label: 'Current',
+                                  value: currentGrade,
+                                  color: 'steelblue',
+                                  placement: 'down1'
+                                },
+                                {
+                                  label: 'Goal',
+                                  value: goalGrade,
+                                  color: 'green',
+                                  placement: 'up1'
+                                },
+                                {
+                                  label: 'Max Possible',
+                                  value: maxPossibleGrade,
+                                  color: 'grey',
+                                  placement: 'down2'
+                                }
+                              ]}
+                              outOf={100}
+                              percentWidth={100}
+                              height={50}
+                            />
+                          </Grid>
                         </Grid>
-                        <Grid item lg={8} md={7} xs={12} className={classes.mainProgressBar}>
-                          <Typography variant='h6' gutterBottom>Grade Progress</Typography>
-                          <ProgressBarV2
-                            score={currentGrade}
-                            lines={[
-                              {
-                                label: 'Current',
-                                value: currentGrade,
-                                color: 'steelblue',
-                                placement: 'down1'
-                              },
-                              {
-                                label: 'Goal',
-                                value: goalGrade,
-                                color: 'green',
-                                placement: 'up1'
-                              },
-                              {
-                                label: 'Max Possible',
-                                value: maxPossibleGrade,
-                                color: 'grey',
-                                placement: 'down2'
-                              }
-                            ]}
-                            outOf={100}
-                            percentWidth={100}
-                            height={50}
-                          />
-                        </Grid>
-                      </Grid>
+                      </div>
                       <Grid container>
                         <Grid item xs={6} md={8}>
                           <Typography variant='h6' gutterBottom>Assignments by Due Date</Typography>

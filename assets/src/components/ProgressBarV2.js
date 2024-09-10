@@ -50,7 +50,6 @@ function ProgressBarV2 (props) {
     <Root>
       {
         <div
-          tabIndex='0'
           aria-label={description !== undefined ? description : undefined}
           className={submitted && !score ? classes.ungradedBar : classes.outOfBar} // submitted assignment, and ungraded yet : otherwise
           style={{
