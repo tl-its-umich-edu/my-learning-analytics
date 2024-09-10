@@ -44,7 +44,7 @@
                     {{ flatpages.first.content|safe }}
                 </td>
                 {% endif %}
-                {% if user.is_superuser and git_version %}
+                {% if user.is_staff and git_version %}
                 <td style="text-align: left">
                     Git version:
                     <a href="{{ git_version.repo }}/commit/{{ git_version.commit }}" target="_blank">{{ git_version.commit_abbrev }}</a>

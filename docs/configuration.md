@@ -103,11 +103,17 @@ MyLA is designed to be deployed as an LTI tool. To grant admin privileges to a u
 do the following:
 
 1. Have the user launch the tool in Canvas.
-1. Modify their `auth_user` record in the database directly so that `is_staff` and `is_superuser` are true.
+2. Modify their `auth_user` record in the database directly so that `is_staff` and `is_superuser` are true to give full Myla Admin access.
     ```sql
     # Replace username with the user's Canvas username.
     UPDATE auth_user SET is_staff=1, is_superuser=1 where auth_user.username='username';
     ```
+3. Modify their `auth_user` record in the database directly `is_staff`, this gives limited access to admin UI and minimally add the permission "Dashboard | Course | Can view Course" to give them access to see the other courses in the system and navigate them through the Course link in the admin.   
+    ```sql
+    # Replace username with the user's Canvas username.
+    UPDATE auth_user SET is_staff=1 where auth_user.username='username';
+    ```
+
 
 Subsequently, that user can grant other users admin privileges using the admin UI.
 

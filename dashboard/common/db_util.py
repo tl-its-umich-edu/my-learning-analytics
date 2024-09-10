@@ -117,15 +117,15 @@ class CourseEnrollment(TypedDict):
     course_name: str
     enrollment_types: List[str]
 
-def is_superuser(user_name: str) -> bool:
-    logger.debug(is_superuser.__name__+f' \'{user_name}\'')
+def is_staff(user_name: str) -> bool:
+    logger.debug(is_staff.__name__+f' \'{user_name}\'')
 
     user = DjangoUser.objects.filter(username=user_name)
     if user.count() == 0:
         result = False
     else:
-        result = user[0].is_superuser
-    logger.debug(is_superuser.__name__+f' \'{user_name}\':{result}')
+        result = user[0].is_staff
+    logger.debug(is_staff.__name__+f' \'{user_name}\':{result}')
     return result
 
 def get_user_courses_info(username: str, course_id: Union[int, None] = None) -> List[CourseEnrollment]:
@@ -145,7 +145,7 @@ def get_user_courses_info(username: str, course_id: Union[int, None] = None) -> 
     else:
         user_enrollments = User.objects.filter(sis_name=username)
     if user_enrollments.count() == 0:
-        if not is_superuser(username):
+        if not is_staff(username):
             logger.warning(
                 f'Couldn\'t find user {username} in enrollment info. Enrollment data has not been populated yet.')
         return []
