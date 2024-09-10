@@ -370,7 +370,9 @@ function AssignmentTable (props) {
         </Grid>
       </Grid>
       <TableContainer className={classes.container} ref={tableRef}>
-        <Box sx={visuallyHidden} aria-live='polite'>{filteredAssignments.length} assignments are listed</Box>
+        <Box sx={visuallyHidden} aria-live='polite'>
+          {filteredAssignments.length < 2 ? `${filteredAssignments.length} assignment is listed` : `${filteredAssignments.length} assignments are listed`}
+        </Box>
         <MTable stickyHeader>
           <TableHead>
             <TableRow>
