@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { styled } from '@mui/material/styles'
 import Button from '@mui/material/Button'
+import Box from '@mui/material/Box'
 import Checkbox from '@mui/material/Checkbox'
 import FormControl from '@mui/material/FormControl'
 import Grid from '@mui/material/Grid'
@@ -17,6 +18,7 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Tooltip from '@mui/material/Tooltip'
+import visuallyHidden from '@mui/utils'
 import GradedIcon from '@mui/icons-material/Done'
 import UnsubmittedIcon from '@mui/icons-material/Remove'
 import SubmittedIcon from '@mui/icons-material/Textsms'
@@ -368,6 +370,9 @@ function AssignmentTable (props) {
         </Grid>
       </Grid>
       <TableContainer className={classes.container} ref={tableRef}>
+        <Box sx={visuallyHidden} aria-live='polite'>
+          {filteredAssignments.length < 2 ? `${filteredAssignments.length} assignment is listed` : `${filteredAssignments.length} assignments are listed`}
+        </Box>
         <MTable stickyHeader>
           <TableHead>
             <TableRow>

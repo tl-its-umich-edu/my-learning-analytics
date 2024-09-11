@@ -9,7 +9,7 @@ import useGoogleAnalytics from '@tl-its-umich-edu/react-ga-onetrust-consent'
 
 function App (props) {
   const { user, gaId, cspNonce, oneTrustScriptDomain } = props
-  useGoogleAnalytics({ googleAnalyticsId: gaId, nonce: cspNonce, oneTrustScriptDomain})
+  useGoogleAnalytics({ googleAnalyticsId: gaId, nonce: cspNonce, oneTrustScriptDomain })
 
   if (!user.isLoggedIn) {
     if (user.loginURL === '') {

@@ -15,7 +15,7 @@ root.render(
   <Router basename='/'>
     <ApolloProvider client={client}>
       <ThemeProvider theme={siteTheme}>
-        <App user={user} gaId={gaId} cspNonce={cspNonce} oneTrustScriptDomain={oneTrustScriptDomain}/>
+        <App user={user} gaId={gaId} cspNonce={cspNonce} oneTrustScriptDomain={oneTrustScriptDomain} />
       </ThemeProvider>
     </ApolloProvider>
   </Router>
