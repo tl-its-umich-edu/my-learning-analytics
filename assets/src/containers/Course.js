@@ -61,18 +61,16 @@ function Course (props) {
         Course {courseId} has not been set up in MyLA. Contact your instructor, who can enable the visualizations by clicking on MyLA in the course navigation.
       </WarningBanner>
     )
-  }
-  else if (error.message === '403' || error.message === 'Forbidden') {
+  } else if (error.message === '403' || error.message === 'Forbidden') {
     return (
       <WarningBanner>
         You do not have access to course {courseId}.
       </WarningBanner>
     )
-  }
-  else if (error) {
+  } else if (error) {
     return (<WarningBanner />)
   }
-  
+
   if (loaded && isObjectEmpty(courseInfo)) return (<WarningBanner>My Learning Analytics is not enabled for this course.</WarningBanner>)
 
   const notLoadedAltMessage = 'Mouse running on wheel with text "Course Data Being Processed, Try Back in 24 Hours"'
