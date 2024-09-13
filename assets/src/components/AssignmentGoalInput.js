@@ -32,7 +32,7 @@ function AssignmentGoalInput (props) {
   } = props
 
   const [goalGradeInternal, setGoalGradeInternal] = useState(goalGrade)
-  const debouncedGoalGrade = useRef(debounce(q => setGoalGrade(q), 500)).current
+  const debouncedGoalGrade = useRef(debounce(q => setGoalGrade(q), 250)).current
   const updateGoalGradeInternal = (grade) => {
     const v = { courseGoalGrade: grade }
     if (goalGrade !== '') {
