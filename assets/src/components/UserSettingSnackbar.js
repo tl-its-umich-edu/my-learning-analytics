@@ -15,12 +15,13 @@ function UserSettingSnackbar (props) {
     response,
     successMessage = 'Setting saved successfully!',
     failureMessage = 'Setting not saved.',
-    debounceAmount = 0
+    debounceAmount = 0 // in milliseconds, for delaying when the toast is shown
   } = props
 
   const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
 
+  // if debounceAmount is 0, the snackbar will show immediately
   const openSnackbarWithDebounce = useCallback(
     debounce((message) => {
       setSnackbarMessage(message)
