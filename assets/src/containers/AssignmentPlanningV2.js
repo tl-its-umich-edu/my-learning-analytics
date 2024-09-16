@@ -293,7 +293,7 @@ function AssignmentPlanningV2 (props) {
               <UserSettingSnackbar
                 saved={!mutationError && !mutationLoading && settingChanged}
                 response={{ default: 'success' }}
-                debounceAmount={500}
+                debounceAmount={750}
               />
             </Paper>
           </Grid>

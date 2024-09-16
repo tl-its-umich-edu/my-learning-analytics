@@ -18,6 +18,9 @@ function UserSettingSnackbar (props) {
     debounceAmount = 0
   } = props
 
+  const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState('')
+
   const openSnackbarWithDebounce = useCallback(
     debounce((message) => {
       setSnackbarMessage(message)
@@ -25,9 +28,6 @@ function UserSettingSnackbar (props) {
     }, debounceAmount),
     [debounceAmount]
   )
-
-  const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false)
-  const [snackbarMessage, setSnackbarMessage] = useState('')
 
   useEffect(() => {
     if (saved) {
