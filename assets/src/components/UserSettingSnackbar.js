@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Snackbar from '@mui/material/Snackbar'
 import IconButton from '@mui/material/IconButton'
 import CloseIcon from '@mui/icons-material/Close'
 import Slide from '@mui/material/Slide'
+import debounce from 'lodash.debounce'
 
 function SlideTransition (props) {
   return <Slide {...props} direction='up' />
@@ -13,22 +14,28 @@ function UserSettingSnackbar (props) {
     saved,
     response,
     successMessage = 'Setting saved successfully!',
-    failureMessage = 'Setting not saved.'
+    failureMessage = 'Setting not saved.',
+    debounceAmount = 0 // in milliseconds, for delaying when the toast is shown
   } = props
 
   const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
 
+  // if debounceAmount is 0, the snackbar will show immediately
+  const openSnackbarWithDebounce = useCallback(
+    debounce((message) => {
+      setSnackbarMessage(message)
+      setSavedSnackbarOpen(true)
+    }, debounceAmount),
+    [debounceAmount]
+  )
+
   useEffect(() => {
     if (saved) {
-      if (response.default === 'success') {
-        setSnackbarMessage(successMessage)
-      } else {
-        setSnackbarMessage(failureMessage)
-      }
-      setSavedSnackbarOpen(true)
+      const message = response.default === 'success' ? successMessage : failureMessage
+      openSnackbarWithDebounce(message)
     }
-  }, [saved])
+  }, [saved, openSnackbarWithDebounce])
 
   const snackbarDuration = Math.max(snackbarMessage.length * 200, 4000)
 
@@ -37,9 +44,6 @@ function UserSettingSnackbar (props) {
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'left'
-      }}
-      ContentProps={{
-        role: 'alertdialog'
       }}
       open={savedSnackbarOpen}
       autoHideDuration={snackbarDuration}
