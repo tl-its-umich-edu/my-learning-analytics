@@ -207,7 +207,7 @@
         (
             select
                 distinct cse.person_id as user_id
-            from context_store_entity.course_section_enrollment cse 
+            from context_store_entity.course_section_enrollment cse
                 left join context_store_entity.course_section cs
                     on cse.course_section_id = cs.course_section_id
                 left join context_store_keymap.course_offering co
