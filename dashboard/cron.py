@@ -52,7 +52,7 @@ class DashboardCronJob(CronJobBase):
 
     def setup_bigquery(self):
         # Instantiates a client
-        self.bigquery_client = bigquery.Client()
+        self.bigquery_client = bigquery.Client(project=settings.DEFAULT_PROJECT_ID)
 
         # BQ Total Bytes Billed to report to status
         self.total_bytes_billed = 0
@@ -99,24 +99,24 @@ class DashboardCronJob(CronJobBase):
         # Remove the newlines from the query
         query = query.replace("\n", " ")
 
-        if bq_job_config:
-            try:
-                # Convert to bq schema object
-                query_job = self.bigquery_client.query(query, job_config=bq_job_config)
-                query_job_result = query_job.result()
+        # Create a new QueryJobConfig if none is provided
+        if bq_job_config is None:
+            bq_job_config = bigquery.QueryJobConfig()
 
-                self.total_bytes_billed += query_job.total_bytes_billed
-                logger.debug(f"This job had {query_job.total_bytes_billed} bytes. Total: {self.total_bytes_billed}")
-                return query_job_result
-            except Exception as e:
-                logger.error(f"Error ({str(e)}) in setting up schema for query {query}.")
-                raise Exception(e)
-        else:
-            query_job = self.bigquery_client.query(query)
+        # Add the dataset_project_id connection property to the job config
+        bq_job_config.connection_properties = [bigquery.ConnectionProperty("dataset_project_id", settings.DATASET_PROJECT_ID)]
+
+        try:
+            # Convert to bq schema object
+            query_job = self.bigquery_client.query(query, job_config=bq_job_config)
             query_job_result = query_job.result()
             self.total_bytes_billed += query_job.total_bytes_billed
             logger.debug(f"This job had {query_job.total_bytes_billed} bytes. Total: {self.total_bytes_billed}")
-            return query_job_result
+        except Exception as e:
+            logger.error(f"Error ({str(e)}) in setting up schema for query {query}.")
+            raise Exception(e)
+
+        return query_job_result
 
     # Execute a query against the MyLA database
     def execute_myla_query(self, query: str, params: Optional[Dict] = None) -> ResultProxy:
@@ -226,7 +226,10 @@ class DashboardCronJob(CronJobBase):
 
         logger.debug(metadata_sql)
 
-        status += self.util_function(metadata_sql, 'unizin_metadata')
+        try:
+            status += self.util_function(metadata_sql, 'unizin_metadata')
+        except Exception as e:
+            logger.warn(f"Could not directly access metadata, this is likely just an issue when using synthetic data.")
 
         return status
 
@@ -313,6 +316,7 @@ class DashboardCronJob(CronJobBase):
                         'canvas_event_urls', 'STRING', settings.CANVAS_EVENT_URLS))
                 job_config = bigquery.QueryJobConfig()
                 job_config.query_parameters = query_params
+                job_config.connection_properties = [bigquery.ConnectionProperty("dataset_project_id", settings.DATASET_PROJECT_ID)]
 
                 # Location must match that of the dataset(s) referenced in the query.
                 bq_job = self.bigquery_client.query(final_query, location='US', job_config=job_config)
@@ -651,8 +655,10 @@ class DashboardCronJob(CronJobBase):
 
         # continue cron tasks
 
+        logger.info("** term")
         status += self.update_term()
 
+        exception_in_run = False
         if len(self.valid_locked_course_ids) == 0:
             logger.info("Skipping course-related table updates...")
             status += "Skipped course-related table updates.\n"
@@ -676,6 +682,7 @@ class DashboardCronJob(CronJobBase):
                     status += str(e)
                     exception_in_run = True
 
+        logger.info("** informational")
         status += self.update_unizin_metadata()
 
         all_str_course_ids = set(
