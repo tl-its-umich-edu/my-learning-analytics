@@ -49,7 +49,7 @@ def lti_error(error_message: Any) -> JsonResponse:
     :return: JsonResponse, with status 500
     """
     logger.error(f'LTI error: {error_message}')
-    return JsonResponse({'lti_error': f'{error_message}'}, status=500)
+    return JsonResponse({'lti_error': 'An internal error has occurred.'}, status=500)
 
 
 class LTIException(Exception):
