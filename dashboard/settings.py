@@ -175,6 +175,9 @@ STORAGES = {
     "staticfiles": {
         "BACKEND": 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
+    'default': {
+        'BACKEND': 'django.core.files.storage.InMemoryStorage',
+    }
 }
 CONTEXT_PROCESSORS = [
     'django.contrib.auth.context_processors.auth',
