@@ -1,6 +1,6 @@
 gunicorn==22.0.0
 
-Django==4.2.17
+Django==4.2.18
 whitenoise==6.6.0
 
 django-cron==0.6.0 #deprecated
