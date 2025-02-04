@@ -111,6 +111,11 @@ WATCHMAN_TOKEN_NAME = ENV.get('DJANGO_WATCHMAN_TOKEN_NAME', 'token')
 # Only report on the default database
 WATCHMAN_DATABASES = ('default',)
 
+WATCHMAN_CHECKS = (
+    "watchman.checks.caches",
+    "watchman.checks.databases",
+)
+
 # courses_enabled api
 COURSES_ENABLED = ENV.get('COURSES_ENABLED', False)
 # Fall back to the old config name
@@ -175,9 +180,6 @@ STORAGES = {
     "staticfiles": {
         "BACKEND": 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
-    'default': {
-        'BACKEND': 'django.core.files.storage.InMemoryStorage',
-    }
 }
 CONTEXT_PROCESSORS = [
     'django.contrib.auth.context_processors.auth',
