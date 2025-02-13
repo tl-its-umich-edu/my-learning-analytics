@@ -29,7 +29,7 @@ RUN npm prune --production && \
     find node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
 
 # FROM directive instructing base image to build upon
-FROM python:3.10-slim-bookworm AS app
+FROM python:3.11-slim-bookworm AS app
 
 # EXPOSE port 5000 to allow communication to/from server
 EXPOSE 5000
