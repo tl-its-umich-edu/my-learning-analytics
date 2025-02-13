@@ -261,6 +261,8 @@ def extract_launch_variables_for_tool_use(request, message_launch):
 
     try:
         Course.objects.get(canvas_id=course_id)
+        # save the timestamp as the course last_accessed_date
+        Course.objects.filter(canvas_id=course_id).update(last_accessed_date=datetime.now())
     except ObjectDoesNotExist:
         if is_instructor or user_obj.is_staff:
             Course.objects.create(id=canvas_course_long_id, canvas_id=course_id, name=course_name)
