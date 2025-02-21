@@ -2,7 +2,7 @@ import json
 import logging
 import math
 from collections import namedtuple
-from datetime import timedelta
+from datetime import timedelta, datetime
 from json import JSONDecodeError
 
 import jsonschema
@@ -102,6 +102,9 @@ def get_course_info(request, course_id=0):
 
     try:
         course = Course.objects.get(id=course_id)
+        # save the timestamp as the course last_accessed_date
+        course.last_accessed_date = datetime.now()
+        course.save()
     except ObjectDoesNotExist:
         return HttpResponse("{}")
 
