@@ -14,16 +14,21 @@ class Migration(migrations.Migration):
             sql="""
                 UPDATE course
                 JOIN (
+                    WITH canvas_data_id_increment AS (
+                    SELECT id - canvas_id AS increment_value
+                    FROM course
+                    LIMIT 1
+                    )
                     SELECT 
-                        CAST(JSON_UNQUOTE(JSON_EXTRACT(extra, '$.course_id')) AS UNSIGNED) - {increment_value} AS course_id,
+                        CAST(JSON_UNQUOTE(JSON_EXTRACT(extra, '$.course_id')) AS UNSIGNED) - (SELECT increment_value FROM canvas_data_id_increment) AS course_id,
                         MAX(timestamp) AS last_accessed_date
                     FROM eventlog_log
                     WHERE JSON_CONTAINS_PATH(extra, 'one', '$.course_id')
                     GROUP BY course_id
                 ) AS subquery
                 ON course.canvas_id = subquery.course_id
-                SET course.last_accessed_date  = subquery.last_accessed_date;
-            """.format(increment_value=settings.CANVAS_DATA_ID_INCREMENT),
+                SET course.last_accessed_date = subquery.last_accessed_date;
+            """,
             reverse_sql=migrations.RunSQL.noop,
             state_operations=[],
             hints={'atomic': False},
