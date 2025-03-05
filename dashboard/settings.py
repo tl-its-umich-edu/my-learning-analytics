@@ -78,7 +78,6 @@ URL_VIEW_GRADE_DISTRIBUTION = ENV.get("URL_VIEW_GRADE_DISTRIBUTION", "https://it
 
 # Google Analytics ID
 GA_ID = ENV.get('GA_ID', '')
-OT_SCRIPT_DOMAIN = ENV.get('OT_SCRIPT_DOMAIN', '')
 
 # Resource values from env
 RESOURCE_VALUES = ENV.get("RESOURCE_VALUES", {"files": {"types": ["canvas"], "icon": "fas fa-file fa-lg"}})
