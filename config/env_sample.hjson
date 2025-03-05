@@ -18,8 +18,6 @@
     # URL_VIEW_GRADE_DISTRIBUTION
     # ID for your Google Analytics, defaults to nothing/disabled
     "GA_ID": "",
-    # ID of OneTrust script domain, used for google analytics integration
-    "OT_SCRIPT_DOMAIN": ""
     # The hex value to be used in the front end for the primary color of the palette and theme
     "PRIMARY_UI_COLOR": "#00274C",
     # Configuration of CSP see https://django-csp.readthedocs.io/en/latest/configuration.html
