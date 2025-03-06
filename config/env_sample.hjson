@@ -27,15 +27,15 @@
         "REPORT_ONLY": true,
         # You should set your domain as the DEFAULT_SRC
         "DEFAULT_SRC": ["'self'","example.edu"],
-        "SCRIPT_SRC": ["'self'", "'unsafe-inline'", "*.googletagmanager.com"],
+        "SCRIPT_SRC": ["'self'", "'unsafe-inline'", "*.googletagmanager.com", "*.umich.edu", "umich.edu"],
         "IMG_SRC": ["'self'", "data:", "*.google-analytics.com", "*.googletagmanager.com"],
         "OBJECT_SRC": [],
         "MEDIA_SRC": [],
         # If you're embedding in Canvas you may need to include instructure.com as FRAME_SRC
         "FRAME_SRC": [],
         "FONT_SRC": ["'self'", "fonts.gstatic.com"],
-        "CONNECT_SRC": ["'self'", "*.google-analytics.com", "*.analytics.google.com", "*.googletagmanager.com"],
-        "STYLE_SRC": ["'self'", "'unsafe-inline'"],
+        "CONNECT_SRC": ["'self'", "*.google-analytics.com", "*.analytics.google.com", "*.googletagmanager.com", "*.umich.edu", "umich.edu"],
+        "STYLE_SRC": ["'self'", "'unsafe-inline'", "*.umich.edu", "umich.edu"],
         "BASE_URI": [],
         "FRAME_ANCESTORS": [],
         "FORM_ACTION": [],
