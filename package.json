@@ -10,7 +10,7 @@
     "@emotion/styled": "11.11.0",
     "@mui/icons-material": "5.15.3",
     "@mui/material": "5.15.3",
-    "@tl-its-umich-edu/react-ga-onetrust-consent": "github:tl-its-umich-edu/react-ga-onetrust-consent#v1.0.0",
+    "@tl-its-umich-edu/react-ga-onetrust-consent": "github:tl-its-umich-edu/react-ga-onetrust-consent#v1.2.1",
     "clsx": "2.1.0",
     "d3": "7.8.5",
     "d3-v6-tip": "1.0.9",
@@ -26,8 +26,21 @@
   },
   "babel": {
     "presets": [
-      ["@babel/preset-env",{"targets": {"esmodules": true}}],
-      ["@babel/preset-react",{"runtime": "automatic"}]]
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "esmodules": true
+          }
+        }
+      ],
+      [
+        "@babel/preset-react",
+        {
+          "runtime": "automatic"
+        }
+      ]
+    ]
   },
   "scripts": {
     "prod": "BABEL_ENV=production webpack --config webpack.config.js --mode production",
