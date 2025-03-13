@@ -28,6 +28,34 @@
         }
     </style>
     {{ myla_globals|json_script:"myla_globals" }}
+    <script>
+        var googleAnalyticsId = JSON.parse(document.getElementById('myla_globals').textContent).google_analytics_id;
+        window.umConsentManager = {
+            mode: 'prod', // values: 'prod', 'dev'
+            customManager: {
+                enabled   : false,
+                alwaysShow: false,
+                rootDomain: false,
+                preferencePanel: {
+                    beforeCategories: false, // HTML
+                    afterCategories: false   // HTML
+                }
+            },
+            privacyUrl: '/privacy/',
+            googleAnalyticsID: googleAnalyticsId, // e.g. G-XXXXXXXXXX
+            googleAnalyticsCustom: 
+            {
+                streamConfig: {
+                    cookie_flags: 'SameSite=None; Secure'
+                }
+            },
+            cookies: {
+                necessary: [], // {name: '', domain: '', regex: ''}
+                analytics: []
+            }
+        };
+    </script>
+    <script async src="https://umich.edu/apis/umconsentmanager/consentmanager.js"></script> 
 </head>
 <body>
     {% include "su/is_su.html" %}
