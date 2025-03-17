@@ -5,28 +5,9 @@ import Course from './Course'
 import WarningBanner from '../components/WarningBanner'
 import AlertBanner from '../components/AlertBanner'
 import { Helmet } from 'react-helmet'
-import {useGoogleAnalytics, useUmConsent} from '@tl-its-umich-edu/react-ga-onetrust-consent'
 
 function App (props) {
-  const { user, gaId, cspNonce } = props
-  const { gaInitialized, gaHandlers } = useGoogleAnalytics({ googleAnalyticsId: gaId, nonce: cspNonce })
-  const { umConsentInitialize, umConsentInitialized } = useUmConsent()
-
-  if (
-    !umConsentInitialized &&
-    gaInitialized &&
-    gaHandlers.onConsentApprove &&
-    gaHandlers.onConsentReject
-  ) {
-    const consentParams = {
-      developmentMode: false,
-      alwaysShow: false,
-      onConsentApprove: gaHandlers.onConsentApprove,
-      onConsentReject: gaHandlers.onConsentReject,
-    };
-    umConsentInitialize(consentParams)
-  }
-
+  const { user } = props
   if (!user.isLoggedIn) {
     if (user.loginURL === '') {
       return (<WarningBanner>This tool needs to be launched from a Canvas course.</WarningBanner>)
