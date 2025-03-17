@@ -28,6 +28,20 @@
         }
     </style>
     {{ myla_globals|json_script:"myla_globals" }}
+    <script>
+        window.umConsentManager = {
+            googleAnalyticsID: "{{ myla_globals.google_analytics_id }}",
+            googleAnalyticsCustom: 
+            {
+                streamConfig: {
+                    cookie_flags: 'SameSite=None; Secure'
+                }
+            },
+            externalLinkBlank: true,
+            privacyUrl: false
+        };
+    </script>
+    <script async src="https://umich.edu/apis/umconsentmanager/consentmanager.js"></script> 
 </head>
 <body>
     {% include "su/is_su.html" %}
