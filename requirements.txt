@@ -1,4 +1,4 @@
-gunicorn==22.0.0
+gunicorn==23.0.0
 
 Django==4.2.20
 whitenoise==6.6.0
