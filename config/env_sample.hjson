@@ -91,7 +91,8 @@
         "ROOT_PASSWORD": "student_dashboard_root_pw"
     },
     # Default Canvas Data id increment for course id, user id, etc
-    "CANVAS_DATA_ID_INCREMENT": 17700000000000000,
+    # for Unizin synthetic data, the value is 1000000000000
+    "CANVAS_DATA_ID_INCREMENT": 1000000000000,
     # Canvas Configuration
     "CANVAS_USER": "",
     # strings for construct file download url
@@ -305,5 +306,11 @@
     "COURSES_ENABLED": false,
 
     # Path to the hjson file contains cron queries
-    "CRON_QUERY_FILE": "config/cron_udp.hjson"
+    "CRON_QUERY_FILE": "config/cron_udp.hjson",
+
+    # Change the default Bigquery Project ID
+    "DEFAULT_PROJECT_ID": "udp-umich-prod",
+    # Change the dataset project ID where queries are run against
+    "DATASET_PROJECT_ID": "unizin-shared"
+    
 }
