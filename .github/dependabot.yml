@@ -20,7 +20,7 @@ updates:
         patterns: ["*"]
   # Maintain dependencies for npm
   - package-ecosystem: "npm"
-    directory: "/frontend"
+    directory: "/"
     schedule:
       interval: "weekly"
     groups:
