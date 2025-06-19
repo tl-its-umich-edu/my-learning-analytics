@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import logging
 from collections import namedtuple
 from typing import Any, Dict, List, Optional, Union
@@ -267,6 +268,10 @@ class DashboardCronJob(CronJobBase):
         return_string = ""
 
         data_last_updated = Course.objects.filter(id__in=self.valid_locked_course_ids).get_data_earliest_date()
+
+        # Maximum number of days allowed for updating course access data
+        MAX_ALLOWED_UPDATE_DATE = datetime.now(ZoneInfo(settings.TIME_ZONE)) - timedelta(days=settings.MAX_ALLOWED_UPDATE_DAYS)
+        data_last_updated = max(data_last_updated, MAX_ALLOWED_UPDATE_DATE)
 
         logger.info(f"Deleting all records in resource_access after {data_last_updated}")
 
