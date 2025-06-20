@@ -308,7 +308,4 @@
 
     # Path to the hjson file contains cron queries
     "CRON_QUERY_FILE": "config/cron_udp.hjson"
-
-    # Maximum number of days allowed for updating course access data
-    MAX_ALLOWED_UPDATE_DAYS: 180,
 }

@@ -18,6 +18,7 @@ from google.cloud import bigquery
 from sqlalchemy import types, text
 from sqlalchemy.engine import ResultProxy
 from sqlalchemy.orm import sessionmaker
+from constance import config
 
 from dashboard.common import db_util
 from dashboard.models import Course, Resource, AcademicTerms, User
@@ -270,7 +271,7 @@ class DashboardCronJob(CronJobBase):
         data_last_updated = Course.objects.filter(id__in=self.valid_locked_course_ids).get_data_earliest_date()
 
         # Maximum number of days allowed for updating course access data
-        MAX_ALLOWED_UPDATE_DATE = datetime.now(ZoneInfo(settings.TIME_ZONE)) - timedelta(days=settings.MAX_ALLOWED_UPDATE_DAYS)
+        MAX_ALLOWED_UPDATE_DATE = datetime.now(ZoneInfo(settings.TIME_ZONE)) - timedelta(days=config.MAX_ALLOWED_UPDATE_DAYS)
         data_last_updated = max(data_last_updated, MAX_ALLOWED_UPDATE_DATE)
 
         logger.info(f"Deleting all records in resource_access after {data_last_updated}")
