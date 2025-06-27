@@ -446,7 +446,18 @@ CONSTANCE_CONFIG = {
     'SURVEY_URL': ('', 'Full URL to Qualtrics survey. If left blank no survey link will display.', str),
     'SURVEY_TEXT': ('Take Survey', 'Custom text for Qualtrics survey link and title. If left blank will default to "Take Survey". Must also configure SURVEY_URL. For best mobile fit keep this text to under 6 words/30 characters.', str),
     'RESOURCE_LIMIT': (100, 'Maximum number of resources shown in the Resources Accessed visualization.', int),
-    'GRADE_DISTRIBUTION_MINIMUM': (10, 'Minimum number of student enrollments required to show the Grade Distribution visualization.', int)
+    'GRADE_DISTRIBUTION_MINIMUM': (10, 'Minimum number of student enrollments required to show the Grade Distribution visualization.', int),
+    'MAX_ALLOWED_UPDATE_DAYS': (180, 'The maximum number of days the MyLA cron job will retrieve course activity events.', int),
+    "MAX_ALLOWED_UPDATE_DAYS": (
+        180,
+        (
+            "The maximum number of days the MyLA cron job will retrieve course activity "
+            "events. Caution: Setting this value too high can lead to increased and "
+            "unnecessary operational costs due to the larger volume of data being "
+            "processed. It is advisable to keep this value as low as feasible."
+        ),
+        int,
+    ),
 }
 
 # the url strings for Canvas Caliper events
