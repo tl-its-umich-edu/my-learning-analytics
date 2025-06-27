@@ -272,9 +272,14 @@ class DashboardCronJob(CronJobBase):
 
         # Maximum number of days allowed for updating course access data
         MAX_ALLOWED_UPDATE_DATE = datetime.now(ZoneInfo(settings.TIME_ZONE)) - timedelta(days=config.MAX_ALLOWED_UPDATE_DAYS)
-        data_last_updated = max(data_last_updated, MAX_ALLOWED_UPDATE_DATE)
-
-        logger.info(f"Deleting all records in resource_access after {data_last_updated}")
+        # Overriding the original timestamp
+        if data_last_updated < MAX_ALLOWED_UPDATE_DATE:
+            logger.info(
+                f"Overriding data_last_updated from {data_last_updated.isoformat()} "
+                f"to MAX_ALLOWED_UPDATE_DATE {MAX_ALLOWED_UPDATE_DATE.isoformat()} "
+                f"due to max allowed update days limit of {config.MAX_ALLOWED_UPDATE_DAYS}."
+            )
+            data_last_updated = MAX_ALLOWED_UPDATE_DATE
 
         status += self.execute_myla_delete_query("DELETE FROM resource_access WHERE access_time > :data_last_updated", {'data_last_updated': data_last_updated })
 

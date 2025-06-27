@@ -449,6 +449,16 @@ CONSTANCE_CONFIG = {
     'RESOURCE_LIMIT': (100, 'Maximum number of resources shown in the Resources Accessed visualization.', int),
     'GRADE_DISTRIBUTION_MINIMUM': (10, 'Minimum number of student enrollments required to show the Grade Distribution visualization.', int),
     'MAX_ALLOWED_UPDATE_DAYS': (180, 'The maximum number of days the MyLA cron job will retrieve course activity events.', int),
+    "MAX_ALLOWED_UPDATE_DAYS": (
+        180,
+        (
+            "The maximum number of days the MyLA cron job will retrieve course activity "
+            "events. Caution: Setting this value too high can lead to increased and "
+            "unnecessary operational costs due to the larger volume of data being "
+            "processed. It is advisable to keep this value as low as feasible."
+        ),
+        int,
+    ),
 }
 
 # the url strings for Canvas Caliper events
