@@ -29,7 +29,7 @@ RUN npm prune --production && \
     find node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
 
 # FROM directive instructing base image to build upon
-FROM python:3.11-slim-bookworm AS app
+FROM python:3.13-slim-bookworm AS app
 
 # EXPOSE port 5000 to allow communication to/from server
 EXPOSE 5000
@@ -39,7 +39,7 @@ WORKDIR /code
 COPY requirements.txt .
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        build-essential curl apt-transport-https libpq-dev netcat-traditional default-libmysqlclient-dev pkg-config jq python3-dev xmlsec1 cron git && \
+    build-essential curl apt-transport-https libpq-dev netcat-traditional default-libmysqlclient-dev pkg-config jq python3-dev xmlsec1 cron git && \
     apt-get upgrade -y
 
 # Install MariaDB from the mariadb repository rather than using Debians 
@@ -65,7 +65,7 @@ RUN /code/scripts/git_version_info.sh
 # Some of these can be purged completely, some of these just remove the package
 RUN apt-get purge -y git curl libcurl4 libcurl3-gnutls && \
     apt-get remove -y linux-libc-dev && \
-# Keep these packages
+    # Keep these packages
     apt-mark manual libmariadb3 mariadb-common && \
     apt autoremove -y && \
     apt-get clean -y && \
