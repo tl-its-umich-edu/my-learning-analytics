@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-import json, logging, os
+import json, logging, os, sys
 from typing import Any, Dict, Tuple, Union
 
 import hjson
@@ -373,7 +373,17 @@ if ENABLE_LTI:
     LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION = ENV.get('LTI_CONFIG_DISABLE_DEPLOYMENT_ID_VALIDATION', False)
 
 # This is used to fix ids from Canvas Data which are incremented by some large number
-CANVAS_DATA_ID_INCREMENT = ENV.get("CANVAS_DATA_ID_INCREMENT", 17700000000000000)
+CANVAS_DATA_ID_INCREMENT = ENV.get("CANVAS_DATA_ID_INCREMENT")
+# Only enforce required settings when running the server;
+# Skip checking during build steps like collectstatic or makemigrations.
+if 'runserver' in sys.argv or 'gunicorn' in sys.argv[0]:
+    if CANVAS_DATA_ID_INCREMENT is None:
+        raise ValueError("The CANVAS_DATA_ID_INCREMENT environment variable must be set to the CANVAS ID for your instance, but no value is provided.")
+    else:
+        try:
+            CANVAS_DATA_ID_INCREMENT = int(CANVAS_DATA_ID_INCREMENT)
+        except ValueError:
+            raise ValueError("The CANVAS_DATA_ID_INCREMENT environment variable must be an integer, but the provided value is not.")
 
 # Allow enabling/disabling the View options globally
 VIEWS_DISABLED = ENV.get('VIEWS_DISABLED', [])
