@@ -1,44 +1,44 @@
-gunicorn==22.0.0
+gunicorn==23.0.0
 
-Django==4.2.20
-whitenoise==6.6.0
+Django==4.2.23
+whitenoise==6.9.0
 
 django-cron==0.6.0 #deprecated
 
 django-watchman==1.3.0
 django-su==1.0.0
-django-mysql==4.12.0
+django-mysql==4.17.0
 # The alternative to this is redis, but we don't use redis yet
-django-constance[database]==3.1.0
-django-webpack-loader==2.0.1
+django-constance[database]==4.3.2
+django-webpack-loader==3.1.1
 
-django-csp==3.7  #no updates
-django-import-export==3.3.1
-django-admin-rangefilter==0.11.2
+django-csp==4.0
+django-import-export==4.3.7
+django-admin-rangefilter==0.13.2
 # Django/Python fontawesome library supporting CSS in UI
-fontawesomefree==6.4.2
+fontawesomefree==6.6.0
 
 # graphql
-graphene-django==3.1.5
-graphql-core-promise==3.2.3.post1
-django-filter==23.3
+graphene-django==3.2.3
+graphql-core-promise==3.4.2
+django-filter==25.1
 
 # object-level permissions
-rules==3.3
+rules==3.5
 
 # These should be okay to update minors
-numpy==1.26.1
-pandas==2.1.2
+numpy==2.2.5
+pandas==2.3.0
 pangres==4.2.1
 
-SQLAlchemy==2.0.23
-mysqlclient==2.2.4
-google-cloud-bigquery[pandas]==3.19.0
+SQLAlchemy==2.0.41
+mysqlclient==2.2.7
+google-cloud-bigquery[pandas]==3.34.0
 
-debugpy==1.8.0
-jsonschema==4.19.2
+debugpy==1.8.14
+jsonschema==4.24.0
 pinax-eventlog==5.1.1  #no updates
-pycryptodome==3.19.1
+pycryptodome==3.23.0
 PyLTI1p3==2.0.0 #no further update Nov 2022)
 hjson==3.1.0
-pytz==2023.3.post1
+pytz==2023.4
