@@ -184,7 +184,7 @@ def get_cache_config():
 # we don't want TA to enable the MyLA data extraction step.
 def check_if_instructor(roles, username, course_id):
     user_membership_roles = set([role for role in roles if role.find(COURSE_MEMBERSHIP) == 0])
-    if user_membership_roles and INSTRUCTOR in roles and not TA in user_membership_roles:
+    if user_membership_roles and INSTRUCTOR in user_membership_roles:
         logger.info(f'user {username} is Instructor in the course {course_id}')
         return True
     return False

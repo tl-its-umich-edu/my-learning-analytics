@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import logging
 from collections import namedtuple
 from typing import Any, Dict, List, Optional, Union
@@ -17,6 +18,7 @@ from google.cloud import bigquery
 from sqlalchemy import types, text
 from sqlalchemy.engine import ResultProxy
 from sqlalchemy.orm import sessionmaker
+from constance import config
 
 from dashboard.common import db_util
 from dashboard.models import Course, Resource, AcademicTerms, User
@@ -268,7 +270,16 @@ class DashboardCronJob(CronJobBase):
 
         data_last_updated = Course.objects.filter(id__in=self.valid_locked_course_ids).get_data_earliest_date()
 
-        logger.info(f"Deleting all records in resource_access after {data_last_updated}")
+        # Maximum number of days allowed for updating course access data
+        MAX_ALLOWED_UPDATE_DATE = datetime.now(ZoneInfo(settings.TIME_ZONE)) - timedelta(days=config.MAX_ALLOWED_UPDATE_DAYS)
+        # Overriding the original timestamp
+        if data_last_updated < MAX_ALLOWED_UPDATE_DATE:
+            logger.info(
+                f"Overriding data_last_updated from {data_last_updated.isoformat()} "
+                f"to MAX_ALLOWED_UPDATE_DATE {MAX_ALLOWED_UPDATE_DATE.isoformat()} "
+                f"due to max allowed update days limit of {config.MAX_ALLOWED_UPDATE_DAYS}."
+            )
+            data_last_updated = MAX_ALLOWED_UPDATE_DATE
 
         status += self.execute_myla_delete_query("DELETE FROM resource_access WHERE access_time > :data_last_updated", {'data_last_updated': data_last_updated })
 
