@@ -21,30 +21,17 @@
     # The hex value to be used in the front end for the primary color of the palette and theme
     "PRIMARY_UI_COLOR": "#00274C",
     # Configuration of CSP see https://django-csp.readthedocs.io/en/latest/configuration.html
-    # To enable this at all you must set have the CSP key set
-    # and REPORT_ONLY should be be false, otherwise it will just console Warn
-    "CSP": {
-        "REPORT_ONLY": true,
-        # You should set your domain as the DEFAULT_SRC
-        "DEFAULT_SRC": ["'self'","example.edu"],
-        "SCRIPT_SRC": ["'self'", "'unsafe-inline'", "*.googletagmanager.com", "*.umich.edu", "umich.edu"],
-        "IMG_SRC": ["'self'", "data:", "*.google-analytics.com", "*.googletagmanager.com"],
-        "OBJECT_SRC": [],
-        "MEDIA_SRC": [],
-        # If you're embedding in Canvas you may need to include instructure.com as FRAME_SRC
-        "FRAME_SRC": [],
-        "FONT_SRC": ["'self'", "fonts.gstatic.com"],
-        "CONNECT_SRC": ["'self'", "*.google-analytics.com", "*.analytics.google.com", "*.googletagmanager.com", "*.umich.edu", "umich.edu"],
-        "STYLE_SRC": ["'self'", "'unsafe-inline'", "*.umich.edu", "umich.edu"],
-        "BASE_URI": [],
-        "FRAME_ANCESTORS": [],
-        "FORM_ACTION": [],
-        "SANDBOX": [],
-        "REPORT_URI": [],
-        "MANIFEST_SRC": [],
-        "WORKER_SRC": [],
-        "PLUGIN_TYPES": [],
-        "REQUIRE_SRI_FOR": [],
+    "CSP_DIRECTIVES": {
+        "SOURCES": {
+            "DEFAULT":["example.edu"],
+            "SCRIPT":["'unsafe-inline'", "*.googletagmanager.com", "*.umich.edu", "umich.edu"],
+            "IMG":["*.google-analytics.com", "*.googletagmanager.com"],
+            # If you're embedding in Canvas you may need to include instructure.com as FRAME_SRC
+            "FRAME":[],
+            "FONT":["fonts.gstatic.com"],
+            "CONNECT":["*.google-analytics.com", "*.analytics.google.com", "*.googletagmanager.com", "*.umich.edu", "umich.edu"],
+            "STYLE":["'unsafe-inline'", "*.umich.edu", "umich.edu"]
+        },
         "UPGRADE_INSECURE_REQUESTS": false,
         "BLOCK_ALL_MIXED_CONTENT": false,
         "INCLUDE_NONCE_IN": ["script-src"]

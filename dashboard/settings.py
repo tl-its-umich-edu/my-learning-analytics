@@ -15,6 +15,8 @@ from typing import Any, Dict, Tuple, Union
 
 import hjson
 from django.core.management.utils import get_random_secret_key
+from csp.constants import SELF
+
 
 
 logger = logging.getLogger(__name__)
@@ -154,7 +156,8 @@ INSTALLED_APPS = [
     'constance.backends.database',
     'import_export',
     'rangefilter',
-    'fontawesomefree'
+    'fontawesomefree',
+    'csp'
 ]
 
 # The order of this MIDDLEWARE is important
@@ -411,12 +414,23 @@ RESOURCE_ACCESS_CONFIG = ENV.get("RESOURCE_ACCESS_CONFIG", {})
 SHA_ABBREV_LENGTH = 7
 
 # Django CSP Settings, load up from file if set
-if "CSP" in ENV:
+if "CSP_DIRECTIVES" in ENV:
     MIDDLEWARE += ['csp.middleware.CSPMiddleware',]
-    for csp_key, csp_val in ENV.get("CSP").items():
-        # If there's a value set for this CSP config, set it as a global
-        if (csp_val):
-            globals()["CSP_"+csp_key] = csp_val
+    csp_directives = ENV["CSP_DIRECTIVES"]
+    csp_sources = csp_directives["SOURCES"]
+    CONTENT_SECURITY_POLICY = {
+        "DIRECTIVES": {
+            'default-src': [SELF] + csp_sources["DEFAULT"],
+            'script-src': [SELF] + csp_sources["SCRIPT"],
+            'img-src': [SELF] + csp_sources["IMG"],
+            'frame-src': csp_sources["FRAME"],
+            'connect-src': csp_sources["CONNECT"],
+            'style-src': csp_sources["STYLE"],
+            'upgrade-insecure-requests': csp_directives["UPGRADE_INSECURE_REQUESTS"],
+            'block-all-mixed-content': csp_directives["BLOCK_ALL_MIXED_CONTENT"],
+            'include-nonce-in': csp_directives["INCLUDE_NONCE_IN"]
+        }
+    }
 # If CSP not set, add in XFrameOptionsMiddleware
 else:
     MIDDLEWARE += ['django.middleware.clickjacking.XFrameOptionsMiddleware',]
