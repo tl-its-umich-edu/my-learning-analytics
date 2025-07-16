@@ -11,7 +11,6 @@
     ],
     # The URL of a generic help or documentation site, to be used in the front end's drop-down menu
     "HELP_URL": "https://its.umich.edu/academics-research/teaching-learning/my-learning-analytics",
-    "PRIVACY_REDIRECT_URL": "https://umich.edu/about/privacy/"
     # Help for views. Specify URLs to overide defaults
     # URL_VIEW_RESOURCES_ACCESSED
     # URL_VIEW_ASSIGNMENT_PLANNING
