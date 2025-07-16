@@ -41,7 +41,7 @@
             privacyUrl: false
         };
     </script>
-    <script async src="https://umich.edu/apis/umconsentmanager/consentmanager.js"></script> 
+    <script async nonce="{{ request.csp_nonce }}" src="https://umich.edu/apis/umconsentmanager/consentmanager.js"></script> 
 </head>
 <body>
     {% include "su/is_su.html" %}

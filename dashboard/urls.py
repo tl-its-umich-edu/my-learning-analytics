@@ -42,8 +42,6 @@ urlpatterns = [
     path('status/bare_status/', watchman.views.bare_status),
 
     path('admin/', admin.site.urls),
-    # Use PRIVACY_REDIRECT_URL for the privacy policy
-    path('privacy/', views.privacy_policy_redirect, name='privacy_policy'),
 
     # Note the absence of a trailing slash; adding one breaks the GraphQL implementation.
     path('graphql', DashboardGraphQLView.as_view( middleware=[] if settings.DEBUG else [DisableIntrospectionMiddleware],graphiql=settings.DEBUG)),
