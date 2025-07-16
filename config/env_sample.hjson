@@ -24,7 +24,7 @@
         "SOURCES": {
             "DEFAULT":["example.edu"],
             "SCRIPT":["'unsafe-inline'", "*.googletagmanager.com", "*.umich.edu", "umich.edu"],
-            "IMG":["*.google-analytics.com", "*.googletagmanager.com"],
+            "IMG":["*.google-analytics.com", "*.googletagmanager.com", "umich.edu"],
             # If you're embedding in Canvas you may need to include instructure.com as FRAME_SRC
             "FRAME":[],
             "FONT":["fonts.gstatic.com"],
