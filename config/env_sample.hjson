@@ -28,11 +28,10 @@
             # If you're embedding in Canvas you may need to include instructure.com as FRAME_SRC
             "FRAME":[],
             "FONT":["fonts.gstatic.com"],
-            "CONNECT":["*.google-analytics.com", "*.analytics.google.com", "*.googletagmanager.com", "*.umich.edu", "umich.edu"],
-            "STYLE":["'unsafe-inline'", "*.umich.edu", "umich.edu"]
+            "CONNECT":["*.google-analytics.com", "*.analytics.google.com", "*.googletagmanager.com", "*.umich.edu", "umich.edu", "*.ngrok-free.app"],
+            "STYLE":["'unsafe-inline'", "*.umich.edu", "umich.edu", "*.ngrok-free.app"]
         },
         "UPGRADE_INSECURE_REQUESTS": false,
-        "BLOCK_ALL_MIXED_CONTENT": false,
         "INCLUDE_NONCE_IN": ["script-src"]
     },
     # default password length indicator incase of creating user from command line or LTI auto login
