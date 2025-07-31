@@ -15,7 +15,7 @@ from typing import Any, Dict, Tuple, Union
 
 import hjson
 from django.core.management.utils import get_random_secret_key
-from csp.constants import SELF, NONCE
+from csp.constants import SELF
 
 
 
@@ -420,7 +420,7 @@ if "CSP_DIRECTIVES" in ENV:
     CONTENT_SECURITY_POLICY = {
         "DIRECTIVES": {
             'default-src': [SELF] + csp_sources["DEFAULT"],
-            'script-src': [SELF, NONCE] + csp_sources["SCRIPT"],
+            'script-src': [SELF] + csp_sources["SCRIPT"],
             'img-src': [SELF] + csp_sources["IMG"],
             'frame-src': csp_sources["FRAME"],
             'connect-src': csp_sources["CONNECT"],
