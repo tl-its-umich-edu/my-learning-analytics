@@ -10,11 +10,11 @@ django-su==1.0.0
 django-mysql==4.17.0
 # The alternative to this is redis, but we don't use redis yet
 django-constance[database]==4.3.2
-django-webpack-loader==3.1.1
+django-webpack-loader==3.2.1
 
 django-csp==4.0
-django-import-export==4.3.7
-django-admin-rangefilter==0.13.2
+django-import-export==4.3.9
+django-admin-rangefilter==0.13.3
 # Django/Python fontawesome library supporting CSS in UI
 fontawesomefree==6.6.0
 
@@ -28,15 +28,15 @@ rules==3.5
 
 # These should be okay to update minors
 numpy==2.2.5
-pandas==2.3.0
+pandas==2.3.1
 pangres==4.2.1
 
-SQLAlchemy==2.0.41
+SQLAlchemy==2.0.42
 mysqlclient==2.2.7
-google-cloud-bigquery[pandas, bqstorage]==3.34.0 
+google-cloud-bigquery[pandas, bqstorage]==3.35.1 
 
-debugpy==1.8.14
-jsonschema==4.24.0
+debugpy==1.8.15
+jsonschema==4.25.0
 pinax-eventlog==5.1.1  #no updates
 setuptools<81 # remove when pinax-eventlog is replaced (uses outdated setuptools)
 pycryptodome==3.23.0
