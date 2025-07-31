@@ -426,7 +426,6 @@ if "CSP_DIRECTIVES" in ENV:
             'connect-src': csp_sources["CONNECT"],
             'style-src': csp_sources["STYLE"],
             'upgrade-insecure-requests': csp_directives["UPGRADE_INSECURE_REQUESTS"],
-            'include-nonce-in': csp_directives["INCLUDE_NONCE_IN"]
         }
     }
 # If CSP not set, add in XFrameOptionsMiddleware

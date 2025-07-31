@@ -5,11 +5,6 @@ import defaultPalette from './defaultPalette'
 const mylaGlobalsEl = document.getElementById('myla_globals')
 const mylaGlobals = mylaGlobalsEl ? JSON.parse(mylaGlobalsEl.textContent) : {}
 
-let cspNonce
-const cspMetaEl = document.querySelector('meta[name="csp-nonce"]')
-if (cspMetaEl !== null & cspMetaEl.hasAttribute('content')) {
-  cspNonce = cspMetaEl.getAttribute('content')
-}
 
 /*
 Frozen to prevent unintentional changes to this object. This object is strictly readonly.
@@ -55,4 +50,4 @@ const siteTheme = createTheme({
 })
 const gaId = mylaGlobals.google_analytics_id
 
-export { user, siteTheme, gaId, cspNonce, viewHelpURLs, surveyLink }
+export { user, siteTheme, gaId, viewHelpURLs, surveyLink }

@@ -32,7 +32,6 @@
             "STYLE":["'unsafe-inline'", "*.umich.edu", "umich.edu", "*.ngrok-free.app"]
         },
         "UPGRADE_INSECURE_REQUESTS": false,
-        "INCLUDE_NONCE_IN": ["script-src"]
     },
     # default password length indicator incase of creating user from command line or LTI auto login
     "RANDOM_PASSWORD_DEFAULT_LENGTH": 32,
