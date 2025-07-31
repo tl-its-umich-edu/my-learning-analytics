@@ -31,7 +31,7 @@
     <script>
         window.umConsentManager = {
             googleAnalyticsID: "{{ myla_globals.google_analytics_id }}",
-            googleAnalyticsCustom:
+            googleAnalyticsCustom: 
             {
                 streamConfig: {
                     cookie_flags: 'SameSite=None; Secure'
@@ -41,9 +41,8 @@
             privacyUrl: false
         };
     </script>
-    <script async src="https://umich.edu/apis/umconsentmanager/consentmanager.js"></script>
+    <script async src="https://umich.edu/apis/umconsentmanager/consentmanager.js"></script> 
 </head>
-
 <body>
     {% include "su/is_su.html" %}
     {% block content %}
@@ -62,11 +61,9 @@
                 {% if user.is_staff and git_version %}
                 <td style="text-align: left">
                     Git version:
-                    <a href="{{ git_version.repo }}/commit/{{ git_version.commit }}" target="_blank">{{
-                        git_version.commit_abbrev }}</a>
+                    <a href="{{ git_version.repo }}/commit/{{ git_version.commit }}" target="_blank">{{ git_version.commit_abbrev }}</a>
                     (commit)
-                    <a href="{{ git_version.repo }}/tree/{{ git_version.branch }}" target="_blank"> {{
-                        git_version.branch }}</a> (branch)
+                    <a href="{{ git_version.repo }}/tree/{{ git_version.branch }}" target="_blank"> {{ git_version.branch }}</a> (branch)
                 </td>
                 {% endif %}
                 <td style="text-align: left">
@@ -80,5 +77,4 @@
         </table>
     </footer>
 </body>
-
 </html>
