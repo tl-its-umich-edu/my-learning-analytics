@@ -182,9 +182,9 @@ def get_cache_config():
 # Checking if user only has Instructor role in a course to enable MyLA in courses.
 # A TA could be an instructor in an course section so his role will be both TA and Instructor.
 # we don't want TA to enable the MyLA data extraction step.
-def check_if_instructor(roles, username, course_id):
+def check_if_instructor(roles, canvas_course_roles, username, course_id):
     user_membership_roles = set([role for role in roles if role.find(COURSE_MEMBERSHIP) == 0])
-    if user_membership_roles and INSTRUCTOR in user_membership_roles:
+    if user_membership_roles and 'teacher' in canvas_course_roles.lower():
         logger.info(f'user {username} is Instructor in the course {course_id}')
         return True
     return False
@@ -224,6 +224,7 @@ def extract_launch_variables_for_tool_use(request, message_launch):
     username = custom_params['user_username']
     course_id = custom_params['canvas_course_id']
     canvas_user_id = custom_params['canvas_user_id']
+    canvas_course_roles = custom_params.get('canvas_course_roles', '')
     time_zone = custom_params.get('person_address_timezone',
                                   settings.TIME_ZONE).strip()
 
@@ -257,7 +258,7 @@ def extract_launch_variables_for_tool_use(request, message_launch):
 
     user_obj.backend = 'django.contrib.auth.backends.ModelBackend'
     django.contrib.auth.login(request, user_obj)
-    is_instructor = check_if_instructor(roles, username, course_id)
+    is_instructor = check_if_instructor(roles, canvas_course_roles, username, course_id)
 
     try:
         Course.objects.get(canvas_id=course_id)
