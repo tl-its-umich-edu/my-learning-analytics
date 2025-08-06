@@ -37,6 +37,7 @@
   "public_jwk": {},
   "description": "MyLA automatically generated configuration",
   "custom_fields": {
+    "canvas_course_roles": "$Canvas.membership.roles",
     "user_username": "$User.username",
     "canvas_user_id": "$Canvas.user.id",
     "canvas_course_id": "$Canvas.course.id",
