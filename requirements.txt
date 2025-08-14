@@ -35,7 +35,7 @@ SQLAlchemy==2.0.42
 mysqlclient==2.2.7
 google-cloud-bigquery[pandas, bqstorage]==3.35.1 
 
-debugpy==1.8.15
+debugpy==1.8.16
 jsonschema==4.25.0
 pinax-eventlog==5.1.1  #no updates
 setuptools<81 # remove when pinax-eventlog is replaced (uses outdated setuptools)
