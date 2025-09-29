@@ -1,19 +1,19 @@
 gunicorn==23.0.0
 
-Django==4.2.23
-whitenoise==6.9.0
+Django==4.2.24
+whitenoise==6.11.0
 
 django-cron==0.6.0 #deprecated
 
 django-watchman==1.3.0
 django-su==1.0.0
-django-mysql==4.17.0
+django-mysql==4.19.0
 # The alternative to this is redis, but we don't use redis yet
 django-constance[database]==4.3.2
 django-webpack-loader==3.2.1
 
 django-csp==4.0
-django-import-export==4.3.9
+django-import-export==4.3.10
 django-admin-rangefilter==0.13.3
 # Django/Python fontawesome library supporting CSS in UI
 fontawesomefree==6.6.0
@@ -28,15 +28,15 @@ rules==3.5
 
 # These should be okay to update minors
 numpy==2.2.5
-pandas==2.3.1
+pandas==2.3.2
 pangres==4.2.1
 
-SQLAlchemy==2.0.42
+SQLAlchemy==2.0.43
 mysqlclient==2.2.7
-google-cloud-bigquery[pandas, bqstorage]==3.35.1 
+google-cloud-bigquery[pandas, bqstorage]==3.38.0 
 
-debugpy==1.8.16
-jsonschema==4.25.0
+debugpy==1.8.17
+jsonschema==4.25.1
 pinax-eventlog==5.1.1  #no updates
 setuptools<81 # remove when pinax-eventlog is replaced (uses outdated setuptools)
 pycryptodome==3.23.0
