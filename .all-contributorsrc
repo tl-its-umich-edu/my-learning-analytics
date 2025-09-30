@@ -1,10 +1,10 @@
 {
-  "projectName": "My Learning Analytics",
+  "projectName": "my-learning-analytics",
   "projectOwner": "tl-its-umich-edu",
   "repoType": "github",
   "repoHost": "https://github.com",
   "files": [
-    "CONTRIBUTORS.md"
+    "docs/CONTRIBUTORS.md"
   ],
   "imageSize": 100,
   "commit": false,
@@ -228,7 +228,12 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/147423601?v=4",
       "profile": "https://github.com/jaydonkrooss",
       "contributions": [
-        "code"
+        "code",
+        "a11y",
+        "bug",
+        "ideas",
+        "maintenance",
+        "review"
       ]
     },
     {
@@ -304,6 +309,26 @@
       "profile": "https://github.com/rpfernandezjr",
       "contributions": [
         "bug"
+      ]
+    },
+    {
+      "login": "jxiao21",
+      "name": "Justin Xiao",
+      "avatar_url": "https://avatars.githubusercontent.com/u/94207497?v=4",
+      "profile": "https://github.com/jxiao21",
+      "contributions": [
+        "code",
+        "review",
+        "test"
+      ]
+    },
+    {
+      "login": "niurcaq",
+      "name": "niurcaq",
+      "avatar_url": "https://avatars.githubusercontent.com/u/110949195?v=4",
+      "profile": "https://github.com/niurcaq",
+      "contributions": [
+        "code"
       ]
     }
   ],
