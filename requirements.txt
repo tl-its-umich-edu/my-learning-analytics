@@ -1,6 +1,6 @@
 gunicorn==23.0.0
 
-Django==4.2.24
+Django==4.2.25
 whitenoise==6.11.0
 
 django-cron==0.6.0 #deprecated
@@ -13,7 +13,7 @@ django-constance[database]==4.3.2
 django-webpack-loader==3.2.1
 
 django-csp==4.0
-django-import-export==4.3.10
+django-import-export==4.3.12
 django-admin-rangefilter==0.13.3
 # Django/Python fontawesome library supporting CSS in UI
 fontawesomefree==6.6.0
@@ -21,17 +21,17 @@ fontawesomefree==6.6.0
 # graphql
 graphene-django==3.2.3
 graphql-core-promise==3.4.2
-django-filter==25.1
+django-filter==25.2
 
 # object-level permissions
 rules==3.5
 
 # These should be okay to update minors
-numpy==2.2.5
-pandas==2.3.2
+numpy==2.3.4
+pandas==2.3.3
 pangres==4.2.1
 
-SQLAlchemy==2.0.43
+SQLAlchemy==2.0.44
 mysqlclient==2.2.7
 google-cloud-bigquery[pandas, bqstorage]==3.38.0 
 
