@@ -15,6 +15,9 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # Update this manually when updating Django/Python to supported version
+      - dependency-name: "django-filter"
+        versions: ["*"]
     groups:
       all-python-dependencies:
         patterns: ["*"]
