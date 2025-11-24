@@ -21,7 +21,7 @@ fontawesomefree==6.6.0
 # graphql
 graphene-django==3.2.3
 graphql-core-promise==3.4.2
-django-filter==25.2
+django-filter==25.1
 
 # object-level permissions
 rules==3.5
