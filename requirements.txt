@@ -10,11 +10,11 @@ django-su==1.0.0
 django-mysql==4.19.0
 # The alternative to this is redis, but we don't use redis yet
 django-constance[database]==4.3.4
-django-webpack-loader==3.2.2
+django-webpack-loader==3.2.3
 
 django-csp==4.0
 django-import-export==4.3.14
-django-admin-rangefilter==0.13.3
+django-admin-rangefilter==0.13.5
 # Django/Python fontawesome library supporting CSS in UI
 fontawesomefree==6.6.0
 
@@ -31,11 +31,11 @@ numpy==2.3.5
 pandas==2.3.3
 pangres==4.2.1
 
-SQLAlchemy==2.0.44
+SQLAlchemy==2.0.45
 mysqlclient==2.2.7
 google-cloud-bigquery[pandas, bqstorage]==3.38.0 
 
-debugpy==1.8.17
+debugpy==1.8.18
 jsonschema==4.25.1
 pinax-eventlog==5.1.1  #no updates
 setuptools<81 # remove when pinax-eventlog is replaced (uses outdated setuptools)
