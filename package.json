@@ -116,8 +116,8 @@
     "style-loader": "3.3.4",
     "typeface-roboto": "1.1.13",
     "url-loader": "4.1.1",
-    "webpack": "5.103.0",
-    "webpack-bundle-tracker": "3.2.2",
+    "webpack": "5.104.1",
+    "webpack-bundle-tracker": "3.2.3",
     "webpack-cli": "5.1.4"
   }
 }
