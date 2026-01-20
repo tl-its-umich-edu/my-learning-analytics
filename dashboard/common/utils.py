@@ -66,7 +66,7 @@ def get_course_id_from_request_url(path: str) -> Union[None, int]:
     course_id = None
     if settings.ENABLE_LTI:
         # Looking for an matching pattern like this /courses/123455
-        course_id_from_path = re.findall('/courses/(\d+)\/?', path)
+        course_id_from_path = re.findall(r'/courses/(\d+)\/?', path)
         if len(course_id_from_path) == 1:
             course_id = int(course_id_from_path[0])
             logger.debug(f'course_id from path: {course_id}')
