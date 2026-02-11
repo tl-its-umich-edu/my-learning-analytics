@@ -44,7 +44,8 @@ RUN apt-get update && \
 
 # Install MariaDB from the mariadb repository rather than using Debians 
 # https://mariadb.com/kb/en/mariadb-package-repository-setup-and-usage/
-RUN curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | bash && \
+RUN curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | \
+    bash -s -- --mariadb-server-version=12.1 && \
     apt install -y --no-install-recommends libmariadb-dev
 
 RUN pip install --no-cache-dir -r requirements.txt
