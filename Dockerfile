@@ -31,6 +31,9 @@ RUN npm prune --production && \
 # FROM directive instructing base image to build upon
 FROM python:3.13-slim-bookworm AS app
 
+# Re-declare build argument for this stage
+ARG MARIADB_VERSION=11.8
+
 # EXPOSE port 5000 to allow communication to/from server
 EXPOSE 5000
 WORKDIR /code
@@ -45,7 +48,7 @@ RUN apt-get update && \
 # Install MariaDB from the mariadb repository rather than using Debians 
 # https://mariadb.com/kb/en/mariadb-package-repository-setup-and-usage/
 RUN curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | \
-    bash -s -- --mariadb-server-version=12.1 && \
+    bash -s -- --mariadb-server-version=${MARIADB_VERSION} && \
     apt install -y --no-install-recommends libmariadb-dev
 
 RUN pip install --no-cache-dir -r requirements.txt
