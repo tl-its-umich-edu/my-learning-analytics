@@ -32,8 +32,8 @@ pandas==2.3.3
 pangres==4.2.1
 
 SQLAlchemy==2.0.46
-mysqlclient==2.2.7
-google-cloud-bigquery[pandas, bqstorage]==3.40.0 
+mysqlclient==2.2.8
+google-cloud-bigquery[pandas, bqstorage]==3.40.1 
 
 debugpy==1.8.20
 jsonschema==4.26.0
