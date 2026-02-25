@@ -5,7 +5,7 @@ whitenoise==6.11.0
 
 django-cron==0.6.0 #deprecated
 
-django-watchman==1.3.0
+django-watchman==1.4.0
 django-su==1.0.0
 django-mysql==4.19.0
 # The alternative to this is redis, but we don't use redis yet
