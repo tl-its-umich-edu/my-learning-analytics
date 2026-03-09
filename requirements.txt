@@ -1,11 +1,11 @@
 gunicorn==23.0.0
 
-Django==4.2.28
-whitenoise==6.11.0
+Django==4.2.29
+whitenoise==6.12.0
 
 django-cron==0.6.0 #deprecated
 
-django-watchman==1.4.0
+django-watchman==1.5.0
 django-su==1.0.0
 django-mysql==4.19.0
 # The alternative to this is redis, but we don't use redis yet
@@ -31,7 +31,7 @@ numpy==2.4.2
 pandas==2.3.3
 pangres==4.2.1
 
-SQLAlchemy==2.0.46
+SQLAlchemy==2.0.48
 mysqlclient==2.2.8
 google-cloud-bigquery[pandas, bqstorage]==3.40.1 
 
