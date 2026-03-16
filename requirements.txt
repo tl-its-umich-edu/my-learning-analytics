@@ -9,7 +9,7 @@ django-watchman==1.5.0
 django-su==1.0.0
 django-mysql==4.19.0
 # The alternative to this is redis, but we don't use redis yet
-django-constance[database]==4.3.4
+django-constance[database]==4.3.5
 django-webpack-loader==3.2.3
 
 django-csp==4.0
@@ -27,7 +27,7 @@ django-filter==25.1
 rules==3.5
 
 # These should be okay to update minors
-numpy==2.4.2
+numpy==2.4.3
 pandas==2.3.3
 pangres==4.2.1
 
