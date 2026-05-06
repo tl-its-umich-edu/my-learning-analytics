@@ -101,9 +101,9 @@
   "devDependencies": {
     "@babel/cli": "7.28.6",
     "@babel/core": "7.29.0",
-    "@babel/preset-env": "7.29.2",
+    "@babel/preset-env": "7.29.3",
     "@babel/preset-react": "7.28.5",
-    "@babel/register": "7.28.6",
+    "@babel/register": "7.29.3",
     "babel-loader": "9.2.1",
     "css-loader": "6.11.0",
     "eslint-plugin-react-hooks": "4.6.2",
