@@ -13,7 +13,7 @@ django-constance[database]==4.3.5
 django-webpack-loader==3.2.3
 
 django-csp==4.0
-django-import-export==4.4.0
+django-import-export==4.4.1
 django-admin-rangefilter==0.13.5
 # Django/Python fontawesome library supporting CSS in UI
 fontawesomefree==6.6.0
