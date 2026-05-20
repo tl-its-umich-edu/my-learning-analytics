@@ -13,8 +13,8 @@
     "clsx": "2.1.1",
     "d3": "7.9.0",
     "d3-v6-tip": "1.0.9",
-    "graphql": "16.13.2",
-    "js-cookie": "3.0.5",
+    "graphql": "16.14.0",
+    "js-cookie": "3.0.7",
     "lodash.debounce": "4.0.8",
     "lodash.isequal": "4.5.0",
     "rc-slider": "10.6.2",
@@ -101,13 +101,13 @@
   "devDependencies": {
     "@babel/cli": "7.28.6",
     "@babel/core": "7.29.0",
-    "@babel/preset-env": "7.29.3",
+    "@babel/preset-env": "7.29.5",
     "@babel/preset-react": "7.28.5",
     "@babel/register": "7.29.3",
     "babel-loader": "9.2.1",
     "css-loader": "6.11.0",
     "eslint-plugin-react-hooks": "4.6.2",
-    "jest": "30.3.0",
+    "jest": "30.4.2",
     "jest-resolve": "27.5.1",
     "mini-css-extract-plugin": "2.10.2",
     "react-app-polyfill": "3.0.0",
@@ -117,7 +117,7 @@
     "typeface-roboto": "1.1.13",
     "url-loader": "4.1.1",
     "webpack": "5.106.2",
-    "webpack-bundle-tracker": "3.2.3",
+    "webpack-bundle-tracker": "3.2.4",
     "webpack-cli": "5.1.4"
   }
 }
