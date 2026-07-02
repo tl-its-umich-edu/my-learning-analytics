@@ -2,7 +2,7 @@
 # Version for MariaDB database package. LTS version is currently being preferred
 ARG MARIADB_VERSION=11.8
 # Named version of Debian to use
-ARG DEBIAN_VERSION=bookworm
+ARG DEBIAN_VERSION=trixie
 # Version of Node.js
 ARG NODE_VERSION=20
 # Version of Python
