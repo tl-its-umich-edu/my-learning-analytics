@@ -27,18 +27,18 @@ django-filter==25.1
 rules==3.5
 
 # These should be okay to update minors
-numpy==2.4.5
+numpy==2.5.1
 pandas==2.3.3
 pangres==4.2.1
 
-SQLAlchemy==2.0.49
+SQLAlchemy==2.0.51
 mysqlclient==2.2.8
-google-cloud-bigquery[pandas, bqstorage]==3.41.0 
+google-cloud-bigquery[pandas, bqstorage]==3.42.1 
 
-debugpy==1.8.20
+debugpy==1.8.21
 jsonschema==4.26.0
 pinax-eventlog==6.0.0  #no updates
-setuptools<83 # remove when pinax-eventlog is replaced (uses outdated setuptools)
+setuptools<84 # remove when pinax-eventlog is replaced (uses outdated setuptools)
 pycryptodome==3.23.0
 PyLTI1p3==2.0.0 #no further update Nov 2022)
 hjson==3.1.0
