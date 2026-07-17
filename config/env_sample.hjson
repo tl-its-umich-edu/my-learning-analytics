@@ -97,6 +97,7 @@
                 # hostname for the following 3 URLs set according to docs at:
                 # * https://community.instructure.com/en/discussion/551677/minor-lti-1-3-changes-new-oidc-auth-endpoint-support-for-platform-storage
                 # * https://developerdocs.instructure.com/services/canvas/external-tools/lti/file.lti_launch_overview
+                # see docs for hostnames in beta and test environments
                 "auth_login_url": "https://sso.canvaslms.com/api/lti/authorize_redirect",
                 "auth_token_url": "https://sso.canvaslms.com/login/oauth2/token",
                 "key_set_url": "https://sso.canvaslms.com/api/lti/security/jwks",
