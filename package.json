@@ -21,7 +21,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-helmet": "6.1.0",
-    "react-router-dom": "6.30.3"
+    "react-router-dom": "6.30.4"
   },
   "babel": {
     "presets": [
@@ -68,7 +68,9 @@
       "<rootDir>/assets/src/**/?(*.)(spec|test).{js,jsx,ts,tsx}"
     ],
     "testEnvironment": "jsdom",
-    "testURL": "http://localhost",
+    "testEnvironmentOptions": {
+      "url": "http://localhost"
+    },
     "transform": {
       "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
       "^.+\\.css$": "<rootDir>/assets/config/jest/cssTransform.js",
@@ -100,7 +102,7 @@
   },
   "devDependencies": {
     "@babel/cli": "7.28.6",
-    "@babel/core": "7.29.0",
+    "@babel/core": "7.29.7",
     "@babel/preset-env": "7.29.5",
     "@babel/preset-react": "7.28.5",
     "@babel/register": "7.29.3",
@@ -108,6 +110,7 @@
     "css-loader": "6.11.0",
     "eslint-plugin-react-hooks": "4.6.2",
     "jest": "30.4.2",
+    "jest-environment-jsdom": "30.4.1",
     "jest-resolve": "27.5.1",
     "mini-css-extract-plugin": "2.10.2",
     "react-app-polyfill": "3.0.0",

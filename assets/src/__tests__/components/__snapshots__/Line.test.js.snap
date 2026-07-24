@@ -1,10 +1,10 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`renders correctly 1`] = `
-Array [
+[
   <div
     style={
-      Object {
+      {
         "backgroundColor": "green",
         "display": "inline-block",
         "height": "70px",
@@ -19,7 +19,7 @@ Array [
   />,
   <div
     style={
-      Object {
+      {
         "color": "green",
         "display": "inline-block",
         "left": "0",

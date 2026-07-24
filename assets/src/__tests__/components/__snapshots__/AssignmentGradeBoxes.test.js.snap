@@ -1,36 +1,36 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`renders correctly 1`] = `
 <div
-  className="MuiGrid-root MuiGrid-item"
+  className="MuiGrid-root MuiGrid-item css-jpjhrp-MuiGrid-root"
 >
   <div
-    className="MuiFormControl-root MuiTextField-root WithStyles(ForwardRef(TextField))-root-2 AssignmentGoalInput-goalGradeInput-1 MuiFormControl-marginNormal"
+    className="MuiFormControl-root MuiFormControl-marginNormal MuiTextField-root AssignmentGoalInput-goalGradeInput css-sxfr3z-MuiFormControl-root-MuiTextField-root"
     style={
-      Object {
+      {
         "marginRight": "10px",
         "width": "25ch",
       }
     }
   >
     <label
-      className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-filled"
+      className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-1jy569b-MuiFormLabel-root-MuiInputLabel-root"
       data-shrink={true}
-      htmlFor="standard-number"
-      id="standard-number-label"
+      htmlFor="minimum-goal"
+      id="minimum-goal-label"
     >
       Set Minimum Goal
     </label>
     <div
-      className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-formControl"
+      className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-9ddj71-MuiInputBase-root-MuiOutlinedInput-root"
       onClick={[Function]}
     >
       <input
         aria-invalid={false}
         autoFocus={false}
-        className="MuiInputBase-input MuiOutlinedInput-input"
+        className="MuiInputBase-input MuiOutlinedInput-input css-1t8l2tu-MuiInputBase-input-MuiOutlinedInput-input"
         disabled={false}
-        id="standard-number"
+        id="minimum-goal"
         onAnimationStart={[Function]}
         onBlur={[Function]}
         onChange={[Function]}
@@ -41,10 +41,10 @@ exports[`renders correctly 1`] = `
       />
       <fieldset
         aria-hidden={true}
-        className="PrivateNotchedOutline-root-3 MuiOutlinedInput-notchedOutline"
+        className="MuiOutlinedInput-notchedOutline css-r01yff-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
       >
         <legend
-          className="PrivateNotchedOutline-legendLabelled-5 PrivateNotchedOutline-legendNotched-6"
+          className="css-sl37lx-MuiNotchedOutlined-root"
         >
           <span>
             Set Minimum Goal
@@ -54,10 +54,11 @@ exports[`renders correctly 1`] = `
     </div>
   </div>
   <button
-    aria-label="clear"
-    className="MuiButtonBase-root MuiButton-root MuiButton-contained"
+    aria-label="clear minimum goal"
+    className="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary css-sghohy-MuiButtonBase-root-MuiButton-root"
     disabled={false}
     onBlur={[Function]}
+    onContextMenu={[Function]}
     onDragLeave={[Function]}
     onFocus={[Function]}
     onKeyDown={[Function]}
@@ -71,11 +72,7 @@ exports[`renders correctly 1`] = `
     tabIndex={0}
     type="button"
   >
-    <span
-      className="MuiButton-label"
-    >
-      Clear
-    </span>
+    Clear minimum goal
   </button>
 </div>
 `;

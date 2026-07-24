@@ -12,7 +12,9 @@ import { user, siteTheme, gaId } from './globals'
 const container = document.getElementById('root')
 const root = createRoot(container)
 root.render(
-  <Router basename='/'>
+  <Router 
+    future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    basename='/'>
     <ApolloProvider client={client}>
       <ThemeProvider theme={siteTheme}>
         <App user={user} gaId={gaId} />
