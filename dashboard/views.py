@@ -7,6 +7,7 @@ from json import JSONDecodeError
 
 import jsonschema
 import pandas as pd
+from sqlalchemy.exc import SQLAlchemyError
 from constance import config
 from django.conf import settings
 from django.contrib import auth
@@ -460,11 +461,18 @@ def grade_distribution(request, course_id=0):
        (select current_grade from user where sis_name=%(current_user)s and course_id=%(course_id)s) as current_user_grade
        from user where course_id=%(course_id)s and enrollment_type=%(enrollment_type)s
        """
-    df = pd.read_sql(grade_score_sql, app_engine, params={
-            'current_user': current_user,
-            'course_id': course_id,
-            'enrollment_type': 'StudentEnrollment'
-        })
+    try:
+        logger.info(f"course_id={course_id}, current_user={current_user}")
+        df = pd.read_sql(grade_score_sql, app_engine, params={
+                'current_user': current_user,
+                'course_id': course_id,
+                'enrollment_type': 'StudentEnrollment'
+            })
+    except SQLAlchemyError as e:
+        grade_distribution_sql_error_msg = f'Error running grade distribution sql with course_id={course_id}, current_user={current_user} enrollment_type=StudentEnrollment'
+        logger.error(f"{grade_distribution_sql_error_msg} sql={grade_score_sql} error={e}")
+        return HttpResponse(json.dumps({'gd_disable':'true','gd_msg': grade_distribution_sql_error_msg}), content_type='application/json')
+
     if len(df) <= config.GRADE_DISTRIBUTION_MINIMUM:
         grade_distribution_limit_msg = f'Grade Distribution view is disabled because the course enrollment is less than {config.GRADE_DISTRIBUTION_MINIMUM}'
         logger.error(f"Course enrollment count {len(df)} Hence the {grade_distribution_limit_msg}")
