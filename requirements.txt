@@ -20,7 +20,7 @@ fontawesomefree==6.6.0
 
 # graphql
 graphene-django==3.2.3
-graphql-core==3.2.11
+graphql-core==3.2.9 # lock until graphql-core-promise fixes errors arg https://github.com/fellowapp/graphql-core-promise/issues/8
 graphql-core-promise==3.4.2
 django-filter==25.1
 
@@ -38,8 +38,7 @@ google-cloud-bigquery[pandas, bqstorage]==3.43.0
 
 debugpy==1.8.21
 jsonschema==4.26.0
-pinax-eventlog==6.0.0  #no updates
-setuptools<84 # remove when pinax-eventlog is replaced (uses outdated setuptools)
+pinax-eventlog==6.0.0
 pycryptodome==3.23.0
 PyLTI1p3==2.0.0 #no further update Nov 2022)
 hjson==3.1.0
