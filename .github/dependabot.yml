@@ -19,7 +19,7 @@ updates:
       - dependency-name: "django-filter"
         versions: ["*"]
     groups:
-      all-python-dependencies:
+      python-version-updates:
         applies-to: "version-updates"
         patterns: ["*"]
       python-security-updates:
