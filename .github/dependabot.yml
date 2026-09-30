@@ -19,16 +19,24 @@ updates:
       - dependency-name: "django-filter"
         versions: ["*"]
     groups:
-      all-python-dependencies:
+      python-version-updates:
+        applies-to: "version-updates"
+        patterns: ["*"]
+      python-security-updates:
+        applies-to: "security-updates"
         patterns: ["*"]
   # Maintain dependencies for npm
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
-    groups:
-      all-npm-dependencies:
-        patterns: ["*"]
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+    groups:
+      npm-version-updates:
+        applies-to: "version-updates"
+        patterns: ["*"]
+      npm-security-updates:
+        applies-to: "security-updates"
+        patterns: ["*"]
