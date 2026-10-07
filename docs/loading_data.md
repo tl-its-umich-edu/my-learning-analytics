@@ -3,7 +3,7 @@
 ## Loading data
 
 Context and event data are loaded into the MySQL database using a job defined in [dashboard/cron.py](../dashboard/cron.py).
-The job approach leverages the [`django-cron`](https://django-cron.readthedocs.io/en/latest/) library.
+The job approach leverages a maintained fork of the [`django-cron`](https://django-cron.readthedocs.io/en/latest/) library - `requirements.txt` directly installs [jorenham/django-cron](https://github.com/jorenham/django-cron) for compatibility with Django 5.1+.
 
 ### Local development
 
@@ -21,7 +21,7 @@ In the admin interface, there is a table where you can check the status of the c
 ### Cron scheduling for deployment
 
 > **Note:** Cron scheduling functionality settings may be removed in the future,
-since this responsibility is often handed off to other infrastructure, like an automation server.
+> since this responsibility is often handed off to other infrastructure, like an automation server.
 
 By setting a few configuration variables in `env.hjson`,
 the application can be started up in a separate container with a Unix crontab schedule.

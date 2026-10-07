@@ -1,9 +1,11 @@
 gunicorn==23.0.0
 
-Django==4.2.30
+Django==5.2.18
 whitenoise==6.12.0
 
-django-cron==0.6.0 #deprecated
+# Tivix/django-cron 0.6.0 is abandoned and breaks on Django 5.1+ (Meta.index_together removed).
+# This fork replaces it with Meta.indexes and ships a migration that renames the existing indexes.
+django-cron @ git+https://github.com/jorenham/django-cron.git@ef73c9ac8f33ff9bfa0772ec8c39b84dac47b7b2
 
 django-watchman==1.5.0
 django-su==1.0.0
