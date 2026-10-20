@@ -13,14 +13,14 @@ django-constance[database]==4.3.5
 django-webpack-loader==3.2.4
 
 django-csp==4.0
-django-import-export==4.4.1
-django-admin-rangefilter==0.14.0
+django-import-export==4.4.2
+django-admin-rangefilter==0.15.0
 # Django/Python fontawesome library supporting CSS in UI
 fontawesomefree==6.6.0
 
 # graphql
 graphene-django==3.2.3
-graphql-core==3.2.9 # lock until graphql-core-promise fixes errors arg https://github.com/fellowapp/graphql-core-promise/issues/8
+graphql-core==3.3.0 # lock until graphql-core-promise fixes errors arg https://github.com/fellowapp/graphql-core-promise/issues/8
 graphql-core-promise==3.4.2
 django-filter==25.1
 
@@ -28,18 +28,18 @@ django-filter==25.1
 rules==3.5
 
 # These should be okay to update minors
-numpy==2.5.1
+numpy==2.5.4
 pandas==2.3.3
 pangres==4.2.1
 
-SQLAlchemy==2.0.51
-mysqlclient==2.2.8
-google-cloud-bigquery[pandas, bqstorage]==3.43.0 
+SQLAlchemy==2.1.5
+mysqlclient==2.3.0
+google-cloud-bigquery[pandas, bqstorage]==3.46.2 
 
-debugpy==1.8.21
+debugpy==1.8.22
 jsonschema==4.26.0
 pinax-eventlog==6.0.0
-pycryptodome==3.23.0
+pycryptodome==3.24.1
 PyLTI1p3==2.0.0 #no further update Nov 2022)
 hjson==3.1.0
 pytz==2023.4
