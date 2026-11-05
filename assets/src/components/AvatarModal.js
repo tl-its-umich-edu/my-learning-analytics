@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { styled } from '@mui/material/styles'
+import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
@@ -15,6 +16,7 @@ import LogoutIcon from '@mui/icons-material/ExitToApp'
 import HelpIcon from '@mui/icons-material/HelpOutline'
 import Lock from '@mui/icons-material/Lock'
 import Launch from '@mui/icons-material/Launch'
+import Cookie from 'js-cookie'
 import { viewHelpURLs } from '../globals'
 
 const PREFIX = 'AvatarModal'
@@ -175,14 +177,15 @@ function AvatarModal (props) {
             {
               user.logoutURL !== ''
                 ? (
-                  <Link style={{ textDecoration: 'none' }} href={user.logoutURL}>
-                    <ListItemButton>
+                  <Box component='form' method='post' action={user.logoutURL}>
+                    <Box component='input' type='hidden' name='csrfmiddlewaretoken' value={Cookie.get('csrftoken')} />
+                    <ListItemButton component='button' type='submit' sx={{ width: '100%' }}>
                       <ListItemIcon>
                         <LogoutIcon />
                       </ListItemIcon>
                       <ListItemText inset primary='Logout' className={classes.text} />
                     </ListItemButton>
-                  </Link>
+                  </Box>
                   )
                 : null
             }
