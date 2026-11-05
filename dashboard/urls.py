@@ -92,6 +92,5 @@ if settings.ENABLE_BACKEND_LOGIN:
     from django.contrib.auth import views as auth_views
     # Login patterns for testing
     urlpatterns += (
-        path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
-        path('accounts/logout/', views.logout, name='logout'), # GET on Django LogoutView is unsupported
+        path("accounts/", include("django.contrib.auth.urls")),
     )

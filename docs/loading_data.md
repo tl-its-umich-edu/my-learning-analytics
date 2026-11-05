@@ -3,7 +3,7 @@
 ## Loading data
 
 Context and event data are loaded into the MySQL database using a job defined in [dashboard/cron.py](../dashboard/cron.py).
-The job approach leverages a maintained fork of the [`django-cron`](https://django-cron.readthedocs.io/en/latest/) library - `requirements.txt` directly installs [jorenham/django-cron](https://github.com/jorenham/django-cron) for compatibility with Django 5.1+.
+The job approach leverages a more maintained fork of the [`django-cron`](https://django-cron.readthedocs.io/en/latest/) library - `requirements.txt` directly installs [tl-its-umich-edu/django-cron](https://github.com/tl-its-umich-edu/django-cron) for compatibility with Django 5.1+. This fork was originally created by [jorenham](https://github.com/jorenham).
 
 ### Local development
 
