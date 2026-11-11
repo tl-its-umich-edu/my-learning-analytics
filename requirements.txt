@@ -20,7 +20,6 @@ fontawesomefree==6.6.0
 
 # graphql
 graphene-django==3.2.3
-graphql-core==3.3.2 # lock until graphql-core-promise fixes errors arg https://github.com/fellowapp/graphql-core-promise/issues/8
 graphql-core-promise==3.5.0
 django-filter==25.1
 
