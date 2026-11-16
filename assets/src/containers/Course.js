@@ -11,6 +11,7 @@ import Spinner from '../components/Spinner'
 import { isObjectEmpty } from '../util/object'
 import { useCourseInfo } from '../service/api'
 import WarningBanner from '../components/WarningBanner'
+import { isTeacherOrAdmin } from '../util/roles'
 import { CardMedia, Card } from '@mui/material'
 
 const PREFIX = 'Course'
@@ -20,7 +21,6 @@ const classes = {
   notLoadedMedia: `${PREFIX}-notLoadedMedia`
 }
 
-// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
 const Root = styled('div')((
   {
     theme
@@ -46,20 +46,32 @@ function Course (props) {
   const [sideDrawerState, setSideDrawerState] = useState(false)
   const menuButtonRef = useRef(null)
   const route = pathname.split('/').filter(Boolean).pop()
-  const viewTitle = {
-    grades: 'Grade Distribution',
-    assignments: 'Assignment Planning',
-    resources: 'Resources Accessed'
-  }[route]
+
+  const matchingCourses = user.relatedCourses.length > 0 ? user.relatedCourses.filter(c => c.course_id === props.courseId) : undefined
+  const enrollmentTypes = matchingCourses && matchingCourses.length === 1 ? matchingCourses[0].enrollment_types : []
+
+  // A view's title is only shown when the user can actually see that view:
+  // the view is enabled for the course, or the user is a teacher/admin (who
+  // sees disabled views in preview mode). Students must not see the title of a
+  // disabled view.
+  const routeViewCode = { grades: 'gd', assignments: 'ap', resources: 'ra' }[route]
+  const viewVisibleToUser = routeViewCode
+    ? Boolean(courseInfo && courseInfo.course_view_options && courseInfo.course_view_options[routeViewCode]) ||
+      isTeacherOrAdmin(user.admin, enrollmentTypes)
+    : false
+  const viewTitle = viewVisibleToUser
+    ? {
+        grades: 'Grade Distribution',
+        assignments: 'Assignment Planning',
+        resources: 'Resources Accessed'
+      }[route]
+    : undefined
   const pageTitle = viewTitle
     ? `${viewTitle} | My Learning Analytics`
     : courseInfo && courseInfo.name
       ? `${courseInfo.name} | My Learning Analytics`
       : 'My Learning Analytics'
   const title = <title>{pageTitle}</title>
-
-  const matchingCourses = user.relatedCourses.length > 0 ? user.relatedCourses.filter(c => c.course_id === props.courseId) : undefined
-  const enrollmentTypes = matchingCourses && matchingCourses.length === 1 ? matchingCourses[0].enrollment_types : []
 
   const toggleDrawer = open => event => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
