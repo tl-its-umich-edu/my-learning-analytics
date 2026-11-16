@@ -63,6 +63,7 @@ const Root = styled('div')((
 function DashboardAppBar (props) {
   const {
     onMenuBarClick,
+    menuButtonRef,
     user,
     courseId,
     courseName
@@ -78,6 +79,7 @@ function DashboardAppBar (props) {
       <AppBar className={classes.root} position='fixed'>
         <Toolbar>
           <IconButton
+            ref={menuButtonRef}
             onClick={onMenuBarClick(true)}
             className={classes.menuButton}
             color='inherit'

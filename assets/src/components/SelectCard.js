@@ -241,7 +241,7 @@ const SelectCard = props => {
     <Root>
       <Card className={classes.card} elevation={2}>
         <div className={classes.mainCardContainer}>
-          <CardActionArea component={Link} to={cardData.path}>
+          <CardActionArea component={Link} nativeButton={false} to={cardData.path}>
             {getLinkContents(cardData)}
           </CardActionArea>
           {getHelpLink(cardData)}

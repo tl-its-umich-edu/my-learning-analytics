@@ -206,7 +206,7 @@ function AssignmentPlanningV2 (props) {
                   : (
                     <div>
                       <div role='region' aria-label='goal and progress'>
-                        <Grid container alignContent='center' className={classes.section}>
+                        <Grid container className={classes.section} sx={{ alignContent: 'center' }}>
                           <Grid size={{ xs: 12, md: 5, lg: 4 }}>
                             <Typography variant='h6' gutterBottom>My Minimum Goal (%)</Typography>
                             <AssignmentGoalInput

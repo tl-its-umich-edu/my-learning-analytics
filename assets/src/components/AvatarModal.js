@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 import Avatar from '@mui/material/Avatar'
+import Stack from '@mui/material/Stack'
 import Link from '@mui/material/Link'
 import List from '@mui/material/List'
 import ListItemButton from '@mui/material/ListItemButton'
@@ -12,7 +13,7 @@ import ListItemText from '@mui/material/ListItemText'
 import DialogTitle from '@mui/material/DialogTitle'
 import Dialog from '@mui/material/Dialog'
 import LogoutIcon from '@mui/icons-material/ExitToApp'
-import HelpIcon from '@mui/icons-material/HelpOutline'
+import HelpIcon from '@mui/icons-material/HelpOutlined'
 import Lock from '@mui/icons-material/Lock'
 import Launch from '@mui/icons-material/Launch'
 import { viewHelpURLs } from '../globals'
@@ -138,17 +139,19 @@ function AvatarModal (props) {
             {user.initials}
           </Avatar>
         </Grid>
-        <Grid container direction='column' size={{ xs: 8 }}>
-          <Typography className={classes.typography}>
-            Signed in as
-          </Typography>
-          <Typography
-            className={classes.typography}
-            variant='subtitle1'
-            style={{ marginTop: 0 }}
-          >
-            {user.displayName}
-          </Typography>
+        <Grid size={{ xs: 8 }}>
+          <Stack>
+            <Typography className={classes.typography}>
+              Signed in as
+            </Typography>
+            <Typography
+              className={classes.typography}
+              variant='subtitle1'
+              style={{ marginTop: 0 }}
+            >
+              {user.displayName}
+            </Typography>
+          </Stack>
         </Grid>
         <Grid size={{ xs: 12 }}>
           <List>

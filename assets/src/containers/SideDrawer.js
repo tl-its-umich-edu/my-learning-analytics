@@ -57,6 +57,7 @@ function SideDrawer (props) {
         {routes(courseId, courseInfo.course_view_options, !isTeacherOrAdmin(isAdmin, enrollmentTypes)).map((props, key) => (
           <ListItemButton
             component={Link}
+            nativeButton={false}
             to={props.path}
             key={key}
             className={classes.sideDrawerLinks}
@@ -78,7 +79,12 @@ function SideDrawer (props) {
 
   return (
     <div>
-      <Drawer open={props.sideDrawerState} onClose={toggleDrawer(false)}>
+      <Drawer
+        open={props.sideDrawerState}
+        onClose={toggleDrawer(false)}
+        disableRestoreFocus
+        slotProps={{ transition: { onExited: props.onRestoreFocus } }}
+      >
         {courseInfo
           ? sideList
           : <Spinner />}

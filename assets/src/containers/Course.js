@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { styled } from '@mui/material/styles'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import DashboardAppBar from './DashboardAppBar'
@@ -44,6 +44,7 @@ function Course (props) {
   const { pathname } = useLocation()
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
+  const menuButtonRef = useRef(null)
   const route = pathname.split('/').filter(Boolean).pop()
   const viewTitle = {
     grades: 'Grade Distribution',
@@ -64,7 +65,20 @@ function Course (props) {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
+    // Move focus off the menu button before the Drawer's Modal applies
+    // aria-hidden to the app root, avoiding the "aria-hidden on a focused
+    // ancestor" warning. Focus is restored to the button after the drawer
+    // finishes closing (see restoreMenuButtonFocus).
+    if (open) {
+      menuButtonRef.current?.blur()
+    }
     setSideDrawerState(open)
+  }
+
+  // Restore focus to the menu button only after the close transition completes,
+  // once the Modal has removed aria-hidden from the app root.
+  const restoreMenuButtonFocus = () => {
+    menuButtonRef.current?.focus()
   }
 
   if (error.message === '404' || error.message === 'Not Found') {
@@ -113,6 +127,7 @@ function Course (props) {
           <>
             <DashboardAppBar
               onMenuBarClick={toggleDrawer}
+              menuButtonRef={menuButtonRef}
               sideDrawerState={sideDrawerState}
               user={user}
               courseName={courseInfo.name}
@@ -120,6 +135,7 @@ function Course (props) {
             />
             <SideDrawer
               toggleDrawer={toggleDrawer}
+              onRestoreFocus={restoreMenuButtonFocus}
               sideDrawerState={sideDrawerState}
               courseId={courseId}
               courseInfo={courseInfo}
