@@ -65,8 +65,8 @@
     },
     "transform": {
       "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
-      "^.+\\.css$": "<rootDir>/assets/config/jest/cssTransform.cjs",
-      "^(?!.*\\.(js|cjs|jsx|ts|tsx|css|json)$)": "<rootDir>/assets/config/jest/fileTransform.cjs"
+      "^.+\\.css$": "<rootDir>/assets/config/jest/cssTransform.js",
+      "^(?!.*\\.(js|cjs|jsx|ts|tsx|css|json)$)": "<rootDir>/assets/config/jest/fileTransform.js"
     },
     "transformIgnorePatterns": [
       "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$",

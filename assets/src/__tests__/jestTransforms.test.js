@@ -1,8 +1,8 @@
 /* global it, expect */
 
 import { runInNewContext } from 'node:vm'
-import cssTransform from '../../config/jest/cssTransform.cjs'
-import fileTransform from '../../config/jest/fileTransform.cjs'
+import cssTransform from '../../config/jest/cssTransform.js'
+import fileTransform from '../../config/jest/fileTransform.js'
 import styles from '../index.css'
 
 it('loads CSS imports through the configured transformer', () => {

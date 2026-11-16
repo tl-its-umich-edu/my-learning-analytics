@@ -18,7 +18,6 @@ beforeAll(async () => {
 const selectCardProps = (courseInfo, cardData) => ({
   courseId: 1,
   courseInfo,
-  isAdmin: true,
   enrollmentTypes: [],
   cardData
 })
