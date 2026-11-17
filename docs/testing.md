@@ -82,6 +82,31 @@ Each smoke run reloads the authenticated MyLA frame first so it tests the curren
 
 Build the frontend in Docker first, then run browser regression checks with Chrome and Playwright installed using `node --test scripts/__tests__/lti-browser-smoke.test.mjs`. The same `PLAYWRIGHT_MODULE` override works for an isolated installation. One test loads the actual generated bundle and renders its MUI course UI with synthetic identity/course responses, catching module-interop failures that markup-only fixtures and Jest can miss. The fixtures contain no real Canvas or student data.
 
+### Accessibility Keyboard Smoke Test
+
+This is a focused check of existing support, not a full accessibility audit.
+It uses the actual frontend bundle with synthetic course data and checks that:
+
+- Tab reaches the named Menu button; Enter and Space open the drawer.
+- Focus enters the drawer, is not inside an `aria-hidden` ancestor, and wraps
+  inside it with Tab and Shift+Tab.
+- Escape closes the drawer and restores focus to Menu.
+- Enter activates a view card; the new view heading receives focus and its
+  document title updates.
+
+Run only this smoke check after building the frontend:
+
+```sh
+docker exec webpack_watcher npm run build
+PLAYWRIGHT_MODULE="$HOME/.cache/myla-isolated-playwright/node_modules/playwright/index.mjs" \
+  node --test --test-name-pattern="accessibility smoke" scripts/__tests__/lti-browser-smoke.test.mjs
+```
+
+It also runs as part of the full browser regression suite. It does not establish
+screen-reader compatibility, visual focus contrast, all-view keyboard coverage,
+or before/after accessibility parity. Pre-existing accessibility gaps remain
+outside this smoke test's scope.
+
 ### Consent Banner Browser Test
 
 With Django running locally and Chrome/Playwright installed, run:
