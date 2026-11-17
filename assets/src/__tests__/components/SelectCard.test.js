@@ -1,6 +1,6 @@
 /* global it, expect, jest, beforeAll */
 
-import React, { act } from 'react'
+import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { TextDecoder, TextEncoder } from 'node:util'
 
@@ -18,7 +18,7 @@ beforeAll(async () => {
 const selectCardProps = (courseInfo, cardData) => ({
   courseId: 1,
   courseInfo,
-  enrollmentTypes: [],
+  enrollmentTypes: ['TeacherEnrollment'],
   cardData
 })
 
@@ -28,7 +28,10 @@ const viewCards = [
   { viewCode: 'gd', title: 'Grade Distribution', path: '/courses/1/grades' }
 ]
 
-it('instructor disabling any view PUTs update_info and updates local state without a refetch', async () => {
+it.each([
+  ['instructor', { isAdmin: false, enrollmentTypes: ['TeacherEnrollment'] }],
+  ['MyLA admin', { isAdmin: true, enrollmentTypes: [] }]
+])('%s disabling any view PUTs update_info and updates local state without a refetch', async (_role, roleProps) => {
   for (const view of viewCards) {
     const originalFetch = globalThis.fetch
     const fetchMock = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ default: 'success' }) })
@@ -46,7 +49,7 @@ it('instructor disabling any view PUTs update_info and updates local state witho
       await act(async () => {
         root.render(
           <MemoryRouter>
-            <SelectCard {...selectCardProps(courseInfo, cardData)} />
+            <SelectCard {...selectCardProps(courseInfo, cardData)} {...roleProps} />
           </MemoryRouter>
         )
       })

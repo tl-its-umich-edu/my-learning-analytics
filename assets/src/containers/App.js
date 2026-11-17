@@ -1,4 +1,3 @@
-import React from 'react'
 import { Route, Routes, useMatch } from 'react-router-dom'
 import CourseList from './CourseList'
 import Course from './Course'

@@ -1,6 +1,6 @@
 /* global it, expect */
 
-import React, { act } from 'react'
+import { act } from 'react'
 import Line from '../../components/Line'
 import renderer from 'react-test-renderer'
 

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { ThemeProvider } from '@mui/material/styles'
 
 import { siteTheme } from '../globals'

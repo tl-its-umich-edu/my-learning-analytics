@@ -1,5 +1,3 @@
-import React from 'react'
-
 import Label from './Label'
 import { roundToXDecimals } from '../util/math'
 

@@ -1,6 +1,6 @@
 /* global it, expect */
 
-import React, { act } from 'react'
+import { act } from 'react'
 import AssignmentGoalInput from '../../components/AssignmentGoalInput'
 import renderer from 'react-test-renderer'
 

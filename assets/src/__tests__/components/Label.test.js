@@ -1,6 +1,6 @@
 /* global it, expect */
 
-import React, { act } from 'react'
+import { act } from 'react'
 import Label from '../../components/Label'
 import renderer from 'react-test-renderer'
 

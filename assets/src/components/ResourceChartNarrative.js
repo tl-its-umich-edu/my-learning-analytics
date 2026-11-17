@@ -1,5 +1,3 @@
-import React from 'react'
-
 function ResourceChartNarrative ({ data, weekRange, gradeSelection, resourceType }) {
   const unAccessedResources = data.filter(resource => resource.self_access_count === 0)
   const accessedResources = data.filter(resource => resource.self_access_count >= 1)

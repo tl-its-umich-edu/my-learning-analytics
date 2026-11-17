@@ -1,6 +1,6 @@
 /* global it, expect */
 
-import React, { act } from 'react'
+import { act } from 'react'
 import ProgressBarV2 from '../../components/ProgressBarV2'
 import renderer from 'react-test-renderer'
 import TestThemeProvider from '../../components/TestThemeProvider'

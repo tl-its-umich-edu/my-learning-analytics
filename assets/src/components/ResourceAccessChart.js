@@ -1,5 +1,5 @@
 import createResourceAccessChart from './d3/createResourceAccessChart'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import useResponsiveness from '../hooks/useResponsiveness'
 import useCreateChart from '../hooks/useCreateChart'
 

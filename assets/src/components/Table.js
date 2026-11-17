@@ -1,6 +1,5 @@
 // modified from https://demos.creative-tim.com/material-dashboard-react/?_ga=2.12819711.913135977.1549993496-494583875.1549993496#/table
 
-import React from 'react'
 import { styled } from '@mui/material/styles'
 import Table from '@mui/material/Table'
 import TableHead from '@mui/material/TableHead'

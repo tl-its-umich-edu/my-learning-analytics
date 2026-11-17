@@ -1,5 +1,5 @@
 /* global fetch */
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { styled } from '@mui/material/styles'
 import { Card, CardActionArea, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Link as MUILink, Snackbar, Tooltip, Typography } from '@mui/material'
 import CheckBoxIcon from '@mui/icons-material/CheckBox'

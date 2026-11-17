@@ -1,6 +1,6 @@
 /* global fetch */
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { styled } from '@mui/material/styles'
 import Checkbox from '@mui/material/Checkbox'
 import FormControl from '@mui/material/FormControl'
