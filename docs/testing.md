@@ -82,6 +82,30 @@ Each smoke run reloads the authenticated MyLA frame first so it tests the curren
 
 Build the frontend in Docker first, then run browser regression checks with Chrome and Playwright installed using `node --test scripts/__tests__/lti-browser-smoke.test.mjs`. The same `PLAYWRIGHT_MODULE` override works for an isolated installation. One test loads the actual generated bundle and renders its MUI course UI with synthetic identity/course responses, catching module-interop failures that markup-only fixtures and Jest can miss. The fixtures contain no real Canvas or student data.
 
+### Consent Banner Browser Test
+
+With Django running locally and Chrome/Playwright installed, run:
+
+```sh
+PLAYWRIGHT_MODULE="$HOME/.cache/myla-isolated-playwright/node_modules/playwright/index.mjs" \
+  node --test scripts/__tests__/consent-banner.test.mjs
+```
+
+Omit `PLAYWRIGHT_MODULE` if Playwright is installed in the project. The test opens
+`http://localhost:5001/`; set `MYLA_CONSENT_TEST_URL` to use another development URL
+serving the MyLA Django shell. No Canvas login is needed for the default home page.
+
+Each case uses a fresh browser context and overrides `umConsentManager` before the
+page scripts run, forcing `mode: 'dev'` only in that browser. It also masks the
+WebDriver flag because the consent library hides its UI from bots by default.
+Leave the template's production configuration unchanged. The override also clears `googleAnalyticsID`
+so accepting cookies does not initialize Google Analytics for the test.
+
+The test loads the real U-M consent-manager scripts over the network, verifies
+the banner appears, and checks that Accept all and Reject all hide it and set
+the expected analytics consent. It requires access to the U-M script host; it
+does not test EU geolocation, actual analytics delivery, or Canvas iframe cookies.
+
 ### Data Validation Testing
 
 Data validation scripts are in `scripts/data_validation` folder.
