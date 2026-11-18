@@ -16,6 +16,8 @@ The frontend package uses `type: module`. Webpack's configuration is ESM in `web
 
 The app's webpack rule retains `javascript/auto` and extensionless resolution for bundled source so legacy MUI 5 CommonJS icon imports remain valid React components. The native Node ESM package/configuration is unaffected. Restart the frontend watcher after webpack configuration changes so it does not retain stale rules.
 
+Development builds write a separate `.js.map` next to the bundle. Serve both files from the same directory so browser DevTools can set breakpoints in the original frontend code. Production builds do not generate source maps.
+
 ### LTI Browser Smoke Helper
 
 The standalone launcher needs Google Chrome and the `playwright` package available locally. With Playwright installed in the project, run:

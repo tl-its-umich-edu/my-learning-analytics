@@ -9,11 +9,11 @@ export default {
   entry: path.join(projectDirectory, 'assets/src/index'),
   output: {
     path: path.join(projectDirectory, 'assets/dist'),
-    filename: '[name]-[fullhash].js',
+    filename: isDevelopment ? '[name]-[fullhash].dev.js' : '[name]-[fullhash].js',
     clean: true
   },
   watchOptions: { poll: true },
-  devtool: isDevelopment ? 'inline-source-map' : false,
+  devtool: isDevelopment ? 'source-map' : false,
   module: {
     rules: [
       {
