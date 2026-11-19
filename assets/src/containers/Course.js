@@ -45,6 +45,8 @@ function Course (props) {
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
   const menuButtonRef = useRef(null)
+  const contentRef = useRef(null)
+  const drawerNavigationRef = useRef(false)
   const route = pathname.split('/').filter(Boolean).pop()
 
   const matchingCourses = user.relatedCourses.length > 0 ? user.relatedCourses.filter(c => c.course_id === props.courseId) : undefined
@@ -73,24 +75,27 @@ function Course (props) {
       : 'My Learning Analytics'
   const title = <title>{pageTitle}</title>
 
-  const toggleDrawer = open => event => {
+  const toggleDrawer = (open, navigation = false) => event => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
     // Move focus off the menu button before the Drawer's Modal applies
     // aria-hidden to the app root, avoiding the "aria-hidden on a focused
-    // ancestor" warning. Focus is restored to the button after the drawer
-    // finishes closing (see restoreMenuButtonFocus).
+    // ancestor" warning. Focus is restored after the drawer finishes closing.
     if (open) {
       menuButtonRef.current?.blur()
     }
+    drawerNavigationRef.current = !open && navigation
     setSideDrawerState(open)
   }
 
-  // Restore focus to the menu button only after the close transition completes,
-  // once the Modal has removed aria-hidden from the app root.
-  const restoreMenuButtonFocus = () => {
-    menuButtonRef.current?.focus()
+  // Wait until the Modal has removed aria-hidden before focusing the destination.
+  const restoreDrawerFocus = () => {
+    if (drawerNavigationRef.current) {
+      contentRef.current?.querySelector('.view-header')?.focus()
+    } else {
+      menuButtonRef.current?.focus()
+    }
   }
 
   if (error.message === '404' || error.message === 'Not Found') {
@@ -132,7 +137,7 @@ function Course (props) {
   const notLoadedAltMessage = 'Mouse running on wheel with text "Course Data Being Processed, Try Back in 24 Hours"'
 
   return (
-    <Root>
+    <Root ref={contentRef}>
       {title}
       {loaded
         ? (
@@ -147,7 +152,7 @@ function Course (props) {
             />
             <SideDrawer
               toggleDrawer={toggleDrawer}
-              onRestoreFocus={restoreMenuButtonFocus}
+              onRestoreFocus={restoreDrawerFocus}
               sideDrawerState={sideDrawerState}
               courseId={courseId}
               courseInfo={courseInfo}

@@ -95,6 +95,10 @@ It uses the actual frontend bundle with synthetic course data and checks that:
 - Escape closes the drawer and restores focus to Menu.
 - Enter activates a view card; the new view heading receives focus and its
   document title updates.
+- Mouse navigation across all three drawer links preserves heading focus after
+  the drawer exits, including headings mounted during the closing transition.
+- Keyboard drawer navigation and selecting the current view focus the heading;
+  Escape and backdrop dismissal restore Menu focus, including after navigation.
 
 Run only this smoke check after building the frontend:
 

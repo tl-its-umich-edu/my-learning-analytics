@@ -50,8 +50,6 @@ function SideDrawer (props) {
   const sideList = (
     <Root
       className={classes.list}
-      onClick={toggleDrawer(false)}
-      role='button'
     >
       <List>
         {routes(courseId, courseInfo.course_view_options, !isTeacherOrAdmin(isAdmin, enrollmentTypes)).map((props, key) => (
@@ -61,7 +59,10 @@ function SideDrawer (props) {
             to={props.path}
             key={key}
             className={classes.sideDrawerLinks}
-            onClick={() => setSelectedIndex(key)}
+            onClick={event => {
+              setSelectedIndex(key)
+              toggleDrawer(false, true)(event)
+            }}
           >
             <ListItemIcon>
               {
