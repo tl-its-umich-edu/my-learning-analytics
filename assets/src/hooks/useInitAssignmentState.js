@@ -28,15 +28,16 @@ const useInitAssignmentState =
           assignmentWeightConsideration,
           currentUserDefaultSelection
         } = data.course
-        setAssignments(
-          createAssignmentFields(assignments, assignmentGroups, dateStart, assignmentWeightConsideration)
+        const enrichedAssignments = createAssignmentFields(
+          assignments, assignmentGroups, dateStart, assignmentWeightConsideration
         )
+        setAssignments(enrichedAssignments)
         setAssignmentGroups(assignmentGroups)
         setCurrentGrade(
-          calculateCurrentGrade(assignments, assignmentGroups, assignmentWeightConsideration)
+          calculateCurrentGrade(enrichedAssignments, assignmentGroups, assignmentWeightConsideration)
         )
         setMaxPossibleGrade(
-          calculateMaxGrade(assignments, assignmentGroups, assignmentWeightConsideration)
+          calculateMaxGrade(enrichedAssignments, assignmentGroups, assignmentWeightConsideration)
         )
         setUserSetting(
           currentUserDefaultSelection
