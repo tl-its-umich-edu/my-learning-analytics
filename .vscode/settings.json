@@ -6,9 +6,5 @@
     "python.linting.mypyEnabled": true,
     "[javascript]": {
         "editor.tabSize": 2
-    },
-    "chat.tools.terminal.autoApprove": {
-        "docker exec": true,
-        "docker compose": true
     }
 }
