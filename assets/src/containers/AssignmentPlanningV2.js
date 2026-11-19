@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { styled } from '@mui/material/styles'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
@@ -18,7 +18,6 @@ import useSaveUserSetting from '../hooks/useSaveUserSetting'
 import useSyncAssignmentAndGoalGrade from '../hooks/useSyncAssignmentAndGoalGrade'
 import useUserAssignmentSetting from '../hooks/useUserAssignmentSetting'
 import { isTeacherOrAdmin } from '../util/roles'
-import { Helmet } from 'react-helmet'
 import { eventLogExtra } from '../util/object'
 import { roundToXDecimals } from '../util/math'
 
@@ -195,11 +194,10 @@ function AssignmentPlanningV2 (props) {
 
   return (
     <Root>
-      <Helmet title='Assignment Planning' />
       {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
       <div className={classes.root}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Paper className={classes.paper}>
               <ViewHeader>Assignment Planning</ViewHeader>
               {
@@ -208,8 +206,8 @@ function AssignmentPlanningV2 (props) {
                   : (
                     <div>
                       <div role='region' aria-label='goal and progress'>
-                        <Grid container alignContent='center' className={classes.section}>
-                          <Grid item lg={4} md={5} xs={12}>
+                        <Grid container className={classes.section} sx={{ alignContent: 'center' }}>
+                          <Grid size={{ xs: 12, md: 5, lg: 4 }}>
                             <Typography variant='h6' gutterBottom>My Minimum Goal (%)</Typography>
                             <AssignmentGoalInput
                               currentGrade={currentGrade}
@@ -227,7 +225,7 @@ function AssignmentPlanningV2 (props) {
                               mathWarning={showMathWarning}
                             />
                           </Grid>
-                          <Grid item lg={8} md={7} xs={12} className={classes.mainProgressBar}>
+                          <Grid size={{ xs: 12, md: 7, lg: 8 }} className={classes.mainProgressBar}>
                             <Typography variant='h6' gutterBottom>Grade Progress</Typography>
                             <ProgressBarV2
                               score={currentGrade}
@@ -259,10 +257,10 @@ function AssignmentPlanningV2 (props) {
                         </Grid>
                       </div>
                       <Grid container>
-                        <Grid item xs={6} md={8}>
+                        <Grid size={{ xs: 6, md: 8 }}>
                           <Typography variant='h6' gutterBottom>Assignments by Due Date</Typography>
                         </Grid>
-                        <Grid item xs={6} md={4} style={{ marginBottom: '1rem' }}>
+                        <Grid size={{ xs: 6, md: 4 }} style={{ marginBottom: '1rem' }}>
                           <Typography variant='h6' gutterBottom>Assignment Status</Typography>
                           <div className={classes.legendItem}>
                             <div className={classes.graded + ' ' + classes.assignStatus} />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { styled } from '@mui/material/styles'
 import Drawer from '@mui/material/Drawer'
 import List from '@mui/material/List'
@@ -50,17 +50,19 @@ function SideDrawer (props) {
   const sideList = (
     <Root
       className={classes.list}
-      onClick={toggleDrawer(false)}
-      role='button'
     >
       <List>
         {routes(courseId, courseInfo.course_view_options, !isTeacherOrAdmin(isAdmin, enrollmentTypes)).map((props, key) => (
           <ListItemButton
             component={Link}
+            nativeButton={false}
             to={props.path}
             key={key}
             className={classes.sideDrawerLinks}
-            onClick={() => setSelectedIndex(key)}
+            onClick={event => {
+              setSelectedIndex(key)
+              toggleDrawer(false, true)(event)
+            }}
           >
             <ListItemIcon>
               {
@@ -78,7 +80,12 @@ function SideDrawer (props) {
 
   return (
     <div>
-      <Drawer open={props.sideDrawerState} onClose={toggleDrawer(false)}>
+      <Drawer
+        open={props.sideDrawerState}
+        onClose={toggleDrawer(false)}
+        disableRestoreFocus
+        slotProps={{ transition: { onExited: props.onRestoreFocus } }}
+      >
         {courseInfo
           ? sideList
           : <Spinner />}

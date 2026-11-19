@@ -1,12 +1,13 @@
 /* global it, expect */
 
-import React from 'react'
+import { act } from 'react'
 import ProgressBarV2 from '../../components/ProgressBarV2'
 import renderer from 'react-test-renderer'
 import TestThemeProvider from '../../components/TestThemeProvider'
-it('renders correctly', () => {
-  const tree = renderer
-    .create(
+it('renders correctly', async () => {
+  let component
+  await act(async () => {
+    component = renderer.create(
       <TestThemeProvider>
         <ProgressBarV2
           submitted=''
@@ -33,7 +34,10 @@ it('renders correctly', () => {
           }]}
         />
       </TestThemeProvider>
-    ).toJSON()
+    )
+  })
+  const tree = component.toJSON()
 
+  expect(tree).not.toBeNull()
   expect(tree).toMatchSnapshot()
 })

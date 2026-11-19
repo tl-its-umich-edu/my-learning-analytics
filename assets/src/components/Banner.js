@@ -1,4 +1,3 @@
-import React from 'react'
 import { styled } from '@mui/material/styles'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
@@ -49,7 +48,7 @@ function Banner (props) {
   return (
     <Root className={classes.root}>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <Paper className={classes.paper} style={paperStyle}>
             <Typography style={typographyStyle} gutterBottom>
               {children}

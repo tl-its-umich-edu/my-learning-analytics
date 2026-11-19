@@ -2,10 +2,10 @@
 
 exports[`renders correctly 1`] = `
 <div
-  className="MuiGrid-root MuiGrid-item css-jpjhrp-MuiGrid-root"
+  className="MuiGrid-root MuiGrid-direction-xs-row css-ojk58u-MuiGrid-root"
 >
   <div
-    className="MuiFormControl-root MuiFormControl-marginNormal MuiTextField-root AssignmentGoalInput-goalGradeInput css-sxfr3z-MuiFormControl-root-MuiTextField-root"
+    className="MuiFormControl-root MuiFormControl-marginNormal MuiTextField-root AssignmentGoalInput-goalGradeInput css-a8kv0n-MuiFormControl-root-MuiTextField-root"
     style={
       {
         "marginRight": "10px",
@@ -14,37 +14,38 @@ exports[`renders correctly 1`] = `
     }
   >
     <label
-      className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-1jy569b-MuiFormLabel-root-MuiInputLabel-root"
-      data-shrink={true}
+      className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined css-19qnlrw-MuiFormLabel-root-MuiInputLabel-root"
+      data-shrink={false}
       htmlFor="minimum-goal"
       id="minimum-goal-label"
     >
       Set Minimum Goal
     </label>
     <div
-      className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-9ddj71-MuiInputBase-root-MuiOutlinedInput-root"
+      className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root"
       onClick={[Function]}
     >
       <input
         aria-invalid={false}
         autoFocus={false}
-        className="MuiInputBase-input MuiOutlinedInput-input css-1t8l2tu-MuiInputBase-input-MuiOutlinedInput-input"
+        className="MuiInputBase-input MuiOutlinedInput-input css-16wblaj-MuiInputBase-input-MuiOutlinedInput-input"
         disabled={false}
         id="minimum-goal"
         onAnimationStart={[Function]}
         onBlur={[Function]}
         onChange={[Function]}
         onFocus={[Function]}
+        ref={[Function]}
         required={false}
         type="number"
         value={90}
       />
       <fieldset
         aria-hidden={true}
-        className="MuiOutlinedInput-notchedOutline css-r01yff-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
+        className="MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
       >
         <legend
-          className="css-sl37lx-MuiNotchedOutlined-root"
+          className="css-1n64csd-MuiNotchedOutlined-root"
         >
           <span>
             Set Minimum Goal
@@ -55,9 +56,10 @@ exports[`renders correctly 1`] = `
   </div>
   <button
     aria-label="clear minimum goal"
-    className="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary css-sghohy-MuiButtonBase-root-MuiButton-root"
-    disabled={false}
+    className="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-sizeMedium MuiButton-colorPrimary css-i572rh-MuiButtonBase-root-MuiButton-root"
+    disabled={null}
     onBlur={[Function]}
+    onClick={[Function]}
     onContextMenu={[Function]}
     onDragLeave={[Function]}
     onFocus={[Function]}
@@ -69,6 +71,7 @@ exports[`renders correctly 1`] = `
     onTouchEnd={[Function]}
     onTouchMove={[Function]}
     onTouchStart={[Function]}
+    ref={[Function]}
     tabIndex={0}
     type="button"
   >

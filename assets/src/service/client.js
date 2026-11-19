@@ -1,13 +1,15 @@
-import { ApolloClient, InMemoryCache } from '@apollo/client'
+import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client'
 import Cookie from 'js-cookie'
 
 export default new ApolloClient({
-  uri: '/graphql',
   cache: new InMemoryCache(),
   assumeImmutableResults: false,
-  headers: {
-    Accept: 'application/json',
-    'X-Requested-With': 'XMLHttpRequest',
-    'X-CSRFToken': Cookie.get('csrftoken')
-  }
+  link: new HttpLink({
+    uri: '/graphql',
+    headers: {
+      Accept: 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRFToken': Cookie.get('csrftoken')
+    }
+  })
 })

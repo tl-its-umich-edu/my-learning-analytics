@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import { useState, useRef } from 'react'
 import { styled } from '@mui/material/styles'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import DashboardAppBar from './DashboardAppBar'
 import SideDrawer from './SideDrawer'
 import GradeDistribution from './GradeDistribution'
@@ -11,8 +11,8 @@ import Spinner from '../components/Spinner'
 import { isObjectEmpty } from '../util/object'
 import { useCourseInfo } from '../service/api'
 import WarningBanner from '../components/WarningBanner'
+import { isTeacherOrAdmin } from '../util/roles'
 import { CardMedia, Card } from '@mui/material'
-import { Helmet } from 'react-helmet'
 
 const PREFIX = 'Course'
 
@@ -21,7 +21,6 @@ const classes = {
   notLoadedMedia: `${PREFIX}-notLoadedMedia`
 }
 
-// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
 const Root = styled('div')((
   {
     theme
@@ -42,47 +41,110 @@ const Root = styled('div')((
 
 function Course (props) {
   const { courseId, user } = props
+  const { pathname } = useLocation()
   const [loaded, error, courseInfo] = useCourseInfo(courseId)
   const [sideDrawerState, setSideDrawerState] = useState(false)
+  const menuButtonRef = useRef(null)
+  const contentRef = useRef(null)
+  const drawerNavigationRef = useRef(false)
+  const route = pathname.split('/').filter(Boolean).pop()
 
   const matchingCourses = user.relatedCourses.length > 0 ? user.relatedCourses.filter(c => c.course_id === props.courseId) : undefined
   const enrollmentTypes = matchingCourses && matchingCourses.length === 1 ? matchingCourses[0].enrollment_types : []
 
-  const toggleDrawer = open => event => {
+  // A view's title is only shown when the user can actually see that view:
+  // the view is enabled for the course, or the user is a teacher/admin (who
+  // sees disabled views in preview mode). Students must not see the title of a
+  // disabled view.
+  const routeViewCode = { grades: 'gd', assignments: 'ap', resources: 'ra' }[route]
+  const viewVisibleToUser = routeViewCode
+    ? Boolean(courseInfo && courseInfo.course_view_options && courseInfo.course_view_options[routeViewCode]) ||
+      isTeacherOrAdmin(user.admin, enrollmentTypes)
+    : false
+  const viewTitle = viewVisibleToUser
+    ? {
+        grades: 'Grade Distribution',
+        assignments: 'Assignment Planning',
+        resources: 'Resources Accessed'
+      }[route]
+    : undefined
+  const pageTitle = viewTitle
+    ? `${viewTitle} | My Learning Analytics`
+    : courseInfo && courseInfo.name
+      ? `${courseInfo.name} | My Learning Analytics`
+      : 'My Learning Analytics'
+  const title = <title>{pageTitle}</title>
+
+  const toggleDrawer = (open, navigation = false) => event => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return
     }
+    // Move focus off the menu button before the Drawer's Modal applies
+    // aria-hidden to the app root, avoiding the "aria-hidden on a focused
+    // ancestor" warning. Focus is restored after the drawer finishes closing.
+    if (open) {
+      menuButtonRef.current?.blur()
+    }
+    drawerNavigationRef.current = !open && navigation
     setSideDrawerState(open)
+  }
+
+  // Wait until the Modal has removed aria-hidden before focusing the destination.
+  const restoreDrawerFocus = () => {
+    if (drawerNavigationRef.current) {
+      contentRef.current?.querySelector('.view-header')?.focus()
+    } else {
+      menuButtonRef.current?.focus()
+    }
   }
 
   if (error.message === '404' || error.message === 'Not Found') {
     return (
-      <WarningBanner>
-        Course {courseId} has not been set up in MyLA. Contact your instructor, who can enable the visualizations by clicking on MyLA in the course navigation.
-      </WarningBanner>
+      <>
+        {title}
+        <WarningBanner>
+          Course {courseId} has not been set up in MyLA. Contact your instructor, who can enable the visualizations by clicking on MyLA in the course navigation.
+        </WarningBanner>
+      </>
     )
   } else if (error.message === '403' || error.message === 'Forbidden') {
     return (
-      <WarningBanner>
-        You do not have access to course {courseId}.
-      </WarningBanner>
+      <>
+        {title}
+        <WarningBanner>
+          You do not have access to course {courseId}.
+        </WarningBanner>
+      </>
     )
   } else if (error) {
-    return (<WarningBanner />)
+    return (
+      <>
+        {title}
+        <WarningBanner />
+      </>
+    )
   }
 
-  if (loaded && isObjectEmpty(courseInfo)) return (<WarningBanner>My Learning Analytics is not enabled for this course.</WarningBanner>)
+  if (loaded && isObjectEmpty(courseInfo)) {
+    return (
+      <>
+        {title}
+        <WarningBanner>My Learning Analytics is not enabled for this course.</WarningBanner>
+      </>
+    )
+  }
 
   const notLoadedAltMessage = 'Mouse running on wheel with text "Course Data Being Processed, Try Back in 24 Hours"'
 
   return (
-    <Root>
+    <Root ref={contentRef}>
+      {title}
       {loaded
         ? (
           <>
-            <Helmet titleTemplate='%s | My Learning Analytics' title={courseInfo.name} />
             <DashboardAppBar
               onMenuBarClick={toggleDrawer}
+              menuButtonRef={menuButtonRef}
               sideDrawerState={sideDrawerState}
               user={user}
               courseName={courseInfo.name}
@@ -90,6 +152,7 @@ function Course (props) {
             />
             <SideDrawer
               toggleDrawer={toggleDrawer}
+              onRestoreFocus={restoreDrawerFocus}
               sideDrawerState={sideDrawerState}
               courseId={courseId}
               courseInfo={courseInfo}

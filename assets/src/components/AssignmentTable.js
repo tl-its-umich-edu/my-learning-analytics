@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { styled } from '@mui/material/styles'
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
@@ -284,10 +284,12 @@ function AssignmentTable (props) {
   const ITEM_HEIGHT = 48
   const ITEM_PADDING_TOP = 8
   const MenuProps = {
-    PaperProps: {
-      style: {
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        width: 250
+    slotProps: {
+      paper: {
+        style: {
+          maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+          width: 250
+        }
       }
     }
   }
@@ -309,7 +311,7 @@ function AssignmentTable (props) {
   return (
     <Root>
       <Grid container className={classes.filterArea}>
-        <Grid item xs={12} sm={4}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <FormControl className={classes.formControl}>
             <InputLabel id='assignment-group-checkbox-label'>Filter by Type</InputLabel>
             <Select
@@ -332,13 +334,13 @@ function AssignmentTable (props) {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid size={{ xs: 12, sm: 3 }}>
           <FormControl className={classes.formControl}>
             <InputLabel>Filter by Name</InputLabel>
             <Input value={assignmentNameFilter} placeholder='Filter by name...' onChange={e => setAssignmentNameFilter(e.target.value)} />
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid size={{ xs: 12, sm: 3 }}>
           <FormControl className={classes.formControl}>
             <InputLabel id='assignment-status-checkbox-label'>Filter by Status</InputLabel>
             <Select
@@ -361,7 +363,7 @@ function AssignmentTable (props) {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={12} sm={1}>
+        <Grid size={{ xs: 12, sm: 1 }}>
           <Tooltip title='Clear filters' placement='bottom' enterDelay={500}>
             <FormControl className={classes.formControl}>
               <Button size='small' variant='contained' onClick={() => clearFilters()} disabled={filtersAreClear} className={classes.filterButton}>Clear Filters</Button>
@@ -541,8 +543,10 @@ function AssignmentTable (props) {
                         checked={!!a.goalGradeSetByUser}
                         onChange={event => handleAssignmentLock(a.id, event.target.checked)}
                         color='primary'
-                        inputProps={{
-                          'aria-label': 'Lock Goal'
+                        slotProps={{
+                          input: {
+                            'aria-label': 'Lock Goal'
+                          }
                         }}
                       />
                     </TableCell>

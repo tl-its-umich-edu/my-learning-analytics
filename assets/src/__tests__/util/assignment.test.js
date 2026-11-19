@@ -6,8 +6,40 @@ import {
   calculateCurrentGrade,
   calculateMaxGrade,
   sumAssignmentGoalGrade,
-  createUserSettings
+  createUserSettings,
+  createAssignmentFields
 } from '../../util/assignment'
+
+describe('createAssignmentFields', () => {
+  it('derives local fields without mutating frozen Apollo query results', () => {
+    const assignment = Object.freeze({
+      id: 'assignment-1',
+      name: 'Homework',
+      dueDate: '2025-01-08T12:00:00Z',
+      pointsPossible: 10,
+      assignmentGroupId: 'group-1',
+      assignmentGroup: Object.freeze({ name: 'Homework' }),
+      currentUserSubmission: null
+    })
+    const assignments = Object.freeze([assignment])
+    const groups = Object.freeze([])
+
+    const result = createAssignmentFields(assignments, groups, '2025-01-01T00:00:00Z', false)
+
+    expect(result[0]).not.toBe(assignment)
+    expect(result[0]).toMatchObject({
+      week: 2,
+      percentOfFinalGrade: 100,
+      outOf: 10,
+      graded: false,
+      submitted: false,
+      goalGrade: '',
+      goalGradeSetByUser: false
+    })
+    expect(assignment).not.toHaveProperty('week')
+    expect(assignment).not.toHaveProperty('goalGrade')
+  })
+})
 
 describe('calculateAssignmentGradeFromCourseGrade', () => {
   it(`takes an array of assignments and a course goal as input,

@@ -1,12 +1,13 @@
 /* global it, expect */
 
-import React from 'react'
+import { act } from 'react'
 import Line from '../../components/Line'
 import renderer from 'react-test-renderer'
 
-it('renders correctly', () => {
-  const tree = renderer
-    .create(
+it('renders correctly', async () => {
+  let component
+  await act(async () => {
+    component = renderer.create(
       <Line
         value={50}
         outOf={100}
@@ -15,7 +16,10 @@ it('renders correctly', () => {
         placement='up1'
         label='Goal'
       />
-    ).toJSON()
+    )
+  })
+  const tree = component.toJSON()
 
+  expect(tree).not.toBeNull()
   expect(tree).toMatchSnapshot()
 })

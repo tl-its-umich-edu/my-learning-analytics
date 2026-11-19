@@ -1,4 +1,3 @@
-import React from 'react'
 import 'rc-slider/assets/index.css'
 import Slider from 'rc-slider'
 import { siteTheme } from '../globals'

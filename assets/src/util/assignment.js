@@ -208,6 +208,7 @@ const createAssignmentFields = (
   )
   return sortAssignments(
     assignments.map(a => {
+      const assignment = { ...a }
       const {
         dueDate,
         pointsPossible,
@@ -215,25 +216,25 @@ const createAssignmentFields = (
         currentUserSubmission
       } = a
 
-      a.week = calculateWeekOffset(courseStartDate, dueDate)
-      a.percentOfFinalGrade = roundToXDecimals(
+      assignment.week = calculateWeekOffset(courseStartDate, dueDate)
+      assignment.percentOfFinalGrade = roundToXDecimals(
         (
           assignmentWeightConsideration
             ? calculateWeight(pointsPossible, assignmentGroupId, assignmentGroups)
             : pointsPossible / totalPointsPossible * 100
         ), 1
       )
-      a.outOf = pointsPossible
+      assignment.outOf = pointsPossible
       // filter out null values
-      a.graded = (currentUserSubmission !== null) && (currentUserSubmission.gradedDate !== null) && (currentUserSubmission.score !== null)
-      a.submitted = !!currentUserSubmission && !!currentUserSubmission.submittedAt
-      a.dueDateMonthDay = dueDate && dateToMonthDay(dueDate)
-      a.goalGrade = ''
-      a.goalGradeSetByUser = false
-      a.inputFocus = false
-      a.inputBlur = true
+      assignment.graded = (currentUserSubmission !== null) && (currentUserSubmission.gradedDate !== null) && (currentUserSubmission.score !== null)
+      assignment.submitted = !!currentUserSubmission && !!currentUserSubmission.submittedAt
+      assignment.dueDateMonthDay = dueDate && dateToMonthDay(dueDate)
+      assignment.goalGrade = ''
+      assignment.goalGradeSetByUser = false
+      assignment.inputFocus = false
+      assignment.inputBlur = true
 
-      return a
+      return assignment
     })
   )
 }

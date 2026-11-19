@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { styled } from '@mui/material/styles'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 import Avatar from '@mui/material/Avatar'
+import Stack from '@mui/material/Stack'
 import Link from '@mui/material/Link'
 import List from '@mui/material/List'
 import ListItemButton from '@mui/material/ListItemButton'
@@ -13,7 +14,7 @@ import ListItemText from '@mui/material/ListItemText'
 import DialogTitle from '@mui/material/DialogTitle'
 import Dialog from '@mui/material/Dialog'
 import LogoutIcon from '@mui/icons-material/ExitToApp'
-import HelpIcon from '@mui/icons-material/HelpOutline'
+import HelpIcon from '@mui/icons-material/HelpOutlined'
 import Lock from '@mui/icons-material/Lock'
 import Launch from '@mui/icons-material/Launch'
 import Cookie from 'js-cookie'
@@ -135,24 +136,26 @@ function AvatarModal (props) {
   return (
     <Root className={classes.root}>
       <Grid container>
-        <Grid item xs={4}>
+        <Grid size={{ xs: 4 }}>
           <Avatar className={classes.avatar}>
             {user.initials}
           </Avatar>
         </Grid>
-        <Grid item xs={8} container direction='column'>
-          <Typography className={classes.typography}>
-            Signed in as
-          </Typography>
-          <Typography
-            className={classes.typography}
-            variant='subtitle1'
-            style={{ marginTop: 0 }}
-          >
-            {user.displayName}
-          </Typography>
+        <Grid size={{ xs: 8 }}>
+          <Stack>
+            <Typography className={classes.typography}>
+              Signed in as
+            </Typography>
+            <Typography
+              className={classes.typography}
+              variant='subtitle1'
+              style={{ marginTop: 0 }}
+            >
+              {user.displayName}
+            </Typography>
+          </Stack>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <List>
             <Divider />
             <Link style={{ textDecoration: 'none' }} href={helpURL} target='_blank' rel='noopener noreferrer'>

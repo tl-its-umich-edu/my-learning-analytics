@@ -1,16 +1,19 @@
-import React from 'react'
 import { Route, Routes, useMatch } from 'react-router-dom'
 import CourseList from './CourseList'
 import Course from './Course'
 import WarningBanner from '../components/WarningBanner'
 import AlertBanner from '../components/AlertBanner'
-import { Helmet } from 'react-helmet'
 
 function App (props) {
   const { user } = props
   if (!user.isLoggedIn) {
     if (user.loginURL === '') {
-      return (<WarningBanner>This tool needs to be launched from a Canvas course.</WarningBanner>)
+      return (
+        <>
+          <title>My Learning Analytics</title>
+          <WarningBanner>This tool needs to be launched from a Canvas course.</WarningBanner>
+        </>
+      )
     }
     return (window.location.href = user.loginURL)
   }
@@ -18,7 +21,7 @@ function App (props) {
   const courseId = coursePageMatch ? coursePageMatch.params.courseId : null
   return (
     <>
-      <Helmet titleTemplate='%s | My Learning Analytics' title='Courses' />
+      {!coursePageMatch && <title>Courses | My Learning Analytics</title>}
       <Routes>
         <Route path='/' element={<CourseList user={user} />} />
         <Route path='/courses' element={<CourseList user={user} />} />

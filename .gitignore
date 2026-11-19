@@ -124,6 +124,7 @@ dmypy.json
 .data/
 .data
 node_modules/
+playwright-artifacts/
 
 webpack-stats.json
 

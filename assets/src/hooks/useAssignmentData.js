@@ -1,4 +1,5 @@
-import { gql, useQuery } from '@apollo/client'
+import { gql } from '@apollo/client'
+import { useQuery } from '@apollo/client/react'
 
 const GET_ASSIGNMENT_PLANNING_DATA = gql`
 query Assignment($courseId: ID!) {

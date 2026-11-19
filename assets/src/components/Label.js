@@ -1,5 +1,3 @@
-import React from 'react'
-
 const getHorizontalStyles = (value) => {
   const alignThreshold = 25
   return (

@@ -1,6 +1,6 @@
 /* global fetch */
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { styled } from '@mui/material/styles'
 import Checkbox from '@mui/material/Checkbox'
 import FormControl from '@mui/material/FormControl'
@@ -24,7 +24,6 @@ import useUserSetting from '../hooks/useUserSetting'
 import { isObjectEmpty } from '../util/object'
 import { handleError, defaultFetchOptions } from '../util/data'
 import { isTeacherOrAdmin } from '../util/roles'
-import { Helmet } from 'react-helmet'
 
 const PREFIX = 'ResourcesAccessed'
 
@@ -274,11 +273,10 @@ function ResourcesAccessed (props) {
   }
   return (
     <Root>
-      <Helmet title='Resources Accessed' />
       {disabled ? <AlertBanner>Preview Mode: This view is currently disabled for students.</AlertBanner> : undefined}
       <div className={classes.root}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Paper className={classes.paper}>
               <ViewHeader>Resources Accessed</ViewHeader>
               {

@@ -1,5 +1,5 @@
 /* global fetch */
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { styled } from '@mui/material/styles'
 import { Card, CardActionArea, CardActions, CardContent, CardMedia, CircularProgress, Divider, Fab, IconButton, Link as MUILink, Snackbar, Tooltip, Typography } from '@mui/material'
 import CheckBoxIcon from '@mui/icons-material/CheckBox'
@@ -13,7 +13,6 @@ import { yellow, grey } from '@mui/material/colors'
 import clsx from 'clsx'
 import { defaultFetchOptions, handleError } from '../util/data'
 import { isTeacherOrAdmin } from '../util/roles'
-import PropTypes from 'prop-types'
 
 const PREFIX = 'SelectCard'
 
@@ -223,7 +222,7 @@ const SelectCard = props => {
     const cardContent = (
       <CardContent className={classes.content}>
         <Grid container className={classes.titleArea}>
-          <Grid item xs={10}>
+          <Grid size={{ xs: 10 }}>
             <Typography gutterBottom variant='h5' component='h2' className={classes.title}>
               {cardData.title}
             </Typography>
@@ -242,7 +241,7 @@ const SelectCard = props => {
     <Root>
       <Card className={classes.card} elevation={2}>
         <div className={classes.mainCardContainer}>
-          <CardActionArea component={Link} to={cardData.path}>
+          <CardActionArea component={Link} nativeButton={false} to={cardData.path}>
             {getLinkContents(cardData)}
           </CardActionArea>
           {getHelpLink(cardData)}
@@ -306,19 +305,5 @@ const SelectCard = props => {
     </Root>
   )
 }
-
-SelectCard.propTypes = {
-  cardData: PropTypes.shape({
-    path: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    image: PropTypes.string,
-    helpUrl: PropTypes.string
-  }).isRequired,
-  courseId: PropTypes.number.isRequired,
-  enrollmentTypes: PropTypes.array.isRequired
-}
-
-SelectCard.defaultProps = {}
 
 export default (SelectCard)

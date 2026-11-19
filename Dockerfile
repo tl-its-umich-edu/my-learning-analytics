@@ -4,7 +4,7 @@ ARG MARIADB_VERSION=11.8
 # Named version of Debian to use
 ARG DEBIAN_VERSION=trixie
 # Version of Node.js
-ARG NODE_VERSION=20
+ARG NODE_VERSION=26
 # Version of Python
 ARG PYTHON_VERSION=3.13
 
@@ -34,7 +34,7 @@ FROM node:${NODE_VERSION}-${DEBIAN_VERSION}-slim AS node-prod-deps
 
 WORKDIR /usr/src/app
 COPY --from=node-webpack /usr/src/app /usr/src/app
-RUN npm prune --production && \
+RUN npm prune --omit=dev && \
     # This is needed to clean up the examples files as these cause collectstatic to fail (and take up extra space)
     find node_modules -type d -name "examples" -print0 | xargs -0 rm -rf
 

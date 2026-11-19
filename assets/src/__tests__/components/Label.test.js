@@ -1,12 +1,13 @@
 /* global it, expect */
 
-import React from 'react'
+import { act } from 'react'
 import Label from '../../components/Label'
 import renderer from 'react-test-renderer'
 
-it('renders correctly', () => {
-  const tree = renderer
-    .create(
+it('renders correctly', async () => {
+  let component
+  await act(async () => {
+    component = renderer.create(
       <Label
         labelText='Current: 75.0'
         color='blue'
@@ -14,7 +15,10 @@ it('renders correctly', () => {
         top='59px'
         zIndex='2'
       />
-    ).toJSON()
+    )
+  })
+  const tree = component.toJSON()
 
+  expect(tree).not.toBeNull()
   expect(tree).toMatchSnapshot()
 })

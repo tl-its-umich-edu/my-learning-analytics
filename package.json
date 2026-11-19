@@ -1,44 +1,33 @@
 {
   "name": "my-learning-analytics",
+  "type": "module",
   "version": "",
   "description": "Providing data visualization",
   "repository": "https://github.com/tl-its-umich-edu/my-learning-analytics",
   "license": "Apache-2.0",
   "dependencies": {
-    "@apollo/client": "3.14.1",
+    "@apollo/client": "4.3.8",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
-    "@mui/icons-material": "5.18.0",
-    "@mui/material": "5.18.0",
+    "@mui/icons-material": "9.5.0",
+    "@mui/material": "9.5.0",
+    "@mui/utils": "9.5.0",
     "clsx": "2.1.1",
-    "d3": "7.9.0",
+    "d3": "7.9.2",
     "d3-v6-tip": "1.0.9",
-    "graphql": "16.14.2",
+    "graphql": "17.1.0",
     "js-cookie": "3.0.8",
     "lodash.debounce": "4.0.8",
-    "lodash.isequal": "4.5.0",
-    "rc-slider": "10.6.2",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-helmet": "6.1.0",
-    "react-router-dom": "6.30.4"
+    "rc-slider": "11.1.9",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-router-dom": "7.18.5",
+    "rxjs": "7.8.2"
   },
   "babel": {
     "presets": [
-      [
-        "@babel/preset-env",
-        {
-          "targets": {
-            "esmodules": true
-          }
-        }
-      ],
-      [
-        "@babel/preset-react",
-        {
-          "runtime": "automatic"
-        }
-      ]
+      "@babel/preset-env",
+      "@babel/preset-react"
     ]
   },
   "scripts": {
@@ -71,16 +60,20 @@
     "testEnvironmentOptions": {
       "url": "http://localhost"
     },
+    "globals": {
+      "IS_REACT_ACT_ENVIRONMENT": true
+    },
     "transform": {
       "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
       "^.+\\.css$": "<rootDir>/assets/config/jest/cssTransform.js",
-      "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "<rootDir>/assets/config/jest/fileTransform.js"
+      "^(?!.*\\.(js|cjs|jsx|ts|tsx|css|json)$)": "<rootDir>/assets/config/jest/fileTransform.js"
     },
     "transformIgnorePatterns": [
       "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$",
       "^.+\\.module\\.(css|sass|scss)$"
     ],
     "moduleNameMapper": {
+      "^d3$": "<rootDir>/node_modules/d3/dist/d3.min.js",
       "^react-native$": "react-native-web",
       "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
     },
@@ -101,26 +94,20 @@
     ]
   },
   "devDependencies": {
-    "@babel/cli": "7.29.7",
-    "@babel/core": "7.29.7",
-    "@babel/preset-env": "7.29.7",
-    "@babel/preset-react": "7.29.7",
-    "@babel/register": "7.29.7",
-    "babel-loader": "9.2.1",
-    "css-loader": "6.11.0",
-    "eslint-plugin-react-hooks": "4.6.2",
-    "jest": "30.4.2",
-    "jest-environment-jsdom": "30.4.1",
-    "jest-resolve": "27.5.1",
-    "mini-css-extract-plugin": "2.10.2",
+    "@babel/core": "8.1.2",
+    "@babel/preset-env": "8.0.7",
+    "@babel/preset-react": "8.0.1",
+    "babel-loader": "10.1.1",
+    "css-loader": "7.1.5",
+    "jest": "30.5.2",
+    "jest-environment-jsdom": "30.5.2",
     "react-app-polyfill": "3.0.0",
-    "react-test-renderer": "18.3.1",
+    "react-test-renderer": "19.3.1",
     "standard": "17.1.2",
-    "style-loader": "3.3.4",
-    "typeface-roboto": "1.1.13",
+    "style-loader": "4.0.0",
     "url-loader": "4.1.1",
-    "webpack": "5.109.0",
+    "webpack": "5.112.2",
     "webpack-bundle-tracker": "3.2.4",
-    "webpack-cli": "5.1.4"
+    "webpack-cli": "7.3.1"
   }
 }

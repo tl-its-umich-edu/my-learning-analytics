@@ -1,6 +1,4 @@
-import React from 'react'
 import { styled } from '@mui/material/styles'
-import PropTypes from 'prop-types'
 import { Card, CardContent, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
 
@@ -80,13 +78,5 @@ const CourseListCard = (props) => {
     </StyledCard>
   )
 }
-
-CourseListCard.propTypes = {
-  path: PropTypes.string.isRequired,
-  courseName: PropTypes.string.isRequired,
-  description: PropTypes.string
-}
-
-CourseListCard.defaultProps = {}
 
 export default (CourseListCard)

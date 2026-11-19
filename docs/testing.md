@@ -12,6 +12,14 @@ To run the Jest test suite, execute the command `docker exec -it webpack_watcher
 
 To update snapshots, execute `docker exec -it webpack_watcher npm run-script update-snapshot`.
 
+The frontend package uses `type: module`. Webpack's configuration is ESM in `webpack.config.js`, and Jest's CSS/asset transformers are ESM `.js` modules (`assets/config/jest/cssTransform.js` and `fileTransform.js`) with a default export; tests continue to be Babel-transformed. Transformer regression tests cover CSS imports and filename/SVG mocks. Run all frontend builds and Jest tests inside Docker.
+
+The app's webpack rule retains `javascript/auto` and extensionless resolution for bundled source so legacy MUI 5 CommonJS icon imports remain valid React components. The native Node ESM package/configuration is unaffected. Restart the frontend watcher after webpack configuration changes so it does not retain stale rules.
+
+Development builds write a separate `.js.map` next to the bundle. Serve both files from the same directory so browser DevTools can set breakpoints in the original frontend code. Production builds do not generate source maps
+
+
+
 ### Data Validation Testing
 
 Data validation scripts are in `scripts/data_validation` folder.

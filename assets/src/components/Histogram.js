@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import createHistogram from './d3/createHistogram'
 import useCreateChart from '../hooks/useCreateChart'
 import useResponsiveness from '../hooks/useResponsiveness'

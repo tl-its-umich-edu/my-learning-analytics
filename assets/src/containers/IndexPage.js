@@ -1,4 +1,3 @@
-import React from 'react'
 import Grid from '@mui/material/Grid'
 import SelectCard from '../components/SelectCard'
 import { isObjectEmpty, getObjectValues } from '../util/object'
@@ -25,7 +24,7 @@ function IndexPage (props) {
     <Grid container spacing={3}>
       {
         routes(courseId, views, !teacherOrAdmin).map((p, key) => (
-          <Grid item xs={12} sm={6} lg={4} key={key}>
+          <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={key}>
             <SelectCard {...props} cardData={p} />
           </Grid>
         ))

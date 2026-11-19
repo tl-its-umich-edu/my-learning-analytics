@@ -8,7 +8,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}{% endblock %}</title>
+    {% block document_title %}<title>{% block title %}{% endblock %}</title>{% endblock %}
     <link rel="stylesheet" type="text/css" href="{% static 'fontawesomefree/css/all.min.css' %}">
     <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
     <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">

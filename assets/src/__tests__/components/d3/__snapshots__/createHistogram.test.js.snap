@@ -1,14 +1,71 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`createHistogram should build a histogram bar chart binning last five grades with MyGrade line 1`] = `
 <div>
   <div>
     <div
       aria-live="polite"
-      class="screenreader-only sr-only"
+      class="fa-sr-only"
       id="grade-view-narrative"
     >
-      Course information: Class size = 84, Average grade = 90.49%, Median grade = 93.39%.Grades at around 74% or lower are placed into one bin. 5 grades are in the 72 to 74% range. ,3 grades are in the 74 to 76% range. ,3 grades are in the 76 to 78% range, and your grade 76.8% is in this range. ,4 grades are in the 78 to 80% range. ,5 grades are in the 80 to 82% range. ,3 grades are in the 82 to 84% range. ,8 grades are in the 84 to 86% range. ,5 grades are in the 86 to 88% range. ,8 grades are in the 88 to 90% range. ,7 grades are in the 90 to 92% range. ,11 grades are in the 92 to 94% range. ,10 grades are in the 94 to 96% range. ,7 grades are in the 96 to 98% range. ,2 grades are in the 98 to 100% range. 
+      The following paragraphs provide a text description for the graphical bar-chart on this page:
+      <span>
+        Course information: Class size = 84, Average grade = 90.49%, Median grade = 93.39%.
+      </span>
+      <span>
+        Grades at around 74% or lower are placed into one bin. 
+      </span>
+      <span
+        id="grades-bins"
+      >
+        List describing the number of students in each grade range
+      </span>
+      <ul
+        aria-labelledby="grades-bins"
+      >
+        <li>
+          5 grades are in the 72 to 74% range. 
+        </li>
+        <li>
+          3 grades are in the 74 to 76% range. 
+        </li>
+        <li>
+          3 grades are in the 76 to 78% range, and your grade 76.8% is in this range. 
+        </li>
+        <li>
+          4 grades are in the 78 to 80% range. 
+        </li>
+        <li>
+          5 grades are in the 80 to 82% range. 
+        </li>
+        <li>
+          3 grades are in the 82 to 84% range. 
+        </li>
+        <li>
+          8 grades are in the 84 to 86% range. 
+        </li>
+        <li>
+          5 grades are in the 86 to 88% range. 
+        </li>
+        <li>
+          8 grades are in the 88 to 90% range. 
+        </li>
+        <li>
+          7 grades are in the 90 to 92% range. 
+        </li>
+        <li>
+          11 grades are in the 92 to 94% range. 
+        </li>
+        <li>
+          10 grades are in the 94 to 96% range. 
+        </li>
+        <li>
+          7 grades are in the 96 to 98% range. 
+        </li>
+        <li>
+          2 grades are in the 98 to 100% range. 
+        </li>
+      </ul>
     </div>
     <svg
       aria-hidden="true"
